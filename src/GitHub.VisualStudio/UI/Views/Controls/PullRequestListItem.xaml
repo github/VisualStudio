@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                     xmlns:i18n="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                     xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
@@ -59,7 +59,7 @@
             Margin="0,-3,5,0"
             Content="{Binding Title}"
             ToolTip="{Binding Title}"
-            Command="{Binding OpenPR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+            Command="{Binding ViewModel.OpenPullRequest, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
             CommandParameter="{Binding Number}"/>
         
         <ui:OcticonImage x:Name="comment_icon"

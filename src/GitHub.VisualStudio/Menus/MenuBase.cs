@@ -104,7 +104,7 @@ namespace GitHub.VisualStudio
             if (uri == null)
                 return false;
 
-            SimpleApiClient = ApiFactory.Create(uri);
+            SimpleApiClient = await ApiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
             if (!isdotcom)

@@ -5,12 +5,16 @@ using GitHub.ViewModels;
 using Octokit;
 using ReactiveUI;
 using NullGuard;
+using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Helpers;
 
 namespace GitHub.Authentication
 {
     [Export(typeof(ITwoFactorChallengeHandler))]
+    [Export(typeof(IDelegatingTwoFactorChallengeHandler))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorChallengeHandler : ReactiveObject, ITwoFactorChallengeHandler
+    public class TwoFactorChallengeHandler : ReactiveObject, IDelegatingTwoFactorChallengeHandler
     {
         ITwoFactorDialogViewModel twoFactorDialog;
         [AllowNull]
@@ -26,15 +30,27 @@ namespace GitHub.Authentication
             CurrentViewModel = vm;
         }
 
-        public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
+        public async Task<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
         {
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
             var userError = new TwoFactorRequiredUserError(exception);
-            return twoFactorDialog.Show(userError)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .SelectMany(x =>
-                    x == RecoveryOptionResult.RetryOperation
-                        ? Observable.Return(userError.ChallengeResult)
-                        : Observable.Throw<TwoFactorChallengeResult>(exception));
+            var result = await twoFactorDialog.Show(userError);
+
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                throw exception;
+            }
+        }
+
+        public async Task ChallengeFailed(Exception exception)
+        {
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            await twoFactorDialog.Cancel.ExecuteAsync(null);
         }
     }
 }

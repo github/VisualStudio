@@ -11,7 +11,7 @@
     <AssemblyName>GitHub.Api</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
+    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -55,7 +55,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiClientConfiguration.cs"/>
+    <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs" Condition="$(Buildtype) == 'Internal'">
+      <Link>ApiClientConfiguration_User.cs</Link>
+    </Compile>
+    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'"/>
+    <Compile Include="ILoginCache.cs" />
+    <Compile Include="ILoginManager.cs" />
+    <Compile Include="ITwoFactorChallengeHandler.cs" />
+    <Compile Include="LoginManager.cs" />
     <Compile Include="SimpleCredentialStore.cs" />
+    <Compile Include="WindowsLoginCache.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>

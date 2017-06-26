@@ -18,14 +18,6 @@ namespace GitHub.Authentication
 
         public TwoFactorType TwoFactorType { get; private set; }
 
-        [AllowNull]
-        public TwoFactorChallengeResult ChallengeResult
-        {
-            [return: AllowNull]
-            get;
-            set;
-        }
-
         public IObservable<RecoveryOptionResult> Throw()
         {
             return Throw(this);

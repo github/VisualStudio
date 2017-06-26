@@ -9,6 +9,9 @@ Official builds of this extension are available at [the official website](https:
 
 [![Join the chat at freenode:github-vs](https://img.shields.io/badge/irc-freenode:%20%23github--vs-blue.svg)](http://webchat.freenode.net/?channels=%23github-vs) [![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Documentation
+Visit the [documentation](https://github.com/github/VisualStudio/tree/master/docs) for details on how to use the features in the GitHub Extension for Visual Studio.
+
 ## Installing beta versions
 
 Older and pre-release/beta/untested versions are available at [the releases page](https://github.com/github/VisualStudio/releases), and also via a custom gallery feed for Visual Studio.
@@ -38,7 +41,7 @@ Open the `GitHubVS.sln` solution with Visual Studio 2015.
 To be able to use the GitHub API, you'll need to:
 
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
-- Open [src/GitHub.App/Api/ApiClientConfiguration.cs](src/GitHub.App/Api/ApiClientConfiguration.cs) and fill out the clientId/clientSecret fields for your application.
+- Open [src/GitHub.Api/ApiClientConfiguration_User.cs](src/GitHub.Api/ApiClientConfiguration_User.cs) and fill out the clientId/clientSecret fields for your application. **Note this has recently changed location, so you may need to re-do this**
 
 Build using Visual Studio 2015 or:
 
@@ -83,7 +86,6 @@ build.cmd
 Note, attempting to install `IsExperimental=false` builds of the VSIX is not recommended.
 
 ## More information
-
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
 
 ## Contributing

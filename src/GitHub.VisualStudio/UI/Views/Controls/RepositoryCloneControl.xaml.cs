@@ -21,7 +21,7 @@ using System.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericRepositoryCloneControl : SimpleViewUserControl<IRepositoryCloneViewModel, RepositoryCloneControl>
+    public class GenericRepositoryCloneControl : ViewBase<IRepositoryCloneViewModel, RepositoryCloneControl>
     {}
 
     /// <summary>
@@ -49,7 +49,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
-                d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
             });
 
             IsVisibleChanged += (s, e) =>

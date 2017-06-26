@@ -6,7 +6,7 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              mc:Ignorable="d"
@@ -14,14 +14,14 @@
              d:DesignHeight="440"
              Style="{DynamicResource DialogUserControl}">
 
-    <UserControl.Resources>
+    <Control.Resources>
         <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
             <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Control.Resources>
 
     <DockPanel>
         <StackPanel Margin="0,0,0,50" DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">

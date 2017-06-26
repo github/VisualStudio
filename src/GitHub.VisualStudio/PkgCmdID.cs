@@ -17,5 +17,6 @@ namespace GitHub.VisualStudio
         public const int copyLinkCommand = 0x101;
         public const int githubCommand = 0x320;
         public const int helpCommand = 0x321;
+        public const int blameCommand = 0x500;
     };
 }

@@ -59,7 +59,7 @@ namespace GitHub.VisualStudio.UI.Views
             browser = vsBrowser;
 
             this.WhenAnyValue(x => x.Control.DataContext)
-                .OfType<BaseViewModel>()
+                .OfType<IPanePageViewModel>()
                 .Select(x => x.WhenAnyValue(y => y.Title))
                 .Switch()
                 .Subscribe(x => Title = x ?? "GitHub");

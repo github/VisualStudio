@@ -1,6 +1,7 @@
 ﻿using GitHub.Exports;
 using GitHub.Models;
 using System;
+using GitHub.ViewModels;
 
 namespace GitHub.UI
 {

@@ -1,4 +1,5 @@
-﻿using GitHub.Primitives;
+﻿using GitHub.Exports;
+using GitHub.Primitives;
 using GitHub.Services;
 using System;
 using System.Threading.Tasks;
@@ -30,13 +31,19 @@ namespace GitHub.VisualStudio.Menus
                 IsFileDescendantOfDirectory(activeDocument.Name, ActiveRepo.LocalPath);
         }
 
-        protected Task<UriString> GenerateLink()
+        protected Task<UriString> GenerateLink(LinkType linkType)
         {
             var repo = ActiveRepo;
             var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();
             if (activeDocument == null)
                 return null;
-            return repo.GenerateUrl(activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine);
+            return repo.GenerateUrl(linkType, activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine);
+        }
+
+        public bool CanShow()
+        {
+            var githubRepoCheckTask = IsCurrentFileInGitHubRepository();
+            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
         }
 
         // Taken from http://stackoverflow.com/a/26012991/6448

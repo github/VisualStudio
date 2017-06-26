@@ -91,7 +91,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await SimpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
-                IsLoggedIn = IsUserAuthenticated();
+                IsLoggedIn = await IsUserAuthenticated();
             }
             else
             {
@@ -104,7 +104,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             IsVisible = await IsAGitHubRepo();
             if (IsVisible)
             {
-                IsLoggedIn = IsUserAuthenticated();
+                IsLoggedIn = await IsUserAuthenticated();
             }
 
             base.Refresh();

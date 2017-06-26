@@ -71,7 +71,7 @@ public class RepositoryCloneViewModelTests
         }
     }
 
-    public class TheIsLoadingProperty : TestBaseClass
+    public class TheIsBusyProperty : TestBaseClass
     {
         [Fact]
         public async Task StartsTrueBecomesFalseWhenCompleted()
@@ -90,7 +90,7 @@ public class RepositoryCloneViewModelTests
                 Substitute.For<IUsageTracker>());
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
 
-            Assert.True(vm.IsLoading);
+            Assert.True(vm.IsBusy);
 
             var done = new ReplaySubject<Unit>();
             done.OnNext(Unit.Default);
@@ -103,13 +103,13 @@ public class RepositoryCloneViewModelTests
             await done;
             done = null;
 
-            Assert.True(vm.IsLoading);
+            Assert.True(vm.IsBusy);
 
             repoSubject.OnCompleted();
 
             await col.OriginalCompleted;
 
-            Assert.False(vm.IsLoading);
+            Assert.False(vm.IsBusy);
         }
 
         [Fact]
@@ -129,7 +129,7 @@ public class RepositoryCloneViewModelTests
                 Substitute.For<IUsageTracker>());
 
             Assert.True(vm.LoadingFailed);
-            Assert.False(vm.IsLoading);
+            Assert.False(vm.IsBusy);
         }
     }
 
@@ -313,7 +313,7 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnError(new InvalidOperationException("Doh!"));
 
             Assert.True(vm.LoadingFailed);
-            Assert.False(vm.IsLoading);
+            Assert.False(vm.IsBusy);
             repoSubject.OnCompleted();
         }
     }

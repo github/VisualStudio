@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GitHub.UI;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestListViewModelDesigner : BaseViewModel, IPullRequestListViewModel
+    public class PullRequestListViewModelDesigner : PanePageViewModelBase, IPullRequestListViewModel
     {
         public PullRequestListViewModelDesigner()
         {
@@ -56,7 +57,6 @@ namespace GitHub.SampleData
 
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
-        public ICommand OpenPullRequest { get; set; }
 
         public IReadOnlyList<PullRequestState> States { get; set; }
         public PullRequestState SelectedState { get; set; }
@@ -66,5 +66,10 @@ namespace GitHub.SampleData
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
+        public IObservable<ViewWithData> Navigate { get; }
+        public bool IsBusy { get; }
+
+        public ReactiveCommand<object> OpenPullRequest { get; }
+        public ReactiveCommand<object> CreatePullRequest { get; }
     }
 }
