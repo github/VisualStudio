@@ -8,7 +8,6 @@ namespace GitHub.Models
 {
     public static class DiffUtilities
     {
-        const string NoNewLineAtEnd = "\\ No newline at end of file";
         static readonly Regex ChunkHeaderRegex = new Regex(@"^@@\s+\-(\d+),?\d*\s+\+(\d+),?\d*\s@@");
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
@@ -38,10 +37,6 @@ namespace GitHub.Models
                             NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
                             DiffLine = diffLine,
                         };
-                    }
-                    else if (line == NoNewLineAtEnd)
-                    {
-                        break;
                     }
                     else if (chunk != null)
                     {
@@ -116,6 +111,7 @@ namespace GitHub.Models
                 case ' ': return DiffChangeType.None;
                 case '+': return DiffChangeType.Add;
                 case '-': return DiffChangeType.Delete;
+                case '\\': return DiffChangeType.Control;
                 default: throw new InvalidDataException($"Invalid diff line change char: '{c}'.");
             }
         }

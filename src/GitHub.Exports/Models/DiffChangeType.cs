@@ -7,5 +7,6 @@ namespace GitHub.Models
         None,
         Add,
         Delete,
+        Control // Git uses this for "\ No newline at end of file".
     }
 }

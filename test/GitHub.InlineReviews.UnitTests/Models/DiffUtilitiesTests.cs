@@ -23,7 +23,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData("@@ -1 +1,0 @@")]
             [InlineData("@@ -1,0 +1 @@")]
             [InlineData("@@ -1,0 +1,0 @@")]
-            [InlineData("@@ -1,0 +1,0 @@ TextOnSameLineAsHeader")]
+            [InlineData("@@ -1,0 +1,0 @@ THIS IS A COMMENT THAT WILL BE IGNORED")]
             public void HeaderOnly_OneChunkNoLines(string header)
             {
                 var chunks = DiffUtilities.ParseFragment(header);
@@ -36,12 +36,29 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [Fact]
             public void HeaderOnlyNoNewLineAtEnd_NoLines()
             {
-                var header = "@@ -1 +1 @@\n\\ No newline at end of file\n";
+                var header =
+@"@@ -1 +1 @@
+\ No newline at end of file\n";
 
                 var chunks = DiffUtilities.ParseFragment(header);
 
                 var chunk = chunks.First();
-                Assert.Equal(0, chunk.Lines.Count());
+                Assert.Equal(1, chunk.Lines.Count());
+            }
+
+            [Fact]
+            public void NoNewLineAtEnd_NotAtEndOfChunk()
+            {
+                var header =
+@"@@ -1 +1 @@
+-old
+\ No newline at end of file
++new";
+
+                var chunks = DiffUtilities.ParseFragment(header);
+
+                var chunk = chunks.First();
+                Assert.Equal(3, chunk.Lines.Count());
             }
 
             [Fact]
