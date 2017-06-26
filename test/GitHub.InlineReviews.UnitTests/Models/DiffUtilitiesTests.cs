@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var chunks = DiffUtilities.ParseFragment(header);
 
                 var chunk = chunks.First();
-                Assert.Equal(1, chunk.Lines.Count());
+                Assert.Equal(0, chunk.Lines.Count());
             }
 
             [Fact]
@@ -58,7 +58,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var chunks = DiffUtilities.ParseFragment(header);
 
                 var chunk = chunks.First();
-                Assert.Equal(3, chunk.Lines.Count());
+                Assert.Equal(2, chunk.Lines.Count());
             }
 
             [Fact]

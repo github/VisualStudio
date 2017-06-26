@@ -41,6 +41,11 @@ namespace GitHub.Models
                     else if (chunk != null)
                     {
                         var type = GetLineChange(line[0]);
+                        if (type == DiffChangeType.Control)
+                        {
+                            // This might contain info about previous line (e.g. "\ No newline at end of file").
+                            continue;
+                        }
 
                         chunk.Lines.Add(new DiffLine
                         {
