@@ -80,6 +80,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 var weekElapsed = DateTimeOffset.Now.GetIso8601WeekOfYear() > settings.WelcomeMessageLastSeen.GetIso8601WeekOfYear();
 
                 if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible() && weekElapsed)
+                // We want to display a welcome message but only if Team Explorer isn't
+                // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
+                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
                 {
                     ShowWelcomeMessage();
                 }
