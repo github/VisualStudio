@@ -18,13 +18,17 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 Assert.Equal(0, chunks.Count());
             }
 
-            [Fact]
-            public void HeaderOnly_NoLines()
+            [Theory]
+            [InlineData("@@ -1 +1 @@")]
+            [InlineData("@@ -1 +1,0 @@")]
+            [InlineData("@@ -1,0 +1 @@")]
+            [InlineData("@@ -1,0 +1,0 @@")]
+            [InlineData("@@ -1,0 +1,0 @@ TextOnSameLineAsHeader")]
+            public void HeaderOnly_OneChunkNoLines(string header)
             {
-                var header = "@@ -1,0 +1,0 @@";
-
                 var chunks = DiffUtilities.ParseFragment(header);
 
+                Assert.Equal(1, chunks.Count());
                 var chunk = chunks.First();
                 Assert.Equal(0, chunk.Lines.Count());
             }
@@ -32,7 +36,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [Fact]
             public void HeaderOnlyNoNewLineAtEnd_NoLines()
             {
-                var header = "@@ -1,0 +1,0 @@\n\\ No newline at end of file\n";
+                var header = "@@ -1 +1 @@\n\\ No newline at end of file\n";
 
                 var chunks = DiffUtilities.ParseFragment(header);
 
@@ -44,7 +48,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             public void FirstChunk_CheckDiffLineZeroBased()
             {
                 var expectDiffLine = 0;
-                var header = "@@ -1,1 +1,1 @@";
+                var header = "@@ -1 +1 @@";
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
@@ -55,7 +59,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData(1, 2)]
             public void FirstChunk_CheckLineNumbers(int oldLineNumber, int newLineNumber)
             {
-                var header = $"@@ -{oldLineNumber},1 +{newLineNumber},1 @@";
+                var header = $"@@ -{oldLineNumber} +{newLineNumber} @@";
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
@@ -69,7 +73,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData(1, 2, "-1", 1, -1)]
             public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber, string line, int expectOldLineNumber, int expectNewLineNumber)
             {
-                var header = $"@@ -{oldLineNumber},1 +{newLineNumber},1 @@\n{line}";
+                var header = $"@@ -{oldLineNumber} +{newLineNumber} @@\n{line}";
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
                 var diffLine = chunk.Lines.First();
@@ -84,22 +88,12 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData(" 1\n 2\n 3", 2, 3)]
             public void SkipNLines_CheckDiffLineNumber(string lines, int skip, int expectDiffLineNumber)
             {
-                var fragment = $"@@ -1,4 +1,4 @@\n{lines}";
+                var fragment = $"@@ -1 +1 @@\n{lines}";
 
                 var result = DiffUtilities.ParseFragment(fragment);
 
                 var firstLine = result.First().Lines.Skip(skip).First();
                 Assert.Equal(expectDiffLineNumber, firstLine.DiffLineNumber);
-            }
-
-            [Fact]
-            public void TextOnSameLineAsHeader_IgnoreLine()
-            {
-                var fragment = $"@@ -10,7 +10,6 @@ TextOnSameLineAsHeader";
-
-                var result = DiffUtilities.ParseFragment(fragment);
-
-                Assert.Equal(0, result.First().Lines.Count());
             }
 
             [Theory]
@@ -108,7 +102,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData("-FIRST")]
             public void FirstLine_CheckToString(string line)
             {
-                var fragment = $"@@ -1,4 +1,4 @@\n{line}";
+                var fragment = $"@@ -1 +1 @@\n{line}";
                 var result = DiffUtilities.ParseFragment(fragment);
                 var firstLine = result.First().Lines.First();
 
@@ -137,7 +131,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData("-FIRST", DiffChangeType.Delete)]
             public void FirstLine_CheckDiffChangeTypes(string line, DiffChangeType expectType)
             {
-                var fragment = $"@@ -1,4 +1,4 @@\n{line}";
+                var fragment = $"@@ -1 +1 @@\n{line}";
 
                 var result = DiffUtilities.ParseFragment(fragment);
 
@@ -169,7 +163,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData(" x", "", -1)]
             public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
             {
-                var header = "@@ -1,1 +1,1 @@";
+                var header = "@@ -1 +1 @@";
                 var chunks1 = DiffUtilities.ParseFragment(header + "\n" + lines1).ToList();
                 var chunks2 = DiffUtilities.ParseFragment(header + "\n" + lines2).ToList();
                 var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
@@ -183,7 +177,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [Fact]
             public void MatchSameLine()
             {
-                var diff = "@@ -1,1 +1,1 @@\n 1";
+                var diff = "@@ -1 +1 @@\n 1";
                 var chunks1 = DiffUtilities.ParseFragment(diff).ToList();
                 var chunks2 = DiffUtilities.ParseFragment(diff).ToList();
                 var expectLine = chunks1.First().Lines.First();
