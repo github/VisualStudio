@@ -91,6 +91,7 @@
     <Compile Include="Peek\InlineCommentPeekResultPresentation.cs" />
     <Compile Include="Peek\InlineCommentPeekResultPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleData\CommentTooltipViewModelDesigner.cs" />
     <Compile Include="SampleData\CommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\DiffCommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestCommentsViewModelDesigner.cs" />
@@ -101,8 +102,10 @@
     <Compile Include="Services\PullRequestSessionManager.cs" />
     <Compile Include="InlineCommentMarginProvider.cs" />
     <Compile Include="Services\PullRequestSessionService.cs" />
+    <Compile Include="ViewModels\CommentTooltipViewModel.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="ViewModels\DiffCommentThreadViewModel.cs" />
+    <Compile Include="ViewModels\ICommentTooltipViewModel.cs" />
     <Compile Include="ViewModels\ICommentThreadViewModel.cs" />
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\IDiffCommentThreadViewModel.cs" />
@@ -113,6 +116,10 @@
     <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCommentsViewModel.cs" />
+    <Compile Include="ViewModels\TooltipCommentViewModel.cs" />
+    <Compile Include="Views\CommentTooltipView.xaml.cs">
+      <DependentUpon>CommentTooltipView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DiffCommentThreadView.xaml.cs">
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
@@ -381,6 +388,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\CommentTooltipView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\DiffCommentThreadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
