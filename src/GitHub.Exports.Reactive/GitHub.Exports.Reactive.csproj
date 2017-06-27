@@ -12,7 +12,7 @@
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
+    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -155,7 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
-    <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
+    <Compile Include="Authentication\IDelegatingTwoFactorChallengeHandler.cs" />
     <Compile Include="Factories\IRepositoryHostFactory.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Collections\ISelectable.cs" />
@@ -187,6 +187,10 @@
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
+      <Project>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</Project>
+      <Name>GitHub.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>

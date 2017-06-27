@@ -41,14 +41,17 @@ namespace GitHub.Api
         string ClientId { get; set; }
         string ClientSecret { get; set; }
 
-        public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
+        public ApiClient([AllowNull] HostAddress hostAddress, [AllowNull] IObservableGitHubClient gitHubClient)
         {
-            Configure();
+            ClientId = ApiClientConfiguration.ClientId;
+            ClientSecret = ApiClientConfiguration.ClientSecret;
             HostAddress = hostAddress;
             this.gitHubClient = gitHubClient;
         }
 
         partial void Configure();
+
+        public IGitHubClient GitHubClient => new GitHubClient(gitHubClient.Connection);
 
         public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
         {

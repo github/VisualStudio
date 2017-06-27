@@ -138,7 +138,7 @@ namespace GitHub.InlineReviews.ViewModels
             var thread = file.InlineCommentThreads.FirstOrDefault(x => 
                 x.LineNumber == lineNumber &&
                 (!leftBuffer || x.DiffLineType == DiffChangeType.Delete));
-            var apiClient = CreateApiClient(session.Repository);
+            var apiClient = await CreateApiClient(session.Repository);
 
             if (thread != null)
             {
@@ -180,7 +180,7 @@ namespace GitHub.InlineReviews.ViewModels
             fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
         }
 
-        IApiClient CreateApiClient(ILocalRepositoryModel repository)
+        Task<IApiClient> CreateApiClient(ILocalRepositoryModel repository)
         {
             var hostAddress = HostAddress.Create(repository.CloneUrl.Host);
             return apiClientFactory.Create(hostAddress);

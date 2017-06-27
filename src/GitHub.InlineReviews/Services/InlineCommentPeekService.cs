@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -125,12 +126,6 @@ namespace GitHub.InlineReviews.Services
             ExpandCollapsedRegions(textView, line.Extent);
             peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
             return trackingPoint;
-        }
-
-        IApiClient CreateApiClient(ILocalRepositoryModel repository)
-        {
-            var hostAddress = HostAddress.Create(repository.CloneUrl.Host);
-            return apiClientFactory.Create(hostAddress);
         }
 
         void ExpandCollapsedRegions(ITextView textView, SnapshotSpan span)
