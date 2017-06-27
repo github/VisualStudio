@@ -75,12 +75,12 @@ namespace GitHub.Services
         IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
-        /// Determines whether the specified pull request is from a fork.
+        /// Determines whether the specified pull request is from the specified repository.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        bool IsPullRequestFromRepository(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
         /// Switches to an existing branch for the specified pull request.

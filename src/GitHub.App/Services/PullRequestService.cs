@@ -220,13 +220,11 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            if (pullRequest.Head?.Label != null && pullRequest.Base?.Label != null)
+            if (pullRequest.Head?.RepositoryCloneUrl != null)
             {
-                var headOwner = pullRequest.Head.Label.Split(':')[0];
-                var baseOwner = pullRequest.Base.Label.Split(':')[0];
-                return headOwner != baseOwner;
+                return repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
             }
 
             return false;
@@ -440,7 +438,7 @@ namespace GitHub.Services
             IRepository repository,
             IPullRequestModel pullRequest)
         {
-            if (!IsPullRequestFromFork(localRepository, pullRequest))
+            if (IsPullRequestFromRepository(localRepository, pullRequest))
             {
                 return new[] { pullRequest.Head.Ref };
             }

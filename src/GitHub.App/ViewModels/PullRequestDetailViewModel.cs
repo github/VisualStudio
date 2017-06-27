@@ -326,7 +326,7 @@ namespace GitHub.ViewModels
             Session = await sessionManager.GetSession(pullRequest);
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-            IsFromFork = pullRequestsService.IsPullRequestFromFork(LocalRepository, Model);
+            IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
             CommentCount = pullRequest.Comments.Count +  pullRequest.ReviewComments.Count;
