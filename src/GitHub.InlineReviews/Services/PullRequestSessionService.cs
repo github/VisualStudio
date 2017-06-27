@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
-using LibGit2Sharp;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -20,7 +19,6 @@ namespace GitHub.InlineReviews.Services
         readonly IDiffService diffService;
 
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
-        readonly IDictionary<ILocalRepositoryModel, IRepository> repositoryCache;
 
         [ImportingConstructor]
         public PullRequestSessionService(
@@ -33,27 +31,27 @@ namespace GitHub.InlineReviews.Services
             this.diffService = diffService;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
-            repositoryCache = new Dictionary<ILocalRepositoryModel, IRepository>();
         }
 
         /// <inheritdoc/>
         public Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string relativePath, byte[] contents)
         {
-            var repo = GetCachedRepository(repository);
+            var repo = gitService.GetRepository(repository.LocalPath);
             return diffService.Diff(repo, baseSha, relativePath, contents);
         }
 
         /// <inheritdoc/>
         public string GetTipSha(ILocalRepositoryModel repository)
         {
-            var repo = GetCachedRepository(repository);
+            var repo = gitService.GetRepository(repository.LocalPath);
             return repo.Head.Tip.Sha;
         }
 
         /// <inheritdoc/>
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
-            var repo = GetCachedRepository(repository);
+            var repo = gitService.GetRepository(repository.LocalPath);
+
             return !await gitClient.IsModified(repo, relativePath, contents) &&
                    await gitClient.IsHeadPushed(repo);
         }
@@ -64,7 +62,7 @@ namespace GitHub.InlineReviews.Services
             string sha,
             string relativePath)
         {
-            var repo = GetCachedRepository(repository);
+            var repo = gitService.GetRepository(repository.LocalPath);
 
             try
             {
@@ -111,7 +109,7 @@ namespace GitHub.InlineReviews.Services
                 return mergeBase;
             }
 
-            var repo = GetCachedRepository(repository);
+            var repo = gitService.GetRepository(repository.LocalPath);
             var remote = await gitClient.GetHttpRemote(repo, "origin");
 
             var baseRef = pullRequest.Base.Ref;
@@ -124,19 +122,6 @@ namespace GitHub.InlineReviews.Services
 
             mergeBaseCache[key] = mergeBase;
             return mergeBase;
-        }
-
-        IRepository GetCachedRepository(ILocalRepositoryModel model)
-        {
-            IRepository repository;
-            if(repositoryCache.TryGetValue(model, out repository))
-            {
-                return repository;
-            }
-
-            repository = gitService.GetRepository(model.LocalPath);
-            repositoryCache[model] = repository;
-            return repository;
         }
     }
 }
