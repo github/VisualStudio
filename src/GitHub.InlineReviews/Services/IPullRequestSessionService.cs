@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns>The tip SHA.</returns>
-        string GetTipSha(ILocalRepositoryModel repository);
+        Task<string> GetTipSha(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Asynchronously reads the contents of a file.

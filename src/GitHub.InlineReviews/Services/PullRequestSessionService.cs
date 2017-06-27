@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
+using LibGit2Sharp;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -34,23 +35,23 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string relativePath, byte[] contents)
+        public async Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string relativePath, byte[] contents)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
-            return diffService.Diff(repo, baseSha, relativePath, contents);
+            var repo = await GetRepository(repository);
+            return await diffService.Diff(repo, baseSha, relativePath, contents);
         }
 
         /// <inheritdoc/>
-        public string GetTipSha(ILocalRepositoryModel repository)
+        public async Task<string> GetTipSha(ILocalRepositoryModel repository)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
+            var repo = await GetRepository(repository);
             return repo.Head.Tip.Sha;
         }
 
         /// <inheritdoc/>
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
+            var repo = await GetRepository(repository);
 
             return !await gitClient.IsModified(repo, relativePath, contents) &&
                    await gitClient.IsHeadPushed(repo);
@@ -62,7 +63,7 @@ namespace GitHub.InlineReviews.Services
             string sha,
             string relativePath)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
+            var repo = await GetRepository(repository);
 
             try
             {
@@ -109,7 +110,7 @@ namespace GitHub.InlineReviews.Services
                 return mergeBase;
             }
 
-            var repo = gitService.GetRepository(repository.LocalPath);
+            var repo = await GetRepository(repository);
             var remote = await gitClient.GetHttpRemote(repo, "origin");
 
             var baseRef = pullRequest.Base.Ref;
@@ -122,6 +123,11 @@ namespace GitHub.InlineReviews.Services
 
             mergeBaseCache[key] = mergeBase;
             return mergeBase;
+        }
+
+        Task<IRepository> GetRepository(ILocalRepositoryModel repository)
+        {
+            return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
     }
 }

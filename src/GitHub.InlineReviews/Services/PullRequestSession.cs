@@ -239,7 +239,7 @@ namespace GitHub.InlineReviews.Services
             if (IsCheckedOut)
             {
                 return await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
-                        service.GetTipSha(Repository) : null;
+                        await service.GetTipSha(Repository) : null;
             }
             else
             {
