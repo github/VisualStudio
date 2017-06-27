@@ -7,18 +7,17 @@ namespace GitHub.InlineReviews.Tags
 {
     public partial class ShowInlineCommentGlyph : UserControl
     {
-        readonly CommentTooltipView commentTooltipView;
+        readonly ToolTip toolTip;
 
         public ShowInlineCommentGlyph()
         {
             InitializeComponent();
 
-            commentTooltipView = new CommentTooltipView();
-            ToolTip = commentTooltipView;
-            ToolTipOpening += ShowInlineCommentGlyph_ToolTipOpening;
+            toolTip = new ToolTip();
+            ToolTip = toolTip;
         }
 
-        private void ShowInlineCommentGlyph_ToolTipOpening(object sender, ToolTipEventArgs e)
+        protected override void OnToolTipOpening(ToolTipEventArgs e)
         {
             var tag = Tag as ShowInlineCommentTag;
 
@@ -29,7 +28,15 @@ namespace GitHub.InlineReviews.Tags
                 viewModel.Comments.Add(commentViewModel);
             }
 
-            commentTooltipView.DataContext = viewModel;
+            var view = new CommentTooltipView();
+            view.DataContext = viewModel;
+
+            toolTip.Content = view;
+        }
+
+        protected override void OnToolTipClosing(ToolTipEventArgs e)
+        {
+            toolTip.Content = null;
         }
     }
 }
