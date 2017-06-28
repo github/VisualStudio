@@ -51,9 +51,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
-        /// <inheritdoc/>
-        public override ReactiveCommand<ICommentModel> PostComment { get; }
-
         async Task<ICommentModel> DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));

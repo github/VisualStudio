@@ -11,6 +11,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel, IDisposable
     {
+        ReactiveCommand<ICommentModel> postComment;
         IDisposable placeholderSubscription;
 
         /// <summary>
@@ -30,7 +31,19 @@ namespace GitHub.InlineReviews.ViewModels
         public ObservableCollection<ICommentViewModel> Comments { get; }
 
         /// <inheritdoc/>
-        public abstract ReactiveCommand<ICommentModel> PostComment { get; }
+        public ReactiveCommand<ICommentModel> PostComment
+        {
+            get { return postComment; }
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(value));
+                postComment = value;
+
+                // We want to ignore thrown exceptions from PostComment - the error should be handled
+                // by the CommentViewModel that trigged PostComment.Execute();
+                value.ThrownExceptions.Subscribe(_ => { });
+            }
+        }
 
         /// <inheritdoc/>
         public IAccount CurrentUser { get; }

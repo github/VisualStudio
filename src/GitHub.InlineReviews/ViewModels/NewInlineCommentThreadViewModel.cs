@@ -86,9 +86,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IObservable<Unit> Finished => finished;
 
-        /// <inheritdoc/>
-        public override ReactiveCommand<ICommentModel> PostComment { get; }
-
         /// <summary>
         /// Gets a value indicating whether the user must commit and push their changes before
         /// leaving a comment on the requested line.

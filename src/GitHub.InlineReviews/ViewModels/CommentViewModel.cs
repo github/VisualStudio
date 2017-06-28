@@ -58,9 +58,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
+            AddErrorHandler(BeginEdit);
 
             CancelEdit = ReactiveCommand.Create();
             CancelEdit.Subscribe(DoCancelEdit);
+            AddErrorHandler(CancelEdit);
 
             CommitEdit = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
@@ -68,6 +70,7 @@ namespace GitHub.InlineReviews.ViewModels
                     this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
                     (hasBody, canPost) => hasBody && canPost),
                 DoCommitEdit);
+            AddErrorHandler(CommitEdit);
         }
 
         /// <summary>
@@ -155,6 +158,11 @@ namespace GitHub.InlineReviews.ViewModels
                 CommentEditState.Placeholder,
                 currentUser,
                 DateTimeOffset.MinValue);
+        }
+
+        void AddErrorHandler<T>(ReactiveCommand<T> command)
+        {
+            command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
         }
 
         void DoBeginEdit(object unused)
