@@ -92,7 +92,7 @@ namespace GitHub.ViewModels
                 .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
-            this.WhenAnyValue(x => x.ShowPullRequestsForFork)
+            this.WhenAnyValue(x => x.SelectedRepository)
                 .Skip(1)
                 .Subscribe(_ => ResetAndLoad());
 
@@ -111,20 +111,6 @@ namespace GitHub.ViewModels
             Load().Forget();
         }
 
-        IRemoteRepositoryModel Repository
-        {
-            get
-            {
-                if (remoteRepository != null)
-                {
-                    return !remoteRepository.IsFork || showForkPullRequests ?
-                        remoteRepository : remoteRepository.Parent;
-                }
-
-                return null;
-            }
-        }
-
         async Task Load()
         {
             IsBusy = true;
@@ -134,10 +120,13 @@ namespace GitHub.ViewModels
                 remoteRepository = await repositoryHost.ModelService.GetRepository(
                     localRepository.Owner,
                     localRepository.Name);
-                RepositoryIsFork = remoteRepository.IsFork;
+                Repositories = remoteRepository.IsFork ?
+                    new[] { remoteRepository.Parent, remoteRepository } :
+                    new[] { remoteRepository };
+                SelectedRepository = Repositories[0];
             }
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(Repository, pullRequests);
+            PullRequests = repositoryHost.ModelService.GetPullRequests(SelectedRepository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -190,6 +179,22 @@ namespace GitHub.ViewModels
         {
             get { return isBusy; }
             private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+        }
+
+        IReadOnlyList<IRemoteRepositoryModel> repositories;
+        public IReadOnlyList<IRemoteRepositoryModel> Repositories
+        {
+            [return: AllowNull]
+            get { return repositories; }
+            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
+        }
+
+        IRemoteRepositoryModel selectedRepository;
+        public IRemoteRepositoryModel SelectedRepository
+        {
+            [return: AllowNull]
+            get { return selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
 
         ITrackingCollection<IPullRequestModel> pullRequests;
@@ -256,20 +261,6 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
         }
 
-        bool repositoryIsFork;
-        public bool RepositoryIsFork
-        {
-            get { return repositoryIsFork; }
-            set { this.RaiseAndSetIfChanged(ref repositoryIsFork, value); }
-        }
-
-        bool showForkPullRequests;
-        public bool ShowPullRequestsForFork
-        {
-            get { return showForkPullRequests; }
-            set { this.RaiseAndSetIfChanged(ref showForkPullRequests, value); }
-        }
-
         IAccount emptyUser = new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>());
         public IAccount EmptyUser
         {
@@ -332,7 +323,7 @@ namespace GitHub.ViewModels
             {
                 Data = new PullRequestDetailArgument
                 {
-                    Repository = Repository,
+                    Repository = SelectedRepository,
                     Number = (int)pullRequest,
                 }
             };

@@ -55,6 +55,9 @@ namespace GitHub.SampleData
             SelectedAuthor = Authors.ElementAt(1);
         }
 
+        public IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
+        public IRemoteRepositoryModel SelectedRepository { get; set; }
+
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
 

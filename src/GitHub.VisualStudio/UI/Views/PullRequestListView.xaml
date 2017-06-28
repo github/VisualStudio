@@ -109,11 +109,11 @@
 
     <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
 
-      <WrapPanel Grid.Column="0" HorizontalAlignment="Stretch">
+      <WrapPanel Grid.Column="0" HorizontalAlignment="Left">
 
         <ui:LinkDropDown ItemsSource="{Binding States}"
                          SelectedItem="{Binding SelectedState}"
@@ -133,11 +133,29 @@
                          SelectedItem="{Binding SelectedAuthor}"
                          AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAuthorFilterComboBox}" />          
         <Separator Style="{StaticResource VerticalSeparator}" />
-          
-        <CheckBox IsChecked="{Binding ShowPullRequestsForFork}"
-                  Visibility="{Binding RepositoryIsFork, Converter={ui:BooleanToVisibilityConverter}}">
-            Fork
-        </CheckBox>
+        
+        <ui:LinkDropDown ItemsSource="{Binding Repositories}"
+                         SelectedItem="{Binding SelectedRepository}">
+          <ui:LinkDropDown.Resources>
+            <Style TargetType="{x:Type ui:LinkDropDown}" BasedOn="{StaticResource {x:Type ui:LinkDropDown}}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Repositories.Count}" Value="1">
+                  <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </ui:LinkDropDown.Resources>
+          <ui:LinkDropDown.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding CloneUrl.NameWithOwner}"/>
+            </DataTemplate>
+          </ui:LinkDropDown.ItemTemplate>
+          <ui:LinkDropDown.LinkItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding CloneUrl.NameWithOwner}"/>
+            </DataTemplate>
+          </ui:LinkDropDown.LinkItemTemplate>
+        </ui:LinkDropDown>
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"
