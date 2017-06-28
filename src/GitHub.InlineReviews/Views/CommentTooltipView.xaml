@@ -25,11 +25,19 @@
         </x:Array>
     </d:DesignProperties.DataContext>
 
-    <ItemsControl ItemsSource="{Binding Comments}">
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <local:CommentView Margin="0 4"/>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom">
+            <Border BorderBrush="Silver" BorderThickness="0,1,0,0" Margin="0,8" />
+            <TextBlock x:Name="StatusTextBlock" FontStyle="Italic">Click to reply</TextBlock>
+        </StackPanel>
+        <ScrollViewer x:Name="CommentScrollViewer" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Comments}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:CommentView Margin="0 4"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>
