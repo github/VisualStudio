@@ -7,14 +7,9 @@ namespace GitHub.InlineReviews.Tags
 {
     public partial class ShowInlineCommentGlyph : UserControl
     {
-        readonly ToolTip toolTip;
-
         public ShowInlineCommentGlyph()
         {
             InitializeComponent();
-
-            toolTip = new ToolTip();
-            ToolTip = toolTip;
         }
 
         protected override void OnToolTipOpening(ToolTipEventArgs e)
@@ -31,12 +26,12 @@ namespace GitHub.InlineReviews.Tags
             var view = new CommentTooltipView();
             view.DataContext = viewModel;
 
-            toolTip.Content = view;
+            CommentToolTip.Content = view;
         }
 
         protected override void OnToolTipClosing(ToolTipEventArgs e)
         {
-            toolTip.Content = null;
+            CommentToolTip.Content = null;
         }
     }
 }
