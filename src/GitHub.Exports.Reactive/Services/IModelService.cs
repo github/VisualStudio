@@ -20,7 +20,7 @@ namespace GitHub.Services
         ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);
         IObservable<LicenseItem> GetLicenses();
         IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
-        IObservable<IPullRequestModel> GetPullRequest(IRepositoryModel repo, int number);
+        IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number);
         ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
         IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,

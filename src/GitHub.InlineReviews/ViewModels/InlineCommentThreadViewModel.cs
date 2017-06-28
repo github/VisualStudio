@@ -61,8 +61,8 @@ namespace GitHub.InlineReviews.ViewModels
             var body = (string)parameter;
             var replyId = Comments[0].Id;
             var result = await apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
+                Session.RepositoryOwner,
+                Session.LocalRepository.Name,
                 Session.PullRequest.Number,
                 body,
                 replyId);

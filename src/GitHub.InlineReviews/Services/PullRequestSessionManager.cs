@@ -25,8 +25,8 @@ namespace GitHub.InlineReviews.Services
         readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
-        readonly Dictionary<int, WeakReference<PullRequestSession>> sessions =
-            new Dictionary<int, WeakReference<PullRequestSession>>();
+        readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
+            new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         IPullRequestSession currentSession;
         ILocalRepositoryModel repository;
 
@@ -118,9 +118,10 @@ namespace GitHub.InlineReviews.Services
 
                 if (modelService != null)
                 {
-                    var number = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                    var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
 
-                    if (number != (CurrentSession?.PullRequest.Number ?? 0))
+                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) &&
+                        pr?.Item2 != (CurrentSession?.PullRequest.Number))
                     {
                         var pullRequest = await GetPullRequestForTip(modelService, repository);
 
@@ -149,8 +150,8 @@ namespace GitHub.InlineReviews.Services
         {
             if (modelService != null)
             {
-                var number = await service.GetPullRequestForCurrentBranch(repository);
-                if (number != 0) return await modelService.GetPullRequest(repository, number).ToTask();
+                var pr = await service.GetPullRequestForCurrentBranch(repository);
+                if (pr != null) return await modelService.GetPullRequest(pr.Item1, repository.Name, pr.Item2).ToTask();
             }
 
             return null;
@@ -160,8 +161,9 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequestSession session = null;
             WeakReference<PullRequestSession> weakSession;
+            var key = Tuple.Create(pullRequest.Base.RepositoryCloneUrl.Owner, pullRequest.Number);
 
-            if (sessions.TryGetValue(pullRequest.Number, out weakSession))
+            if (sessions.TryGetValue(key, out weakSession))
             {
                 weakSession.TryGetTarget(out session);
             }
@@ -177,8 +179,9 @@ namespace GitHub.InlineReviews.Services
                         await modelService.GetCurrentUser(),
                         pullRequest,
                         repository,
+                        key.Item1,
                         false);
-                    sessions[pullRequest.Number] = new WeakReference<PullRequestSession>(session);
+                    sessions[key] = new WeakReference<PullRequestSession>(session);
                 }
             }
             else

@@ -31,7 +31,6 @@ namespace GitHub.ViewModels
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
-        IRemoteRepositoryModel remoteRepository;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -139,9 +138,18 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the repository that the pull request relates to.
+        /// Gets the local repository.
         /// </summary>
         public ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
+        /// Gets the remote repository that contains the pull request.
+        /// </summary>
+        /// <remarks>
+        /// The remote repository may be different from the local repository if the local
+        /// repository is a fork and the user is viewing pull requests from the parent repository.
+        /// </remarks>
+        public IRemoteRepositoryModel RemoteRepository { get; private set; }
 
         /// <summary>
         /// Gets the session for the pull request.
@@ -293,12 +301,13 @@ namespace GitHub.ViewModels
         public override void Initialize([AllowNull] ViewWithData data)
         {
             int number;
+            var repo = RemoteRepository;
 
             if (data != null)
             {
                 var arg = (PullRequestDetailArgument)data.Data;
                 number = arg.Number;
-                remoteRepository = arg.Repository;
+                repo = arg.Repository;
                 IsLoading = true;
             }
             else
@@ -308,21 +317,23 @@ namespace GitHub.ViewModels
             }
 
             OperationError = null;
-            modelService.GetPullRequest(remoteRepository, number)
+            modelService.GetPullRequest(repo, number)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => Load(x).Forget());
+                .Subscribe(x => Load(repo, x).Forget());
         }
 
         /// <summary>
         /// Loads the view model from octokit models.
         /// </summary>
+        /// <param name="remoteRepository">The remote repository.</param>
         /// <param name="pullRequest">The pull request model.</param>
-        /// <param name="files">The pull request's changed files.</param>
-        public async Task Load(IPullRequestModel pullRequest)
+        public async Task Load(IRemoteRepositoryModel remoteRepository, IPullRequestModel pullRequest)
         {
             var firstLoad = (Model == null);
+
             Model = pullRequest;
+            RemoteRepository = remoteRepository;
             Session = await sessionManager.GetSession(pullRequest);
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 

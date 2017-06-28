@@ -23,7 +23,7 @@ namespace GitHub.InlineReviews.ViewModels
             this.apiClient = apiClient;
             this.session = session;
 
-            Repository = session.Repository;
+            Repository = session.LocalRepository;
             Number = session.PullRequest.Number;
             Title = session.PullRequest.Title;
 

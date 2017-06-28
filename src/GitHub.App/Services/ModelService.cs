@@ -189,16 +189,16 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> GetPullRequest(IRepositoryModel repo, int number)
+        public IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number)
         {
             return Observable.Defer(() =>
             {
                 return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
                         Observable.CombineLatest(
-                            apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
-                            apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
-                            apiClient.GetIssueComments(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
-                            apiClient.GetPullRequestReviewComments(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            apiClient.GetPullRequest(owner, name, number),
+                            apiClient.GetPullRequestFiles(owner, name, number).ToList(),
+                            apiClient.GetIssueComments(owner, name, number).ToList(),
+                            apiClient.GetPullRequestReviewComments(owner, name, number).ToList(),
                             (pr, files, comments, reviewComments) => new
                             {
                                 PullRequest = pr,

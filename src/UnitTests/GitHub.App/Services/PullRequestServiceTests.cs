@@ -323,11 +323,12 @@ public class PullRequestServiceTests : TestBaseClass
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(4);
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
 
             await service.Checkout(localRepo, pr, "pr/123-foo1");
 
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr", "4").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr", "owner#4").Forget();
 
             Assert.Equal(2, gitClient.ReceivedCalls().Count());
         }
@@ -347,13 +348,14 @@ public class PullRequestServiceTests : TestBaseClass
 
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(5);
-            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/owner/repo"));
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+            pr.Head.Returns(new GitReferenceModel("prbranch", "owner:prbranch", "123", "https://foo.bar/owner/repo"));
 
-            await service.Checkout(localRepo, pr, "local");
+            await service.Checkout(localRepo, pr, "prbranch");
 
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
-            gitClient.Received().Checkout(Arg.Any<IRepository>(), "local").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.local.ghfvs-pr", "5").Forget();
+            gitClient.Received().Checkout(Arg.Any<IRepository>(), "prbranch").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.prbranch.ghfvs-pr", "owner#5").Forget();
 
             Assert.Equal(4, gitClient.ReceivedCalls().Count());
         }
@@ -373,17 +375,18 @@ public class PullRequestServiceTests : TestBaseClass
 
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(5);
-            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/fork/repo.git"));
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+            pr.Head.Returns(new GitReferenceModel("prbranch", "fork:prbranch", "123", "https://foo.bar/fork/repo.git"));
 
             await service.Checkout(localRepo, pr, "pr/5-fork-branch");
 
             gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork", new Uri("https://foo.bar/fork/repo.git")).Forget();
             gitClient.Received().SetConfig(Arg.Any<IRepository>(), "remote.fork.created-by-ghfvs", "true").Forget();
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork").Forget();
-            gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "source:pr/5-fork-branch").Forget();
+            gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "prbranch:pr/5-fork-branch").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/5-fork-branch").Forget();
-            gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/source").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr", "5").Forget();
+            gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/prbranch").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr", "owner#5").Forget();
             Assert.Equal(7, gitClient.ReceivedCalls().Count());
         }
 
@@ -409,7 +412,8 @@ public class PullRequestServiceTests : TestBaseClass
 
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(5);
-            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/fork/repo.git"));
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+            pr.Head.Returns(new GitReferenceModel("prbranch", "fork:prbranch", "123", "https://foo.bar/fork/repo.git"));
 
             await service.Checkout(localRepo, pr, "pr/5-fork-branch");
 
@@ -490,10 +494,10 @@ public class PullRequestServiceTests : TestBaseClass
 
             var configEntry1 = Substitute.For<ConfigurationEntry<string>>();
             configEntry1.Key.Returns("branch.pr/1-foo.ghfvs-pr");
-            configEntry1.Value.Returns("1");
+            configEntry1.Value.Returns("foo#1");
             var configEntry2 = Substitute.For<ConfigurationEntry<string>>();
             configEntry2.Key.Returns("branch.pr/2-bar.ghfvs-pr");
-            configEntry2.Value.Returns("2");
+            configEntry2.Value.Returns("foo#2");
 
             config.GetEnumerator().Returns(new List<ConfigurationEntry<string>>
             {

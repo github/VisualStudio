@@ -65,7 +65,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = TeamExplorerServiceHolder.ActiveRepo;
+            var repo = ViewModel.RemoteRepository;
             var browser = VisualStudioBrowser;
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);

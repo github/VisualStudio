@@ -111,14 +111,14 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns>
-        /// An observable that produces a single value: the pull request number, or 0 if the
-        /// current branch is not a PR branch.
+        /// An observable that produces a single tuple which contains the owner of the fork and the
+        /// pull request number. Returns null if the current branch is not a PR branch.
         /// </returns>
         /// <remarks>
         /// This method does not do an API request - it simply checks the mark left in the git
         /// config by <see cref="Checkout(ILocalRepositoryModel, IPullRequestModel, string)"/>.
         /// </remarks>
-        IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
+        IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Removes any association between the current branch and a pull request.

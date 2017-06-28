@@ -142,7 +142,7 @@ namespace GitHub.Services
 
                 // Store the PR number in the branch config with the key "ghfvs-pr".
                 var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
-                await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
+                await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
 
                 return Observable.Return(Unit.Default);
             });
@@ -209,9 +209,9 @@ namespace GitHub.Services
 
                 foreach (var branch in branches)
                 {
-                    if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest.Number))
+                    if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest))
                     {
-                        await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.Number);
+                        await MarkBranchAsPullRequest(repo, branch.Name, pullRequest);
                         result = true;
                     }
                 }
@@ -263,16 +263,16 @@ namespace GitHub.Services
                     }
 
                     await gitClient.Checkout(repo, branchName);
-                    await MarkBranchAsPullRequest(repo, branchName, pullRequest.Number);
+                    await MarkBranchAsPullRequest(repo, branchName, pullRequest);
                 }
 
                 return Observable.Return(Unit.Default);
             });
         }
 
-        public IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
+        public IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var configKey = string.Format(
@@ -280,7 +280,8 @@ namespace GitHub.Services
                     "branch.{0}.{1}",
                     repo.Head.FriendlyName,
                     SettingGHfVSPullRequest);
-                return gitClient.GetConfig<int>(repo, configKey).ToObservable();
+                var value = await gitClient.GetConfig<string>(repo, configKey);
+                return Observable.Return(ParseGHfVSConfigKeyValue(value));
             });
         }
 
@@ -444,25 +445,29 @@ namespace GitHub.Services
             }
             else
             {
-                var pr = pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+                var key = BuildGHfVSConfigKeyValue(pullRequest);
+
                 return repository.Config
                     .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == key)
                     .Select(x => x.Branch);
             }
         }
 
-        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, int number)
+        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            return await gitClient.GetConfig<int>(repo, prConfigKey) == number;
+            var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
+            return value != null && 
+                value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
+                value.Item2 == pullRequest.Number;
         }
 
-        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, int number)
+        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
         {
             // Store the PR number in the branch config with the key "ghfvs-pr".
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            await gitClient.SetConfig(repo, prConfigKey, number.ToString());
+            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
@@ -501,6 +506,29 @@ namespace GitHub.Services
 
                 before = after;
             }
+        }
+
+        static string BuildGHfVSConfigKeyValue(IPullRequestModel pullRequest)
+        {
+            return pullRequest.Base.RepositoryCloneUrl.Owner + '#' +
+                   pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+        }
+
+        static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
+        {
+            if (value != null)
+            {
+                var separator = value.IndexOf('#');
+
+                if (separator != -1)
+                {
+                    var owner = value.Substring(0, separator);
+                    var number = int.Parse(value.Substring(separator + 1), CultureInfo.InvariantCulture);
+                    return Tuple.Create(owner, number);
+                }
+            }
+
+            return null;
         }
     }
 }

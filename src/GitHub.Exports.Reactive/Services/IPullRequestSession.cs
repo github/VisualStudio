@@ -31,9 +31,19 @@ namespace GitHub.Services
         IPullRequestModel PullRequest { get; }
 
         /// <summary>
-        /// Gets the pull request's repository.
+        /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel Repository { get; }
+        ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
+        /// Gets the owner of the repository that contains the pull request.
+        /// </summary>
+        /// <remarks>
+        /// If the pull request is targeting <see cref="LocalRepository"/> then the owner will be
+        /// the owner of the local repository. If however the pull request targets a different fork
+        /// then this property describes the owner of the fork.
+        /// </remarks>
+        string RepositoryOwner { get; }
 
         /// <summary>
         /// Adds a new comment to the session.
