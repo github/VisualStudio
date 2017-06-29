@@ -43,10 +43,10 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <StackPanel Orientation="Horizontal">
-                <ui:OcticonImage Icon="alert" Margin="0 0 8 0"/>
-                <TextBlock>You must commit and push your changes to add a comment here.</TextBlock>
-            </StackPanel>
+            <DockPanel>
+                <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 8 0"/>
+                <TextBlock TextWrapping="Wrap">You must commit and push your changes to add a comment here.</TextBlock>
+            </DockPanel>
         </Border>
 
         <Border DockPanel.Dock="Top"
