@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GitHub.InlineReviews.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace GitHub.InlineReviews {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace GitHub.InlineReviews {
         /// <summary>
         ///   Looks up a localized string similar to Click to reply.
         /// </summary>
-        internal static string CommentTooltipStatusMessage {
+        public static string CommentTooltipStatusMessage {
             get {
                 return ResourceManager.GetString("CommentTooltipStatusMessage", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace GitHub.InlineReviews {
         /// <summary>
         ///   Looks up a localized string similar to Click to reply or view more (showing most recent of {0} comments).
         /// </summary>
-        internal static string CommentTooltipStatusOverflowMessage {
+        public static string CommentTooltipStatusOverflowMessage {
             get {
                 return ResourceManager.GetString("CommentTooltipStatusOverflowMessage", resourceCulture);
             }
