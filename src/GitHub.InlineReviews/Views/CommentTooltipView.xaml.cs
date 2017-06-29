@@ -21,7 +21,10 @@ namespace GitHub.InlineReviews.Views
             if (CommentScrollViewer.ComputedVerticalScrollBarVisibility == System.Windows.Visibility.Visible)
             {
                 CommentScrollViewer.ScrollToBottom();
-                StatusTextBlock.Text = "Click to view more or reply";
+
+                var messageFormat = InlineReviews.Resources.CommentTooltipStatusOverflowMessage;
+                var message = string.Format(messageFormat, ViewModel.Comments.Count);
+                StatusTextBlock.Text = message;
                 CommentScrollViewer.LayoutUpdated -= WatchForScrollBarVisible;
             }
         }

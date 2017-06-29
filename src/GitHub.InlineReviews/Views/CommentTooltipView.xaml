@@ -3,32 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prop="clr-namespace:GitHub.InlineReviews"
+             xmlns:vm="clr-namespace:GitHub.InlineReviews.ViewModels"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <x:Array Type="{x:Type sample:CommentTooltipViewModelDesigner}">
-            <sample:CommentTooltipViewModelDesigner>
-                <sample:CommentTooltipViewModelDesigner.Comments>
-                    <sample:CommentViewModelDesigner EditState="None">
-                        <sample:CommentViewModelDesigner.Body>
-                            I assume this doesn't do anything if our message isn't showing?
-                        </sample:CommentViewModelDesigner.Body>
-                    </sample:CommentViewModelDesigner>
-                    <sample:CommentViewModelDesigner EditState="None">
-                        <sample:CommentViewModelDesigner.Body>
-                            Nope, does nothing! Also checked the logs.
-                        </sample:CommentViewModelDesigner.Body>
-                    </sample:CommentViewModelDesigner>
-                </sample:CommentTooltipViewModelDesigner.Comments>
-            </sample:CommentTooltipViewModelDesigner>
-        </x:Array>
+        <sample:CommentTooltipViewModelDesigner>
+            <sample:CommentTooltipViewModelDesigner.Comments>
+                <sample:CommentViewModelDesigner EditState="None">
+                    <sample:CommentViewModelDesigner.Body>
+                        I assume this doesn't do anything if our message isn't showing?
+                    </sample:CommentViewModelDesigner.Body>
+                </sample:CommentViewModelDesigner>
+                <sample:CommentViewModelDesigner EditState="None">
+                    <sample:CommentViewModelDesigner.Body>
+                        Nope, does nothing! Also checked the logs.
+                    </sample:CommentViewModelDesigner.Body>
+                </sample:CommentViewModelDesigner>
+            </sample:CommentTooltipViewModelDesigner.Comments>
+        </sample:CommentTooltipViewModelDesigner>
     </d:DesignProperties.DataContext>
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom">
             <Border BorderBrush="Silver" BorderThickness="0,1,0,0" Margin="0,8" />
-            <TextBlock x:Name="StatusTextBlock" FontStyle="Italic">Click to reply</TextBlock>
+            <!--<TextBlock x:Name="StatusTextBlock" FontStyle="Italic" Text="{x:Static prop:Resources.CommentTooltipStatusMessage}" />-->
+            <TextBlock x:Name="StatusTextBlock" FontStyle="Italic" Text="Click to reply" />
         </StackPanel>
         <ScrollViewer x:Name="CommentScrollViewer" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Comments}">
