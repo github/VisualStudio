@@ -61,10 +61,6 @@ namespace GitHub.InlineReviews.ViewModels
             BeginEdit.Subscribe(DoBeginEdit);
             AddErrorHandler(BeginEdit);
 
-            CancelEdit = ReactiveCommand.Create();
-            CancelEdit.Subscribe(DoCancelEdit);
-            AddErrorHandler(CancelEdit);
-
             CommitEdit = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
                     this.WhenAnyValue(x => x.IsReadOnly),
@@ -73,6 +69,10 @@ namespace GitHub.InlineReviews.ViewModels
                     (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
                 DoCommitEdit);
             AddErrorHandler(CommitEdit);
+
+            CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
+            CancelEdit.Subscribe(DoCancelEdit);
+            AddErrorHandler(CancelEdit);
         }
 
         /// <summary>
