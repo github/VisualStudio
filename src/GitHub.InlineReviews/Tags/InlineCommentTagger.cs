@@ -131,7 +131,10 @@ namespace GitHub.InlineReviews.Tags
                         {
                             var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
 
-                            if (lineNumber >= startLine && lineNumber <= endLine && !linesWithComments[lineNumber - startLine])
+                            if (lineNumber >= startLine && 
+                                lineNumber <= endLine && 
+                                !linesWithComments[lineNumber - startLine]
+                                && (!leftHandSide || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                 yield return new TagSpan<InlineCommentTag>(
