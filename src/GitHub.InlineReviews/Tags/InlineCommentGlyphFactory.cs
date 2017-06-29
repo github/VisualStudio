@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
 using GitHub.InlineReviews.Glyph;
@@ -14,9 +13,16 @@ namespace GitHub.InlineReviews.Tags
 {
     class InlineCommentGlyphFactory : IGlyphFactory<InlineCommentTag>
     {
+        const string AddBackgroundKey = "deltadiff.add.word";
+        const string DeleteBackgroundKey = "deltadiff.remove.word";
+        const string NoneBackgroundKey = "Indicator Margin";
+
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
-        readonly BrushesManager brushesManager;
+
+        readonly ResourceDictionary addResourceDictionary;
+        readonly ResourceDictionary deleteResourceDictionary;
+        readonly ResourceDictionary noneResourceDictionary;
 
         public InlineCommentGlyphFactory(
             IInlineCommentPeekService peekService,
@@ -26,84 +32,9 @@ namespace GitHub.InlineReviews.Tags
             this.peekService = peekService;
             this.textView = textView;
 
-            brushesManager = new BrushesManager(editorFormatMap);
-        }
-
-        class BrushesManager
-        {
-            const string AddBackgroundColorKey = "deltadiff.add.word";
-            const string DeleteBackgroundColorKey = "deltadiff.remove.word";
-            const string NoneBackgroundColorKey = "Indicator Margin";
-
-            readonly IEditorFormatMap editorFormatMap;
-            readonly SolidColorBrush addBackground;
-            readonly SolidColorBrush deleteBackground;
-            readonly SolidColorBrush noneBackground;
-
-            internal BrushesManager(IEditorFormatMap editorFormatMap)
-            {
-                this.editorFormatMap = editorFormatMap;
-
-                addBackground = new SolidColorBrush();
-                deleteBackground = new SolidColorBrush();
-                noneBackground = new SolidColorBrush();
-                UpdateBrushColors();
-
-                editorFormatMap.FormatMappingChanged += EditorFormatMap_FormatMappingChanged;
-            }
-
-            internal Brush GetBrush(DiffChangeType diffChangeType)
-            {
-                switch (diffChangeType)
-                {
-                    case DiffChangeType.Add:
-                        return addBackground;
-                    case DiffChangeType.Delete:
-                        return deleteBackground;
-                    case DiffChangeType.None:
-                    default:
-                        return noneBackground;
-                }
-            }
-
-            void EditorFormatMap_FormatMappingChanged(object sender, FormatItemsEventArgs e)
-            {
-                foreach (var key in e.ChangedItems)
-                {
-                    UpdateBrushColors(key);
-                }
-            }
-
-            void UpdateBrushColors(string key = null)
-            {
-                if (key == null || key == AddBackgroundColorKey)
-                {
-                    addBackground.Color = TryGetBackgroundColor(AddBackgroundColorKey);
-                }
-
-                if (key == null || key == DeleteBackgroundColorKey)
-                {
-                    deleteBackground.Color = TryGetBackgroundColor(DeleteBackgroundColorKey);
-                }
-
-                if (key == null || key == "Indicator Margin")
-                {
-                    noneBackground.Color = TryGetBackgroundColor(NoneBackgroundColorKey);
-                }
-            }
-
-            Color TryGetBackgroundColor(string key)
-            {
-                try
-                {
-                    var properties = editorFormatMap.GetProperties(key);
-                    return (Color)properties?["BackgroundColor"];
-                }
-                catch
-                {
-                    return Colors.Transparent;
-                }
-            }
+            addResourceDictionary = editorFormatMap.GetProperties(AddBackgroundKey);
+            deleteResourceDictionary = editorFormatMap.GetProperties(DeleteBackgroundKey);
+            noneResourceDictionary = editorFormatMap.GetProperties(NoneBackgroundKey);
         }
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
@@ -114,7 +45,9 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Background = brushesManager.GetBrush(tag.DiffChangeType);
+            var dictionary = GetResourceDictionary(tag.DiffChangeType);
+            glyph.Resources.MergedDictionaries.Add(dictionary);
+
             return glyph;
         }
 
@@ -125,6 +58,20 @@ namespace GitHub.InlineReviews.Tags
                 typeof(AddInlineCommentTag),
                 typeof(ShowInlineCommentTag)
             };
+        }
+
+        internal ResourceDictionary GetResourceDictionary(DiffChangeType diffChangeType)
+        {
+            switch (diffChangeType)
+            {
+                case DiffChangeType.Add:
+                    return addResourceDictionary;
+                case DiffChangeType.Delete:
+                    return deleteResourceDictionary;
+                case DiffChangeType.None:
+                default:
+                    return noneResourceDictionary;
+            }
         }
 
         static UserControl CreateGlyph(InlineCommentTag tag)
