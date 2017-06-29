@@ -16,6 +16,7 @@ namespace GitHub.InlineReviews.ViewModels
     {
         string body;
         string errorMessage;
+        bool isReadOnly;
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
@@ -66,9 +67,10 @@ namespace GitHub.InlineReviews.ViewModels
 
             CommitEdit = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
+                    this.WhenAnyValue(x => x.IsReadOnly),
                     this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
                     this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
-                    (hasBody, canPost) => hasBody && canPost),
+                    (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
                 DoCommitEdit);
             AddErrorHandler(CommitEdit);
         }
@@ -109,6 +111,13 @@ namespace GitHub.InlineReviews.ViewModels
         {
             get { return state; }
             private set { this.RaiseAndSetIfChanged(ref state, value); }
+        }
+
+        /// <inheritdoc/>
+        public bool IsReadOnly
+        {
+            get { return isReadOnly; }
+            set { this.RaiseAndSetIfChanged(ref isReadOnly, value); }
         }
 
         /// <inheritdoc/>

@@ -55,6 +55,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             var placeholder = CommentViewModel.CreatePlaceholder(this, CurrentUser);
             placeholder.BeginEdit.Execute(null);
+            this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
 
             file.WhenAnyValue(x => x.CommitSha).Subscribe(x => NeedsPush = x == null);

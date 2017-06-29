@@ -35,6 +35,11 @@ namespace GitHub.InlineReviews.ViewModels
         CommentEditState EditState { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the comment is read-only.
+        /// </summary>
+        bool IsReadOnly { get; set; }
+
+        /// <summary>
         /// Gets the modified date of the comment.
         /// </summary>
         DateTimeOffset UpdatedAt { get; }
