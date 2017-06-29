@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Reactive;
+using ReactiveUI;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.SampleData;
-using ReactiveUI;
+using GitHub.ViewModels;
 
 namespace GitHub.InlineReviews.SampleData
 {
-    class CommentViewModelDesigner : ICommentViewModel
+    class CommentViewModelDesigner : ViewModelBase, ICommentViewModel
     {
         public CommentViewModelDesigner()
         {

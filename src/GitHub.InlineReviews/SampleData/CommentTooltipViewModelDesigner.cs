@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using GitHub.ViewModels;
 using GitHub.InlineReviews.ViewModels;
-using GitHub.Models;
-using GitHub.SampleData;
-using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
-    class CommentTooltipViewModelDesigner : ICommentTooltipViewModel
+    class CommentTooltipViewModelDesigner : ViewModelBase, ICommentTooltipViewModel
     {
         public ObservableCollection<ICommentViewModel> Comments { get; }
             = new ObservableCollection<ICommentViewModel>();

@@ -1,10 +1,13 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Windows.Controls;
+using GitHub.UI;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Views
 {
-    public partial class CommentTooltipView : UserControl
+    public class GenericCommentTooltipView : ViewBase<ICommentTooltipViewModel, CommentTooltipView>
+    { }
+
+    public partial class CommentTooltipView : GenericCommentTooltipView
     {
         public CommentTooltipView()
         {

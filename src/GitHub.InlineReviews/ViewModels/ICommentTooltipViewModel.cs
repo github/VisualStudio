@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using GitHub.Models;
 using ReactiveUI;
+using GitHub.Models;
+using GitHub.ViewModels;
 
 namespace GitHub.InlineReviews.ViewModels
 {
     /// <summary>
     /// A comment tooltip.
     /// </summary>
-    public interface ICommentTooltipViewModel
+    public interface ICommentTooltipViewModel : IViewModel
     {
         /// <summary>
         /// Gets the comments in the thread.
