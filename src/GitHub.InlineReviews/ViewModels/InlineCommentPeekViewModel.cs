@@ -61,14 +61,16 @@ namespace GitHub.InlineReviews.ViewModels
 
             peekSession.Dismissed += (s, e) => Dispose();
 
-            NextComment = ReactiveCommand.CreateAsyncTask(_ =>
-                nextCommentCommand.Execute(new InlineCommentNavigationParams
+            NextComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(nextCommentCommand.IsEnabled),
+                _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
-            PreviousComment = ReactiveCommand.CreateAsyncTask(_ =>
-                previousCommentCommand.Execute(new InlineCommentNavigationParams
+            PreviousComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(previousCommentCommand.IsEnabled),
+                _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
