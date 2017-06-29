@@ -31,21 +31,25 @@ namespace GitHub.InlineReviews.Tags
 
         class BrushesManager
         {
-            readonly Brush addBackground;
-            readonly Brush deleteBackground;
-            readonly Brush noneBackground;
+            const string AddBackgroundColorKey = "deltadiff.add.word";
+            const string DeleteBackgroundColorKey = "deltadiff.remove.word";
+            const string NoneBackgroundColorKey = "Indicator Margin";
+
+            readonly IEditorFormatMap editorFormatMap;
+            readonly SolidColorBrush addBackground;
+            readonly SolidColorBrush deleteBackground;
+            readonly SolidColorBrush noneBackground;
 
             internal BrushesManager(IEditorFormatMap editorFormatMap)
             {
-                addBackground = TryGetValue<Brush>(editorFormatMap, "deltadiff.add.word", "Background");
-                deleteBackground = TryGetValue<Brush>(editorFormatMap, "deltadiff.remove.word", "Background");
-                noneBackground = TryGetValue<Brush>(editorFormatMap, "Indicator Margin", "Background");
-            }
+                this.editorFormatMap = editorFormatMap;
 
-            T TryGetValue<T>(IEditorFormatMap editorFormatMap, string key, string name) where T : class
-            {
-                var properties = editorFormatMap.GetProperties(key);
-                return properties?[name] as T;
+                addBackground = new SolidColorBrush();
+                deleteBackground = new SolidColorBrush();
+                noneBackground = new SolidColorBrush();
+                UpdateBrushColors();
+
+                editorFormatMap.FormatMappingChanged += EditorFormatMap_FormatMappingChanged;
             }
 
             internal Brush GetBrush(DiffChangeType diffChangeType)
@@ -59,6 +63,45 @@ namespace GitHub.InlineReviews.Tags
                     case DiffChangeType.None:
                     default:
                         return noneBackground;
+                }
+            }
+
+            void EditorFormatMap_FormatMappingChanged(object sender, FormatItemsEventArgs e)
+            {
+                foreach (var key in e.ChangedItems)
+                {
+                    UpdateBrushColors(key);
+                }
+            }
+
+            void UpdateBrushColors(string key = null)
+            {
+                if (key == null || key == AddBackgroundColorKey)
+                {
+                    addBackground.Color = TryGetBackgroundColor(AddBackgroundColorKey);
+                }
+
+                if (key == null || key == DeleteBackgroundColorKey)
+                {
+                    deleteBackground.Color = TryGetBackgroundColor(DeleteBackgroundColorKey);
+                }
+
+                if (key == null || key == "Indicator Margin")
+                {
+                    noneBackground.Color = TryGetBackgroundColor(NoneBackgroundColorKey);
+                }
+            }
+
+            Color TryGetBackgroundColor(string key)
+            {
+                try
+                {
+                    var properties = editorFormatMap.GetProperties(key);
+                    return (Color)properties?["BackgroundColor"];
+                }
+                catch
+                {
+                    return Colors.Transparent;
                 }
             }
         }
