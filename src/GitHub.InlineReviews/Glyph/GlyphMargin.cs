@@ -66,6 +66,33 @@ namespace GitHub.InlineReviews.Glyph
             return (marginName == this.marginName) ? this : null;
         }
 
+        public bool Enabled
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return true;
+            }
+        }
+
+        public double MarginSize
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return marginVisual.Width;
+            }
+        }
+
+        public FrameworkElement VisualElement
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return marginVisual;
+            }
+        }
+
         void OnLoaded(object sender, RoutedEventArgs e)
         {
             RefreshMarginVisibility();
@@ -177,33 +204,6 @@ namespace GitHub.InlineReviews.Glyph
             if (isDisposed)
             {
                 throw new ObjectDisposedException(marginName);
-            }
-        }
-
-        public bool Enabled
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return true;
-            }
-        }
-
-        public double MarginSize
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual.Width;
-            }
-        }
-
-        public FrameworkElement VisualElement
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual;
             }
         }
     }
