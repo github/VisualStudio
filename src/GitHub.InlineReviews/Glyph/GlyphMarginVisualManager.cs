@@ -73,15 +73,6 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                         element.Height = startingLine.TextHeight + 1; // HACK: +1 to fill gaps
                         data.SetTop(startingLine.TextTop - textView.ViewportTop);
 
-                        // draw where line is
-                        //element.Height = startingLine.Height;
-                        //data.SetTop(startingLine.Top - textView.ViewportTop);
-
-                        // center on margin
-                        //element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                        //double length = (17.0 - element.DesiredSize.Width) / 2.0;
-                        //Canvas.SetLeft(element, length);
-
                         glyphs[element] = data;
                         visuals[glyphType].Children.Add(element);
                     }
@@ -199,28 +190,6 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                 var backgroundColor = (Color)properties["BackgroundColor"];
                 ImageThemingUtilities.SetImageBackgroundColor(glyphMarginGrid, backgroundColor);
             }
-
-            // set background color for margin
-            //var properties = editorFormatMap.GetProperties(marginPropertiesName);
-            //if (properties.Contains("BackgroundColor"))
-            //{
-            //    glyphMarginGrid.Background = new SolidColorBrush((Color)properties["BackgroundColor"]);
-            //    glyphMarginGrid.Background.Freeze();
-            //}
-            //else if (properties.Contains("Background"))
-            //{
-            //    glyphMarginGrid.Background = (Brush)properties["Background"];
-            //}
-            //else
-            //{
-            //    glyphMarginGrid.Background = Brushes.Transparent;
-            //}
-
-            //var background = glyphMarginGrid.Background as SolidColorBrush;
-            //if (background != null)
-            //{
-            //    ImageThemingUtilities.SetImageBackgroundColor(glyphMarginGrid, background.Color);
-            //}
         }
     }
 }
