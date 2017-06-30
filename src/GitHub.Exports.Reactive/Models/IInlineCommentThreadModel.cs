@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GitHub.Models
 {
     /// <summary>
-    /// Represents a thread of inline comments on a pull request.
+    /// Represents a thread of inline comments on an <see cref="IPullRequestSessionFile"/>.
     /// </summary>
     public interface IInlineCommentThreadModel
     {

@@ -7,6 +7,9 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.Models
 {
+    /// <summary>
+    /// Represents a thread of inline comments on an <see cref="IPullRequestSessionFile"/>.
+    /// </summary>
     class InlineCommentThreadModel : ReactiveObject, IInlineCommentThreadModel
     {
         bool isStale;
