@@ -63,12 +63,7 @@ namespace GitHub.InlineReviews.Glyph
 
         public ITextViewMargin GetTextViewMargin(string marginName)
         {
-            if (marginName == this.marginName)
-            {
-                return this;
-            }
-
-            return null;
+            return (marginName == this.marginName) ? this : null;
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
