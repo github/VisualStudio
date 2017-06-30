@@ -373,7 +373,6 @@
       <SubType>Designer</SubType>
     </VSCTCompile>
     <Content Include="Resources\InlineReviewsPackage.ico" />
-    <Content Include="Resources\PullRequestCommentsToolWindowCommand.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">

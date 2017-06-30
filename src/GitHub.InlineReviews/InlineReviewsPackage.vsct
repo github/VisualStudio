@@ -67,16 +67,6 @@
         </Strings>
       </Button>
     </Buttons>
-
-    <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
-    <Bitmaps>
-      <!--  The bitmap id is defined in a way that is a little bit different from the others:
-            the declaration starts with a guid for the bitmap strip, then there is the resource id of the
-            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
-            inside a button definition. An important aspect of this declaration is that the element id
-            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\PullRequestCommentsToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
-    </Bitmaps>
   </Commands>
   <KeyBindings>
     <KeyBinding guid="guidGitHubCommandSet" id="NextInlineCommentId" editor="guidVSStd97" key1="VK_OEM_6" mod1="Alt"/>
