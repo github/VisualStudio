@@ -1,5 +1,6 @@
 ﻿using System;
 using GitHub.Validation;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -10,7 +11,7 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> NavigateLearnMore { get; }
         ReactiveCommand<object> ResendCodeCommand { get; }
 
-        IObservable<RecoveryOptionResult> Show(UserError error);
+        IObservable<TwoFactorChallengeResult> Show(UserError error);
 
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }

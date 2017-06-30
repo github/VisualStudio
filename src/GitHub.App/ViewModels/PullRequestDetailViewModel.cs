@@ -286,6 +286,7 @@ namespace GitHub.ViewModels
         /// <param name="files">The pull request's changed files.</param>
         public async Task Load(IPullRequestModel pullRequest)
         {
+            var firstLoad = (Model == null);
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
@@ -298,7 +299,6 @@ namespace GitHub.ViewModels
             ChangedFilesTree = CreateChangedFilesTree(pullRequest, changes).Children.ToList();
 
             var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
-
             IsCheckedOut = localBranches.Contains(repository.CurrentBranch);
 
             if (IsCheckedOut)
@@ -362,6 +362,11 @@ namespace GitHub.ViewModels
             }
 
             IsLoading = IsBusy = false;
+
+            if (firstLoad)
+            {
+                usageTracker.IncrementPullRequestOpened().Forget();
+            }
 
             if (!isInCheckout)
             {
@@ -480,7 +485,6 @@ namespace GitHub.ViewModels
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
-
                 if (localBranches.Count > 0)
                 {
                     return pullRequestsService.SwitchToBranch(repository, Model);

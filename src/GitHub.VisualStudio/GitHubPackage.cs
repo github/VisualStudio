@@ -17,6 +17,7 @@ using Task = System.Threading.Tasks.Task;
 using GitHub.VisualStudio.Menus;
 using System.ComponentModel.Design;
 using GitHub.ViewModels;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio
 {
@@ -89,6 +90,7 @@ namespace GitHub.VisualStudio
 
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
@@ -139,6 +141,7 @@ namespace GitHub.VisualStudio
             }
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
+            AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
@@ -196,6 +199,20 @@ namespace GitHub.VisualStudio
                 var result = new GitHubServiceProvider(this, this);
                 await result.Initialize();
                 return result;
+            }
+            else if (serviceType == typeof(ILoginManager))
+            {
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var loginCache = serviceProvider.GetService<ILoginCache>();
+                var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
+
+                return new LoginManager(
+                    loginCache,
+                    twoFaHandler,
+                    ApiClientConfiguration.ClientId,
+                    ApiClientConfiguration.ClientSecret,
+                    ApiClientConfiguration.AuthorizationNote,
+                    ApiClientConfiguration.MachineFingerprint);
             }
             else if (serviceType == typeof(IMenuProvider))
             {

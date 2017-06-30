@@ -64,7 +64,7 @@ namespace UnitTests
         public static IRepositoryHosts RepositoryHosts { get { return Substitute.For<IRepositoryHosts>(); } }
         public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
-        public static ITwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<ITwoFactorChallengeHandler>(); } }
+        public static IDelegatingTwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<IDelegatingTwoFactorChallengeHandler>(); } }
         public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
         public static IPullRequestService PullRequestService { get { return Substitute.For<IPullRequestService>(); } }
         public static IUIProvider UIProvider { get { return Substitute.For<IUIProvider>(); } }
@@ -129,7 +129,7 @@ namespace UnitTests
             ret.GetService(typeof(IConnection)).Returns(Connection);
             ret.GetService(typeof(IConnectionManager)).Returns(ConnectionManager);
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
-            ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
+            ret.GetService(typeof(IDelegatingTwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
             ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
             ret.GetService(typeof(IPullRequestService)).Returns(PullRequestService);
             ret.GetService(typeof(IUIProvider)).Returns(UIProvider);
@@ -200,9 +200,9 @@ namespace UnitTests
             return provider.GetService(typeof(IAvatarProvider)) as IAvatarProvider;
         }
 
-        public static ITwoFactorChallengeHandler GetTwoFactorChallengeHandler(this IServiceProvider provider)
+        public static IDelegatingTwoFactorChallengeHandler GetTwoFactorChallengeHandler(this IServiceProvider provider)
         {
-            return provider.GetService(typeof(ITwoFactorChallengeHandler)) as ITwoFactorChallengeHandler;
+            return provider.GetService(typeof(IDelegatingTwoFactorChallengeHandler)) as IDelegatingTwoFactorChallengeHandler;
         }
 
         public static IGistPublishService GetGistPublishService(this IServiceProvider provider)

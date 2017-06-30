@@ -57,13 +57,13 @@ namespace GitHub.Primitives
         }
 
         /// <summary>
-        /// The Base URL to the host. For example, "https://github.com" or "https://ghe.io"
+        /// The Base URL to the host. For example, "https://github.com" or "https://github-enterprise.com"
         /// </summary>
         public Uri WebUri { get; set; }
 
         /// <summary>
         /// The Base Url to the host's API endpoint. For example, "https://api.github.com" or
-        ///  "https://ghe.io/api/v3"
+        ///  "https://github-enterprise.com/api/v3"
         /// </summary>
         public Uri ApiUri { get; set; }
 
