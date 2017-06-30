@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -9,9 +10,11 @@ namespace GitHub.Models
     /// </summary>
     /// <remarks>
     /// A pull request session file represents the real-time state of a file in a pull request in
-    /// the IDE. It represents the state of a file from the pull request model updated to the 
-    /// current state of the code on disk and in the editor.
+    /// the IDE. If the pull request branch is checked out, it represents the state of a file from
+    /// the pull request model updated to the current state of the code on disk and in the editor.
     /// </remarks>
+    /// <seealso cref="IPullRequestSession"/>
+    /// <seealso cref="IPullRequestSessionManager"/>
     public interface IPullRequestSessionFile : INotifyPropertyChanged
     {
         /// <summary>
