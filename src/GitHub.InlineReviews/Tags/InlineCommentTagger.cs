@@ -18,6 +18,9 @@ using System.Collections;
 
 namespace GitHub.InlineReviews.Tags
 {
+    /// <summary>
+    /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
+    /// </summary>
     sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IEditorContentSource, IDisposable
     {
         readonly IGitService gitService;

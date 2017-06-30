@@ -5,6 +5,11 @@ using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Tags
 {
+    /// <summary>
+    /// Base class for inline comment tags.
+    /// </summary>
+    /// <seealso cref="AddInlineCommentTag"/>
+    /// <seealso cref="ShowInlineCommentTag"/>
     public abstract class InlineCommentTag : ITag
     {
         public InlineCommentTag(
