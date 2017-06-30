@@ -286,17 +286,6 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository)
-        {
-            return Observable.Defer(async () =>
-            {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var configKey = $"branch.{repo.Head.FriendlyName}.{SettingGHfVSPullRequest}";
-                await gitClient.UnsetConfig(repo, configKey);
-                return Observable.Return(Unit.Default);
-            });
-        }
-
         public IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,

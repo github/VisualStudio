@@ -121,13 +121,6 @@ namespace GitHub.Services
         IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
-        /// Removes any association between the current branch and a pull request.
-        /// </summary>
-        /// <param name="repository">The repository.</param>
-        /// <returns></returns>
-        IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository);
-
-        /// <summary>
         /// Gets the left and right files for a diff.
         /// </summary>
         /// <param name="repository">The repository.</param>
