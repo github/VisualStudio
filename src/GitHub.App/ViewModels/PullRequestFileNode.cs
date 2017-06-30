@@ -21,7 +21,6 @@ namespace GitHub.ViewModels
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
-        /// <param name="commentCount">The number of review comments on the file.</param>
         public PullRequestFileNode(
             string repositoryPath,
             string path,
