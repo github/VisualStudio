@@ -139,13 +139,11 @@ namespace GitHub.InlineReviews.Glyph
                 {
                     var span = list[0];
                     int start = span.Start;
-                    span = list[0];
                     int end = span.End;
                     for (int i = 1; i < list.Count; i++)
                     {
                         span = list[i];
                         start = Math.Min(start, span.Start);
-                        span = list[i];
                         end = Math.Max(end, span.End);
                     }
 
