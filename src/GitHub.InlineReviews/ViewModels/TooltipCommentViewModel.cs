@@ -28,6 +28,8 @@ namespace GitHub.InlineReviews.ViewModels
 
         public int Id { get; }
 
+        public bool IsReadOnly { get; set; }
+
         public DateTimeOffset UpdatedAt { get; }
 
         public IAccount User { get; }
