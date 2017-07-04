@@ -390,7 +390,13 @@ namespace GitHub.Services
         {
             return Task.Factory.StartNew(() =>
             {
-                return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
+                if (repo.Head.IsTracking)
+                {
+                    var divergence = repo.ObjectDatabase.CalculateHistoryDivergence(repo.Head.Tip, repo.Head.TrackedBranch.Tip);
+                    return divergence.AheadBy == 0;
+                }
+
+                return false;
             });
         }
 
