@@ -105,10 +105,11 @@ namespace GitHub.Services
 
         public IObservable<Unit> Push(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, repo.Head.Remote.Name).ToObservable();
+                var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
             });
         }
 
@@ -171,8 +172,13 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
+
                 if (repo.Head.Remote != null)
-                    await gitClient.Fetch(repo, repo.Head.Remote.Name);
+                {
+                    var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                    await gitClient.Fetch(repo, remote.Name);
+                }
+
                 return Observable.Return(repo.Head.TrackingDetails);
             });
         }
