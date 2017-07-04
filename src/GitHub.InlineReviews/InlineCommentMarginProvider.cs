@@ -58,8 +58,14 @@ namespace GitHub.InlineReviews
             IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
+            var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
+
+            var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
+            wpfTextViewHost.TextView.VisualElement.MouseMove += (t, e) => router.MouseMove(margin.VisualElement, e);
+            wpfTextViewHost.TextView.VisualElement.MouseLeave += (t, e) => router.MouseLeave(margin.VisualElement, e);
+
+            return margin;
         }
 
         bool IsMarginVisible(ITextBuffer buffer)
