@@ -485,19 +485,13 @@ namespace GitHub.Services
 
         static string GetSafeBranchName(string name)
         {
-            var before = InvalidBranchCharsRegex.Replace(name, "-").TrimEnd('-');
+            var safeBranchName = InvalidBranchCharsRegex.Replace(name, "-").TrimEnd('-');
 
-            for (;;)
+            while (safeBranchName.IndexOf("--") > 0)
             {
-                string after = before.Replace("--", "-");
-
-                if (after == before)
-                {
-                    return before.ToLower(CultureInfo.CurrentCulture);
-                }
-
-                before = after;
+                safeBranchName.Replace("--", "-");
             }
+            return safeBranchName.ToLower(CultureInfo.CurrentCulture);
         }
     }
 }
