@@ -2,14 +2,17 @@
 using System.IO;
 using GitHub.Models;
 using NullGuard;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     /// <summary>
     /// A file node in a pull request changes tree.
     /// </summary>
-    public class PullRequestFileNode : IPullRequestFileNode
+    public class PullRequestFileNode : ReactiveObject, IPullRequestFileNode
     {
+        int commentCount;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestFileNode"/> class.
         /// </summary>
@@ -18,7 +21,12 @@ namespace GitHub.ViewModels
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
-        public PullRequestFileNode(string repositoryPath, string path, string sha, PullRequestFileStatus status, [AllowNull] string statusDisplay)
+        public PullRequestFileNode(
+            string repositoryPath,
+            string path,
+            string sha,
+            PullRequestFileStatus status,
+            [AllowNull] string statusDisplay)
         {
             FileName = Path.GetFileName(path);
             DirectoryPath = Path.GetDirectoryName(path);
@@ -57,5 +65,14 @@ namespace GitHub.ViewModels
         /// Gets the string to display in the [message] box next to the filename.
         /// </summary>
         public string StatusDisplay { [return: AllowNull] get; }
+
+        /// <summary>
+        /// Gets or sets the number of review comments on the file.
+        /// </summary>
+        public int CommentCount
+        {
+            get { return commentCount; }
+            set { this.RaiseAndSetIfChanged(ref commentCount, value); }
+        }
     }
 }

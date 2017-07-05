@@ -40,6 +40,8 @@ namespace GitHub.Services
             this.statusBar = serviceProvider.GetService<IVsStatusbar>();
         }
 
+        public event EventHandler ActiveRepoChanged;
+
         // The Default Repository Path that VS uses is hidden in an internal
         // service 'ISccSettingsService' registered in an internal service
         // 'ISccServiceHost' in an assembly with no public types that's

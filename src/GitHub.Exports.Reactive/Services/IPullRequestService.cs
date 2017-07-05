@@ -53,9 +53,26 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the local branches that exist for the specified pull request.
         /// </summary>
+        /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
         IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
+        /// Ensures that all local branches for the specified pull request are marked as PR branches.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request details.</param>
+        /// <returns>
+        /// An observable that produces a single value indicating whether a change to the repository was made.
+        /// </returns>
+        /// <remarks>
+        /// Pull request branches are marked in the local repository with a config value so that they can
+        /// be easily identified without a roundtrip to the server. This method ensures that the local branches
+        /// for the specified pull request are indeed marked and returns a value indicating whether any branches
+        /// have had the mark added.
+        /// </remarks>
+        IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
         /// Determines whether the specified pull request is from a fork.
@@ -90,27 +107,18 @@ namespace GitHub.Services
         IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
-        /// Removes any association between the current branch and a pull request.
+        /// Gets the pull request associated with the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <returns></returns>
-        IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository);
-
-        /// <summary>
-        /// Extracts a file at a specified commit from the repository.
-        /// </summary>
-        /// <param name="repository">The repository.</param>
-        /// <param name="modelService">A model service to use as a cache if the file is not fetched.</param>
-        /// <param name="commitSha">The SHA of the commit.</param>
-        /// <param name="fileName">The path to the file, relative to the repository.</param>
-        /// <param name="fileSha">The SHA of the file in the pull request.</param>
-        /// <returns>The filename of the extracted file.</returns>
-        IObservable<string> ExtractFile(
-            ILocalRepositoryModel repository,
-            IModelService modelService,
-            string commitSha,
-            string fileName,
-            string fileSha);
+        /// <returns>
+        /// An observable that produces a single value: the pull request number, or 0 if the
+        /// current branch is not a PR branch.
+        /// </returns>
+        /// <remarks>
+        /// This method does not do an API request - it simply checks the mark left in the git
+        /// config by <see cref="Checkout(ILocalRepositoryModel, IPullRequestModel, string)"/>.
+        /// </remarks>
+        IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Gets the left and right files for a diff.
@@ -127,10 +135,8 @@ namespace GitHub.Services
         /// <returns>The paths of the left and right files for the diff.</returns>
         IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
-            IModelService modelService,
             IPullRequestModel pullRequest,
             string fileName,
-            string fileSha,
             bool isPullRequestBranchCheckedOut);
 
         /// <summary>

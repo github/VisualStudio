@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -71,6 +72,16 @@ namespace GitHub.ViewModels
         IPullRequestModel Model { get; }
 
         /// <summary>
+        /// Gets the session for the pull request.
+        /// </summary>
+        IPullRequestSession Session { get; }
+
+        /// <summary>
+        /// Gets the repository that the pull request relates to.
+        /// </summary>
+        ILocalRepositoryModel Repository { get; }
+
+        /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
         /// </summary>
         string SourceBranchDisplayName { get; }
@@ -79,6 +90,11 @@ namespace GitHub.ViewModels
         /// Gets a string describing how to display the pull request's target branch.
         /// </summary>
         string TargetBranchDisplayName { get; }
+
+        /// <summary>
+        /// Gets the number of comments made on the pull request.
+        /// </summary>
+        int CommentCount { get; }
 
         /// <summary>
         /// Gets a value indicating whether the pull request branch is checked out.

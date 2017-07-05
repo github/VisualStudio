@@ -31,6 +31,7 @@ namespace GitHub.Models
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }
         public IAccount User { get; private set; }
+        [AllowNull]
         public IModelService ModelService { get; private set; }
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)

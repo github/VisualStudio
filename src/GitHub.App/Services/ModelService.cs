@@ -41,6 +41,11 @@ namespace GitHub.Services
             this.avatarProvider = avatarProvider;
         }
 
+        public IObservable<IAccount> GetCurrentUser()
+        {
+            return GetUserFromCache().Select(Create);
+        }
+
         public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
@@ -138,7 +143,7 @@ namespace GitHub.Services
                 .Concat(GetAllRepositoriesForAllOrganizations());
         }
 
-        public IObservable<AccountCacheItem> GetUserFromCache()
+        IObservable<AccountCacheItem> GetUserFromCache()
         {
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
@@ -192,8 +197,20 @@ namespace GitHub.Services
                         Observable.CombineLatest(
                             apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
                             apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
-                            (pr, files) => new { PullRequest = pr, Files = files })
-                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, (IReadOnlyList<PullRequestFile>)x.Files)),
+                            apiClient.GetIssueComments(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            apiClient.GetPullRequestReviewComments(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            (pr, files, comments, reviewComments) => new
+                            {
+                                PullRequest = pr,
+                                Files = files,
+                                Comments = comments,
+                                ReviewComments = reviewComments
+                            })
+                            .Select(x => PullRequestCacheItem.Create(
+                                x.PullRequest, 
+                                (IReadOnlyList<PullRequestFile>)x.Files,
+                                (IReadOnlyList<IssueComment>)x.Comments,
+                                (IReadOnlyList<PullRequestReviewComment>)x.ReviewComments)),
                         TimeSpan.Zero,
                         TimeSpan.FromDays(7))
                     .Select(Create);
@@ -400,6 +417,28 @@ namespace GitHub.Services
                 Body = prCacheItem.Body ?? string.Empty,
                 ChangedFiles = prCacheItem.ChangedFiles.Select(x => 
                     (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Sha, x.Status)).ToList(),
+                Comments = prCacheItem.Comments.Select(x =>
+                    (ICommentModel)new IssueCommentModel
+                    {
+                        Id = x.Id,
+                        Body = x.Body,
+                        User = Create(x.User),
+                        CreatedAt = x.CreatedAt ?? DateTimeOffset.MinValue,
+                    }).ToList(),
+                ReviewComments = prCacheItem.ReviewComments.Select(x =>
+                    (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
+                    {
+                        Id = x.Id,
+                        Path = x.Path,
+                        Position = x.Position,
+                        OriginalPosition = x.OriginalPosition,
+                        CommitId = x.CommitId,
+                        OriginalCommitId = x.OriginalCommitId,
+                        DiffHunk = x.DiffHunk,
+                        User = Create(x.User),
+                        Body = x.Body,
+                        CreatedAt = x.CreatedAt,
+                    }).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
@@ -489,22 +528,30 @@ namespace GitHub.Services
         {
             public static PullRequestCacheItem Create(PullRequest pr)
             {
-                return new PullRequestCacheItem(pr, new PullRequestFile[0]);
+                return new PullRequestCacheItem(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReviewComment[0]);
             }
 
-            public static PullRequestCacheItem Create(PullRequest pr, IReadOnlyList<PullRequestFile> files)
+            public static PullRequestCacheItem Create(
+                PullRequest pr,
+                IReadOnlyList<PullRequestFile> files,
+                IReadOnlyList<IssueComment> comments,
+                IReadOnlyList<PullRequestReviewComment> reviewComments)
             {
-                return new PullRequestCacheItem(pr, files);
+                return new PullRequestCacheItem(pr, files, comments, reviewComments);
             }
 
             public PullRequestCacheItem() {}
 
             public PullRequestCacheItem(PullRequest pr)
-                : this(pr, new PullRequestFile[0])
+                : this(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReviewComment[0])
             {
             }
 
-            public PullRequestCacheItem(PullRequest pr, IReadOnlyList<PullRequestFile> files)
+            public PullRequestCacheItem(
+                PullRequest pr,
+                IReadOnlyList<PullRequestFile> files,
+                IReadOnlyList<IssueComment> comments,
+                IReadOnlyList<PullRequestReviewComment> reviewComments)
             {
                 Title = pr.Title;
                 Number = pr.Number;
@@ -530,6 +577,8 @@ namespace GitHub.Services
                 UpdatedAt = pr.UpdatedAt;
                 Body = pr.Body;
                 ChangedFiles = files.Select(x => new PullRequestFileCacheItem(x)).ToList();
+                Comments = comments.Select(x => new IssueCommentCacheItem(x)).ToList();
+                ReviewComments = reviewComments.Select(x => new PullRequestReviewCommentCacheItem(x)).ToList();
                 State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
                 Merged = pr.Merged;
@@ -549,6 +598,8 @@ namespace GitHub.Services
             public DateTimeOffset UpdatedAt { get; set; }
             public string Body { get; set; }
             public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
+            public IList<IssueCommentCacheItem> Comments { get; set; } = new IssueCommentCacheItem[0];
+            public IList<PullRequestReviewCommentCacheItem> ReviewComments { get; set; } = new PullRequestReviewCommentCacheItem[0];
 
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
@@ -591,6 +642,60 @@ namespace GitHub.Services
             public string FileName { get; set; }
             public string Sha { get; set; }
             public PullRequestFileStatus Status { get; set; }
+        }
+
+        [NullGuard(ValidationFlags.None)]
+        public class IssueCommentCacheItem
+        {
+            public IssueCommentCacheItem()
+            {
+            }
+
+            public IssueCommentCacheItem(IssueComment comment)
+            {
+                Id = comment.Id;
+                User = new AccountCacheItem(comment.User);
+                Body = comment.Body;
+                CreatedAt = comment.CreatedAt;
+            }
+
+            public int Id { get; }
+            public AccountCacheItem User { get; set; }
+            public string Body { get; set; }
+            public DateTimeOffset? CreatedAt { get; set; }
+        }
+
+        [NullGuard(ValidationFlags.None)]
+        public class PullRequestReviewCommentCacheItem
+        {
+            public PullRequestReviewCommentCacheItem()
+            {
+            }
+
+            public PullRequestReviewCommentCacheItem(PullRequestReviewComment comment)
+            {
+                Id = comment.Id;
+                Path = comment.Path;
+                Position = comment.Position;
+                OriginalPosition = comment.OriginalPosition;
+                CommitId = comment.CommitId;
+                OriginalCommitId = comment.OriginalCommitId;
+                DiffHunk = comment.DiffHunk;
+                User = new AccountCacheItem(comment.User);
+                Body = comment.Body;
+                CreatedAt = comment.CreatedAt;
+            }
+
+            public int Id { get; }
+            public string Path { get; set; }
+            public int? Position { get; set; }
+            public int? OriginalPosition { get; set; }
+            public string CommitId { get; set; }
+            public string OriginalCommitId { get; set; }
+            public string DiffHunk { get; set; }
+            public AccountCacheItem User { get; set; }
+            public string Body { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
         }
 
         [NullGuard(ValidationFlags.None)]

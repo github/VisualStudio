@@ -105,10 +105,11 @@ namespace GitHub.Services
 
         public IObservable<Unit> Push(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, repo.Head.Remote.Name).ToObservable();
+                var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
             });
         }
 
@@ -132,15 +133,17 @@ namespace GitHub.Services
                 else
                 {
                     var refSpec = $"{pullRequest.Head.Ref}:{localBranchName}";
-                    var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
                     var remoteName = await CreateRemote(repo, pullRequest.Head.RepositoryCloneUrl);
 
                     await gitClient.Fetch(repo, remoteName);
                     await gitClient.Fetch(repo, remoteName, new[] { refSpec });
                     await gitClient.Checkout(repo, localBranchName);
                     await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.Head.Ref}");
-                    await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
                 }
+
+                // Store the PR number in the branch config with the key "ghfvs-pr".
+                var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
+                await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
 
                 return Observable.Return(Unit.Default);
             });
@@ -169,8 +172,13 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
+
                 if (repo.Head.Remote != null)
-                    await gitClient.Fetch(repo, repo.Head.Remote.Name);
+                {
+                    var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                    await gitClient.Fetch(repo, remote.Name);
+                }
+
                 return Observable.Return(repo.Head.TrackingDetails);
             });
         }
@@ -194,6 +202,27 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
                 return result.ToObservable();
+            });
+        }
+
+        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var branches = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
+                var result = false;
+
+                foreach (var branch in branches)
+                {
+                    if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest.Number))
+                    {
+                        await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.Number);
+                        result = true;
+                    }
+                }
+
+                return Observable.Return(result);
             });
         }
 
@@ -242,93 +271,92 @@ namespace GitHub.Services
                     }
 
                     await gitClient.Checkout(repo, branchName);
+                    await MarkBranchAsPullRequest(repo, branchName, pullRequest.Number);
                 }
 
                 return Observable.Return(Unit.Default);
             });
         }
 
-        public IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository)
+        public IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(async () =>
+            return Observable.Defer(() =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var configKey = $"branch.{repo.Head.FriendlyName}.ghfvs-pr";
-                await gitClient.UnsetConfig(repo, configKey);
-                return Observable.Return(Unit.Default);
-            });
-        }
-
-        public IObservable<string> ExtractFile(
-            ILocalRepositoryModel repository,
-            IModelService modelService,
-            string commitSha,
-            string fileName,
-            string fileSha)
-        {
-            return Observable.Defer(async () =>
-            {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name);
-                var result = await GetFileFromRepositoryOrApi(repository, repo, modelService, commitSha, fileName, fileSha);
-
-                if (result == null)
-                {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{commitSha}");
-                }
-
-                return Observable.Return(result);
+                var configKey = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "branch.{0}.{1}",
+                    repo.Head.FriendlyName,
+                    SettingGHfVSPullRequest);
+                return gitClient.GetConfig<int>(repo, configKey).ToObservable();
             });
         }
 
         public IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
-            IModelService modelService,
             IPullRequestModel pullRequest,
             string fileName,
-            string fileSha,
             bool isPullRequestBranchCheckedOut)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name);
 
-                // The left file is the target of the PR so this should already be fetched.
-                var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
-
-                // The right file - if it comes from a fork - may not be fetched so fall back to
-                // getting the file contents from the model service.
-                var right = isPullRequestBranchCheckedOut ?
-                    Path.Combine(repository.LocalPath, fileName) :
-                    await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
-
-                if (left == null)
+                var baseSha = pullRequest.Base.Sha;
+                var headSha = pullRequest.Head.Sha;
+                var baseRef = pullRequest.Base.Ref;
+                string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
+                if (mergeBase == null)
                 {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Base.Sha}");
+                    throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
                 }
 
-                if (right == null)
+                string left;
+                string right;
+                if (isPullRequestBranchCheckedOut)
                 {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Head.Sha}");
+                    right = Path.Combine(repository.LocalPath, fileName);
+                    left = await ExtractToTempFile(repo, mergeBase, fileName, GetEncoding(right));
+                }
+                else
+                {
+                    left = await ExtractToTempFile(repo, mergeBase, fileName, Encoding.UTF8);
+                    right = await ExtractToTempFile(repo, headSha, fileName, Encoding.UTF8);
                 }
 
                 return Observable.Return(Tuple.Create(left, right));
             });
         }
 
-        async Task<string> GetFileFromRepositoryOrApi(
-            ILocalRepositoryModel repository,
-            IRepository repo,
-            IModelService modelService,
-            string commitSha,
-            string fileName,
-            string fileSha)
+        static Encoding GetEncoding(string file)
         {
-            return await gitClient.ExtractFile(repo, commitSha, fileName) ??
-                   await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+            if (File.Exists(file))
+            {
+                var encoding = Encoding.UTF8;
+                if (HasPreamble(file, encoding))
+                {
+                    return encoding;
+                }
+            }
+
+            return Encoding.Default;
+        }
+
+        static bool HasPreamble(string file, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(file))
+            {
+                foreach (var b in encoding.GetPreamble())
+                {
+                    if(b != stream.ReadByte())
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
@@ -385,6 +413,23 @@ namespace GitHub.Services
             return uniqueName;
         }
 
+        async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName, Encoding encoding)
+        {
+            var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            return CreateTempFile(fileName, commitSha, contents, encoding);
+        }
+
+        static string CreateTempFile(string fileName, string commitSha, string contents, Encoding encoding)
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
+            var tempFile = Path.Combine(tempDir, tempFileName);
+
+            Directory.CreateDirectory(tempDir);
+            File.WriteAllText(tempFile, contents, encoding);
+            return tempFile;
+        }
+
         IEnumerable<string> GetLocalBranchesInternal(
             ILocalRepositoryModel localRepository,
             IRepository repository,
@@ -402,6 +447,19 @@ namespace GitHub.Services
                     .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
                     .Select(x => x.Branch);
             }
+        }
+
+        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, int number)
+        {
+            var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
+            return await gitClient.GetConfig<int>(repo, prConfigKey) == number;
+        }
+
+        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, int number)
+        {
+            // Store the PR number in the branch config with the key "ghfvs-pr".
+            var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
+            await gitClient.SetConfig(repo, prConfigKey, number.ToString());
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
