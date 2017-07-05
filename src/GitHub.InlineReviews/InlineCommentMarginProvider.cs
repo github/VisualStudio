@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
@@ -10,7 +11,6 @@ using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Glyph;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Views;
-using GitHub.Models;
 using GitHub.Services;
 
 namespace GitHub.InlineReviews
@@ -61,11 +61,18 @@ namespace GitHub.InlineReviews
             var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
 
-            var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
-            wpfTextViewHost.TextView.VisualElement.MouseMove += (t, e) => router.MouseMove(margin.VisualElement, e);
-            wpfTextViewHost.TextView.VisualElement.MouseLeave += (t, e) => router.MouseLeave(margin.VisualElement, e);
-
+            TrackCommentGlyphOnDiffView(wpfTextViewHost.TextView, margin.VisualElement);
             return margin;
+        }
+
+        void TrackCommentGlyphOnDiffView(IWpfTextView textView, FrameworkElement visualElement)
+        {
+            if (textView.Roles.Contains("DIFF"))
+            {
+                var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
+                textView.VisualElement.MouseMove += (t, e) => router.MouseMove(visualElement, e);
+                textView.VisualElement.MouseLeave += (t, e) => router.MouseLeave(visualElement, e);
+            }
         }
 
         bool IsMarginVisible(ITextBuffer buffer)
