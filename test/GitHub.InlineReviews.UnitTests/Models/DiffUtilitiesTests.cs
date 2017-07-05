@@ -86,8 +86,8 @@ namespace GitHub.InlineReviews.UnitTests.Models
 
             [Theory]
             [InlineData(1, 2, " 1", 1, 2)]
-            [InlineData(1, 2, "+1", -1, 2)]
-            [InlineData(1, 2, "-1", 1, -1)]
+            [InlineData(1, 2, "+1", 1, 2)]
+            [InlineData(1, 2, "-1", 1, 2)]
             public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber, string line, int expectOldLineNumber, int expectNewLineNumber)
             {
                 var header = $"@@ -{oldLineNumber} +{newLineNumber} @@\n{line}";
@@ -169,7 +169,33 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
         }
 
-        public class TheMatchMethod
+        public class TheMatchLineMethod
+        {
+            [Theory]
+            [InlineData("@@ -1 +1 @@. 1", "@@ -2 +1 @@. 1", -1)]
+            [InlineData("@@ -1 +1 @@. 1", "@@ -1 +1 @@. 1", 0)]
+            [InlineData("@@ -1 +1 @@. 1.+2", "@@ -1 +1 @@. 1", 0)]
+            [InlineData("@@ -1 +1 @@.+2. 1", "@@ -1 +1 @@. 1", 1)]
+
+            [InlineData("@@ -1 +1 @@.+1", "@@ -1 +1 @@.+1", 0)]
+            [InlineData("@@ -1 +1 @@.-1", "@@ -1 +1 @@.-1", 0)]
+
+            [InlineData("@@ -1 +1 @@.+1", "@@ -1 +1 @@", -1)]
+            public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
+            {
+                lines1 = lines1.Replace(".", "\r\n");
+                lines2 = lines2.Replace(".", "\r\n");
+                var chunks1 = DiffUtilities.ParseFragment(lines1).ToList();
+                var chunks2 = DiffUtilities.ParseFragment(lines2).ToList();
+                var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
+                var targetLines = chunks2.First().Lines;
+
+                var matchLine = DiffUtilities.MatchLine(chunks1, targetLines);
+                Assert.Equal(expectLine, matchLine);
+            }
+        }
+
+        public class TheMatchChunkMethod
         {
             [Theory]
             [InlineData(" 1", " 1", 0)]
@@ -186,7 +212,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
                 var targetLines = chunks2.First().Lines;
 
-                var line = DiffUtilities.Match(chunks1, targetLines);
+                var line = DiffUtilities.MatchChunk(chunks1, targetLines);
 
                 Assert.Equal(expectLine, line);
             }
@@ -201,7 +227,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var targetLine = chunks2.First().Lines.First();
                 var targetLines = new[] { targetLine };
 
-                var line = DiffUtilities.Match(chunks1, targetLines);
+                var line = DiffUtilities.MatchChunk(chunks1, targetLines);
 
                 Assert.Equal(expectLine, line);
             }
@@ -212,7 +238,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var chunks = new DiffChunk[0];
                 var lines = new DiffLine[0];
 
-                var line = DiffUtilities.Match(chunks, lines);
+                var line = DiffUtilities.MatchChunk(chunks, lines);
 
                 Assert.Equal(null, line);
             }

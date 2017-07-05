@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace GitHub.Models
 {
@@ -50,8 +51,10 @@ namespace GitHub.Models
                         chunk.Lines.Add(new DiffLine
                         {
                             Type = type,
-                            OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
-                            NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
+                            //OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
+                            //NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
+                            OldLineNumber = oldLine,
+                            NewLineNumber = newLine,
                             DiffLineNumber = diffLine,
                             Content = line,
                         });
@@ -83,13 +86,29 @@ namespace GitHub.Models
 
         public static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
         {
-            int j = 0;
+            var diffLine = MatchLine(diff, target);
+            if (diffLine != null)
+            {
+                return diffLine;
+            }
 
+            diffLine = MatchChunk(diff, target);
+            if (diffLine != null)
+            {
+                return diffLine;
+            }
+
+            return null;
+        }
+
+        public static DiffLine MatchChunk(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
+        {
             if (target.Count == 0)
             {
                 return null; // no lines to match
             }
 
+            int j = 0;
             foreach (var source in diff)
             {
                 for (var i = source.Lines.Count - 1; i >= 0; --i)
@@ -101,6 +120,31 @@ namespace GitHub.Models
                     else
                     {
                         j = 0;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static DiffLine MatchLine(IEnumerable<DiffChunk> chunks1, IList<DiffLine> targetLines)
+        {
+            var targetLine = targetLines.FirstOrDefault();
+            if (targetLine == null)
+            {
+                return null;
+            }
+
+            foreach (var chunk in chunks1)
+            {
+                foreach (var line in chunk.Lines)
+                {
+                    if (targetLine.OldLineNumber == line.OldLineNumber)
+                    {
+                        if(targetLine.Content == line.Content)
+                        {
+                            return line;
+                        }
                     }
                 }
             }

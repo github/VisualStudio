@@ -40,11 +40,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 // -    public class UsageTracker : IUsageTracker
                 Assert.Equal(17, result[0].Lines[7].OldLineNumber);
-                Assert.Equal(-1, result[0].Lines[7].NewLineNumber);
+                Assert.Equal(18, result[0].Lines[7].NewLineNumber);
                 Assert.Equal(12, result[0].Lines[7].DiffLineNumber);
 
                 // +    public sealed class UsageTracker : IUsageTracker, IDisposable
-                Assert.Equal(-1, result[0].Lines[8].OldLineNumber);
+                Assert.Equal(18, result[0].Lines[8].OldLineNumber);
                 Assert.Equal(18, result[0].Lines[8].NewLineNumber);
                 Assert.Equal(13, result[0].Lines[8].DiffLineNumber);
 
