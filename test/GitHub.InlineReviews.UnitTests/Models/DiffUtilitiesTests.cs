@@ -172,14 +172,20 @@ namespace GitHub.InlineReviews.UnitTests.Models
         public class TheMatchLineMethod
         {
             [Theory]
+            // context line moves
             [InlineData("@@ -1 +1 @@. 1", "@@ -2 +1 @@. 1", -1)]
             [InlineData("@@ -1 +1 @@. 1", "@@ -1 +1 @@. 1", 0)]
             [InlineData("@@ -1 +1 @@. 1.+2", "@@ -1 +1 @@. 1", 0)]
             [InlineData("@@ -1 +1 @@.+2. 1", "@@ -1 +1 @@. 1", 1)]
 
+            // lines added or deleted
             [InlineData("@@ -1 +1 @@.+1", "@@ -1 +1 @@.+1", 0)]
             [InlineData("@@ -1 +1 @@.-1", "@@ -1 +1 @@.-1", 0)]
 
+            // context line changed
+            [InlineData("@@ -1 +1 @@.-x.+y", "@@ -1 +1 @@. x", -1)]
+
+            // no target lines
             [InlineData("@@ -1 +1 @@.+1", "@@ -1 +1 @@", -1)]
             public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
             {
@@ -188,9 +194,30 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var chunks1 = DiffUtilities.ParseFragment(lines1).ToList();
                 var chunks2 = DiffUtilities.ParseFragment(lines2).ToList();
                 var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
-                var targetLines = chunks2.First().Lines;
+                var targetLines = chunks2.First().Lines.Reverse().ToList();
 
                 var matchLine = DiffUtilities.MatchLine(chunks1, targetLines);
+                Assert.Equal(expectLine, matchLine);
+            }
+        }
+
+        public class TheMatchLineIgnoreCommentsMethod
+        {
+            [Theory]
+            [InlineData("@@ -1 +1 @@. x", "@@ -1 +1 @@-x.+//x", 0)] // Ignore extra '/' char.
+            [InlineData("@@ -1 +1 @@. x", "@@ -1 +1 @@-x.+ x", 0)] // Ignore extra ' ' char.
+            [InlineData("@@ -1 +1 @@. x", "@@ -1 +1 @@-x.+\tx", 0)] // Ignore extra '\t' char.
+            [InlineData("@@ -1 +1 @@. x", "@@ -1 +1 @@-x.+!x", -1)] // Don't ignore extra '!' char.
+            public void MatchLineIgnoreComments(string lines1, string lines2, int skip /* -1 for no match */)
+            {
+                lines1 = lines1.Replace(".", Environment.NewLine);
+                lines2 = lines2.Replace(".", Environment.NewLine);
+                var chunks1 = DiffUtilities.ParseFragment(lines1).ToList();
+                var chunks2 = DiffUtilities.ParseFragment(lines2).ToList();
+                var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
+                var targetLines = chunks2.First().Lines.Reverse().ToList();
+
+                var matchLine = DiffUtilities.MatchLineIgnoreComments(chunks1, targetLines);
                 Assert.Equal(expectLine, matchLine);
             }
         }

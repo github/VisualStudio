@@ -92,6 +92,12 @@ namespace GitHub.Models
                 return diffLine;
             }
 
+            diffLine = MatchLineIgnoreComments(diff, target);
+            if (diffLine != null)
+            {
+                return diffLine;
+            }
+
             diffLine = MatchChunk(diff, target);
             if (diffLine != null)
             {
@@ -150,6 +156,55 @@ namespace GitHub.Models
             }
 
             return null;
+        }
+
+        public static DiffLine MatchLineIgnoreComments(IEnumerable<DiffChunk> chunks1, IList<DiffLine> targetLines)
+        {
+            var ignoreChars = new[] { ' ', '\t', '/' };
+
+            var targetLine = targetLines.FirstOrDefault();
+            if (targetLine == null)
+            {
+                return null;
+            }
+
+            foreach (var chunk in chunks1)
+            {
+                bool loose = false;
+                foreach (var line in chunk.Lines)
+                {
+                    if (targetLine.OldLineNumber == line.OldLineNumber || loose)
+                    {
+                        var targetContent = targetLine.Content;
+                        var lineContent = line.Content;
+                        if (targetContent == lineContent)
+                        {
+                            return line;
+                        }
+
+                        targetContent = GetSignificantContent(targetContent, ignoreChars);
+                        lineContent = GetSignificantContent(lineContent, ignoreChars);
+                        if (targetContent == lineContent)
+                        {
+                            if (line.Type == DiffChangeType.Delete)
+                            {
+                                loose = true;
+                            }
+                            else
+                            {
+                                return line;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        static string GetSignificantContent(string content, char[] ignoreChars)
+        {
+            return content.Substring(1).TrimStart(ignoreChars);
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
