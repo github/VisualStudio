@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
@@ -96,7 +98,15 @@ namespace GitHub.InlineReviews.Services
 
             ExpandCollapsedRegions(textView, line.Extent);
 
-            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
+            var session = peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
+            var item = session.PeekableItems.OfType<InlineCommentPeekableItem>().FirstOrDefault();
+
+            if (item != null)
+            {
+                var placeholder = item.ViewModel.Thread.Comments.Last();
+                placeholder.CancelEdit.Take(1).Subscribe(_ => session.Dismiss());
+            }
+
             return trackingPoint;
         }
 
