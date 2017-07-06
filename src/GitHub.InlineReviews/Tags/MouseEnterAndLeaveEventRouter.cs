@@ -9,7 +9,13 @@ namespace GitHub.InlineReviews.Tags
     {
         T previousMouseOverElement;
 
-        public void MouseMove(object target, MouseEventArgs e)
+        public void Add(UIElement sourceElement, UIElement targetElement)
+        {
+            sourceElement.MouseMove += (t, e) => MouseMove(targetElement, e);
+            sourceElement.MouseLeave += (t, e) => MouseLeave(targetElement, e);
+        }
+
+        void MouseMove(object target, MouseEventArgs e)
         {
             T mouseOverElement = null;
             Action<T> visitAction = element =>
@@ -27,7 +33,7 @@ namespace GitHub.InlineReviews.Tags
             }
         }
 
-        public void MouseLeave(object target, MouseEventArgs e)
+        void MouseLeave(object target, MouseEventArgs e)
         {
             MouseLeave(previousMouseOverElement, e);
         }

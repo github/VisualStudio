@@ -65,15 +65,13 @@ namespace GitHub.InlineReviews
             return margin;
         }
 
-        void TrackCommentGlyphOnDiffView(IWpfTextViewHost host, FrameworkElement marginElement)
+        void TrackCommentGlyphOnDiffView(IWpfTextViewHost host, UIElement marginElement)
         {
             var textView = host.TextView;
             if (textView.Roles.Contains("DIFF"))
             {
-                var hostControl = host.HostControl;
                 var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
-                hostControl.MouseMove += (t, e) => router.MouseMove(marginElement, e);
-                hostControl.MouseLeave += (t, e) => router.MouseLeave(marginElement, e);
+                router.Add(host.HostControl, marginElement);
             }
         }
 
