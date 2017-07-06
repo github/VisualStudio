@@ -309,7 +309,7 @@ namespace GitHub.Services
                 string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
                 if (mergeBase == null)
                 {
-                    throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+                    throw new InvalidOperationException($"Couldn't find merge base between {baseSha} and {headSha}.");
                 }
 
                 string left;
@@ -349,7 +349,7 @@ namespace GitHub.Services
             {
                 foreach (var b in encoding.GetPreamble())
                 {
-                    if(b != stream.ReadByte())
+                    if (b != stream.ReadByte())
                     {
                         return false;
                     }

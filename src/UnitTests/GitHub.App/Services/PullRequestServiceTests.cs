@@ -68,7 +68,7 @@ public class PullRequestServiceTests : TestBaseClass
             var checkedOut = false;
             var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
 
-            var ex = await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
                                 fileName, checkedOut));
             Assert.Equal(expectMessage, ex.Message);
         }
