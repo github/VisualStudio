@@ -23,7 +23,8 @@
         <Binding>
             <Binding.Source>
                 <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
-                                                               TargetBranchDisplayName="master-is-always-stable">
+                                                               TargetBranchDisplayName="master-is-always-stable"
+                                                               CommentCount="10">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
@@ -158,7 +159,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Opacity="0.5" Margin="0 2 0 0" VerticalAlignment="Top"
+                    <TextBlock Grid.Column="0" Opacity="0.5" VerticalAlignment="Center"
                                Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
                     <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
@@ -175,7 +176,7 @@
 
                     <!-- Pull/push buttons -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
-                                Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
+                            Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
                         <ui:OcticonImage Icon="arrow_down"/>
                         <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
                         <ui:GitHubActionLink Content="Pull"
@@ -195,9 +196,8 @@
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
-                        <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -214,17 +214,18 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
+                    <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
+                    <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
                     </TextBlock>
                 </Grid>
             </StackPanel>
 
             <!-- Git operation error message -->
-
             <TextBox Grid.Column="0"
                      Grid.ColumnSpan="3"
                      Grid.Row="2"
                      Foreground="Red" 
-                     Margin="0 0 0 0"
+                     Margin="0 2 0 0"
                      Text="{Binding OperationError, Mode=OneWay}"
                      VerticalAlignment="Center"
                      TextWrapping="Wrap"
@@ -241,10 +242,14 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Author and open time -->
-                    <RowDefinition Height="Auto"/> <!-- PR body -->
-                    <RowDefinition Height="Auto"/> <!-- View on github link -->
-                    <RowDefinition Height="Auto"/> <!-- Files changed -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Author and open time -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- PR body -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- View on github link -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Files changed -->
                 </Grid.RowDefinitions>
 
                 <!-- Author and open time -->
@@ -268,11 +273,11 @@
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-                <!-- View on github link -->
+                <!-- View conversation on GitHub -->
                 <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
-
+                
                 <!-- Files changed -->
                 <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
@@ -290,7 +295,7 @@
                                     <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
                                 </ContextMenu>
                             </Grid.Resources>
-                            
+
                             <!-- Tree View -->
                             <TreeView ItemsSource="{Binding ChangedFilesTree}"
                                       ContextMenuOpening="TreeView_ContextMenuOpening"
@@ -351,6 +356,21 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
+                                            <TextBlock VerticalAlignment="Center" Margin="4 0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CommentCount}" Value="0">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                                <ui:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0"/>
+                                                <Hyperlink Click="ViewFileCommentsClick">
+                                                    <Run Text="{Binding CommentCount, Mode=OneWay}"/>
+                                                </Hyperlink>
+                                            </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
@@ -360,6 +380,5 @@
                 </ui:SectionControl>
             </Grid>
         </ScrollViewer>
-
     </DockPanel>
 </local:GenericPullRequestDetailView>

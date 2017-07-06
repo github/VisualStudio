@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using NullGuard;
-using System.Diagnostics;
 using NLog;
+using NullGuard;
 
 namespace GitHub.Services
 {
     [Export(typeof(IGitClient))]
     [PartCreationPolicy(CreationPolicy.Shared)]
+    [NullGuard(ValidationFlags.None)]
     public class GitClient : IGitClient
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
@@ -159,6 +159,58 @@ namespace GitHub.Services
             });
         }
 
+        public Task<Patch> Compare(
+            IRepository repository,
+            string sha1,
+            string sha2,
+            string path)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
+            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var commit1 = repository.Lookup<Commit>(sha1);
+                var commit2 = repository.Lookup<Commit>(sha2);
+
+                if (commit1 != null && commit2 != null)
+                {
+                    return repository.Diff.Compare<Patch>(
+                        commit1.Tree,
+                        commit2.Tree,
+                        new[] { path });
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, [AllowNull] byte[] contents)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha, nameof(sha));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var commit = repository.Lookup<Commit>(sha);
+
+                if (commit != null)
+                {
+                    var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
+                    var blob1 = commit[path]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
+                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
+                    return repository.Diff.Compare(blob1, blob2);
+                }
+
+                return null;
+            });
+        }
+
         public Task<T> GetConfig<T>(IRepository repository, string key)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -239,36 +291,107 @@ namespace GitHub.Services
         }
 
         [return: AllowNull]
-        public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
+        public Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
-            var commit = repository.Lookup<Commit>(commitSha);
+            return Task.Factory.StartNew(() =>
+            {
+                var commit = repository.Lookup<Commit>(commitSha);
+                if(commit == null)
+                {
+                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
+                }
 
-            if (commit == null)
+                var blob = commit[fileName]?.Target as Blob;
+                return blob?.GetContentText();
+            });
+        }
+
+        [return: AllowNull]
+        public Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var commit = repository.Lookup<Commit>(commitSha);
+                if (commit == null)
+                {
+                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
+                }
+
+                var blob = commit[fileName]?.Target as Blob;
+
+                if (blob != null)
+                {
+                    using (var m = new MemoryStream())
+                    {
+                        var content = blob.GetContentStream();
+                        content.CopyTo(m);
+                        return m.ToArray();
+                    }
+                }
+
+                return null;
+            });
+        }
+
+
+        public Task<bool> IsModified(IRepository repository, string path, [AllowNull] byte[] contents)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
+                {
+                    var head = repository.Head[path];
+                    if (head.TargetType != TreeEntryTargetType.Blob)
+                    {
+                        return false;
+                    }
+
+                    var blob1 = (Blob)head.Target;
+                    using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
+                    {
+                        var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
+                        var diff = repository.Diff.Compare(blob1, blob2);
+                        return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
+                    }
+                }
+
+                return true;
+            });
+        }
+
+        public async Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber)
+        {
+            var mergeBase = GetMergeBase(repo, baseSha, headSha);
+            if (mergeBase == null)
+            {
+                var pullHeadRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, remoteName, baseRef, pullHeadRef);
+
+                mergeBase = GetMergeBase(repo, baseSha, headSha);
+            }
+
+            return mergeBase;
+        }
+
+        static string GetMergeBase(IRepository repo, string a, string b)
+        {
+            var aCommit = repo.Lookup<Commit>(a);
+            var bCommit = repo.Lookup<Commit>(b);
+            if (aCommit == null || bCommit == null)
             {
                 return null;
             }
 
-            var blob = commit[fileName]?.Target as Blob;
-            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
-            var tempFile = Path.Combine(tempDir, tempFileName);
+            var baseCommit = repo.ObjectDatabase.FindMergeBase(aCommit, bCommit);
+            return baseCommit?.Sha;
+        }
 
-            Directory.CreateDirectory(tempDir);
-
-            if (blob != null)
+        public Task<bool> IsHeadPushed(IRepository repo)
+        {
+            return Task.Factory.StartNew(() =>
             {
-                using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
-                using (var destination = File.OpenWrite(tempFile))
-                {
-                    await source.CopyToAsync(destination);
-                }
-            }
-            else
-            {
-                File.Create(tempFile).Dispose();
-            }
-
-            return tempFile;
+                return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
+            });
         }
 
         static bool IsCanonical(string s)

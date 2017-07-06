@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels;
 using ReactiveUI;
 
@@ -71,8 +72,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
         }
 
         public IPullRequestModel Model { get; }
+        public IPullRequestSession Session { get; }
+        public ILocalRepositoryModel Repository { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
+        public int CommentCount { get; set; }
         public bool IsLoading { get; }
         public bool IsBusy { get; }
         public bool IsCheckedOut { get; }

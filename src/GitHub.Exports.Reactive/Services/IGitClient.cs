@@ -68,6 +68,30 @@ namespace GitHub.Services
         /// </returns>
         Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false);
 
+        /// <summary>
+        /// Compares a file in two commits.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="sha1">The SHA of the first commit.</param>
+        /// <param name="sha2">The SHA of the second commit.</param>
+        /// <param name="path">The relative path to the file.</param>
+        /// <returns>
+        /// A <see cref="Patch"/> object or null if one of the commits could not be found in the repository.
+        /// </returns>
+        Task<Patch> Compare(IRepository repository, string sha1, string sha2, string path);
+
+        /// <summary>
+        /// Compares a file in a commit to a string.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="sha">The SHA of the first commit.</param>
+        /// <param name="path">The relative path to the file.</param>
+        /// <param name="contents">The contents to compare with the file.</param>
+        /// <returns>
+        /// A <see cref="Patch"/> object or null if the commit could not be found in the repository.
+        /// </returns>
+        Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, byte[] contents);
+
         /// Gets the value of a configuration key.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -119,8 +143,49 @@ namespace GitHub.Services
         /// <param name="commitSha">The SHA of the commit.</param>
         /// <param name="fileName">The path to the file, relative to the repository.</param>
         /// <returns>
-        /// The filename of a temporary file containing the file contents.
+        /// The contents of the file, or null if the file was not found at the specified commit.
         /// </returns>
         Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
+
+        /// <summary>
+        /// Extracts a file at a specified commit from the repository as binary data.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="fileName">The path to the file, relative to the repository.</param>
+        /// <returns>
+        /// The contents of the file, or null if the file was not found at the specified commit.
+        /// </returns>
+        Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName);
+
+        /// <summary>
+        /// Checks whether the latest commit of a file in the repository has the specified file
+        /// contents.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="path">The relative path to the file.</param>
+        /// <param name="contents">The file contents to test.</param>
+        /// <returns></returns>
+        Task<bool> IsModified(IRepository repository, string path, byte[] contents);
+
+        /// <summary>
+        /// Find the merge base SHA between two commits.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="remoteName">The name of the remote (e.g. 'origin').</param>
+        /// <param name="baseSha">The PR base SHA.</param>
+        /// <param name="headSha">The PR head SHA.</param>
+        /// <param name="baseRef">The PR base ref (e.g. 'master').</param>
+        /// <param name="pullNumber">The PR number.</param>
+        /// <returns>
+        /// The merge base SHA or null.
+        /// </returns>
+        Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber);
+
+        /// Checks whether the current head is pushed to its remote tracking branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        Task<bool> IsHeadPushed(IRepository repo);
     }
 }

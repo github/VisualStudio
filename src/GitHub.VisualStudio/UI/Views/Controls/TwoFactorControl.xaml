@@ -15,6 +15,7 @@
     d:DesignWidth="414"
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
+    ShowBusyState="False"
     AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <Control.Resources>

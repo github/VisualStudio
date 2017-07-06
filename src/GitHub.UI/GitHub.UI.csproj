@@ -91,6 +91,7 @@
       <DependentUpon>Spinner.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\AllCapsConverter.cs" />
+    <Compile Include="Converters\MultiBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\BranchNameConverter.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />

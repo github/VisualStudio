@@ -62,6 +62,30 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body,
+            string commitId,
+            string path,
+            int position)
+        {
+            var comment = new PullRequestReviewCommentCreate(body, commitId, path, position);
+            return gitHubClient.PullRequest.Comment.Create(owner, name, number, comment);
+        }
+
+        public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body,
+            int inReplyTo)
+        {
+            var comment = new PullRequestReviewCommentReplyCreate(body, inReplyTo);
+            return gitHubClient.PullRequest.Comment.CreateReply(owner, name, number, comment);
+        }
+
         public IObservable<Gist> CreateGist(NewGist newGist)
         {
             return gitHubClient.Gist.Create(newGist);
@@ -239,6 +263,11 @@ namespace GitHub.Api
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
         }
 
+        public IObservable<IssueComment> GetIssueComments(string owner, string name, int number)
+        {
+            return gitHubClient.Issue.Comment.GetAllForIssue(owner, name, number);
+        }
+
         public IObservable<PullRequest> GetPullRequest(string owner, string name, int number)
         {
             return gitHubClient.PullRequest.Get(owner, name, number);
@@ -247,6 +276,11 @@ namespace GitHub.Api
         public IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number)
         {
             return gitHubClient.PullRequest.Files(owner, name, number);
+        }
+
+        public IObservable<PullRequestReviewComment> GetPullRequestReviewComments(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Comment.GetAll(owner, name, number);
         }
 
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)

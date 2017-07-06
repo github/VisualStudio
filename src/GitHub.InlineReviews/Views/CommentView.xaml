@@ -1,0 +1,189 @@
+﻿<UserControl x:Class="GitHub.InlineReviews.Views.CommentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
+             mc:Ignorable="d" d:DesignWidth="300">
+    <d:DesignProperties.DataContext>
+        <sample:CommentViewModelDesigner EditState="Editing">
+            <sample:CommentViewModelDesigner.Body>
+                You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
+            </sample:CommentViewModelDesigner.Body>
+        </sample:CommentViewModelDesigner>
+    </d:DesignProperties.DataContext>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="Button" BasedOn="{StaticResource GitHubVsButton}"/>
+
+            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="PagePadding" Value="0"/>
+
+                <Style.Resources>
+                    <Style TargetType="Image">
+                        <Setter Property="Stretch" Value="UniformToFill" />
+                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
+                    </Style>
+                </Style.Resources>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Displays an existing comment-->
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="FrameworkElement">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding EditState}" Value="None">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <controls:AccountAvatar Margin="4 4"
+                                    Width="28" 
+                                    Height="28" 
+                                    VerticalAlignment="Top"
+                                    Account="{Binding User}"/>
+
+            <StackPanel Margin="4 4" Orientation="Vertical" Grid.Column="1">
+                <Border Background="#FFF6F8FA" Padding="6 5" BorderThickness="1 1 1 0" BorderBrush="#FFD1D5DA" CornerRadius="2 2 0 0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
+                        <TextBlock Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" Padding="6 5" BorderThickness="1" BorderBrush="#FFD1D5DA" CornerRadius="0 0 2 2 ">
+                    <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                                   DocumentStyle="{StaticResource DocumentStyle}"
+                                   RawContent="{Binding Body}"
+                                   ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Displays edit view or a reply placeholder-->
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="FrameworkElement">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding EditState}" Value="Placeholder">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <controls:AccountAvatar Grid.RowSpan="2"
+                                Margin="4"
+                                Width="28" 
+                                Height="28" 
+                                VerticalAlignment="Top"
+                                Account="{Binding User}"/>
+
+            <ui:PromptTextBox Name="body"
+                              Grid.Column="1"
+                              AcceptsReturn="True"
+                              AcceptsTab="True"
+                              IsReadOnly="{Binding IsReadOnly}"
+                              Margin="4 0"
+                              Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
+                              TextWrapping="Wrap"
+                              VerticalAlignment="Center"
+                              GotFocus="ReplyPlaceholder_GotFocus">
+                <ui:PromptTextBox.Style>
+                    <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
+                        <Setter Property="Height" Value="28"/>
+                        <Setter Property="PromptText" Value="Reply..."/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                                <Setter Property="MinHeight" Value="100"/>
+                                <Setter Property="PromptText" Value="Leave a comment"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:PromptTextBox.Style>
+            </ui:PromptTextBox>
+
+            <DockPanel Grid.Column="1" Grid.Row="1"
+                       Margin="0 4"
+                       HorizontalAlignment="Left" 
+                       TextBlock.Foreground="Red">
+                <DockPanel.Style>
+                    <Style TargetType="FrameworkElement">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DockPanel.Style>
+                <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
+                <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
+            </DockPanel>
+            
+            <StackPanel Name="buttonPanel"
+                        Grid.Column="1" Grid.Row="2" 
+                        Margin="0 4" 
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        IsVisibleChanged="buttonPanel_IsVisibleChanged">
+                <StackPanel.Style>
+                    <Style TargetType="FrameworkElement">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Button Command="{Binding CommitEdit}">Comment</Button>
+                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -9,13 +11,263 @@ using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
-using Octokit;
 using Rothko;
 using UnitTests;
 using Xunit;
 
 public class PullRequestServiceTests : TestBaseClass
 {
+    public class TheExtractDiffFilesMethod
+    {
+        [Fact]
+        public async Task NotCheckedOut_ExtractFilesFromLocalRepo()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
+
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async Task MergeBaseAvailable_UseMergeBaseSha()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = "mergeBaseFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = "mergeBaseSha";
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                fileName, checkedOut);
+
+            Assert.Equal(mergeBaseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async void MergeBaseNotAvailable_ThrowsFileNotFoundException()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = null as string;
+            var checkedOut = false;
+            var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
+
+            var ex = await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                                fileName, checkedOut));
+            Assert.Equal(expectMessage, ex.Message);
+        }
+
+        [Fact]
+        public async Task FileAdded_BaseFileEmpty()
+        {
+            var baseFileContent = null as string;
+            var headFileContent = "headFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
+
+            Assert.Equal(string.Empty, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async Task FileDeleted_HeadFileEmpty()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
+
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(string.Empty, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async Task CheckedOut_BaseFromWorkingFile()
+        {
+            var repoDir = "repoDir";
+            var baseFileContent = "baseFileContent";
+            var headFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var checkedOut = true;
+            var workingFile = Path.Combine(repoDir, fileName);
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut, repoDir);
+
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(workingFile, files.Item2);
+        }
+
+        // https://github.com/github/VisualStudio/issues/1010
+        [Theory]
+        [InlineData("utf-8")]        // Unicode (UTF-8)
+        [InlineData("Windows-1252")] // Western European (Windows)        
+        public async Task CheckedOut_DifferentEncodings(string encodingName)
+        {
+            var encoding = Encoding.GetEncoding(encodingName);
+            var repoDir = Path.GetTempPath();
+            var baseFileContent = "baseFileContent";
+            var headFileContent = null as string;
+            var fileName = "fileName.txt";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var checkedOut = true;
+            var workingFile = Path.Combine(repoDir, fileName);
+            var workingFileContent = baseFileContent;
+            File.WriteAllText(workingFile, workingFileContent, encoding);
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, checkedOut, repoDir);
+
+            Assert.Equal(File.ReadAllText(files.Item1), File.ReadAllText(files.Item2));
+            Assert.Equal(File.ReadAllBytes(files.Item1), File.ReadAllBytes(files.Item2));
+        }
+
+        // Files need to be explicitly marked as UTF-8 otherwise Visual Studio will take them to be Windows-1252.
+        // Fixes https://github.com/github/VisualStudio/pull/1004#issuecomment-308358520
+        [Fact]
+        public async Task NotCheckedOut_FilesHaveUTF8Encoding()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
+
+            Assert.True(HasPreamble(files.Item1, Encoding.UTF8));
+            Assert.True(HasPreamble(files.Item2, Encoding.UTF8));
+        }
+
+        static bool HasPreamble(string file, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(file))
+            {
+                foreach (var b in encoding.GetPreamble())
+                {
+                    if (b != stream.ReadByte())
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        [Fact]
+        public async Task HeadBranchNotAvailable_ThrowsFileNotFoundException()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = new FileNotFoundException();
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
+            var checkedOut = false;
+
+            await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, checkedOut));
+        }
+
+        static async Task<Tuple<string, string>> ExtractDiffFiles(
+            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
+            string fileName, bool checkedOut, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef")
+        {
+            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+            repositoryModel.LocalPath.Returns(repoDir);
+
+            var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Number.Returns(pullNumber);
+
+            pullRequest.Base.Returns(new GitReferenceModel(baseRef, "label", baseSha, "uri"));
+            pullRequest.Head.Returns(new GitReferenceModel("ref", "label", headSha, "uri"));
+
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitClient = MockGitClient();
+            var gitService = serviceProvider.GetGitService();
+            var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
+            gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<string>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
+
+            return await service.ExtractDiffFiles(repositoryModel, pullRequest, fileName, checkedOut);
+        }
+
+        static IObservable<string> GetFileObservable(object fileOrException)
+        {
+            if (fileOrException is string)
+            {
+                return Observable.Return((string)fileOrException);
+            }
+
+            if (fileOrException is Exception)
+            {
+                return Observable.Throw<string>((Exception)fileOrException);
+            }
+
+            return Observable.Throw<string>(new FileNotFoundException());
+        }
+
+        static Task<string> GetFileTask(object content)
+        {
+            if (content is string)
+            {
+                return Task.FromResult((string)content);
+            }
+
+            if (content is Exception)
+            {
+                return Task.FromException<string>((Exception)content);
+            }
+
+            if (content == null)
+            {
+                return Task.FromResult<string>(null);
+            }
+
+            throw new ArgumentException("Unsupported content type: " + content);
+        }
+    }
+
     [Fact]
     public void CreatePullRequestAllArgsMandatory()
     {
@@ -70,11 +322,14 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var pr = Substitute.For<IPullRequestModel>();
+            pr.Number.Returns(4);
 
             await service.Checkout(localRepo, pr, "pr/123-foo1");
 
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
-            Assert.Equal(1, gitClient.ReceivedCalls().Count());
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr", "4").Forget();
+
+            Assert.Equal(2, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
@@ -98,7 +353,9 @@ public class PullRequestServiceTests : TestBaseClass
 
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "local").Forget();
-            Assert.Equal(3, gitClient.ReceivedCalls().Count());
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.local.ghfvs-pr", "5").Forget();
+
+            Assert.Equal(4, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
