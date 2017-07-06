@@ -160,6 +160,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compare With Working Directory.
+        /// </summary>
+        public static string CompareFileWithWorkingDirectory {
+            get {
+                return ResourceManager.GetString("CompareFileWithWorkingDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not connect to github.com.
         /// </summary>
         public static string couldNotConnectToGitHubText {
@@ -547,20 +556,20 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open File.
-        /// </summary>
-        public static string OpenFile {
-            get {
-                return ResourceManager.GetString("OpenFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open File as Default Action.
         /// </summary>
         public static string OpenFileAsDefaultAction {
             get {
                 return ResourceManager.GetString("OpenFileAsDefaultAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open File In Working Directory.
+        /// </summary>
+        public static string OpenFileInWorkingDirectory {
+            get {
+                return ResourceManager.GetString("OpenFileInWorkingDirectory", resourceCulture);
             }
         }
         
@@ -790,7 +799,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thanks for installing GitHub for Visual Studio. Why not take a look at our [training](show-training) or [documentation](show-docs)?
+        ///   Looks up a localized string similar to Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
         ///
         ///[Don&apos;t show this again](dont-show-again).
         /// </summary>
@@ -842,6 +851,15 @@ namespace GitHub.VisualStudio.UI {
         public static string verifyText {
             get {
                 return ResourceManager.GetString("verifyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View File.
+        /// </summary>
+        public static string ViewFile {
+            get {
+                return ResourceManager.GetString("ViewFile", resourceCulture);
             }
         }
         

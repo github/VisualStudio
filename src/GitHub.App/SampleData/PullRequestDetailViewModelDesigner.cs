@@ -91,10 +91,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
+        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+        public ReactiveCommand<object> ViewFile { get; }
 
-        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
             return null;
         }

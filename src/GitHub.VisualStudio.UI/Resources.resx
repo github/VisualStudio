@@ -360,8 +360,8 @@
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
     <value>Compare File as Default Action</value>
   </data>
-  <data name="OpenFile" xml:space="preserve">
-    <value>Open File</value>
+  <data name="ViewFile" xml:space="preserve">
+    <value>View File</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
     <value>Open File as Default Action</value>
@@ -382,5 +382,11 @@
     <value>Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
 
 [Don't show this again](dont-show-again)</value>
+  </data>
+  <data name="CompareFileWithWorkingDirectory" xml:space="preserve">
+    <value>Compare With Working Directory</value>
+  </data>
+  <data name="OpenFileInWorkingDirectory" xml:space="preserve">
+    <value>Open File In Working Directory</value>
   </data>
 </root>

@@ -152,21 +152,35 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
-        /// </summary>
-        ReactiveCommand<object> OpenFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
 
         /// <summary>
-        /// Gets the before and after files needed for viewing a diff.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
+        /// the working directory and HEAD.
+        /// </summary>
+        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
+        /// </summary>
+        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
+        /// </summary>
+        ReactiveCommand<object> ViewFile { get; }
+
+        /// <summary>
+        /// Gets a file as it appears in the pull request.
         /// </summary>
         /// <param name="file">The changed file.</param>
-        /// <returns>A tuple containing the full path to the before and after files.</returns>
-        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
+        /// <param name="head">
+        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
+        /// </param>
+        /// <returns>The path to a temporary file.</returns>
+        Task<string> ExtractFile(IPullRequestFileNode file, bool head);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.

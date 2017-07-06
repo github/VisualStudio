@@ -113,8 +113,10 @@ namespace GitHub.ViewModels
             SubscribeOperationError(Push);
 
             OpenOnGitHub = ReactiveCommand.Create();
-            OpenFile = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             DiffFile = ReactiveCommand.Create();
+            DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
+            OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
+            ViewFile = ReactiveCommand.Create();
         }
 
         /// <summary>
@@ -276,14 +278,25 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
-        /// </summary>
-        public ReactiveCommand<object> OpenFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
         public ReactiveCommand<object> DiffFile { get; }
+
+        /// <summary>
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
+        /// the working directory and HEAD.
+        /// </summary>
+        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
+        /// </summary>
+        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
+        /// </summary>
+        public ReactiveCommand<object> ViewFile { get; }
 
         /// <summary>
         /// Initializes the view model with new data.
@@ -404,14 +417,17 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the before and after files needed for viewing a diff.
+        /// Gets a file as it appears in the pull request head.
         /// </summary>
         /// <param name="file">The changed file.</param>
-        /// <returns>A tuple containing the full path to the before and after files.</returns>
-        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        /// <param name="head">
+        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
+        /// </param>
+        /// <returns>The path to a temporary file.</returns>
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(Repository, model, path, IsCheckedOut).ToTask();
+            return pullRequestsService.ExtractFile(Repository, model, path).ToTask();
         }
 
         /// <summary>
