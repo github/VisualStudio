@@ -61,17 +61,19 @@ namespace GitHub.InlineReviews
             var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
 
-            TrackCommentGlyphOnDiffView(wpfTextViewHost.TextView, margin.VisualElement);
+            TrackCommentGlyphOnDiffView(wpfTextViewHost, margin.VisualElement);
             return margin;
         }
 
-        void TrackCommentGlyphOnDiffView(IWpfTextView textView, FrameworkElement visualElement)
+        void TrackCommentGlyphOnDiffView(IWpfTextViewHost host, FrameworkElement marginElement)
         {
+            var textView = host.TextView;
             if (textView.Roles.Contains("DIFF"))
             {
+                var hostControl = host.HostControl;
                 var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
-                textView.VisualElement.MouseMove += (t, e) => router.MouseMove(visualElement, e);
-                textView.VisualElement.MouseLeave += (t, e) => router.MouseLeave(visualElement, e);
+                hostControl.MouseMove += (t, e) => router.MouseMove(marginElement, e);
+                hostControl.MouseLeave += (t, e) => router.MouseLeave(marginElement, e);
             }
         }
 
