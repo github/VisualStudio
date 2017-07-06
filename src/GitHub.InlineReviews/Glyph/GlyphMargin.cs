@@ -12,6 +12,10 @@ using GitHub.InlineReviews.Glyph.Implementation;
 
 namespace GitHub.InlineReviews.Glyph
 {
+    /// <summary>
+    /// Responsibe for updating the margin when tags change.
+    /// </summary>
+    /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
     public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag: ITag
     {
         bool handleZoom;
