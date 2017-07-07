@@ -112,6 +112,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Markdig", "Markdig", "{C5964392-2BEF-41DD-8D36-9E306FD67137}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdig.Wpf", "submodules\markdig-wpf\src\Markdig.Wpf\Markdig.Wpf.csproj", "{01E40FB5-B4E9-489D-98D5-4771DDC2D1D7}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews", "src\GitHub.InlineReviews\GitHub.InlineReviews.csproj", "{7F5ED78B-74A3-4406-A299-70CFB5885B8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews.UnitTests", "test\GitHub.InlineReviews.UnitTests\GitHub.InlineReviews.UnitTests.csproj", "{17EB676B-BB91-48B5-AA59-C67695C647C2}"
