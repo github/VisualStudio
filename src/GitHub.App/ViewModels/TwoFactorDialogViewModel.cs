@@ -90,8 +90,16 @@ namespace GitHub.ViewModels
 
             IsBusy = false;
             var error = userError as TwoFactorRequiredUserError;
-            Debug.Assert(error != null,
-                String.Format(CultureInfo.InvariantCulture, "The user error is '{0}' not a TwoFactorRequiredUserError", userError));
+
+            if (error == null)
+            {
+                throw new GitHubLogicException(
+                    String.Format(
+                        CultureInfo.InvariantCulture,
+                        "The user error is '{0}' not a TwoFactorRequiredUserError",
+                        userError));
+            }
+
             InvalidAuthenticationCode = error.RetryFailed;
             IsAuthenticationCodeSent = false;
             TwoFactorType = error.TwoFactorType;

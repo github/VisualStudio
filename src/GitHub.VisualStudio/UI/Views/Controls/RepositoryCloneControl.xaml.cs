@@ -71,7 +71,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 return null;
 
             var view = new ListCollectionView((IList)repositories);
-            Debug.Assert(view.GroupDescriptions != null, "view.GroupDescriptions is null");
             view.GroupDescriptions.Add(new RepositoryGroupDescription(this));
             return view;
         }

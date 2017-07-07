@@ -245,14 +245,23 @@ namespace GitHub.VisualStudio
             Guard.ArgumentNotNull(instance, nameof(instance));
 
             string contract = AttributedModelServices.GetContractName(t);
-            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+
+            if (string.IsNullOrEmpty(contract))
+            {
+                throw new GitHubLogicException("Every type must have a contract name");
+            }
 
             // we want to remove stale instances of a service, if they exist, regardless of who put them there
             RemoveService(t, null);
 
             var batch = new CompositionBatch();
             var part = batch.AddExportedValue(contract, instance);
-            Debug.Assert(part != null, "Adding an exported value must return a non-null part");
+
+            if (part == null)
+            {
+                throw new GitHubLogicException("Adding an exported value must return a non-null part");
+            }
+
             tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
             TempContainer.Compose(batch);
         }

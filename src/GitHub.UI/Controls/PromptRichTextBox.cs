@@ -111,8 +111,12 @@ namespace GitHub.UI
 
             var content = SetDocumentContent(document, rtf, DataFormats.Rtf);
 
+            if (content.Text == null)
+            {
+                throw new GitHubLogicException("WPF ensures this is not null. WPF failed on the job");
+            }
+
             var d = new DataObject();
-            Debug.Assert(content.Text != null, "WPF ensures this is not null. WPF failed on the job");
             var textContent = content.Text;
             if (!richTextBox.AcceptsReturn)
             {

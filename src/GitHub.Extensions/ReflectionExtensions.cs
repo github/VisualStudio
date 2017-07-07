@@ -53,31 +53,5 @@ namespace GitHub.Extensions
             var value = propertyInfo.GetValue(attribute, null);
             return value.ToString();
         }
-
-        public static object GetValueForProperty(this Type type, object instance, string propName)
-        {
-            Guard.ArgumentNotNull(type, nameof(type));
-            Guard.ArgumentNotNull(instance, nameof(instance));
-            Guard.ArgumentNotEmptyString(propName, nameof(propName));
-
-            var prop = type.GetProperty(propName);
-            Debug.Assert(prop != null, string.Format(CultureInfo.InvariantCulture, "'{0}' {1} not found in assembly '{2}'. Check if it's been moved or mistyped.",
-                propName, "property", type.Assembly.GetCustomAttributeValue<AssemblyFileVersionAttribute>("Version")));
-            if (prop == null)
-                return null;
-            var getm = prop.GetGetMethod();
-            Debug.Assert(prop != null, string.Format(CultureInfo.InvariantCulture, "'{0}' {1} not found in assembly '{2}'. Check if it's been moved or mistyped.",
-                propName, "getter", type.Assembly.GetCustomAttributeValue<AssemblyFileVersionAttribute>("Version")));
-            if (getm == null)
-                return null;
-            try {
-                return getm.Invoke(instance, null);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "'{0}' {1} in assembly '{2}' threw an exception. {3}.",
-                    propName, "getter", type.Assembly.GetCustomAttributeValue<AssemblyFileVersionAttribute>("Version"), ex));
-            }
-        }
     }
 }
