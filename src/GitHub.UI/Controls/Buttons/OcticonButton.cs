@@ -1,5 +1,4 @@
-﻿using NullGuard;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,7 +26,6 @@ namespace GitHub.UI
 
         public Geometry Data
         {
-            [return: AllowNull]
             get { return (Geometry)GetValue(DataProperty); }
             set { SetValue(DataProperty, value); }
         }
@@ -43,7 +41,6 @@ namespace GitHub.UI
 
         public Octicon Icon
         {
-            [return: AllowNull]
             get { return (Octicon)GetValue(OcticonPath.IconProperty); }
             set { SetValue(OcticonPath.IconProperty, value); }
         }

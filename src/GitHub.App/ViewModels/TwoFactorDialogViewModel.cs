@@ -7,10 +7,10 @@ using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Services;
 using GitHub.Validation;
-using NullGuard;
 using Octokit;
 using ReactiveUI;
 
@@ -33,6 +33,9 @@ namespace GitHub.ViewModels
             IVisualStudioBrowser browser,
             IDelegatingTwoFactorChallengeHandler twoFactorChallengeHandler)
         {
+            Guard.ArgumentNotNull(browser, nameof(browser));
+            Guard.ArgumentNotNull(twoFactorChallengeHandler, nameof(twoFactorChallengeHandler));
+
             Title = Resources.TwoFactorTitle;
             twoFactorChallengeHandler.SetViewModel(this);
 
@@ -83,6 +86,8 @@ namespace GitHub.ViewModels
 
         public IObservable<TwoFactorChallengeResult> Show(UserError userError)
         {
+            Guard.ArgumentNotNull(userError, nameof(userError));
+
             IsBusy = false;
             var error = userError as TwoFactorRequiredUserError;
             Debug.Assert(error != null,
@@ -118,14 +123,11 @@ namespace GitHub.ViewModels
 
         public string Description
         {
-            [return: AllowNull]
             get { return description.Value; }
         }
 
-        [AllowNull]
         public string AuthenticationCode
         {
-            [return: AllowNull]
             get { return authenticationCode; }
             set { this.RaiseAndSetIfChanged(ref authenticationCode, value); }
         }

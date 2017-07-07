@@ -6,7 +6,6 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 using GitHub.Extensions.Reactive;

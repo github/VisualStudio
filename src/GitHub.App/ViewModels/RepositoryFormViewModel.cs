@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Windows.Input;
 using GitHub.Models;
 using GitHub.Validation;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -38,10 +37,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Description to set on the repo (optional)
         /// </summary>
-        [AllowNull]
         public string Description
         {
-            [return: AllowNull]
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
@@ -60,10 +57,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Name of the repository as typed by user
         /// </summary>
-        [AllowNull]
         public string RepositoryName
         {
-            [return: AllowNull]
             get { return repositoryName; }
             set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
         }
@@ -75,7 +70,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public string SafeRepositoryName
         {
-            [return: AllowNull]
             get { return safeRepositoryName.Value; }
         }
 
@@ -85,10 +79,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Account where the repository is going to be created on
         /// </summary>
-        [AllowNull]
         public IAccount SelectedAccount
         {
-            [return: AllowNull]
             get { return selectedAccount; }
             set { this.RaiseAndSetIfChanged(ref selectedAccount, value); }
         }
@@ -97,7 +89,6 @@ namespace GitHub.ViewModels
 
         public bool ShowUpgradeToMicroPlanWarning { get; private set; }
 
-        [AllowNull]
         public ICommand UpgradeAccountPlan { get; private set; }
 
         protected IObservable<bool> CanKeepPrivateObservable { get; private set; }

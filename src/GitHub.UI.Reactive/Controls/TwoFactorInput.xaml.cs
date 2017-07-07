@@ -4,15 +4,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GitHub.Extensions;
-using NullGuard;
 using System.Globalization;
 
 namespace GitHub.UI
 {
     public class TwoFactorInputToTextBox : ValueConverterMarkupExtension<TwoFactorInputToTextBox>
     {
-        public override object Convert([AllowNull] object value, [AllowNull] Type targetType,
-            [AllowNull] object parameter, [AllowNull] CultureInfo culture)
+        public override object Convert(object value, Type targetType,
+            object parameter, CultureInfo culture)
         {
             return value is TwoFactorInput ? ((TwoFactorInput)value).TextBox : null;
         }
@@ -56,6 +55,9 @@ namespace GitHub.UI
 
         private void OnPaste(object sender, DataObjectPastingEventArgs e)
         {
+            Guard.ArgumentNotNull(sender, nameof(sender));
+            Guard.ArgumentNotNull(e, nameof(e));
+
             var isText = e.SourceDataObject.GetDataPresent(DataFormats.Text, true);
             if (!isText) return;
 
@@ -84,16 +86,16 @@ namespace GitHub.UI
             SetValue(TextProperty, String.Join("", digits));
         }
 
-        [AllowNull]
         public string Text
         {
-            [return: AllowNull]
             get { return (string)GetValue(TextProperty); }
             set { SetText(value); }
         }
 
         private void SetupTextBox(TextBox textBox)
         {
+            Guard.ArgumentNotNull(textBox, nameof(textBox));
+
             DataObject.AddPastingHandler(textBox, new DataObjectPastingEventHandler(OnPaste));
 
             textBox.GotFocus += (sender, args) => textBox.SelectAll();
@@ -182,6 +184,8 @@ namespace GitHub.UI
 
         private static string GetTextBoxValue(TextBox textBox)
         {
+            Guard.ArgumentNotNull(textBox, nameof(textBox));
+
             return String.IsNullOrEmpty(textBox.Text) ? " " : textBox.Text;
         }
 

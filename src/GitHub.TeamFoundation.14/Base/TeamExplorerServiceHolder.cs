@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using GitHub.Services;
 using Microsoft.TeamFoundation.Controls;
-using NullGuard;
 using GitHub.Extensions;
 using System.ComponentModel.Composition;
 using System.Collections.Generic;
@@ -36,10 +35,9 @@ namespace GitHub.VisualStudio.Base
         }
 
         // set by the sections when they get initialized
-        [AllowNull]
         public IServiceProvider ServiceProvider
         {
-            [return: AllowNull] get { return serviceProvider; }
+            get { return serviceProvider; }
             set
             {
                 if (serviceProvider == value)
@@ -53,10 +51,9 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        [AllowNull]
         public ILocalRepositoryModel ActiveRepo
         {
-            [return: AllowNull] get { return activeRepo; }
+            get { return activeRepo; }
             private set
             {
                 if (activeRepo == value)
@@ -72,6 +69,9 @@ namespace GitHub.VisualStudio.Base
 
         public void Subscribe(object who, Action<ILocalRepositoryModel> handler)
         {
+            Guard.ArgumentNotNull(who, nameof(who));
+            Guard.ArgumentNotNull(handler, nameof(handler));
+
             bool notificationsExist;
             ILocalRepositoryModel repo;
             lock(activeRepoHandlers)
@@ -97,6 +97,8 @@ namespace GitHub.VisualStudio.Base
 
         public void Unsubscribe(object who)
         {
+            Guard.ArgumentNotNull(who, nameof(who));
+
             if (activeRepoHandlers.ContainsKey(who))
                 activeRepoHandlers.Remove(who);
         }
@@ -110,6 +112,8 @@ namespace GitHub.VisualStudio.Base
         /// <param name="provider">If the current ServiceProvider matches this, clear it</param>
         public void ClearServiceProvider(IServiceProvider provider)
         {
+            Guard.ArgumentNotNull(provider, nameof(provider));
+
             if (serviceProvider != provider)
                 return;
 
@@ -134,6 +138,8 @@ namespace GitHub.VisualStudio.Base
 
         void UIContextChanged(object sender, UIContextChangedEventArgs e)
         {
+            Guard.ArgumentNotNull(e, nameof(e));
+
             ActiveRepo = null;
             UIContextChanged(e.Activated, false);
         }
@@ -171,6 +177,8 @@ namespace GitHub.VisualStudio.Base
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            Guard.ArgumentNotNull(e, nameof(e));
+
             if (e.PropertyName != "ActiveRepositories")
                 return;
 
@@ -186,13 +194,14 @@ namespace GitHub.VisualStudio.Base
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            Guard.ArgumentNotNull(e, nameof(e));
+
             if (e.PropertyName == "CloneUrl")
                 ActiveRepo = sender as ILocalRepositoryModel;
         }
 
         public IGitAwareItem HomeSection
         {
-            [return:AllowNull]
             get
             {
                 if (ServiceProvider == null)
@@ -206,14 +215,11 @@ namespace GitHub.VisualStudio.Base
 
         ITeamExplorerPage PageService
         {
-            [return:AllowNull]
             get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
         }
 
-        [AllowNull]
         UIContext GitUIContext
         {
-            [return: AllowNull]
             get { return gitUIContext; }
             set
             {
@@ -227,10 +233,8 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        [AllowNull]
         IGitExt GitService
         {
-            [return: AllowNull]
             get { return gitService; }
             set
             {

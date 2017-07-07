@@ -9,12 +9,12 @@ using System.Windows.Media.Imaging;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -40,6 +40,9 @@ namespace GitHub.ViewModels
             IPackageSettings settings)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
         {
+            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(teservice, nameof(teservice));
+            Guard.ArgumentNotNull(settings, nameof(settings));
         }
 
         public PullRequestListViewModel(
@@ -47,6 +50,10 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IPackageSettings settings)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotNull(settings, nameof(settings));
+
             constructing = true;
             this.repositoryHost = repositoryHost;
             this.repository = repository;
@@ -99,7 +106,7 @@ namespace GitHub.ViewModels
             constructing = false;
         }
 
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
             base.Initialize(data);
 
@@ -142,7 +149,7 @@ namespace GitHub.ViewModels
                 });
         }
 
-        void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass, [AllowNull]IAccount aut)
+        void UpdateFilter(PullRequestState state, IAccount ass, IAccount aut)
         {
             if (PullRequests == null)
                 return;
@@ -163,16 +170,13 @@ namespace GitHub.ViewModels
         ITrackingCollection<IPullRequestModel> pullRequests;
         public ITrackingCollection<IPullRequestModel> PullRequests
         {
-            [return: AllowNull]
             get { return pullRequests; }
             private set { this.RaiseAndSetIfChanged(ref pullRequests, value); }
         }
 
         IPullRequestModel selectedPullRequest;
-        [AllowNull]
         public IPullRequestModel SelectedPullRequest
         {
-            [return: AllowNull]
             get { return selectedPullRequest; }
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
         }
@@ -187,7 +191,6 @@ namespace GitHub.ViewModels
         PullRequestState selectedState;
         public PullRequestState SelectedState
         {
-            [return: AllowNull]
             get { return selectedState; }
             set { this.RaiseAndSetIfChanged(ref selectedState, value); }
         }
@@ -207,19 +210,15 @@ namespace GitHub.ViewModels
         }
 
         IAccount selectedAuthor;
-        [AllowNull]
         public IAccount SelectedAuthor
         {
-            [return: AllowNull]
             get { return selectedAuthor; }
             set { this.RaiseAndSetIfChanged(ref selectedAuthor, value); }
         }
 
         IAccount selectedAssignee;
-        [AllowNull]
         public IAccount SelectedAssignee
         {
-            [return: AllowNull]
             get { return selectedAssignee; }
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
         }
@@ -268,6 +267,8 @@ namespace GitHub.ViewModels
 
         void DoOpenPullRequest(object pullRequest)
         {
+            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+
             var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = pullRequest };
             navigate.OnNext(d);
         }

@@ -8,7 +8,6 @@ using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
-using NullGuard;
 using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
@@ -21,6 +20,10 @@ namespace GitHub.VisualStudio.Base
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
             : base(serviceProvider, apiFactory, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+
             this.octicon = octicon;
 
             IsVisible = false;
@@ -97,19 +100,15 @@ namespace GitHub.VisualStudio.Base
         }
 
         object icon;
-        [AllowNull]
         public object Icon
         {
-            [return: AllowNull]
             get { return icon; }
             set { icon = value; this.RaisePropertyChange(); }
         }
 
         Image image;
-        [AllowNull]
         public Image Image
         {
-            [return: AllowNull]
             get{ return image; }
             set { image = value; this.RaisePropertyChange(); }
         }

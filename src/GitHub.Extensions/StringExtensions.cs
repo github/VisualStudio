@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using NullGuard;
 
 namespace GitHub.Extensions
 {
@@ -12,35 +11,40 @@ namespace GitHub.Extensions
     {
         public static bool Contains(this string s, string expectedSubstring, StringComparison comparison)
         {
+            Guard.ArgumentNotNull(s, nameof(s));
+            Guard.ArgumentNotNull(expectedSubstring, nameof(expectedSubstring));
+
             return s.IndexOf(expectedSubstring, comparison) > -1;
         }
 
         public static bool ContainsAny(this string s, IEnumerable<char> characters)
         {
+            Guard.ArgumentNotNull(s, nameof(s));
+
             return s.IndexOfAny(characters.ToArray()) > -1;
         }
 
-        public static string DebugRepresentation([AllowNull]this string s)
+        public static string DebugRepresentation(this string s)
         {
             s = s ?? "(null)";
             return string.Format(CultureInfo.InvariantCulture, "\"{0}\"", s);
         }
 
-        [return: AllowNull]
-        public static string ToNullIfEmpty([AllowNull]this string s)
+        public static string ToNullIfEmpty(this string s)
         {
             return String.IsNullOrEmpty(s) ? null : s;
         }
 
-        public static bool StartsWith([AllowNull]this string s, char c)
+        public static bool StartsWith(this string s, char c)
         {
             if (String.IsNullOrEmpty(s)) return false;
             return s.First() == c;
         }
 
-        [return: AllowNull]
-        public static string RightAfter([AllowNull]this string s, string search)
+        public static string RightAfter(this string s, string search)
         {
+            Guard.ArgumentNotNull(search, nameof(search));
+
             if (s == null) return null;
             int lastIndex = s.IndexOf(search, StringComparison.OrdinalIgnoreCase);
             if (lastIndex < 0)
@@ -49,9 +53,10 @@ namespace GitHub.Extensions
             return s.Substring(lastIndex + search.Length);
         }
 
-        [return: AllowNull]
         public static string RightAfterLast(this string s, string search)
         {
+            Guard.ArgumentNotNull(search, nameof(search));
+
             if (s == null) return null;
             int lastIndex = s.LastIndexOf(search, StringComparison.OrdinalIgnoreCase);
             if (lastIndex < 0)
@@ -60,9 +65,10 @@ namespace GitHub.Extensions
             return s.Substring(lastIndex + search.Length);
         }
 
-        [return: AllowNull]
-        public static string LeftBeforeLast([AllowNull]this string s, string search)
+        public static string LeftBeforeLast(this string s, string search)
         {
+            Guard.ArgumentNotNull(search, nameof(search));
+
             if (s == null) return null;
             int lastIndex = s.LastIndexOf(search, StringComparison.OrdinalIgnoreCase);
             if (lastIndex < 0)
@@ -72,47 +78,43 @@ namespace GitHub.Extensions
         }
 
         // Returns a file name even if the path is FUBAR.
-        [return: AllowNull]
-        public static string ParseFileName([AllowNull]this string path)
+        public static string ParseFileName(this string path)
         {
             if (path == null) return null;
             return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).RightAfterLast(Path.DirectorySeparatorChar + "");
         }
 
         // Returns the parent directory even if the path is FUBAR.
-        [return: AllowNull]
-        public static string ParseParentDirectory([AllowNull]this string path)
+        public static string ParseParentDirectory(this string path)
         {
             if (path == null) return null;
             return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).LeftBeforeLast(Path.DirectorySeparatorChar + "");
         }
 
-        [return: AllowNull]
-        public static string EnsureStartsWith([AllowNull]this string s, char c)
+        public static string EnsureStartsWith(this string s, char c)
         {
             if (s == null) return null;
             return c + s.TrimStart(c);
         }
 
         // Ensures the string ends with the specified character.
-        [return: AllowNull]
-        public static string EnsureEndsWith([AllowNull]this string s, char c)
+        public static string EnsureEndsWith(this string s, char c)
         {
             if (s == null) return null;
             return s.TrimEnd(c) + c;
         }
 
-        [return: AllowNull]
-        public static string NormalizePath([AllowNull]this string path)
+        public static string NormalizePath(this string path)
         {
             if (String.IsNullOrEmpty(path)) return null;
 
             return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }
 
-        [return: AllowNull]
-        public static string TrimEnd([AllowNull]this string s, string suffix)
+        public static string TrimEnd(this string s, string suffix)
         {
+            Guard.ArgumentNotNull(suffix, nameof(suffix));
+
             if (s == null) return null;
             if (!s.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
                 return s;
@@ -122,6 +124,8 @@ namespace GitHub.Extensions
 
         public static string RemoveSurroundingQuotes(this string s)
         {
+            Guard.ArgumentNotNull(s, nameof(s));
+
             if (s.Length < 2)
                 return s;
 
@@ -138,6 +142,8 @@ namespace GitHub.Extensions
 
         public static Int32 ToInt32(this string s)
         {
+            Guard.ArgumentNotNull(s, nameof(s));
+
             Int32 val;
             return Int32.TryParse(s, out val) ? val : 0;
         }
@@ -150,6 +156,8 @@ namespace GitHub.Extensions
         /// <returns>A wrapped string using the platform's default newline character. This string will end in a newline.</returns>
         public static string Wrap(this string text, int maxLength = 72)
         {
+            Guard.ArgumentNotNull(text, nameof(text));
+
             if (text.Length == 0) return string.Empty;
 
             var sb = new StringBuilder();
@@ -197,6 +205,8 @@ namespace GitHub.Extensions
 
         public static Uri ToUriSafe(this string url)
         {
+            Guard.ArgumentNotNull(url, nameof(url));
+
             Uri uri;
             Uri.TryCreate(url, UriKind.Absolute, out uri);
             return uri;

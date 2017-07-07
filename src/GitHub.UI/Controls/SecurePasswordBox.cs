@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Controls;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -30,7 +29,6 @@ namespace GitHub.UI
         /// </summary>
         protected string BaseText
         {
-            [return: AllowNull]
             get { return base.Text; }
             set
             {
@@ -43,10 +41,8 @@ namespace GitHub.UI
         /// <summary>
         ///   Clean Password
         /// </summary>
-        [AllowNull]
         public new string Text
         {
-            [return: AllowNull]
             get { return password; }
             set
             {

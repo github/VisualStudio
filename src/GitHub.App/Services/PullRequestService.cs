@@ -19,7 +19,6 @@ using System.Diagnostics;
 
 namespace GitHub.Services
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService

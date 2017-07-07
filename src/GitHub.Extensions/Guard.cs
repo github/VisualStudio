@@ -6,7 +6,6 @@ using System.Linq;
 
 namespace GitHub.Extensions
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public static class Guard
     {
         public static void ArgumentNotNull(object value, string name)

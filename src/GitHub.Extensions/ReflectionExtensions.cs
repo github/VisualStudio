@@ -1,5 +1,4 @@
-﻿using NullGuard;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -12,6 +11,8 @@ namespace GitHub.Extensions
     {
         public static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
         {
+            Guard.ArgumentNotNull(assembly, nameof(assembly));
+
             try
             {
                 return assembly.GetTypes();
@@ -24,6 +25,9 @@ namespace GitHub.Extensions
 
         public static bool HasInterface(this Type type, Type targetInterface)
         {
+            Guard.ArgumentNotNull(type, nameof(type));
+            Guard.ArgumentNotNull(targetInterface, nameof(targetInterface));
+
             if (targetInterface.IsAssignableFrom(type))
                 return true;
             return type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == targetInterface);
@@ -32,6 +36,9 @@ namespace GitHub.Extensions
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         public static string GetCustomAttributeValue<T>(this Assembly assembly, string propertyName) where T : Attribute
         {
+            Guard.ArgumentNotNull(assembly, nameof(assembly));
+            Guard.ArgumentNotEmptyString(propertyName, nameof(propertyName));
+
             if (assembly == null || string.IsNullOrEmpty(propertyName)) return string.Empty;
 
             object[] attributes = assembly.GetCustomAttributes(typeof(T), false);
@@ -47,9 +54,12 @@ namespace GitHub.Extensions
             return value.ToString();
         }
 
-        [return: AllowNull]
         public static object GetValueForProperty(this Type type, object instance, string propName)
         {
+            Guard.ArgumentNotNull(type, nameof(type));
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotEmptyString(propName, nameof(propName));
+
             var prop = type.GetProperty(propName);
             Debug.Assert(prop != null, string.Format(CultureInfo.InvariantCulture, "'{0}' {1} not found in assembly '{2}'. Check if it's been moved or mistyped.",
                 propName, "property", type.Assembly.GetCustomAttributeValue<AssemblyFileVersionAttribute>("Version")));

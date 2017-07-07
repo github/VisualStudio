@@ -13,7 +13,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 using GitHub.Services;
@@ -83,11 +82,16 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             public RepositoryGroupDescription(RepositoryCloneControl owner)
             {
+                Guard.ArgumentNotNull(owner, nameof(owner));
+
                 this.owner = owner;
             }
 
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
+                Guard.ArgumentNotNull(item, nameof(item));
+                Guard.ArgumentNotNull(culture, nameof(culture));
+
                 var repo = item as IRemoteRepositoryModel;
                 var name = repo.Owner;
                 RepositoryGroup group;
@@ -111,6 +115,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             public RepositoryGroup(string header, bool isExpanded)
             {
+                Guard.ArgumentNotEmptyString(header, nameof(header));
+
                 Header = header;
                 this.isExpanded = isExpanded;
             }
