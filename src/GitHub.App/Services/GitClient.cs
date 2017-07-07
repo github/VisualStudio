@@ -374,8 +374,6 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
-            Guard.ArgumentNotEmptyString(baseSha, nameof(baseSha));
-            Guard.ArgumentNotEmptyString(headSha, nameof(headSha));
             Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
 
             var mergeBase = GetMergeBase(repo, baseSha, headSha);
@@ -393,8 +391,6 @@ namespace GitHub.Services
         static string GetMergeBase(IRepository repo, string a, string b)
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
-            Guard.ArgumentNotEmptyString(a, nameof(a));
-            Guard.ArgumentNotEmptyString(b, nameof(b));
 
             var aCommit = repo.Lookup<Commit>(a);
             var bCommit = repo.Lookup<Commit>(b);
