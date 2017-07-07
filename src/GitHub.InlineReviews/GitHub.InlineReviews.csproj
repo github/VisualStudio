@@ -163,6 +163,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\markdig-wpf\src\Markdig.Wpf\Markdig.Wpf.csproj">
+      <Project>{01e40fb5-b4e9-489d-98d5-4771ddc2d1d7}</Project>
+      <Name>Markdig.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
