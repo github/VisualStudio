@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Text;
 using GitHub.Models;
 using LibGit2Sharp;
 using Octokit;
@@ -121,18 +122,27 @@ namespace GitHub.Services
         IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
+        /// Gets the encoding for the specified file.
+        /// </summary>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>The file's encoding</returns>
+        Encoding GetEncoding(string path);
+
+        /// <summary>
         /// Gets a file as it appears in a pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <param name="fileName">The filename relative to the repository root.</param>
         /// <param name="head">If true, gets the file at the PR head, otherwise gets the file at the PR base.</param>
+        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The paths of the left and right files for the diff.</returns>
         IObservable<string> ExtractFile(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
             string fileName,
-            bool head = true);
+            bool head,
+            Encoding encoding);
 
         /// <summary>
         /// Remotes all unused remotes that were created by GitHub for Visual Studio to track PRs

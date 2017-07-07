@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
@@ -179,8 +180,16 @@ namespace GitHub.ViewModels
         /// <param name="head">
         /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
         /// </param>
+        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The path to a temporary file.</returns>
-        Task<string> ExtractFile(IPullRequestFileNode file, bool head);
+        Task<string> ExtractFile(IPullRequestFileNode file, bool head, Encoding encoding);
+
+        /// <summary>
+        /// Gets the encoding for the specified file.
+        /// </summary>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>The file's encoding</returns>
+        Encoding GetEncoding(string path);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.

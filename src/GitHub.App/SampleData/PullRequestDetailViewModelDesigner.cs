@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
@@ -96,10 +97,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
         public ReactiveCommand<object> ViewFile { get; }
 
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head, Encoding encoding)
         {
             return null;
         }
+
+        public Encoding GetEncoding(string path) => Encoding.UTF8;
 
         public string GetLocalFilePath(IPullRequestFileNode file)
         {

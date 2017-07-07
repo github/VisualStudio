@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Exports;
@@ -417,18 +418,26 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets a file as it appears in the pull request head.
+        /// Gets a file as it appears in the pull request.
         /// </summary>
         /// <param name="file">The changed file.</param>
         /// <param name="head">
         /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
         /// </param>
+        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The path to a temporary file.</returns>
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head, Encoding encoding)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractFile(Repository, model, path).ToTask();
+            return pullRequestsService.ExtractFile(Repository, model, path, head, encoding).ToTask();
         }
+
+        /// <summary>
+        /// Gets the encoding for the specified file.
+        /// </summary>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>The file's encoding</returns>
+        public Encoding GetEncoding(string path) => pullRequestsService.GetEncoding(path);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.

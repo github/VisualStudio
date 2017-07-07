@@ -295,7 +295,8 @@ namespace GitHub.Services
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
             string fileName,
-            bool head = true)
+            bool head,
+            Encoding encoding)
         {
             return Observable.Defer(async () =>
             {
@@ -323,17 +324,17 @@ namespace GitHub.Services
                     }
                 }
 
-                var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, Encoding.UTF8);
+                var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);
                 return Observable.Return(file);
             });
         }
 
-        static Encoding GetEncoding(string file)
+        public Encoding GetEncoding(string path)
         {
-            if (File.Exists(file))
+            if (File.Exists(path))
             {
                 var encoding = Encoding.UTF8;
-                if (HasPreamble(file, encoding))
+                if (HasPreamble(path, encoding))
                 {
                     return encoding;
                 }
