@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -92,6 +93,57 @@ namespace UnitTests.GitHub.App.ViewModels
                 var readme = (PullRequestFileNode)target.ChangedFilesTree[2];
                 Assert.Equal("readme.md", readme.FileName);
             }
+
+            [Fact]
+            public async Task FileCommentCountShouldTrackSessionInlineComments()
+            {
+                var pr = CreatePullRequest();
+                var file = Substitute.For<IPullRequestSessionFile>();
+                var thread1 = CreateThread(5);
+                var thread2 = CreateThread(6);
+                var outdatedThread = CreateThread(-1);
+                var session = Substitute.For<IPullRequestSession>();
+                var sessionManager = Substitute.For<IPullRequestSessionManager>();
+
+                file.InlineCommentThreads.Returns(new[] { thread1 });
+                session.GetFile("readme.md").Returns(Task.FromResult(file));
+                sessionManager.GetSession(pr).Returns(Task.FromResult(session));
+
+                var target = CreateTarget(sessionManager: sessionManager);
+
+                pr.ChangedFiles = new[]
+                {
+                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
+                };
+
+                await target.Load(pr);
+                Assert.Equal(1, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
+
+                file.InlineCommentThreads.Returns(new[] { thread1, thread2 });
+                RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
+                Assert.Equal(2, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
+
+                // Outdated comment is not included in the count.
+                file.InlineCommentThreads.Returns(new[] { thread1, thread2, outdatedThread });
+                RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
+                Assert.Equal(2, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
+
+                file.Received(1).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
+            }
+
+            IInlineCommentThreadModel CreateThread(int lineNumber)
+            {
+                var result = Substitute.For<IInlineCommentThreadModel>();
+                result.LineNumber.Returns(lineNumber);
+                return result;
+            }
+
+            void RaisePropertyChanged<T>(T o, string propertyName)
+                where T : INotifyPropertyChanged
+            {
+                o.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(new PropertyChangedEventArgs(propertyName));
+            }
+
         }
 
         public class TheCheckoutCommand
@@ -418,7 +470,8 @@ namespace UnitTests.GitHub.App.ViewModels
             bool prFromFork = false,
             bool dirty = false,
             int aheadBy = 0,
-            int behindBy = 0)
+            int behindBy = 0,
+            IPullRequestSessionManager sessionManager = null)
         {
             return CreateTargetAndService(
                 currentBranch: currentBranch,
@@ -426,7 +479,8 @@ namespace UnitTests.GitHub.App.ViewModels
                 prFromFork: prFromFork,
                 dirty: dirty,
                 aheadBy: aheadBy,
-                behindBy: behindBy).Item1;
+                behindBy: behindBy,
+                sessionManager: sessionManager).Item1;
         }
 
         static Tuple<PullRequestDetailViewModel, IPullRequestService> CreateTargetAndService(
@@ -435,7 +489,8 @@ namespace UnitTests.GitHub.App.ViewModels
             bool prFromFork = false,
             bool dirty = false,
             int aheadBy = 0,
-            int behindBy = 0)
+            int behindBy = 0,
+            IPullRequestSessionManager sessionManager = null)
         {
             var repository = Substitute.For<ILocalRepositoryModel>();
             var currentBranchModel = new BranchModel(currentBranch, repository);
@@ -478,6 +533,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 repository,
                 Substitute.For<IModelService>(),
                 pullRequestService,
+                sessionManager ?? Substitute.For<IPullRequestSessionManager>(),
                 Substitute.For<IUsageTracker>());
 
             return Tuple.Create(vm, pullRequestService);

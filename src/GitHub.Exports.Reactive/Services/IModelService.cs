@@ -4,7 +4,6 @@ using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
-using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -14,7 +13,7 @@ namespace GitHub.Services
     /// </summary>
     public interface IModelService : IDisposable
     {
-        IObservable<AccountCacheItem> GetUserFromCache();
+        IObservable<IAccount> GetCurrentUser();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
         ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);

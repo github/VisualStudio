@@ -32,16 +32,28 @@
 
                 <ui:GitHubProgressBar Foreground="{DynamicResource GitHubAccentBrush}"
                                       IsIndeterminate="True"
-                                      Style="{DynamicResource GitHubProgressBar}"
-                                      Visibility="{TemplateBinding IsBusy, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+                                      Style="{DynamicResource GitHubProgressBar}">
+                    <ui:GitHubProgressBar.Visibility>
+                        <MultiBinding Converter="{ui:MultiBooleanToVisibilityConverter}">
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsBusy"/>
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ShowBusyState"/>
+                        </MultiBinding>
+                    </ui:GitHubProgressBar.Visibility>
+                </ui:GitHubProgressBar>
 
                 <c:Spinner Name="spinner" 
                            Grid.Row="1"
                            Width="48"
                            Height="48"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Visibility="{TemplateBinding IsLoading, Converter={ui:BooleanToVisibilityConverter}}"/>
+                           VerticalAlignment="Center">
+                    <c:Spinner.Visibility>
+                        <MultiBinding Converter="{ui:MultiBooleanToVisibilityConverter}">
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsLoading"/>
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ShowBusyState"/>
+                        </MultiBinding>
+                    </c:Spinner.Visibility>
+                </c:Spinner>
                 
                 <ContentPresenter Grid.Row="1"
                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
