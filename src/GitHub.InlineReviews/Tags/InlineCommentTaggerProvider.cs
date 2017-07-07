@@ -10,6 +10,9 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace GitHub.InlineReviews.Tags
 {
+    /// <summary>
+    /// Factory class for <see cref="InlineCommentTagger"/>s.
+    /// </summary>
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
     [TagType(typeof(ShowInlineCommentTag))]

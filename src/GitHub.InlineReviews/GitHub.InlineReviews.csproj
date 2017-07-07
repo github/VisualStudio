@@ -80,7 +80,6 @@
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
     <Compile Include="Glyph\IGlyphFactory.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
-    <Compile Include="Models\AddCommentModel.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
@@ -373,13 +372,12 @@
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
-    <Content Include="Resources\InlineReviewsPackage.ico" />
-    <Content Include="Resources\PullRequestCommentsToolWindowCommand.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -417,6 +415,11 @@
     </Page>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\logo_32x32%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != '' And '$(NCrunch)' != '1'" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

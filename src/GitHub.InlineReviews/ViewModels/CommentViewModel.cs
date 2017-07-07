@@ -16,6 +16,7 @@ namespace GitHub.InlineReviews.ViewModels
     {
         string body;
         string errorMessage;
+        bool isReadOnly;
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
@@ -58,16 +59,20 @@ namespace GitHub.InlineReviews.ViewModels
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
-
-            CancelEdit = ReactiveCommand.Create();
-            CancelEdit.Subscribe(DoCancelEdit);
+            AddErrorHandler(BeginEdit);
 
             CommitEdit = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
-                    this.WhenAnyValue(x => x.Body, x => !string.IsNullOrEmpty(x)),
+                    this.WhenAnyValue(x => x.IsReadOnly),
+                    this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
                     this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
-                    (hasBody, canPost) => hasBody && canPost),
+                    (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
                 DoCommitEdit);
+            AddErrorHandler(CommitEdit);
+
+            CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
+            CancelEdit.Subscribe(DoCancelEdit);
+            AddErrorHandler(CancelEdit);
         }
 
         /// <summary>
@@ -106,6 +111,13 @@ namespace GitHub.InlineReviews.ViewModels
         {
             get { return state; }
             private set { this.RaiseAndSetIfChanged(ref state, value); }
+        }
+
+        /// <inheritdoc/>
+        public bool IsReadOnly
+        {
+            get { return isReadOnly; }
+            set { this.RaiseAndSetIfChanged(ref isReadOnly, value); }
         }
 
         /// <inheritdoc/>
@@ -155,6 +167,11 @@ namespace GitHub.InlineReviews.ViewModels
                 CommentEditState.Placeholder,
                 currentUser,
                 DateTimeOffset.MinValue);
+        }
+
+        void AddErrorHandler<T>(ReactiveCommand<T> command)
+        {
+            command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
         }
 
         void DoBeginEdit(object unused)

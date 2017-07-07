@@ -31,35 +31,38 @@ namespace GitHub.InlineReviews.Tags
 
         class BrushesManager
         {
-            readonly Brush addBackground;
-            readonly Brush deleteBackground;
-            readonly Brush noneBackground;
+            const string AddPropertiesKey = "deltadiff.add.word";
+            const string DeletePropertiesKey = "deltadiff.remove.word";
+            const string NonePropertiesKey = "Indicator Margin";
+
+            readonly ResourceDictionary addProperties;
+            readonly ResourceDictionary deleteProperties;
+            readonly ResourceDictionary noneProperties;
 
             internal BrushesManager(IEditorFormatMap editorFormatMap)
             {
-                addBackground = TryGetValue<Brush>(editorFormatMap, "deltadiff.add.word", "Background");
-                deleteBackground = TryGetValue<Brush>(editorFormatMap, "deltadiff.remove.word", "Background");
-                noneBackground = TryGetValue<Brush>(editorFormatMap, "Indicator Margin", "Background");
+                addProperties = editorFormatMap.GetProperties(AddPropertiesKey);
+                deleteProperties = editorFormatMap.GetProperties(DeletePropertiesKey);
+                noneProperties = editorFormatMap.GetProperties(NonePropertiesKey);
             }
 
-            T TryGetValue<T>(IEditorFormatMap editorFormatMap, string key, string name) where T : class
-            {
-                var properties = editorFormatMap.GetProperties(key);
-                return properties?[name] as T;
-            }
-
-            internal Brush GetBrush(DiffChangeType diffChangeType)
+            internal Brush GetBackground(DiffChangeType diffChangeType)
             {
                 switch (diffChangeType)
                 {
                     case DiffChangeType.Add:
-                        return addBackground;
+                        return GetBackground(addProperties);
                     case DiffChangeType.Delete:
-                        return deleteBackground;
+                        return GetBackground(deleteProperties);
                     case DiffChangeType.None:
                     default:
-                        return noneBackground;
+                        return GetBackground(noneProperties);
                 }
+            }
+
+            static Brush GetBackground(ResourceDictionary dictionary)
+            {
+                return dictionary["Background"] as Brush;
             }
         }
 
@@ -71,7 +74,7 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Background = brushesManager.GetBrush(tag.DiffChangeType);
+            glyph.Background = brushesManager.GetBackground(tag.DiffChangeType);
             return glyph;
         }
 

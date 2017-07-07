@@ -19,8 +19,5 @@ namespace GitHub.InlineReviews.ViewModels
 
         public IRepositoryModel Repository { get; }
         public int Number { get; }
-
-        /// <inheritdoc/>
-        public override ReactiveCommand<ICommentModel> PostComment { get; }
     }
 }

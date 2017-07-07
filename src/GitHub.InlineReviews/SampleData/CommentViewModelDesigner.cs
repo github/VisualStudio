@@ -18,6 +18,7 @@ namespace GitHub.InlineReviews.SampleData
         public string Body { get; set; }
         public string ErrorMessage { get; set; }
         public CommentEditState EditState { get; set; }
+        public bool IsReadOnly { get; set; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }
 

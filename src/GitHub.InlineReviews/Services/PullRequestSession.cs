@@ -27,7 +27,7 @@ namespace GitHub.InlineReviews.Services
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         bool isCheckedOut;
-        ReactiveList<IPullRequestSessionFile> files;
+        IReadOnlyList<IPullRequestSessionFile> files;
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -84,7 +84,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IReactiveList<IPullRequestSessionFile>> GetAllFiles()
+        public async Task<IReadOnlyList<IPullRequestSessionFile>> GetAllFiles()
         {
             if (files == null)
             {
@@ -227,9 +227,9 @@ namespace GitHub.InlineReviews.Services
             return file;
         }
 
-        async Task<ReactiveList<IPullRequestSessionFile>> CreateAllFiles()
+        async Task<IReadOnlyList<IPullRequestSessionFile>> CreateAllFiles()
         {
-            var result = new ReactiveList<IPullRequestSessionFile>();
+            var result = new List<IPullRequestSessionFile>();
 
             foreach (var path in FilePaths)
             {

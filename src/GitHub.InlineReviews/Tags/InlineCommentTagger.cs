@@ -18,6 +18,9 @@ using System.Collections;
 
 namespace GitHub.InlineReviews.Tags
 {
+    /// <summary>
+    /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
+    /// </summary>
     sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IEditorContentSource, IDisposable
     {
         readonly IGitService gitService;
@@ -131,7 +134,10 @@ namespace GitHub.InlineReviews.Tags
                         {
                             var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
 
-                            if (lineNumber >= startLine && lineNumber <= endLine && !linesWithComments[lineNumber - startLine])
+                            if (lineNumber >= startLine && 
+                                lineNumber <= endLine && 
+                                !linesWithComments[lineNumber - startLine]
+                                && (!leftHandSide || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                 yield return new TagSpan<InlineCommentTag>(

@@ -55,6 +55,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             var placeholder = CommentViewModel.CreatePlaceholder(this, CurrentUser);
             placeholder.BeginEdit.Execute(null);
+            this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
 
             file.WhenAnyValue(x => x.CommitSha).Subscribe(x => NeedsPush = x == null);
@@ -85,9 +86,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// posted and therefore this is no loner a new comment thread.
         /// </summary>
         public IObservable<Unit> Finished => finished;
-
-        /// <inheritdoc/>
-        public override ReactiveCommand<ICommentModel> PostComment { get; }
 
         /// <summary>
         /// Gets a value indicating whether the user must commit and push their changes before

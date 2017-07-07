@@ -63,12 +63,34 @@ namespace GitHub.InlineReviews.Glyph
 
         public ITextViewMargin GetTextViewMargin(string marginName)
         {
-            if (marginName == this.marginName)
-            {
-                return this;
-            }
+            return (marginName == this.marginName) ? this : null;
+        }
 
-            return null;
+        public bool Enabled
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return true;
+            }
+        }
+
+        public double MarginSize
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return marginVisual.Width;
+            }
+        }
+
+        public FrameworkElement VisualElement
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return marginVisual;
+            }
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -117,13 +139,11 @@ namespace GitHub.InlineReviews.Glyph
                 {
                     var span = list[0];
                     int start = span.Start;
-                    span = list[0];
                     int end = span.End;
                     for (int i = 1; i < list.Count; i++)
                     {
                         span = list[i];
                         start = Math.Min(start, span.Start);
-                        span = list[i];
                         end = Math.Max(end, span.End);
                     }
 
@@ -182,33 +202,6 @@ namespace GitHub.InlineReviews.Glyph
             if (isDisposed)
             {
                 throw new ObjectDisposedException(marginName);
-            }
-        }
-
-        public bool Enabled
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return true;
-            }
-        }
-
-        public double MarginSize
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual.Width;
-            }
-        }
-
-        public FrameworkElement VisualElement
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual;
             }
         }
     }

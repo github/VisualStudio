@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -57,7 +58,7 @@ namespace GitHub.Services
         /// <returns>
         /// A list of the files touched by the pull request.
         /// </returns>
-        Task<IReactiveList<IPullRequestSessionFile>> GetAllFiles();
+        Task<IReadOnlyList<IPullRequestSessionFile>> GetAllFiles();
 
         /// <summary>
         /// Gets a file touched by the pull request.
