@@ -5,7 +5,7 @@ using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class InlineCommentPeekResult : IPeekResult
+    sealed class InlineCommentPeekResult : IPeekResult
     {
         public InlineCommentPeekResult(InlineCommentPeekViewModel viewModel)
         {
