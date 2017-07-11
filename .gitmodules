@@ -16,6 +16,3 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
-[submodule "submodules/markdig-wpf"]
-	path = submodules/markdig-wpf
-	url = https://github.com/grokys/markdig-wpf.git
