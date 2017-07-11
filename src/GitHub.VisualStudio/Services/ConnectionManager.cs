@@ -26,7 +26,6 @@ namespace GitHub.VisualStudio
 
         [ImportingConstructor]
         public ConnectionManager(
-            IProgram program,
             IVSGitServices vsGitServices,
             IConnectionCache cache,
             ILoginManager loginManager,

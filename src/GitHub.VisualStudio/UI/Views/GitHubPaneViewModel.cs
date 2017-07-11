@@ -8,7 +8,6 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
-using NullGuard;
 using ReactiveUI;
 using System;
 using System.ComponentModel.Composition;
@@ -22,7 +21,6 @@ namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
         const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequestList;
@@ -48,6 +46,15 @@ namespace GitHub.VisualStudio.UI.Views
             IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(cm, nameof(cm));
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
+            Guard.ArgumentNotNull(vsBrowser, nameof(vsBrowser));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.connectionManager = cm;
             this.hosts = hosts;
             this.uiProvider = uiProvider;
@@ -67,6 +74,8 @@ namespace GitHub.VisualStudio.UI.Views
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Load(new ViewWithData(UIControllerFlow.PullRequestList)).Forget());
 
@@ -307,7 +316,6 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         string title;
-        [AllowNull]
         public string Title
         {
             get { return title; }
@@ -331,7 +339,6 @@ namespace GitHub.VisualStudio.UI.Views
         public RepositoryOrigin RepositoryOrigin { get; private set; }
 
         string message;
-        [AllowNull]
         public string Message
         {
             get { return message; }
@@ -339,7 +346,6 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         MessageType messageType;
-        [AllowNull]
         public MessageType MessageType
         {
             get { return messageType; }

@@ -303,7 +303,10 @@ namespace GitHub.Services
 
         async Task SendUsage(UsageModel usage, bool weekly, bool monthly)
         {
-            Debug.Assert(client != null, "SendUsage should not be called when there is no IMetricsService");
+            if (client == null)
+            {
+                throw new GitHubLogicException("SendUsage should not be called when there is no IMetricsService");
+            }
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {

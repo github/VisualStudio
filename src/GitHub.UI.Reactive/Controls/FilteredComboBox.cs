@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using GitHub.Extensions.Reactive;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -46,7 +45,6 @@ namespace GitHub.UI
 
         public string FilterText
         {
-            [return: AllowNull]
             get { return (string)GetValue(FilterTextProperty); }
             set { SetValue(FilterTextProperty, value); }
         }

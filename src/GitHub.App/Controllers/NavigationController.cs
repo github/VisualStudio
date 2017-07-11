@@ -7,12 +7,10 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using System.Diagnostics;
 
 namespace GitHub.Controllers
 {
-    [NullGuard(ValidationFlags.None)]
     public class NavigationController : NotificationAwareObject, IDisposable, IHasBusy
     {
         readonly List<IUIController> history = new List<IUIController>();

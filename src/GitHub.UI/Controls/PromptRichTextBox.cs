@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -41,7 +40,6 @@ namespace GitHub.UI
 
         public Brush PromptForeground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(PromptForegroundProperty); }
             set { SetValue(PromptForegroundProperty, value); }
         }
@@ -50,7 +48,6 @@ namespace GitHub.UI
         [DefaultValue("")]
         public string PromptText
         {
-            [return: AllowNull]
             get { return (string)GetValue(PromptTextProperty); }
             set { SetValue(PromptTextProperty, value); }
         }
@@ -59,7 +56,6 @@ namespace GitHub.UI
         [DefaultValue("")]
         public string Text
         {
-            [return: AllowNull]
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value ?? ""); }
         }
@@ -68,7 +64,6 @@ namespace GitHub.UI
         [DefaultValue("")]
         public string CharacterLimitToolTipWarning
         {
-            [return: AllowNull]
             get { return (string)GetValue(CharacterLimitToolTipWarningProperty); }
             set { SetValue(CharacterLimitToolTipWarningProperty, value); }
         }
@@ -116,8 +111,12 @@ namespace GitHub.UI
 
             var content = SetDocumentContent(document, rtf, DataFormats.Rtf);
 
+            if (content.Text == null)
+            {
+                throw new GitHubLogicException("WPF ensures this is not null. WPF failed on the job");
+            }
+
             var d = new DataObject();
-            Debug.Assert(content.Text != null, "WPF ensures this is not null. WPF failed on the job");
             var textContent = content.Text;
             if (!richTextBox.AcceptsReturn)
             {

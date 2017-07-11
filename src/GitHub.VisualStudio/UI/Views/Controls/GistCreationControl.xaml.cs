@@ -22,7 +22,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     {
         [ImportingConstructor]
         public GistCreationControl(
-            ITeamExplorerServices teServices,
             INotificationDispatcher notifications,
             IGitHubServiceProvider serviceProvider)
         {
