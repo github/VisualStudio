@@ -197,7 +197,7 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        private void ViewCommentsClick(object sender, RoutedEventArgs e)
+        void ViewCommentsClick(object sender, RoutedEventArgs e)
         {
             var model = (object)ViewModel.Model;
             Services.Dte.Commands.Raise(
@@ -207,7 +207,7 @@ namespace GitHub.VisualStudio.UI.Views
                 null);
         }
 
-        private async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
+        async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
         {
             try
             {
