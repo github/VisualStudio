@@ -25,7 +25,7 @@ namespace GitHub.Services
     public class PullRequestService : IPullRequestService
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
-        const string SettingGHfVSPullRequest = "ghfvs-pr";
+        const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
 
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
