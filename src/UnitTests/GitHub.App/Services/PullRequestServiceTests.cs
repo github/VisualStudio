@@ -328,7 +328,7 @@ public class PullRequestServiceTests : TestBaseClass
             await service.Checkout(localRepo, pr, "pr/123-foo1");
 
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr", "owner#4").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr-owner-number", "owner#4").Forget();
 
             Assert.Equal(2, gitClient.ReceivedCalls().Count());
         }
@@ -355,7 +355,7 @@ public class PullRequestServiceTests : TestBaseClass
 
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "prbranch").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.prbranch.ghfvs-pr", "owner#5").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.prbranch.ghfvs-pr-owner-number", "owner#5").Forget();
 
             Assert.Equal(4, gitClient.ReceivedCalls().Count());
         }
@@ -386,7 +386,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "prbranch:pr/5-fork-branch").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/5-fork-branch").Forget();
             gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/prbranch").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr", "owner#5").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr-owner-number", "owner#5").Forget();
             Assert.Equal(7, gitClient.ReceivedCalls().Count());
         }
 
