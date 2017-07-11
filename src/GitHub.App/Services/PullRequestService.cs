@@ -518,8 +518,12 @@ namespace GitHub.Services
                 if (separator != -1)
                 {
                     var owner = value.Substring(0, separator);
-                    var number = int.Parse(value.Substring(separator + 1), CultureInfo.InvariantCulture);
-                    return Tuple.Create(owner, number);
+                    int number;
+
+                    if (int.TryParse(value.Substring(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                    {
+                        return Tuple.Create(owner, number);
+                    }
                 }
             }
 
