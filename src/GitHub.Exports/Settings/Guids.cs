@@ -12,6 +12,7 @@ namespace GitHub.VisualStudio
         public const string GitHubServiceProviderId = "76909E1A-9D58-41AB-8957-C26B9550787B";
         public const string StartPagePackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
         public const string CodeContainerProviderId = "6CE146CB-EF57-4F2C-A93F-5BA685317660";
+        public const string InlineReviewsPackageId = "248325BE-4A2D-4111-B122-E7D59BF73A35";
         public const string TeamExplorerWelcomeMessage = "C529627F-8AA6-4FDB-82EB-4BFB7DB753C3";
         public const string LoginManagerId = "7BA2071A-790A-4F95-BE4A-0EEAA5928AAF";
 

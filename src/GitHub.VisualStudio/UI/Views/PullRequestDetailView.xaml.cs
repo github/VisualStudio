@@ -1,26 +1,30 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
+using Task = System.Threading.Tasks.Task;
+using GitHub.InlineReviews.Commands;
+using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -44,6 +48,8 @@ namespace GitHub.VisualStudio.UI.Views
                 d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x)));
                 d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x).Forget()));
             });
+
+            bodyGrid.RequestBringIntoView += BodyFocusHack;
         }
 
         [Import]
@@ -51,6 +57,9 @@ namespace GitHub.VisualStudio.UI.Views
 
         [Import]
         IVisualStudioBrowser VisualStudioBrowser { get; set; }
+
+        [Import]
+        IEditorOptionsFactoryService EditorOptionsFactoryService { get; set; }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
@@ -83,8 +92,10 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
-                var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-                var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
+                var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var fullPath = System.IO.Path.Combine(ViewModel.Repository.LocalPath, relativePath);
+                var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = $"{relativePath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
@@ -95,21 +106,41 @@ namespace GitHub.VisualStudio.UI.Views
                     options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
                 }
 
-                Services.DifferenceService.OpenComparisonWindow2(
-                    fileNames.Item1,
-                    fileNames.Item2,
-                    caption,
-                    tooltip,
-                    leftLabel,
-                    rightLabel,
-                    string.Empty,
-                    string.Empty,
-                    (uint)options);
+                IVsWindowFrame frame;
+                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                {
+                    // Diff window will open in provisional (right hand) tab until document is touched.
+                    frame = Services.DifferenceService.OpenComparisonWindow2(
+                        fileNames.Item1,
+                        fileNames.Item2,
+                        caption,
+                        tooltip,
+                        leftLabel,
+                        rightLabel,
+                        string.Empty,
+                        string.Empty,
+                        (uint)options);
+                }
+
+                object docView;
+                frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
+                var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
+
+                var session = ViewModel.Session;
+                AddCompareBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
+                AddCompareBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
             }
+        }
+
+        void AddCompareBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, bool isLeftBuffer)
+        {
+            buffer.Properties.GetOrCreateSingletonProperty(
+                typeof(PullRequestTextBufferInfo),
+                () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
@@ -167,6 +198,57 @@ namespace GitHub.VisualStudio.UI.Views
                     e.Handled = false;
                 }
             }
+        }
+
+        void BodyFocusHack(object sender, RequestBringIntoViewEventArgs e)
+        {
+            if (e.TargetObject == bodyMarkdown)
+            {
+                // Hack to prevent pane scrolling to top. Instead focus selected tree view item.
+                // See https://github.com/github/VisualStudio/issues/1042
+                var node = changesTree.GetTreeViewItem(changesTree.SelectedItem);
+                node?.Focus();
+                e.Handled = true;
+            }
+        }
+
+        void ViewCommentsClick(object sender, RoutedEventArgs e)
+        {
+            var model = (object)ViewModel.Model;
+            Services.Dte.Commands.Raise(
+                GlobalCommands.CommandSetString,
+                GlobalCommands.ShowPullRequestCommentsId,
+                ref model,
+                null);
+        }
+
+        async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var file = (e.OriginalSource as Hyperlink)?.DataContext as IPullRequestFileNode;
+
+                if (file != null)
+                {
+                    var param = (object)new InlineCommentNavigationParams
+                    {
+                        FromLine = -1,
+                    };
+
+                    await DoDiffFile(file);
+
+                    // HACK: We need to wait here for the diff view to set itself up and move its cursor
+                    // to the first changed line. There must be a better way of doing this.
+                    await Task.Delay(1500);
+
+                    Services.Dte.Commands.Raise(
+                        GlobalCommands.CommandSetString,
+                        GlobalCommands.NextInlineCommentId,
+                        ref param,
+                        null);
+                }
+            }
+            catch { }
         }
     }
 }
