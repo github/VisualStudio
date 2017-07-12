@@ -49,7 +49,7 @@ namespace GitHub.InlineReviews.Commands
             get
             {
                 var tags = GetTags(GetCurrentTextViews());
-                return tags.Count > 1;
+                return tags.Count > 0;
             }
         }
 

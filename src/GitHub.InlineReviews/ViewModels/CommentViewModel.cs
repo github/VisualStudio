@@ -89,66 +89,6 @@ namespace GitHub.InlineReviews.ViewModels
         {
         }
 
-        /// <inheritdoc/>
-        public int Id { get; private set; }
-
-        /// <inheritdoc/>
-        public string Body
-        {
-            get { return body; }
-            set { this.RaiseAndSetIfChanged(ref body, value); }
-        }
-
-        /// <inheritdoc/>
-        public string ErrorMessage
-        {
-            get { return this.errorMessage; }
-            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
-        }
-
-        /// <inheritdoc/>
-        public CommentEditState EditState
-        {
-            get { return state; }
-            private set { this.RaiseAndSetIfChanged(ref state, value); }
-        }
-
-        /// <inheritdoc/>
-        public bool IsReadOnly
-        {
-            get { return isReadOnly; }
-            set { this.RaiseAndSetIfChanged(ref isReadOnly, value); }
-        }
-
-        /// <inheritdoc/>
-        public DateTimeOffset UpdatedAt
-        {
-            get { return updatedAt; }
-            private set { this.RaiseAndSetIfChanged(ref updatedAt, value); }
-        }
-
-        /// <summary>
-        /// Gets the current user.
-        /// </summary>
-        public IAccount CurrentUser { get; }
-
-        /// <summary>
-        /// Gets the thread that the comment is a part of.
-        /// </summary>
-        public ICommentThreadViewModel Thread { get; }
-
-        /// <inheritdoc/>
-        public IAccount User { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<object> BeginEdit { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<object> CancelEdit { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit> CommitEdit { get; }
-
         /// <summary>
         /// Creates a placeholder comment which can be used to add a new comment to a thread.
         /// </summary>
@@ -208,5 +148,65 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = e.Message;
             }
         }
+
+        /// <inheritdoc/>
+        public int Id { get; private set; }
+
+        /// <inheritdoc/>
+        public string Body
+        {
+            get { return body; }
+            set { this.RaiseAndSetIfChanged(ref body, value); }
+        }
+
+        /// <inheritdoc/>
+        public string ErrorMessage
+        {
+            get { return this.errorMessage; }
+            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
+        }
+
+        /// <inheritdoc/>
+        public CommentEditState EditState
+        {
+            get { return state; }
+            private set { this.RaiseAndSetIfChanged(ref state, value); }
+        }
+
+        /// <inheritdoc/>
+        public bool IsReadOnly
+        {
+            get { return isReadOnly; }
+            set { this.RaiseAndSetIfChanged(ref isReadOnly, value); }
+        }
+
+        /// <inheritdoc/>
+        public DateTimeOffset UpdatedAt
+        {
+            get { return updatedAt; }
+            private set { this.RaiseAndSetIfChanged(ref updatedAt, value); }
+        }
+
+        /// <summary>
+        /// Gets the current user.
+        /// </summary>
+        public IAccount CurrentUser { get; }
+
+        /// <summary>
+        /// Gets the thread that the comment is a part of.
+        /// </summary>
+        public ICommentThreadViewModel Thread { get; }
+
+        /// <inheritdoc/>
+        public IAccount User { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> BeginEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> CancelEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> CommitEdit { get; }
     }
 }
