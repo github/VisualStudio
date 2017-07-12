@@ -59,7 +59,26 @@
                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                  Visibility="{TemplateBinding IsLoading, Converter={ui:BooleanToInverseVisibilityConverter}}"/>
+                                  Visibility="{TemplateBinding ShowContent, Converter={ui:BooleanToVisibilityConverter}}"/>
+
+                <Border Grid.RowSpan="2"
+                        Background="{TemplateBinding Background}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ui:OcticonImage Icon="alert" Width="32" Height="32" Margin="8"/>
+                        <TextBlock Text="{Binding ErrorMessage}" TextAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Border>
     </ControlTemplate>
@@ -67,10 +86,10 @@
     <!-- Applies the control template for ViewBase depending on HasBusyState -->
     <Style TargetType="local:ViewBase">
         <Style.Triggers>
-            <Trigger Property="HasBusyState" Value="False">
+            <Trigger Property="HasState" Value="False">
                 <Setter Property="Template" Value="{StaticResource ViewBaseDefaultTemplate}"/>
             </Trigger>
-            <Trigger Property="HasBusyState" Value="True">
+            <Trigger Property="HasState" Value="True">
                 <Setter Property="Template" Value="{StaticResource ViewBaseBusyStateTemplate}"/>
             </Trigger>
         </Style.Triggers>
