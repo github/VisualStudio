@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using GitHub.InlineReviews.Commands;
+using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -47,6 +48,8 @@ namespace GitHub.VisualStudio.UI.Views
                 d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x)));
                 d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x).Forget()));
             });
+
+            bodyGrid.RequestBringIntoView += BodyFocusHack;
         }
 
         [Import]
@@ -194,6 +197,18 @@ namespace GitHub.VisualStudio.UI.Views
 
                     e.Handled = false;
                 }
+            }
+        }
+
+        void BodyFocusHack(object sender, RequestBringIntoViewEventArgs e)
+        {
+            if (e.TargetObject == bodyMarkdown)
+            {
+                // Hack to prevent pane scrolling to top. Instead focus selected tree view item.
+                // See https://github.com/github/VisualStudio/issues/1042
+                var node = changesTree.GetTreeViewItem(changesTree.SelectedItem);
+                node?.Focus();
+                e.Handled = true;
             }
         }
 
