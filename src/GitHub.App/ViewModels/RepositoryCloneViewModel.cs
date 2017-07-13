@@ -128,15 +128,17 @@ namespace GitHub.ViewModels
 
             IsBusy = true;
             repositoryHost.ModelService.GetRepositories(repositories);
-            repositories.OriginalCompleted.Subscribe(
-                _ => { }
-                , ex =>
-                {
-                    LoadingFailed = true;
-                    IsBusy = false;
-                    log.Error("Error while loading repositories", ex);
-                },
-                () => IsBusy = false
+            repositories.OriginalCompleted
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(
+                    _ => { }
+                    , ex =>
+                    {
+                        LoadingFailed = true;
+                        IsBusy = false;
+                        log.Error("Error while loading repositories", ex);
+                    },
+                    () => IsBusy = false
             );
             repositories.Subscribe();
         }
