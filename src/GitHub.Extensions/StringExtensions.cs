@@ -180,21 +180,6 @@ namespace GitHub.Extensions
             return sb.ToString();
         }
 
-        public static bool EqualsIgnoringLineEndings(this string a, string b)
-        {
-            if (ReferenceEquals(a, b))
-                return true;
-
-            if (a == null || b == null)
-                return false;
-
-            // TODO: Write a non-allocating comparison.
-            a = a.Replace("\r\n", "\n");
-            b = b.Replace("\r\n", "\n");
-
-            return a == b;
-        }
-
         public static Uri ToUriSafe(this string url)
         {
             Uri uri;

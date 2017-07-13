@@ -296,7 +296,7 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
-                if(commit == null)
+                if (commit == null)
                 {
                     throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
                 }

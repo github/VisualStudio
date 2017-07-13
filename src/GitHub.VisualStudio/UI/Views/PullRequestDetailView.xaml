@@ -236,7 +236,7 @@
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,5,-8,0"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-8,0">
-            <Grid Margin="0 5 0 0">
+            <Grid Name="bodyGrid" Margin="0 5 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
@@ -297,7 +297,8 @@
                             </Grid.Resources>
 
                             <!-- Tree View -->
-                            <TreeView ItemsSource="{Binding ChangedFilesTree}"
+                            <TreeView Name="changesTree"
+                                      ItemsSource="{Binding ChangedFilesTree}"
                                       ContextMenuOpening="TreeView_ContextMenuOpening"
                                       ContextMenu="{StaticResource FileContextMenu}"
                                       Background="Transparent"
