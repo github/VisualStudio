@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using GitHub.Models;
+using GitHub.ViewModels;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -12,7 +13,7 @@ namespace GitHub.InlineReviews.ViewModels
         Placeholder,
     }
 
-    public interface ICommentViewModel
+    public interface ICommentViewModel : IViewModel
     {
         /// <summary>
         /// Gets the ID of the comment.
@@ -50,6 +51,11 @@ namespace GitHub.InlineReviews.ViewModels
         IAccount User { get; }
 
         /// <summary>
+        /// Gets the thread that the comment is a part of.
+        /// </summary>
+        ICommentThreadViewModel Thread { get; }
+
+        /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
         ReactiveCommand<object> BeginEdit { get; }
@@ -63,5 +69,10 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets a command which will commit edits to the comment.
         /// </summary>
         ReactiveCommand<Unit> CommitEdit { get; }
+
+        /// <summary>
+        /// Gets a command to open the comment in a browser.
+        /// </summary>
+        ReactiveCommand<object> OpenOnGitHub { get; }
     }
 }
