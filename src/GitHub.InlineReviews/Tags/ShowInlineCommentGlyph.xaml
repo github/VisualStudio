@@ -4,32 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
-    <!--
-    <DrawingImage>
-        <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V14 H14 V0 H0 Z">
-                <GeometryDrawing Brush="#FF9EC7FF" Geometry="F0 M14,14z M0,0z M1,0C0.45,0,0,0.45,0,1L0,9C0,9.55,0.45,10,1,10L3,10 3,13.5 6.5,10 13,10C13.55,10,14,9.55,14,9L14,1C14,0.45,13.55,0,13,0L1,0z" />
-                <GeometryDrawing Geometry="F0 M14,14z M0,0z M3.5,12.2928932L6.29289322,9.5 13,9.5C13.2738576,9.5,13.5,9.27385763,13.5,9L13.5,1C13.5,0.726142375,13.2738576,0.5,13,0.5L1,0.5C0.726142375,0.5,0.5,0.726142375,0.5,1L0.5,9C0.5,9.27385763,0.726142375,9.5,1,9.5L3.5,9.5 3.5,12.2928932z">
-                    <GeometryDrawing.Pen>
-                        <Pen Thickness="1" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter">
-                            <Pen.Brush>
-                                <SolidColorBrush Color="#FF313131" Opacity="0.163071784" />
-                            </Pen.Brush>
-                        </Pen>
-                    </GeometryDrawing.Pen>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    -->
-    <Viewbox>
+    <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
         <Canvas>
-            <Path Stroke="Black"
-              Data="M13 2H1c-0.55 0-1 0.45-1 1v8c0 0.55 0.45 1 1 1h2v3.5l3.5-3.5h6.5c0.55 0 1-0.45 1-1V3c0-0.55-0.45-1-1-1z m0 9H6L4 13V11H1V3h12v8z"/>
-            <!--
-            <Path Stroke="White"
-              Data="F0 M14,14z M0,0z M3.5,12.2928932L6.29289322,9.5 13,9.5C13.2738576,9.5,13.5,9.27385763,13.5,9L13.5,1C13.5,0.726142375,13.2738576,0.5,13,0.5L1,0.5C0.726142375,0.5,0.5,0.726142375,0.5,1L0.5,9C0.5,9.27385763,0.726142375,9.5,1,9.5L3.5,9.5 3.5,12.2928932z"/>
-              -->
+            <Path Fill="#9EC7FF" 
+                Data="M1,0 C0.45,0 0,0.45 0,1 L0,9 C0,9.55 0.45,10 1,10 L3,10 L3,13.5 L6.5,10 L13,10 C13.55,10 14,9.55 14,9 L14,1 C14,0.45 13.55,0 13,0 L1,0 Z" />
+            <Path Opacity="0.163" Stroke="#313131" 
+                  Data="M3.5,12.2928932 L6.29289322,9.5 L13,9.5 C13.2738576,9.5 13.5,9.27385763 13.5,9 L13.5,1 C13.5,0.726142375 13.2738576,0.5 13,0.5 L1,0.5 C0.726142375,0.5 0.5,0.726142375 0.5,1 L0.5,9 C0.5,9.27385763 0.726142375,9.5 1,9.5 L3.5,9.5 L3.5,12.2928932 Z" />
         </Canvas>
     </Viewbox>
 </UserControl>
