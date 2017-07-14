@@ -639,18 +639,18 @@ namespace GitHub.VisualStudio.UI {
         /// <summary>
         ///   Looks up a localized string similar to by.
         /// </summary>
-        public static string prOpenedByText {
+        public static string prUpdatedByText {
             get {
-                return ResourceManager.GetString("prOpenedByText", resourceCulture);
+                return ResourceManager.GetString("prUpdatedByText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to opened.
+        ///   Looks up a localized string similar to Updated.
         /// </summary>
-        public static string prOpenedText {
+        public static string prUpdatedText {
             get {
-                return ResourceManager.GetString("prOpenedText", resourceCulture);
+                return ResourceManager.GetString("prUpdatedText", resourceCulture);
             }
         }
         
@@ -790,7 +790,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thanks for installing GitHub for Visual Studio. Why not take a look at our [training](show-training) or [documentation](show-docs)?
+        ///   Looks up a localized string similar to Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
         ///
         ///[Don&apos;t show this again](dont-show-again).
         /// </summary>
