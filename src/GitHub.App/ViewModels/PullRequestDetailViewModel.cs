@@ -39,6 +39,7 @@ namespace GitHub.ViewModels
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
+        string errorMessage;
         string operationError;
         bool isBusy;
         bool isLoading;
@@ -246,6 +247,15 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets an error message to display if loading fails.
+        /// </summary>
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
+            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
+        }
+
+        /// <summary>
         /// Gets the error message to be displayed in the action area as a result of an error in a
         /// git operation.
         /// </summary>
@@ -316,10 +326,16 @@ namespace GitHub.ViewModels
                 IsBusy = true;
             }
 
-            OperationError = null;
+            ErrorMessage = OperationError = null;
             modelService.GetPullRequest(repo, number)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
+                .Catch<IPullRequestModel, Exception>(ex =>
+                {
+                    ErrorMessage = ex.Message.Trim();
+                    IsLoading = IsBusy = false;
+                    return Observable.Empty<IPullRequestModel>();
+                })
                 .Subscribe(x => Load(repo, x).Forget());
         }
 
@@ -330,96 +346,103 @@ namespace GitHub.ViewModels
         /// <param name="pullRequest">The pull request model.</param>
         public async Task Load(IRemoteRepositoryModel remoteRepository, IPullRequestModel pullRequest)
         {
-            var firstLoad = (Model == null);
-
-            Model = pullRequest;
-            RemoteRepository = remoteRepository;
-            Session = await sessionManager.GetSession(pullRequest);
-            Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
-
-            IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
-            SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
-            CommentCount = pullRequest.Comments.Count +  pullRequest.ReviewComments.Count;
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
-
-            var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-            ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
-
-            var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
-
-            IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
-
-            if (IsCheckedOut)
+            try
             {
-                var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
-                var pullEnabled = divergence.BehindBy > 0;
-                var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
-                string pullToolTip;
-                string pushToolTip;
+                var firstLoad = (Model == null);
+                Model = pullRequest;
+                Session = await sessionManager.GetSession(pullRequest);
+                Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-                if (pullEnabled)
+                IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
+                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
+                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
+                CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
+                Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
+
+                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
+                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+
+                var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
+
+                IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
+
+                if (IsCheckedOut)
                 {
-                    pullToolTip = string.Format(
-                        Resources.PullRequestDetailsPullToolTip,
-                        IsFromFork ? Resources.Fork : Resources.Remote,
-                        SourceBranchDisplayName);
+                    var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
+                    var pullEnabled = divergence.BehindBy > 0;
+                    var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                    string pullToolTip;
+                    string pushToolTip;
+
+                    if (pullEnabled)
+                    {
+                        pullToolTip = string.Format(
+                            Resources.PullRequestDetailsPullToolTip,
+                            IsFromFork ? Resources.Fork : Resources.Remote,
+                            SourceBranchDisplayName);
+                    }
+                    else
+                    {
+                        pullToolTip = Resources.NoCommitsToPull;
+                    }
+
+                    if (pushEnabled)
+                    {
+                        pushToolTip = string.Format(
+                            Resources.PullRequestDetailsPushToolTip,
+                            IsFromFork ? Resources.Fork : Resources.Remote,
+                            SourceBranchDisplayName);
+                    }
+                    else if (divergence.AheadBy == 0)
+                    {
+                        pushToolTip = Resources.NoCommitsToPush;
+                    }
+                    else
+                    {
+                        pushToolTip = Resources.MustPullBeforePush;
+                    }
+
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    CheckoutState = null;
                 }
                 else
                 {
-                    pullToolTip = Resources.NoCommitsToPull;
+                    var caption = localBranches.Count > 0 ?
+                        string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
+                        string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
+                    var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
+                    string disabled = null;
+
+                    if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                    {
+                        disabled = Resources.SourceRepositoryNoLongerAvailable;
+                    }
+                    else if (!clean)
+                    {
+                        disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
+                    }
+
+                    CheckoutState = new CheckoutCommandState(caption, disabled);
+                    UpdateState = null;
                 }
 
-                if (pushEnabled)
+                if (firstLoad)
                 {
-                    pushToolTip = string.Format(
-                        Resources.PullRequestDetailsPushToolTip,
-                        IsFromFork ? Resources.Fork : Resources.Remote,
-                        SourceBranchDisplayName);
-                }
-                else if (divergence.AheadBy == 0)
-                {
-                    pushToolTip = Resources.NoCommitsToPush;
-                }
-                else
-                {
-                    pushToolTip = Resources.MustPullBeforePush;
+                    usageTracker.IncrementPullRequestOpened().Forget();
                 }
 
-                UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
-                CheckoutState = null;
+                if (!isInCheckout)
+                {
+                    pullRequestsService.RemoveUnusedRemotes(LocalRepository).Subscribe(_ => { });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var caption = localBranches.Count > 0 ?
-                    string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
-                var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
-                string disabled = null;
-
-                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
-                {
-                    disabled = Resources.SourceRepositoryNoLongerAvailable;
-                }
-                else if (!clean)
-                {
-                    disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
-                }
-
-                CheckoutState = new CheckoutCommandState(caption, disabled);
-                UpdateState = null;
+                ErrorMessage = ex.Message.Trim();
             }
-
-            IsLoading = IsBusy = false;
-
-            if (firstLoad)
+            finally
             {
-                usageTracker.IncrementPullRequestOpened().Forget();
-            }
-
-            if (!isInCheckout)
-            {
-                pullRequestsService.RemoveUnusedRemotes(LocalRepository).Subscribe(_ => { });
+                IsLoading = IsBusy = false;
             }
         }
 

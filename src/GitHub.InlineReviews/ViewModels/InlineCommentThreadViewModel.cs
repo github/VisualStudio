@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -34,6 +35,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             this.apiClient = apiClient;
             Session = session;
+
             PostComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(true),
                 DoPostComment);
@@ -50,6 +52,17 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets the current pull request review session.
         /// </summary>
         public IPullRequestSession Session { get; }
+
+        /// <inheritdoc/>
+        public override Uri GetCommentUrl(int id)
+        {
+            return new Uri(string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}/pull/{1}#discussion_r{2}",
+                Session.LocalRepository.CloneUrl.ToRepositoryUrl(),
+                Session.PullRequest.Number,
+                id));
+        }
 
         async Task<ICommentModel> DoPostComment(object parameter)
         {

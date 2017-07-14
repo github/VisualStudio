@@ -87,6 +87,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
+        public string ErrorMessage { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
