@@ -44,7 +44,7 @@ namespace GitHub.Factories
         public async Task<IRepositoryHost> Create(HostAddress hostAddress)
         {
             var apiClient = await apiClientFactory.Create(hostAddress);
-            var hostCache = hostCacheFactory.Create(hostAddress);
+            var hostCache = await hostCacheFactory.Create(hostAddress);
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
             var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
             hosts.Add(host);

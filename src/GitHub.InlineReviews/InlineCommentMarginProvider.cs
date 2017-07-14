@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
@@ -10,7 +11,6 @@ using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Glyph;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Views;
-using GitHub.Models;
 using GitHub.Services;
 
 namespace GitHub.InlineReviews
@@ -58,8 +58,21 @@ namespace GitHub.InlineReviews
             IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
+            var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
+
+            TrackCommentGlyphOnDiffView(wpfTextViewHost, margin.VisualElement);
+            return margin;
+        }
+
+        void TrackCommentGlyphOnDiffView(IWpfTextViewHost host, UIElement marginElement)
+        {
+            var textView = host.TextView;
+            if (textView.Roles.Contains("DIFF"))
+            {
+                var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
+                router.Add(host.HostControl, marginElement);
+            }
         }
 
         bool IsMarginVisible(ITextBuffer buffer)

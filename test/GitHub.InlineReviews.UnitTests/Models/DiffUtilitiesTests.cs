@@ -173,14 +173,20 @@ namespace GitHub.InlineReviews.UnitTests.Models
         {
             [Theory]
             [InlineData(" 1", " 1", 0)]
-            [InlineData(" 1\n 2", " 2", 1)]
-            [InlineData(" 1\n 1", " 1", 1)] // match the later line
+            [InlineData(" 1. 2", " 2", 1)]
+            [InlineData(" 1. 1", " 1", 1)] // match the later line
             [InlineData("+x", "-x", -1)]
             [InlineData("", " x", -1)]
             [InlineData(" x", "", -1)]
+
+            [InlineData(" 1. 2.", " 2. 1.", 1)] // matched full context
+            [InlineData(" 1. 2.", " 2. 3.", -1)] // didn't match full context
+            [InlineData(" 2.", " 2. 1.", 0)] // match if we run out of context lines
             public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
             {
                 var header = "@@ -1 +1 @@";
+                lines1 = lines1.Replace(".", "\r\n");
+                lines2 = lines2.Replace(".", "\r\n");
                 var chunks1 = DiffUtilities.ParseFragment(header + "\n" + lines1).ToList();
                 var chunks2 = DiffUtilities.ParseFragment(header + "\n" + lines2).ToList();
                 var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
