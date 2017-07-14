@@ -196,6 +196,10 @@
       <Project>{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
+      <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
+      <Name>GitHub.UI.Reactive</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
