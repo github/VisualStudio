@@ -160,11 +160,12 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
+            // NOTE: We must call GetPullRequestMergeBase before GetFileContent.
+            var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
             var content = await GetFileContent(file);
 
             file.BaseSha = PullRequest.Base.Sha;
             file.CommitSha = await CalculateCommitSha(file, content);
-            var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
             file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
