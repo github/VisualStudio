@@ -300,12 +300,13 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-
+                var baseUrl = pullRequest.Base.RepositoryCloneUrl;
+                var headUrl = pullRequest.Head.RepositoryCloneUrl;
                 var baseSha = pullRequest.Base.Sha;
                 var headSha = pullRequest.Head.Sha;
                 var baseRef = pullRequest.Base.Ref;
-                string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
+                string mergeBase = await gitClient.GetPullRequestMergeBase(
+                    repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullRequest.Number);
                 if (mergeBase == null)
                 {
                     throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");

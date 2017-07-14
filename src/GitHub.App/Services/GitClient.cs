@@ -359,18 +359,34 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber)
+        public async Task<string> GetPullRequestMergeBase(IRepository repo,
+            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber)
         {
             var mergeBase = GetMergeBase(repo, baseSha, headSha);
             if (mergeBase == null)
             {
-                var pullHeadRef = $"refs/pull/{pullNumber}/head";
-                await Fetch(repo, remoteName, baseRef, pullHeadRef);
+                // TODO: Optimize and error check.
+                await Fetch(repo, baseCloneUrl, baseRef);
+                await Fetch(repo, headCloneUrl, $"refs/pull/{pullNumber}/head");
 
                 mergeBase = GetMergeBase(repo, baseSha, headSha);
             }
 
             return mergeBase;
+        }
+
+        async Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        {
+            var tempRemoteName = $"{cloneUrl.Host}-{Guid.NewGuid()}";
+            var remote = repo.Network.Remotes.Add(tempRemoteName, cloneUrl.ToRepositoryUrl().ToString());
+            try
+            {
+                await Fetch(repo, remote.Name, refspecs);
+            }
+            finally
+            {
+                repo.Network.Remotes.Remove(tempRemoteName);
+            }
         }
 
         static string GetMergeBase(IRepository repo, string a, string b)

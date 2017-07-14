@@ -346,6 +346,8 @@ namespace GitHub.ViewModels
         /// <param name="pullRequest">The pull request model.</param>
         public async Task Load(IRemoteRepositoryModel remoteRepository, IPullRequestModel pullRequest)
         {
+            Guard.ArgumentNotNull(remoteRepository, nameof(remoteRepository));
+
             try
             {
                 var firstLoad = (Model == null);

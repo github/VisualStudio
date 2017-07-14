@@ -111,18 +111,18 @@ namespace GitHub.InlineReviews.Services
             }
 
             var repo = await GetRepository(repository);
-            var remote = await gitClient.GetHttpRemote(repo, "origin");
-
+            var baseUrl = pullRequest.Base.RepositoryCloneUrl;
+            var headUrl = pullRequest.Head.RepositoryCloneUrl;
+            var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
             var pullNumber = pullRequest.Number;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullNumber);
-            if (mergeBase == null)
+            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
+            if (mergeBase != null)
             {
-                throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+                return mergeBaseCache[key] = mergeBase;
             }
 
-            mergeBaseCache[key] = mergeBase;
-            return mergeBase;
+            throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
         }
 
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
