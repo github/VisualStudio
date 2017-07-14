@@ -8,7 +8,8 @@
              d:DesignHeight="100" Width="17">
 
     <Grid.Background>
-
+        White
+        <!--
         <VisualBrush TileMode="Tile" Viewport="0,0,5,5" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute">
             <VisualBrush.Visual>
                 <Grid>
@@ -16,6 +17,7 @@
                 </Grid>
             </VisualBrush.Visual>
         </VisualBrush>
+        -->
 
         <!-- NOTE: We should really use a DrawingBrush not a VisualBrush, e.g. -->
         <!--
@@ -65,6 +67,7 @@
             </DrawingBrush.Drawing>
         </DrawingBrush>
         -->
-        
     </Grid.Background>
+
+    <Border BorderBrush="#FFE5E5E5" BorderThickness="1,0,1,0"/>
 </Grid>

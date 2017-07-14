@@ -5,7 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
     <Viewbox x:Name="AddViewbox">
-        <Path Stroke="Black"
-          Data="M13 2H1c-0.55 0-1 0.45-1 1v8c0 0.55 0.45 1 1 1h2v3.5l3.5-3.5h6.5c0.55 0 1-0.45 1-1V3c0-0.55-0.45-1-1-1z m0 9H6L4 13V11H1V3h12v8z M7,5 L7,9 M5,7 L9,7"/>
+        <Canvas Width="16" Height="15">
+            <Path Fill="#9EC7FF" Data="M1 0C.45 0 0 .45 0 1v8c0 .55.45 1 1 1h2v3.5L6.5 10H13c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1H1z" />
+            <Path Opacity="0.163" Stroke="#313131" Data="M3.5 12.293L6.293 9.5H13c.274 0 .5-.226.5-.5V1c0-.274-.226-.5-.5-.5H1C.726.5.5.726.5 1v8c0 .274.226.5.5.5h2.5v2.793z"/>
+            <Path Data="M7.5 5.525 V3.5h-1v2.025h-2v1h2V8.5h1V6.525h2v-1h-2z" Fill="#FFF" Canvas.Top="-1.1"/>
+        </Canvas>
     </Viewbox>
 </UserControl>
