@@ -6,6 +6,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
 using Xunit;
+using GitHub.Primitives;
 
 public class GitClientTests
 {
@@ -87,7 +88,8 @@ public class GitClientTests
         [Fact]
         public async Task LocalBaseHeadAndMergeBase_DontFetch()
         {
-            var remoteName = "origin";
+            var baseUrl = new UriString("https://github.com/owner/repo");
+            var headUrl = new UriString("https://github.com/owner/repo");
             var baseSha = "baseSha";
             var headSha = "headSha";
             var expectMergeBaseSha = "mergeBaseSha";
@@ -96,7 +98,7 @@ public class GitClientTests
             var repo = MockRepo(baseSha, headSha, expectMergeBaseSha);
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, remoteName, baseSha, headSha, baseRef, pullNumber);
+            var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
 
             repo.Network.DidNotReceiveWithAnyArgs().Fetch(null as Remote, null, null as FetchOptions);
             Assert.Equal(mergeBaseSha, expectMergeBaseSha);
@@ -104,18 +106,22 @@ public class GitClientTests
 
         [Theory]
         [InlineData("baseSha", "headSha", "mergeBaseSha", 0)]
-        [InlineData(null, "headSha", "mergeBaseSha", 1)]
-        [InlineData("baseSha", null, "mergeBaseSha", 1)]
-        [InlineData("baseSha", "headSha", null, 1)]
+        [InlineData(null, "headSha", "mergeBaseSha", 2)]
+        [InlineData("baseSha", null, "mergeBaseSha", 2)]
+        [InlineData("baseSha", "headSha", null, 2)]
         public async Task WhenToFetch(string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
         {
-            var remoteName = "origin";
+            var baseUrl = new UriString("https://github.com/owner/repo");
+            var headUrl = new UriString("https://github.com/owner/repo");
             var baseRef = "master";
             var pullNumber = 666;
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);
+            var remote = Substitute.For<Remote>();
+            repo.Network.Remotes.Add(null, null).ReturnsForAnyArgs(remote);
+
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            await gitClient.GetPullRequestMergeBase(repo, remoteName, baseSha, headSha, baseRef, pullNumber);
+            await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
 
             repo.Network.Received(receivedFetch).Fetch(Arg.Any<Remote>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
         }
@@ -126,11 +132,12 @@ public class GitClientTests
         public async Task WhatToFetch(string baseSha, string headSha, string mergeBaseSha, string baseRef, int pullNumber,
             string expectRefSpec)
         {
-            var remoteName = "origin";
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);
+            var baseUrl = new UriString("https://github.com/owner/repo");
+            var headUrl = new UriString("https://github.com/owner/repo");
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            await gitClient.GetPullRequestMergeBase(repo, remoteName, baseSha, headSha, baseRef, pullNumber);
+            await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
 
             repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<string[]>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
         }

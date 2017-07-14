@@ -381,7 +381,7 @@ namespace GitHub.Services
             var remote = repo.Network.Remotes.Add(tempRemoteName, cloneUrl.ToRepositoryUrl().ToString());
             try
             {
-                await Fetch(repo, remote.Name, refspecs);
+                await Fetch(repo, tempRemoteName, refspecs);
             }
             finally
             {
