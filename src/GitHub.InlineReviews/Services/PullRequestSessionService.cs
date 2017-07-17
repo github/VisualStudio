@@ -115,8 +115,8 @@ namespace GitHub.InlineReviews.Services
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
             var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
-            var pullNumber = pullRequest.Number;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
+            var headRef = pullRequest.Head.Ref;
+            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
             if (mergeBase != null)
             {
                 return mergeBaseCache[key] = mergeBase;

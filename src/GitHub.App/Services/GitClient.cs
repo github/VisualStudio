@@ -360,46 +360,37 @@ namespace GitHub.Services
         }
 
         public async Task<string> GetPullRequestMergeBase(IRepository repo,
-            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber)
+            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
         {
-            var mergeBase = GetMergeBase(repo, baseSha, headSha);
-            if (mergeBase == null)
+            var baseCommit = repo.Lookup<Commit>(baseSha);
+            if (baseCommit == null)
             {
-                // TODO: Optimize and error check.
                 await Fetch(repo, baseCloneUrl, baseRef);
-                await Fetch(repo, headCloneUrl, $"refs/pull/{pullNumber}/head");
-
-                mergeBase = GetMergeBase(repo, baseSha, headSha);
+                baseCommit = repo.Lookup<Commit>(baseSha);
+                if (baseCommit == null)
+                {
+                    return null;
+                }
             }
 
-            return mergeBase;
-        }
-
-        async Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
-        {
-            var tempRemoteName = $"{cloneUrl.Host}-{Guid.NewGuid()}";
-            var remote = repo.Network.Remotes.Add(tempRemoteName, cloneUrl.ToRepositoryUrl().ToString());
-            try
+            var headCommit = repo.Lookup<Commit>(headSha);
+            if (headCommit == null)
             {
-                await Fetch(repo, tempRemoteName, refspecs);
+                await Fetch(repo, headCloneUrl, headRef);
+                headCommit = repo.Lookup<Commit>(headSha);
+                if (headCommit == null)
+                {
+                    return null;
+                }
             }
-            finally
-            {
-                repo.Network.Remotes.Remove(tempRemoteName);
-            }
-        }
 
-        static string GetMergeBase(IRepository repo, string a, string b)
-        {
-            var aCommit = repo.Lookup<Commit>(a);
-            var bCommit = repo.Lookup<Commit>(b);
-            if (aCommit == null || bCommit == null)
+            var mergeBaseCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, headCommit);
+            if(mergeBaseCommit == null)
             {
                 return null;
             }
 
-            var baseCommit = repo.ObjectDatabase.FindMergeBase(aCommit, bCommit);
-            return baseCommit?.Sha;
+            return mergeBaseCommit.Sha;
         }
 
         public Task<bool> IsHeadPushed(IRepository repo)
@@ -408,6 +399,20 @@ namespace GitHub.Services
             {
                 return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
             });
+        }
+
+        Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        {
+            var tempRemoteName = $"{cloneUrl.Owner}-{Guid.NewGuid()}";
+            var remote = repo.Network.Remotes.Add(tempRemoteName, cloneUrl.ToRepositoryUrl().ToString());
+            try
+            {
+                return Fetch(repo, tempRemoteName, refspecs);
+            }
+            finally
+            {
+                repo.Network.Remotes.Remove(tempRemoteName);
+            }
         }
 
         static bool IsCanonical(string s)

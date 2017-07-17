@@ -182,7 +182,7 @@ namespace GitHub.Services
         /// <returns>
         /// The merge base SHA or null.
         /// </returns>
-        Task<string> GetPullRequestMergeBase(IRepository repo, UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber);
+        Task<string> GetPullRequestMergeBase(IRepository repo, UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef);
 
         /// Checks whether the current head is pushed to its remote tracking branch.
         /// </summary>

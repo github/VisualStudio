@@ -305,8 +305,9 @@ namespace GitHub.Services
                 var baseSha = pullRequest.Base.Sha;
                 var headSha = pullRequest.Head.Sha;
                 var baseRef = pullRequest.Base.Ref;
+                var headRef = pullRequest.Head.Ref;
                 string mergeBase = await gitClient.GetPullRequestMergeBase(
-                    repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullRequest.Number);
+                    repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
                 if (mergeBase == null)
                 {
                     throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");

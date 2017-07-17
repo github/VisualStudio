@@ -7,6 +7,7 @@ using LibGit2Sharp;
 using NSubstitute;
 using Xunit;
 using GitHub.Primitives;
+using System.Collections.Generic;
 
 public class GitClientTests
 {
@@ -94,42 +95,41 @@ public class GitClientTests
             var headSha = "headSha";
             var expectMergeBaseSha = "mergeBaseSha";
             var baseRef = "master";
-            var pullNumber = 666;
+            var headRef = "headRef";
             var repo = MockRepo(baseSha, headSha, expectMergeBaseSha);
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
+            var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
 
             repo.Network.DidNotReceiveWithAnyArgs().Fetch(null as Remote, null, null as FetchOptions);
-            Assert.Equal(mergeBaseSha, expectMergeBaseSha);
+            Assert.Equal(expectMergeBaseSha, mergeBaseSha);
         }
 
         [Theory]
-        [InlineData("baseSha", "headSha", "mergeBaseSha", 0)]
-        [InlineData(null, "headSha", "mergeBaseSha", 2)]
-        [InlineData("baseSha", null, "mergeBaseSha", 2)]
-        [InlineData("baseSha", "headSha", null, 2)]
-        public async Task WhenToFetch(string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
+        [InlineData("https://github.com/owner/repo", "https://github.com/owner/repo", "baseSha", "headSha", "mergeBaseSha", 0)]
+        [InlineData("https://github.com/owner/repo", "https://github.com/owner/repo", null, "headSha", "mergeBaseSha", 1)]
+        [InlineData("https://github.com/owner/repo", "https://github.com/owner/repo", "baseSha", null, "mergeBaseSha", 1)]
+        [InlineData("https://github.com/owner/repo", "https://github.com/owner/repo", "baseSha", "headSha", null, 0)]
+        public async Task WhenToFetch(string baseUrl, string headUrl, string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
         {
-            var baseUrl = new UriString("https://github.com/owner/repo");
-            var headUrl = new UriString("https://github.com/owner/repo");
+            var baseUri = new UriString(baseUrl);
+            var headUri = new UriString(headUrl);
             var baseRef = "master";
-            var pullNumber = 666;
+            var headRef = "headRef";
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);
             var remote = Substitute.For<Remote>();
             repo.Network.Remotes.Add(null, null).ReturnsForAnyArgs(remote);
-
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
+            await gitClient.GetPullRequestMergeBase(repo, baseUri, headUri, baseSha, headSha, baseRef, headRef);
 
             repo.Network.Received(receivedFetch).Fetch(Arg.Any<Remote>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
         }
 
         [Theory]
-        [InlineData("baseSha", null, "mergeBaseSha", "master", 666, "master")]
-        [InlineData("baseSha", null, "mergeBaseSha", "master", 666, "refs/pull/666/head")]
-        public async Task WhatToFetch(string baseSha, string headSha, string mergeBaseSha, string baseRef, int pullNumber,
+        [InlineData("baseSha", null, "mergeBaseSha", "baseRef", "headRef", "headRef")]
+        [InlineData(null, "headSha", "mergeBaseSha", "baseRef", "headRef", "baseRef")]
+        public async Task WhatToFetch(string baseSha, string headSha, string mergeBaseSha, string baseRef, string headRef,
             string expectRefSpec)
         {
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);
@@ -137,9 +137,9 @@ public class GitClientTests
             var headUrl = new UriString("https://github.com/owner/repo");
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, pullNumber);
+            await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
 
-            repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<string[]>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
+            repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<IEnumerable<string>>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
         }
 
         static IRepository MockRepo(string baseSha, string headSha, string mergeBaseSha)
