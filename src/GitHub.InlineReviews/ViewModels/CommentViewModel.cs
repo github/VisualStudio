@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.UI;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -72,6 +73,8 @@ namespace GitHub.InlineReviews.ViewModels
             CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
             CancelEdit.Subscribe(DoCancelEdit);
             AddErrorHandler(CancelEdit);
+
+            OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id, x => x != 0));
         }
 
         /// <summary>
@@ -86,6 +89,11 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentModel model)
             : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
+        }
+
+        public void Initialize(ViewWithData data)
+        {
+            // Nothing to do here: initialized in constructor.
         }
 
         /// <summary>
@@ -207,5 +215,8 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> CommitEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> OpenOnGitHub { get; }
     }
 }

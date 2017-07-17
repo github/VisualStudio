@@ -13,5 +13,10 @@ namespace GitHub.InlineReviews.ViewModels
                 Comments.Add(new CommentViewModel(this, CurrentUser, comment));
             }
         }
+
+        public override Uri GetCommentUrl(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

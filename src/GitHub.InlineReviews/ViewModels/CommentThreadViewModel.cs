@@ -52,6 +52,9 @@ namespace GitHub.InlineReviews.ViewModels
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc/>
+        public abstract Uri GetCommentUrl(int id);
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
