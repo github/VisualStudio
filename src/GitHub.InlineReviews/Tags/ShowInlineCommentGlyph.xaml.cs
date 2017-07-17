@@ -2,6 +2,8 @@
 using System.Windows.Controls;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
+using System.Linq;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -15,15 +17,15 @@ namespace GitHub.InlineReviews.Tags
         protected override void OnToolTipOpening(ToolTipEventArgs e)
         {
             var tag = Tag as ShowInlineCommentTag;
-
-            var viewModel = new CommentTooltipViewModel();
-            foreach (var comment in tag.Thread.Comments)
+            var comments = tag.Thread.Comments.Select(comment => new PullRequestReviewCommentModel
             {
-                var commentViewModel = new TooltipCommentViewModel(comment.User, comment.Body, comment.CreatedAt);
-                viewModel.Comments.Add(commentViewModel);
-            }
+                User = comment.User,
+                Body = comment.Body,
+                CreatedAt = comment.CreatedAt
+            });
 
-            var view = new CommentTooltipView();
+            var viewModel = new TooltipCommentThreadViewModel(comments);
+            var view = new TooltipCommentThreadView();
             view.DataContext = viewModel;
 
             CommentToolTip.Content = view;

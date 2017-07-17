@@ -1,15 +1,13 @@
 ﻿using System;
 using GitHub.UI;
 using GitHub.InlineReviews.ViewModels;
+using System.Windows.Controls;
 
 namespace GitHub.InlineReviews.Views
 {
-    public class GenericCommentTooltipView : ViewBase<ICommentTooltipViewModel, CommentTooltipView>
-    { }
-
-    public partial class CommentTooltipView : GenericCommentTooltipView
+    public partial class TooltipCommentThreadView : UserControl
     {
-        public CommentTooltipView()
+        public TooltipCommentThreadView()
         {
             InitializeComponent();
 
@@ -22,8 +20,9 @@ namespace GitHub.InlineReviews.Views
             {
                 CommentScrollViewer.ScrollToBottom();
 
+                var viewModel = (ICommentThreadViewModel)DataContext;
                 var messageFormat = InlineReviews.Resources.CommentTooltipStatusOverflowMessage;
-                var message = string.Format(messageFormat, ViewModel.Comments.Count);
+                var message = string.Format(messageFormat, viewModel.Comments.Count);
                 StatusTextBlock.Text = message;
                 CommentScrollViewer.LayoutUpdated -= WatchForScrollBarVisible;
             }
