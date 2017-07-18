@@ -84,6 +84,25 @@ public class GitClientTests
         }
     }
 
+    public class TheFetchMethod : TestBaseClass
+    {
+        [Theory]
+        [InlineData("https://github.com/owner/repo", "https://github.com/owner/repo")]
+        [InlineData("git@github.com:github/VisualStudioBuildScripts", "https://github.com/github/VisualStudioBuildScripts")]
+        public async Task FetchUsingHttps(string repoUrl, string expectFetchUrl)
+        {
+            var repo = Substitute.For<IRepository>();
+            var uri = new UriString(repoUrl);
+            var refSpec = "refSpec";
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var expectUrl = UriString.ToUriString(uri.ToRepositoryUrl());
+
+            await gitClient.Fetch(repo, uri, refSpec);
+
+            repo.Network.Remotes.Received(1).Add(Arg.Any<string>(), expectFetchUrl);
+        }
+    }
+
     public class TheGetPullRequestMergeBaseMethod : TestBaseClass
     {
         [Fact]

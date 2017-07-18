@@ -401,10 +401,11 @@ namespace GitHub.Services
             });
         }
 
-        Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
         {
             var tempRemoteName = $"{cloneUrl.Owner}-{Guid.NewGuid()}";
-            var remote = repo.Network.Remotes.Add(tempRemoteName, cloneUrl.ToRepositoryUrl().ToString());
+            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
+            var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
             try
             {
                 return Fetch(repo, tempRemoteName, refspecs);

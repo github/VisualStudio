@@ -40,6 +40,9 @@ namespace GitHub.Services
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
 
+        // TODO: xmldoc
+        Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs);
+
         /// <summary>
         /// Checks out a branch.
         /// </summary>
