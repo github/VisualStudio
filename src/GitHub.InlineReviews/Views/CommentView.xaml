@@ -137,6 +137,8 @@
                               GotFocus="ReplyPlaceholder_GotFocus">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
+                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+                        <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
                         <Setter Property="Height" Value="28"/>
                         <Setter Property="PromptText" Value="Reply..."/>
                         <Style.Triggers>
@@ -145,6 +147,12 @@
                                 <Setter Property="PromptText" Value="Leave a comment"/>
                             </DataTrigger>
                         </Style.Triggers>
+
+                        <Style.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+                            </Style>
+                        </Style.Resources>
                     </Style>
                 </ui:PromptTextBox.Style>
             </ui:PromptTextBox>
