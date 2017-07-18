@@ -17,6 +17,8 @@ namespace GitHub.Services
     [NullGuard(ValidationFlags.None)]
     public class GitClient : IGitClient
     {
+        const string defaultOriginName = "origin";
+
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
@@ -403,9 +405,14 @@ namespace GitHub.Services
 
         public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
         {
-            var tempRemoteName = $"{cloneUrl.Owner}-{Guid.NewGuid()}";
             var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
-            var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
+            if (repo.Network.Remotes[defaultOriginName]?.Url == httpsUrl)
+            {
+                return Fetch(repo, defaultOriginName, refspecs);
+            }
+
+            var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
+            repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
             try
             {
                 return Fetch(repo, tempRemoteName, refspecs);

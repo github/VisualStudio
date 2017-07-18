@@ -101,6 +101,32 @@ public class GitClientTests
 
             repo.Network.Remotes.Received(1).Add(Arg.Any<string>(), expectFetchUrl);
         }
+
+        [Theory]
+        [InlineData("https://github.com/owner/repo", "https://github.com/owner/repo", null)]
+        [InlineData("https://github.com/fetch/repo", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
+        [InlineData("git@github.com:owner/repo", "git@github.com:owner/repo", "https://github.com/owner/repo")]
+        public async Task UseOriginWhenPossible(string fetchUrl, string originUrl, string addUrl = null)
+        {
+            var remote = Substitute.For<Remote>();
+            remote.Url.Returns(originUrl);
+            var repo = Substitute.For<IRepository>();
+            repo.Network.Remotes["origin"].Returns(remote);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            if (addUrl != null)
+            {
+                repo.Network.Remotes.Received().Add(Arg.Any<string>(), addUrl);
+            }
+            else
+            {
+                repo.Network.Remotes.DidNotReceiveWithAnyArgs().Add(null, null);
+            }
+        }
     }
 
     public class TheGetPullRequestMergeBaseMethod : TestBaseClass
