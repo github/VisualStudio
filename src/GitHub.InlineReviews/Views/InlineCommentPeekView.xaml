@@ -19,10 +19,15 @@
             <Style x:Key="GitHubToolbarButton" TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
 
                 <Style.Triggers>
                     <Trigger Property="IsEnabled" Value="False">
                         <Setter Property="Opacity" Value="0.25" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowBackground}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -51,8 +56,8 @@
 
         <Border DockPanel.Dock="Top"
                 BorderThickness="0 0 0 1"
-                Background="#FFEEEEF2"
-                BorderBrush="#FFD1D5DA">
+                Background="{DynamicResource GitHubVsBrandedUIBackground}"
+                BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}">
             <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Left" >
                 <Button Margin="2 0" Padding="2" Command="{Binding PreviousComment}"
