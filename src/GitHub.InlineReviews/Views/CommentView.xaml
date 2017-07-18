@@ -74,15 +74,16 @@
                                     Account="{Binding User}"/>
 
             <StackPanel Margin="4 4" Orientation="Vertical" Grid.Column="1">
-                <Border Background="#FFF6F8FA" Padding="6 5" BorderThickness="1 1 1 0" BorderBrush="#FFD1D5DA" CornerRadius="2 2 0 0">
+                <Border Background="{DynamicResource GitHubVsBrandedUIBackground}" Padding="6 5" BorderThickness="1 1 1 0" BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}" CornerRadius="2 2 0 0">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
-                        <TextBlock Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
+                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
                     </StackPanel>
                 </Border>
 
-                <Border Background="White" Padding="6 5" BorderThickness="1" BorderBrush="#FFD1D5DA" CornerRadius="0 0 2 2 ">
+                <Border Background="{DynamicResource GitHubVsToolWindowBackground}" Padding="6 5" BorderThickness="1" BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}" CornerRadius="0 0 2 2 ">
                     <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                                   Foreground="{DynamicResource GitHubVsToolWindowText}"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
