@@ -178,7 +178,7 @@
             
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="2" 
-                        Margin="0 4" 
+                        Margin="4 8" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         IsVisibleChanged="buttonPanel_IsVisibleChanged">
