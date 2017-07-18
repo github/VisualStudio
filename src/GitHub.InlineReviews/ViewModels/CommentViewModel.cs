@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.UI;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -25,7 +26,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
         /// <param name="thread">The thread that the comment is a part of.</param>
-        /// <param name="currentUser">The current user.</param>
+        /// <param name="currentUser">The current user or null if not used.</param>
         /// <param name="commentId">The ID of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
@@ -41,7 +42,6 @@ namespace GitHub.InlineReviews.ViewModels
             DateTimeOffset updatedAt)
         {
             Guard.ArgumentNotNull(thread, nameof(thread));
-            Guard.ArgumentNotNull(currentUser, nameof(currentUser));
             Guard.ArgumentNotNull(body, nameof(body));
             Guard.ArgumentNotNull(user, nameof(user));
 
@@ -73,6 +73,8 @@ namespace GitHub.InlineReviews.ViewModels
             CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
             CancelEdit.Subscribe(DoCancelEdit);
             AddErrorHandler(CancelEdit);
+
+            OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id, x => x != 0));
         }
 
         /// <summary>
@@ -87,6 +89,11 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentModel model)
             : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
+        }
+
+        public void Initialize(ViewWithData data)
+        {
+            // Nothing to do here: initialized in constructor.
         }
 
         /// <summary>
@@ -208,5 +215,8 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> CommitEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> OpenOnGitHub { get; }
     }
 }
