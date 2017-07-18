@@ -27,7 +27,7 @@
                     </Trigger>
 
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowBackground}" />
+                        <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -79,12 +79,12 @@
                                      Height="16"
                                      Icon="arrow_right" />
                 </Button>
-                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Separator Background="{DynamicResource GitHubButtonBorderBrush}" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             </StackPanel>
         </Border>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      Background="#FFF5F5F5">
+                      Background="{DynamicResource GitHubVsToolWindowBackground}">
             <Grid>
                 <local:CommentThreadView DataContext="{Binding Thread}"/>
             </Grid>
