@@ -8,6 +8,12 @@
         <SolidColorBrush x:Key="DiffChangeBackground" Color="DarkSlateGray" />
     </UserControl.Resources>
 
+    <!-- This is just an exmaple showing where DiffChangeType is exposed -->
+    <UserControl.ToolTip>
+        <TextBlock Text="{Binding DiffChangeType}" />
+    </UserControl.ToolTip>
+    <!-- ^ delete me ^ -->
+
     <Grid Background="{DynamicResource DiffChangeBackground}">
         <Viewbox x:Name="AddViewbox">
             <Path Stroke="Black"
