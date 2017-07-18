@@ -141,6 +141,8 @@
                         <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
                         <Setter Property="Height" Value="28"/>
                         <Setter Property="PromptText" Value="Reply..."/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
+
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding EditState}" Value="Editing">
                                 <Setter Property="MinHeight" Value="100"/>
