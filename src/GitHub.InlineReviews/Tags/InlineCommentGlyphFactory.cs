@@ -69,7 +69,7 @@ namespace GitHub.InlineReviews.Tags
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
         {
             var glyph = CreateGlyph(tag);
-            glyph.Tag = tag;
+            glyph.DataContext = tag;
 
             glyph.MouseLeftButtonUp += (s, e) =>
             {
