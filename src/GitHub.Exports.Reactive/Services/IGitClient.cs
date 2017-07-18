@@ -40,8 +40,19 @@ namespace GitHub.Services
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
 
-        // TODO: xmldoc
-        Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs);
+        /// <summary>
+        /// Fetches from a remote URI, using custom refspecs. 
+        /// </summary>
+        /// <remarks>
+        /// If the URI is the same as origin then origin will be used, otherwise a
+        /// temporary remote will be created for the fetch. The fetch will always be made
+        /// using HTTPS.
+        /// </remarks>
+        /// <param name="repository">The repository to pull</param>
+        /// <param name="remoteUri">The remote URI to fetch from</param>
+        /// <param name="refspecs">The custom refspecs</param>
+        /// <returns></returns>
+        Task Fetch(IRepository repository, UriString remoteUri, params string[] refspecs);
 
         /// <summary>
         /// Checks out a branch.
