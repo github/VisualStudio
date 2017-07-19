@@ -12,6 +12,10 @@ using Microsoft.VisualStudio.Text.Classification;
 
 namespace GitHub.InlineReviews.Glyph.Implementation
 {
+    /// <summary>
+    /// Manage the MarginVisual element.
+    /// </summary>
+    /// <typeparam name="TGlyphTag">The type of tag we're managing.</typeparam>
     internal class GlyphMarginVisualManager<TGlyphTag> where TGlyphTag: ITag
     {
         readonly IEditorFormatMap editorFormatMap;
@@ -51,8 +55,6 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                 }
             }
         }
-
-        public FrameworkElement MarginVisual => glyphMarginGrid;
 
         public void AddGlyph(TGlyphTag tag, SnapshotSpan span)
         {
@@ -132,6 +134,7 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                 glyphs = dictionary;
             }
         }
+
         static ITextViewLine GetStartingLine(IList<ITextViewLine> lines, Span span)
         {
             if (lines.Count > 0)
@@ -191,6 +194,8 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                 ImageThemingUtilities.SetImageBackgroundColor(glyphMarginGrid, backgroundColor);
             }
         }
+
+        public FrameworkElement MarginVisual => glyphMarginGrid;
     }
 }
 

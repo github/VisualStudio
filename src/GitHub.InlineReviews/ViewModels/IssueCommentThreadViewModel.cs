@@ -17,6 +17,12 @@ namespace GitHub.InlineReviews.ViewModels
             Number = number;
         }
 
+        /// <inheritdoc/>
+        public override Uri GetCommentUrl(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public IRepositoryModel Repository { get; }
         public int Number { get; }
     }
