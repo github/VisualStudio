@@ -16,19 +16,22 @@ namespace GitHub.InlineReviews.Tags
 
         protected override void OnToolTipOpening(ToolTipEventArgs e)
         {
-            var tag = Tag as ShowInlineCommentTag;
-            var comments = tag.Thread.Comments.Select(comment => new PullRequestReviewCommentModel
+            var tag = DataContext as ShowInlineCommentTag;
+            if (tag != null)
             {
-                User = comment.User,
-                Body = comment.Body,
-                CreatedAt = comment.CreatedAt
-            });
+                var comments = tag.Thread.Comments.Select(comment => new PullRequestReviewCommentModel
+                {
+                    User = comment.User,
+                    Body = comment.Body,
+                    CreatedAt = comment.CreatedAt
+                });
 
-            var viewModel = new TooltipCommentThreadViewModel(comments);
-            var view = new TooltipCommentThreadView();
-            view.DataContext = viewModel;
+                var viewModel = new TooltipCommentThreadViewModel(comments);
+                var view = new TooltipCommentThreadView();
+                view.DataContext = viewModel;
 
-            CommentToolTip.Content = view;
+                CommentToolTip.Content = view;
+            }
         }
 
         protected override void OnToolTipClosing(ToolTipEventArgs e)
