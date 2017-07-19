@@ -9,6 +9,51 @@ using Xunit;
 
 public class GitClientTests
 {
+    public class TheIsHeadPushedMethod : TestBaseClass
+    {
+        [Theory]
+        [InlineData(true, "sha", "sha", true)]
+        [InlineData(true, "xxx", "yyy", false)]
+        [InlineData(true, "headSha", null, false)]
+        [InlineData(false, "sha", "sha", false)]
+        public async Task IsHeadPushed(bool istracking, string headSha, string trackedBranchSha, bool expectHeadPushed)
+        {
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var repository = MockTrackedBranchRepository(istracking, headSha, trackedBranchSha);
+
+            var isHeadPushed = await gitClient.IsHeadPushed(repository);
+
+            Assert.Equal(expectHeadPushed, isHeadPushed);
+        }
+
+        static IRepository MockTrackedBranchRepository(bool isTracking, string headSha, string trackedBranchSha)
+        {
+            var trackedBranch = Substitute.For<Branch>();
+            var trackedBranchTip = MockCommitOrNull(trackedBranchSha);
+            trackedBranch.Tip.Returns(trackedBranchTip);
+            var headBranch = Substitute.For<Branch>();
+            var headTip = MockCommitOrNull(headSha);
+            headBranch.Tip.Returns(headTip);
+            headBranch.IsTracking.Returns(isTracking);
+            headBranch.TrackedBranch.Returns(trackedBranch);
+            var repository = Substitute.For<IRepository>();
+            repository.Head.Returns(headBranch);
+            return repository;
+        }
+
+        static Commit MockCommitOrNull(string sha)
+        {
+            if(sha != null)
+            {
+                var commit = Substitute.For<Commit>();
+                commit.Sha.Returns(sha);
+                return commit;
+            }
+
+            return null;
+        }
+    }
+
     public class ThePushMethod : TestBaseClass
     {
         [Fact]
