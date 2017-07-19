@@ -9,7 +9,6 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using System.Windows.Automation.Peers;
-using System.Windows.Automation;
 
 namespace GitHub.UI
 {
