@@ -6,18 +6,32 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <SolidColorBrush x:Key="DiffChangeBackground" Color="DarkSlateGray" />
+        <SolidColorBrush x:Key="AddDiffChangeBackground" Color="Green" />
+        <SolidColorBrush x:Key="RemovedDiffChangeBackground" Color="Red" />
     </UserControl.Resources>
-
-    <!-- This is just an exmaple showing where DiffChangeType is exposed -->
-    <UserControl.ToolTip>
-        <TextBlock Text="{Binding DiffChangeType}" />
-    </UserControl.ToolTip>
-    <!-- ^ delete me ^ -->
 
     <Grid Background="{DynamicResource DiffChangeBackground}">
         <Viewbox x:Name="AddViewbox">
-            <Path Stroke="Black"
-          Data="M13 2H1c-0.55 0-1 0.45-1 1v8c0 0.55 0.45 1 1 1h2v3.5l3.5-3.5h6.5c0.55 0 1-0.45 1-1V3c0-0.55-0.45-1-1-1z m0 9H6L4 13V11H1V3h12v8z M7,5 L7,9 M5,7 L9,7"/>
+            <Path
+          Data="M13 2H1c-0.55 0-1 0.45-1 1v8c0 0.55 0.45 1 1 1h2v3.5l3.5-3.5h6.5c0.55 0 1-0.45 1-1V3c0-0.55-0.45-1-1-1z m0 9H6L4 13V11H1V3h12v8z M7,5 L7,9 M5,7 L9,7">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DiffChangeType}" Value="Add">
+                                <Setter Property="Stroke" Value="{DynamicResource AddDiffChangeBackground}" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding DiffChangeType}" Value="None">
+                                <Setter Property="Stroke" Value="{DynamicResource DiffChangeBackground}" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding DiffChangeType}" Value="Delete">
+                                <Setter Property="Stroke" Value="{DynamicResource RemovedDiffChangeBackground}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
         </Viewbox>
     </Grid>
 </UserControl>
