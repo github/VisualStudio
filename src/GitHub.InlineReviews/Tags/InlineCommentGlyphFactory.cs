@@ -76,7 +76,9 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Resources["DiffChangeBackground"] = brushesManager.GetBackground(tag.DiffChangeType);
+            glyph.Resources["DiffChangeBackground.Add"] = brushesManager.GetBackground(DiffChangeType.Add);
+            glyph.Resources["DiffChangeBackground.Delete"] = brushesManager.GetBackground(DiffChangeType.Delete);
+            glyph.Resources["DiffChangeBackground.None"] = brushesManager.GetBackground(DiffChangeType.None);
             return glyph;
         }
 
