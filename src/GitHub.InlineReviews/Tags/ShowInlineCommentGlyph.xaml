@@ -32,7 +32,10 @@
     </Grid>
 
     <UserControl.ToolTip>
-        <ToolTip x:Name="CommentToolTip" Background="Transparent" />
+        <ToolTip
+            Background="{DynamicResource GitHubVsToolWindowBackground}"
+            Foreground="{DynamicResource GitHubVsToolWindowText}"
+            x:Name="CommentToolTip" />
     </UserControl.ToolTip>
 
 </UserControl>

@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Resources.MergedDictionaries.Add(brushesManager.Resources);
+            glyph.Resources.MergedDictionaries.Add(brushesManager.DynamicResources);
 
             return glyph;
         }

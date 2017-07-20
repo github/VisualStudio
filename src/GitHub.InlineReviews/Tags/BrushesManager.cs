@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Classification;
+using GitHub.UI.Helpers;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -21,22 +22,32 @@ namespace GitHub.InlineReviews.Tags
             deleteProperties = editorFormatMap.GetProperties(DeletePropertiesKey);
             noneProperties = editorFormatMap.GetProperties(NonePropertiesKey);
 
-            Resources = new ResourceDictionary();
-            UpdateResources();
+            DynamicResources = new ResourceDictionary();
+            MergeResources(DynamicResources, "pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml");
+            MergeResources(DynamicResources, "pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml");
+            MergeResources(DynamicResources, "pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml");
+            UpdateResources(DynamicResources);
 
             editorFormatMap.FormatMappingChanged += OnFormatMappingChanged;
         }
 
         void OnFormatMappingChanged(object sender, FormatItemsEventArgs e)
         {
-            UpdateResources();
+            UpdateResources(DynamicResources);
         }
 
-        void UpdateResources()
+        void UpdateResources(ResourceDictionary resources)
         {
-            Resources["DiffChangeBackground.Add"] = GetBackground(addProperties);
-            Resources["DiffChangeBackground.Delete"] = GetBackground(deleteProperties);
-            Resources["DiffChangeBackground.None"] = GetBackground(noneProperties);
+            resources["DiffChangeBackground.Add"] = GetBackground(addProperties);
+            resources["DiffChangeBackground.Delete"] = GetBackground(deleteProperties);
+            resources["DiffChangeBackground.None"] = GetBackground(noneProperties);
+        }
+
+        static void MergeResources(ResourceDictionary resources, string url)
+        {
+            var sharedResources = new SharedDictionaryManager();
+            sharedResources.Source = new Uri(url);
+            resources.MergedDictionaries.Add(sharedResources);
         }
 
         static Brush GetBackground(ResourceDictionary dictionary)
@@ -44,6 +55,6 @@ namespace GitHub.InlineReviews.Tags
             return dictionary["Background"] as Brush;
         }
 
-        internal ResourceDictionary Resources { get; }
+        internal ResourceDictionary DynamicResources { get; }
     }
 }
