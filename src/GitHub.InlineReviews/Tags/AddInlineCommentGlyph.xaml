@@ -6,7 +6,7 @@
              mc:Ignorable="d">
 
     <UserControl.Resources>
-        <SolidColorBrush x:Key="DiffChangeBackground" Color="#F0F1F2" />
+        <SolidColorBrush x:Key="DiffChangeBackground" Color="Blue" />
         <SolidColorBrush x:Key="AddDiffChangeBackground" Color="#6CC644" />
         <SolidColorBrush x:Key="RemovedDiffChangeBackground" Color="#BD2C00" />
         <SolidColorBrush x:Key="NoneChangeBackground" Color="#9EC7FF" />

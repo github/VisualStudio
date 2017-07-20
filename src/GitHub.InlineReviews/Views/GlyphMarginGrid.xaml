@@ -5,11 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" 
+             Background="{DynamicResource VsBrush.Window}" 
              d:DesignHeight="100" Width="17">
-
+    <!--
     <Grid.Background>
-        White
-        <!--
         <VisualBrush TileMode="Tile" Viewport="0,0,5,5" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute">
             <VisualBrush.Visual>
                 <Grid>
@@ -66,8 +65,8 @@
                 </DrawingGroup>
             </DrawingBrush.Drawing>
         </DrawingBrush>
-        -->
     </Grid.Background>
+    -->
 
-    <Border BorderBrush="#FFE5E5E5" BorderThickness="1,0,1,0"/>
+    <Border BorderBrush="{DynamicResource VsBrush.ScrollBarBackground}" BorderThickness="0,0,1,0"/>
 </Grid>
