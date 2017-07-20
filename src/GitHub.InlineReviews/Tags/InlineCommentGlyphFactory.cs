@@ -29,43 +29,6 @@ namespace GitHub.InlineReviews.Tags
             brushesManager = new BrushesManager(editorFormatMap);
         }
 
-        class BrushesManager
-        {
-            const string AddPropertiesKey = "deltadiff.add.word";
-            const string DeletePropertiesKey = "deltadiff.remove.word";
-            const string NonePropertiesKey = "Indicator Margin";
-
-            readonly ResourceDictionary addProperties;
-            readonly ResourceDictionary deleteProperties;
-            readonly ResourceDictionary noneProperties;
-
-            internal BrushesManager(IEditorFormatMap editorFormatMap)
-            {
-                addProperties = editorFormatMap.GetProperties(AddPropertiesKey);
-                deleteProperties = editorFormatMap.GetProperties(DeletePropertiesKey);
-                noneProperties = editorFormatMap.GetProperties(NonePropertiesKey);
-            }
-
-            internal Brush GetBackground(DiffChangeType diffChangeType)
-            {
-                switch (diffChangeType)
-                {
-                    case DiffChangeType.Add:
-                        return GetBackground(addProperties);
-                    case DiffChangeType.Delete:
-                        return GetBackground(deleteProperties);
-                    case DiffChangeType.None:
-                    default:
-                        return GetBackground(noneProperties);
-                }
-            }
-
-            static Brush GetBackground(ResourceDictionary dictionary)
-            {
-                return dictionary["Background"] as Brush;
-            }
-        }
-
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
         {
             var glyph = CreateGlyph(tag);
@@ -76,9 +39,8 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Resources["DiffChangeBackground.Add"] = brushesManager.GetBackground(DiffChangeType.Add);
-            glyph.Resources["DiffChangeBackground.Delete"] = brushesManager.GetBackground(DiffChangeType.Delete);
-            glyph.Resources["DiffChangeBackground.None"] = brushesManager.GetBackground(DiffChangeType.None);
+            glyph.Resources.MergedDictionaries.Add(brushesManager.Resources);
+
             return glyph;
         }
 
