@@ -6,8 +6,21 @@
              xmlns:prop="clr-namespace:GitHub.InlineReviews"
              xmlns:vm="clr-namespace:GitHub.InlineReviews.ViewModels"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             Foreground="{DynamicResource GitHubVsToolWindowText}"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <d:DesignProperties.DataContext>
         <sample:CommentThreadViewModelDesigner>
             <sample:CommentThreadViewModelDesigner.Comments>

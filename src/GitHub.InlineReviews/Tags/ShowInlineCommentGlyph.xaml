@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
-             ToolTipService.ShowDuration="600000" ToolTipService.HasDropShadow="True">
+             ToolTipService.ShowDuration="600000">
     <UserControl.ToolTip>
-        <ToolTip x:Name="CommentToolTip" />
+        <ToolTip x:Name="CommentToolTip" Background="Transparent" />
     </UserControl.ToolTip>
     <Viewbox>
         <Path Stroke="Black"
