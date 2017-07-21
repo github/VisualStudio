@@ -63,4 +63,7 @@
   <!-- Indicator Margin: #FF333333 -->
   <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="#FF333333" />    
     
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Add" Color="#6CC644" />
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Delete" Color="#BD2C00" />
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#9EC7FF" />
 </ResourceDictionary>

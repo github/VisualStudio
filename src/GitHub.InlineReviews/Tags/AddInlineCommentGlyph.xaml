@@ -35,7 +35,7 @@
         </Style>
     </UserControl.Style>
 
-    <Grid Background="{DynamicResource DiffChangeBackground}">
+    <Grid>
         <Viewbox x:Name="AddViewbox">
             <Canvas Width="16" Height="15">
                 <Path Canvas.Top="1" Canvas.Left="0.85" Data="M1 0C.45 0 0 .45 0 1v8c0 .55.45 1 1 1h2v3.5L6.5 10H13c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1H1z" />
@@ -46,15 +46,15 @@
                     <Style TargetType="Path">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="Add">
-                                <Setter Property="Fill" Value="{DynamicResource AddDiffChangeBackground}" />
+                                <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.Add}" />
                             </DataTrigger>
 
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="None">
-                                <Setter Property="Fill" Value="{DynamicResource NoneChangeBackground}" />
+                                <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
                             </DataTrigger>
 
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="Delete">
-                                <Setter Property="Fill" Value="{DynamicResource RemovedDiffChangeBackground}" />
+                                <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.Delete}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

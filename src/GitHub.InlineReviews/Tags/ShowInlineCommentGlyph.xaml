@@ -48,15 +48,15 @@
                     <Style TargetType="Path">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="Add">
-                                <Setter Property="Fill" Value="{DynamicResource AddDiffChangeBackground}" />
+                                <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.Add}" />
                             </DataTrigger>
 
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="None">
-                                <Setter Property="Fill" Value="{DynamicResource NoneChangeBackground}" />
+                                <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
                             </DataTrigger>
 
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="Delete">
-                                <Setter Property="Fill" Value="{DynamicResource RemovedDiffChangeBackground}" />
+                                <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.Delete}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
