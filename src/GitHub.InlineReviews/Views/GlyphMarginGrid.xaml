@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" 
-             Background="{DynamicResource VsBrush.Window}" 
+             Background="{DynamicResource VsBrush.Window}"
              d:DesignHeight="100" Width="17">
     <Grid.Resources>
         <ResourceDictionary>

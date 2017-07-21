@@ -61,7 +61,9 @@
   <!-- deltadiff.remove.word: #FFFF9999 -->
   <SolidColorBrush x:Key="GitHubDiffChangeBackground.Delete" Color="#FFFF9999" />
   <!-- Indicator Margin: #FFE6E7E8 -->
-  <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="#FFE6E7E8" />
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="#FFF2F3F9" />
+
+  <SolidColorBrush x:Key="GitHubDiffMarginBackground" Color="#FFF9F9F9" />    
 
   <SolidColorBrush x:Key="GitHubDiffGlyphFill.Add" Color="#6CC644" />
   <SolidColorBrush x:Key="GitHubDiffGlyphFill.Delete" Color="#BD2C00" />
