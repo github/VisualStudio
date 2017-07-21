@@ -80,7 +80,8 @@
                         <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
                         <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
                                              Command="{Binding OpenOnGitHub}"
-                                             Foreground="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBlock}, AncestorLevel=1}, Path=Foreground}"
+                                             Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                             Opacity="0.75"
                                              Margin="2 0"/>
                     </StackPanel>
                 </Border>
