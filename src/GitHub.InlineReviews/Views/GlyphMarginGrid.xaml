@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" 
+             Background="{DynamicResource VsBrush.Window}" 
              d:DesignHeight="100" Width="17">
-
     <Grid.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -18,8 +18,8 @@
         </ResourceDictionary>
     </Grid.Resources>
 
+    <!--
     <Grid.Background>
-
         <VisualBrush TileMode="Tile" Viewport="0,0,5,5" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute">
             <VisualBrush.Visual>
                 <Grid>
@@ -27,6 +27,7 @@
                 </Grid>
             </VisualBrush.Visual>
         </VisualBrush>
+        -->
 
         <!-- NOTE: We should really use a DrawingBrush not a VisualBrush, e.g. -->
         <!--
@@ -75,7 +76,8 @@
                 </DrawingGroup>
             </DrawingBrush.Drawing>
         </DrawingBrush>
-        -->
-        
     </Grid.Background>
+    -->
+
+    <Border BorderBrush="{DynamicResource VsBrush.ScrollBarBackground}" BorderThickness="0,0,1,0"/>
 </Grid>
