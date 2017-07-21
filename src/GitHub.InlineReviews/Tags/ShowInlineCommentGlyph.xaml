@@ -3,22 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d"
              ToolTipService.ShowDuration="600000">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- GitHubDiffChangeBackground.* are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml -->
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding DiffChangeType}" Value="Add">
-                    <Setter Property="Background" Value="{DynamicResource DiffChangeBackground.Add}" />
+                    <Setter Property="Background" Value="{DynamicResource GitHubDiffChangeBackground.Add}" />
                 </DataTrigger>
 
                 <DataTrigger Binding="{Binding DiffChangeType}" Value="Delete">
-                    <Setter Property="Background" Value="{DynamicResource DiffChangeBackground.Delete}" />
+                    <Setter Property="Background" Value="{DynamicResource GitHubDiffChangeBackground.Delete}" />
                 </DataTrigger>
 
                 <DataTrigger Binding="{Binding DiffChangeType}" Value="None">
-                    <Setter Property="Background" Value="{DynamicResource DiffChangeBackground.None}" />
+                    <Setter Property="Background" Value="{DynamicResource GitHubDiffChangeBackground.None}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>

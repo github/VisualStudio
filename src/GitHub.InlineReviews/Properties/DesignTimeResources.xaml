@@ -1,15 +1,5 @@
 ﻿<ResourceDictionary
-        xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <SolidColorBrush x:Key="DiffChangeBackground.Add" Color="Green" />
-    <SolidColorBrush x:Key="DiffChangeBackground.Delete" Color="Red" />
-    <SolidColorBrush x:Key="DiffChangeBackground.None" Color="Blue" />
-
-    <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-    </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
