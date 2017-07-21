@@ -16,17 +16,13 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
-        readonly BrushesManager brushesManager;
 
         public InlineCommentGlyphFactory(
             IInlineCommentPeekService peekService,
-            ITextView textView,
-            IEditorFormatMap editorFormatMap)
+            ITextView textView)
         {
             this.peekService = peekService;
             this.textView = textView;
-
-            brushesManager = new BrushesManager(editorFormatMap);
         }
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
@@ -38,8 +34,6 @@ namespace GitHub.InlineReviews.Tags
             {
                 if (OpenThreadView(tag)) e.Handled = true;
             };
-
-            glyph.Resources.MergedDictionaries.Add(brushesManager.DynamicResources);
 
             return glyph;
         }

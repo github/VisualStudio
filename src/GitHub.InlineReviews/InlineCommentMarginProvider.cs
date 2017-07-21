@@ -47,10 +47,10 @@ namespace GitHub.InlineReviews
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
             var textView = wpfTextViewHost.TextView;
-            var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
-            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView, editorFormatMap);
+            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
 
             Func<Grid> gridFactory = () => new GlyphMarginGrid();
+            var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
             return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, parent, editorFormatMap);
         }
 
