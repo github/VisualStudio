@@ -40,7 +40,7 @@
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom">
-            <Border BorderBrush="Silver" BorderThickness="0,1,0,0" Margin="0,8" />
+            <Border BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}" BorderThickness="0,1,0,0" Margin="0,8" />
             <TextBlock x:Name="StatusTextBlock" FontStyle="Italic" Text="{x:Static prop:Resources.CommentTooltipStatusMessage}" />
         </StackPanel>
         <ScrollViewer x:Name="CommentScrollViewer" VerticalScrollBarVisibility="Auto">
