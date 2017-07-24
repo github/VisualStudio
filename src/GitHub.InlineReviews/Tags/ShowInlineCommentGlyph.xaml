@@ -7,17 +7,7 @@
              mc:Ignorable="d"
              ToolTipService.ShowDuration="600000">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
-    <!-- GitHubDiffChangeBackground.* are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml -->
+    <!-- Resourcess are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml (and Properties\DesignTimeResources.xaml) -->
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Style.Triggers>
