@@ -27,9 +27,10 @@
 
     <Grid>
         <Border BorderBrush="{DynamicResource VsBrush.ScrollBarBackground}" BorderThickness="0,0,1,0" />
-        <Viewbox x:Name="AddViewbox">
+        <Viewbox x:Name="AddViewbox" Margin="1,1,0,0">
             <Canvas Width="14" Height="14">
-                <Rectangle Stroke="#313131" Width="13" Height="13" />
+                <Rectangle Width="13" Height="13" />
+                <Rectangle Stroke="#313131" Fill="Transparent" Opacity="0.163" Width="13" Height="13" />
                 <Path Canvas.Top="-0.5" Canvas.Left="-0.5" Fill="#FFF" Data="M11 8H8v3H6V8H3V6h3V3h2v3h3z"/>
 
                 <Canvas.Resources>
