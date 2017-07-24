@@ -64,7 +64,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a view model for displaying details of a pull request.
     /// </summary>
-    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy
+    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy, IHasErrorState
     {
         /// <summary>
         /// Gets the underlying pull request model.
