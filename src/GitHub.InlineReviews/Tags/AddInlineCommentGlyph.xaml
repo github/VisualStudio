@@ -28,13 +28,12 @@
     <Grid>
         <Border BorderBrush="{DynamicResource VsBrush.ScrollBarBackground}" BorderThickness="0,0,1,0" />
         <Viewbox x:Name="AddViewbox">
-            <Canvas Width="16" Height="15">
-                <Path Canvas.Top="1" Canvas.Left="0.85" Data="M1 0C.45 0 0 .45 0 1v8c0 .55.45 1 1 1h2v3.5L6.5 10H13c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1H1z" />
-                <Path Canvas.Top="1" Canvas.Left="0.85" Opacity="0.163" Stroke="#313131" Data="M3.5 12.293L6.293 9.5H13c.274 0 .5-.226.5-.5V1c0-.274-.226-.5-.5-.5H1C.726.5.5.726.5 1v8c0 .274.226.5.5.5h2.5v2.793z"/>
-                <Path Canvas.Left="1" Data="M7.5 5.525 V3.5h-1v2.025h-2v1h2V8.5h1V6.525h2v-1h-2z" Fill="#FFF" />
+            <Canvas Width="14" Height="14">
+                <Rectangle Stroke="#313131" Width="13" Height="13" />
+                <Path Canvas.Top="-0.5" Canvas.Left="-0.5" Fill="#FFF" Data="M11 8H8v3H6V8H3V6h3V3h2v3h3z"/>
 
                 <Canvas.Resources>
-                    <Style TargetType="Path">
+                    <Style TargetType="Rectangle">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding DiffChangeType}" Value="Add">
                                 <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.Add}" />
