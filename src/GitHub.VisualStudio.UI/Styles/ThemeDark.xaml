@@ -65,7 +65,7 @@
 
   <SolidColorBrush x:Key="GitHubDiffMarginBackground" Color="#FF222222" />    
     
-  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Add" Color="#6CC644" />
-  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Delete" Color="#BD2C00" />
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Add" Color="#76923C" />
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Delete" Color="#FF6666" />
   <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#9EC7FF" />
 </ResourceDictionary>
