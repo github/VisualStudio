@@ -38,10 +38,10 @@
         </sample:CommentThreadViewModelDesigner>
     </d:DesignProperties.DataContext>
 
-    <DockPanel>
+    <DockPanel MaxWidth="300">
         <StackPanel DockPanel.Dock="Bottom">
             <Border BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}" BorderThickness="0,1,0,0" Margin="0,8" />
-            <TextBlock x:Name="StatusTextBlock" FontStyle="Italic" Text="{x:Static prop:Resources.CommentTooltipStatusMessage}" />
+            <TextBlock x:Name="StatusTextBlock" FontSize="10" Text="{x:Static prop:Resources.CommentTooltipStatusMessage}" />
         </StackPanel>
         <ScrollViewer x:Name="CommentScrollViewer" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Comments}">
