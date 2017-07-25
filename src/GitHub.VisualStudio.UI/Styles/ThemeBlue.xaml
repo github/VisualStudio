@@ -55,4 +55,17 @@
   <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FFF5D367" />
 
   <SolidColorBrush x:Key="GitHubBranchNameBackgroundBrush" Color="#FFE8F0F8" />
+
+  <!-- deltadiff.add.word: #FFD7E3BC -->
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.Add" Color="#FFD7E3BC" />
+  <!-- deltadiff.remove.word: #FFFF9999 -->
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.Delete" Color="#FFFF9999" />
+  <!-- Indicator Margin: #FFE6E7E8 -->
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="#FFF2F3F9" />
+
+  <SolidColorBrush x:Key="GitHubDiffMarginBackground" Color="#FFF9F9F9" />
+
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Add" Color="#76923C" />
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Delete" Color="#FF6666" />
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#9EC7FF" />
 </ResourceDictionary>
