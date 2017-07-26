@@ -61,7 +61,8 @@
       </Setter>
     </Style>
   </UserControl.Resources>
-  <GroupBox Height="85"
+    <StackPanel>
+        <GroupBox Height="85"
             Margin="8,0,8,0"
             VerticalAlignment="Top"
             BorderBrush="LightGray"
@@ -69,16 +70,34 @@
             Padding="6 8 6 8"
             Style="{DynamicResource GroupBoxFlat}">
 
-    <GroupBox.Header>
-      <Run Text="{x:Static prop:Resources.Options_PrivacyTitle}" />
-    </GroupBox.Header>
-    <DockPanel>
-      <WrapPanel DockPanel.Dock="Top">
-        <CheckBox x:Name="chkMetrics" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_MetricsLabel}" />
-      </WrapPanel>
-      <TextBlock>
+            <GroupBox.Header>
+                <Run Text="{x:Static prop:Resources.Options_PrivacyTitle}" />
+            </GroupBox.Header>
+            <DockPanel>
+                <WrapPanel DockPanel.Dock="Top">
+                    <CheckBox x:Name="chkMetrics" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_MetricsLabel}" />
+                </WrapPanel>
+                <TextBlock>
         <Hyperlink ToolTip="https://visualstudio.github.com/samples.html" NavigateUri="https://visualstudio.github.com/samples.html" RequestNavigate="Hyperlink_RequestNavigate"><TextBlock Text="{x:Static prop:Resources.learnMoreLink}"/></Hyperlink>
       </TextBlock>
-    </DockPanel>
-  </GroupBox>
+            </DockPanel>
+        </GroupBox>
+        <GroupBox Height="85"
+            Margin="8,0,8,0"
+            VerticalAlignment="Top"
+            BorderBrush="LightGray"
+            BorderThickness="1"
+            Padding="6 8 6 8"
+            Style="{DynamicResource GroupBoxFlat}">
+
+            <GroupBox.Header>
+                <Run Text="{x:Static prop:Resources.Options_PullRequestsTitle}" />
+            </GroupBox.Header>
+            <DockPanel>
+                <WrapPanel DockPanel.Dock="Top">
+                    <CheckBox x:Name="chkEditorComments" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EditorCommentsLabel}" />
+                </WrapPanel>
+            </DockPanel>
+        </GroupBox>
+    </StackPanel>
 </UserControl>
