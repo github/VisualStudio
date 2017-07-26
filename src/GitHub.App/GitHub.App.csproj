@@ -86,6 +86,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SQLitePCL.raw, Version=0.7.3.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\lib\net45\SQLitePCL.raw.dll</HintPath>
       <Private>True</Private>
@@ -299,10 +303,6 @@
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
-      <Name>Rothko</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

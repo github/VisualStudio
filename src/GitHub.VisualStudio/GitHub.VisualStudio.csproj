@@ -233,6 +233,10 @@
       <HintPath>..\..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SQLitePCL.raw, Version=0.7.3.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\lib\net45\SQLitePCL.raw.dll</HintPath>
       <Private>True</Private>
@@ -689,13 +693,6 @@
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
-      <Private>False</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
-      <Name>Rothko</Name>
       <Private>False</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
