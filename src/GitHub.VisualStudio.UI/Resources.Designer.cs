@@ -592,6 +592,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show PR comments on editor margin.
+        /// </summary>
+        public static string Options_EditorCommentsLabel {
+            get {
+                return ResourceManager.GetString("Options_EditorCommentsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
         /// </summary>
         public static string Options_MetricsLabel {
@@ -606,6 +615,15 @@ namespace GitHub.VisualStudio.UI {
         public static string Options_PrivacyTitle {
             get {
                 return ResourceManager.GetString("Options_PrivacyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Requests.
+        /// </summary>
+        public static string Options_PullRequestsTitle {
+            get {
+                return ResourceManager.GetString("Options_PullRequestsTitle", resourceCulture);
             }
         }
         
