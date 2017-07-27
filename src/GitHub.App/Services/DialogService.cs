@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 
 namespace GitHub.Services
 {
@@ -17,10 +17,12 @@ namespace GitHub.Services
         [ImportingConstructor]
         public DialogService(IUIProvider uiProvider)
         {
+            Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
+
             this.uiProvider = uiProvider;
         }
 
-        public Task<CloneDialogResult> ShowCloneDialog([AllowNull] IConnection connection)
+        public Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
         {
             var controller = uiProvider.Configure(UIControllerFlow.Clone, connection);
             var basePath = default(string);
@@ -46,6 +48,8 @@ namespace GitHub.Services
 
         public Task<string> ShowReCloneDialog(IRepositoryModel repository)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+
             var controller = uiProvider.Configure(UIControllerFlow.ReClone);
             var basePath = default(string);
 

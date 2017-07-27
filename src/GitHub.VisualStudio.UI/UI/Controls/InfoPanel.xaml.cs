@@ -14,7 +14,6 @@ using Colors = System.Windows.Media.Colors;
 
 namespace GitHub.VisualStudio.UI.Controls
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public partial class InfoPanel : UserControl, IInfoPanel, INotifyPropertyChanged, INotifyPropertySource
     {
         static SolidColorBrush WarningColorBrush = new SolidColorBrush(Colors.DarkRed);

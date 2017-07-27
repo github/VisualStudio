@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -14,7 +13,6 @@ namespace GitHub.UI
         [DefaultValue("")]
         public string PromptText
         {
-            [return: AllowNull]
             get { return (string)GetValue(PromptTextProperty); }
             set { SetValue(PromptTextProperty, value); }
         }

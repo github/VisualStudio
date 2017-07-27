@@ -11,7 +11,6 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 using GitHub.App.Factories;
 using GitHub.Exports;
@@ -21,7 +20,6 @@ namespace GitHub.VisualStudio.UI
 {
     [Export(typeof(IUIProvider))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class UIProviderDispatcher : IUIProvider
     {
         readonly IUIProvider theRealProvider;
@@ -47,7 +45,6 @@ namespace GitHub.VisualStudio.UI
         public void StopUI(IUIController controller) => theRealProvider.StopUI(controller);
     }
 
-    [NullGuard(ValidationFlags.None)]
     public class UIProvider : IUIProvider, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();

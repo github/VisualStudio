@@ -7,8 +7,8 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Models;
-using NullGuard;
 
 namespace GitHub.Services
 {
@@ -36,6 +36,9 @@ namespace GitHub.Services
         [ImportingConstructor]
         public AvatarProvider(ISharedCache sharedCache, IImageCache imageCache)
         {
+            Guard.ArgumentNotNull(sharedCache, nameof(sharedCache));
+            Guard.ArgumentNotNull(imageCache, nameof(imageCache));
+
             cache = sharedCache.LocalMachine;
             this.imageCache = imageCache;
 
@@ -45,6 +48,8 @@ namespace GitHub.Services
 
         public static BitmapImage CreateBitmapImage(string packUrl)
         {
+            Guard.ArgumentNotEmptyString(packUrl, nameof(packUrl));
+
             var bitmap = new BitmapImage(new Uri(packUrl));
             bitmap.Freeze();
             return bitmap;
@@ -52,6 +57,8 @@ namespace GitHub.Services
 
         public IObservable<BitmapSource> GetAvatar(IAvatarContainer apiAccount)
         {
+            Guard.ArgumentNotNull(apiAccount, nameof(apiAccount));
+
             if (apiAccount.AvatarUrl == null)
             {
                 return Observable.Return(DefaultAvatar(apiAccount));
@@ -65,7 +72,7 @@ namespace GitHub.Services
                 .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(apiAccount)));
         }
             
-        public IObservable<Unit> InvalidateAvatar([AllowNull] IAvatarContainer apiAccount)
+        public IObservable<Unit> InvalidateAvatar(IAvatarContainer apiAccount)
         {
             return String.IsNullOrWhiteSpace(apiAccount?.Login)
                 ? Observable.Return(Unit.Default)
@@ -74,6 +81,8 @@ namespace GitHub.Services
 
         BitmapImage DefaultAvatar(IAvatarContainer apiAccount)
         {
+            Guard.ArgumentNotNull(apiAccount, nameof(apiAccount));
+
             return apiAccount.IsUser ? DefaultUserBitmapImage : DefaultOrgBitmapImage;
         }
 
