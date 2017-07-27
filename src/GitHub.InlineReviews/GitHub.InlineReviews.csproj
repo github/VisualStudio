@@ -127,8 +127,8 @@
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DiffView.cs" />
-    <Compile Include="Views\GlyphMarginGrid.xaml.cs">
-      <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
+    <Compile Include="Views\GlyphMarginView.xaml.cs">
+      <DependentUpon>GlyphMarginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\InlineCommentPeekView.xaml.cs">
       <DependentUpon>InlineCommentPeekView.xaml</DependentUpon>
@@ -407,7 +407,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\GlyphMarginGrid.xaml">
+    <Page Include="Views\GlyphMarginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

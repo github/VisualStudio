@@ -32,7 +32,7 @@ namespace GitHub.InlineReviews.Glyph
         public GlyphMargin(
             IWpfTextViewHost wpfTextViewHost,
             IGlyphFactory<TGlyphTag> glyphFactory,
-            Func<Grid> gridFactory,
+            Grid marginVisual,
             ITagAggregator<TGlyphTag> tagAggregator,
             IEditorFormatMap editorFormatMap,
             Func<ITextBuffer, bool> isMarginVisible,
@@ -44,15 +44,15 @@ namespace GitHub.InlineReviews.Glyph
             this.marginName = marginName;
             this.handleZoom = handleZoom;
             this.marginWidth = marginWidth;
+            this.marginVisual = marginVisual;
 
-            marginVisual = gridFactory();
             marginVisual.Width = marginWidth;
 
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
                 this, editorFormatMap, marginPropertiesName);
 
             // Do on Loaded to give diff view a chance to initialize.
-            marginVisual.Loaded += OnLoaded;
+            this.marginVisual.Loaded += OnLoaded;
         }
 
         public void Dispose()
