@@ -96,8 +96,6 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnLoaded(object sender, RoutedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
             textView.LayoutChanged += OnLayoutChanged;
             if (handleZoom)
@@ -126,8 +124,6 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             if (!textView.IsClosed)
             {
                 var list = new List<SnapshotSpan>();
@@ -160,8 +156,6 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             visualManager.SetSnapshotAndUpdate(textView.TextSnapshot, e.NewOrReformattedLines, e.VerticalTranslation ? (IList<ITextViewLine>)textView.TextViewLines : e.TranslatedLines);
 
             var lines = refreshAllGlyphs ? (IList<ITextViewLine>)textView.TextViewLines : e.NewOrReformattedLines;
@@ -191,12 +185,6 @@ namespace GitHub.InlineReviews.Glyph
                     visualManager.AddGlyph(span.Tag, spans[0]);
                 }
             }
-        }
-
-        void RefreshMarginVisibility()
-        {
-            // TODO: What should we do here?
-            //marginVisual.Visibility = isMarginVisible(textView.TextBuffer) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void ThrowIfDisposed()
