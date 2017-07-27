@@ -2,7 +2,6 @@
 using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 
 namespace GitHub.App.Factories
 {
@@ -66,8 +66,10 @@ namespace GitHub.App.Factories
         /// <param name="v">The IView</param>
         /// <param name="vm">The IViewModel. Might be null because the 2fa view shares the same viewmodel as the login dialog, so it's
         /// set manually in the view outside of this</param>
-        public UIPair(UIViewType type, ExportLifetimeContext<IView> v, [AllowNull]ExportLifetimeContext<IViewModel> vm)
+        public UIPair(UIViewType type, ExportLifetimeContext<IView> v, ExportLifetimeContext<IViewModel> vm)
         {
+            Guard.ArgumentNotNull(v, nameof(v));
+
             viewType = type;
             view = v;
             viewModel = vm;

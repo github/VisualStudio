@@ -174,14 +174,6 @@ namespace GitHub.Services
             return DisplayErrorMessage(ErrorType.RepoExistsOnDisk, new object[] { repositoryName, fullPath }, new[] { OpenPathInExplorer(fullPath), Cancel });
         }
 
-        public static IObservable<RecoveryOptionResult> ShowCloneError(this Exception exception,
-            ErrorType errorType,
-            string displayName,
-            string repositoryLocalWorkingDirectory)
-        {
-            return exception.DisplayErrorMessage(errorType, new object[] { displayName }, null);
-        }
-
         public static IObservable<RecoveryOptionResult> ShowUserErrorThatRequiresNavigatingToBilling(
             this Exception exception,
             IAccount account)

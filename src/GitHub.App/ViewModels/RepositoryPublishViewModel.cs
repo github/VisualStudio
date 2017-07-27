@@ -15,7 +15,6 @@ using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -43,6 +42,12 @@ namespace GitHub.ViewModels
             IConnectionManager connectionManager,
             IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(repositoryPublishService, nameof(repositoryPublishService));
+            Guard.ArgumentNotNull(notificationService, nameof(notificationService));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.notificationService = notificationService;
             this.hosts = hosts;
             this.usageTracker = usageTracker;
@@ -115,17 +120,14 @@ namespace GitHub.ViewModels
         public ObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
-        [AllowNull]
         public IConnection SelectedConnection
         {
-            [return: AllowNull]
             get { return selectedConnection; }
             set { this.RaiseAndSetIfChanged(ref selectedConnection, value); }
         }
 
         IRepositoryHost SelectedHost
         {
-            [return:AllowNull]
             get { return selectedConnection != null ? hosts.LookupHost(selectedConnection.HostAddress) : null; }
         }
 

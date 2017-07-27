@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -31,14 +30,12 @@ namespace GitHub.UI
 
         public HorizontalAlignment HorizontalContentAlignment
         {
-            [return: AllowNull]
             get { return (HorizontalAlignment)GetValue(Control.HorizontalContentAlignmentProperty); }
             set { SetValue(Control.HorizontalContentAlignmentProperty, value); }
         }
 
         public VerticalAlignment VerticalContentAlignment
         {
-            [return: AllowNull]
             get { return (VerticalAlignment)GetValue(Control.VerticalContentAlignmentProperty); }
             set { SetValue(Control.VerticalContentAlignmentProperty, value); }
         }
