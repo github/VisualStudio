@@ -390,10 +390,10 @@ namespace GitHub.Services
         {
             return Task.Factory.StartNew(() =>
             {
-                if(repo.Head.IsTracking)
+                if (repo.Head.IsTracking)
                 {
                     var trackedBranchTip = repo.Head.TrackedBranch.Tip;
-                    if(trackedBranchTip != null)
+                    if (trackedBranchTip != null)
                     {
                         return repo.Head.Tip.Sha == trackedBranchTip.Sha;
                     }
