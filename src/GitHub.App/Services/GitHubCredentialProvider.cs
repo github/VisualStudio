@@ -4,9 +4,9 @@ using System.Reactive.Linq;
 using System.Security;
 using Akavache;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using NullGuard;
 
 namespace GitHub.Services
 {
@@ -19,6 +19,8 @@ namespace GitHub.Services
         [ImportingConstructor]
         public GitHubCredentialProvider(ISharedCache sharedCache)
         {
+            Guard.ArgumentNotNull(sharedCache, nameof(sharedCache));
+
             secureCache = sharedCache.Secure;
         }
 
@@ -26,7 +28,7 @@ namespace GitHub.Services
         /// This is a callback from libgit2
         /// </summary>
         /// <returns></returns>
-        public Credentials HandleCredentials([AllowNull]string url, [AllowNull]string username, SupportedCredentialTypes types)
+        public Credentials HandleCredentials(string url, string username, SupportedCredentialTypes types)
         {
             if (url == null)
                 return null; // wondering if we should return DefaultCredentials instead
@@ -40,6 +42,8 @@ namespace GitHub.Services
 
         static Credentials CreateCredentials(Tuple<string, SecureString> data)
         {
+            Guard.ArgumentNotNull(data, nameof(data));
+
             return new SecureUsernamePasswordCredentials
             {
                 Username = data.Item1,

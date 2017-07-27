@@ -14,7 +14,6 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
-using NullGuard;
 using ReactiveUI;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
@@ -47,8 +46,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { SectionContent = value; }
         }
 
-        [AllowNull]
-        public IConnection SectionConnection { [return:AllowNull] get; set; }
+        public IConnection SectionConnection { get; set; }
 
         bool loggedIn;
         bool LoggedIn
@@ -75,19 +73,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         }
 
         IReactiveDerivedList<ILocalRepositoryModel> repositories;
-        [AllowNull]
         public IReactiveDerivedList<ILocalRepositoryModel> Repositories
         {
-            [return:AllowNull]
             get { return repositories; }
             set { repositories = value; this.RaisePropertyChange(); }
         }
 
         ILocalRepositoryModel selectedRepository;
-        [AllowNull]
         public ILocalRepositoryModel SelectedRepository
         {
-            [return: AllowNull]
             get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); }
         }
@@ -107,6 +101,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(manager, nameof(manager));
+            Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
+            Guard.ArgumentNotNull(vsServices, nameof(vsServices));
+            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
+            Guard.ArgumentNotNull(dialogService, nameof(dialogService));
+
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
@@ -214,6 +216,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             base.Initialize(serviceProvider);
             UpdateConnection();
 
@@ -302,6 +306,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleCreatedRepo(ILocalRepositoryModel newrepo)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
             msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
@@ -309,6 +315,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleClonedRepo(ILocalRepositoryModel newrepo)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
             if (newrepo.HasCommits() && newrepo.MightContainSolution())
                 msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
@@ -319,6 +327,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void ShowNotification(ILocalRepositoryModel newrepo, string msg)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
             
             teServices.ClearNotifications();
@@ -456,6 +466,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         /// </remarks>
         static ReactiveCommand<object> CreateAsyncCommandHack(Func<Task> executeAsync)
         {
+            Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
+
             var enabled = new BehaviorSubject<bool>(true);
             var command = ReactiveCommand.Create(enabled);
             command.Subscribe(async _ =>

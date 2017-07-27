@@ -21,7 +21,6 @@ using System.Reactive;
 
 namespace GitHub.ViewModels
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]

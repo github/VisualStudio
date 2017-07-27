@@ -3,11 +3,11 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {
@@ -22,10 +22,8 @@ namespace GitHub.VisualStudio
 
         protected ISimpleApiClient simpleApiClient;
 
-        [AllowNull]
         protected ISimpleApiClient SimpleApiClient
         {
-            [return: AllowNull]
             get { return simpleApiClient; }
             set
             {
@@ -42,6 +40,8 @@ namespace GitHub.VisualStudio
 
         protected MenuBase(IGitHubServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             this.serviceProvider = serviceProvider;
             apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
         }

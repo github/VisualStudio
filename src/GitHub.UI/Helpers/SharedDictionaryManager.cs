@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Collections.Generic;
-using NullGuard;
+using GitHub.Extensions;
 
 namespace GitHub.UI.Helpers
 {
@@ -16,13 +16,14 @@ namespace GitHub.UI.Helpers
 
         public SharedDictionaryManager(CachingFactory factory)
         {
+            Guard.ArgumentNotNull(factory, nameof(factory));
+
             this.factory = factory;
         }
 
         public virtual new Uri Source
         {
             // Just in case the designer checks this property.
-            [return: AllowNull]
             get
             {
                 return source;
@@ -74,6 +75,9 @@ namespace GitHub.UI.Helpers
 
             public ResourceDictionary GetOrCreateResourceDictionary(ResourceDictionary owner, Uri uri)
             {
+                Guard.ArgumentNotNull(owner, nameof(owner));
+                Guard.ArgumentNotNull(uri, nameof(uri));
+
                 TryAddDisposable(owner);
 
                 ResourceDictionary rd;
@@ -89,6 +93,8 @@ namespace GitHub.UI.Helpers
             // Remember subtypes that need disposing of.
             public void TryAddDisposable(object owner)
             {
+                Guard.ArgumentNotNull(owner, nameof(owner));
+
                 var disposable = owner as IDisposable;
                 if (disposable != null)
                 {
@@ -122,6 +128,8 @@ namespace GitHub.UI.Helpers
 
         public static Uri FixDesignTimeUri(Uri inUri)
         {
+            Guard.ArgumentNotNull(inUri, nameof(inUri));
+
             if (inUri.Scheme != "file")
             {
                 return inUri;

@@ -13,7 +13,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 using GitHub.Services;

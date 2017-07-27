@@ -92,11 +92,6 @@
     <Compile Include="Peek\InlineCommentPeekResultPresentation.cs" />
     <Compile Include="Peek\InlineCommentPeekResultPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="SampleData\CommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\DiffCommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestCommentsViewModelDesigner.cs" />
@@ -121,10 +116,6 @@
     <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCommentsViewModel.cs" />
-    <Compile Include="ViewModels\TooltipCommentThreadViewModel.cs" />
-    <Compile Include="Views\TooltipCommentThreadView.xaml.cs">
-      <DependentUpon>TooltipCommentThreadView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\DiffCommentThreadView.xaml.cs">
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
@@ -182,10 +173,6 @@
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
       <Project>{1CE2D235-8072-4649-BA5A-CFB1AF8776E0}</Project>
       <Name>ReactiveUI_Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}</Project>
-      <Name>Rothko</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
@@ -351,6 +338,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
@@ -390,10 +381,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
@@ -401,10 +388,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\TooltipCommentThreadView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\DiffCommentThreadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

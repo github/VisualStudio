@@ -9,10 +9,10 @@ using System.Reactive.Subjects;
 using Akavache;
 using GitHub.Authentication;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Primitives;
 using GitHub.Services;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.Models
@@ -35,6 +35,10 @@ namespace GitHub.Models
             ISharedCache sharedCache,
             IConnectionManager connectionManager)
         {
+            Guard.ArgumentNotNull(repositoryHostFactory, nameof(repositoryHostFactory));
+            Guard.ArgumentNotNull(sharedCache, nameof(sharedCache));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+
             this.connectionManager = connectionManager;
 
             RepositoryHostFactory = repositoryHostFactory;
@@ -98,6 +102,8 @@ namespace GitHub.Models
 
         IObservable<IConnection> RunLoginHandler(IConnection connection)
         {
+            Guard.ArgumentNotNull(connection, nameof(connection));
+
             var handler = new ReplaySubject<IConnection>();
             var address = connection.HostAddress;
             var host = LookupHost(address);
@@ -112,7 +118,7 @@ namespace GitHub.Models
             return handler;
         }
 
-        public IRepositoryHost LookupHost([AllowNull] HostAddress address)
+        public IRepositoryHost LookupHost(HostAddress address)
         {
             if (address == GitHubHost.Address)
                 return GitHubHost;
@@ -126,6 +132,10 @@ namespace GitHub.Models
             string usernameOrEmail,
             string password)
         {
+            Guard.ArgumentNotNull(address, nameof(address));
+            Guard.ArgumentNotEmptyString(usernameOrEmail, nameof(usernameOrEmail));
+            Guard.ArgumentNotEmptyString(password, nameof(password));
+
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
 
             return Observable.Defer(async () =>
@@ -173,6 +183,8 @@ namespace GitHub.Models
         /// <returns></returns>
         public IObservable<AuthenticationResult> LogInFromCache(HostAddress address)
         {
+            Guard.ArgumentNotNull(address, nameof(address));
+
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
 
             return Observable.Defer(async () =>
@@ -197,6 +209,8 @@ namespace GitHub.Models
 
         public IObservable<Unit> LogOut(IRepositoryHost host)
         {
+            Guard.ArgumentNotNull(host, nameof(host));
+
             var address = host.Address;
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             return host.LogOut()
@@ -241,7 +255,6 @@ namespace GitHub.Models
         }
 
         IRepositoryHost githubHost;
-        [AllowNull]
         public IRepositoryHost GitHubHost
         {
             get { return githubHost; }
@@ -253,7 +266,6 @@ namespace GitHub.Models
         }
 
         IRepositoryHost enterpriseHost;
-        [AllowNull]
         public IRepositoryHost EnterpriseHost
         {
             get { return enterpriseHost; }
