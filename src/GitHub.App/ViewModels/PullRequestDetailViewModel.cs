@@ -37,6 +37,7 @@ namespace GitHub.ViewModels
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
+        string errorMessage;
         string operationError;
         bool isBusy;
         bool isLoading;
@@ -235,6 +236,15 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets an error message to display if loading fails.
+        /// </summary>
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
+            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
+        }
+
+        /// <summary>
         /// Gets the error message to be displayed in the action area as a result of an error in a
         /// git operation.
         /// </summary>
@@ -296,10 +306,16 @@ namespace GitHub.ViewModels
             else
                 IsBusy = true;
 
-            OperationError = null;
+            ErrorMessage = OperationError = null;
             modelService.GetPullRequest(Repository, prNumber)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
+                .Catch<IPullRequestModel, Exception>(ex =>
+                {
+                    ErrorMessage = ex.Message.Trim();
+                    IsLoading = IsBusy = false;
+                    return Observable.Empty<IPullRequestModel>();
+                })
                 .Subscribe(x => Load(x).Forget());
         }
 
@@ -310,94 +326,103 @@ namespace GitHub.ViewModels
         /// <param name="files">The pull request's changed files.</param>
         public async Task Load(IPullRequestModel pullRequest)
         {
-            var firstLoad = (Model == null);
-            Model = pullRequest;
-            Session = await sessionManager.GetSession(pullRequest);
-            Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
-
-            IsFromFork = pullRequestsService.IsPullRequestFromFork(Repository, Model);
-            SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
-            CommentCount = pullRequest.Comments.Count +  pullRequest.ReviewComments.Count;
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
-
-            var changes = await pullRequestsService.GetTreeChanges(Repository, pullRequest);
-            ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
-
-            var localBranches = await pullRequestsService.GetLocalBranches(Repository, pullRequest).ToList();
-
-            IsCheckedOut = localBranches.Contains(Repository.CurrentBranch);
-
-            if (IsCheckedOut)
+            try
             {
-                var divergence = await pullRequestsService.CalculateHistoryDivergence(Repository, Model.Number);
-                var pullEnabled = divergence.BehindBy > 0;
-                var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
-                string pullToolTip;
-                string pushToolTip;
+                var firstLoad = (Model == null);
+                Model = pullRequest;
+                Session = await sessionManager.GetSession(pullRequest);
+                Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-                if (pullEnabled)
+                IsFromFork = pullRequestsService.IsPullRequestFromFork(Repository, Model);
+                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
+                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
+                CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
+                Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
+
+                var changes = await pullRequestsService.GetTreeChanges(Repository, pullRequest);
+                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+
+                var localBranches = await pullRequestsService.GetLocalBranches(Repository, pullRequest).ToList();
+
+                IsCheckedOut = localBranches.Contains(Repository.CurrentBranch);
+
+                if (IsCheckedOut)
                 {
-                    pullToolTip = string.Format(
-                        Resources.PullRequestDetailsPullToolTip,
-                        IsFromFork ? Resources.Fork : Resources.Remote,
-                        SourceBranchDisplayName);
+                    var divergence = await pullRequestsService.CalculateHistoryDivergence(Repository, Model.Number);
+                    var pullEnabled = divergence.BehindBy > 0;
+                    var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                    string pullToolTip;
+                    string pushToolTip;
+
+                    if (pullEnabled)
+                    {
+                        pullToolTip = string.Format(
+                            Resources.PullRequestDetailsPullToolTip,
+                            IsFromFork ? Resources.Fork : Resources.Remote,
+                            SourceBranchDisplayName);
+                    }
+                    else
+                    {
+                        pullToolTip = Resources.NoCommitsToPull;
+                    }
+
+                    if (pushEnabled)
+                    {
+                        pushToolTip = string.Format(
+                            Resources.PullRequestDetailsPushToolTip,
+                            IsFromFork ? Resources.Fork : Resources.Remote,
+                            SourceBranchDisplayName);
+                    }
+                    else if (divergence.AheadBy == 0)
+                    {
+                        pushToolTip = Resources.NoCommitsToPush;
+                    }
+                    else
+                    {
+                        pushToolTip = Resources.MustPullBeforePush;
+                    }
+
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    CheckoutState = null;
                 }
                 else
                 {
-                    pullToolTip = Resources.NoCommitsToPull;
+                    var caption = localBranches.Count > 0 ?
+                        string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
+                        string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(Repository, Model.Number, Model.Title));
+                    var clean = await pullRequestsService.IsWorkingDirectoryClean(Repository);
+                    string disabled = null;
+
+                    if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                    {
+                        disabled = Resources.SourceRepositoryNoLongerAvailable;
+                    }
+                    else if (!clean)
+                    {
+                        disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
+                    }
+
+                    CheckoutState = new CheckoutCommandState(caption, disabled);
+                    UpdateState = null;
                 }
 
-                if (pushEnabled)
+                if (firstLoad)
                 {
-                    pushToolTip = string.Format(
-                        Resources.PullRequestDetailsPushToolTip,
-                        IsFromFork ? Resources.Fork : Resources.Remote,
-                        SourceBranchDisplayName);
-                }
-                else if (divergence.AheadBy == 0)
-                {
-                    pushToolTip = Resources.NoCommitsToPush;
-                }
-                else
-                {
-                    pushToolTip = Resources.MustPullBeforePush;
+                    usageTracker.IncrementPullRequestOpened().Forget();
                 }
 
-                UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
-                CheckoutState = null;
+                if (!isInCheckout)
+                {
+                    pullRequestsService.RemoveUnusedRemotes(Repository).Subscribe(_ => { });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var caption = localBranches.Count > 0 ?
-                    string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(Repository, Model.Number, Model.Title));
-                var clean = await pullRequestsService.IsWorkingDirectoryClean(Repository);
-                string disabled = null;
-
-                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
-                {
-                    disabled = Resources.SourceRepositoryNoLongerAvailable;
-                }
-                else if (!clean)
-                {
-                    disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
-                }
-
-                CheckoutState = new CheckoutCommandState(caption, disabled);
-                UpdateState = null;
+                ErrorMessage = ex.Message.Trim();
             }
-
-            IsLoading = IsBusy = false;
-
-            if (firstLoad)
+            finally
             {
-                usageTracker.IncrementPullRequestOpened().Forget();
-            }
-
-            if (!isInCheckout)
-            {
-                pullRequestsService.RemoveUnusedRemotes(Repository).Subscribe(_ => { });
+                IsLoading = IsBusy = false;
             }
         }
 

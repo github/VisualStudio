@@ -1,11 +1,12 @@
 ﻿using Akavache;
 using GitHub.Primitives;
 using System;
+using System.Threading.Tasks;
 
 namespace GitHub.Factories
 {
     public interface IHostCacheFactory : IDisposable
     {
-        IBlobCache Create(HostAddress hostAddress);
+        Task<IBlobCache> Create(HostAddress hostAddress);
     }
 }

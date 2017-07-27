@@ -96,6 +96,7 @@
     <Compile Include="Helpers\LoadingResourceDictionary.cs" />
     <Compile Include="Helpers\ScrollViewerUtilities.cs" />
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
+    <Compile Include="Helpers\TreeViewExtensions.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

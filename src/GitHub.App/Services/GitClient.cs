@@ -302,7 +302,7 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
-                if(commit == null)
+                if (commit == null)
                 {
                     throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
                 }
@@ -409,7 +409,16 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
+                if (repo.Head.IsTracking)
+                {
+                    var trackedBranchTip = repo.Head.TrackedBranch.Tip;
+                    if (trackedBranchTip != null)
+                    {
+                        return repo.Head.Tip.Sha == trackedBranchTip.Sha;
+                    }
+                }
+
+                return false;
             });
         }
 

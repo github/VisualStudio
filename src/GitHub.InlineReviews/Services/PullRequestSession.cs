@@ -49,27 +49,6 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public bool IsCheckedOut
-        {
-            get { return isCheckedOut; }
-            internal set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
-        }
-
-        /// <inheritdoc/>
-        public IAccount User { get; }
-
-        /// <inheritdoc/>
-        public IPullRequestModel PullRequest { get; private set; }
-
-        /// <inheritdoc/>
-        public ILocalRepositoryModel Repository { get; }
-
-        IEnumerable<string> FilePaths
-        {
-            get { return PullRequest.ChangedFiles.Select(x => x.FileName); }
-        }
-
-        /// <inheritdoc/>
         public async Task AddComment(IPullRequestReviewCommentModel comment)
         {
             PullRequest.ReviewComments = PullRequest.ReviewComments
@@ -171,7 +150,7 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequest = pullRequest;
 
-            foreach (var file in this.fileIndex.Values)
+            foreach (var file in this.fileIndex.Values.ToList())
             {
                 await UpdateFile(file);
             }
@@ -284,6 +263,27 @@ namespace GitHub.InlineReviews.Services
             }
 
             return -1;
+        }
+
+        /// <inheritdoc/>
+        public bool IsCheckedOut
+        {
+            get { return isCheckedOut; }
+            internal set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
+        }
+
+        /// <inheritdoc/>
+        public IAccount User { get; }
+
+        /// <inheritdoc/>
+        public IPullRequestModel PullRequest { get; private set; }
+
+        /// <inheritdoc/>
+        public ILocalRepositoryModel Repository { get; }
+
+        IEnumerable<string> FilePaths
+        {
+            get { return PullRequest.ChangedFiles.Select(x => x.FileName); }
         }
     }
 }
