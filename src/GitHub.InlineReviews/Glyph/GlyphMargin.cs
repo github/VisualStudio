@@ -27,7 +27,6 @@ namespace GitHub.InlineReviews.Glyph
         IWpfTextView textView;
         string marginName;
         GlyphMarginVisualManager<TGlyphTag> visualManager;
-        Func<ITextBuffer, bool> isMarginVisible;
 
         public GlyphMargin(
             IWpfTextViewHost wpfTextViewHost,
@@ -35,12 +34,10 @@ namespace GitHub.InlineReviews.Glyph
             Grid marginVisual,
             ITagAggregator<TGlyphTag> tagAggregator,
             IEditorFormatMap editorFormatMap,
-            Func<ITextBuffer, bool> isMarginVisible,
             string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
         {
             textView = wpfTextViewHost.TextView;
             this.tagAggregator = tagAggregator;
-            this.isMarginVisible = isMarginVisible;
             this.marginName = marginName;
             this.handleZoom = handleZoom;
             this.marginWidth = marginWidth;
@@ -198,7 +195,8 @@ namespace GitHub.InlineReviews.Glyph
 
         void RefreshMarginVisibility()
         {
-            marginVisual.Visibility = isMarginVisible(textView.TextBuffer) ? Visibility.Visible : Visibility.Collapsed;
+            // TODO: What should we do here?
+            //marginVisual.Visibility = isMarginVisible(textView.TextBuffer) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void ThrowIfDisposed()

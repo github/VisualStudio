@@ -109,9 +109,11 @@
     <Compile Include="Services\PullRequestSessionService.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="ViewModels\DiffCommentThreadViewModel.cs" />
+    <Compile Include="ViewModels\GlyphMarginViewModel.cs" />
     <Compile Include="ViewModels\ICommentThreadViewModel.cs" />
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\IDiffCommentThreadViewModel.cs" />
+    <Compile Include="ViewModels\IGlyphMarginViewModel.cs" />
     <Compile Include="ViewModels\IInlineCommentViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
     <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />

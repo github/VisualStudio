@@ -7,6 +7,18 @@
              mc:Ignorable="d" 
              d:DesignHeight="100" Width="17">
 
+    <Grid.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+    </Grid.Resources>
+
+    <Grid.Visibility>
+        <Binding Path="Visible" Converter="{StaticResource BooleanToVisibility}" />
+    </Grid.Visibility>
+
+    <Grid.ToolTip>
+        <TextBlock Text="{Binding Visible}" />
+    </Grid.ToolTip>
+
     <Grid.Background>
 
         <VisualBrush TileMode="Tile" Viewport="0,0,5,5" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute">
