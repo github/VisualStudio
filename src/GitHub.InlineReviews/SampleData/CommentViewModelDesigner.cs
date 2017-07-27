@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reactive;
-using ReactiveUI;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.SampleData;
 using GitHub.UI;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {

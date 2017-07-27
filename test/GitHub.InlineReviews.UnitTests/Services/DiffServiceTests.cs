@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using GitHub.InlineReviews.Services;
+using GitHub.InlineReviews.UnitTests.Properties;
 using GitHub.Services;
 using GitHub.Models;
 using NSubstitute;
@@ -9,8 +10,6 @@ using Xunit;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
-    using Resources = Properties.Resources;
-
     public class DiffServiceTests
     {
         public class TheParseFragmentMethod

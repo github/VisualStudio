@@ -3,17 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d"
-             ToolTipService.ShowDuration="600000" ToolTipService.HasDropShadow="True">
+             mc:Ignorable="d">
 
     <UserControl.Resources>
         <!-- This will be the color of an added/deleted word in the diff view or the indicator margin color -->
         <SolidColorBrush x:Key="DiffChangeBackground" Color="DarkSlateGray" />
     </UserControl.Resources>
 
-    <UserControl.ToolTip>
-        <ToolTip x:Name="CommentToolTip" />
-    </UserControl.ToolTip>
 
     <Grid Background="{DynamicResource DiffChangeBackground}">
         <Viewbox>
