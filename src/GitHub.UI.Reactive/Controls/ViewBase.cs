@@ -80,7 +80,6 @@ namespace GitHub.UI
         /// <summary>
         /// Gets a value reflecting the associated view model's <see cref="IHasErrorState.ErrorMessage"/> property.
         /// </summary>
-        [AllowNull]
         public string ErrorMessage
         {
             get { return (string)GetValue(ErrorMessageProperty); }
