@@ -43,7 +43,7 @@ public class GitClientTests
 
         static Commit MockCommitOrNull(string sha)
         {
-            if(sha != null)
+            if (sha != null)
             {
                 var commit = Substitute.For<Commit>();
                 commit.Sha.Returns(sha);
@@ -188,7 +188,7 @@ public class GitClientTests
             var mergeBaseCommit = Substitute.For<Commit>();
             mergeBaseCommit.Sha.Returns(mergeBaseSha);
 
-            if(baseSha != null)
+            if (baseSha != null)
             {
                 repo.Lookup<Commit>(baseSha).Returns(baseCommit);
             }
