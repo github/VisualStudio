@@ -67,9 +67,9 @@ namespace GitHub.InlineReviews
             glyphMarginView.Unloaded += (s, e) => glyphMarginViewModel.Dispose();
 
             var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, glyphMarginView, tagAggregator, editorFormatMap,
-                MarginPropertiesName, MarginName, true, 17.0);
+                MarginPropertiesName, MarginName, true);
 
-            if(IsDiffView(wpfTextViewHost))
+            if (IsDiffView(wpfTextViewHost))
             {
                 TrackCommentGlyph(wpfTextViewHost, glyphMarginView);
             }

@@ -18,6 +18,8 @@ namespace GitHub.InlineReviews.Glyph
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
     public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag: ITag
     {
+        const double DefaultMarginWidth = 17.0;
+
         bool handleZoom;
         bool isDisposed;
         Grid marginVisual;
@@ -34,7 +36,7 @@ namespace GitHub.InlineReviews.Glyph
             Grid marginVisual,
             ITagAggregator<TGlyphTag> tagAggregator,
             IEditorFormatMap editorFormatMap,
-            string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
+            string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = DefaultMarginWidth)
         {
             textView = wpfTextViewHost.TextView;
             this.tagAggregator = tagAggregator;

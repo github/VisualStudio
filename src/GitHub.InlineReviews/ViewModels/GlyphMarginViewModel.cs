@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.ViewModels
 
         void PackageSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == nameof(packageSettings.EditorComments))
+            if (e.PropertyName == nameof(packageSettings.EditorComments))
             {
                 RefreshVisibility();
             }
@@ -75,7 +75,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             private set
             {
-                if(value != visible)
+                if (value != visible)
                 {
                     visible = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Visible)));
