@@ -1,11 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using GitHub.Models;
-using NullGuard;
 
 namespace GitHub.VisualStudio.UI.Controls
 {
-    [NullGuard(ValidationFlags.None)]
     public partial class AccountAvatar : UserControl
     {
         public static readonly DependencyProperty AccountProperty =

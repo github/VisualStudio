@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -21,9 +20,16 @@ namespace GitHub.UI
     /// </remarks>
     public class ViewBase : ContentControl
     {
-        static readonly DependencyPropertyKey HasBusyStatePropertyKey =
+        static readonly DependencyPropertyKey ErrorMessagePropertyKey =
             DependencyProperty.RegisterReadOnly(
-                nameof(HasBusyState),
+                nameof(ErrorMessage),
+                typeof(string),
+                typeof(ViewBase),
+                new FrameworkPropertyMetadata());
+
+        static readonly DependencyPropertyKey HasStatePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(HasState),
                 typeof(bool),
                 typeof(ViewBase),
                 new FrameworkPropertyMetadata());
@@ -42,6 +48,13 @@ namespace GitHub.UI
                 typeof(ViewBase),
                 new FrameworkPropertyMetadata());
 
+        static readonly DependencyPropertyKey ShowContentPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ShowContent),
+                typeof(bool),
+                typeof(ViewBase),
+                new FrameworkPropertyMetadata());
+
         static readonly DependencyProperty ShowBusyStateProperty =
             DependencyProperty.Register(
                 nameof(ShowBusyState),
@@ -49,9 +62,11 @@ namespace GitHub.UI
                 typeof(ViewBase),
                 new FrameworkPropertyMetadata(true));
 
-        public static readonly DependencyProperty HasBusyStateProperty = HasBusyStatePropertyKey.DependencyProperty;
+        public static readonly DependencyProperty ErrorMessageProperty = ErrorMessagePropertyKey.DependencyProperty;
+        public static readonly DependencyProperty HasStateProperty = HasStatePropertyKey.DependencyProperty;
         public static readonly DependencyProperty IsBusyProperty = IsBusyPropertyKey.DependencyProperty;
         public static readonly DependencyProperty IsLoadingProperty = IsLoadingPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty ShowContentProperty = ShowContentPropertyKey.DependencyProperty;
 
         static ViewBase()
         {
@@ -63,13 +78,22 @@ namespace GitHub.UI
         }
 
         /// <summary>
-        /// Gets a value indicating whether the associated view model implements <see cref="IHasLoading"/>
-        /// or <see cref="IHasBusy"/>.
+        /// Gets a value reflecting the associated view model's <see cref="IHasErrorState.ErrorMessage"/> property.
         /// </summary>
-        public bool HasBusyState
+        public string ErrorMessage
         {
-            get { return (bool)GetValue(HasBusyStateProperty); }
-            protected set { SetValue(HasBusyStatePropertyKey, value); }
+            get { return (string)GetValue(ErrorMessageProperty); }
+            protected set { SetValue(ErrorMessagePropertyKey, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the associated view model implements <see cref="IHasLoading"/>
+        /// <see cref="IHasBusy"/> or <see cref="IHasErrorState"/>.
+        /// </summary>
+        public bool HasState
+        {
+            get { return (bool)GetValue(HasStateProperty); }
+            protected set { SetValue(HasStatePropertyKey, value); }
         }
 
         /// <summary>
@@ -99,6 +123,15 @@ namespace GitHub.UI
             set { SetValue(ShowBusyStateProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to the view model content.
+        /// </summary>
+        public bool ShowContent
+        {
+            get { return (bool)GetValue(ShowContentProperty); }
+            protected set { SetValue(ShowContentPropertyKey, value); }
+        }
+
         internal ViewBase()
         {
         }
@@ -109,9 +142,9 @@ namespace GitHub.UI
     /// </summary>
     /// <remarks>
     /// Exposes a typed <see cref="ViewModel"/> property and optionally displays <see cref="IHasLoading.IsLoading"/> 
-    /// and <see cref="IHasBusy.IsBusy"/> state if the view model implements those interfaces. In addition, if the view
-    /// model is an <see cref="IDialogViewModel"/>, invokes <see cref="IDialogViewModel.Cancel"/> when the escape key
-    /// is pressed.
+    /// <see cref="IHasBusy.IsBusy"/> and <see cref="IHasErrorState.ErrorMessage"/> state if the view model implements
+    /// those interfaces. In addition, if the view model is an <see cref="IDialogViewModel"/>, invokes 
+    /// <see cref="IDialogViewModel.Cancel"/> when the escape key is pressed.
     /// </remarks>
     public class ViewBase<TInterface, TImplementor> : ViewBase, IView, IViewFor<TInterface>, IDisposable
         where TInterface : class, IViewModel
@@ -134,6 +167,7 @@ namespace GitHub.UI
 
                 var hasLoading = ViewModel as IHasLoading;
                 var hasBusy = ViewModel as IHasBusy;
+                var hasErrorState = ViewModel as IHasErrorState;
                 var subs = new CompositeDisposable();
 
                 if (hasLoading != null)
@@ -146,7 +180,12 @@ namespace GitHub.UI
                     subs.Add(this.OneWayBind(hasBusy, x => x.IsBusy, x => x.IsBusy));
                 }
 
-                HasBusyState = hasLoading != null || hasBusy != null;
+                if (hasErrorState != null)
+                {
+                    subs.Add(this.OneWayBind(hasErrorState, x => x.ErrorMessage, x => x.ErrorMessage));
+                }
+
+                HasState = hasLoading != null || hasBusy != null;
                 subscriptions = subs;
             };
 
@@ -161,15 +200,19 @@ namespace GitHub.UI
                         (this.ViewModel as IDialogViewModel)?.Cancel.Execute(null);
                     }));
             });
+
+            this.WhenAnyValue(
+                x => x.IsLoading,
+                x => x.ErrorMessage,
+                (l, m) => !l && m == null)
+                .Subscribe(x => ShowContent = x);
         }
 
         /// <summary>
         /// Gets or sets the control's data context as a typed view model.
         /// </summary>
-        [AllowNull]
         public TInterface ViewModel
         {
-            [return: AllowNull]
             get { return (TInterface)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
@@ -178,10 +221,8 @@ namespace GitHub.UI
         /// Gets or sets the control's data context as a typed view model. Required for interaction
         /// with ReactiveUI.
         /// </summary>
-        [AllowNull]
         TInterface IViewFor<TInterface>.ViewModel
         {
-            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = value; }
         }
@@ -189,10 +230,8 @@ namespace GitHub.UI
         /// <summary>
         /// Gets or sets the control's data context. Required for interaction with ReactiveUI.
         /// </summary>
-        [AllowNull]
         object IViewFor.ViewModel
         {
-            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = (TInterface)value; }
         }
@@ -200,10 +239,8 @@ namespace GitHub.UI
         /// <summary>
         /// Gets or sets the control's data context. Required for interaction with ReactiveUI.
         /// </summary>
-        [AllowNull]
         IViewModel IView.ViewModel
         {
-            [return: AllowNull]
             get { return ViewModel; }
         }
 

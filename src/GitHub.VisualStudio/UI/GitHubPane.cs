@@ -27,7 +27,6 @@ namespace GitHub.VisualStudio.UI
     /// </para>
     /// </remarks>
     [Guid(GitHubPaneGuid)]
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public class GitHubPane : ToolWindowPane, IServiceProviderAware, IViewHost
     {
         public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";

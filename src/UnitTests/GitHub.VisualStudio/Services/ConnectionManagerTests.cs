@@ -30,7 +30,7 @@ public class ConnectionManagerTests
             var cache = Substitute.For<IConnectionCache>();
             var loginManager = Substitute.For<ILoginManager>();
             var apiClientFactory = Substitute.For<IApiClientFactory>();
-            var manager = new ConnectionManager(program, Substitutes.IVSGitServices, cache, loginManager, apiClientFactory);
+            var manager = new ConnectionManager(Substitutes.IVSGitServices, cache, loginManager, apiClientFactory);
 
             manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));
 

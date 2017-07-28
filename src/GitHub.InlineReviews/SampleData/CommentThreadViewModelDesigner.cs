@@ -16,5 +16,10 @@ namespace GitHub.InlineReviews.SampleData
             = new AccountDesigner { Login = "shana", IsUser = true };
 
         public ReactiveCommand<ICommentModel> PostComment { get; }
+
+        public Uri GetCommentUrl(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

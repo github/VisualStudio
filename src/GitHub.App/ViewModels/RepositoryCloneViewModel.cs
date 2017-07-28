@@ -16,7 +16,6 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 using Rothko;
 using System.Collections.ObjectModel;
@@ -54,6 +53,10 @@ namespace GitHub.ViewModels
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
+            Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
+
             this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
 
@@ -119,27 +122,32 @@ namespace GitHub.ViewModels
             NoRepositoriesFound = true;
         }
 
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
             base.Initialize(data);
 
             IsBusy = true;
             repositoryHost.ModelService.GetRepositories(repositories);
-            repositories.OriginalCompleted.Subscribe(
-                _ => { }
-                , ex =>
-                {
-                    LoadingFailed = true;
-                    IsBusy = false;
-                    log.Error("Error while loading repositories", ex);
-                },
-                () => IsBusy = false
+            repositories.OriginalCompleted
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(
+                    _ => { }
+                    , ex =>
+                    {
+                        LoadingFailed = true;
+                        IsBusy = false;
+                        log.Error("Error while loading repositories", ex);
+                    },
+                    () => IsBusy = false
             );
             repositories.Subscribe();
         }
 
         bool FilterRepository(IRemoteRepositoryModel repo, int position, IList<IRemoteRepositoryModel> list)
         {
+            Guard.ArgumentNotNull(repo, nameof(repo));
+            Guard.ArgumentNotNull(list, nameof(list));
+
             if (string.IsNullOrWhiteSpace(FilterText))
                 return true;
 
@@ -149,7 +157,7 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string path)
         {
-            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
+            Guard.ArgumentNotEmptyString(path, nameof(path));
 
             bool isAlreadyRepoAtPath = false;
 
@@ -195,7 +203,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public string BaseRepositoryPath
         {
-            [return: AllowNull]
             get { return baseRepositoryPath; }
             set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
         }
@@ -208,7 +215,6 @@ namespace GitHub.ViewModels
         TrackingCollection<IRemoteRepositoryModel> repositories;
         public ObservableCollection<IRemoteRepositoryModel> Repositories
         {
-            [return: AllowNull]
             get { return repositories; }
             private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRemoteRepositoryModel>)value); }
         }
@@ -217,10 +223,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Selected repository to clone
         /// </summary>
-        [AllowNull]
         public IRepositoryModel SelectedRepository
         {
-            [return: AllowNull]
             get { return selectedRepository; }
             set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
@@ -235,10 +239,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// User text to filter the repositories list
         /// </summary>
-        [AllowNull]
         public string FilterText
         {
-            [return: AllowNull]
             get { return filterText; }
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }

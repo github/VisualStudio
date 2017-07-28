@@ -88,7 +88,6 @@ namespace GitHub.VisualStudio
         }
     }
 
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]

@@ -6,19 +6,12 @@ using System.Linq;
 
 namespace GitHub.Extensions
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public static class Guard
     {
         public static void ArgumentNotNull(object value, string name)
         {
             if (value != null) return;
             string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
-#if DEBUG
-            if (!InUnitTestRunner)
-            {
-                Debug.Fail(message);
-            }
-#endif
             throw new ArgumentNullException(name, message);
         }
 
@@ -27,12 +20,6 @@ namespace GitHub.Extensions
             if (value > -1) return;
 
             var message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must be non-negative", name);
-#if DEBUG
-            if (!InUnitTestRunner)
-            {
-                Debug.Fail(message);
-            }
-#endif
             throw new ArgumentException(message, name);
         }
 
@@ -45,12 +32,6 @@ namespace GitHub.Extensions
         {
             if (value?.Length > 0) return;
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
-#if DEBUG
-            if (!InUnitTestRunner)
-            {
-                Debug.Fail(message);
-            }
-#endif
             throw new ArgumentException(message, name);
         }
 
@@ -62,12 +43,6 @@ namespace GitHub.Extensions
                 value,
                 name,
                 minValue);
-#if DEBUG
-            if (!InUnitTestRunner)
-            {
-                Debug.Fail(message);
-            }
-#endif
             throw new ArgumentOutOfRangeException(name, message);
         }
 
@@ -80,12 +55,6 @@ namespace GitHub.Extensions
                 name,
                 minValue,
                 maxValue);
-#if DEBUG
-            if (!InUnitTestRunner)
-            {
-                Debug.Fail(message);
-            }
-#endif
             throw new ArgumentOutOfRangeException(name, message);
         }
 
