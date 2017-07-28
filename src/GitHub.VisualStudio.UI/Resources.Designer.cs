@@ -601,6 +601,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to These features might change in a future version.
+        /// </summary>
+        public static string Options_ExperimentalNote {
+            get {
+                return ResourceManager.GetString("Options_ExperimentalNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Experimental features.
+        /// </summary>
+        public static string Options_ExperimentalTitle {
+            get {
+                return ResourceManager.GetString("Options_ExperimentalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
         /// </summary>
         public static string Options_MetricsLabel {
@@ -615,15 +633,6 @@ namespace GitHub.VisualStudio.UI {
         public static string Options_PrivacyTitle {
             get {
                 return ResourceManager.GetString("Options_PrivacyTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Pull Requests.
-        /// </summary>
-        public static string Options_PullRequestsTitle {
-            get {
-                return ResourceManager.GetString("Options_PullRequestsTitle", resourceCulture);
             }
         }
         

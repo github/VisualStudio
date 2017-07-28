@@ -386,7 +386,10 @@
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
     <value>Show PR comments on editor margin</value>
   </data>
-  <data name="Options_PullRequestsTitle" xml:space="preserve">
-    <value>Pull Requests</value>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>Experimental features</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>These features might change in a future version</value>
   </data>
 </root>
