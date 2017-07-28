@@ -15,6 +15,7 @@ namespace GitHub.InlineReviews.ViewModels
         readonly bool isDiffView;
 
         bool visible;
+        bool disposed;
 
         public GlyphMarginViewModel(IPackageSettings packageSettings, IPullRequestSessionManager sessionManager,
             IWpfTextViewHost wpfTextViewHost, bool isDiffView)
@@ -30,7 +31,18 @@ namespace GitHub.InlineReviews.ViewModels
 
         public void Dispose()
         {
-            packageSettings.PropertyChanged -= PackageSettings_PropertyChanged;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+            if (disposing)
+            {
+                disposed = true;
+                packageSettings.PropertyChanged -= PackageSettings_PropertyChanged;
+            }
         }
 
         void PackageSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
