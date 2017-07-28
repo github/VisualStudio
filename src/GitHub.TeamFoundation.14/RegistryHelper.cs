@@ -63,13 +63,29 @@ namespace GitHub.TeamFoundation
             {
                 var newProjectKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true) ??
                                     Microsoft.Win32.Registry.CurrentUser.CreateSubKey(NewProjectDialogKeyPath);
-                Debug.Assert(newProjectKey != null, string.Format(CultureInfo.CurrentCulture, "Could not open or create registry key '{0}'", NewProjectDialogKeyPath));
+
+                if (newProjectKey == null)
+                {
+                    throw new GitHubLogicException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            "Could not open or create registry key '{0}'",
+                            NewProjectDialogKeyPath));
+                }
 
                 using (newProjectKey)
                 {
                     var mruKey = newProjectKey.OpenSubKey(MRUKeyPath, true) ??
                                  Microsoft.Win32.Registry.CurrentUser.CreateSubKey(MRUKeyPath);
-                    Debug.Assert(mruKey != null, string.Format(CultureInfo.CurrentCulture, "Could not open or create registry key '{0}'", MRUKeyPath));
+
+                    if (mruKey == null)
+                    {
+                        throw new GitHubLogicException(
+                            string.Format(
+                                CultureInfo.CurrentCulture,
+                                "Could not open or create registry key '{0}'",
+                                MRUKeyPath));
+                    }
 
                     using (mruKey)
                     {

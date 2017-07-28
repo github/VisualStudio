@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GitHub.UI.Controls.Octicons;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -35,7 +34,6 @@ namespace GitHub.UI
 
         public Octicon Icon
         {
-            [return: AllowNull]
             get { return (Octicon)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }

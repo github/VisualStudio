@@ -1,7 +1,6 @@
 ﻿using System;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
-using NullGuard;
 using GitHub.Services;
 using System.Diagnostics;
 using GitHub.Api;
@@ -30,7 +29,6 @@ namespace GitHub.VisualStudio.Base
         }
 
         object sectionContent;
-        [AllowNull]
         public object SectionContent
         {
             get { return sectionContent; }
@@ -38,14 +36,12 @@ namespace GitHub.VisualStudio.Base
         }
 
         string title;
-        [AllowNull]
         public string Title
         {
             get { return title; }
             set { title = value; this.RaisePropertyChange(); }
         }
 
-        [return: AllowNull]
         public virtual object GetExtensibilityService(Type serviceType)
         {
             return null;
@@ -54,6 +50,9 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider, ITeamExplorerServiceHolder holder)
             : base(serviceProvider, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+
             IsVisible = false;
             IsEnabled = true;
             IsExpanded = true;
@@ -63,6 +62,10 @@ namespace GitHub.VisualStudio.Base
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
             : base(serviceProvider, apiFactory, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+
             IsVisible = false;
             IsEnabled = true;
             IsExpanded = true;
@@ -71,6 +74,10 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider,
             ITeamExplorerServiceHolder holder, IConnectionManager cm) : this(serviceProvider, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(cm, nameof(cm));
+
             connectionManager = cm;
         }
 
@@ -78,6 +85,11 @@ namespace GitHub.VisualStudio.Base
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
             IConnectionManager cm) : this(serviceProvider, apiFactory, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(cm, nameof(cm));
+
             connectionManager = cm;
         }
 
@@ -87,6 +99,8 @@ namespace GitHub.VisualStudio.Base
 
         void ITeamExplorerSection.Initialize(object sender, SectionInitializeEventArgs e)
         {
+            Guard.ArgumentNotNull(e, nameof(e));
+
             Initialize(e.ServiceProvider);
         }
 
