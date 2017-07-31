@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GitHub.InlineReviews.Views.CommentView"
+﻿<views:GenericCommentView x:Class="GitHub.InlineReviews.Views.CommentView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,16 +9,17 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
+             xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:CommentViewModelDesigner EditState="Editing">
+        <sample:CommentViewModelDesigner EditState="None">
             <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:CommentViewModelDesigner.Body>
         </sample:CommentViewModelDesigner>
     </d:DesignProperties.DataContext>
 
-    <UserControl.Resources>
+    <FrameworkElement.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
@@ -28,7 +29,7 @@
 
             <Style TargetType="Button" BasedOn="{StaticResource GitHubVsButton}"/>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </FrameworkElement.Resources>
 
     <Grid>
         <!-- Displays an existing comment-->
@@ -63,7 +64,10 @@
                 <Border Background="#FFF6F8FA" Padding="6 5" BorderThickness="1 1 1 0" BorderBrush="#FFD1D5DA" CornerRadius="2 2 0 0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
-                        <TextBlock Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+                        <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
+                                             Command="{Binding OpenOnGitHub}"
+                                             Foreground="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBlock}, AncestorLevel=1}, Path=Foreground}"
+                                             Margin="2 0"/>
                     </StackPanel>
                 </Border>
 
@@ -170,4 +174,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</UserControl>
+</views:GenericCommentView>

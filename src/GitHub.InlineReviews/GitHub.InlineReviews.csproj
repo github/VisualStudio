@@ -172,10 +172,6 @@
       <Project>{1CE2D235-8072-4649-BA5A-CFB1AF8776E0}</Project>
       <Name>ReactiveUI_Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}</Project>
-      <Name>Rothko</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
@@ -195,6 +191,10 @@
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}</Project>
       <Name>GitHub.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
+      <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
+      <Name>GitHub.UI.Reactive</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
@@ -344,6 +344,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>

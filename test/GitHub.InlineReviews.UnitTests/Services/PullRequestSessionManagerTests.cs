@@ -16,6 +16,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
         const int CurrentBranchPullRequestNumber = 15;
         const int NotCurrentBranchPullRequestNumber = 10;
 
+        public PullRequestSessionManagerTests()
+        {
+            Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+        }
+
         [Fact]
         public void CreatesSessionForCurrentBranch()
         {
