@@ -350,6 +350,7 @@ namespace GitHub.ViewModels
             {
                 var firstLoad = (Model == null);
                 Model = pullRequest;
+                RemoteRepository = remoteRepository;
                 Session = await sessionManager.GetSession(pullRequest);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
