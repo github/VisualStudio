@@ -1,9 +1,7 @@
 ﻿using System;
-using NullGuard;
 
 namespace GitHub.Models
 {
-    [NullGuard(ValidationFlags.None)]
     public class PullRequestReviewCommentModel : IPullRequestReviewCommentModel
     {
         public int Id { get; set; }

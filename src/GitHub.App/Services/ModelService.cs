@@ -16,7 +16,6 @@ using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Primitives;
 using NLog;
-using NullGuard;
 using Octokit;
 
 namespace GitHub.Services
@@ -525,27 +524,15 @@ namespace GitHub.Services
             public long Id { get; set; }
 
             public string Name { get; set; }
-            [AllowNull]
-            public AccountCacheItem Owner
-            {
-                [return: AllowNull]
-                get; set;
-            }
+            public AccountCacheItem Owner { get; set; }
             public string CloneUrl { get; set; }
             public bool Private { get; set; }
             public bool Fork { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
-
-            [AllowNull]
-            public RepositoryCacheItem Parent
-            {
-                [return: AllowNull]
-                get; set;
-            }
+            public RepositoryCacheItem Parent { get; set; }
         }
 
-        [NullGuard(ValidationFlags.None)]
         public class PullRequestCacheItem : CacheItem
         {
             public static PullRequestCacheItem Create(PullRequest pr)
@@ -647,7 +634,6 @@ namespace GitHub.Services
             }
         }
 
-        [NullGuard(ValidationFlags.None)]
         public class PullRequestFileCacheItem
         {
             public PullRequestFileCacheItem()
@@ -666,7 +652,6 @@ namespace GitHub.Services
             public PullRequestFileStatus Status { get; set; }
         }
 
-        [NullGuard(ValidationFlags.None)]
         public class IssueCommentCacheItem
         {
             public IssueCommentCacheItem()
@@ -687,7 +672,6 @@ namespace GitHub.Services
             public DateTimeOffset? CreatedAt { get; set; }
         }
 
-        [NullGuard(ValidationFlags.None)]
         public class PullRequestReviewCommentCacheItem
         {
             public PullRequestReviewCommentCacheItem()
@@ -720,7 +704,6 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
         }
 
-        [NullGuard(ValidationFlags.None)]
         public class GitReferenceCacheItem
         {
             public string Ref { get; set; }

@@ -8,13 +8,11 @@ using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using NLog;
-using NullGuard;
 
 namespace GitHub.Services
 {
     [Export(typeof(IGitClient))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    [NullGuard(ValidationFlags.None)]
     public class GitClient : IGitClient
     {
         const string defaultOriginName = "origin";
@@ -27,6 +25,8 @@ namespace GitHub.Services
         [ImportingConstructor]
         public GitClient(IGitHubCredentialProvider credentialProvider)
         {
+            Guard.ArgumentNotNull(credentialProvider, nameof(credentialProvider));
+
             pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             pullOptions = new PullOptions
@@ -191,7 +191,7 @@ namespace GitHub.Services
             });
         }
 
-        public Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, [AllowNull] byte[] contents)
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
@@ -281,6 +281,9 @@ namespace GitHub.Services
 
         public Task<Remote> GetHttpRemote(IRepository repo, string remote)
         {
+            Guard.ArgumentNotNull(repo, nameof(repo));
+            Guard.ArgumentNotEmptyString(remote, nameof(remote));
+
             return Task.Factory.StartNew(() =>
             {
                 var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
@@ -292,9 +295,12 @@ namespace GitHub.Services
             });
         }
 
-        [return: AllowNull]
         public Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
+            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
+
             return Task.Factory.StartNew(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
@@ -308,9 +314,12 @@ namespace GitHub.Services
             });
         }
 
-        [return: AllowNull]
         public Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
+            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
+
             return Task.Factory.StartNew(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
@@ -335,9 +344,11 @@ namespace GitHub.Services
             });
         }
 
-
-        public Task<bool> IsModified(IRepository repository, string path, [AllowNull] byte[] contents)
+        public Task<bool> IsModified(IRepository repository, string path, byte[] contents)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
             return Task.Factory.StartNew(() =>
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
@@ -364,6 +375,11 @@ namespace GitHub.Services
         public async Task<string> GetPullRequestMergeBase(IRepository repo,
             UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
         {
+            Guard.ArgumentNotNull(repo, nameof(repo));
+            Guard.ArgumentNotNull(baseCloneUrl, nameof(baseCloneUrl));
+            Guard.ArgumentNotNull(headCloneUrl, nameof(headCloneUrl));
+            Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
+
             var baseCommit = repo.Lookup<Commit>(baseSha);
             if (baseCommit == null)
             {
@@ -397,9 +413,20 @@ namespace GitHub.Services
 
         public Task<bool> IsHeadPushed(IRepository repo)
         {
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
             return Task.Factory.StartNew(() =>
             {
-                return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
+                if (repo.Head.IsTracking)
+                {
+                    var trackedBranchTip = repo.Head.TrackedBranch.Tip;
+                    if (trackedBranchTip != null)
+                    {
+                        return repo.Head.Tip.Sha == trackedBranchTip.Sha;
+                    }
+                }
+
+                return false;
             });
         }
 
@@ -425,6 +452,8 @@ namespace GitHub.Services
 
         static bool IsCanonical(string s)
         {
+            Guard.ArgumentNotEmptyString(s, nameof(s));
+
             return s.StartsWith("refs/", StringComparison.Ordinal);
         }
     }

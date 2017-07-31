@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GitHub.Extensions;
 using Newtonsoft.Json;
-using NullGuard;
 using Octokit;
 
 namespace GitHub.Services
@@ -14,29 +13,39 @@ namespace GitHub.Services
         readonly ErrorMessage defaultMessage;
         readonly Func<Exception, ErrorMessage> translator;
 
-        public Translation([AllowNull]string original, string heading, string message)
+        public Translation(string original, string heading, string message)
         {
+            Guard.ArgumentNotNull(heading, nameof(heading));
+            Guard.ArgumentNotNull(message, nameof(message));
+
             Original = original;
             defaultMessage = new ErrorMessage(heading, message);
         }
 
-        public Translation([AllowNull]string original, Func<Exception, ErrorMessage> translator)
+        public Translation(string original, Func<Exception, ErrorMessage> translator)
         {
+            Guard.ArgumentNotNull(translator, nameof(translator));
+
             Original = original;
             this.translator = translator;
         }
 
-        public Translation([AllowNull]string original, string heading, string messageFormatString, Func<Exception, string> translator)
+        public Translation(string original, string heading, string messageFormatString, Func<Exception, string> translator)
             : this(original, heading, messageFormatString)
         {
+            Guard.ArgumentNotNull(heading, nameof(heading));
+            Guard.ArgumentNotNull(messageFormatString, nameof(messageFormatString));
+            Guard.ArgumentNotNull(translator, nameof(translator));
+
             this.translator = e => new ErrorMessage(heading, String.Format(CultureInfo.InvariantCulture, messageFormatString, translator(e)));
         }
 
         public string Original { get; private set; }
 
-        [return: AllowNull]
         public ErrorMessage Translate(Exception exception)
         {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
             var match = Match(exception);
             if (match == null) return null;
 
@@ -64,6 +73,8 @@ namespace GitHub.Services
         // Returns a tuple indicating whether this translation is a match for the exception and the regex line if existing.
         protected virtual Tuple<Translation, string> Match(Exception exception)
         {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
             string exceptionMessage = exception.Message;
 
             var apiException = exception as ApiValidationException;
@@ -105,14 +116,19 @@ namespace GitHub.Services
     {
         public Translation(string heading, string message) : base(null, heading, message)
         {
+            Guard.ArgumentNotNull(heading, nameof(heading));
+            Guard.ArgumentNotNull(message, nameof(message));
         }
 
         public Translation(string heading) : base(null, e => new ErrorMessage(heading, e.Message))
         {
+            Guard.ArgumentNotNull(heading, nameof(heading));
         }
 
         protected override Tuple<Translation, string> Match(Exception exception)
         {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
             if (exception is TException) return new Tuple<Translation, string>(null, null);
             return null;
         }

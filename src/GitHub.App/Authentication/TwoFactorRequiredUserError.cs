@@ -1,5 +1,5 @@
 ﻿using System;
-using NullGuard;
+using GitHub.Extensions;
 using Octokit;
 using ReactiveUI;
 
@@ -10,6 +10,8 @@ namespace GitHub.Authentication
         public TwoFactorRequiredUserError(TwoFactorAuthorizationException exception)
             : base(exception.Message, innerException: exception)
         {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
             TwoFactorType = exception.TwoFactorType;
             RetryFailed = exception is TwoFactorChallengeFailedException;
         }

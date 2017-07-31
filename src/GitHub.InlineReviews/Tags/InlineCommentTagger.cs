@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 using System.Collections;
+using GitHub.Helpers;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -94,6 +95,8 @@ namespace GitHub.InlineReviews.Tags
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
+            var result = new List<ITagSpan<InlineCommentTag>>();
+
             if (!initialized)
             {
                 // Sucessful initialization will call NotifyTagsChanged, causing this method to be re-called.
@@ -122,9 +125,9 @@ namespace GitHub.InlineReviews.Tags
                             trackingPoints[thread] = trackingPoint;
                             linesWithComments[thread.LineNumber - startLine] = true;
 
-                            yield return new TagSpan<ShowInlineCommentTag>(
+                            result.Add(new TagSpan<ShowInlineCommentTag>(
                                 new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineCommentTag(session, thread));
+                                new ShowInlineCommentTag(session, thread)));
                         }
                     }
 
@@ -140,14 +143,16 @@ namespace GitHub.InlineReviews.Tags
                                 && (!leftHandSide || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
-                                yield return new TagSpan<InlineCommentTag>(
+                                result.Add(new TagSpan<InlineCommentTag>(
                                     new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
-                                    new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type));
+                                    new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type)));
                             }
                         }
                     }
                 }
             }
+
+            return result;
         }
 
         Task<byte[]> IEditorContentSource.GetContent()
@@ -292,7 +297,7 @@ namespace GitHub.InlineReviews.Tags
 
         async Task Rebuild(ITextSnapshot snapshot)
         {
-            if (buffer.CurrentSnapshot == snapshot)
+            if (buffer.CurrentSnapshot == snapshot && session != null)
             {
                 await session.UpdateEditorContent(relativePath);
 

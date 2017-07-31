@@ -14,7 +14,6 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using LibGit2Sharp;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -24,7 +23,6 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
         readonly IModelService modelService;
@@ -308,7 +306,7 @@ namespace GitHub.ViewModels
         /// Initializes the view model with new data.
         /// </summary>
         /// <param name="data"></param>
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
             int number;
             var repo = RemoteRepository;

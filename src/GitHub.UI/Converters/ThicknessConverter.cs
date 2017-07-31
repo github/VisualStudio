@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -9,9 +8,9 @@ namespace GitHub.UI
     {
         public object Convert(
             object value,
-            [AllowNull]Type targetType,
-            [AllowNull]object parameter,
-            [AllowNull]System.Globalization.CultureInfo culture)
+            Type targetType,
+            object parameter,
+            System.Globalization.CultureInfo culture)
         {
             var t = ((Thickness)value);
 

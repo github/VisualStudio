@@ -152,7 +152,7 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequest = pullRequest;
 
-            foreach (var file in this.fileIndex.Values)
+            foreach (var file in this.fileIndex.Values.ToList())
             {
                 await UpdateFile(file);
             }
