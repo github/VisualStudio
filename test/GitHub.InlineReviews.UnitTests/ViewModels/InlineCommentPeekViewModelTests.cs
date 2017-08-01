@@ -275,7 +275,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var session = Substitute.For<IPullRequestSession>();
             session.GetFile(RelativePath).Returns(file);
             session.GetRelativePath(FullPath).Returns(RelativePath);
-            session.Repository.CloneUrl.Returns(new UriString("https://foo.bar"));
+            session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
 
             var result = Substitute.For<IPullRequestSessionManager>();
             result.CurrentSession.Returns(session);

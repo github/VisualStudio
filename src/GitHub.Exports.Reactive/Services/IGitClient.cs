@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using LibGit2Sharp;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -38,6 +39,20 @@ namespace GitHub.Services
         /// <param name="refspecs">The custom refspecs</param>
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
+
+        /// <summary>
+        /// Fetches from a remote URI, using custom refspecs. 
+        /// </summary>
+        /// <remarks>
+        /// If the URI is the same as origin then origin will be used, otherwise a
+        /// temporary remote will be created for the fetch. The fetch will always be made
+        /// using HTTPS.
+        /// </remarks>
+        /// <param name="repository">The repository to pull</param>
+        /// <param name="remoteUri">The remote URI to fetch from</param>
+        /// <param name="refspecs">The custom refspecs</param>
+        /// <returns></returns>
+        Task Fetch(IRepository repository, UriString remoteUri, params string[] refspecs);
 
         /// <summary>
         /// Checks out a branch.
@@ -172,7 +187,8 @@ namespace GitHub.Services
         /// Find the merge base SHA between two commits.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="remoteName">The name of the remote (e.g. 'origin').</param>
+        /// <param name="baseCloneUrl">The clone url of the PR base.</param>
+        /// <param name="headCloneUrl">The clone url of the PR head.</param>
         /// <param name="baseSha">The PR base SHA.</param>
         /// <param name="headSha">The PR head SHA.</param>
         /// <param name="baseRef">The PR base ref (e.g. 'master').</param>
@@ -180,7 +196,7 @@ namespace GitHub.Services
         /// <returns>
         /// The merge base SHA or null.
         /// </returns>
-        Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber);
+        Task<string> GetPullRequestMergeBase(IRepository repo, UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef);
 
         /// Checks whether the current head is pushed to its remote tracking branch.
         /// </summary>

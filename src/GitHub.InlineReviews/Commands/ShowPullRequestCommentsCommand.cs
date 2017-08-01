@@ -56,7 +56,7 @@ namespace GitHub.InlineReviews.Commands
             }
 
             var session = await sessionManager.GetSession(pullRequest);
-            var address = HostAddress.Create(session.Repository.CloneUrl);
+            var address = HostAddress.Create(session.LocalRepository.CloneUrl);
             var apiClient = await apiClientFactory.Create(address);
             await window.Initialize(session, apiClient);
 

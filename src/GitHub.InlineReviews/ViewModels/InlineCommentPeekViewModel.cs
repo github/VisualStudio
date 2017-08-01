@@ -140,7 +140,7 @@ namespace GitHub.InlineReviews.ViewModels
             var thread = file.InlineCommentThreads.FirstOrDefault(x => 
                 x.LineNumber == lineNumber &&
                 (!leftBuffer || x.DiffLineType == DiffChangeType.Delete));
-            var apiClient = await CreateApiClient(session.Repository);
+            var apiClient = await CreateApiClient(session.LocalRepository);
 
             if (thread != null)
             {
