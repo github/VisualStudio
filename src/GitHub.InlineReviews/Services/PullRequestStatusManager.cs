@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
 using GitHub.InlineReviews.Views;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -30,7 +31,8 @@ namespace GitHub.InlineReviews.Services
                 var githubStatusBar = FindPullRequestStatusView(statusBar);
                 if (githubStatusBar == null)
                 {
-                    var view = new PullRequestStatusView { Name = GitHubStatusName };
+                    var viewModel = new PullRequestStatusViewModel { Number = 666, Title = "A beast of a PR" };
+                    var view = new PullRequestStatusView { Name = GitHubStatusName, DataContext = viewModel };
                     statusBar.Items.Insert(0, view);
                 }
             }
