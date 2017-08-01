@@ -77,6 +77,8 @@
     <Compile Include="Models\InlineCommentThreadModel.cs" />
     <Compile Include="Models\PullRequestSessionLiveFile.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
+    <Compile Include="Services\IPullRequestStatusManager.cs" />
+    <Compile Include="Services\PullRequestStatusManager.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
@@ -145,6 +147,9 @@
     </Compile>
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PullRequestStatusView.xaml.cs">
+      <DependentUpon>PullRequestStatusView.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
@@ -426,6 +431,10 @@
     <Page Include="Views\CommentView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PullRequestStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup />
