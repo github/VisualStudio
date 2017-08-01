@@ -6,10 +6,11 @@ using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
+using GitHub.Services;
+using System.ComponentModel;
 
 namespace GitHub.InlineReviews.Services
 {
-
     [Export(typeof(IPullRequestStatusManager))]
     public class PullRequestStatusManager : IPullRequestStatusManager
     {
@@ -17,9 +18,41 @@ namespace GitHub.InlineReviews.Services
         const string GitHubStatusName = "GitHubStatusView";
 
         readonly Window mainWindow;
+        readonly IPullRequestSessionManager pullRequestSessionManager;
+        readonly PullRequestStatusViewModel pullRequestStatusViewModel;
 
-        public PullRequestStatusManager()
+        [ImportingConstructor]
+        public PullRequestStatusManager(IPullRequestSessionManager pullRequestSessionManager) : this(new PullRequestStatusViewModel())
         {
+            this.pullRequestSessionManager = pullRequestSessionManager;
+
+            RefreshCurrentSession();
+            pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+        }
+
+        void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PullRequestSessionManager.CurrentSession))
+            {
+                RefreshCurrentSession();
+            }
+        }
+
+        void RefreshCurrentSession()
+        {
+            var currentSession = pullRequestSessionManager.CurrentSession;
+            var pullRequest = currentSession?.PullRequest;
+
+            if (pullRequest != null)
+            {
+                pullRequestStatusViewModel.Number = pullRequest.Number;
+                pullRequestStatusViewModel.Title = pullRequest.Title;
+            }
+        }
+
+        public PullRequestStatusManager(PullRequestStatusViewModel pullRequestStatusViewModel)
+        {
+            this.pullRequestStatusViewModel = pullRequestStatusViewModel;
             mainWindow = Application.Current.MainWindow;
         }
 
@@ -31,8 +64,7 @@ namespace GitHub.InlineReviews.Services
                 var githubStatusBar = FindPullRequestStatusView(statusBar);
                 if (githubStatusBar == null)
                 {
-                    var viewModel = new PullRequestStatusViewModel { Number = 666, Title = "A beast of a PR" };
-                    var view = new PullRequestStatusView { Name = GitHubStatusName, DataContext = viewModel };
+                    var view = new PullRequestStatusView { Name = GitHubStatusName, DataContext = pullRequestStatusViewModel };
                     statusBar.Items.Insert(0, view);
                 }
             }
@@ -110,7 +142,8 @@ namespace GitHub.InlineReviews.Services
             [STAThread]
             void Install()
             {
-                var provider = new PullRequestStatusManager();
+                var viewModel = new PullRequestStatusViewModel { Number = 666, Title = "A beast of a PR" };
+                var provider = new PullRequestStatusManager(viewModel);
                 provider.HideStatus();
                 provider.ShowStatus();
             }
