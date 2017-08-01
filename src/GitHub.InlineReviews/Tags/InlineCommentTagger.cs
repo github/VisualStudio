@@ -240,7 +240,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (snapshot == null) return;
 
-            var repository = gitService.GetRepository(session.Repository.LocalPath);
+            var repository = gitService.GetRepository(session.LocalRepository.LocalPath);
             file = await session.GetFile(relativePath, !leftHandSide ? this : null);
 
             if (file == null) return;

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using GitHub.App;
 using GitHub.Collections;
@@ -26,12 +28,13 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IRepositoryHost repositoryHost;
-        readonly ILocalRepositoryModel repository;
+        readonly ILocalRepositoryModel localRepository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
+        IRemoteRepositoryModel remoteRepository;
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -56,7 +59,7 @@ namespace GitHub.ViewModels
 
             constructing = true;
             this.repositoryHost = repositoryHost;
-            this.repository = repository;
+            this.localRepository = repository;
             this.settings = settings;
 
             Title = Resources.PullRequestsNavigationItemText;
@@ -81,9 +84,7 @@ namespace GitHub.ViewModels
             Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
             Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
 
-            PullRequests = new TrackingCollection<IPullRequestModel>();
-            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
-            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            CreatePullRequests();
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
@@ -97,6 +98,10 @@ namespace GitHub.ViewModels
                 .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
+            this.WhenAnyValue(x => x.SelectedRepository)
+                .Skip(1)
+                .Subscribe(_ => ResetAndLoad());
+
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
             OpenPullRequest = ReactiveCommand.Create();
             OpenPullRequest.Subscribe(DoOpenPullRequest);
@@ -109,10 +114,25 @@ namespace GitHub.ViewModels
         public override void Initialize(ViewWithData data)
         {
             base.Initialize(data);
+            Load().Forget();
+        }
 
+        async Task Load()
+        {
             IsBusy = true;
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
+            if (remoteRepository == null)
+            {
+                remoteRepository = await repositoryHost.ModelService.GetRepository(
+                    localRepository.Owner,
+                    localRepository.Name);
+                Repositories = remoteRepository.IsFork ?
+                    new[] { remoteRepository.Parent, remoteRepository } :
+                    new[] { remoteRepository };
+                SelectedRepository = Repositories[0];
+            }
+
+            PullRequests = repositoryHost.ModelService.GetPullRequests(SelectedRepository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -143,7 +163,7 @@ namespace GitHub.ViewModels
                     {
                         SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
                     }
- 
+
                     IsBusy = false;
                     UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
                 });
@@ -165,6 +185,20 @@ namespace GitHub.ViewModels
         {
             get { return isBusy; }
             private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+        }
+
+        IReadOnlyList<IRemoteRepositoryModel> repositories;
+        public IReadOnlyList<IRemoteRepositoryModel> Repositories
+        {
+            get { return repositories; }
+            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
+        }
+
+        IRemoteRepositoryModel selectedRepository;
+        public IRemoteRepositoryModel SelectedRepository
+        {
+            get { return selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
 
         ITrackingCollection<IPullRequestModel> pullRequests;
@@ -254,6 +288,20 @@ namespace GitHub.ViewModels
             GC.SuppressFinalize(this);
         }
 
+        void CreatePullRequests()
+        {
+            PullRequests = new TrackingCollection<IPullRequestModel>();
+            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+        }
+
+        void ResetAndLoad()
+        {
+            CreatePullRequests();
+            UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
+            Load().Forget();
+        }
+
         void SaveSettings()
         {
             if (!constructing)
@@ -269,7 +317,15 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
 
-            var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = pullRequest };
+            var d = new ViewWithData(UIControllerFlow.PullRequestDetail)
+            {
+                Data = new PullRequestDetailArgument
+                {
+                    Repository = SelectedRepository,
+                    Number = (int)pullRequest,
+                }
+            };
+
             navigate.OnNext(d);
         }
 

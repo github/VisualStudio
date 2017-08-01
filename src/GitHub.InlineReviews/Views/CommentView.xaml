@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
              xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
@@ -27,21 +28,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Button" BasedOn="{StaticResource GitHubVsButton}"/>
-
-            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
-                <Setter Property="FontFamily" Value="Segoe UI"/>
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="TextAlignment" Value="Left"/>
-                <Setter Property="PagePadding" Value="0"/>
-
-                <Style.Resources>
-                    <Style TargetType="Image">
-                        <Setter Property="Stretch" Value="UniformToFill" />
-                        <Setter Property="StretchDirection" Value="DownOnly" />
-                        <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
-                    </Style>
-                </Style.Resources>
-            </Style>
         </ResourceDictionary>
     </FrameworkElement.Resources>
 
@@ -86,10 +72,8 @@
                 </Border>
 
                 <Border Background="White" Padding="6 5" BorderThickness="1" BorderBrush="#FFD1D5DA" CornerRadius="0 0 2 2 ">
-                    <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
-                                   DocumentStyle="{StaticResource DocumentStyle}"
-                                   RawContent="{Binding Body}"
-                                   ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                    <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                                            Markdown="{Binding Body}"/>
                 </Border>
             </StackPanel>
         </Grid>

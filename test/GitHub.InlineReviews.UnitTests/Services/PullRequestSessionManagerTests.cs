@@ -38,7 +38,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
         public void CurrentSessionIsNullIfNoPullRequestForCurrentBranch()
         {
             var service = CreatePullRequestService();
-            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<int>());
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
 
             var target = new PullRequestSessionManager(
                 service,
@@ -62,7 +62,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
             var session = target.CurrentSession;
 
-            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(22));
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
             teService.NotifyActiveRepoChanged();
 
             Assert.NotSame(session, target.CurrentSession);
@@ -136,6 +136,23 @@ namespace GitHub.InlineReviews.UnitTests.Services
         }
 
         [Fact]
+        public async Task GetSessionReturnsNewSessionForPullRequestWithDifferentBaseOwner()
+        {
+            var target = new PullRequestSessionManager(
+                CreatePullRequestService(),
+                Substitute.For<IPullRequestSessionService>(),
+                CreateRepositoryHosts(),
+                new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+
+            var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber, "https://github.com/fork/repo");
+            var result = await target.GetSession(newModel);
+
+            Assert.NotSame(target.CurrentSession, result);
+            Assert.Same(result.PullRequest, newModel);
+            Assert.False(result.IsCheckedOut);
+        }
+
+        [Fact]
         public async Task GetSessionReturnsSameSessionEachTime()
         {
             var target = new PullRequestSessionManager(
@@ -186,7 +203,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
         {
             var service = CreatePullRequestService();
 
-            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<int>());
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
 
             var target = new PullRequestSessionManager(
                 service,
@@ -199,34 +216,66 @@ namespace GitHub.InlineReviews.UnitTests.Services
             var model = CreatePullRequestModel(CurrentBranchPullRequestNumber);
 
             service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<ILocalRepositoryModel>(), model).Returns(Observable.Return(true));
-            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(CurrentBranchPullRequestNumber));
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("owner", CurrentBranchPullRequestNumber)));
 
             var session = await target.GetSession(model);
 
             Assert.Same(session, target.CurrentSession);
         }
 
-        IPullRequestModel CreatePullRequestModel(int number)
+        [Fact]
+        public void ReadsPullRequestFromCorrectFork()
+        {
+            var service = CreatePullRequestService();
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
+                Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
+
+            var repositoryHosts = CreateRepositoryHosts();
+            var repositoryModel = CreateRepositoryModel();
+            var target = new PullRequestSessionManager(
+                service,
+                Substitute.For<IPullRequestSessionService>(),
+                repositoryHosts,
+                new FakeTeamExplorerServiceHolder(repositoryModel));
+
+            var modelService = repositoryHosts.LookupHost(HostAddress.Create(repositoryModel.CloneUrl)).ModelService;
+            modelService.Received(1).GetPullRequest("fork", "repo", 15);
+        }
+
+        [Fact]
+        public void CreatesSessionWithCorrectRepositoryOwner()
+        {
+            var target = new PullRequestSessionManager(
+                CreatePullRequestService("this-owner"),
+                Substitute.For<IPullRequestSessionService>(),
+                CreateRepositoryHosts(),
+                new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+
+            Assert.Equal("this-owner", target.CurrentSession.RepositoryOwner);
+        }
+
+        IPullRequestModel CreatePullRequestModel(int number, string cloneUrl = "https://github.com/owner/repo")
         {
             var result = Substitute.For<IPullRequestModel>();
             result.Number.Returns(number);
+            result.Base.Returns(new GitReferenceModel("BASEREF", "pr", "BASESHA", cloneUrl));
             return result;
         }
 
-        IPullRequestService CreatePullRequestService()
+        IPullRequestService CreatePullRequestService(string owner = "owner")
         {
             var result = Substitute.For<IPullRequestService>();
-            result.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(CurrentBranchPullRequestNumber));
+            result.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create(owner, CurrentBranchPullRequestNumber)));
             return result;
         }
 
         IRepositoryHosts CreateRepositoryHosts()
         {
             var modelService = Substitute.For<IModelService>();
-            modelService.GetPullRequest(null, 0).ReturnsForAnyArgs(x =>
+            modelService.GetPullRequest(null, null, 0).ReturnsForAnyArgs(x =>
             {
-                var pr = Substitute.For<IPullRequestModel>();
-                pr.Number.Returns(x.Arg<int>());
+                var cloneUrl = $"https://github.com/{x.ArgAt<string>(0)}/{x.ArgAt<string>(1)}";
+                var pr = CreatePullRequestModel(x.ArgAt<int>(2), cloneUrl);
                 return Observable.Return(pr);
             });
 
@@ -241,7 +290,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
         ILocalRepositoryModel CreateRepositoryModel(string cloneUrl = "https://github.com/owner/repo")
         {
             var result = Substitute.For<ILocalRepositoryModel>();
-            result.CloneUrl.Returns(new UriString(cloneUrl));
+            var uriString = new UriString(cloneUrl);
+            result.CloneUrl.Returns(uriString);
+            result.Name.Returns(uriString.RepositoryName);
+            result.Owner.Returns(uriString.Owner);
             return result;
         }
     }

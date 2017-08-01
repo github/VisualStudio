@@ -1,18 +1,19 @@
 ﻿using System;
 using System.IO;
+using System.IO.Packaging;
 using System.Windows;
 
 namespace GitHub.UI.Helpers.UnitTests
 {
     class ResourceDictionaryUtilities
     {
+        public static string PackUriScheme { get; private set; }
+
         public static Uri ToPackUri(string url)
         {
-            if (!UriParser.IsKnownScheme("pack"))
-            {
-                // Register the pack scheme.
-                new Application();
-            }
+            // Calling `Application.Current` will install pack URI scheme via Application.cctor.
+            // This is needed when unit testing for the pack:// URL format to be understood.
+            if (Application.Current != null) { }
 
             return new Uri(url);
         }
