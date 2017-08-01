@@ -6,10 +6,11 @@
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="60">
-    <UserControl.ToolTip>
-        <TextBlock Text="{Binding Title}" />
-    </UserControl.ToolTip>
-    <Grid>
+
+    <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
         <TextBlock>PR# <Run Text="{Binding Number}" /></TextBlock>
+        <Grid.ToolTip>
+            <TextBlock Text="{Binding Title}" />
+        </Grid.ToolTip>
     </Grid>
 </UserControl>

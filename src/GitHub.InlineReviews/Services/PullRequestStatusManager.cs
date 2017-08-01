@@ -40,14 +40,9 @@ namespace GitHub.InlineReviews.Services
 
         void RefreshCurrentSession()
         {
-            var currentSession = pullRequestSessionManager.CurrentSession;
-            var pullRequest = currentSession?.PullRequest;
-
-            if (pullRequest != null)
-            {
-                pullRequestStatusViewModel.Number = pullRequest.Number;
-                pullRequestStatusViewModel.Title = pullRequest.Title;
-            }
+            var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
+            pullRequestStatusViewModel.Number = pullRequest?.Number;
+            pullRequestStatusViewModel.Title = pullRequest?.Title;
         }
 
         public PullRequestStatusManager(PullRequestStatusViewModel pullRequestStatusViewModel)

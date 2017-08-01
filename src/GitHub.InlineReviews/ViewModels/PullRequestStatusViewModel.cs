@@ -5,10 +5,10 @@ namespace GitHub.InlineReviews.ViewModels
 {
     public class PullRequestStatusViewModel : INotifyPropertyChanged
     {
-        int number;
+        int? number;
         string title;
 
-        public int Number
+        public int? Number
         {
             get { return number; }
             set
@@ -20,7 +20,6 @@ namespace GitHub.InlineReviews.ViewModels
                 }
             }
         }
-
 
         public string Title
         {
