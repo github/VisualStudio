@@ -50,6 +50,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -90,6 +91,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var file = await target.GetFile(FilePath);
@@ -132,6 +134,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -178,6 +181,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(diskContents);
@@ -229,6 +233,7 @@ Line 4");
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         isCheckedOut: false);
 
                     var editor = new FakeEditorContentSource(editorContents);
@@ -276,6 +281,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(editorContents);
@@ -332,6 +338,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(editorContents);
@@ -377,6 +384,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -411,6 +419,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -449,6 +458,7 @@ Line 4 with comment");
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -488,6 +498,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         isCheckedOut: false);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -546,6 +557,7 @@ Line 4";
                     Substitute.For<IAccount>(),
                     pullRequest,
                     Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
                     true);
 
                 var editor = new FakeEditorContentSource(headContents);
@@ -575,6 +587,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        string.Empty,
                         true);
 
                     await target.GetFile("test.cs");

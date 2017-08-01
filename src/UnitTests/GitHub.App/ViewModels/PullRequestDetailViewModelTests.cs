@@ -26,8 +26,9 @@ namespace UnitTests.GitHub.App.ViewModels
             public async Task ShouldUsePlaceholderBodyIfNoneExists()
             {
                 var target = CreateTarget();
+                var repo = Substitute.For<IRemoteRepositoryModel>();
 
-                await target.Load(CreatePullRequest(body: string.Empty));
+                await target.Load(repo, CreatePullRequest(body: string.Empty));
 
                 Assert.Equal("*No description provided.*", target.Body);
             }
@@ -40,11 +41,12 @@ namespace UnitTests.GitHub.App.ViewModels
             {
                 var target = CreateTarget();
                 var model = CreatePullRequest();
+                var repo = Substitute.For<IRemoteRepositoryModel>();
 
                 // PullRequest.Head can be null for example if a user deletes the repository after creating the PR.
                 model.Head = null;
 
-                await target.Load(model);
+                await target.Load(repo, model);
 
                 Assert.Equal("[invalid]", target.SourceBranchDisplayName);
             }
@@ -57,6 +59,7 @@ namespace UnitTests.GitHub.App.ViewModels
             {
                 var target = CreateTarget();
                 var pr = CreatePullRequest();
+                var repo = Substitute.For<IRemoteRepositoryModel>();
 
                 pr.ChangedFiles = new[]
                 {
@@ -67,7 +70,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
                 };
 
-                await target.Load(pr);
+                await target.Load(repo, pr);
 
                 Assert.Equal(3, target.ChangedFilesTree.Count);
 
@@ -104,6 +107,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 var outdatedThread = CreateThread(-1);
                 var session = Substitute.For<IPullRequestSession>();
                 var sessionManager = Substitute.For<IPullRequestSessionManager>();
+                var repo = Substitute.For<IRemoteRepositoryModel>();
 
                 file.InlineCommentThreads.Returns(new[] { thread1 });
                 session.GetFile("readme.md").Returns(Task.FromResult(file));
@@ -116,7 +120,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
                 };
 
-                await target.Load(pr);
+                await target.Load(repo, pr);
                 Assert.Equal(1, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
 
                 file.InlineCommentThreads.Returns(new[] { thread1, thread2 });
@@ -154,7 +158,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Checkout.CanExecute(null));
                 Assert.Null(target.CheckoutState);
@@ -166,7 +172,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.True(target.CheckoutState.IsEnabled);
@@ -180,7 +188,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     currentBranch: "master",
                     existingPrBranch: "pr/123",
                     dirty: true);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Checkout.CanExecute(null));
                 Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.ToolTip);
@@ -192,7 +202,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest(number: 123));
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest(number: 123));
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.Equal("Checkout pr/123", target.CheckoutState.Caption);
@@ -203,7 +215,9 @@ namespace UnitTests.GitHub.App.ViewModels
             {
                 var target = CreateTarget(
                     currentBranch: "master");
-                await target.Load(CreatePullRequest(number: 123));
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest(number: 123));
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.Equal("Checkout to pr/123", target.CheckoutState.Caption);
@@ -216,10 +230,11 @@ namespace UnitTests.GitHub.App.ViewModels
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
                 var pr = CreatePullRequest();
+                var repo = Substitute.For<IRemoteRepositoryModel>();
 
                 pr.Head = new GitReferenceModel("source", null, "sha", (string)null);
 
-                await target.Load(pr);
+                await target.Load(repo, pr);
 
                 Assert.False(target.Checkout.CanExecute(null));
                 Assert.Equal("The source repository is no longer available.", target.CheckoutState.ToolTip);
@@ -231,7 +246,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
 
@@ -246,7 +263,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
                 await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
@@ -262,7 +281,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
                 await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
@@ -281,7 +302,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Pull.CanExecute(null));
                 Assert.Null(target.UpdateState);
@@ -293,7 +316,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Pull.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
@@ -308,7 +333,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123",
                     behindBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
@@ -324,7 +351,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     existingPrBranch: "pr/123",
                     aheadBy: 3,
                     behindBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.Equal(3, target.UpdateState.CommitsAhead);
@@ -340,7 +369,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     existingPrBranch: "pr/123",
                     prFromFork: true,
                     behindBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
@@ -354,7 +385,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 await Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
                 Assert.Equal("Pull threw", target.OperationError);
@@ -369,7 +402,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Null(target.UpdateState);
@@ -381,7 +416,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
@@ -396,7 +433,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123",
                     aheadBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Push.CanExecute(null));
                 Assert.Equal(2, target.UpdateState.CommitsAhead);
@@ -411,7 +450,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123",
                     behindBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
@@ -427,7 +468,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     existingPrBranch: "pr/123",
                     aheadBy: 3,
                     behindBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(3, target.UpdateState.CommitsAhead);
@@ -443,7 +486,9 @@ namespace UnitTests.GitHub.App.ViewModels
                     existingPrBranch: "pr/123",
                     prFromFork: true,
                     aheadBy: 2);
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 Assert.True(target.Push.CanExecute(null));
                 Assert.Equal(2, target.UpdateState.CommitsAhead);
@@ -457,7 +502,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                await target.Load(CreatePullRequest());
+                var repo = Substitute.For<IRemoteRepositoryModel>();
+
+                await target.Load(repo, CreatePullRequest());
 
                 await Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
                 Assert.Equal("Push threw", target.OperationError);
@@ -514,7 +561,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
             pullRequestService.Checkout(repository, Arg.Any<IPullRequestModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
             pullRequestService.GetDefaultLocalBranchName(repository, Arg.Any<int>(), Arg.Any<string>()).Returns(x => Observable.Return($"pr/{x[1]}"));
-            pullRequestService.IsPullRequestFromFork(repository, Arg.Any<IPullRequestModel>()).Returns(prFromFork);
+            pullRequestService.IsPullRequestFromRepository(repository, Arg.Any<IPullRequestModel>()).Returns(!prFromFork);
             pullRequestService.IsWorkingDirectoryClean(repository).Returns(Observable.Return(!dirty));
             pullRequestService.Pull(repository).Returns(x => Throws("Pull threw"));
             pullRequestService.Push(repository).Returns(x => Throws("Push threw"));
