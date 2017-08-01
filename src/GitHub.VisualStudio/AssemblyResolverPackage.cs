@@ -26,6 +26,10 @@ namespace GitHub.VisualStudio
             "GitHub.UI",
             "GitHub.VisualStudio.UI",
 
+            // these are signed by StrongNameSigner
+            "Markdig",
+            "Markdig.Wpf",
+
             // these are included just in case
             "GitHub.UI.Reactive",
             "System.Windows.Interactivity"
