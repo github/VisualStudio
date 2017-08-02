@@ -153,7 +153,7 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(ILocalRepositoryModel repo,
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
@@ -163,7 +163,7 @@ namespace GitHub.Services
             // and replaces it instead of appending, so items get refreshed in-place as they come in.
 
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name));
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, repo.Owner, repo.Name));
 
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
@@ -188,16 +188,16 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number)
+        public IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number)
         {
             return Observable.Defer(() =>
             {
                 return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
                         Observable.CombineLatest(
-                            apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
-                            apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
-                            apiClient.GetIssueComments(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
-                            apiClient.GetPullRequestReviewComments(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            apiClient.GetPullRequest(owner, name, number),
+                            apiClient.GetPullRequestFiles(owner, name, number).ToList(),
+                            apiClient.GetIssueComments(owner, name, number).ToList(),
+                            apiClient.GetPullRequestReviewComments(owner, name, number).ToList(),
                             (pr, files, comments, reviewComments) => new
                             {
                                 PullRequest = pr,
@@ -214,6 +214,19 @@ namespace GitHub.Services
                         TimeSpan.FromDays(7))
                     .Select(Create);
             });
+        }
+
+        public IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo)
+        {
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
+
+            return Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatest(
+                        key,
+                        () => apiClient.GetRepository(owner, repo).Select(RepositoryCacheItem.Create))
+                    .Select(Create)));
         }
 
         public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
@@ -390,7 +403,8 @@ namespace GitHub.Services
                 new UriString(item.CloneUrl),
                 item.Private,
                 item.Fork,
-                Create(item.Owner))
+                Create(item.Owner),
+                item.Parent != null ? Create(item.Parent) : null)
             {
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
@@ -504,6 +518,7 @@ namespace GitHub.Services
                 CreatedAt = apiRepository.CreatedAt;
                 UpdatedAt = apiRepository.UpdatedAt;
                 Timestamp = apiRepository.UpdatedAt;
+                Parent = apiRepository.Parent != null ? new RepositoryCacheItem(apiRepository.Parent) : null;
             }
 
             public long Id { get; set; }
@@ -515,6 +530,7 @@ namespace GitHub.Services
             public bool Fork { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
+            public RepositoryCacheItem Parent { get; set; }
         }
 
         public class PullRequestCacheItem : CacheItem

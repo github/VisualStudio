@@ -444,6 +444,7 @@ public class ModelServiceTests
 
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.Name.Returns(reponame);
+            repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
@@ -511,6 +512,7 @@ public class ModelServiceTests
 
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.Name.Returns(reponame);
+            repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);

@@ -122,8 +122,8 @@ namespace GitHub.InlineReviews.ViewModels
 
             var body = (string)parameter;
             var result = await apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
+                Session.RepositoryOwner,
+                Session.LocalRepository.Name,
                 Session.PullRequest.Number,
                 body,
                 File.CommitSha,
