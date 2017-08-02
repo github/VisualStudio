@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Threading;
 using Microsoft.VisualStudio.Text.Editor;
 using GitHub.Settings;
 using GitHub.Services;
@@ -13,6 +14,7 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IPullRequestSessionManager sessionManager;
         readonly IWpfTextViewHost wpfTextViewHost;
         readonly bool isDiffView;
+        readonly DispatcherTimer dispatcherTimer;
 
         bool visible;
         bool disposed;
@@ -25,7 +27,11 @@ namespace GitHub.InlineReviews.ViewModels
             this.wpfTextViewHost = wpfTextViewHost;
             this.isDiffView = isDiffView;
 
-            Visible = IsVisible();
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += (s, e) => RefreshVisibility();
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
+
             packageSettings.PropertyChanged += PackageSettings_PropertyChanged;
         }
 
@@ -41,6 +47,7 @@ namespace GitHub.InlineReviews.ViewModels
             if (disposing)
             {
                 disposed = true;
+                dispatcherTimer.Stop();
                 packageSettings.PropertyChanged -= PackageSettings_PropertyChanged;
             }
         }
@@ -53,7 +60,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        internal void RefreshVisibility()
+        void RefreshVisibility()
         {
             Visible = IsVisible();
         }

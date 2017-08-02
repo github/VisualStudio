@@ -58,15 +58,12 @@ namespace GitHub.InlineReviews
         IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory,
             IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
         {
-            var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-
             var isDiffView = IsDiffView(wpfTextViewHost);
             var glyphMarginViewModel = new GlyphMarginViewModel(packageSettings, sessionManager, wpfTextViewHost, isDiffView);
             var glyphMarginView = new GlyphMarginView { DataContext = glyphMarginViewModel };
-            tagAggregator.BatchedTagsChanged += (s, e) => glyphMarginViewModel.RefreshVisibility();
             glyphMarginView.Unloaded += (s, e) => glyphMarginViewModel.Dispose();
 
-            var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, glyphMarginView, tagAggregator, editorFormatMap,
+            var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, glyphMarginView, tagAggregatorFactory, editorFormatMap,
                 MarginPropertiesName, MarginName, true);
 
             if (IsDiffView(wpfTextViewHost))
