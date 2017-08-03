@@ -340,7 +340,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="Settings\Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />

@@ -42,13 +42,13 @@ namespace GitHub.VisualStudio.UI
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
-            
+
             BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
             {
-                Guid = GuidList.guidImageMoniker,
+                Guid = Guids.guidImageMoniker,
                 Id = 1
             };
-            ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
+            ToolBar = new CommandID(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
             var provider = Services.GitHubServiceProvider;
             var uiProvider = provider.GetServiceSafe<IUIProvider>();

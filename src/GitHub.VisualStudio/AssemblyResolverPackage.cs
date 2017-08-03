@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio
     // This fires before ShellInitialized and SolutionExists.
     //[ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
 
-    [Guid(GuidList.guidAssemblyResolverPkgString)]
+    [Guid(Guids.guidAssemblyResolverPkgString)]
     public class AssemblyResolverPackage : Package
     {
         // list of assemblies that should be resolved by name only
