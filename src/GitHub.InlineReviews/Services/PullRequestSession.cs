@@ -51,15 +51,6 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task AddComment(IPullRequestReviewCommentModel comment)
-        {
-            PullRequest.ReviewComments = PullRequest.ReviewComments
-                .Concat(new[] { comment })
-                .ToList();
-            await Update(PullRequest);
-        }
-
-        /// <inheritdoc/>
         public async Task<IReadOnlyList<IPullRequestSessionFile>> GetAllFiles()
         {
             if (files == null)
@@ -126,6 +117,34 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, string commitId, string path, int position)
+        {
+            var model = await service.PostReviewComment(
+                LocalRepository,
+                User,
+                PullRequest.Number,
+                body,
+                commitId,
+                path,
+                position);
+            await AddComment(model);
+            return model;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo)
+        {
+            var model = await service.PostReviewComment(
+                LocalRepository,
+                User,
+                PullRequest.Number,
+                body,
+                inReplyTo);
+            await AddComment(model);
+            return model;
+        }
+
+        /// <inheritdoc/>
         public async Task UpdateEditorContent(string relativePath)
         {
             PullRequestSessionFile file;
@@ -157,6 +176,14 @@ namespace GitHub.InlineReviews.Services
             {
                 await UpdateFile(file);
             }
+        }
+
+        async Task AddComment(IPullRequestReviewCommentModel comment)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Concat(new[] { comment })
+                .ToList();
+            await Update(PullRequest);
         }
 
         async Task UpdateFile(PullRequestSessionFile file)

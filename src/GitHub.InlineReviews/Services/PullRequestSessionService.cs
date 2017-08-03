@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 
@@ -18,6 +21,7 @@ namespace GitHub.InlineReviews.Services
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
+        readonly IApiClientFactory apiClientFactory;
 
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
 
@@ -25,11 +29,13 @@ namespace GitHub.InlineReviews.Services
         public PullRequestSessionService(
             IGitService gitService,
             IGitClient gitClient,
-            IDiffService diffService)
+            IDiffService diffService,
+            IApiClientFactory apiClientFactory)
         {
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
+            this.apiClientFactory = apiClientFactory;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
         }
@@ -123,6 +129,76 @@ namespace GitHub.InlineReviews.Services
             }
 
             throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+            ILocalRepositoryModel repository,
+            IAccount user,
+            int number,
+            string body,
+            string commitId,
+            string path,
+            int position)
+        {
+            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var apiClient = await apiClientFactory.Create(address);
+
+            var result = await apiClient.CreatePullRequestReviewComment(
+                repository.Owner,
+                repository.Name,
+                number,
+                body,
+                commitId,
+                path,
+                position);
+
+            return new PullRequestReviewCommentModel
+            {
+                Body = result.Body,
+                CommitId = result.CommitId,
+                DiffHunk = result.DiffHunk,
+                Id = result.Id,
+                OriginalCommitId = result.OriginalCommitId,
+                OriginalPosition = result.OriginalPosition,
+                Path = result.Path,
+                Position = result.Position,
+                CreatedAt = result.CreatedAt,
+                User = user,
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+            ILocalRepositoryModel repository,
+            IAccount user,
+            int number,
+            string body,
+            int inReplyTo)
+        {
+            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var apiClient = await apiClientFactory.Create(address);
+
+            var result = await apiClient.CreatePullRequestReviewComment(
+                repository.Owner,
+                repository.Name,
+                number,
+                body,
+                inReplyTo);
+
+            return new PullRequestReviewCommentModel
+            {
+                Body = result.Body,
+                CommitId = result.CommitId,
+                DiffHunk = result.DiffHunk,
+                Id = result.Id,
+                OriginalCommitId = result.OriginalCommitId,
+                OriginalPosition = result.OriginalPosition,
+                Path = result.Path,
+                Position = result.Position,
+                CreatedAt = result.CreatedAt,
+                User = user,
+            };
         }
 
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)

@@ -86,7 +86,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             target.Thread.Comments[0].Body = "New Comment";
 
             sessionManager.CurrentSession
-                .When(x => x.AddComment(Arg.Any<IPullRequestReviewCommentModel>()))
+                .When(x => x.PostReviewComment(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>()))
                 .Do(async x =>
                 {
                     // Simulate the thread being added to the session.
@@ -168,7 +168,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             Assert.Equal(2, target.Thread.Comments.Count);
 
-            sessionManager.CurrentSession.AddComment(null)
+            sessionManager.CurrentSession.PostReviewComment(null, 0)
                 .ReturnsForAnyArgs(async x =>
                 {
                     var file = await sessionManager.CurrentSession.GetFile(RelativePath);

@@ -54,7 +54,6 @@ namespace GitHub.InlineReviews.ViewModels
                 foreach (var thread in file.InlineCommentThreads)
                 {
                     var threadViewModel = new InlineCommentThreadViewModel(
-                        apiClient,
                         session,
                         thread.Comments);
 
