@@ -69,8 +69,8 @@
             </Grid.RowDefinitions>
 
             <controls:AccountAvatar Margin="4 4"
-                                    Width="28" 
-                                    Height="28" 
+                                    Width="16" 
+                                    Height="16" 
                                     VerticalAlignment="Top"
                                     Account="{Binding User}"/>
 
