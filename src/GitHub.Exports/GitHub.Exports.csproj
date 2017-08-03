@@ -134,7 +134,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GitHubLogicException.cs" />
-    <Compile Include="GlobalCommands.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />
