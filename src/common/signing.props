@@ -10,9 +10,19 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(BuildType)' != 'Internal' and Exists('..\..\publickey.snk')">
+    <AssemblyOriginatorKeyFile>..\..\publickey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\script\Key.snk" Condition="'$(BuildType)' == 'Internal'">
       <Link>Key.snk</Link>
+    </None>
+
+    <None Include="..\..\publickey.snk" Condition="'$(BuildType)' != 'Internal' and Exists('..\..\publickey.snk')">
+      <Link>publickey.snk</Link>
     </None>
   </ItemGroup>
 </Project>

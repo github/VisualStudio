@@ -22,7 +22,7 @@ Beta releases will have `(beta)` in their title in the gallery, following the ve
 
 ## Build requirements
 
-* Visual Studio 2015
+* Visual Studio 2015+
 * Visual Studio SDK
 
 ## Build
@@ -37,7 +37,13 @@ git submodule deinit script
 git submodule update
 ```
 
-Open the `GitHubVS.sln` solution with Visual Studio 2015.
+Visual Studio extensions have to be signed, so you need to create a signing key with the name `publickey.snk` for your build in the root of the repository:
+
+```txt
+sn -k `publickey.snk`
+```
+
+Open the `GitHubVS.sln` solution with Visual Studio 2015+.
 To be able to use the GitHub API, you'll need to:
 
 - [Register a new developer application](https://github.com/settings/developers) in your profile.

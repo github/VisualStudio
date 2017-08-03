@@ -72,7 +72,7 @@
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <DeployExtension>False</DeployExtension>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\src\common\internal.props" />
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- Only deploy extension when building inside Visual Studio -->
     <DeployExtension>false</DeployExtension>
