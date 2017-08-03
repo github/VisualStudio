@@ -56,7 +56,7 @@
 
         <Border DockPanel.Dock="Top"
                 BorderThickness="0 0 0 1"
-                Background="{DynamicResource GitHubVsBrandedUIBackground}"
+                Background="{DynamicResource VsBrush.CommandBarOptionsBackground}"
                 BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}">
             <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Left" >
