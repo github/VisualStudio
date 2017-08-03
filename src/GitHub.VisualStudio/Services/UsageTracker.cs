@@ -202,6 +202,20 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementNumberOfPullRequestInlineCommentsOpened()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPullRequestInlineCommentsOpened;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementNumberOfPullRequestInlineCommentsPosted()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPullRequestInlineCommentsPosted;
+            SaveUsage(usage);
+        }
+
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
@@ -359,6 +373,8 @@ namespace GitHub.Services
             usage.NumberOfGitHubPaneHelpClicks = 0;
             usage.NumberOfWelcomeTrainingClicks = 0;
             usage.NumberOfWelcomeDocsClicks = 0;
+            usage.NumberOfPullRequestInlineCommentsOpened = 0;
+            usage.NumberOfPullRequestInlineCommentsPosted = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;

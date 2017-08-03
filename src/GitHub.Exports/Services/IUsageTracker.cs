@@ -23,5 +23,7 @@ namespace GitHub.Services
         Task IncrementWelcomeDocsClicks();
         Task IncrementWelcomeTrainingClicks();
         Task IncrementGitHubPaneHelpClicks();
+        Task IncrementNumberOfPullRequestInlineCommentsOpened();
+        Task IncrementNumberOfPullRequestInlineCommentsPosted();
     }
 }
