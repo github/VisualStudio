@@ -47,8 +47,8 @@
 
     <Grid>
         <!-- Displays an existing comment-->
-        <Grid>
-            <Grid.Style>
+        <StackPanel Orientation="Vertical" Margin="4">
+            <StackPanel.Style>
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
@@ -57,44 +57,25 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </Grid.Style>
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            </StackPanel.Style>
 
-            <controls:AccountAvatar Margin="4 4"
-                                    Width="16" 
-                                    Height="16" 
-                                    VerticalAlignment="Top"
-                                    Account="{Binding User}"/>
+            <StackPanel Orientation="Horizontal">
+                <controls:AccountAvatar Width="16" 
+                                        Height="16" 
+                                        Account="{Binding User}"/>
 
-            <StackPanel Margin="4 4" Orientation="Vertical" Grid.Column="1">
-                <Border Background="{DynamicResource GitHubVsBrandedUIBackground}" Padding="6 5" BorderThickness="1 1 1 0" BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}" CornerRadius="2 2 0 0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
-                        <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
-                                             Command="{Binding OpenOnGitHub}"
-                                             Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                             Opacity="0.75"
-                                             Margin="2 0"/>
-                    </StackPanel>
-                </Border>
-
-                <Border Background="{DynamicResource GitHubVsToolWindowBackground}" Padding="6 5" BorderThickness="1" BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}" CornerRadius="0 0 2 2 ">
-                    <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
-                                   Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                   DocumentStyle="{StaticResource DocumentStyle}"
-                                   RawContent="{Binding Body}"
-                                   ScrollViewer.VerticalScrollBarVisibility="Auto"/>
-                </Border>
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding User.Login}" Margin="4 0"/>
+                <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
+                                     Command="{Binding OpenOnGitHub}"
+                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                     Opacity="0.75" />
             </StackPanel>
-        </Grid>
+
+            <ui:MarkdownViewer Foreground="{DynamicResource GitHubVsToolWindowText}"
+                           DocumentStyle="{StaticResource DocumentStyle}"
+                           RawContent="{Binding Body}"
+                           ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        </StackPanel>
 
         <!-- Displays edit view or a reply placeholder-->
         <Grid>
