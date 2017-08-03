@@ -27,7 +27,7 @@
                   <Binding Path="DataContext.CheckedOutPullRequest" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type views:PullRequestListView}}"/>
                 </MultiBinding>
               </DataTrigger.Binding>
-              <Setter Property="Background" Value="{DynamicResource GitHubVsCommandBarSelectedBorder}"/>
+              <Setter Property="Background" Value="{DynamicResource GitHubMultilineListItemActiveBrush}"/>
             </DataTrigger>
           </Style.Triggers>
         </Style>
