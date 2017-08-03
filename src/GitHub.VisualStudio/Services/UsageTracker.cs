@@ -202,17 +202,17 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
-        public async Task IncrementNumberOfPullRequestInlineCommentsOpened()
+        public async Task IncrementPRReviewDiffViewInlineCommentOpen()
         {
             var usage = await LoadUsage();
-            ++usage.Model.NumberOfPullRequestInlineCommentsOpened;
+            ++usage.Model.NumberOfPRReviewDiffViewInlineCommentOpen;
             SaveUsage(usage);
         }
 
-        public async Task IncrementNumberOfPullRequestInlineCommentsPosted()
+        public async Task IncrementPRReviewDiffViewInlineCommentPost()
         {
             var usage = await LoadUsage();
-            ++usage.Model.NumberOfPullRequestInlineCommentsPosted;
+            ++usage.Model.NumberOfPRReviewDiffViewInlineCommentPost;
             SaveUsage(usage);
         }
 
@@ -373,8 +373,8 @@ namespace GitHub.Services
             usage.NumberOfGitHubPaneHelpClicks = 0;
             usage.NumberOfWelcomeTrainingClicks = 0;
             usage.NumberOfWelcomeDocsClicks = 0;
-            usage.NumberOfPullRequestInlineCommentsOpened = 0;
-            usage.NumberOfPullRequestInlineCommentsPosted = 0;
+            usage.NumberOfPRReviewDiffViewInlineCommentOpen = 0;
+            usage.NumberOfPRReviewDiffViewInlineCommentPost = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;

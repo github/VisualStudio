@@ -160,7 +160,7 @@ namespace GitHub.InlineReviews.Services
             ExpandCollapsedRegions(textView, line.Extent);
             peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
 
-            usageTracker.IncrementNumberOfPullRequestInlineCommentsOpened().Forget();
+            usageTracker.IncrementPRReviewDiffViewInlineCommentOpen().Forget();
 
             return Tuple.Create(line, trackingPoint);
         }

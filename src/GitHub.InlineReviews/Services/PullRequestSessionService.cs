@@ -156,7 +156,7 @@ namespace GitHub.InlineReviews.Services
                 path,
                 position);
 
-            await usageTracker.IncrementNumberOfPullRequestInlineCommentsPosted();
+            await usageTracker.IncrementPRReviewDiffViewInlineCommentPost();
 
             return new PullRequestReviewCommentModel
             {
@@ -191,7 +191,7 @@ namespace GitHub.InlineReviews.Services
                 body,
                 inReplyTo);
 
-            await usageTracker.IncrementNumberOfPullRequestInlineCommentsPosted();
+            await usageTracker.IncrementPRReviewDiffViewInlineCommentPost();
 
             return new PullRequestReviewCommentModel
             {

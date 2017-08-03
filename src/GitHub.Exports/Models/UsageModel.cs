@@ -30,8 +30,8 @@ namespace GitHub.Models
         public int NumberOfWelcomeDocsClicks { get; set; }
         public int NumberOfWelcomeTrainingClicks { get; set; }
         public int NumberOfGitHubPaneHelpClicks { get; set; }
-        public int NumberOfPullRequestInlineCommentsOpened { get; set; }
-        public int NumberOfPullRequestInlineCommentsPosted { get; set; }
+        public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
+        public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
@@ -63,8 +63,8 @@ namespace GitHub.Models
                 NumberOfWelcomeDocsClicks = NumberOfWelcomeDocsClicks,
                 NumberOfWelcomeTrainingClicks = NumberOfWelcomeTrainingClicks,
                 NumberOfGitHubPaneHelpClicks = NumberOfGitHubPaneHelpClicks,
-                NumberOfPullRequestInlineCommentsOpened = NumberOfPullRequestInlineCommentsOpened,
-                NumberOfPullRequestInlineCommentsPosted = NumberOfPullRequestInlineCommentsPosted,
+                NumberOfPRReviewDiffViewInlineCommentOpen = NumberOfPRReviewDiffViewInlineCommentOpen,
+                NumberOfPRReviewDiffViewInlineCommentPost = NumberOfPRReviewDiffViewInlineCommentPost,
             };
         }
     }
