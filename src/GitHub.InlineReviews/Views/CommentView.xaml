@@ -104,13 +104,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <controls:AccountAvatar Grid.RowSpan="2"
-                                Margin="4"
-                                Width="28" 
-                                Height="28" 
-                                VerticalAlignment="Top"
-                                Account="{Binding User}"/>
-
             <ui:PromptTextBox Name="body"
                               Grid.Column="1"
                               AcceptsReturn="True"
