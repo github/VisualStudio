@@ -40,22 +40,26 @@ namespace GitHub.ViewModels
         PullRequestListViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPackageSettings settings)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
+            IPackageSettings settings,
+            IPullRequestSessionManager sessionManager)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, sessionManager)
         {
             Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
         }
 
         public PullRequestListViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
 
             constructing = true;
             this.repositoryHost = repositoryHost;
@@ -107,6 +111,20 @@ namespace GitHub.ViewModels
             OpenPullRequest.Subscribe(DoOpenPullRequest);
             CreatePullRequest = ReactiveCommand.Create();
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
+
+            // Get the current pull request session and the this list's selected repository.
+            // When the session's repository is the same as our selected repository set
+            // CheckedOutPullRequest to the current session's model, so that the checked out
+            // PR can be highlighted.
+            Observable.CombineLatest(
+                sessionManager.WhenAnyValue(x => x.CurrentSession),
+                this.WhenAnyValue(x => x.SelectedRepository),
+                (s, r) => new { Session = s, Repository = r })
+                .Subscribe(x =>
+                {
+                    CheckedOutPullRequest = x.Session?.RepositoryOwner == x.Repository?.Owner ?
+                        x.Session?.PullRequest : null;
+                });
 
             constructing = false;
         }
@@ -213,6 +231,13 @@ namespace GitHub.ViewModels
         {
             get { return selectedPullRequest; }
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
+        }
+
+        IPullRequestModel checkedOutPullRequest;
+        public IPullRequestModel CheckedOutPullRequest
+        {
+            get { return checkedOutPullRequest; }
+            set { this.RaiseAndSetIfChanged(ref checkedOutPullRequest, value); }
         }
 
         IReadOnlyList<PullRequestState> states;

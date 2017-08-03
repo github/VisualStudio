@@ -57,7 +57,7 @@ namespace GitHub.SampleData
 
         public IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
         public IRemoteRepositoryModel SelectedRepository { get; set; }
-
+        public IPullRequestModel CheckedOutPullRequest { get; set; }
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
 
