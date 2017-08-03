@@ -22,6 +22,7 @@ namespace GitHub.InlineReviews.Services
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
         readonly IApiClientFactory apiClientFactory;
+        readonly IUsageTracker usageTracker;
 
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
 
@@ -30,12 +31,14 @@ namespace GitHub.InlineReviews.Services
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
-            IApiClientFactory apiClientFactory)
+            IApiClientFactory apiClientFactory,
+            IUsageTracker usageTracker)
         {
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
             this.apiClientFactory = apiClientFactory;
+            this.usageTracker = usageTracker;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
         }
@@ -153,6 +156,8 @@ namespace GitHub.InlineReviews.Services
                 path,
                 position);
 
+            await usageTracker.IncrementNumberOfPullRequestInlineCommentsPosted();
+
             return new PullRequestReviewCommentModel
             {
                 Body = result.Body,
@@ -185,6 +190,8 @@ namespace GitHub.InlineReviews.Services
                 number,
                 body,
                 inReplyTo);
+
+            await usageTracker.IncrementNumberOfPullRequestInlineCommentsPosted();
 
             return new PullRequestReviewCommentModel
             {
