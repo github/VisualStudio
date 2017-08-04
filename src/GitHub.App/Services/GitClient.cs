@@ -191,20 +191,27 @@ namespace GitHub.Services
             });
         }
 
-        public Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, byte[] contents)
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(sha, nameof(sha));
+            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
+            Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
             Guard.ArgumentNotEmptyString(path, nameof(path));
 
             return Task.Factory.StartNew(() =>
             {
-                var commit = repository.Lookup<Commit>(sha);
+                var commit1 = repository.Lookup<Commit>(sha1);
+                var commit2 = repository.Lookup<Commit>(sha2);
 
-                if (commit != null)
+                var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree);
+                var normalizedPath = path.Replace("/", "\\");
+                var renamed = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
+                var oldPath = renamed?.OldPath ?? path;
+
+                if (commit1 != null)
                 {
                     var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
-                    var blob1 = commit[path]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
+                    var blob1 = commit1[oldPath]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
                     var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
                     return repository.Diff.Compare(blob1, blob2);
                 }

@@ -20,6 +20,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="DocumentStyle" TargetType="FlowDocument">
                 <Setter Property="FontFamily" Value="Segoe UI"/>

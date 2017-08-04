@@ -15,12 +15,14 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="baseSha">The commit to use as the base.</param>
+        /// <param name="headSha">The commit to use as the head.</param>
         /// <param name="relativePath">The relative path to the file.</param>
         /// <param name="contents">The contents of the file.</param>
         /// <returns></returns>
         Task<IList<DiffChunk>> Diff(
             ILocalRepositoryModel repository,
             string baseSha,
+            string headSha,
             string relativePath,
             byte[] contents);
 
