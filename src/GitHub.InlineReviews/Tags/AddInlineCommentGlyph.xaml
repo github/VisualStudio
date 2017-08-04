@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
 
-    <!-- Resourcess are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml (and Properties\DesignTimeResources.xaml) -->
+    <!-- Resources are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml (and Properties\DesignTimeResources.xaml) -->
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Style.Triggers>

@@ -1,14 +1,15 @@
 using System;
+using System.IO.Packaging;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Models;
+using System.Windows;
 
 namespace GitHub.Services
 {
@@ -24,13 +25,9 @@ namespace GitHub.Services
 
         static AvatarProvider()
         {
-            // NB: If this isn't explicitly set, WPF will try to guess it via
-            // GetEntryAssembly, which in a unit test runner will be null
-            // This is needed for the pack:// URL format to be understood.
-            if (Application.ResourceAssembly == null)
-            {
-                Application.ResourceAssembly = typeof(AvatarProvider).Assembly;
-            }
+            // Calling `Application.Current` will install pack URI scheme via Application.cctor.
+            // This is needed when unit testing for the pack:// URL format to be understood.
+            if (Application.Current != null) { }
         }
 
         [ImportingConstructor]
@@ -71,7 +68,7 @@ namespace GitHub.Services
             return imageCache.GetImage(avatarUrl)
                 .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(apiAccount)));
         }
-            
+
         public IObservable<Unit> InvalidateAvatar(IAvatarContainer apiAccount)
         {
             return String.IsNullOrWhiteSpace(apiAccount?.Login)
@@ -87,7 +84,7 @@ namespace GitHub.Services
         }
 
         protected virtual void Dispose(bool disposing)
-        {}
+        { }
 
         public void Dispose()
         {

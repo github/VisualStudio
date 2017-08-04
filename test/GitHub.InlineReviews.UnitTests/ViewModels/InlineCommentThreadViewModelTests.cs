@@ -120,8 +120,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
-            result.Repository.Owner.Returns("owner");
-            result.Repository.Name.Returns("repo");
+            result.RepositoryOwner.Returns("owner");
+            result.LocalRepository.Name.Returns("repo");
+            result.LocalRepository.Owner.Returns("shouldnt-be-used");
             result.PullRequest.Number.Returns(47);
             return result;
         }

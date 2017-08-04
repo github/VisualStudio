@@ -29,7 +29,6 @@ namespace GitHub.InlineReviews.Tags
         {
             var glyph = CreateGlyph(tag);
             glyph.DataContext = tag;
-
             glyph.MouseLeftButtonUp += (s, e) =>
             {
                 if (OpenThreadView(tag)) e.Handled = true;

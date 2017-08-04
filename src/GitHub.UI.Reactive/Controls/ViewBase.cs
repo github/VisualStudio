@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Automation.Peers;
 using GitHub.ViewModels;
 using ReactiveUI;
 
@@ -277,6 +278,16 @@ namespace GitHub.UI
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///  Add an automation peer to views and custom controls 
+        ///  They do not have automation peers or properties by default
+        ///  https://stackoverflow.com/questions/30198109/automationproperties-automationid-on-custom-control-not-exposed
+        /// </summary>
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new UIElementAutomationPeer(this);
         }
     }
 }

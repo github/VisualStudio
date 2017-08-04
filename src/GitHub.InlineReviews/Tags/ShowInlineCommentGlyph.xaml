@@ -4,10 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-             mc:Ignorable="d"
-             ToolTipService.ShowDuration="600000">
+             mc:Ignorable="d">
 
-    <!-- Resourcess are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml (and Properties\DesignTimeResources.xaml) -->
+    <!-- Resources are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml (and Properties\DesignTimeResources.xaml) -->
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Style.Triggers>
@@ -54,12 +53,4 @@
             </Canvas>
         </Viewbox>
     </Grid>
-
-    <UserControl.ToolTip>
-        <ToolTip
-            Background="{DynamicResource GitHubVsToolWindowBackground}"
-            Foreground="{DynamicResource GitHubVsToolWindowText}"
-            x:Name="CommentToolTip" />
-    </UserControl.ToolTip>
-
 </UserControl>

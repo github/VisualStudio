@@ -17,10 +17,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
-        /// <param name="currentUser">The current user on null if not required.</param>
+        /// <param name="currentUser">The current user.</param>
         /// <param name="commentModels">The thread comments.</param>
-        public CommentThreadViewModel(IAccount currentUser = null)
+        public CommentThreadViewModel(IAccount currentUser)
         {
+            Guard.ArgumentNotNull(currentUser, nameof(currentUser));
+
             Comments = new ObservableCollection<ICommentViewModel>();
             CurrentUser = currentUser;
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
@@ -192,8 +191,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
-            result.Repository.Owner.Returns("owner");
-            result.Repository.Name.Returns("repo");
+            result.RepositoryOwner.Returns("owner");
+            result.LocalRepository.Name.Returns("repo");
+            result.LocalRepository.Owner.Returns("shouldnt-be-used");
             result.PullRequest.Number.Returns(47);
             return result;
         }
