@@ -65,9 +65,13 @@
                     <Button.ToolTip>
                         <TextBlock FontSize="11">Previous Comment</TextBlock>
                     </Button.ToolTip>
-                    <ui:OcticonImage Width="16"
-                                     Height="16"
-                                     Icon="arrow_left" />
+                    <Canvas Width="16" Height="16">
+                        <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
+                        <Polygon Points="10 2 5 8 8 8 8 12 12 12 12 8 15 8" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1" Canvas.Top="9" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1" Canvas.Top="10.75" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1" Canvas.Top="13" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                    </Canvas>
                 </Button>
 
                 <Button Margin="2 0" Padding="2" Command="{Binding NextComment}"
@@ -75,9 +79,14 @@
                     <Button.ToolTip>
                         <TextBlock FontSize="11">Next Comment</TextBlock>
                     </Button.ToolTip>
-                    <ui:OcticonImage Width="16"
-                                     Height="16"
-                                     Icon="arrow_right" />
+
+                    <Canvas Width="16" Height="16">
+                        <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
+                        <Polygon Points="8 8 8 4 4 4 4 8 1 8 6 14 11 8" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="9" Canvas.Top="2" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="9" Canvas.Top="4" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="9" Canvas.Top="6" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                    </Canvas>
                 </Button>
                 <Separator Background="{DynamicResource GitHubButtonBorderBrush}" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             </StackPanel>
