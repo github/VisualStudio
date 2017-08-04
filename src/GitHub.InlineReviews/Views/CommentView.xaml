@@ -60,6 +60,7 @@
 
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                                    Foreground="{DynamicResource VsBrush.WindowText}"
                                     Markdown="{Binding Body}"/>
         </StackPanel>
 
