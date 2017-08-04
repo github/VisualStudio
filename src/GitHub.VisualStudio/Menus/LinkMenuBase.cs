@@ -33,10 +33,12 @@ namespace GitHub.VisualStudio.Menus
 
         protected Task<UriString> GenerateLink(LinkType linkType)
         {
-            var repo = ActiveRepo;
             var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();
             if (activeDocument == null)
                 return null;
+
+            var repo = GetRepositoryByPath(activeDocument.Name);
+
             return repo.GenerateUrl(linkType, activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine);
         }
 
