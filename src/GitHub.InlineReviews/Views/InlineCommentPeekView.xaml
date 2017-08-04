@@ -68,9 +68,9 @@
                     <Canvas Width="16" Height="16">
                         <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
                         <Polygon Points="10 2 5 8 8 8 8 12 12 12 12 8 15 8" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
-                        <Rectangle Canvas.Left="1" Canvas.Top="9" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
-                        <Rectangle Canvas.Left="1" Canvas.Top="10.75" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
-                        <Rectangle Canvas.Left="1" Canvas.Top="13" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1.25" Canvas.Top="9" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1.25" Canvas.Top="10.75" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1.25" Canvas.Top="12.75" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
                     </Canvas>
                 </Button>
 
