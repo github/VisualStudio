@@ -115,6 +115,8 @@ namespace GitHub.InlineReviews.Services
                     sessions.Clear();
                 }
 
+                if (repository == null) return;
+
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
                 var session = CurrentSession;
 
