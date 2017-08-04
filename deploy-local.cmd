@@ -1,1 +1,1 @@
-powershell.exe .\script\deploy.ps1 production None -Force -NoChat -NoPush -NoUpload
+powershell.exe .\script\deploy.ps1 -NoVersionBump -Force -NoChat -NoPush -NoUpload
