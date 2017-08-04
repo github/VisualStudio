@@ -18,8 +18,16 @@
 
             <Style x:Key="GitHubToolbarButton" TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}" BorderThickness="1">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
 
                 <Style.Triggers>
                     <Trigger Property="IsEnabled" Value="False">
@@ -27,7 +35,7 @@
                     </Trigger>
 
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource VsBrush.CommandBarHover}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
