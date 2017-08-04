@@ -1,6 +1,7 @@
 using System.IO;
 using Microsoft.VisualStudio.Settings;
 using GitHub.Extensions;
+using System;
 
 namespace GitHub.Helpers
 {
@@ -39,6 +40,7 @@ namespace GitHub.Helpers
 
             var collection = subpath != null ? Path.Combine(root, subpath) : root;
             store.CreateCollection(collection);
+            DateTimeOffset offset;
 
             if (defaultValue is bool)
                 return store.GetBoolean(collection, property, (bool)defaultValue);
@@ -50,6 +52,8 @@ namespace GitHub.Helpers
                 return store.GetInt64(collection, property, (long)defaultValue);
             else if (defaultValue is ulong)
                 return store.GetUInt64(collection, property, (ulong)defaultValue);
+            else if (defaultValue is DateTimeOffset)
+                return DateTimeOffset.TryParse(store.GetString(collection, property, defaultValue?.ToString() ?? ""), out offset) ? offset : defaultValue;
             return store.GetString(collection, property, defaultValue?.ToString() ?? "");
         }
 

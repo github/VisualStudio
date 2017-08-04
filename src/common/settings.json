@@ -1,20 +1,25 @@
 ﻿{
-    "settings": [
+  "settings": [
     {
-        "name": "CollectMetrics",
-        "type": "bool",
-        "default": 'true'
+      "name": "CollectMetrics",
+      "type": "bool",
+      "default": "true"
     },
     {
-        "name": "UIState",
-        "type": "object",
-        "typename": "UIState",
-        "default": 'null'
+      "name": "UIState",
+      "type": "object",
+      "typename": "UIState",
+      "default": "null"
     },
-	{
-		"name": "HideTeamExplorerWelcomeMessage",
-		"type": "bool",
-		"default": 'false'
-	}
-    ]
-}
+    {
+      "name": "HideTeamExplorerWelcomeMessage",
+      "type": "bool",
+      "default": "false"
+    },
+    {
+      "name": "WelcomeMessageLastSeen",
+      "type": "DateTimeOffset",
+      "default": "DateTimeOffset.MinValue"
+    }
+  ]
+}            

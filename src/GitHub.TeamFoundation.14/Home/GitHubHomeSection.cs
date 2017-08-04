@@ -17,6 +17,7 @@ using GitHub.VisualStudio.UI;
 using GitHub.Settings;
 using System.Windows.Threading;
 using GitHub.Info;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -76,9 +77,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
 
+                var weekElapsed = (DateTimeOffset.Now - settings.WelcomeMessageLastSeen).Days > 6;
+
                 // We want to display a welcome message but only if Team Explorer isn't
                 // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
-                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
+                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible() && weekElapsed)
                 {
                     ShowWelcomeMessage();
                 }
@@ -169,6 +172,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 }),
                 false,
                 welcomeMessageGuid);
+
+            settings.WelcomeMessageLastSeen = DateTimeOffset.UtcNow;
+            settings.Save();
         }
 
         protected GitHubHomeContent View
