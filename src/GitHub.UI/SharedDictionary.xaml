@@ -5,6 +5,5 @@
         <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Controls.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Buttons.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/TextBlocks.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

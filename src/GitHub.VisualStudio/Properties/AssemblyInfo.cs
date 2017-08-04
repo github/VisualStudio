@@ -20,3 +20,5 @@ using Microsoft.VisualStudio.Shell;
 [assembly: ProvideCodeBase(AssemblyName = "LibGit2Sharp", CodeBase = @"$PackageFolder$\LibGit2Sharp.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Splat", CodeBase = @"$PackageFolder$\Splat.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Rothko", CodeBase = @"$PackageFolder$\Rothko.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Markdig", CodeBase = @"$PackageFolder$\Markdig.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Markdig.Wpf", CodeBase = @"$PackageFolder$\Markdig.Wpf.dll")]

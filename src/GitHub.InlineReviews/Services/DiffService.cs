@@ -23,11 +23,12 @@ namespace GitHub.InlineReviews.Services
 
         public async Task<IList<DiffChunk>> Diff(
             IRepository repo,
-            string sha,
+            string baseSha,
+            string headSha,
             string path,
             byte[] contents)
         {
-            var changes = await gitClient.CompareWith(repo, sha, path, contents);
+            var changes = await gitClient.CompareWith(repo, baseSha, headSha, path, contents);
             return DiffUtilities.ParseFragment(changes.Patch).ToList();
         }
     }
