@@ -12,7 +12,7 @@
              xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:CommentViewModelDesigner EditState="None">
+        <sample:CommentViewModelDesigner EditState="Editing">
             <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:CommentViewModelDesigner.Body>
@@ -86,13 +86,18 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
+            <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0 0 0 4" 
+                       Background="{DynamicResource GitHubVsBrandedUIBorder}"/>
+
             <ui:PromptTextBox Name="body"
                               Grid.Column="1"
+                              Grid.Row="1"
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
@@ -125,7 +130,7 @@
                 </ui:PromptTextBox.Style>
             </ui:PromptTextBox>
 
-            <DockPanel Grid.Column="1" Grid.Row="1"
+            <DockPanel Grid.Column="1" Grid.Row="2"
                        Margin="0 4"
                        HorizontalAlignment="Left" 
                        TextBlock.Foreground="Red">
@@ -143,7 +148,7 @@
             </DockPanel>
             
             <StackPanel Name="buttonPanel"
-                        Grid.Column="1" Grid.Row="2" 
+                        Grid.Column="1" Grid.Row="3" 
                         Margin="4 8" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
