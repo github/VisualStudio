@@ -287,7 +287,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyResolverPackage.cs" />
-    <Compile Include="Helpers\VisualTreeExtensions.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Menus\BlameLink.cs" />
     <Compile Include="Menus\MenuBase.cs" />

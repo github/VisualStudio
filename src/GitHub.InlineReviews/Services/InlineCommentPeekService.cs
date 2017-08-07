@@ -96,10 +96,15 @@ namespace GitHub.InlineReviews.Services
             var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
             var line = lineAndtrackingPoint.Item1;
             var trackingPoint = lineAndtrackingPoint.Item2;
+            var options = new PeekSessionCreationOptions(
+                textView,
+                InlineCommentPeekRelationship.Instance.Name,
+                trackingPoint,
+                defaultHeight: 0);
 
             ExpandCollapsedRegions(textView, line.Extent);
 
-            var session = peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
+            var session = peekBroker.TriggerPeekSession(options);
             var item = session.PeekableItems.OfType<InlineCommentPeekableItem>().FirstOrDefault();
 
             if (item != null)
@@ -120,10 +125,15 @@ namespace GitHub.InlineReviews.Services
             var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
             var line = lineAndtrackingPoint.Item1;
             var trackingPoint = lineAndtrackingPoint.Item2;
+            var options = new PeekSessionCreationOptions(
+                textView,
+                InlineCommentPeekRelationship.Instance.Name,
+                trackingPoint,
+                defaultHeight: 0);
 
             ExpandCollapsedRegions(textView, line.Extent);
 
-            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
+            peekBroker.TriggerPeekSession(options);
 
             return trackingPoint;
         }
