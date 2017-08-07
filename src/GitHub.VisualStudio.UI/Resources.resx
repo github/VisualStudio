@@ -351,8 +351,8 @@
   <data name="ChangesCountFormat" xml:space="preserve">
     <value>Changes ({0})</value>
   </data>
-  <data name="CompareFile" xml:space="preserve">
-    <value>Compare File</value>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>View Changes</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
     <value>Compare File as Default Action</value>
@@ -383,10 +383,10 @@
   <data name="prUpdatedText" xml:space="preserve">
     <value>Updated</value>
   </data>
-  <data name="CompareFileWithWorkingDirectory" xml:space="preserve">
-    <value>Compare With Working Directory</value>
+  <data name="CompareFileWithSolution" xml:space="preserve">
+    <value>Compare With Solution</value>
   </data>
-  <data name="OpenFileInWorkingDirectory" xml:space="preserve">
-    <value>Open File In Working Directory</value>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>Open File In Solution</value>
   </data>
 </root>

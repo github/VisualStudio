@@ -142,15 +142,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compare File.
-        /// </summary>
-        public static string CompareFile {
-            get {
-                return ResourceManager.GetString("CompareFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Compare File as Default Action.
         /// </summary>
         public static string CompareFileAsDefaultAction {
@@ -160,11 +151,11 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compare With Working Directory.
+        ///   Looks up a localized string similar to Compare With Solution.
         /// </summary>
-        public static string CompareFileWithWorkingDirectory {
+        public static string CompareFileWithSolution {
             get {
-                return ResourceManager.GetString("CompareFileWithWorkingDirectory", resourceCulture);
+                return ResourceManager.GetString("CompareFileWithSolution", resourceCulture);
             }
         }
         
@@ -565,11 +556,11 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open File In Working Directory.
+        ///   Looks up a localized string similar to Open File In Solution.
         /// </summary>
-        public static string OpenFileInWorkingDirectory {
+        public static string OpenFileInSolution {
             get {
-                return ResourceManager.GetString("OpenFileInWorkingDirectory", resourceCulture);
+                return ResourceManager.GetString("OpenFileInSolution", resourceCulture);
             }
         }
         
@@ -851,6 +842,15 @@ namespace GitHub.VisualStudio.UI {
         public static string verifyText {
             get {
                 return ResourceManager.GetString("verifyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Changes.
+        /// </summary>
+        public static string ViewChanges {
+            get {
+                return ResourceManager.GetString("ViewChanges", resourceCulture);
             }
         }
         
