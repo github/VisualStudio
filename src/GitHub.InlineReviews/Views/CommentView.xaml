@@ -93,7 +93,7 @@
             </Grid.RowDefinitions>
 
             <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0 0 0 4" 
-                       Background="{DynamicResource GitHubVsBrandedUIBorder}"/>
+                       Background="{DynamicResource GitHubButtonBorderBrush}"/>
 
             <ui:PromptTextBox Name="body"
                               Grid.Column="1"
@@ -109,7 +109,7 @@
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
                         <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
-                        <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
+                        <Setter Property="Background" Value="{DynamicResource VsBrush.SearchBoxBackground}" />
                         <Setter Property="Height" Value="28"/>
                         <Setter Property="PromptText" Value="Reply..."/>
                         <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
