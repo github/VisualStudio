@@ -100,10 +100,11 @@
             </StackPanel>
         </Border>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
+        <ScrollViewer Name="threadScroller"
+                      VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubVsToolWindowBackground}">
             <Grid>
-                <local:CommentThreadView DataContext="{Binding Thread}"/>
+                <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
             </Grid>
         </ScrollViewer>
     </DockPanel>
