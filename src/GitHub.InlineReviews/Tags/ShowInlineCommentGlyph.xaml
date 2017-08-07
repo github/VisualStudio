@@ -25,7 +25,7 @@
         </Style>
     </UserControl.Style>
 
-    <Grid>
+    <Grid Background="{DynamicResource GitHubGlyphMarginCommentableBackground}">
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
             <Canvas Width="16" Height="15">
                 <Path Canvas.Top="1" Canvas.Left="0.85"

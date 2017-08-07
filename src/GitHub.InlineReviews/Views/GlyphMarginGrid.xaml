@@ -16,5 +16,5 @@
         </ResourceDictionary>
     </Grid.Resources>
 
-    <Border BorderBrush="{DynamicResource VsBrush.ScrollBarBackground}" BorderThickness="0,0,1,0"/>
+    <Border Background="{DynamicResource GitHubPeekViewBackground}" BorderBrush="{DynamicResource GitHubPeekViewBackground}" BorderThickness="0,0,1,0"/>
 </Grid>
