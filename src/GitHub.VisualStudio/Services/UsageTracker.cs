@@ -202,6 +202,34 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementPRDetailsViewChanges()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsViewChanges;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsViewFile()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsViewFile;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsCompareWithSolution()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsCompareWithSolution;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsOpenFileInSolution()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsOpenFileInSolution;
+            SaveUsage(usage);
+        }
+
         public async Task IncrementPRReviewDiffViewInlineCommentOpen()
         {
             var usage = await LoadUsage();
@@ -373,9 +401,13 @@ namespace GitHub.Services
             usage.NumberOfGitHubPaneHelpClicks = 0;
             usage.NumberOfWelcomeTrainingClicks = 0;
             usage.NumberOfWelcomeDocsClicks = 0;
+            usage.NumberOfPRDetailsViewChanges = 0;
+            usage.NumberOfPRDetailsViewFile = 0;
+            usage.NumberOfPRDetailsCompareWithSolution = 0;
+            usage.NumberOfPRDetailsOpenFileInSolution = 0;
             usage.NumberOfPRReviewDiffViewInlineCommentOpen = 0;
             usage.NumberOfPRReviewDiffViewInlineCommentPost = 0;
-
+    
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;
 

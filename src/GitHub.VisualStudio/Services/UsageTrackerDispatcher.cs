@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using Task = System.Threading.Tasks.Task;
 using GitHub.Exports;
 using Microsoft.VisualStudio.Shell;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -34,6 +35,10 @@ namespace GitHub.Services
         public Task IncrementWelcomeDocsClicks() => inner.IncrementWelcomeDocsClicks();
         public Task IncrementWelcomeTrainingClicks() => inner.IncrementWelcomeTrainingClicks();
         public Task IncrementGitHubPaneHelpClicks() => inner.IncrementGitHubPaneHelpClicks();
+        public Task IncrementPRDetailsViewChanges() => inner.IncrementPRDetailsViewChanges();
+        public Task IncrementPRDetailsViewFile() => inner.IncrementPRDetailsViewFile();
+        public Task IncrementPRDetailsCompareWithSolution() => inner.IncrementPRDetailsCompareWithSolution();
+        public Task IncrementPRDetailsOpenFileInSolution() => inner.IncrementPRDetailsOpenFileInSolution();
         public Task IncrementPRReviewDiffViewInlineCommentOpen() => inner.IncrementPRReviewDiffViewInlineCommentOpen();
         public Task IncrementPRReviewDiffViewInlineCommentPost() => inner.IncrementPRReviewDiffViewInlineCommentPost();
     }

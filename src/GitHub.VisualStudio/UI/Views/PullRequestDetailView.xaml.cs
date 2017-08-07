@@ -64,6 +64,9 @@ namespace GitHub.VisualStudio.UI.Views
         [Import]
         IEditorOptionsFactoryService EditorOptionsFactoryService { get; set; }
 
+        [Import]
+        IUsageTracker UsageTracker { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -92,6 +95,11 @@ namespace GitHub.VisualStudio.UI.Views
                     var buffer = GetBufferAt(fileName);
                     AddBufferTag(buffer, ViewModel.Session, fullPath, false);
                 }
+
+                if (workingDirectory)
+                    await UsageTracker.IncrementPRDetailsOpenFileInSolution();
+                else
+                    await UsageTracker.IncrementPRDetailsViewFile();
             }
             catch (Exception e)
             {
@@ -144,6 +152,11 @@ namespace GitHub.VisualStudio.UI.Views
                 var session = ViewModel.Session;
                 AddBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
                 AddBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
+
+                if (workingDirectory)
+                    await UsageTracker.IncrementPRDetailsCompareWithSolution();
+                else
+                    await UsageTracker.IncrementPRDetailsViewChanges();
             }
             catch (Exception e)
             {
