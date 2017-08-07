@@ -93,8 +93,9 @@ namespace GitHub.InlineReviews.Services
         {
             Guard.ArgumentNotNull(tag, nameof(tag));
 
-            var line = textView.TextSnapshot.GetLineFromLineNumber(tag.LineNumber);
-            var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
+            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
+            var line = lineAndtrackingPoint.Item1;
+            var trackingPoint = lineAndtrackingPoint.Item2;
 
             ExpandCollapsedRegions(textView, line.Extent);
 
@@ -116,13 +117,21 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(textView, nameof(textView));
             Guard.ArgumentNotNull(tag, nameof(tag));
 
-            var projectionBuffer = textView.TextBuffer as IProjectionBuffer;
-            var snapshot = textView.TextSnapshot;
+            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
+            var line = lineAndtrackingPoint.Item1;
+            var trackingPoint = lineAndtrackingPoint.Item2;
 
-            // If we're in an inline diff view then we need to get the line number from the
-            // left or right buffer depending on the type of diff change that the comment was
-            // made on.
+            ExpandCollapsedRegions(textView, line.Extent);
+
+            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
+
+            return trackingPoint;
+        }
+
+        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineCommentTag tag)
+        {
             var diffModel = (textView as IWpfTextView)?.TextViewModel as IDifferenceTextViewModel;
+            var snapshot = textView.TextSnapshot;
 
             if (diffModel?.ViewType == DifferenceViewType.InlineView)
             {
@@ -133,9 +142,7 @@ namespace GitHub.InlineReviews.Services
 
             var line = snapshot.GetLineFromLineNumber(tag.LineNumber);
             var trackingPoint = snapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-            ExpandCollapsedRegions(textView, line.Extent);
-            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
-            return trackingPoint;
+            return Tuple.Create(line, trackingPoint);
         }
 
         void ExpandCollapsedRegions(ITextView textView, SnapshotSpan span)
