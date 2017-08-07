@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
         /// <param name="thread">The thread that the comment is a part of.</param>
-        /// <param name="currentUser">The current user or null if not used.</param>
+        /// <param name="currentUser">The current user.</param>
         /// <param name="commentId">The ID of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
@@ -42,6 +43,7 @@ namespace GitHub.InlineReviews.ViewModels
             DateTimeOffset updatedAt)
         {
             Guard.ArgumentNotNull(thread, nameof(thread));
+            Guard.ArgumentNotNull(currentUser, nameof(currentUser));
             Guard.ArgumentNotNull(body, nameof(body));
             Guard.ArgumentNotNull(user, nameof(user));
 

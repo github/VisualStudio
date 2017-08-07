@@ -9,22 +9,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Commands;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.UI.Helpers;
 using GitHub.ViewModels;
-using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
-using GitHub.InlineReviews.Commands;
-using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -68,7 +67,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = TeamExplorerServiceHolder.ActiveRepo;
+            var repo = ViewModel.RemoteRepository;
             var browser = VisualStudioBrowser;
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);
@@ -93,7 +92,7 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
                 var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
-                var fullPath = System.IO.Path.Combine(ViewModel.Repository.LocalPath, relativePath);
+                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
                 var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
                 var rightLabel = $"{relativePath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";

@@ -3,7 +3,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using ReactiveUI;
 using Stateless;
 using System;
@@ -144,12 +143,18 @@ namespace GitHub.Controllers
                    serviceProvider.TryGetService<IUIFactory>(),
                    serviceProvider.TryGetService<IConnectionManager>())
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
         public UIController(IGitHubServiceProvider gitHubServiceProvider,
             IRepositoryHosts hosts, IUIFactory factory,
             IConnectionManager connectionManager)
         {
+            Guard.ArgumentNotNull(gitHubServiceProvider, nameof(gitHubServiceProvider));
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(factory, nameof(factory));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+
             this.factory = factory;
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.hosts = hosts;
@@ -180,8 +185,8 @@ namespace GitHub.Controllers
         }
 
         public IObservable<LoadData> Configure(UIControllerFlow choice,
-            [AllowNull] IConnection conn = null,
-            [AllowNull] ViewWithData parameters = null)
+            IConnection conn = null,
+            ViewWithData parameters = null)
         {
             connection = conn;
             selectedFlow = choice;

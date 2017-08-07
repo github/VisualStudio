@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -12,8 +11,8 @@ namespace GitHub.UI
     {
         public override object Convert(object value,
             Type targetType,
-            [AllowNull]object parameter,
-            [AllowNull]CultureInfo culture)
+            object parameter,
+            CultureInfo culture)
         {
             if (targetType != typeof(bool))
                 throw new InvalidOperationException("The target must be a boolean");
@@ -22,8 +21,8 @@ namespace GitHub.UI
         }
 
         public override object ConvertBack(object value, Type targetType,
-            [AllowNull]object parameter,
-            [AllowNull]CultureInfo culture)
+            object parameter,
+            CultureInfo culture)
         {
             if (targetType != typeof(bool))
                 throw new InvalidOperationException("The target must be a boolean");

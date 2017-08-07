@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             DeleteDirectory(path);
         }
 
-        public Task<IList<DiffChunk>> Diff(IRepository repo, string baseSha, string path, byte[] contents)
+        public Task<IList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();

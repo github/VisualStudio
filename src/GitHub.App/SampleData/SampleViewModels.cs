@@ -321,7 +321,7 @@ namespace GitHub.SampleData
         {
             name = name ?? "octocat";
             owner = owner ?? "github";
-            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner });
+            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner }, null);
         }
     }
 

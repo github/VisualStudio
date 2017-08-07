@@ -18,6 +18,7 @@ using System.Threading;
 using System.Linq;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using GitHub.Extensions;
 
 namespace GitHub.Collections
 {
@@ -76,8 +77,8 @@ namespace GitHub.Collections
             IObservable<T> selection)
             where T : class, ICopyable<T>
         {
-            Debug.Assert(stickieItemOnTop != null, "stickieItemOnTop may not be null in CreateListenerCollection");
-            Debug.Assert(selection != null, "selection may not be null in CreateListenerCollection");
+            Guard.ArgumentNotNull(stickieItemOnTop, nameof(stickieItemOnTop));
+            Guard.ArgumentNotNull(selection, nameof(selection));
 
             var stickieItems = new[] { stickieItemOnTop };
             var result = new ObservableCollection<T>(tcol);

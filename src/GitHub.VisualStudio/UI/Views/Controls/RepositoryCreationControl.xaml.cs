@@ -9,7 +9,6 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.UserErrors;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 

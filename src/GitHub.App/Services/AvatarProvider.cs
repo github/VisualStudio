@@ -1,14 +1,15 @@
 using System;
+using System.IO.Packaging;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Models;
-using NullGuard;
+using System.Windows;
 
 namespace GitHub.Services
 {
@@ -24,18 +25,17 @@ namespace GitHub.Services
 
         static AvatarProvider()
         {
-            // NB: If this isn't explicitly set, WPF will try to guess it via
-            // GetEntryAssembly, which in a unit test runner will be null
-            // This is needed for the pack:// URL format to be understood.
-            if (Application.ResourceAssembly == null)
-            {
-                Application.ResourceAssembly = typeof(AvatarProvider).Assembly;
-            }
+            // Calling `Application.Current` will install pack URI scheme via Application.cctor.
+            // This is needed when unit testing for the pack:// URL format to be understood.
+            if (Application.Current != null) { }
         }
 
         [ImportingConstructor]
         public AvatarProvider(ISharedCache sharedCache, IImageCache imageCache)
         {
+            Guard.ArgumentNotNull(sharedCache, nameof(sharedCache));
+            Guard.ArgumentNotNull(imageCache, nameof(imageCache));
+
             cache = sharedCache.LocalMachine;
             this.imageCache = imageCache;
 
@@ -45,6 +45,8 @@ namespace GitHub.Services
 
         public static BitmapImage CreateBitmapImage(string packUrl)
         {
+            Guard.ArgumentNotEmptyString(packUrl, nameof(packUrl));
+
             var bitmap = new BitmapImage(new Uri(packUrl));
             bitmap.Freeze();
             return bitmap;
@@ -52,6 +54,8 @@ namespace GitHub.Services
 
         public IObservable<BitmapSource> GetAvatar(IAvatarContainer apiAccount)
         {
+            Guard.ArgumentNotNull(apiAccount, nameof(apiAccount));
+
             if (apiAccount.AvatarUrl == null)
             {
                 return Observable.Return(DefaultAvatar(apiAccount));
@@ -64,8 +68,8 @@ namespace GitHub.Services
             return imageCache.GetImage(avatarUrl)
                 .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(apiAccount)));
         }
-            
-        public IObservable<Unit> InvalidateAvatar([AllowNull] IAvatarContainer apiAccount)
+
+        public IObservable<Unit> InvalidateAvatar(IAvatarContainer apiAccount)
         {
             return String.IsNullOrWhiteSpace(apiAccount?.Login)
                 ? Observable.Return(Unit.Default)
@@ -74,11 +78,13 @@ namespace GitHub.Services
 
         BitmapImage DefaultAvatar(IAvatarContainer apiAccount)
         {
+            Guard.ArgumentNotNull(apiAccount, nameof(apiAccount));
+
             return apiAccount.IsUser ? DefaultUserBitmapImage : DefaultOrgBitmapImage;
         }
 
         protected virtual void Dispose(bool disposing)
-        {}
+        { }
 
         public void Dispose()
         {

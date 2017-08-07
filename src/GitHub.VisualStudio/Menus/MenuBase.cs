@@ -3,11 +3,11 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {
@@ -22,10 +22,8 @@ namespace GitHub.VisualStudio
 
         protected ISimpleApiClient simpleApiClient;
 
-        [AllowNull]
         protected ISimpleApiClient SimpleApiClient
         {
-            [return: AllowNull]
             get { return simpleApiClient; }
             set
             {
@@ -42,8 +40,28 @@ namespace GitHub.VisualStudio
 
         protected MenuBase(IGitHubServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             this.serviceProvider = serviceProvider;
             apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
+        }
+
+        protected ILocalRepositoryModel GetRepositoryByPath(string path)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(path))
+                {
+                    var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
+                    return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
+                }
+            }
+            catch (Exception ex)
+            {
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
+            }
+
+            return null;
         }
 
         protected ILocalRepositoryModel GetActiveRepo()

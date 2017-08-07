@@ -8,12 +8,12 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.App;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 using Rothko;
 
@@ -43,6 +43,10 @@ namespace GitHub.ViewModels
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
+            Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
+
             this.operatingSystem = operatingSystem;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
@@ -74,7 +78,7 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string path)
         {
-            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
+            Guard.ArgumentNotNull(path, nameof(path));
 
             bool isAlreadyRepoAtPath = false;
 
@@ -120,7 +124,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public string BaseRepositoryPath
         {
-            [return: AllowNull]
             get { return baseRepositoryPath; }
             set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
         }
@@ -134,10 +137,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Selected repository to clone
         /// </summary>
-        [AllowNull]
         public IRepositoryModel SelectedRepository
         {
-            [return: AllowNull]
             get { return selectedRepository; }
             set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }

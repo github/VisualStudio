@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews.ViewModels
             return new Uri(string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}/pull/{1}#discussion_r{2}",
-                Session.Repository.CloneUrl.ToRepositoryUrl(),
+                Session.LocalRepository.CloneUrl.ToRepositoryUrl(),
                 Session.PullRequest.Number,
                 id));
         }
@@ -71,8 +71,8 @@ namespace GitHub.InlineReviews.ViewModels
             var body = (string)parameter;
             var replyId = Comments[0].Id;
             var result = await apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
+                Session.RepositoryOwner,
+                Session.LocalRepository.Name,
                 Session.PullRequest.Number,
                 body,
                 replyId);

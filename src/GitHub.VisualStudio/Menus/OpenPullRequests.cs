@@ -1,9 +1,9 @@
 ﻿using GitHub.Exports;
 using GitHub.UI;
 using GitHub.VisualStudio.UI;
-using NullGuard;
 using System;
 using GitHub.Services;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -13,12 +13,13 @@ namespace GitHub.VisualStudio.Menus
         public OpenPullRequests(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
         public Guid Guid => GuidList.guidGitHubCmdSet;
         public int CmdId => PkgCmdIDList.openPullRequestsCommand;
 
-        public void Activate([AllowNull]object data = null)
+        public void Activate(object data = null)
         {
             var host = ServiceProvider.TryGetService<IGitHubToolWindowManager>().ShowHomePane();
             host?.ShowView(new ViewWithData(UIControllerFlow.PullRequestList));

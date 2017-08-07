@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
@@ -49,6 +50,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -89,6 +91,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var file = await target.GetFile(FilePath);
@@ -131,6 +134,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -177,6 +181,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(diskContents);
@@ -228,6 +233,7 @@ Line 4");
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         isCheckedOut: false);
 
                     var editor = new FakeEditorContentSource(editorContents);
@@ -275,6 +281,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(editorContents);
@@ -331,6 +338,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(editorContents);
@@ -376,6 +384,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -410,6 +419,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -448,6 +458,7 @@ Line 4 with comment");
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         true);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -487,6 +498,7 @@ Line 4";
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
                         isCheckedOut: false);
 
                     var editor = new FakeEditorContentSource(headContents);
@@ -545,11 +557,48 @@ Line 4";
                     Substitute.For<IAccount>(),
                     pullRequest,
                     Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
                     true);
 
                 var editor = new FakeEditorContentSource(headContents);
                 var file = await target.GetFile(FilePath, editor);
                 return target;
+            }
+        }
+
+        public class TheUpdateMethod
+        {
+            [Fact]
+            public async Task DoesntThrowIfGetFileCalledDuringUpdate()
+            {
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        string.Empty,
+                        true);
+
+                    await target.GetFile("test.cs");
+
+                    // Simulate calling GetFile with a file that's not yet been initialized
+                    // while doing the Update.
+                    service.WhenForAnyArgs(x => x.Diff(null, null, null, null, null))
+                        .Do(_ => target.GetFile("other.cs").Forget());
+
+                    await target.Update(pullRequest);
+                }
             }
         }
 
@@ -566,14 +615,16 @@ Line 4";
 
         static IPullRequestModel CreatePullRequest(params IPullRequestReviewCommentModel[] comments)
         {
-            var changedFile = Substitute.For<IPullRequestFileModel>();
-            changedFile.FileName.Returns("test.cs");
+            var changedFile1 = Substitute.For<IPullRequestFileModel>();
+            changedFile1.FileName.Returns("test.cs");
+            var changedFile2 = Substitute.For<IPullRequestFileModel>();
+            changedFile2.FileName.Returns("other.cs");
 
             var result = Substitute.For<IPullRequestModel>();
             result.Number.Returns(PullRequestNumber);
             result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
             result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
-            result.ChangedFiles.Returns(new[] { changedFile });
+            result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
             result.ReviewComments.Returns(comments);
 
             return result;
@@ -597,12 +648,14 @@ Line 4";
                 Arg.Any<ILocalRepositoryModel>(),
                 Arg.Any<string>(),
                 Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<byte[]>())
                 .Returns(i => diffService.Diff(
                     null,
                     i.ArgAt<string>(1),
                     i.ArgAt<string>(2),
-                    i.ArgAt<byte[]>(3)));
+                    i.ArgAt<string>(3),
+                    i.ArgAt<byte[]>(4)));
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
             return result;
         }

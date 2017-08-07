@@ -5,8 +5,8 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Automation.Peers;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -81,7 +81,6 @@ namespace GitHub.UI
         /// <summary>
         /// Gets a value reflecting the associated view model's <see cref="IHasErrorState.ErrorMessage"/> property.
         /// </summary>
-        [AllowNull]
         public string ErrorMessage
         {
             get { return (string)GetValue(ErrorMessageProperty); }
@@ -213,10 +212,8 @@ namespace GitHub.UI
         /// <summary>
         /// Gets or sets the control's data context as a typed view model.
         /// </summary>
-        [AllowNull]
         public TInterface ViewModel
         {
-            [return: AllowNull]
             get { return (TInterface)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
@@ -225,10 +222,8 @@ namespace GitHub.UI
         /// Gets or sets the control's data context as a typed view model. Required for interaction
         /// with ReactiveUI.
         /// </summary>
-        [AllowNull]
         TInterface IViewFor<TInterface>.ViewModel
         {
-            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = value; }
         }
@@ -236,10 +231,8 @@ namespace GitHub.UI
         /// <summary>
         /// Gets or sets the control's data context. Required for interaction with ReactiveUI.
         /// </summary>
-        [AllowNull]
         object IViewFor.ViewModel
         {
-            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = (TInterface)value; }
         }
@@ -247,10 +240,8 @@ namespace GitHub.UI
         /// <summary>
         /// Gets or sets the control's data context. Required for interaction with ReactiveUI.
         /// </summary>
-        [AllowNull]
         IViewModel IView.ViewModel
         {
-            [return: AllowNull]
             get { return ViewModel; }
         }
 
@@ -287,6 +278,16 @@ namespace GitHub.UI
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///  Add an automation peer to views and custom controls 
+        ///  They do not have automation peers or properties by default
+        ///  https://stackoverflow.com/questions/30198109/automationproperties-automationid-on-custom-control-not-exposed
+        /// </summary>
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new UIElementAutomationPeer(this);
         }
     }
 }

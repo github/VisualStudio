@@ -32,8 +32,8 @@ public class RepositoryModelTests
         public void SameContentEqualsTrue2(long id1, string name1, string url1, long id2, string name2, string url2)
         {
             var account = Substitute.For<IAccount>();
-            var a = new RemoteRepositoryModel(id1, name1, new UriString(url1), false, false, account);
-            var b = new RemoteRepositoryModel(id2, name2, new UriString(url2), false, false, account);
+            var a = new RemoteRepositoryModel(id1, name1, new UriString(url1), false, false, account, null);
+            var b = new RemoteRepositoryModel(id2, name2, new UriString(url2), false, false, account, null);
             Assert.Equal(a, b);
             Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
@@ -44,8 +44,8 @@ public class RepositoryModelTests
         public void DifferentContentEqualsFalse(long id1, string name1, string url1, long id2, string name2, string url2)
         {
             var account = Substitute.For<IAccount>();
-            var a = new RemoteRepositoryModel(id1, name1, new UriString(url1), false, false, account);
-            var b = new RemoteRepositoryModel(id2, name2, new UriString(url2), false, false, account);
+            var a = new RemoteRepositoryModel(id1, name1, new UriString(url1), false, false, account, null);
+            var b = new RemoteRepositoryModel(id2, name2, new UriString(url2), false, false, account, null);
             Assert.NotEqual(a, b);
             Assert.False(a == b);
             Assert.NotEqual(a.GetHashCode(), b.GetHashCode());

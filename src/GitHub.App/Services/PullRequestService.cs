@@ -19,13 +19,12 @@ using System.Diagnostics;
 
 namespace GitHub.Services
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
-        const string SettingGHfVSPullRequest = "ghfvs-pr";
+        const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
 
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
@@ -143,7 +142,7 @@ namespace GitHub.Services
 
                 // Store the PR number in the branch config with the key "ghfvs-pr".
                 var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
-                await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
+                await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
 
                 return Observable.Return(Unit.Default);
             });
@@ -215,9 +214,9 @@ namespace GitHub.Services
 
                 foreach (var branch in branches)
                 {
-                    if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest.Number))
+                    if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest))
                     {
-                        await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.Number);
+                        await MarkBranchAsPullRequest(repo, branch.Name, pullRequest);
                         result = true;
                     }
                 }
@@ -226,13 +225,11 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            if (pullRequest.Head?.Label != null && pullRequest.Base?.Label != null)
+            if (pullRequest.Head?.RepositoryCloneUrl != null)
             {
-                var headOwner = pullRequest.Head.Label.Split(':')[0];
-                var baseOwner = pullRequest.Base.Label.Split(':')[0];
-                return headOwner != baseOwner;
+                return repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
             }
 
             return false;
@@ -271,16 +268,16 @@ namespace GitHub.Services
                     }
 
                     await gitClient.Checkout(repo, branchName);
-                    await MarkBranchAsPullRequest(repo, branchName, pullRequest.Number);
+                    await MarkBranchAsPullRequest(repo, branchName, pullRequest);
                 }
 
                 return Observable.Return(Unit.Default);
             });
         }
 
-        public IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
+        public IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var configKey = string.Format(
@@ -288,7 +285,8 @@ namespace GitHub.Services
                     "branch.{0}.{1}",
                     repo.Head.FriendlyName,
                     SettingGHfVSPullRequest);
-                return gitClient.GetConfig<int>(repo, configKey).ToObservable();
+                var value = await gitClient.GetConfig<string>(repo, configKey);
+                return Observable.Return(ParseGHfVSConfigKeyValue(value));
             });
         }
 
@@ -301,12 +299,14 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-
+                var baseUrl = pullRequest.Base.RepositoryCloneUrl;
+                var headUrl = pullRequest.Head.RepositoryCloneUrl;
                 var baseSha = pullRequest.Base.Sha;
                 var headSha = pullRequest.Head.Sha;
                 var baseRef = pullRequest.Base.Ref;
-                string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
+                var headRef = pullRequest.Head.Ref;
+                string mergeBase = await gitClient.GetPullRequestMergeBase(
+                    repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
                 if (mergeBase == null)
                 {
                     throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
@@ -435,31 +435,35 @@ namespace GitHub.Services
             IRepository repository,
             IPullRequestModel pullRequest)
         {
-            if (!IsPullRequestFromFork(localRepository, pullRequest))
+            if (IsPullRequestFromRepository(localRepository, pullRequest))
             {
                 return new[] { pullRequest.Head.Ref };
             }
             else
             {
-                var pr = pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+                var key = BuildGHfVSConfigKeyValue(pullRequest);
+
                 return repository.Config
                     .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == key)
                     .Select(x => x.Branch);
             }
         }
 
-        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, int number)
+        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            return await gitClient.GetConfig<int>(repo, prConfigKey) == number;
+            var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
+            return value != null && 
+                value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
+                value.Item2 == pullRequest.Number;
         }
 
-        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, int number)
+        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
         {
             // Store the PR number in the branch config with the key "ghfvs-pr".
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            await gitClient.SetConfig(repo, prConfigKey, number.ToString());
+            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
@@ -498,6 +502,33 @@ namespace GitHub.Services
 
                 before = after;
             }
+        }
+
+        static string BuildGHfVSConfigKeyValue(IPullRequestModel pullRequest)
+        {
+            return pullRequest.Base.RepositoryCloneUrl.Owner + '#' +
+                   pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+        }
+
+        static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
+        {
+            if (value != null)
+            {
+                var separator = value.IndexOf('#');
+
+                if (separator != -1)
+                {
+                    var owner = value.Substring(0, separator);
+                    int number;
+
+                    if (int.TryParse(value.Substring(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                    {
+                        return Tuple.Create(owner, number);
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

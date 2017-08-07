@@ -33,19 +33,21 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService service,
             IAccount user,
             IPullRequestModel pullRequest,
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string repositoryOwner,
             bool isCheckedOut)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
-            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotNull(localRepository, nameof(localRepository));
 
             this.service = service;
             this.isCheckedOut = isCheckedOut;
             User = user;
             PullRequest = pullRequest;
-            Repository = repository;
+            LocalRepository = localRepository;
+            RepositoryOwner = repositoryOwner;
         }
 
         /// <inheritdoc/>
@@ -112,7 +114,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (Path.IsPathRooted(path))
             {
-                var basePath = Repository.LocalPath;
+                var basePath = LocalRepository.LocalPath;
 
                 if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
                 {
@@ -134,9 +136,10 @@ namespace GitHub.InlineReviews.Services
             {
                 var content = await GetFileContent(file);
 
-                file.CommitSha = await CalculateCommitSha(file, content);
-                var mergeBaseSha = await service.GetPullRequestMergeBase(Repository, PullRequest);
-                file.Diff = await service.Diff(Repository, mergeBaseSha, relativePath, content);
+                file.CommitSha = await CalculateContentCommitSha(file, content);
+                var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+                var headSha = await CalculateHeadSha();
+                file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, relativePath, content);
 
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -150,7 +153,7 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequest = pullRequest;
 
-            foreach (var file in this.fileIndex.Values)
+            foreach (var file in this.fileIndex.Values.ToList())
             {
                 await UpdateFile(file);
             }
@@ -158,12 +161,14 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
+            // NOTE: We must call GetPullRequestMergeBase before GetFileContent.
+            var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+            var headSha = await CalculateHeadSha();
             var content = await GetFileContent(file);
 
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await CalculateCommitSha(file, content);
-            var mergeBaseSha = await service.GetPullRequestMergeBase(Repository, PullRequest);
-            file.Diff = await service.Diff(Repository, mergeBaseSha, file.RelativePath, content);
+            file.CommitSha = await CalculateContentCommitSha(file, content);
+            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
                 .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)
@@ -213,12 +218,12 @@ namespace GitHub.InlineReviews.Services
             return result;
         }
 
-        async Task<string> CalculateCommitSha(IPullRequestSessionFile file, byte[] content)
+        async Task<string> CalculateContentCommitSha(IPullRequestSessionFile file, byte[] content)
         {
             if (IsCheckedOut)
             {
-                return await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
-                        await service.GetTipSha(Repository) : null;
+                return await service.IsUnmodifiedAndPushed(LocalRepository, file.RelativePath, content) ?
+                        await service.GetTipSha(LocalRepository) : null;
             }
             else
             {
@@ -226,12 +231,19 @@ namespace GitHub.InlineReviews.Services
             }       
         }
 
+        async Task<string> CalculateHeadSha()
+        {
+            return IsCheckedOut ? 
+                await service.GetTipSha(LocalRepository) :
+                PullRequest.Head.Sha;
+        }
+
         Task<byte[]> GetFileContent(IPullRequestSessionFile file)
         {
             if (!IsCheckedOut)
             {
                 return service.ExtractFileFromGit(
-                    Repository,
+                    LocalRepository,
                     PullRequest.Number,
                     PullRequest.Head.Sha,
                     file.RelativePath);
@@ -242,13 +254,13 @@ namespace GitHub.InlineReviews.Services
             }
             else
             {
-                return service.ReadFileAsync(Path.Combine(Repository.LocalPath, file.RelativePath));
+                return service.ReadFileAsync(Path.Combine(LocalRepository.LocalPath, file.RelativePath));
             }
         }
 
         string GetFullPath(string relativePath)
         {
-            return Path.Combine(Repository.LocalPath, relativePath);
+            return Path.Combine(LocalRepository.LocalPath, relativePath);
         }
 
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
@@ -279,7 +291,10 @@ namespace GitHub.InlineReviews.Services
         public IPullRequestModel PullRequest { get; private set; }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel Repository { get; }
+        public ILocalRepositoryModel LocalRepository { get; }
+
+        /// <inheritdoc/>
+        public string RepositoryOwner { get; }
 
         IEnumerable<string> FilePaths
         {
