@@ -102,7 +102,7 @@
 
         <ScrollViewer Name="threadScroller"
                       VerticalScrollBarVisibility="Auto"
-                      Background="{DynamicResource GitHubVsToolWindowBackground}">
+                      Background="{DynamicResource GitHubPeekViewBackground}">
             <Grid>
                 <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
             </Grid>
