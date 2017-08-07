@@ -10,13 +10,6 @@
     </NuGetPackageImportStamp>
     <UseCodebase>true</UseCodebase>
     <TargetFrameworkProfile />
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -56,6 +49,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -82,6 +76,7 @@
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
+    <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSourceProvider.cs" />
@@ -153,9 +148,6 @@
     <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
@@ -170,10 +162,6 @@
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
       <Project>{1CE2D235-8072-4649-BA5A-CFB1AF8776E0}</Project>
       <Name>ReactiveUI_Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}</Project>
-      <Name>Rothko</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
@@ -194,6 +182,10 @@
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}</Project>
       <Name>GitHub.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
+      <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
+      <Name>GitHub.UI.Reactive</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
@@ -219,6 +211,14 @@
     </Reference>
     <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig, Version=0.13.0.0, Culture=neutral, PublicKeyToken=870da25a133885f8, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Signed.0.13.0\lib\net40\Markdig.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig.Wpf, Version=0.2.1.0, Culture=neutral, PublicKeyToken=a0d0cdbebd8d164b, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Wpf.Signed.0.2.1\lib\net452\Markdig.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
@@ -335,6 +335,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>

@@ -4,12 +4,10 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.UI;
-using NullGuard;
 using GitHub.Exports;
 
 namespace GitHub.App.SampleData
 {
-    [NullGuard(ValidationFlags.None)]
     public class LocalRepositoryModelDesigner : ILocalRepositoryModel
     {
         public UriString CloneUrl { get; set; }

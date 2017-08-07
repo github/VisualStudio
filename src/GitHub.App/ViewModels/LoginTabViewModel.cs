@@ -14,7 +14,6 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -26,6 +25,9 @@ namespace GitHub.ViewModels
 
         protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
         {
+            Guard.ArgumentNotNull(repositoryHosts, nameof(repositoryHosts));
+            Guard.ArgumentNotNull(browser, nameof(browser));
+
             RepositoryHosts = repositoryHosts;
 
             UsernameOrEmailValidator = ReactivePropertyValidator.For(this, x => x.UsernameOrEmail)
@@ -83,10 +85,8 @@ namespace GitHub.ViewModels
         public IRecoveryCommand NavigateForgotPassword { get; }
 
         string usernameOrEmail;
-        [AllowNull]
         public string UsernameOrEmail
         {
-            [return: AllowNull]
             get
             { return usernameOrEmail; }
             set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
@@ -100,10 +100,8 @@ namespace GitHub.ViewModels
         }
 
         string password;
-        [AllowNull]
         public string Password
         {
-            [return: AllowNull]
             get
             { return password; }
             set { this.RaiseAndSetIfChanged(ref password, value); }
@@ -129,10 +127,8 @@ namespace GitHub.ViewModels
         }
 
         UserError error;
-        [AllowNull]
         public UserError Error
         {
-            [return: AllowNull]
             get { return error; }
             set { this.RaiseAndSetIfChanged(ref error, value); }
         }
@@ -141,6 +137,8 @@ namespace GitHub.ViewModels
 
         protected IObservable<AuthenticationResult> LogInToHost(HostAddress hostAddress)
         {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+
             return Observable.Defer(() =>
             {
                 return hostAddress != null ?

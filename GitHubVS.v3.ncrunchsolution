@@ -1,7 +1,12 @@
 ﻿<SolutionConfiguration>
   <Settings>
+    <AdditionalFilesForGridProcessing>
+      <Value>packages\Fody.1.29.4\**.*</Value>
+      <Value>packages\EntryExitDecorator.Fody.0.3.0\**.*</Value>
+    </AdditionalFilesForGridProcessing>
     <AdditionalFilesToIncludeForSolution>
       <Value>lib\**.*</Value>
+      <Value>packages\Brutal.Dev.StrongNameSigner.2.1.3\build\**.*</Value>
     </AdditionalFilesToIncludeForSolution>
     <AllowParallelTestExecution>False</AllowParallelTestExecution>
     <ProjectConfigStoragePathRelativeToSolutionDir>.ncrunch</ProjectConfigStoragePathRelativeToSolutionDir>

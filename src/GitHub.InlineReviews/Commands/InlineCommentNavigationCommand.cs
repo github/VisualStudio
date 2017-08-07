@@ -49,7 +49,7 @@ namespace GitHub.InlineReviews.Commands
             get
             {
                 var tags = GetTags(GetCurrentTextViews());
-                return tags.Count > 1;
+                return tags.Count > 0;
             }
         }
 
@@ -215,6 +215,14 @@ namespace GitHub.InlineReviews.Commands
             ShowInlineCommentTag tag,
             IEnumerable<ITextView> allTextViews)
         {
+            foreach (var other in allTextViews)
+            {
+                if (other != textView)
+                {
+                    peekService.Hide(other);
+                }
+            }
+
             var point = peekService.Show(textView, tag);
 
             if (parameter?.MoveCursor != false)
@@ -229,14 +237,6 @@ namespace GitHub.InlineReviews.Commands
                 {
                     (textView as FrameworkElement)?.Focus();
                     textView.Caret.MoveTo(caretPoint.Value);
-                }
-            }
-
-            foreach (var other in allTextViews)
-            {
-                if (other != textView)
-                {
-                    peekService.Hide(other);
                 }
             }
         }

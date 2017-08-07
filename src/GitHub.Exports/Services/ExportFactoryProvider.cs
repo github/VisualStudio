@@ -28,16 +28,30 @@ namespace GitHub.Services
 
         public ExportLifetimeContext<IViewModel> GetViewModel(UIViewType viewType)
         {
-            Debug.Assert(ViewModelFactory != null, "Attempted to obtain a view model before we imported the ViewModelFactory");
+            if (ViewModelFactory == null)
+            {
+                throw new GitHubLogicException("Attempted to obtain a view model before we imported the ViewModelFactory");
+            }
+
             var f = ViewModelFactory.FirstOrDefault(x => x.Metadata.ViewType == viewType);
-            Debug.Assert(f != null, string.Format(CultureInfo.InvariantCulture, "Could not locate view model for {0}.", viewType));
+
+            if (f == null)
+            {
+                throw new GitHubLogicException(string.Format(CultureInfo.InvariantCulture, "Could not locate view model for {0}.", viewType));
+            }
+
             return f.CreateExport();
         }
 
         public ExportLifetimeContext<IView> GetView(UIViewType viewType)
         {
             var f = ViewFactory.FirstOrDefault(x => x.Metadata.ViewType == viewType);
-            Debug.Assert(f != null, string.Format(CultureInfo.InvariantCulture, "Could not locate view for {0}.", viewType));
+
+            if (f == null)
+            {
+                throw new GitHubLogicException(string.Format(CultureInfo.InvariantCulture, "Could not locate view for {0}.", viewType));
+            }
+
             return f.CreateExport();
         }
     }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.UI;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -73,6 +75,8 @@ namespace GitHub.InlineReviews.ViewModels
             CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
             CancelEdit.Subscribe(DoCancelEdit);
             AddErrorHandler(CancelEdit);
+
+            OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id, x => x != 0));
         }
 
         /// <summary>
@@ -87,6 +91,71 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentModel model)
             : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
+        }
+
+        public void Initialize(ViewWithData data)
+        {
+            // Nothing to do here: initialized in constructor.
+        }
+
+        /// <summary>
+        /// Creates a placeholder comment which can be used to add a new comment to a thread.
+        /// </summary>
+        /// <param name="thread">The comment thread.</param>
+        /// <param name="currentUser">The current user.</param>
+        /// <returns>THe placeholder comment.</returns>
+        public static CommentViewModel CreatePlaceholder(
+            ICommentThreadViewModel thread,
+            IAccount currentUser)
+        {
+            return new CommentViewModel(
+                thread,
+                currentUser,
+                0,
+                string.Empty,
+                CommentEditState.Placeholder,
+                currentUser,
+                DateTimeOffset.MinValue);
+        }
+
+        void AddErrorHandler<T>(ReactiveCommand<T> command)
+        {
+            command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
+        }
+
+        void DoBeginEdit(object unused)
+        {
+            if (state != CommentEditState.Editing)
+            {
+                undoBody = Body;
+                EditState = CommentEditState.Editing;
+            }
+        }
+
+        void DoCancelEdit(object unused)
+        {
+            if (EditState == CommentEditState.Editing)
+            {
+                EditState = string.IsNullOrWhiteSpace(undoBody) ? CommentEditState.Placeholder : CommentEditState.None;
+                Body = undoBody;
+                ErrorMessage = null;
+                undoBody = null;
+            }
+        }
+
+        async Task DoCommitEdit(object unused)
+        {
+            try
+            {
+                ErrorMessage = null;
+                Id = (await Thread.PostComment.ExecuteAsyncTask(Body)).Id;
+                EditState = CommentEditState.None;
+                UpdatedAt = DateTimeOffset.Now;
+            }
+            catch (Exception e)
+            {
+                ErrorMessage = e.Message;
+            }
         }
 
         /// <inheritdoc/>
@@ -149,64 +218,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <inheritdoc/>
         public ReactiveCommand<Unit> CommitEdit { get; }
 
-        /// <summary>
-        /// Creates a placeholder comment which can be used to add a new comment to a thread.
-        /// </summary>
-        /// <param name="thread">The comment thread.</param>
-        /// <param name="currentUser">The current user.</param>
-        /// <returns>THe placeholder comment.</returns>
-        public static CommentViewModel CreatePlaceholder(
-            ICommentThreadViewModel thread,
-            IAccount currentUser)
-        {
-            return new CommentViewModel(
-                thread,
-                currentUser,
-                0,
-                string.Empty,
-                CommentEditState.Placeholder,
-                currentUser,
-                DateTimeOffset.MinValue);
-        }
-
-        void AddErrorHandler<T>(ReactiveCommand<T> command)
-        {
-            command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
-        }
-
-        void DoBeginEdit(object unused)
-        {
-            if (state != CommentEditState.Editing)
-            {
-                undoBody = Body;
-                EditState = CommentEditState.Editing;
-            }
-        }
-
-        void DoCancelEdit(object unused)
-        {
-            if (EditState == CommentEditState.Editing)
-            {
-                EditState = string.IsNullOrWhiteSpace(undoBody) ? CommentEditState.Placeholder : CommentEditState.None;
-                Body = undoBody;
-                ErrorMessage = null;
-                undoBody = null;
-            }
-        }
-
-        async Task DoCommitEdit(object unused)
-        {
-            try
-            {
-                ErrorMessage = null;
-                Id = (await Thread.PostComment.ExecuteAsyncTask(Body)).Id;
-                EditState = CommentEditState.None;
-                UpdatedAt = DateTimeOffset.Now;
-            }
-            catch (Exception e)
-            {
-                ErrorMessage = e.Message;
-            }
-        }
+        /// <inheritdoc/>
+        public ReactiveCommand<object> OpenOnGitHub { get; }
     }
 }

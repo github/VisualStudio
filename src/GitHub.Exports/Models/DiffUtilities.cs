@@ -96,7 +96,10 @@ namespace GitHub.Models
                 {
                     if (source.Lines[i].Content == target[j].Content)
                     {
-                        if (++j == target.Count) return source.Lines[i + j - 1];
+                        if (++j == target.Count || i == 0)
+                        {
+                            return source.Lines[i + j - 1];
+                        }
                     }
                     else
                     {

@@ -9,22 +9,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Commands;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.UI.Helpers;
 using GitHub.ViewModels;
-using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
-using GitHub.InlineReviews.Commands;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Text;
 
@@ -52,6 +51,8 @@ namespace GitHub.VisualStudio.UI.Views
                 d(ViewModel.DiffFileWithWorkingDirectory.Subscribe(x => DoDiffFile((IPullRequestFileNode)x, true).Forget()));
                 d(ViewModel.OpenFileInWorkingDirectory.Subscribe(x => DoOpenFile((IPullRequestFileNode)x, true).Forget()));
             });
+
+            bodyGrid.RequestBringIntoView += BodyFocusHack;
         }
 
         [Import]
@@ -70,7 +71,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = TeamExplorerServiceHolder.ActiveRepo;
+            var repo = ViewModel.RemoteRepository;
             var browser = VisualStudioBrowser;
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);
@@ -106,7 +107,7 @@ namespace GitHub.VisualStudio.UI.Views
                 var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true, Encoding.UTF8);
                 var encoding = ViewModel.GetEncoding(rightFile);
                 var leftFile = await ViewModel.ExtractFile(file, false, encoding);
-                var fullPath = System.IO.Path.Combine(ViewModel.Repository.LocalPath, relativePath);
+                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
                 var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
                 var rightLabel = workingDirectory ? relativePath : $"{relativePath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
@@ -242,7 +243,19 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        private void ViewCommentsClick(object sender, RoutedEventArgs e)
+        void BodyFocusHack(object sender, RequestBringIntoViewEventArgs e)
+        {
+            if (e.TargetObject == bodyMarkdown)
+            {
+                // Hack to prevent pane scrolling to top. Instead focus selected tree view item.
+                // See https://github.com/github/VisualStudio/issues/1042
+                var node = changesTree.GetTreeViewItem(changesTree.SelectedItem);
+                node?.Focus();
+                e.Handled = true;
+            }
+        }
+
+        void ViewCommentsClick(object sender, RoutedEventArgs e)
         {
             var model = (object)ViewModel.Model;
             Services.Dte.Commands.Raise(
@@ -252,7 +265,7 @@ namespace GitHub.VisualStudio.UI.Views
                 null);
         }
 
-        private async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
+        async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
         {
             try
             {

@@ -65,7 +65,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a view model for displaying details of a pull request.
     /// </summary>
-    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy
+    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy, IHasErrorState
     {
         /// <summary>
         /// Gets the underlying pull request model.
@@ -78,9 +78,18 @@ namespace GitHub.ViewModels
         IPullRequestSession Session { get; }
 
         /// <summary>
-        /// Gets the repository that the pull request relates to.
+        /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel Repository { get; }
+        ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
+        /// Gets the remote repository that contains the pull request.
+        /// </summary>
+        /// <remarks>
+        /// The remote repository may be different from the local repository if the local
+        /// repository is a fork and the user is viewing pull requests from the parent repository.
+        /// </remarks>
+        IRemoteRepositoryModel RemoteRepository { get; }
 
         /// <summary>
         /// Gets a string describing how to display the pull request's source branch.

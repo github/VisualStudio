@@ -55,6 +55,9 @@ namespace GitHub.SampleData
             SelectedAuthor = Authors.ElementAt(1);
         }
 
+        public IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
+        public IRemoteRepositoryModel SelectedRepository { get; set; }
+
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
 
@@ -63,6 +66,8 @@ namespace GitHub.SampleData
 
         public ObservableCollection<IAccount> Authors { get; set; }
         public IAccount SelectedAuthor { get; set; }
+        public bool RepositoryIsFork { get; set; } = true;
+        public bool ShowPullRequestsForFork { get; set; }
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }

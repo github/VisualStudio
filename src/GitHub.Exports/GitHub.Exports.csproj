@@ -12,7 +12,6 @@
     <AssemblyName>GitHub.Exports</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -41,11 +40,7 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -114,6 +109,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -129,6 +128,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitHubLogicException.cs" />
     <Compile Include="GlobalCommands.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
@@ -137,12 +137,10 @@
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
+    <Compile Include="ViewModels\IHasErrorState.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />
     <Compile Include="ViewModels\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
@@ -256,10 +254,6 @@
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}</Project>
-      <Name>Rothko</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>

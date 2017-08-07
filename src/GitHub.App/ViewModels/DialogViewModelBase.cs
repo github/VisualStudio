@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reactive;
 using GitHub.Extensions.Reactive;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -32,7 +31,6 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public string Title
         {
-            [return: AllowNull]
             get { return title; }
             protected set { this.RaiseAndSetIfChanged(ref title, value); }
         }

@@ -74,7 +74,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public IPullRequestModel Model { get; }
         public IPullRequestSession Session { get; }
-        public ILocalRepositoryModel Repository { get; }
+        public ILocalRepositoryModel LocalRepository { get; }
+        public IRemoteRepositoryModel RemoteRepository { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public int CommentCount { get; set; }
@@ -87,6 +88,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
+        public string ErrorMessage { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }

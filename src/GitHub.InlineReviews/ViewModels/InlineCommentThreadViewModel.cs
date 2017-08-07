@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -34,6 +35,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             this.apiClient = apiClient;
             Session = session;
+
             PostComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(true),
                 DoPostComment);
@@ -51,6 +53,17 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
+        /// <inheritdoc/>
+        public override Uri GetCommentUrl(int id)
+        {
+            return new Uri(string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}/pull/{1}#discussion_r{2}",
+                Session.LocalRepository.CloneUrl.ToRepositoryUrl(),
+                Session.PullRequest.Number,
+                id));
+        }
+
         async Task<ICommentModel> DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
@@ -58,8 +71,8 @@ namespace GitHub.InlineReviews.ViewModels
             var body = (string)parameter;
             var replyId = Comments[0].Id;
             var result = await apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
+                Session.RepositoryOwner,
+                Session.LocalRepository.Name,
                 Session.PullRequest.Number,
                 body,
                 replyId);

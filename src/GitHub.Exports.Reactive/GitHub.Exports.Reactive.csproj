@@ -12,7 +12,6 @@
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -41,11 +40,7 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
@@ -111,6 +106,7 @@
     <Compile Include="Services\IPullRequestSession.cs" />
     <Compile Include="Services\IPullRequestService.cs" />
     <Compile Include="Services\IPullRequestSessionManager.cs" />
+    <Compile Include="Services\ModelServiceExtensions.cs" />
     <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
     <Compile Include="ViewModels\IHasCancel.cs" />
@@ -142,9 +138,6 @@
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Models\GitIgnoreItem.cs" />
     <Compile Include="Models\LicenseItem.cs" />

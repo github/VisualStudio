@@ -35,10 +35,10 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string relativePath, byte[] contents)
+        public async Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);
-            return await diffService.Diff(repo, baseSha, relativePath, contents);
+            return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
         }
 
         /// <inheritdoc/>
@@ -111,18 +111,18 @@ namespace GitHub.InlineReviews.Services
             }
 
             var repo = await GetRepository(repository);
-            var remote = await gitClient.GetHttpRemote(repo, "origin");
-
+            var baseUrl = pullRequest.Base.RepositoryCloneUrl;
+            var headUrl = pullRequest.Head.RepositoryCloneUrl;
+            var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
-            var pullNumber = pullRequest.Number;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullNumber);
-            if (mergeBase == null)
+            var headRef = pullRequest.Head.Ref;
+            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            if (mergeBase != null)
             {
-                throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+                return mergeBaseCache[key] = mergeBase;
             }
 
-            mergeBaseCache[key] = mergeBase;
-            return mergeBase;
+            throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
         }
 
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
