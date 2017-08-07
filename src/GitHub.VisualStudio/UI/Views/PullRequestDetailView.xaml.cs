@@ -9,22 +9,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Commands;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.UI.Helpers;
 using GitHub.ViewModels;
-using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
-using GitHub.InlineReviews.Commands;
-using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
