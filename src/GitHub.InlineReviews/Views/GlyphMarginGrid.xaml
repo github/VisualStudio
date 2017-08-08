@@ -4,67 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" 
+             Background="{DynamicResource VsBrush.Window}"
              d:DesignHeight="100" Width="17">
-
-    <Grid.Background>
-
-        <VisualBrush TileMode="Tile" Viewport="0,0,5,5" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute">
-            <VisualBrush.Visual>
-                <Grid>
-                    <Path Data="M 0 15 L 15 0" Stroke="Black" />
-                </Grid>
-            </VisualBrush.Visual>
-        </VisualBrush>
-
-        <!-- NOTE: We should really use a DrawingBrush not a VisualBrush, e.g. -->
-        <!--
-        <DrawingBrush Stretch="UniformToFill" ViewportUnits="Absolute" Viewport="0,0,10,10" TileMode="Tile">
-            <DrawingBrush.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="Black">
-                            <GeometryDrawing.Geometry>
-                                <GeometryGroup FillRule="Nonzero">
-                                    <PathGeometry>
-                                        <PathFigure StartPoint="0,0">
-                                            <LineSegment  Point="100,0"/>
-                                            <LineSegment  Point="100,100"/>
-                                            <LineSegment  Point="0,100"/>
-                                        </PathFigure>
-                                    </PathGeometry>
-                                </GeometryGroup>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                        <GeometryDrawing Brush="#FF404040">
-                            <GeometryDrawing.Geometry>
-                                <GeometryGroup FillRule="Nonzero">
-                                    <PathGeometry>
-                                        <PathFigure StartPoint="0,0">
-                                            <LineSegment  Point="25,0"/>
-                                            <LineSegment  Point="100,75"/>
-                                            <LineSegment  Point="100,100"/>
-                                            <LineSegment  Point="75,100"/>
-                                            <LineSegment  Point="0,25"/>
-                                            <LineSegment  Point="0,0"/>
-                                        </PathFigure>
-                                        <PathFigure StartPoint="75,0">
-                                            <LineSegment  Point="100,25"/>
-                                            <LineSegment  Point="100,0"/>
-                                        </PathFigure>
-                                        <PathFigure StartPoint="0,75">
-                                            <LineSegment  Point="25,100"/>
-                                            <LineSegment  Point="0,100"/>
-                                        </PathFigure>
-                                    </PathGeometry>
-                                </GeometryGroup>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingBrush.Drawing>
-        </DrawingBrush>
-        -->
-        
-    </Grid.Background>
+    <Grid.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Grid.Resources>
 </Grid>

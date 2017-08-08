@@ -16,54 +16,13 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
-        readonly BrushesManager brushesManager;
 
         public InlineCommentGlyphFactory(
             IInlineCommentPeekService peekService,
-            ITextView textView,
-            IEditorFormatMap editorFormatMap)
+            ITextView textView)
         {
             this.peekService = peekService;
             this.textView = textView;
-
-            brushesManager = new BrushesManager(editorFormatMap);
-        }
-
-        class BrushesManager
-        {
-            const string AddPropertiesKey = "deltadiff.add.word";
-            const string DeletePropertiesKey = "deltadiff.remove.word";
-            const string NonePropertiesKey = "Indicator Margin";
-
-            readonly ResourceDictionary addProperties;
-            readonly ResourceDictionary deleteProperties;
-            readonly ResourceDictionary noneProperties;
-
-            internal BrushesManager(IEditorFormatMap editorFormatMap)
-            {
-                addProperties = editorFormatMap.GetProperties(AddPropertiesKey);
-                deleteProperties = editorFormatMap.GetProperties(DeletePropertiesKey);
-                noneProperties = editorFormatMap.GetProperties(NonePropertiesKey);
-            }
-
-            internal Brush GetBackground(DiffChangeType diffChangeType)
-            {
-                switch (diffChangeType)
-                {
-                    case DiffChangeType.Add:
-                        return GetBackground(addProperties);
-                    case DiffChangeType.Delete:
-                        return GetBackground(deleteProperties);
-                    case DiffChangeType.None:
-                    default:
-                        return GetBackground(noneProperties);
-                }
-            }
-
-            static Brush GetBackground(ResourceDictionary dictionary)
-            {
-                return dictionary["Background"] as Brush;
-            }
         }
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
@@ -75,7 +34,6 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Resources["DiffChangeBackground"] = brushesManager.GetBackground(tag.DiffChangeType);
             return glyph;
         }
 
