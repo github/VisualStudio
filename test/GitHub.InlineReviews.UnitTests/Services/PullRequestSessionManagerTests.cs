@@ -103,6 +103,21 @@ namespace GitHub.InlineReviews.UnitTests.Services
         }
 
         [Fact]
+        public void RepoChangedHandlesNullRepository()
+        {
+            var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
+            var target = new PullRequestSessionManager(
+                CreatePullRequestService(),
+                Substitute.For<IPullRequestSessionService>(),
+                CreateRepositoryHosts(),
+                teService);
+
+            teService.ActiveRepo = null;
+
+            Assert.Null(target.CurrentSession);
+        }
+
+        [Fact]
         public async Task GetSessionReturnsAndUpdatesCurrentSessionIfNumbersMatch()
         {
             var target = new PullRequestSessionManager(
