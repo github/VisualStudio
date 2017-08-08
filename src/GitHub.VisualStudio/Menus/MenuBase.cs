@@ -46,6 +46,24 @@ namespace GitHub.VisualStudio
             apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
         }
 
+        protected ILocalRepositoryModel GetRepositoryByPath(string path)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(path))
+                {
+                    var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
+                    return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
+                }
+            }
+            catch (Exception ex)
+            {
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
+            }
+
+            return null;
+        }
+
         protected ILocalRepositoryModel GetActiveRepo()
         {
             var activeRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;

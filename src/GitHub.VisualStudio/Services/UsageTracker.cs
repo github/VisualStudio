@@ -210,7 +210,7 @@ namespace GitHub.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = gitHubServiceProvider.GetService<IMetricsService>();
+                client = gitHubServiceProvider.TryGetService<IMetricsService>();
                 connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
                 userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
                 vsservices = gitHubServiceProvider.GetService<IVSServices>();

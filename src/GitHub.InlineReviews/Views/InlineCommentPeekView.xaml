@@ -78,10 +78,11 @@
             </StackPanel>
         </Border>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
+        <ScrollViewer Name="threadScroller"
+                      VerticalScrollBarVisibility="Auto"
                       Background="#FFF5F5F5">
             <Grid>
-                <local:CommentThreadView DataContext="{Binding Thread}"/>
+                <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
             </Grid>
         </ScrollViewer>
     </DockPanel>
