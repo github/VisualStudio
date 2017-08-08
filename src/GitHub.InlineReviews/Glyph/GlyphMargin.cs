@@ -52,8 +52,7 @@ namespace GitHub.InlineReviews.Glyph
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
                 this, editorFormatMap, marginPropertiesName);
 
-            InitializeWhenVisible(marginVisual.IsVisible);
-            marginVisual.IsVisibleChanged += (s, e) => InitializeWhenVisible(marginVisual.IsVisible);
+            Initialize();
         }
 
         public void Dispose()
@@ -98,36 +97,33 @@ namespace GitHub.InlineReviews.Glyph
             }
         }
 
-        void InitializeWhenVisible(bool isVisible)
+        void Initialize()
         {
-            if (tagAggregator == null && isVisible)
+            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
+            tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
+
+            textView.LayoutChanged += OnLayoutChanged;
+            if (handleZoom)
             {
-                tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
-                tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
+                textView.ZoomLevelChanged += OnZoomLevelChanged;
+            }
 
-                textView.LayoutChanged += OnLayoutChanged;
-                if (handleZoom)
+            if (textView.InLayout)
+            {
+                refreshAllGlyphs = true;
+            }
+            else
+            {
+                foreach (var line in textView.TextViewLines)
                 {
-                    textView.ZoomLevelChanged += OnZoomLevelChanged;
+                    RefreshGlyphsOver(line);
                 }
+            }
 
-                if (textView.InLayout)
-                {
-                    refreshAllGlyphs = true;
-                }
-                else
-                {
-                    foreach (var line in textView.TextViewLines)
-                    {
-                        RefreshGlyphsOver(line);
-                    }
-                }
-
-                if (handleZoom)
-                {
-                    marginVisual.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
-                    marginVisual.LayoutTransform.Freeze();
-                }
+            if (handleZoom)
+            {
+                marginVisual.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
+                marginVisual.LayoutTransform.Freeze();
             }
         }
 
