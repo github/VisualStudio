@@ -12,6 +12,7 @@ using GitHub.InlineReviews.Glyph;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Views;
 using GitHub.Services;
+using GitHub.Settings;
 
 namespace GitHub.InlineReviews
 {
@@ -30,22 +31,30 @@ namespace GitHub.InlineReviews
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IPackageSettings packageSettings;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            IPackageSettings packageSettings)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
+            this.packageSettings = packageSettings;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
+            if (IsMarginDisabled(wpfTextViewHost))
+            {
+                return null;
+            }
+
             var textView = wpfTextViewHost.TextView;
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
 
@@ -61,18 +70,26 @@ namespace GitHub.InlineReviews
             var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
 
-            TrackCommentGlyphOnDiffView(wpfTextViewHost, margin.VisualElement);
+            if(IsDiffView(wpfTextViewHost))
+            {
+                TrackCommentGlyph(wpfTextViewHost, margin.VisualElement);
+            }
+
             return margin;
         }
 
-        void TrackCommentGlyphOnDiffView(IWpfTextViewHost host, UIElement marginElement)
+        bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView(textViewHost);
+
+        bool IsDiffView(IWpfTextViewHost host)
         {
             var textView = host.TextView;
-            if (textView.Roles.Contains("DIFF"))
-            {
-                var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
-                router.Add(host.HostControl, marginElement);
-            }
+            return textView.Roles.Contains("DIFF");
+        }
+
+        void TrackCommentGlyph(IWpfTextViewHost host, UIElement marginElement)
+        {
+            var router = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
+            router.Add(host.HostControl, marginElement);
         }
 
         bool IsMarginVisible(ITextBuffer buffer)

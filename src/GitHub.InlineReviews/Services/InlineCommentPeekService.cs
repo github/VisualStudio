@@ -51,18 +51,18 @@ namespace GitHub.InlineReviews.Services
             {
                 if (diffModel.ViewType == DifferenceViewType.InlineView)
                 {
-                    // If we're displaying a diff in inline mode, then we're in the left buffer if
-                    // the point can be mapped down to the left buffer.
+                    // If we're displaying a diff in inline mode, then we need to map the point down
+                    // to the left or right buffer.
                     var snapshotPoint = point.GetPoint(point.TextBuffer.CurrentSnapshot);
-                    var mappedPoint = session.TextView.BufferGraph.MapDownToBuffer(
+                    var mappedPoint = session.TextView.BufferGraph.MapDownToFirstMatch(
                         snapshotPoint,
                         PointTrackingMode.Negative,
-                        diffModel.Viewer.DifferenceBuffer.LeftBuffer,
+                        x => !(x is IProjectionSnapshot),
                         PositionAffinity.Successor);
 
                     if (mappedPoint != null)
                     {
-                        leftBuffer = true;
+                        leftBuffer = mappedPoint.Value.Snapshot == diffModel.Viewer.DifferenceBuffer.LeftBuffer.CurrentSnapshot;
                         line = mappedPoint.Value.GetContainingLine();
                     }
                 }
@@ -93,8 +93,9 @@ namespace GitHub.InlineReviews.Services
         {
             Guard.ArgumentNotNull(tag, nameof(tag));
 
-            var line = textView.TextSnapshot.GetLineFromLineNumber(tag.LineNumber);
-            var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
+            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
+            var line = lineAndtrackingPoint.Item1;
+            var trackingPoint = lineAndtrackingPoint.Item2;
             var options = new PeekSessionCreationOptions(
                 textView,
                 InlineCommentPeekRelationship.Instance.Name,
@@ -121,23 +122,9 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(textView, nameof(textView));
             Guard.ArgumentNotNull(tag, nameof(tag));
 
-            var projectionBuffer = textView.TextBuffer as IProjectionBuffer;
-            var snapshot = textView.TextSnapshot;
-
-            // If we're displaying a comment on a deleted line, then check if we're displaying in a
-            // diff view in inline mode. If so, get the line from the left buffer.
-            if (tag.DiffChangeType == DiffChangeType.Delete)
-            {
-                var diffModel = (textView as IWpfTextView)?.TextViewModel as IDifferenceTextViewModel;
-
-                if (diffModel?.ViewType == DifferenceViewType.InlineView)
-                {
-                    snapshot = diffModel.Viewer.DifferenceBuffer.LeftBuffer.CurrentSnapshot;
-                }
-            }
-
-            var line = snapshot.GetLineFromLineNumber(tag.LineNumber);
-            var trackingPoint = snapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
+            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
+            var line = lineAndtrackingPoint.Item1;
+            var trackingPoint = lineAndtrackingPoint.Item2;
             var options = new PeekSessionCreationOptions(
                 textView,
                 InlineCommentPeekRelationship.Instance.Name,
@@ -145,8 +132,27 @@ namespace GitHub.InlineReviews.Services
                 defaultHeight: 0);
 
             ExpandCollapsedRegions(textView, line.Extent);
+
             peekBroker.TriggerPeekSession(options);
+
             return trackingPoint;
+        }
+
+        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineCommentTag tag)
+        {
+            var diffModel = (textView as IWpfTextView)?.TextViewModel as IDifferenceTextViewModel;
+            var snapshot = textView.TextSnapshot;
+
+            if (diffModel?.ViewType == DifferenceViewType.InlineView)
+            {
+                snapshot = tag.DiffChangeType == DiffChangeType.Delete ?
+                    diffModel.Viewer.DifferenceBuffer.LeftBuffer.CurrentSnapshot :
+                    diffModel.Viewer.DifferenceBuffer.RightBuffer.CurrentSnapshot;
+            }
+
+            var line = snapshot.GetLineFromLineNumber(tag.LineNumber);
+            var trackingPoint = snapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
+            return Tuple.Create(line, trackingPoint);
         }
 
         void ExpandCollapsedRegions(ITextView textView, SnapshotSpan span)
