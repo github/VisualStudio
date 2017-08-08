@@ -392,10 +392,10 @@
   <data name="Options_ExperimentalNote" xml:space="preserve">
     <value>These features might change in a future version</value>
   </data>
-  <data name="CompareFileWithSolution" xml:space="preserve">
-    <value>Compare With Solution</value>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>View Changes in Solution</value>
   </data>
   <data name="OpenFileInSolution" xml:space="preserve">
-    <value>Open File In Solution</value>
+    <value>Open File in Solution</value>
   </data>
 </root>

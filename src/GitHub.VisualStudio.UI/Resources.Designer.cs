@@ -151,15 +151,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compare With Solution.
-        /// </summary>
-        public static string CompareFileWithSolution {
-            get {
-                return ResourceManager.GetString("CompareFileWithSolution", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Could not connect to github.com.
         /// </summary>
         public static string couldNotConnectToGitHubText {
@@ -556,7 +547,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open File In Solution.
+        ///   Looks up a localized string similar to Open File in Solution.
         /// </summary>
         public static string OpenFileInSolution {
             get {
@@ -878,6 +869,15 @@ namespace GitHub.VisualStudio.UI {
         public static string ViewChanges {
             get {
                 return ResourceManager.GetString("ViewChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Changes in Solution.
+        /// </summary>
+        public static string ViewChangesInSolution {
+            get {
+                return ResourceManager.GetString("ViewChangesInSolution", resourceCulture);
             }
         }
         
