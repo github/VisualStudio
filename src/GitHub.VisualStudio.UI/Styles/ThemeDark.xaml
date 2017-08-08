@@ -60,8 +60,6 @@
   <SolidColorBrush x:Key="GitHubDiffChangeBackground.Delete" Color="#FF333333" />
   <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="{DynamicResource VsColor.Window}" />
 
-  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Add" Color="#569CD6" />
-  <SolidColorBrush x:Key="GitHubDiffGlyphFill.Delete" Color="#569CD6" />
   <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#569CD6" />
 
   <SolidColorBrush x:Key="GitHubPeekViewBackground" Color="#252526" />
