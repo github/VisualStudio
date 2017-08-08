@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Exports;
 using GitHub.Primitives;
 using Microsoft.VisualStudio.Shell;
 using Octokit;
@@ -9,7 +10,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
-    [Export(typeof(ILoginManager))]
+    [ExportForProcess(typeof(ILoginManager), "devenv")]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginManagerDispatcher : ILoginManager
     {

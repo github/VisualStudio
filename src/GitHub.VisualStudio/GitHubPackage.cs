@@ -57,6 +57,11 @@ namespace GitHub.VisualStudio
         async Task InitializeMenus()
         {
             var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
+            if (menus == null)
+            {
+                // Ignore if null because Expression Blend doesn't support custom services or menu extensibility.
+                return;
+            }
 
             await ThreadingHelper.SwitchToMainThreadAsync();
 
