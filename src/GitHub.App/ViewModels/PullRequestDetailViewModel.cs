@@ -316,11 +316,18 @@ namespace GitHub.ViewModels
                 var arg = (PullRequestDetailArgument)data.Data;
                 number = arg.Number;
                 repo = arg.Repository;
-                IsLoading = true;
             }
             else
             {
                 number = Model.Number;
+            }
+
+            if (Model == null)
+            {
+                IsLoading = true;
+            }
+            else
+            {
                 IsBusy = true;
             }
 
