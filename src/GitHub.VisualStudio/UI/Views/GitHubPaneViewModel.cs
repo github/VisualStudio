@@ -76,10 +76,10 @@ namespace GitHub.VisualStudio.UI.Views
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
 
-            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Load(new ViewWithData(UIControllerFlow.PullRequestList)).Forget());
 
-            back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+            back = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && (navController?.HasBack ?? false),
                 () =>
                 {
@@ -88,7 +88,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+            forward = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && (navController?.HasForward ?? false),
                 () =>
                 {
@@ -97,7 +97,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+            refresh = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled,
                 () =>
                 {
@@ -106,7 +106,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
                 () => !disabled && (RepositoryOrigin == RepositoryOrigin.DotCom || RepositoryOrigin == RepositoryOrigin.Enterprise),
                 () =>
                 {
@@ -137,14 +137,14 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-           serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                () => true,
-                () =>
-                {
-                    browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                    usageTracker.IncrementGitHubPaneHelpClicks().Forget();
-                },
-                true);
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                 () => true,
+                 () =>
+                 {
+                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                     usageTracker.IncrementGitHubPaneHelpClicks().Forget();
+                 },
+                 true);
 
             initialized = true;
 

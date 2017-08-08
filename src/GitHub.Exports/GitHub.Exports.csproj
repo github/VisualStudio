@@ -130,7 +130,6 @@
   <ItemGroup>
     <Compile Include="Exports\ExportForProcess.cs" />
     <Compile Include="GitHubLogicException.cs" />
-    <Compile Include="GlobalCommands.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />
@@ -138,6 +137,7 @@
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
+    <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\IHasErrorState.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />
     <Compile Include="ViewModels\IPanePageViewModel.cs" />

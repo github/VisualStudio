@@ -15,7 +15,7 @@ namespace GitHub.VisualStudio.Menus
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidContextMenuSet;
+        public Guid Guid => Guids.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.copyLinkCommand;
 
         public async void Activate(object data = null)

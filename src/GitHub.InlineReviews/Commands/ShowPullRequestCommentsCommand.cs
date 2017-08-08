@@ -1,12 +1,13 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Shell.Interop;
 using GitHub.Factories;
 using GitHub.InlineReviews.Views;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
-using Microsoft.VisualStudio.Shell.Interop;
+using GitHub.VisualStudio;
 
 namespace GitHub.InlineReviews.Commands
 {
@@ -16,8 +17,8 @@ namespace GitHub.InlineReviews.Commands
     [ExportCommand(typeof(InlineReviewsPackage))]
     class ShowPullRequestCommentsCommand : VsCommand<IPullRequestModel>
     {
-        public static readonly Guid CommandSet = GlobalCommands.CommandSetGuid;
-        public const int CommandId = GlobalCommands.ShowPullRequestCommentsId;
+        public static readonly Guid CommandSet = Guids.CommandSetGuid;
+        public const int CommandId = PkgCmdIDList.ShowPullRequestCommentsId;
 
         readonly IApiClientFactory apiClientFactory;
         readonly IPullRequestSessionManager sessionManager;
