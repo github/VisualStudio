@@ -6,28 +6,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
 
-    <!-- Resources are defined in \GitHub.VisualStudio.UI\Styles\Theme*.xaml (and Properties\DesignTimeResources.xaml) -->
-    <UserControl.Style>
-        <Style TargetType="UserControl">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DiffChangeType}" Value="Add">
-                    <Setter Property="Background" Value="{DynamicResource GitHubDiffChangeBackground.Add}" />
-                </DataTrigger>
-
-                <DataTrigger Binding="{Binding DiffChangeType}" Value="Delete">
-                    <Setter Property="Background" Value="{DynamicResource GitHubDiffChangeBackground.Delete}" />
-                </DataTrigger>
-
-                <DataTrigger Binding="{Binding DiffChangeType}" Value="None">
-                    <Setter Property="Background" Value="{DynamicResource GitHubDiffChangeBackground.None}" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
-
     <Grid>
         <Border Background="{DynamicResource GitHubGlyphMarginCommentableBackground}" BorderThickness="0,0,1,0" />
-        <Viewbox x:Name="AddViewbox" Margin="1,1,0,0">
+        <Viewbox x:Name="AddViewbox" Margin="0,1,0,0">
             <Canvas Width="14" Height="14">
                 <Rectangle Width="13" Height="13" Fill="{DynamicResource GitHubDiffGlyphFill.None}"/>
                 <Rectangle Stroke="#313131" Fill="Transparent" Opacity="0.163" Width="13" Height="13" />
