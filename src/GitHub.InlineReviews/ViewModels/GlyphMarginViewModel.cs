@@ -27,6 +27,8 @@ namespace GitHub.InlineReviews.ViewModels
             this.wpfTextViewHost = wpfTextViewHost;
             this.isDiffView = isDiffView;
 
+            // The previous implementation refreshed its visibility when TagAggregator events were fired.
+            // Using a timer allows us to only create a TagAggregator if the margin becomes visible.
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += (s, e) => RefreshVisibility();
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
