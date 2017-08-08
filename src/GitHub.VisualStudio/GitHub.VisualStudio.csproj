@@ -11,7 +11,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-    <ApplicationVersion>2.3.0.10</ApplicationVersion>
+    <ApplicationVersion>2.3.0.12</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
@@ -319,10 +319,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="Settings\Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
-    <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
     <Compile Include="UI\GitHubPane.cs" />
     <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
