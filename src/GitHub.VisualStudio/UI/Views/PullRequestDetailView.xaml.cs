@@ -177,7 +177,7 @@ namespace GitHub.VisualStudio.UI.Views
         void FileListMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var item = (e.OriginalSource as Visual)?.GetSelfAndVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
-            
+
             if (item != null)
             {
                 // Select tree view item on right click.
@@ -259,8 +259,8 @@ namespace GitHub.VisualStudio.UI.Views
         {
             var model = (object)ViewModel.Model;
             Services.Dte.Commands.Raise(
-                GlobalCommands.CommandSetString,
-                GlobalCommands.ShowPullRequestCommentsId,
+                Guids.CommandSetString,
+                PkgCmdIDList.ShowPullRequestCommentsId,
                 ref model,
                 null);
         }
@@ -285,8 +285,8 @@ namespace GitHub.VisualStudio.UI.Views
                     await Task.Delay(1500);
 
                     Services.Dte.Commands.Raise(
-                        GlobalCommands.CommandSetString,
-                        GlobalCommands.NextInlineCommentId,
+                        Guids.CommandSetString,
+                        PkgCmdIDList.NextInlineCommentId,
                         ref param,
                         null);
                 }

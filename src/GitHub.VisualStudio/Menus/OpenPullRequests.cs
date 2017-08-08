@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.Menus
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidGitHubCmdSet;
+        public Guid Guid => Guids.guidGitHubCmdSet;
         public int CmdId => PkgCmdIDList.openPullRequestsCommand;
 
         public void Activate(object data = null)

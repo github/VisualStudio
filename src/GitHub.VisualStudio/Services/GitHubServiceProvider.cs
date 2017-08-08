@@ -11,6 +11,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using GitHub.Infrastructure;
 using GitHub.Models;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -28,7 +29,7 @@ namespace GitHub.VisualStudio
     /// redirects every request to the actual service, and can be
     /// thrown away as soon as the caller is done (no state is kept)
     /// </summary>
-    [Export(typeof(IGitHubServiceProvider))]
+    [ExportForProcess(typeof(IGitHubServiceProvider), "devenv")]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubProviderDispatcher : IGitHubServiceProvider
     {

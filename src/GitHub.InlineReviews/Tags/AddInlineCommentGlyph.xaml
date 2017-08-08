@@ -2,16 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <SolidColorBrush x:Key="DiffChangeBackground" Color="DarkSlateGray" />
-    </UserControl.Resources>
 
-    <Grid Background="{DynamicResource DiffChangeBackground}">
-        <Viewbox x:Name="AddViewbox">
-            <Path Stroke="Black"
-          Data="M13 2H1c-0.55 0-1 0.45-1 1v8c0 0.55 0.45 1 1 1h2v3.5l3.5-3.5h6.5c0.55 0 1-0.45 1-1V3c0-0.55-0.45-1-1-1z m0 9H6L4 13V11H1V3h12v8z M7,5 L7,9 M5,7 L9,7"/>
+    <Grid>
+        <Viewbox x:Name="AddViewbox" Margin="0,1,0,0">
+            <Canvas Width="14" Height="14">
+                <Rectangle Width="13" Height="13" Fill="{DynamicResource GitHubDiffGlyphFill.None}"/>
+                <Rectangle Stroke="#313131" Fill="Transparent" Opacity="0.163" Width="13" Height="13" />
+                <Path Canvas.Top="-0.5" Canvas.Left="-0.5" Fill="#FFF" Data="M11 8H8v3H6V8H3V6h3V3h2v3h3z"/>
+            </Canvas>
         </Viewbox>
     </Grid>
 </UserControl>

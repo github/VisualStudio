@@ -2,10 +2,11 @@
 using System;
 using System.ComponentModel.Composition;
 using Task = System.Threading.Tasks.Task;
+using GitHub.Exports;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IUsageTracker))]
+    [ExportForProcess(typeof(IUsageTracker), "devenv")]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class UsageTrackerDispatcher : IUsageTracker
     {

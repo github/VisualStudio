@@ -592,6 +592,33 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show PR comments on editor margin.
+        /// </summary>
+        public static string Options_EditorCommentsLabel {
+            get {
+                return ResourceManager.GetString("Options_EditorCommentsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These features might change in a future version.
+        /// </summary>
+        public static string Options_ExperimentalNote {
+            get {
+                return ResourceManager.GetString("Options_ExperimentalNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Experimental features.
+        /// </summary>
+        public static string Options_ExperimentalTitle {
+            get {
+                return ResourceManager.GetString("Options_ExperimentalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
         /// </summary>
         public static string Options_MetricsLabel {

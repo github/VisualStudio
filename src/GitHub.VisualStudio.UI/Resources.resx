@@ -383,6 +383,15 @@
   <data name="prUpdatedText" xml:space="preserve">
     <value>Updated</value>
   </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>Show PR comments on editor margin</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>Experimental features</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>These features might change in a future version</value>
+  </data>
   <data name="CompareFileWithSolution" xml:space="preserve">
     <value>Compare With Solution</value>
   </data>

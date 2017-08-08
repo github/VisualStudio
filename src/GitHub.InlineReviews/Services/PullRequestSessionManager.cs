@@ -115,6 +115,8 @@ namespace GitHub.InlineReviews.Services
                     sessions.Clear();
                 }
 
+                if (string.IsNullOrWhiteSpace(repository?.CloneUrl)) return;
+
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
                 var session = CurrentSession;
 
@@ -196,7 +198,7 @@ namespace GitHub.InlineReviews.Services
 
         async Task EnsureLoggedIn(ILocalRepositoryModel repository)
         {
-            if (!hosts.IsLoggedInToAnyHost && repository != null)
+            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(repository?.CloneUrl))
             {
                 var hostAddress = HostAddress.Create(repository.CloneUrl);
                 await hosts.LogInFromCache(hostAddress);
