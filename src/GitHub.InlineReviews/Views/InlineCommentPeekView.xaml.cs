@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using System.Reactive.Subjects;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.InlineReviews.Views
 {
     public partial class InlineCommentPeekView : UserControl
     {
+        readonly Subject<double> desiredHeight;
+
         public InlineCommentPeekView()
         {
             InitializeComponent();
+
+            desiredHeight = new Subject<double>();
+            threadView.LayoutUpdated += ThreadViewLayoutUpdated;
+            threadScroller.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
+        }
+
+        public IObservable<double> DesiredHeight => desiredHeight;
+
+        void ThreadViewLayoutUpdated(object sender, EventArgs e)
+        {
+            var otherControlsHeight = ActualHeight - threadScroller.ActualHeight;
+            var threadViewHeight = threadView.DesiredSize.Height + threadView.Margin.Top + threadView.Margin.Bottom;
+            desiredHeight.OnNext(threadViewHeight + otherControlsHeight);
         }
     }
 }
