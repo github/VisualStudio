@@ -19,6 +19,12 @@ namespace GitHub.VisualStudio.UI
             set { chkMetrics.IsChecked = value; }
         }
 
+        public bool EditorComments
+        {
+            get { return chkEditorComments.IsChecked ?? false; }
+            set { chkEditorComments.IsChecked = value; }
+        }
+
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             var browser = Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>();

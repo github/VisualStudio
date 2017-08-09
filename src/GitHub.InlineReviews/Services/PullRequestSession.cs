@@ -51,15 +51,6 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task AddComment(IPullRequestReviewCommentModel comment)
-        {
-            PullRequest.ReviewComments = PullRequest.ReviewComments
-                .Concat(new[] { comment })
-                .ToList();
-            await Update(PullRequest);
-        }
-
-        /// <inheritdoc/>
         public async Task<IReadOnlyList<IPullRequestSessionFile>> GetAllFiles()
         {
             if (files == null)
@@ -126,6 +117,34 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, string commitId, string path, int position)
+        {
+            var model = await service.PostReviewComment(
+                LocalRepository,
+                User,
+                PullRequest.Number,
+                body,
+                commitId,
+                path,
+                position);
+            await AddComment(model);
+            return model;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo)
+        {
+            var model = await service.PostReviewComment(
+                LocalRepository,
+                User,
+                PullRequest.Number,
+                body,
+                inReplyTo);
+            await AddComment(model);
+            return model;
+        }
+
+        /// <inheritdoc/>
         public async Task UpdateEditorContent(string relativePath)
         {
             PullRequestSessionFile file;
@@ -136,9 +155,10 @@ namespace GitHub.InlineReviews.Services
             {
                 var content = await GetFileContent(file);
 
-                file.CommitSha = await CalculateCommitSha(file, content);
+                file.CommitSha = await CalculateContentCommitSha(file, content);
                 var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
-                file.Diff = await service.Diff(LocalRepository, mergeBaseSha, relativePath, content);
+                var headSha = await CalculateHeadSha();
+                file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, relativePath, content);
 
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -158,15 +178,24 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
+        async Task AddComment(IPullRequestReviewCommentModel comment)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Concat(new[] { comment })
+                .ToList();
+            await Update(PullRequest);
+        }
+
         async Task UpdateFile(PullRequestSessionFile file)
         {
             // NOTE: We must call GetPullRequestMergeBase before GetFileContent.
             var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+            var headSha = await CalculateHeadSha();
             var content = await GetFileContent(file);
 
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await CalculateCommitSha(file, content);
-            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.RelativePath, content);
+            file.CommitSha = await CalculateContentCommitSha(file, content);
+            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
                 .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)
@@ -216,7 +245,7 @@ namespace GitHub.InlineReviews.Services
             return result;
         }
 
-        async Task<string> CalculateCommitSha(IPullRequestSessionFile file, byte[] content)
+        async Task<string> CalculateContentCommitSha(IPullRequestSessionFile file, byte[] content)
         {
             if (IsCheckedOut)
             {
@@ -227,6 +256,13 @@ namespace GitHub.InlineReviews.Services
             {
                 return PullRequest.Head.Sha;
             }       
+        }
+
+        async Task<string> CalculateHeadSha()
+        {
+            return IsCheckedOut ? 
+                await service.GetTipSha(LocalRepository) :
+                PullRequest.Head.Sha;
         }
 
         Task<byte[]> GetFileContent(IPullRequestSessionFile file)

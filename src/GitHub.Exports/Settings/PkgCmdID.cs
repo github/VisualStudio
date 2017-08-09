@@ -4,6 +4,7 @@ namespace GitHub.VisualStudio
 {
     public static class PkgCmdIDList
     {
+        // IDs defined in GitHub.VisualStudio.vsct
         public const int addConnectionCommand = 0x110;
         public const int idGitHubToolbar = 0x1120;
         public const int showGitHubPaneCommand = 0x200;
@@ -18,5 +19,10 @@ namespace GitHub.VisualStudio
         public const int githubCommand = 0x320;
         public const int helpCommand = 0x321;
         public const int blameCommand = 0x500;
+
+        // IDs defined in InlineReviewsPackage.vsct
+        public const int ShowPullRequestCommentsId = 0x1000;
+        public const int NextInlineCommentId = 0x1001;
+        public const int PreviousInlineCommentId = 0x1002;
     };
 }

@@ -14,4 +14,12 @@
     </ItemGroup>
     <Message Importance="High" Text='Suppressed "@(SuppressPackaging)" from being included in VSIX.' />
   </Target>
+
+
+  <!-- Update to have AllUsers="true" and Experimental="false" when $(IsExperimental)' == 'false' -->
+  <Target Name="MakeVsixManifestAllUsers" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(IsExperimental)' == 'false' ">
+    <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to have AllUsers='true' and Experimental='false'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="true" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="false" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+  </Target>
 </Project>

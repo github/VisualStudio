@@ -15,12 +15,14 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="baseSha">The commit to use as the base.</param>
+        /// <param name="headSha">The commit to use as the head.</param>
         /// <param name="relativePath">The relative path to the file.</param>
         /// <param name="contents">The contents of the file.</param>
         /// <returns></returns>
         Task<IList<DiffChunk>> Diff(
             ILocalRepositoryModel repository,
             string baseSha,
+            string headSha,
             string relativePath,
             byte[] contents);
 
@@ -79,5 +81,41 @@ namespace GitHub.InlineReviews.Services
         /// The merge base SHA for the PR.
         /// </returns>
         Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
+        /// Posts a new PR review comment.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="user">The user posting the comment.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <param name="body">The comment body.</param>
+        /// <param name="commitId">THe SHA of the commit to comment on.</param>
+        /// <param name="path">The relative path of the file to comment on.</param>
+        /// <param name="position">The line index in the diff to comment on.</param>
+        /// <returns>A model representing the posted comment.</returns>
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            ILocalRepositoryModel repository,
+            IAccount user,
+            int number,
+            string body,
+            string commitId,
+            string path,
+            int position);
+
+        /// <summary>
+        /// Posts a PR review comment reply.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="user">The user posting the comment.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <param name="body">The comment body.</param>
+        /// <param name="inReplyTo">The comment ID to reply to.</param>
+        /// <returns>A model representing the posted comment.</returns>
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            ILocalRepositoryModel repository,
+            IAccount user,
+            int number,
+            string body,
+            int inReplyTo);
     }
 }
