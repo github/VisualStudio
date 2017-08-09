@@ -25,8 +25,8 @@ using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.TextManager.Interop;
-using System.Text;
 using Microsoft.VisualStudio.Text.Projection;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -75,10 +75,16 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = ViewModel.RemoteRepository;
             var browser = VisualStudioBrowser;
-            var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
+            var cloneUrl = ViewModel.LocalRepository.CloneUrl;
+            var url = ToPullRequestUrl(cloneUrl.Host, ViewModel.RemoteRepositoryOwner, ViewModel.LocalRepository.Name, ViewModel.Model.Number);
             browser.OpenUrl(url);
+        }
+
+        static Uri ToPullRequestUrl(string host, string owner, string repositoryName, int number)
+        {
+            var url = string.Format(CultureInfo.InvariantCulture, "https://{0}/{1}/{2}/pull/{3}", host, owner, repositoryName, number);
+            return new Uri(url);
         }
 
         async Task DoOpenFile(IPullRequestFileNode file, bool workingDirectory)
