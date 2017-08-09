@@ -7,6 +7,7 @@
              mc:Ignorable="d">
 
     <Grid>
+        <Border Background="{DynamicResource GitHubGlyphMarginCommentableBackground}" BorderThickness="0,0,1,0" />
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0,1,0,0">
             <Canvas Width="16" Height="15">
                 <Path Canvas.Top="1" Canvas.Left="0.85"

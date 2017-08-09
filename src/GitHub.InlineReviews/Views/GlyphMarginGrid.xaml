@@ -15,4 +15,6 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Grid.Resources>
+
+    <Border Background="{DynamicResource GitHubPeekViewBackground}" BorderBrush="{DynamicResource GitHubPeekViewBackground}" BorderThickness="0,0,1,0"/>
 </Grid>
