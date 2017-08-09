@@ -6,6 +6,7 @@ using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using Xunit;
+using EnterpriseProbeResult = GitHub.Services.EnterpriseProbeResult;
 
 public class SimpleApiClientTests
 {
@@ -240,6 +241,6 @@ public class SimpleApiClientTests
         return new Repository("", "", "", "", "", "", "",
             id, new User(), "", "", "", "", "", false, false, 0, 0, "",
             0, null, DateTimeOffset.Now, DateTimeOffset.Now, new RepositoryPermissions(), null, null, false,
-            hasWiki, false);
+            hasWiki, false, false, 0, 0, null, null, null);
     }
 }

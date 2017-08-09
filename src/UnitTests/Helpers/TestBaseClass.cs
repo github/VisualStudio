@@ -51,7 +51,7 @@ public class TestBaseClass : IEntryExitDecorator
             id, CreateOctokitUser(owner),
             name, "fullname", "description", notCloneUrl, "c#", false, parent != null, 0, 0, "master",
             0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow,
-            new RepositoryPermissions(), parent, null, true, false, false);
+            new RepositoryPermissions(), parent, null, true, false, false, false, 0, 0, null, null, null);
     }
 
     protected static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
@@ -64,13 +64,15 @@ public class TestBaseClass : IEntryExitDecorator
             false, false, 0, 0, "master",
             0, null, createdAt, updatedAt,
             null, null, null,
-            false, false, false);
-        return new PullRequest(uri, uri, uri, uri, uri, uri,
+            false, false, false,
+            false, 0, 0,
+            null, null, null);
+        return new PullRequest(0, uri, uri, uri, uri, uri, uri,
             id, state, title, "", createdAt, updatedAt,
             null, null, 
             new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
             new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
-            user, null, false, null,
+            user, null, null, false, null,
             commentCount, reviewCommentCount, 0, 0, 0, 0,
             null, false);
     }
