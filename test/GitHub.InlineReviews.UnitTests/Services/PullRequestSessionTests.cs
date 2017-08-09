@@ -509,17 +509,11 @@ Line 4";
 
         }
 
-        public class TheAddCommentMethod
+        public class ThePostReviewCommentMethod
         {
             [Fact]
             public async Task UpdatesFileWithNewThread()
             {
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
- Line 1
- Line 2
--Line 3
-+Line 3 with comment", "New Comment");
-
                 using (var diffService = new FakeDiffService())
                 {
                     var target = await CreateTarget(diffService);
@@ -527,10 +521,9 @@ Line 4";
 
                     Assert.Empty(file.InlineCommentThreads);
 
-                    await target.AddComment(comment);
+                    await target.PostReviewComment("New Comment", 0);
 
                     Assert.Equal(1, file.InlineCommentThreads.Count);
-                    Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
                     Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
                     Assert.Equal("New Comment", file.InlineCommentThreads[0].Comments[0].Body);
                 }
@@ -657,6 +650,12 @@ Line 4";
                     i.ArgAt<string>(3),
                     i.ArgAt<byte[]>(4)));
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
+
+            var diffChunk = "@@ -1,4 +1,4 @@";
+            result.PostReviewComment(null, null, 0, null, 0).ReturnsForAnyArgs(i =>
+                CreateComment(diffChunk, i.ArgAt<string>(3)));
+            result.PostReviewComment(null, null, 0, null, null, null, 0).ReturnsForAnyArgs(i =>
+                CreateComment(diffChunk, i.ArgAt<string>(3)));
             return result;
         }
     }

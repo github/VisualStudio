@@ -17,7 +17,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesReplyPlaceholder()
         {
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
@@ -33,7 +32,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 file,
                 10,
@@ -58,7 +56,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 file,
                 10,
@@ -79,18 +76,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Fact]
         public void PostsCommentToCorrectAddedLine()
         {
-            var apiClient = CreateApiClient();
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
+            var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
 
-            apiClient.Received(1).CreatePullRequestReviewComment(
-                "owner",
-                "repo",
-                47,
+            session.Received(1).PostReviewComment(
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
@@ -100,7 +93,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Fact]
         public void AddsCommentToCorrectDeletedLine()
         {
-            var apiClient = CreateApiClient();
             var session = CreateSession();
             var file = CreateFile();
 
@@ -115,15 +107,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }
             });
 
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 16, true);
+            var target = new NewInlineCommentThreadViewModel(session, file, 16, true);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
 
-            apiClient.Received(1).CreatePullRequestReviewComment(
-                "owner",
-                "repo",
-                47,
+            session.Received(1).PostReviewComment(
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
@@ -131,26 +120,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Fact]
-        public void AddsPostedCommentToSession()
-        {
-            var apiClient = CreateApiClient();
-            var session = CreateSession();
-            var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
-
-            target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
-
-            session.Received(1).AddComment(Arg.Any<IPullRequestReviewCommentModel>());
-        }
-
-        [Fact]
         public void SignalsFinishedWhenCommentPosted()
         {
-            var apiClient = CreateApiClient();
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
+            var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
             var signalled = false;
 
             target.Finished.Subscribe(_ => signalled = true);
