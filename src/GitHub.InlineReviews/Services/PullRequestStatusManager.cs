@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
-using System.ComponentModel;
+using GitHub.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -22,27 +25,13 @@ namespace GitHub.InlineReviews.Services
         readonly PullRequestStatusViewModel pullRequestStatusViewModel;
 
         [ImportingConstructor]
-        public PullRequestStatusManager(IPullRequestSessionManager pullRequestSessionManager) : this(new PullRequestStatusViewModel())
+        public PullRequestStatusManager(SVsServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager)
+            : this(CreatePullRequestStatusViewModel(serviceProvider))
         {
             this.pullRequestSessionManager = pullRequestSessionManager;
 
             RefreshCurrentSession();
             pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
-        }
-
-        void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(PullRequestSessionManager.CurrentSession))
-            {
-                RefreshCurrentSession();
-            }
-        }
-
-        void RefreshCurrentSession()
-        {
-            var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
-            pullRequestStatusViewModel.Number = pullRequest?.Number;
-            pullRequestStatusViewModel.Title = pullRequest?.Title;
         }
 
         public PullRequestStatusManager(PullRequestStatusViewModel pullRequestStatusViewModel)
@@ -76,6 +65,27 @@ namespace GitHub.InlineReviews.Services
                     statusBar.Items.Remove(githubStatusBar);
                 }
             }
+        }
+
+        static PullRequestStatusViewModel CreatePullRequestStatusViewModel(IServiceProvider serviceProvider)
+        {
+            var command = new RaiseVsCommand(serviceProvider, Guids.guidGitHubCmdSetString, PkgCmdIDList.showCurrentPullRequestCommand);
+            return new PullRequestStatusViewModel(command);
+        }
+
+        void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PullRequestSessionManager.CurrentSession))
+            {
+                RefreshCurrentSession();
+            }
+        }
+
+        void RefreshCurrentSession()
+        {
+            var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
+            pullRequestStatusViewModel.Number = pullRequest?.Number;
+            pullRequestStatusViewModel.Title = pullRequest?.Title;
         }
 
         static UserControl FindPullRequestStatusView(StatusBar statusBar)
@@ -132,12 +142,46 @@ namespace GitHub.InlineReviews.Services
             return foundChild;
         }
 
+        class RaiseVsCommand : ICommand
+        {
+            readonly IServiceProvider serviceProvider;
+            readonly string guid;
+            readonly int id;
+
+            internal RaiseVsCommand(IServiceProvider serviceProvider, string guid, int id)
+            {
+                this.serviceProvider = serviceProvider;
+                this.guid = guid;
+                this.id = id;
+            }
+
+            public bool CanExecute(object parameter) => true;
+
+            public void Execute(object parameter)
+            {
+                try
+                {
+                    var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                    object customIn = null;
+                    object customOut = null;
+                    dte.Commands.Raise(guid, id, ref customIn, ref customOut);
+                }
+                catch (Exception e)
+                {
+                    VsOutputLogger.WriteLine("Couldn't raise {0}: {1}", nameof(PkgCmdIDList.openPullRequestsCommand), e);
+                    System.Diagnostics.Trace.WriteLine(e);
+                }
+            }
+
+            public event EventHandler CanExecuteChanged;
+        }
+
         class PullRequestStatusManagerInstaller
         {
             [STAThread]
             void Install()
             {
-                var viewModel = new PullRequestStatusViewModel { Number = 666, Title = "A beast of a PR" };
+                var viewModel = new PullRequestStatusViewModel(null) { Number = 666, Title = "A beast of a PR" };
                 var provider = new PullRequestStatusManager(viewModel);
                 provider.HideStatus();
                 provider.ShowStatus();

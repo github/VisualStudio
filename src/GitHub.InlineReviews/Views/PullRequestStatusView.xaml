@@ -8,7 +8,9 @@
              d:DesignHeight="20" d:DesignWidth="60">
 
     <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
-        <TextBlock>PR# <Run Text="{Binding Number}" /></TextBlock>
+        <Button Command="{Binding ShowCurrentPullRequestCommand}">
+            <TextBlock>PR #<Run Text="{Binding Number}" /></TextBlock>
+        </Button>
         <Grid.ToolTip>
             <TextBlock Text="{Binding Title}" />
         </Grid.ToolTip>
