@@ -276,8 +276,10 @@
                                 <!-- When invoked from the TreeView and the ListView we programmatically bind the 
                                      DataContext and update the CommandParameter to the changed file -->
                                 <ContextMenu x:Key="FileContextMenu">
-                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding DiffFile}"/>
-                                    <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewChanges}" Command="{Binding DiffFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewFile}" Command="{Binding ViewFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewChangesInSolution}" Command="{Binding DiffFileWithWorkingDirectory}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.OpenFileInSolution}" Command="{Binding OpenFileInWorkingDirectory}"/>
                                 </ContextMenu>
                             </Grid.Resources>
 

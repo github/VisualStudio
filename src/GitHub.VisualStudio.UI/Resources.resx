@@ -351,14 +351,14 @@
   <data name="ChangesCountFormat" xml:space="preserve">
     <value>Changes ({0})</value>
   </data>
-  <data name="CompareFile" xml:space="preserve">
-    <value>Compare File</value>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>View Changes</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
     <value>Compare File as Default Action</value>
   </data>
-  <data name="OpenFile" xml:space="preserve">
-    <value>Open File</value>
+  <data name="ViewFile" xml:space="preserve">
+    <value>View File</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
     <value>Open File as Default Action</value>
@@ -391,5 +391,11 @@
   </data>
   <data name="Options_ExperimentalNote" xml:space="preserve">
     <value>These features might change in a future version</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>View Changes in Solution</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>Open File in Solution</value>
   </data>
 </root>

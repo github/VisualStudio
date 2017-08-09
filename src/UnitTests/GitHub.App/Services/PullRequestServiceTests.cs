@@ -17,27 +17,26 @@ using Xunit;
 
 public class PullRequestServiceTests : TestBaseClass
 {
-    public class TheExtractDiffFilesMethod
+    public class TheExtractFileMethod
     {
         [Fact]
-        public async Task NotCheckedOut_ExtractFilesFromLocalRepo()
+        public async Task ExtractHead()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
-            var checkedOut = false;
+            var head = true;
 
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, checkedOut);
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, head, Encoding.UTF8);
 
-            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
-            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+            Assert.Equal(headFileContent, File.ReadAllText(file));
         }
 
         [Fact]
-        public async Task MergeBaseAvailable_UseMergeBaseSha()
+        public async Task ExtractBase_MergeBaseAvailable_UseMergeBaseSha()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
@@ -46,13 +45,12 @@ public class PullRequestServiceTests : TestBaseClass
             var baseSha = "baseSha";
             var headSha = "headSha";
             var mergeBaseSha = "mergeBaseSha";
-            var checkedOut = false;
+            var head = false;
 
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                fileName, checkedOut);
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                fileName, head, Encoding.UTF8);
 
-            Assert.Equal(mergeBaseFileContent, File.ReadAllText(files.Item1));
-            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+            Assert.Equal(mergeBaseFileContent, File.ReadAllText(file));
         }
 
         [Fact]
@@ -65,11 +63,11 @@ public class PullRequestServiceTests : TestBaseClass
             var baseSha = "baseSha";
             var headSha = "headSha";
             var mergeBaseSha = null as string;
-            var checkedOut = false;
+            var head = false;
             var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
 
-            var ex = await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                                fileName, checkedOut));
+            var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                                fileName, head, Encoding.UTF8));
             Assert.Equal(expectMessage, ex.Message);
         }
 
@@ -81,13 +79,12 @@ public class PullRequestServiceTests : TestBaseClass
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
-            var checkedOut = false;
+            var head = false;
 
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, checkedOut);
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, head, Encoding.UTF8);
 
-            Assert.Equal(string.Empty, File.ReadAllText(files.Item1));
-            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+            Assert.Equal(string.Empty, File.ReadAllText(file));
         }
 
         [Fact]
@@ -100,40 +97,19 @@ public class PullRequestServiceTests : TestBaseClass
             var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
             var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-            var checkedOut = false;
+            var head = true;
 
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, checkedOut);
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, head, Encoding.UTF8);
 
-            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
-            Assert.Equal(string.Empty, File.ReadAllText(files.Item2));
-        }
-
-        [Fact]
-        public async Task CheckedOut_BaseFromWorkingFile()
-        {
-            var repoDir = "repoDir";
-            var baseFileContent = "baseFileContent";
-            var headFileContent = null as string;
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var checkedOut = true;
-            var workingFile = Path.Combine(repoDir, fileName);
-
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, checkedOut, repoDir);
-
-            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
-            Assert.Equal(workingFile, files.Item2);
+            Assert.Equal(string.Empty, File.ReadAllText(file));
         }
 
         // https://github.com/github/VisualStudio/issues/1010
         [Theory]
         [InlineData("utf-8")]        // Unicode (UTF-8)
         [InlineData("Windows-1252")] // Western European (Windows)        
-        public async Task CheckedOut_DifferentEncodings(string encodingName)
+        public async Task ChangeEncoding(string encodingName)
         {
             var encoding = Encoding.GetEncoding(encodingName);
             var repoDir = Path.GetTempPath();
@@ -143,35 +119,17 @@ public class PullRequestServiceTests : TestBaseClass
             var baseSha = "baseSha";
             var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var checkedOut = true;
-            var workingFile = Path.Combine(repoDir, fileName);
-            var workingFileContent = baseFileContent;
-            File.WriteAllText(workingFile, workingFileContent, encoding);
+            var head = false;
 
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
-                baseSha, baseFileContent, fileName, checkedOut, repoDir);
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, head, encoding, repoDir);
 
-            Assert.Equal(File.ReadAllText(files.Item1), File.ReadAllText(files.Item2));
-            Assert.Equal(File.ReadAllBytes(files.Item1), File.ReadAllBytes(files.Item2));
-        }
+            var expectedPath = Path.Combine(repoDir, fileName);
+            var expectedContent = baseFileContent;
+            File.WriteAllText(expectedPath, expectedContent, encoding);
 
-        // Files need to be explicitly marked as UTF-8 otherwise Visual Studio will take them to be Windows-1252.
-        // Fixes https://github.com/github/VisualStudio/pull/1004#issuecomment-308358520
-        [Fact]
-        public async Task NotCheckedOut_FilesHaveUTF8Encoding()
-        {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = "headFileContent";
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var checkedOut = false;
-
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, checkedOut);
-
-            Assert.True(HasPreamble(files.Item1, Encoding.UTF8));
-            Assert.True(HasPreamble(files.Item2, Encoding.UTF8));
+            Assert.Equal(File.ReadAllText(expectedPath), File.ReadAllText(file));
+            Assert.Equal(File.ReadAllBytes(expectedPath), File.ReadAllBytes(file));
         }
 
         static bool HasPreamble(string file, Encoding encoding)
@@ -190,25 +148,9 @@ public class PullRequestServiceTests : TestBaseClass
             return true;
         }
 
-        [Fact]
-        public async Task HeadBranchNotAvailable_ThrowsFileNotFoundException()
-        {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = new FileNotFoundException();
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-            var checkedOut = false;
-
-            await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
-                baseSha, baseFileContent, fileName, checkedOut));
-        }
-
-        static async Task<Tuple<string, string>> ExtractDiffFiles(
+        static async Task<string> ExtractFile(
             string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
-            string fileName, bool checkedOut, string repoDir = "repoDir", string headRef = "headRef", string baseRef = "baseRef")
+            string fileName, bool head, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef")
         {
             var repositoryModel = Substitute.For<ILocalRepositoryModel>();
             repositoryModel.LocalPath.Returns(repoDir);
@@ -229,7 +171,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
 
-            return await service.ExtractDiffFiles(repositoryModel, pullRequest, fileName, checkedOut);
+            return await service.ExtractFile(repositoryModel, pullRequest, fileName, head, encoding);
         }
 
         static IObservable<string> GetFileObservable(object fileOrException)
