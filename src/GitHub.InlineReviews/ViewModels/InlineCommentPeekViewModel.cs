@@ -137,18 +137,17 @@ namespace GitHub.InlineReviews.ViewModels
             var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
             var lineNumber = lineAndLeftBuffer.Item1;
             var leftBuffer = lineAndLeftBuffer.Item2;
-            var thread = file.InlineCommentThreads.FirstOrDefault(x => 
+            var thread = file.InlineCommentThreads.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
-            var apiClient = await CreateApiClient(session.LocalRepository);
 
             if (thread != null)
             {
-                Thread = new InlineCommentThreadViewModel(apiClient, session, thread.Comments);
+                Thread = new InlineCommentThreadViewModel(session, thread.Comments);
             }
             else
             {
-                var newThread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber, leftBuffer);
+                var newThread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
                 threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread().Forget());
                 Thread = newThread;
             }
@@ -180,12 +179,6 @@ namespace GitHub.InlineReviews.ViewModels
             var relativePath = session.GetRelativePath(fullPath);
             file = await session.GetFile(relativePath);
             fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
-        }
-
-        Task<IApiClient> CreateApiClient(ILocalRepositoryModel repository)
-        {
-            var hostAddress = HostAddress.Create(repository.CloneUrl.Host);
-            return apiClientFactory.Create(hostAddress);
         }
 
         async Task<string> GetPlaceholderBodyToPreserve()
