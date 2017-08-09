@@ -129,13 +129,13 @@
 
                     <ui:OcticonImage Grid.Column="0" VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.5" Margin="0 0 3 0" />
                     <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
                     </Border>
 
                     <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="into" />
 
                     <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
                     </Border>
                 </Grid>
 
@@ -262,7 +262,7 @@
                 <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
-                
+
                 <!-- Files changed -->
                 <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
@@ -276,8 +276,10 @@
                                 <!-- When invoked from the TreeView and the ListView we programmatically bind the 
                                      DataContext and update the CommandParameter to the changed file -->
                                 <ContextMenu x:Key="FileContextMenu">
-                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding DiffFile}"/>
-                                    <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewChanges}" Command="{Binding DiffFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewFile}" Command="{Binding ViewFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewChangesInSolution}" Command="{Binding DiffFileWithWorkingDirectory}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.OpenFileInSolution}" Command="{Binding OpenFileInWorkingDirectory}"/>
                                 </ContextMenu>
                             </Grid.Resources>
 

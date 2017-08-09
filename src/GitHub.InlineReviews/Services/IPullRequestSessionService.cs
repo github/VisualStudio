@@ -81,5 +81,41 @@ namespace GitHub.InlineReviews.Services
         /// The merge base SHA for the PR.
         /// </returns>
         Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
+        /// Posts a new PR review comment.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="user">The user posting the comment.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <param name="body">The comment body.</param>
+        /// <param name="commitId">THe SHA of the commit to comment on.</param>
+        /// <param name="path">The relative path of the file to comment on.</param>
+        /// <param name="position">The line index in the diff to comment on.</param>
+        /// <returns>A model representing the posted comment.</returns>
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            ILocalRepositoryModel repository,
+            IAccount user,
+            int number,
+            string body,
+            string commitId,
+            string path,
+            int position);
+
+        /// <summary>
+        /// Posts a PR review comment reply.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="user">The user posting the comment.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <param name="body">The comment body.</param>
+        /// <param name="inReplyTo">The comment ID to reply to.</param>
+        /// <returns>A model representing the posted comment.</returns>
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            ILocalRepositoryModel repository,
+            IAccount user,
+            int number,
+            string body,
+            int inReplyTo);
     }
 }

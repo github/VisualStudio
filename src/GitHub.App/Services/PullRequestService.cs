@@ -14,7 +14,6 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
-using PullRequest = Octokit.PullRequest;
 using System.Diagnostics;
 
 namespace GitHub.Services
@@ -290,51 +289,51 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Tuple<string, string>> ExtractDiffFiles(
+        public IObservable<string> ExtractFile(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
             string fileName,
-            bool isPullRequestBranchCheckedOut)
+            bool head,
+            Encoding encoding)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var baseUrl = pullRequest.Base.RepositoryCloneUrl;
-                var headUrl = pullRequest.Head.RepositoryCloneUrl;
-                var baseSha = pullRequest.Base.Sha;
-                var headSha = pullRequest.Head.Sha;
-                var baseRef = pullRequest.Base.Ref;
-                var headRef = pullRequest.Head.Ref;
-                string mergeBase = await gitClient.GetPullRequestMergeBase(
-                    repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
-                if (mergeBase == null)
-                {
-                    throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
-                }
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                string sha;
 
-                string left;
-                string right;
-                if (isPullRequestBranchCheckedOut)
+                if (head)
                 {
-                    right = Path.Combine(repository.LocalPath, fileName);
-                    left = await ExtractToTempFile(repo, mergeBase, fileName, GetEncoding(right));
+                    sha = pullRequest.Head.Sha;
                 }
                 else
                 {
-                    left = await ExtractToTempFile(repo, mergeBase, fileName, Encoding.UTF8);
-                    right = await ExtractToTempFile(repo, headSha, fileName, Encoding.UTF8);
+                    sha = await gitClient.GetPullRequestMergeBase(
+                        repo,
+                        pullRequest.Base.RepositoryCloneUrl,
+                        pullRequest.Head.RepositoryCloneUrl,
+                        pullRequest.Base.Sha,
+                        pullRequest.Head.Sha,
+                        pullRequest.Base.Ref,
+                        pullRequest.Head.Ref);
+
+                    if (sha == null)
+                    {
+                        throw new NotFoundException($"Couldn't find merge base between {pullRequest.Base.Sha} and {pullRequest.Head.Sha}.");
+                    }
                 }
 
-                return Observable.Return(Tuple.Create(left, right));
+                var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);
+                return Observable.Return(file);
             });
         }
 
-        static Encoding GetEncoding(string file)
+        public Encoding GetEncoding(string path)
         {
-            if (File.Exists(file))
+            if (File.Exists(path))
             {
                 var encoding = Encoding.UTF8;
-                if (HasPreamble(file, encoding))
+                if (HasPreamble(path, encoding))
                 {
                     return encoding;
                 }
@@ -413,9 +412,27 @@ namespace GitHub.Services
             return uniqueName;
         }
 
-        async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName, Encoding encoding)
+        async Task<string> ExtractToTempFile(
+            IRepository repo,
+            int pullRequestNumber,
+            string commitSha,
+            string fileName,
+            Encoding encoding)
         {
-            var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            string contents;
+
+            try
+            {
+                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            }
+            catch (FileNotFoundException)
+            {
+                var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
+                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            }
+
             return CreateTempFile(fileName, commitSha, contents, encoding);
         }
 
@@ -427,6 +444,7 @@ namespace GitHub.Services
 
             Directory.CreateDirectory(tempDir);
             File.WriteAllText(tempFile, contents, encoding);
+            File.SetAttributes(tempFile, FileAttributes.ReadOnly);
             return tempFile;
         }
 

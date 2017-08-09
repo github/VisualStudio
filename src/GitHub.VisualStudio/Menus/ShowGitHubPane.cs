@@ -4,7 +4,7 @@ using GitHub.Services;
 
 namespace GitHub.VisualStudio.Menus
 {
-    public class ShowGitHubPane: MenuBase, IMenuHandler
+    public class ShowGitHubPane : MenuBase, IMenuHandler
     {
         public ShowGitHubPane(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
@@ -12,7 +12,7 @@ namespace GitHub.VisualStudio.Menus
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidGitHubCmdSet;
+        public Guid Guid => Guids.guidGitHubCmdSet;
         public int CmdId => PkgCmdIDList.showGitHubPaneCommand;
 
         public void Activate(object data = null)

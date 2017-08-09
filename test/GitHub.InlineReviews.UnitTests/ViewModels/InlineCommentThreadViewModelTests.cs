@@ -18,7 +18,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesComments()
         {
             var target = new InlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1", "Comment 2"));
 
@@ -46,7 +45,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
             var target = new InlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1"));
 
@@ -59,36 +57,15 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Fact]
         public void PostsCommentInReplyToCorrectComment()
         {
-            var apiClient = CreateApiClient();
-            var target = new InlineCommentThreadViewModel(
-                apiClient,
-                CreateSession(),
-                CreateComments("Comment 1", "Comment 2"));
-
-            target.Comments[2].Body = "New Comment";
-            target.Comments[2].CommitEdit.Execute(null);
-
-            apiClient.Received(1).CreatePullRequestReviewComment(
-                "owner",
-                "repo",
-                47,
-                "New Comment",
-                1);
-        }
-
-        [Fact]
-        public void AddsPostedCommentToSession()
-        {
             var session = CreateSession();
             var target = new InlineCommentThreadViewModel(
-                CreateApiClient(),
                 session,
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";
             target.Comments[2].CommitEdit.Execute(null);
 
-            session.Received(1).AddComment(Arg.Any<IPullRequestReviewCommentModel>());
+            session.Received(1).PostReviewComment("New Comment", 1);
         }
 
         IApiClient CreateApiClient()

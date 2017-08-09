@@ -19,7 +19,7 @@ namespace GitHub.VisualStudio.Menus
             selectedTextProvider = new Lazy<ISelectedTextProvider>(() => ServiceProvider.TryGetService<ISelectedTextProvider>());
         }
 
-        public Guid Guid { get { return GuidList.guidContextMenuSet; } }
+        public Guid Guid { get { return Guids.guidContextMenuSet; } }
         public int CmdId { get { return PkgCmdIDList.createGistCommand; } }
 
         public bool CanShow()

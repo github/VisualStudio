@@ -12,22 +12,22 @@
   </Style>
   <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading1StyleKey}">
     <Setter Property="FontSize" Value="19" />
-    <Setter Property="Foreground" Value="#ff000000" />
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
     <Setter Property="FontWeight" Value="Light" />
   </Style>
   <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading2StyleKey}">
     <Setter Property="FontSize" Value="17" />
-    <Setter Property="Foreground" Value="#ff000000" />
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
     <Setter Property="FontWeight" Value="Light" />
   </Style>
   <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading3StyleKey}">
     <Setter Property="FontSize" Value="16" />
-    <Setter Property="Foreground" Value="#99000000" />
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
     <Setter Property="FontWeight" Value="Light" />
   </Style>
   <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading4StyleKey}">
     <Setter Property="FontSize" Value="14" />
-    <Setter Property="Foreground" Value="#99000000" />
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
     <Setter Property="FontWeight" Value="Light" />
     <Setter Property="TextDecorations" Value="Underline" />
   </Style>
@@ -40,5 +40,16 @@
     <Setter Property="BorderBrush" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
     <Setter Property="BorderThickness" Value="1,1,0,0"/>
     <Setter Property="Padding" Value="4"/>
+  </Style>
+  <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.CodeBlockStyleKey}">
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.Text}" />
+    <Setter Property="Background" Value="#66d3d3d3" />
+    <Setter Property="Padding" Value="2" />
+    <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
+  </Style>
+  <Style TargetType="{x:Type Run}" x:Key="{x:Static markdig:Styles.CodeStyleKey}">
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.Text}" />
+    <Setter Property="Background" Value="#66d3d3d3" />
+    <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
   </Style>
 </ResourceDictionary>
