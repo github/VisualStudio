@@ -46,11 +46,15 @@ namespace GitHub.InlineReviews.Services
             if (statusBar != null)
             {
                 var githubStatusBar = FindPullRequestStatusView(statusBar);
-                if (githubStatusBar == null)
+
+                // HACK: Insert every time to ensure that status shows up.
+                if (githubStatusBar != null)
                 {
-                    var view = new PullRequestStatusView { Name = GitHubStatusName, DataContext = pullRequestStatusViewModel };
-                    statusBar.Items.Insert(0, view);
+                    statusBar.Items.Remove(githubStatusBar);
                 }
+
+                var view = new PullRequestStatusView { Name = GitHubStatusName, DataContext = pullRequestStatusViewModel };
+                statusBar.Items.Insert(0, view);
             }
         }
 
