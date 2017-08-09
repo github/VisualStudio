@@ -294,6 +294,7 @@
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Menus\OpenLink.cs" />
     <Compile Include="Menus\LinkMenuBase.cs" />
+    <Compile Include="Menus\ShowCurrentPullRequest.cs" />
     <Compile Include="Menus\OpenPullRequests.cs" />
     <Compile Include="Menus\ShowGitHubPane.cs" />
     <Compile Include="Menus\AddConnection.cs" />

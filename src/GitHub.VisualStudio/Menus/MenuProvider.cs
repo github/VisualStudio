@@ -44,7 +44,8 @@ namespace GitHub.VisualStudio.Menus
             {
                 new AddConnection(serviceProvider),
                 new OpenPullRequests(serviceProvider),
-                new ShowGitHubPane(serviceProvider)
+                new ShowGitHubPane(serviceProvider),
+                new ShowCurrentPullRequest(serviceProvider)
             };
 
             DynamicMenus = new List<IDynamicMenuHandler>
