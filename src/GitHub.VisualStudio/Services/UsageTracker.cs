@@ -41,174 +41,13 @@ namespace GitHub.Services
             timer?.Dispose();
         }
 
-        public async Task IncrementLaunchCount()
+        public async Task IncrementCounter(Expression<Func<UsageModel, int>> counter)
         {
             var usage = await LoadUsage();
-            ++usage.Model.NumberOfStartups;
-            ++usage.Model.NumberOfStartupsWeek;
-            ++usage.Model.NumberOfStartupsMonth;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementCloneCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfClones;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementCreateCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfReposCreated;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPublishCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfReposPublished;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementOpenInGitHubCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfOpenInGitHub;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementLinkToGitHubCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfLinkToGitHub;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementCreateGistCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfGists;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementUpstreamPullRequestCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfUpstreamPullRequests;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementLoginCount()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfLogins;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPullRequestCheckOutCount(bool fork)
-        {
-            var usage = await LoadUsage();
-
-            if (fork)
-                ++usage.Model.NumberOfForkPullRequestsCheckedOut;
-            else
-                ++usage.Model.NumberOfLocalPullRequestsCheckedOut;
-
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPullRequestPushCount(bool fork)
-        {
-            var usage = await LoadUsage();
-
-            if (fork)
-                ++usage.Model.NumberOfForkPullRequestPushes;
-            else
-                ++usage.Model.NumberOfLocalPullRequestPushes;
-
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPullRequestPullCount(bool fork)
-        {
-            var usage = await LoadUsage();
-
-            if (fork)
-                ++usage.Model.NumberOfForkPullRequestPulls;
-            else
-                ++usage.Model.NumberOfLocalPullRequestPulls;
-
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementWelcomeDocsClicks()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfWelcomeDocsClicks;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementWelcomeTrainingClicks()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfWelcomeTrainingClicks;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementGitHubPaneHelpClicks()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfGitHubPaneHelpClicks;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPullRequestOpened()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPullRequestsOpened;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPRDetailsViewChanges()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPRDetailsViewChanges;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPRDetailsViewFile()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPRDetailsViewFile;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPRDetailsCompareWithSolution()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPRDetailsCompareWithSolution;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPRDetailsOpenFileInSolution()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPRDetailsOpenFileInSolution;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPRReviewDiffViewInlineCommentOpen()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPRReviewDiffViewInlineCommentOpen;
-            await service.WriteLocalData(usage);
-        }
-
-        public async Task IncrementPRReviewDiffViewInlineCommentPost()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPRReviewDiffViewInlineCommentPost;
+            var property = (MemberExpression)counter.Body;
+            var propertyInfo = (PropertyInfo)property.Member;
+            var value = (int)propertyInfo.GetValue(usage.Model);
+            propertyInfo.SetValue(usage.Model, value + 1);
             await service.WriteLocalData(usage);
         }
 
@@ -231,6 +70,15 @@ namespace GitHub.Services
                 vsservices = gitHubServiceProvider.GetService<IVSServices>();
                 initialized = true;
             }
+        }
+
+        async Task IncrementLaunchCount()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfStartups;
+            ++usage.Model.NumberOfStartupsWeek;
+            ++usage.Model.NumberOfStartupsMonth;
+            await service.WriteLocalData(usage);
         }
 
         async Task<UsageData> LoadUsage()

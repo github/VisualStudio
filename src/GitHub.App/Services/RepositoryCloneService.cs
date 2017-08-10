@@ -63,7 +63,7 @@ namespace GitHub.Services
             try
             {
                 await vsGitServices.Clone(cloneUrl, path, true, progress);
-                await usageTracker.IncrementCloneCount();
+                await usageTracker.IncrementCounter(x => x.NumberOfClones);
             }
             catch (Exception ex)
             {

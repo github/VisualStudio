@@ -181,6 +181,36 @@ namespace UnitTests.GitHub.VisualStudio.Services
             }
         }
 
+        public class TheIncrementCounterMethod : TestBaseClass
+        {
+            [Fact]
+            public async Task ShouldIncrementCounter()
+            {
+                var model = new UsageModel { NumberOfClones = 4 };
+                var target = new UsageTracker(
+                    CreateServiceProvider(),
+                    CreateUsageService(model));
+
+                await target.IncrementCounter(x => x.NumberOfClones);
+
+                Assert.Equal(5, model.NumberOfClones);
+            }
+
+            [Fact]
+            public async Task ShouldWriteUpdatedData()
+            {
+                var data = new UsageData { Model = new UsageModel() };
+                var service = CreateUsageService(data);
+                var target = new UsageTracker(
+                    CreateServiceProvider(),
+                    service);
+
+                await target.IncrementCounter(x => x.NumberOfClones);
+
+                await service.Received(1).WriteLocalData(data);
+            }
+        }
+
         static Tuple<UsageTracker, Func<Task>> CreateTargetAndGetTick(
             IGitHubServiceProvider serviceProvider,
             IUsageService service)

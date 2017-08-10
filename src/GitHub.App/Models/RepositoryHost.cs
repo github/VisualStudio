@@ -78,7 +78,8 @@ namespace GitHub.Models
                 {
                     var user = await loginManager.LoginFromCache(Address, ApiClient.GitHubClient);
                     var accountCacheItem = new AccountCacheItem(user);
-                    usage.IncrementLoginCount().Forget();
+
+                    await usage.IncrementCounter(x => x.NumberOfLogins);
                     await ModelService.InsertUser(accountCacheItem);
 
                     if (user != unverifiedUser.User)
@@ -109,7 +110,8 @@ namespace GitHub.Models
             {
                 var user = await loginManager.Login(Address, ApiClient.GitHubClient, usernameOrEmail, password);
                 var accountCacheItem = new AccountCacheItem(user);
-                usage.IncrementLoginCount().Forget();
+
+                await usage.IncrementCounter(x => x.NumberOfLogins);
                 await ModelService.InsertUser(accountCacheItem);
 
                 if (user != unverifiedUser.User)
@@ -165,7 +167,7 @@ namespace GitHub.Models
                     if (result.IsSuccess())
                     {
                         var accountCacheItem = new AccountCacheItem(userAndScopes.User);
-                        usage.IncrementLoginCount().Forget();
+                        usage.IncrementCounter(x => x.NumberOfLogins).Forget();
                         return ModelService.InsertUser(accountCacheItem).Select(_ => result);
                     }
 
