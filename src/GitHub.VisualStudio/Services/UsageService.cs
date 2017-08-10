@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Helpers;
 using GitHub.Models;
 using Task = System.Threading.Tasks.Task;
 
@@ -54,7 +55,7 @@ namespace GitHub.Services
 
         public async Task<UsageData> ReadLocalData()
         {
-            Initialize();
+            await Initialize();
 
             var json = File.Exists(storePath) ? await ReadAllTextAsync(storePath) : null;
 
@@ -84,10 +85,12 @@ namespace GitHub.Services
             }
         }
 
-        void Initialize()
+        async Task Initialize()
         {
             if (storePath == null)
             {
+                await ThreadingHelper.SwitchToMainThreadAsync();
+
                 var program = serviceProvider.GetService<IProgram>();
                 storePath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
