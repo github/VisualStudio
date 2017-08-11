@@ -35,6 +35,10 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+
     <DockPanel Margin="8" LastChildFill="True">
         <ui:OcticonImage Width="16"
                          Height="16"
