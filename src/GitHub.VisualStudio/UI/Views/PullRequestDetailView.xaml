@@ -83,6 +83,10 @@
         </ResourceDictionary>
     </Control.Resources>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+    
     <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
