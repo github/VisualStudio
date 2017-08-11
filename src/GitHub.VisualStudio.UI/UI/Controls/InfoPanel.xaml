@@ -58,6 +58,7 @@
                                 VerticalAlignment="Top"
                                 DockPanel.Dock="Top"
                                 Foreground="Black"
+                                Markdown="{Binding Message}"
                                 ScrollViewer.CanContentScroll="False"
                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                                 ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
