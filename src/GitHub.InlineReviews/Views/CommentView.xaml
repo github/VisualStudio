@@ -34,7 +34,7 @@
 
     <Grid>
         <!-- Displays an existing comment-->
-        <StackPanel Orientation="Vertical" Margin="4 4 4 0">
+        <StackPanel Orientation="Vertical" Margin="4 0 4 0">
             <StackPanel.Style>
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -102,7 +102,7 @@
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4 0"
+                              Margin="4 0 4 0"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
@@ -150,7 +150,7 @@
             
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="2" 
-                        Margin="4 8" 
+                        Margin="4 8 4 4" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         IsVisibleChanged="buttonPanel_IsVisibleChanged">
