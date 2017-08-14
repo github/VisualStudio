@@ -18,11 +18,14 @@ namespace GitHub.Caches
 
         public static CacheIndex Create(string key)
         {
-            return new CacheIndex { IndexKey = key };
+            return new CacheIndex(key);
         }
 
-        public CacheIndex()
+        public CacheIndex(string key)
         {
+            Guard.ArgumentNotEmptyString(key, nameof(key));
+
+            IndexKey = key;
             Keys = new List<string>();
             OldKeys = new List<string>();
         }
@@ -90,9 +93,9 @@ namespace GitHub.Caches
                 .Select(x => this);
         }
 
-        public string IndexKey { get; set; }
-        public List<string> Keys { get; set; }
+        public string IndexKey { get; }
+        public List<string> Keys { get; }
         public DateTimeOffset UpdatedAt { get; set; }
-        public List<string> OldKeys { get; set; }
+        public List<string> OldKeys { get; private set; }
     }
 }
