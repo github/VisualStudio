@@ -23,7 +23,8 @@
                         <ToggleButton Grid.Column="0" Grid.Row="0" 
                                       IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                       VerticalAlignment="Stretch"
-                                      Width="16">
+                                      Margin="0 0 4 0"
+                                      Width="10">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Border Background="Transparent">
