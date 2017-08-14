@@ -157,7 +157,9 @@ namespace GitHub.InlineReviews.Tags
 
         Task<byte[]> IEditorContentSource.GetContent()
         {
-            return Task.FromResult(GetContents(buffer.CurrentSnapshot));
+            var text = buffer.CurrentSnapshot.GetText();
+            var bytes = document.Encoding.GetBytes(text);
+            return Task.FromResult(bytes);
         }
 
         void Initialize()
@@ -277,22 +279,6 @@ namespace GitHub.InlineReviews.Tags
 
                 signalRebuild.OnNext(buffer.CurrentSnapshot);
             }
-        }
-
-        byte[] GetContents(ITextSnapshot snapshot)
-        {
-            var currentText = snapshot.GetText();
-
-            var content = document.Encoding.GetBytes(currentText);
-
-            var preamble = document.Encoding.GetPreamble();
-            if (preamble.Length == 0) return content;
-
-            var completeContent = new byte[preamble.Length + content.Length];
-            Buffer.BlockCopy(preamble, 0, completeContent, 0, preamble.Length);
-            Buffer.BlockCopy(content, 0, completeContent, preamble.Length, content.Length);
-
-            return completeContent;
         }
 
         async Task Rebuild(ITextSnapshot snapshot)
