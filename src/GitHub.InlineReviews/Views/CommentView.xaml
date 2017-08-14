@@ -34,7 +34,7 @@
 
     <Grid>
         <!-- Displays an existing comment-->
-        <StackPanel Orientation="Vertical" Margin="4">
+        <StackPanel Orientation="Vertical" Margin="4 4 4 0">
             <StackPanel.Style>
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -63,6 +63,10 @@
                                     Margin="0 2 0 0"
                                     Foreground="{DynamicResource VsBrush.WindowText}"
                                     Markdown="{Binding Body}"/>
+
+            <Separator Margin="0 4 0 0" 
+                       Background="{DynamicResource GitHubButtonBorderBrush}"/>
+
         </StackPanel>
 
         <!-- Displays edit view or a reply placeholder-->
@@ -87,18 +91,14 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0 0 0 4" 
-                       Background="{DynamicResource GitHubButtonBorderBrush}"/>
-
             <ui:PromptTextBox Name="body"
                               Grid.Column="1"
-                              Grid.Row="1"
+                              Grid.Row="0"
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
@@ -131,7 +131,7 @@
                 </ui:PromptTextBox.Style>
             </ui:PromptTextBox>
 
-            <DockPanel Grid.Column="1" Grid.Row="2"
+            <DockPanel Grid.Column="1" Grid.Row="1"
                        Margin="0 4"
                        HorizontalAlignment="Left" 
                        TextBlock.Foreground="Red">
@@ -149,7 +149,7 @@
             </DockPanel>
             
             <StackPanel Name="buttonPanel"
-                        Grid.Column="1" Grid.Row="3" 
+                        Grid.Column="1" Grid.Row="2" 
                         Margin="4 8" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
