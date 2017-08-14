@@ -28,16 +28,16 @@
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Border Background="Transparent" >
                                         <Path Name="Arrow"
-                                              Fill="{TemplateBinding Foreground}"
+                                              Fill="{DynamicResource VsBrush.WindowText}"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Center"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="Arrow" Property="Data" Value="M 0 0 L 4 4 L 8 0 Z" />
+                                            <Setter TargetName="Arrow" Property="Data" Value="M6 0v6H0" />
                                         </Trigger>
                                         <Trigger Property="IsChecked" Value="False">
-                                            <Setter TargetName="Arrow" Property="Data" Value="M 0 4 L 4 0 L 8 4 Z" />
+                                            <Setter TargetName="Arrow" Property="Data" Value="M0 0l4.5 4.25L0 8.5z" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
