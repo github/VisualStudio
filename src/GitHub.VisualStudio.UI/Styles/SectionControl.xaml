@@ -32,18 +32,19 @@
                                               Height="7"
                                               Width="7"
                                               Stretch="UniformToFill"
+                                              Data="M7 1l-.025 5H2z"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Center"/>
                                     </Border>
+
                                     <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="Arrow" Property="Data" Value="M7 1l-.025 5H2z" />
-                                        </Trigger>
-                                        <!--
                                         <Trigger Property="IsChecked" Value="False">
-                                            <Setter TargetName="Arrow" Property="Data" Value="M3.518 0l3.5 3.536-3.5 3.5z" />
+                                            <Setter TargetName="Arrow" Property="LayoutTransform">
+                                                <Setter.Value>
+                                                    <RotateTransform Angle="-45" />
+                                                </Setter.Value>
+                                            </Setter>
                                         </Trigger>
-                                        -->
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </ToggleButton.Template>
