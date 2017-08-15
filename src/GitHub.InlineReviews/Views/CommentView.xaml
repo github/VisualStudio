@@ -34,7 +34,7 @@
 
     <Grid>
         <!-- Displays an existing comment-->
-        <StackPanel Orientation="Vertical" Margin="4 0 4 0">
+        <StackPanel Orientation="Vertical" Margin="4 4 4 0">
             <StackPanel.Style>
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -60,13 +60,12 @@
 
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
-                                    Margin="0 2 0 0"
+                                    Margin="0 2 0 4"
                                     Foreground="{DynamicResource VsBrush.WindowText}"
                                     Markdown="{Binding Body}"/>
 
             <Separator Margin="0 4 0 0" 
                        Background="{DynamicResource GitHubButtonBorderBrush}"/>
-
         </StackPanel>
 
         <!-- Displays edit view or a reply placeholder-->
