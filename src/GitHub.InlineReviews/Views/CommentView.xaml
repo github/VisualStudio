@@ -102,7 +102,7 @@
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4 0 4 0"
+                              Margin="4 0 4 4"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
@@ -132,7 +132,7 @@
             </ui:PromptTextBox>
 
             <DockPanel Grid.Column="1" Grid.Row="1"
-                       Margin="0 4"
+                       Margin="0 0 0 4"
                        HorizontalAlignment="Left" 
                        TextBlock.Foreground="Red">
                 <DockPanel.Style>
@@ -150,7 +150,7 @@
             
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="2" 
-                        Margin="4 8 4 4" 
+                        Margin="4" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         IsVisibleChanged="buttonPanel_IsVisibleChanged">
