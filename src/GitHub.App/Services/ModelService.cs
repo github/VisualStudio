@@ -219,7 +219,7 @@ namespace GitHub.Services
         public IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo)
         {
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|{2}/{3}", CacheIndex.RepoPrefix, user.Login, owner, repo));
 
             return Observable.Defer(() => keyobs
                 .SelectMany(key =>
