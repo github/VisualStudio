@@ -85,7 +85,7 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fullPath = ViewModel.GetLocalFilePath(file);
-                var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true, Encoding.UTF8);
+                var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true);
 
                 using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
                 {
@@ -112,9 +112,8 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
-                var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true, Encoding.UTF8);
-                var encoding = ViewModel.GetEncoding(rightFile);
-                var leftFile = await ViewModel.ExtractFile(file, false, encoding);
+                var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true);
+                var leftFile = await ViewModel.ExtractFile(file, false);
                 var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
                 var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
                 var rightLabel = workingDirectory ? relativePath : $"{relativePath};PR {ViewModel.Model.Number}";

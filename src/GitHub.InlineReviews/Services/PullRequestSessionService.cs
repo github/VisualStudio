@@ -61,9 +61,10 @@ namespace GitHub.InlineReviews.Services
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);
+            var modified = await gitClient.IsModified(repo, relativePath, contents);
+            var pushed = await gitClient.IsHeadPushed(repo);
 
-            return !await gitClient.IsModified(repo, relativePath, contents) &&
-                   await gitClient.IsHeadPushed(repo);
+            return !modified && pushed;
         }
 
         public async Task<byte[]> ExtractFileFromGit(
