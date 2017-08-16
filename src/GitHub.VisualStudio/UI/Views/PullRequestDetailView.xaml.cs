@@ -309,11 +309,11 @@ namespace GitHub.VisualStudio.UI.Views
 
         void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
         {
-            var url = e.Parameter.ToString();
+            Uri uri;
 
-            if (!string.IsNullOrEmpty(url))
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
             {
-                VisualStudioBrowser.OpenUrl(new Uri(url));
+                VisualStudioBrowser.OpenUrl(uri);
             }
         }
     }
