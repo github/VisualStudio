@@ -9,7 +9,7 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
-             Background="Beige"
+             Background="{DynamicResource VsBrush.InfoBackground}"
              d:DataContext="{d:DesignInstance Type=sampleData:InfoPanelDesigner, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -35,6 +35,10 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+
     <DockPanel Margin="8" LastChildFill="True">
         <ui:OcticonImage Width="16"
                          Height="16"
@@ -58,6 +62,7 @@
                                 VerticalAlignment="Top"
                                 DockPanel.Dock="Top"
                                 Foreground="Black"
+                                Markdown="{Binding Message}"
                                 ScrollViewer.CanContentScroll="False"
                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                                 ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
