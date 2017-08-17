@@ -478,9 +478,9 @@ namespace GitHub.ViewModels
         /// <returns>The path to a temporary file.</returns>
         public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
-            var path = Path.Combine(file.DirectoryPath, file.FileName);
-            var encoding = pullRequestsService.GetEncoding(path);
-            return pullRequestsService.ExtractFile(LocalRepository, model, path, head, encoding).ToTask();
+            var relativePath = Path.Combine(file.DirectoryPath, file.FileName);
+            var encoding = pullRequestsService.GetEncoding(LocalRepository, relativePath);
+            return pullRequestsService.ExtractFile(LocalRepository, model, relativePath, head, encoding).ToTask();
         }
 
         /// <summary>
