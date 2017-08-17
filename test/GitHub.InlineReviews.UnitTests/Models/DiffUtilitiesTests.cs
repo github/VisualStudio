@@ -47,7 +47,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Fact]
-            public void NoNewLineAtEnd_NotAtEndOfChunk()
+            public void NoNewLineNotAtEndOfChunk_CheckLineCount()
             {
                 var header =
 @"@@ -1 +1 @@
@@ -55,10 +55,24 @@ namespace GitHub.InlineReviews.UnitTests.Models
 \ No newline at end of file
 +new";
 
-                var chunks = DiffUtilities.ParseFragment(header);
+                var chunk = DiffUtilities.ParseFragment(header).First();
 
-                var chunk = chunks.First();
                 Assert.Equal(2, chunk.Lines.Count());
+            }
+
+            [Fact]
+            public void NoNewLineNotAtEndOfChunk_CheckDiffLineNumber()
+            {
+                var header =
+@"@@ -1 +1 @@
+-old
+\ No newline at end of file
++new";
+
+                var chunk = DiffUtilities.ParseFragment(header).First();
+
+                var line = chunk.Lines.Last();
+                Assert.Equal(3, line.DiffLineNumber);
             }
 
             [Fact]
