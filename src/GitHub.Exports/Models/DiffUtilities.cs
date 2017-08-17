@@ -44,6 +44,7 @@ namespace GitHub.Models
                         if (type == DiffChangeType.Control)
                         {
                             // This might contain info about previous line (e.g. "\ No newline at end of file").
+                            ++diffLine;
                             continue;
                         }
 
