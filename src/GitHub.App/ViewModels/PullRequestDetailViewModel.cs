@@ -475,7 +475,6 @@ namespace GitHub.ViewModels
         /// <param name="head">
         /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
         /// </param>
-        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The path to a temporary file.</returns>
         public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
