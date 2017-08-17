@@ -475,20 +475,13 @@ namespace GitHub.ViewModels
         /// <param name="head">
         /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
         /// </param>
-        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The path to a temporary file.</returns>
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head, Encoding encoding)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
+            var encoding = pullRequestsService.GetEncoding(path);
             return pullRequestsService.ExtractFile(LocalRepository, model, path, head, encoding).ToTask();
         }
-
-        /// <summary>
-        /// Gets the encoding for the specified file.
-        /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>The file's encoding</returns>
-        public Encoding GetEncoding(string path) => pullRequestsService.GetEncoding(path);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.
