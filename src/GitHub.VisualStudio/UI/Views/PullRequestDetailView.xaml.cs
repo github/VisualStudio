@@ -305,5 +305,15 @@ namespace GitHub.VisualStudio.UI.Views
             }
             catch { }
         }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                VisualStudioBrowser.OpenUrl(uri);
+            }
+        }
     }
 }
