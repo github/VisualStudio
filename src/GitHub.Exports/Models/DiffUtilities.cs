@@ -41,34 +41,32 @@ namespace GitHub.Models
                     else if (chunk != null)
                     {
                         var type = GetLineChange(line[0]);
-                        if (type == DiffChangeType.Control)
-                        {
-                            // This might contain info about previous line (e.g. "\ No newline at end of file").
-                            ++diffLine;
-                            continue;
-                        }
 
-                        chunk.Lines.Add(new DiffLine
+                        // This might contain info about previous line (e.g. "\ No newline at end of file").
+                        if (type != DiffChangeType.Control)
                         {
-                            Type = type,
-                            OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
-                            NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
-                            DiffLineNumber = diffLine,
-                            Content = line,
-                        });
+                            chunk.Lines.Add(new DiffLine
+                            {
+                                Type = type,
+                                OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
+                                NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
+                                DiffLineNumber = diffLine,
+                                Content = line,
+                            });
 
-                        switch (type)
-                        {
-                            case DiffChangeType.None:
-                                ++oldLine;
-                                ++newLine;
-                                break;
-                            case DiffChangeType.Delete:
-                                ++oldLine;
-                                break;
-                            case DiffChangeType.Add:
-                                ++newLine;
-                                break;
+                            switch (type)
+                            {
+                                case DiffChangeType.None:
+                                    ++oldLine;
+                                    ++newLine;
+                                    break;
+                                case DiffChangeType.Delete:
+                                    ++oldLine;
+                                    break;
+                                case DiffChangeType.Add:
+                                    ++newLine;
+                                    break;
+                            }
                         }
                     }
 
