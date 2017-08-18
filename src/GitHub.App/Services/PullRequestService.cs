@@ -328,12 +328,14 @@ namespace GitHub.Services
             });
         }
 
-        public Encoding GetEncoding(string path)
+        public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
         {
-            if (File.Exists(path))
+            var fullPath = Path.Combine(repository.LocalPath, relativePath);
+
+            if (File.Exists(fullPath))
             {
                 var encoding = Encoding.UTF8;
-                if (HasPreamble(path, encoding))
+                if (HasPreamble(fullPath, encoding))
                 {
                     return encoding;
                 }
