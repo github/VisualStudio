@@ -424,16 +424,7 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                if (repo.Head.IsTracking)
-                {
-                    var trackedBranchTip = repo.Head.TrackedBranch.Tip;
-                    if (trackedBranchTip != null)
-                    {
-                        return repo.Head.Tip.Sha == trackedBranchTip.Sha;
-                    }
-                }
-
-                return false;
+                return repo.Head.TrackingDetails.AheadBy == 0;
             });
         }
 
