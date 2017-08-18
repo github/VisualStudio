@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
@@ -23,11 +24,15 @@ namespace GitHub.InlineReviews.Views
             });
         }
 
-        void DoOpenOnGitHub()
+        IVisualStudioBrowser GetBrowser()
         {
             var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
-            var browser = serviceProvider.GetService<IVisualStudioBrowser>();
-            browser.OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
+            return serviceProvider.GetService<IVisualStudioBrowser>();
+        }
+
+        void DoOpenOnGitHub()
+        {
+            GetBrowser().OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
         }
 
         private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -54,6 +59,16 @@ namespace GitHub.InlineReviews.Views
             if (buttonPanel.IsVisible)
             {
                 BringIntoView();
+            }
+        }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                GetBrowser().OpenUrl(uri);
             }
         }
     }
