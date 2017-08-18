@@ -126,7 +126,9 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="relativePath">The relative path to the file in the repository.</param>
-        /// <returns>The file's encoding</returns>
+        /// <returns>
+        /// The file's encoding or <see cref="Encoding.Default"/> if the file doesn't exist.
+        /// </returns>
         Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath);
 
         /// <summary>
