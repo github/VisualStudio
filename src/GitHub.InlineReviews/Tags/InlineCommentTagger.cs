@@ -102,7 +102,7 @@ namespace GitHub.InlineReviews.Tags
                 // Sucessful initialization will call NotifyTagsChanged, causing this method to be re-called.
                 Initialize();
             }
-            else if (file != null)
+            else if (file != null && session != null)
             {
                 foreach (var span in spans)
                 {
