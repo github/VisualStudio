@@ -193,9 +193,16 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData("", " x", -1)]
             [InlineData(" x", "", -1)]
 
-            [InlineData(" 1. 2.", " 2. 1.", 1)] // matched full context
-            [InlineData(" 1. 2.", " 2. 3.", -1)] // didn't match full context
-            [InlineData(" 2.", " 2. 1.", 0)] // match if we run out of context lines
+            [InlineData(" 1. 2.", " 1. 2.", 1)] // matched full context
+            [InlineData(" 1. 2.", " 3. 2.", -1)] // didn't match full context
+            [InlineData(" 2.", " 1. 2.", 0)] // match if we run out of context lines
+
+            // Tests for https://github.com/github/VisualStudio/issues/1149
+            // Matching algorithm got confused when there was a partial match.
+            [InlineData("+a.+x.+x.", "+a.+x.", 1)]
+            [InlineData("+a.+x.+x.", "+a.+x.+x.", 2)]
+            [InlineData("+a.+x.+x.+b.+x.+x.", "+a.+x.", 1)]
+            [InlineData("+a.+x.+x.+b.+x.+x.", "+b.+x.", 4)]
             public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
             {
                 var header = "@@ -1 +1 @@";
@@ -203,8 +210,8 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 lines2 = lines2.Replace(".", "\r\n");
                 var chunks1 = DiffUtilities.ParseFragment(header + "\n" + lines1).ToList();
                 var chunks2 = DiffUtilities.ParseFragment(header + "\n" + lines2).ToList();
-                var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
-                var targetLines = chunks2.First().Lines;
+                var expectLine = (skip != -1) ? chunks1.First().Lines[skip] : null;
+                var targetLines = chunks2.First().Lines.Reverse().ToList();
 
                 var line = DiffUtilities.Match(chunks1, targetLines);
 

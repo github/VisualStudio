@@ -100,10 +100,6 @@ namespace GitHub.Models
                             return source.Lines[i + j - 1];
                         }
                     }
-                    else
-                    {
-                        j = 0;
-                    }
                 }
             }
 
