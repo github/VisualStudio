@@ -87,7 +87,7 @@ namespace GitHub.VisualStudio.UI.Views
                 var fullPath = ViewModel.GetLocalFilePath(file);
                 var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true);
 
-                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                using (workingDirectory ? null : OpenInProvisionalTab())
                 {
                     var window = Services.Dte.ItemOperations.OpenFile(fileName);
                     window.Document.ReadOnly = !workingDirectory;
@@ -127,7 +127,7 @@ namespace GitHub.VisualStudio.UI.Views
                 }
 
                 IVsWindowFrame frame;
-                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                using (OpenInProvisionalTab())
                 {
                     var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
 
@@ -314,6 +314,13 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 VisualStudioBrowser.OpenUrl(uri);
             }
+        }
+
+        static IDisposable OpenInProvisionalTab()
+        {
+            return new NewDocumentStateScope
+                (__VSNEWDOCUMENTSTATE.NDS_Provisional,
+                VSConstants.NewDocumentStateReason.SolutionExplorer);
         }
     }
 }
