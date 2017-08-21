@@ -203,6 +203,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             [InlineData("+a.+x.+x.", "+a.+x.+x.", 2)]
             [InlineData("+a.+x.+x.+b.+x.+x.", "+a.+x.", 1)]
             [InlineData("+a.+x.+x.+b.+x.+x.", "+b.+x.", 4)]
+            [InlineData("+a.+b.+x", "+a.+x.", -1)] // backtrack when there is a failed match
             public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
             {
                 var header = "@@ -1 +1 @@";
