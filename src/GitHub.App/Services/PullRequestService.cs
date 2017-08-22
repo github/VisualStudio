@@ -446,7 +446,6 @@ namespace GitHub.Services
 
             Directory.CreateDirectory(tempDir);
             File.WriteAllText(tempFile, contents, encoding);
-            File.SetAttributes(tempFile, FileAttributes.ReadOnly);
             return tempFile;
         }
 
