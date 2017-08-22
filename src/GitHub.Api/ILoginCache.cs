@@ -25,13 +25,13 @@ namespace GitHub.Api
         /// <param name="password">The password.</param>
         /// <param name="hostAddress">The host address.</param>
         /// <returns>A task tracking the operation.</returns>
-        Task SaveLogin(string userName, string password, HostAddress hostAddress);
+        Task<bool> SaveLogin(string userName, string password, HostAddress hostAddress);
 
         /// <summary>
         /// Removes the login details for the specified host address.
         /// </summary>
         /// <param name="hostAddress"></param>
         /// <returns>A task tracking the operation.</returns>
-        Task EraseLogin(HostAddress hostAddress);
+        Task<bool> EraseLogin(HostAddress hostAddress);
     }
 }

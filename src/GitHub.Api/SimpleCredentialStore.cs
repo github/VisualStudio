@@ -28,6 +28,46 @@ namespace GitHub.Api
             return Task.FromResult(Credentials.Anonymous);
         }
 
+        public static Task<Credentials> GetCredentials(HostAddress hostAddress)
+        {
+            var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
+            using (var credential = new Credential())
+            {
+                credential.Target = keyHost;
+                credential.Type = CredentialType.Generic;
+                if (credential.Load())
+                    return Task.FromResult(new Credentials(credential.Username, credential.Password));
+            }
+            return Task.FromResult(Credentials.Anonymous);
+        }
+
+        public static Task<bool> SaveCredentials(HostAddress hostAddress, Credentials credentials)
+        {
+            var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
+            using (var credential = new Credential())
+            {
+                credential.Target = keyHost;
+                credential.Type = CredentialType.Generic;
+                credential.Username = credentials.Login;
+                credential.Password = credentials.Password;
+                return Task.FromResult(credential.Save());
+            }
+        }
+
+        public static Task<bool> RemoveCredentials(HostAddress hostAddress)
+        {
+            var host = hostAddress.CredentialCacheKeyHost;
+            var keyGit = GetKeyGit(host);
+            if (!DeleteKey(keyGit))
+                return Task.FromResult(false);
+
+            var keyHost = GetKeyHost(host);
+            if (!DeleteKey(keyHost))
+                return Task.FromResult(false);
+
+            return Task.FromResult(true);
+        }
+
         public static Task<bool> RemoveCredentials(string key)
         {
             var keyGit = GetKeyGit(key);

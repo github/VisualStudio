@@ -15,69 +15,29 @@ namespace GitHub.Api
     public class WindowsLoginCache : ILoginCache
     {
         /// <inheritdoc/>
-        public Task<Tuple<string, string>> GetLogin(HostAddress hostAddress)
+        public async Task<Tuple<string, string>> GetLogin(HostAddress hostAddress)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
-            var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
-
-            using (var credential = new Credential())
-            {
-                credential.Target = keyHost;
-                credential.Type = CredentialType.Generic;
-                if (credential.Load())
-                    return Task.FromResult(Tuple.Create(credential.Username, credential.Password));
-            }
-
-            return Task.FromResult(Tuple.Create<string, string>(null, null));
+            var creds = await SimpleCredentialStore.GetCredentials(hostAddress);
+            return Tuple.Create(creds.Login, creds.Password);
         }
 
         /// <inheritdoc/>
-        public Task SaveLogin(string userName, string password, HostAddress hostAddress)
+        public async Task<bool> SaveLogin(string userName, string password, HostAddress hostAddress)
         {
             Guard.ArgumentNotEmptyString(userName, nameof(userName));
             Guard.ArgumentNotEmptyString(password, nameof(password));
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
-            var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
-            var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
-
-            using (var credential = new Credential(userName, password, keyGit))
-            {
-                credential.Save();
-            }
-
-            using (var credential = new Credential(userName, password, keyHost))
-            {
-                credential.Save();
-            }
-
-            return Task.CompletedTask;
+            return await SimpleCredentialStore.SaveCredentials(hostAddress, new Octokit.Credentials(userName, password));
         }
 
         /// <inheritdoc/>
-        public Task EraseLogin(HostAddress hostAddress)
+        public async Task<bool> EraseLogin(HostAddress hostAddress)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
-
-            var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
-            var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
-
-            using (var credential = new Credential())
-            {
-                credential.Target = keyGit;
-                credential.Type = CredentialType.Generic;
-                credential.Delete();
-            }
-
-            using (var credential = new Credential())
-            {
-                credential.Target = keyHost;
-                credential.Type = CredentialType.Generic;
-                credential.Delete();
-            }
-
-            return Task.CompletedTask;
+            return await SimpleCredentialStore.RemoveCredentials(hostAddress);
         }
 
         static string GetKeyGit(string key)
