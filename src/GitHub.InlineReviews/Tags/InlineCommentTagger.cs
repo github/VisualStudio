@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -15,8 +14,7 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 using System.Collections;
-using GitHub.Helpers;
-
+using GitHub.VisualStudio;
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
@@ -78,7 +76,7 @@ namespace GitHub.InlineReviews.Tags
             signalRebuild = new Subject<ITextSnapshot>();
             signalRebuild.Throttle(TimeSpan.FromMilliseconds(500))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => Rebuild(x).Forget());
+                .Subscribe(x => ForgetWithLogging(Rebuild(x)));
 
             this.buffer.Changed += Buffer_Changed;
         }
@@ -137,8 +135,8 @@ namespace GitHub.InlineReviews.Tags
                         {
                             var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
 
-                            if (lineNumber >= startLine && 
-                                lineNumber <= endLine && 
+                            if (lineNumber >= startLine &&
+                                lineNumber <= endLine &&
                                 !linesWithComments[lineNumber - startLine]
                                 && (!leftHandSide || line.Type == DiffChangeType.Delete))
                             {
@@ -187,14 +185,19 @@ namespace GitHub.InlineReviews.Tags
 
             if (session == null)
             {
-                managerSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession).Subscribe(SessionChanged);
+                managerSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession).Subscribe(x => ForgetWithLogging(SessionChanged(x)));
             }
             else
             {
-                SessionChanged(session);
+                ForgetWithLogging(SessionChanged(session));
             }
 
             initialized = true;
+        }
+
+        static void ForgetWithLogging(Task task)
+        {
+            task.Catch(e => VsOutputLogger.WriteLine("Exception caught while executing background task: {0}", e)).Forget();
         }
 
         void NotifyTagsChanged()
@@ -210,7 +213,7 @@ namespace GitHub.InlineReviews.Tags
             TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
         }
 
-        async void SessionChanged(IPullRequestSession session)
+        async Task SessionChanged(IPullRequestSession session)
         {
             sessionSubscription?.Dispose();
             this.session = session;
