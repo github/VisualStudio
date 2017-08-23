@@ -26,6 +26,7 @@ using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Text;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -168,6 +169,16 @@ namespace GitHub.VisualStudio.UI.Views
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
                 () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    AddBufferTag(source, session, path, isLeftBuffer);
+                }
+            }
         }
 
         void ShowErrorInStatusBar(string message, Exception e)

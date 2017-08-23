@@ -160,7 +160,7 @@ namespace GitHub.InlineReviews.Tags
 
         void Initialize()
         {
-            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+            document = TryGetDocument(buffer);
 
             if (document == null)
                 return;
@@ -193,6 +193,27 @@ namespace GitHub.InlineReviews.Tags
             }
 
             initialized = true;
+        }
+
+        static ITextDocument TryGetDocument(ITextBuffer buffer)
+        {
+            ITextDocument result;
+
+            if (buffer.Properties.TryGetProperty(typeof(ITextDocument), out result))
+                return result;
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    if ((result = TryGetDocument(source)) != null)
+                        return result;
+                }
+            }
+
+            return null;
         }
 
         static void ForgetWithLogging(Task task)
@@ -244,7 +265,8 @@ namespace GitHub.InlineReviews.Tags
             if (snapshot == null) return;
 
             var repository = gitService.GetRepository(session.LocalRepository.LocalPath);
-            file = await session.GetFile(relativePath, !leftHandSide ? this : null);
+            var isContentSource = !leftHandSide && !(buffer is IProjectionBuffer);
+            file = await session.GetFile(relativePath, isContentSource ? this : null);
 
             if (file == null) return;
 

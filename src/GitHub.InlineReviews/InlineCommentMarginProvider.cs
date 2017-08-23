@@ -13,6 +13,7 @@ using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Views;
 using GitHub.Services;
 using GitHub.Settings;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace GitHub.InlineReviews
 {
@@ -105,6 +106,18 @@ namespace GitHub.InlineReviews
                 if (inlineCommentTagger.ShowMargin)
                 {
                     return true;
+                }
+            }
+
+            var projection = buffer as IProjectionBuffer;
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    if (IsMarginVisible(source))
+                    {
+                        return true;
+                    }
                 }
             }
 
