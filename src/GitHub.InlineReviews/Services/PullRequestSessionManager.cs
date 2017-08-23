@@ -84,12 +84,14 @@ namespace GitHub.InlineReviews.Services
         public PullRequestTextBufferInfo GetTextBufferInfo(ITextBuffer buffer)
         {
             var projectionBuffer = buffer as IProjectionBuffer;
+            PullRequestTextBufferInfo result;
 
-            if (projectionBuffer == null)
+            if (buffer.Properties.TryGetProperty(typeof(PullRequestTextBufferInfo), out result))
             {
-                return buffer.Properties.GetProperty<PullRequestTextBufferInfo>(typeof(PullRequestTextBufferInfo), null);
+                return result;
             }
-            else
+
+            if (projectionBuffer != null)
             {
                 foreach (var sourceBuffer in projectionBuffer.SourceBuffers)
                 {
