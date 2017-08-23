@@ -265,7 +265,8 @@ namespace GitHub.InlineReviews.Tags
             if (snapshot == null) return;
 
             var repository = gitService.GetRepository(session.LocalRepository.LocalPath);
-            file = await session.GetFile(relativePath, !leftHandSide ? this : null);
+            var isContentSource = !leftHandSide && !(buffer is IProjectionBuffer);
+            file = await session.GetFile(relativePath, isContentSource ? this : null);
 
             if (file == null) return;
 
