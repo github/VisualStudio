@@ -115,7 +115,7 @@ namespace GitHub.InlineReviews.Services
             var key = new Tuple<string, string>(baseSha, headSha);
 
             string mergeBase;
-            if(mergeBaseCache.TryGetValue(key, out mergeBase))
+            if (mergeBaseCache.TryGetValue(key, out mergeBase))
             {
                 return mergeBase;
             }
@@ -123,7 +123,6 @@ namespace GitHub.InlineReviews.Services
             var repo = await GetRepository(repository);
             var baseUrl = pullRequest.Base.RepositoryCloneUrl;
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
-            var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
             var headRef = pullRequest.Head.Ref;
             mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
