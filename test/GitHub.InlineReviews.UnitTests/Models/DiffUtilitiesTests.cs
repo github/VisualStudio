@@ -17,6 +17,14 @@ namespace GitHub.InlineReviews.UnitTests.Models
 
                 Assert.Equal(0, chunks.Count());
             }
+            
+            [Fact]
+            public void EmptyDiff_NoDiffChunks()
+            {
+                var chunks = DiffUtilities.ParseFragment("");
+
+                Assert.Equal(0, chunks.Count());
+            }
 
             [Theory]
             [InlineData("@@ -1 +1 @@")]
