@@ -316,11 +316,6 @@ namespace GitHub.Services
                         pullRequest.Head.Sha,
                         pullRequest.Base.Ref,
                         pullRequest.Head.Ref);
-
-                    if (sha == null)
-                    {
-                        throw new NotFoundException($"Couldn't find merge base between {pullRequest.Base.Sha} and {pullRequest.Head.Sha}.");
-                    }
                 }
 
                 var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);
@@ -350,7 +345,7 @@ namespace GitHub.Services
             {
                 foreach (var b in encoding.GetPreamble())
                 {
-                    if(b != stream.ReadByte())
+                    if (b != stream.ReadByte())
                     {
                         return false;
                     }
@@ -473,7 +468,7 @@ namespace GitHub.Services
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
-            return value != null && 
+            return value != null &&
                 value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
                 value.Item2 == pullRequest.Number;
         }
