@@ -30,33 +30,18 @@ namespace GitHub.Caches
             }
         }
 
-        public SharedCache() : this(null, null, null)
+        public SharedCache() : this(null, null)
         {
         }
 
-        protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache, ISecureBlobCache secureCache)
+        protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache)
         {
-            if (secureCache == null)
-            {
-                try
-                {
-                    BlobCache.Secure = new CredentialCache();
-                    secureCache = BlobCache.Secure;
-                }
-                catch (Exception e)
-                {
-                    log.Error("Failed to set up secure cache.", e);
-                    secureCache = new InMemoryBlobCache();
-                }
-            }
             UserAccount = userAccountCache ?? GetBlobCacheWithFallback(() => BlobCache.UserAccount, "UserAccount");
             LocalMachine = localMachineCache ?? GetBlobCacheWithFallback(() => BlobCache.LocalMachine, "LocalMachine");
-            Secure = secureCache;
         }
 
         public IBlobCache UserAccount { get; private set; }
         public IBlobCache LocalMachine { get; private set; }
-        public ISecureBlobCache Secure { get; private set; }
 
         public IObservable<Uri> GetEnterpriseHostUri()
         {
@@ -84,8 +69,6 @@ namespace GitHub.Caches
                 UserAccount.Shutdown.Wait();
                 LocalMachine.Dispose();
                 LocalMachine.Shutdown.Wait();
-                Secure.Dispose();
-                Secure.Shutdown.Wait();
                 disposed = true;
             }
         }

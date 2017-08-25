@@ -29,7 +29,7 @@ namespace GitHub.Api
                     return Task.FromResult(Tuple.Create(credential.Username, credential.Password));
             }
 
-            return Task.FromResult(Tuple.Create<string, string>(null, null));
+            return Task.FromResult<Tuple<string, string>>(null);
         }
 
         /// <inheritdoc/>

@@ -13,7 +13,7 @@ namespace GitHub.Api
     public class LoginManager : ILoginManager
     {
         readonly string[] scopes = { "user", "repo", "gist", "write:public_key" };
-        readonly IKeychain loginCache;
+        readonly IKeychain keychain;
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
@@ -42,7 +42,7 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(clientId, nameof(clientId));
             Guard.ArgumentNotEmptyString(clientSecret, nameof(clientSecret));
 
-            this.loginCache = loginCache;
+            this.keychain = loginCache;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
@@ -64,7 +64,7 @@ namespace GitHub.Api
 
             // Start by saving the username and password, these will be used by the `IGitHubClient`
             // until an authorization token has been created and acquired:
-            await loginCache.Save(userName, password, hostAddress).ConfigureAwait(false);
+            await keychain.Save(userName, password, hostAddress).ConfigureAwait(false);
 
             var newAuth = new NewAuthorization
             {
@@ -99,13 +99,13 @@ namespace GitHub.Api
                     }
                     else
                     {
-                        await loginCache.Delete(hostAddress).ConfigureAwait(false);
+                        await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }
             } while (auth == null);
 
-            await loginCache.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
+            await keychain.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
 
             var retry = 0;
 
@@ -141,7 +141,7 @@ namespace GitHub.Api
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            await loginCache.Delete(hostAddress);
+            await keychain.Delete(hostAddress);
         }
 
         async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
@@ -219,7 +219,7 @@ namespace GitHub.Api
                     catch (Exception e)
                     {
                         await twoFactorChallengeHandler.ChallengeFailed(e);
-                        await loginCache.Delete(hostAddress).ConfigureAwait(false);
+                        await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }

@@ -165,7 +165,6 @@
     <Compile Include="Services\PullRequestService.cs" />
     <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
-    <Compile Include="Caches\CredentialCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -178,7 +177,7 @@
     <Compile Include="Factories\HostCacheFactory.cs" />
     <Compile Include="Factories\IBlobCacheFactory.cs" />
     <Compile Include="Factories\IHostCacheFactory.cs" />
-    <Compile Include="Caches\LoginCache.cs" />
+    <Compile Include="Caches\ObservableKeychainAdapter.cs" />
     <Compile Include="Caches\SharedCache.cs" />
     <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
     <Compile Include="Info\GitHubUrls.cs" />
@@ -196,7 +195,6 @@
     <Compile Include="Services\ErrorMap.cs" />
     <Compile Include="Services\ErrorMessage.cs" />
     <Compile Include="Services\ErrorMessageTranslator.cs" />
-    <Compile Include="Services\GitHubCredentialStore.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />

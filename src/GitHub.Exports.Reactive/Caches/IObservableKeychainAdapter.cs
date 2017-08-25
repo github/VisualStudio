@@ -5,7 +5,7 @@ using GitHub.Primitives;
 
 namespace GitHub.Caches
 {
-    public interface ILoginCache : IDisposable
+    public interface IObservableKeychainAdapter : IDisposable
     {
         IObservable<LoginInfo> GetLoginAsync(HostAddress hostAddress);
         IObservable<Unit> SaveLogin(string user, string password, HostAddress hostAddress);

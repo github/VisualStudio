@@ -50,17 +50,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiClientConfiguration.cs"/>
+    <Compile Include="ApiClientConfiguration.cs" />
     <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs" Condition="$(Buildtype) == 'Internal'">
       <Link>ApiClientConfiguration_User.cs</Link>
     </Compile>
-    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'"/>
-    <Compile Include="ILoginCache.cs" />
+    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
+    <Compile Include="IKeychain.cs" />
     <Compile Include="ILoginManager.cs" />
     <Compile Include="ITwoFactorChallengeHandler.cs" />
     <Compile Include="LoginManager.cs" />
-    <Compile Include="SimpleCredentialStore.cs" />
-    <Compile Include="WindowsLoginCache.cs" />
+    <Compile Include="KeychainCredentialStore.cs" />
+    <Compile Include="WindowsKeychain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

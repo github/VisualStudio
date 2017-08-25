@@ -12,26 +12,27 @@ namespace GitHub.Api
         /// <summary>
         /// Loads the credentials for the specified host address.
         /// </summary>
-        /// <param name="hostAddress">The host address.</param>
+        /// <param name="address">The host address.</param>
         /// <returns>
-        /// A task returning a tuple consisting of the retrieved username and password.
+        /// A task returning a tuple consisting of the retrieved username and password or null
+        /// if the credentials were not found.
         /// </returns>
-        Task<Tuple<string, string>> Load(HostAddress hostAddress);
+        Task<Tuple<string, string>> Load(HostAddress address);
 
         /// <summary>
         /// Saves the credentials for the specified host address.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
-        /// <param name="hostAddress">The host address.</param>
+        /// <param name="address">The host address.</param>
         /// <returns>A task tracking the operation.</returns>
-        Task Save(string userName, string password, HostAddress hostAddress);
+        Task Save(string userName, string password, HostAddress address);
 
         /// <summary>
         /// Deletes the login details for the specified host address.
         /// </summary>
-        /// <param name="hostAddress"></param>
+        /// <param name="address"></param>
         /// <returns>A task tracking the operation.</returns>
-        Task Delete(HostAddress hostAddress);
+        Task Delete(HostAddress address);
     }
 }

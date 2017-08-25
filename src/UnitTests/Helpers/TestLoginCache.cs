@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Reactive;
 using Akavache;
+using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Primitives;
+using NSubstitute;
 
 namespace UnitTests.Helpers
 {
-    public class TestLoginCache : ILoginCache
+    public class TestLoginCache : IObservableKeychainAdapter
     {
-        readonly LoginCache loginCacheDelegate = new LoginCache(new TestSharedCache());
+        static readonly IKeychain keychain = Substitute.For<IKeychain>();
+        readonly ObservableKeychainAdapter loginCacheDelegate = new ObservableKeychainAdapter(keychain);
 
         public void Dispose()
         {

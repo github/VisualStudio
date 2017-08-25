@@ -198,7 +198,7 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(ILoginManager))
             {
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                var loginCache = serviceProvider.GetService<ILoginCache>();
+                var loginCache = serviceProvider.GetService<IKeychain>();
                 var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
 
                 return new LoginManager(
