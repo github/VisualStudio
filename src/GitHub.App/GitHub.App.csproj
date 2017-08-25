@@ -177,7 +177,6 @@
     <Compile Include="Factories\HostCacheFactory.cs" />
     <Compile Include="Factories\IBlobCacheFactory.cs" />
     <Compile Include="Factories\IHostCacheFactory.cs" />
-    <Compile Include="Caches\ObservableKeychainAdapter.cs" />
     <Compile Include="Caches\SharedCache.cs" />
     <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
     <Compile Include="Info\GitHubUrls.cs" />

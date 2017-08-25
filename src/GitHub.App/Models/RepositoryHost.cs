@@ -27,7 +27,7 @@ namespace GitHub.Models
 
         readonly ILoginManager loginManager;
         readonly HostAddress hostAddress;
-        readonly IObservableKeychainAdapter keychain;
+        readonly IKeychain keychain;
         readonly IUsageTracker usage;
 
         bool isLoggedIn;
@@ -36,7 +36,7 @@ namespace GitHub.Models
             IApiClient apiClient,
             IModelService modelService,
             ILoginManager loginManager,
-            IObservableKeychainAdapter keychain,
+            IKeychain keychain,
             IUsageTracker usage)
         {
             ApiClient = apiClient;
@@ -126,7 +126,7 @@ namespace GitHub.Models
 
             log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", hostAddress.ApiUri);
 
-            return keychain.EraseLogin(Address)
+            return keychain.Delete(Address).ToObservable()
                 .Catch<Unit, Exception>(e =>
                 {
                     log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);
@@ -167,7 +167,7 @@ namespace GitHub.Models
 
                     if (result == AuthenticationResult.VerificationFailure)
                     {
-                        return keychain.EraseLogin(Address).Select(_ => result);
+                        return keychain.Delete(Address).ToObservable().Select(_ => result);
                     }
                     return Observable.Return(result);
                 })

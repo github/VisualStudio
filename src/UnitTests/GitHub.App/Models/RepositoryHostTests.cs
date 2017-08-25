@@ -12,7 +12,6 @@ using GitHub.Primitives;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using UnitTests.Helpers;
 using Xunit;
 
 public class RepositoryHostTests
@@ -32,9 +31,9 @@ public class RepositoryHostTests
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginManager = Substitute.For<ILoginManager>();
             loginManager.Login(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>(), "baymax", "aPassword").Returns(CreateUserAndScopes("baymax").User);
-            var loginCache = new TestLoginCache();
+            var keychain = Substitute.For<IKeychain>();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, keychain, usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -57,9 +56,9 @@ public class RepositoryHostTests
             var modelService = Substitute.For<IModelService>();
             var loginManager = Substitute.For<ILoginManager>();
             loginManager.Login(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>(), "baymax", "aPassword").Returns(CreateUserAndScopes("baymax").User);
-            var loginCache = new TestLoginCache();
+            var keychain = Substitute.For<IKeychain>();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, keychain, usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -76,9 +75,9 @@ public class RepositoryHostTests
             var loginManager = Substitute.For<ILoginManager>();
             loginManager.Login(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>(), "jiminy", "cricket")
                 .Returns<User>(_ => { throw new NotFoundException("", HttpStatusCode.BadGateway); });
-            var loginCache = new TestLoginCache();
+            var keychain = Substitute.For<IKeychain>();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, keychain, usage);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await host.LogIn("jiminy", "cricket"));
 
@@ -98,9 +97,9 @@ public class RepositoryHostTests
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginManager = Substitute.For<ILoginManager>();
             loginManager.LoginFromCache(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>()).Returns(CreateUserAndScopes("baymax").User);
-            var loginCache = new TestLoginCache();
+            var keychain = Substitute.For<IKeychain>();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, keychain, usage);
 
             var result = await host.LogInFromCache();
 
@@ -119,9 +118,9 @@ public class RepositoryHostTests
             var modelService = Substitute.For<IModelService>();
             var loginManager = Substitute.For<ILoginManager>();
             loginManager.LoginFromCache(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>()).Returns(CreateUserAndScopes("baymax").User);
-            var loginCache = new TestLoginCache();
+            var keychain = Substitute.For<IKeychain>();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, keychain, usage);
 
             var result = await host.LogInFromCache();
 

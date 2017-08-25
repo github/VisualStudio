@@ -17,7 +17,7 @@ namespace GitHub.Factories
         readonly IApiClientFactory apiClientFactory;
         readonly IHostCacheFactory hostCacheFactory;
         readonly ILoginManager loginManager;
-        readonly IObservableKeychainAdapter keychain;
+        readonly IKeychain keychain;
         readonly IAvatarProvider avatarProvider;
         readonly CompositeDisposable hosts = new CompositeDisposable();
         readonly IUsageTracker usage;
@@ -27,7 +27,7 @@ namespace GitHub.Factories
             IApiClientFactory apiClientFactory,
             IHostCacheFactory hostCacheFactory,
             ILoginManager loginManager,
-            IObservableKeychainAdapter keychain,
+            IKeychain keychain,
             IAvatarProvider avatarProvider,
             IUsageTracker usage)
         {

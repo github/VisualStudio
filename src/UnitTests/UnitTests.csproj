@@ -264,7 +264,6 @@
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
-    <Compile Include="Helpers\TestLoginCache.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

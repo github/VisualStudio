@@ -120,7 +120,6 @@
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
     <Compile Include="Caches\IImageCache.cs" />
-    <Compile Include="Caches\IObservableKeychainAdapter.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
     <Compile Include="Services\IGitClient.cs" />
