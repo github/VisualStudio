@@ -132,7 +132,7 @@ namespace GitHub.InlineReviews.Services
             }
             catch (NotFoundException ex)
             {
-                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again.", ex);
+                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
             }
 
             return mergeBaseCache[key] = mergeBase;
