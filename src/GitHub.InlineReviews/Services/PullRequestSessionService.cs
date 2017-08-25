@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
+using NLog;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -137,7 +138,8 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -145,12 +147,12 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 commitId,
@@ -176,18 +178,19 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
             int inReplyTo)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 inReplyTo);
