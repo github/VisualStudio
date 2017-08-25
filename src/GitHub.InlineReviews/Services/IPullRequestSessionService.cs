@@ -85,8 +85,8 @@ namespace GitHub.InlineReviews.Services
         /// <summary>
         /// Posts a new PR review comment.
         /// </summary>
-        /// <param name="repository">The repository.</param>
-        /// <param name="repositoryOwner">The owner of the repository fork to post to.</param>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
         /// <param name="user">The user posting the comment.</param>
         /// <param name="number">The pull request number.</param>
         /// <param name="body">The comment body.</param>
@@ -95,8 +95,8 @@ namespace GitHub.InlineReviews.Services
         /// <param name="position">The line index in the diff to comment on.</param>
         /// <returns>A model representing the posted comment.</returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
-            string repositoryOwner,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -107,16 +107,16 @@ namespace GitHub.InlineReviews.Services
         /// <summary>
         /// Posts a PR review comment reply.
         /// </summary>
-        /// <param name="repository">The repository.</param>
-        /// <param name="repositoryOwner">The owner of the repository fork to post to.</param>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
         /// <param name="user">The user posting the comment.</param>
         /// <param name="number">The pull request number.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The comment ID to reply to.</param>
         /// <returns>A model representing the posted comment.</returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
-            string repositoryOwner,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,

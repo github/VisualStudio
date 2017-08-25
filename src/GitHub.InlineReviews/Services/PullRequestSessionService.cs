@@ -137,8 +137,8 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
-            string repositoryOwner,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -146,12 +146,12 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repositoryOwner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 commitId,
@@ -177,19 +177,19 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
-            string repositoryOwner,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
             int inReplyTo)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repositoryOwner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 inReplyTo);
