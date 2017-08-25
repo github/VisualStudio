@@ -321,7 +321,7 @@ namespace GitHub.Services
                     }
                     catch (NotFoundException ex)
                     {
-                        throw new NotFoundException($"Couldn't find merge base. Please check your network connection and try again.", ex);
+                        throw new NotFoundException($"The Pull Request file failed to load. Please check your network connection and click refresh to try again.", ex);
                     }
                 }
 
