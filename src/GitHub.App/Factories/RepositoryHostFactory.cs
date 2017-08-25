@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -8,7 +7,6 @@ using GitHub.Services;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using GitHub.Api;
-using IObservableKeychainAdapter = GitHub.Caches.IObservableKeychainAdapter;
 
 namespace GitHub.Factories
 {

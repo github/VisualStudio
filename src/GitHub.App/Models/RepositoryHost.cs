@@ -16,7 +16,6 @@ using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
-using IObservableKeychainAdapter = GitHub.Caches.IObservableKeychainAdapter;
 
 namespace GitHub.Models
 {
