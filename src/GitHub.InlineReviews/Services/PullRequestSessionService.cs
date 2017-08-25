@@ -126,7 +126,14 @@ namespace GitHub.InlineReviews.Services
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
             var headRef = pullRequest.Head.Ref;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            try
+            {
+                mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("Couldn't find merge base. Please check your network connection and try again.", ex);
+            }
 
             return mergeBaseCache[key] = mergeBase;
         }

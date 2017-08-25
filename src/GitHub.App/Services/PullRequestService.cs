@@ -308,14 +308,21 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    sha = await gitClient.GetPullRequestMergeBase(
-                        repo,
-                        pullRequest.Base.RepositoryCloneUrl,
-                        pullRequest.Head.RepositoryCloneUrl,
-                        pullRequest.Base.Sha,
-                        pullRequest.Head.Sha,
-                        pullRequest.Base.Ref,
-                        pullRequest.Head.Ref);
+                    try
+                    {
+                        sha = await gitClient.GetPullRequestMergeBase(
+                            repo,
+                            pullRequest.Base.RepositoryCloneUrl,
+                            pullRequest.Head.RepositoryCloneUrl,
+                            pullRequest.Base.Sha,
+                            pullRequest.Head.Sha,
+                            pullRequest.Base.Ref,
+                            pullRequest.Head.Ref);
+                    }
+                    catch (NotFoundException ex)
+                    {
+                        throw new NotFoundException($"Couldn't find merge base. Please check your network connection and try again.", ex);
+                    }
                 }
 
                 var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);

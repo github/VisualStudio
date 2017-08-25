@@ -54,7 +54,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Fact]
-        public async void MergeBaseNotAvailable_ThrowsFileNotFoundException()
+        public async void MergeBaseNotAvailable_ThrowsNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
@@ -64,7 +64,7 @@ public class PullRequestServiceTests : TestBaseClass
             var headSha = "headSha";
             var mergeBaseSha = null as string;
             var head = false;
-            var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
+            var expectMessage = $"Couldn't find merge base. Please check your network connection and try again.";
             var mergeBaseException = new NotFoundException(expectMessage);
 
             var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
