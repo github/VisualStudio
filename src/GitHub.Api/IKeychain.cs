@@ -5,33 +5,33 @@ using GitHub.Primitives;
 namespace GitHub.Api
 {
     /// <summary>
-    /// Stores login details.
+    /// Represents a keychain used to store credentials.
     /// </summary>
-    public interface ILoginCache
+    public interface IKeychain
     {
         /// <summary>
-        /// Gets the login details for the specified host address.
+        /// Loads the credentials for the specified host address.
         /// </summary>
         /// <param name="hostAddress">The host address.</param>
         /// <returns>
-        /// A task returning a tuple containing the retrieved username and password.
+        /// A task returning a tuple consisting of the retrieved username and password.
         /// </returns>
-        Task<Tuple<string, string>> GetLogin(HostAddress hostAddress);
+        Task<Tuple<string, string>> Load(HostAddress hostAddress);
 
         /// <summary>
-        /// Saves the login details for the specified host address.
+        /// Saves the credentials for the specified host address.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
         /// <param name="hostAddress">The host address.</param>
         /// <returns>A task tracking the operation.</returns>
-        Task SaveLogin(string userName, string password, HostAddress hostAddress);
+        Task Save(string userName, string password, HostAddress hostAddress);
 
         /// <summary>
-        /// Removes the login details for the specified host address.
+        /// Deletes the login details for the specified host address.
         /// </summary>
         /// <param name="hostAddress"></param>
         /// <returns>A task tracking the operation.</returns>
-        Task EraseLogin(HostAddress hostAddress);
+        Task Delete(HostAddress hostAddress);
     }
 }

@@ -21,13 +21,13 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns(new ApplicationAuthorization("123abc"));
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
             await target.Login(host, client, "foo", "bar");
 
-            await loginCache.Received().SaveLogin("foo", "123abc", host);
+            await loginCache.Received().Save("foo", "123abc", host);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ public class LoginManagerTests
                 .Returns(new ApplicationAuthorization("123abc"));
             client.User.Current().Returns(user);
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
@@ -62,7 +62,7 @@ public class LoginManagerTests
                     new ApplicationAuthorization("123abc"));
             client.User.Current().Returns(user);
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
@@ -70,7 +70,7 @@ public class LoginManagerTests
 
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
             await client.Authorization.Received(1).Delete(0);
-            await loginCache.Received().SaveLogin("foo", "123abc", host);
+            await loginCache.Received().Save("foo", "123abc", host);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "123456")
                 .Returns(new ApplicationAuthorization("123abc"));
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
             tfa.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
@@ -111,7 +111,7 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "123456")
                 .Returns(new ApplicationAuthorization("123abc"));
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
             tfa.HandleTwoFactorException(exception).Returns(
                 new TwoFactorChallengeResult("111111"),
@@ -146,7 +146,7 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "111111")
                 .Returns<ApplicationAuthorization>(_ => { throw loginAttemptsException; });
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
             tfa.HandleTwoFactorException(twoFaException).Returns(
                 new TwoFactorChallengeResult("111111"),
@@ -176,7 +176,7 @@ public class LoginManagerTests
                 .Returns(new ApplicationAuthorization("456def"));
             client.User.Current().Returns(user);
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
             tfa.HandleTwoFactorException(exception).Returns(
                 TwoFactorChallengeResult.RequestResendCode,
@@ -201,13 +201,13 @@ public class LoginManagerTests
                 });
             client.User.Current().Returns(user);
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
             await target.Login(enterprise, client, "foo", "bar");
 
-            await loginCache.Received().SaveLogin("foo", "bar", enterprise);
+            await loginCache.Received().Save("foo", "bar", enterprise);
         }
 
         [Fact]
@@ -219,13 +219,13 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns<ApplicationAuthorization>(_ => { throw new AuthorizationException(); });
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
             await Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
 
-            await loginCache.Received().EraseLogin(enterprise);
+            await loginCache.Received().Delete(enterprise);
         }
 
         [Fact]
@@ -237,13 +237,13 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns<ApplicationAuthorization>(_ => { throw new InvalidOperationException(); });
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
-            await loginCache.Received().EraseLogin(host);
+            await loginCache.Received().Delete(host);
         }
 
         [Fact]
@@ -259,14 +259,14 @@ public class LoginManagerTests
                 .Returns<ApplicationAuthorization>(_ => { throw new InvalidOperationException(); });
             client.User.Current().Returns(user);
 
-            var loginCache = Substitute.For<ILoginCache>();
+            var loginCache = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
             tfa.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
-            await loginCache.Received().EraseLogin(host);
+            await loginCache.Received().Delete(host);
         }
     }
 }
