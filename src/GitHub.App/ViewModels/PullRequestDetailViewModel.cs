@@ -16,6 +16,7 @@ using GitHub.Services;
 using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
+using NLog;
 
 namespace GitHub.ViewModels
 {
@@ -26,6 +27,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
@@ -93,7 +96,7 @@ namespace GitHub.ViewModels
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
                     .Cast<CheckoutCommandState>()
-                    .Select(x => x != null && x.IsEnabled), 
+                    .Select(x => x != null && x.IsEnabled),
                 DoCheckout);
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
             SubscribeOperationError(Checkout);
@@ -351,6 +354,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<IPullRequestModel, Exception>(ex =>
                 {
+                    log.Error("Error observing GetPullRequest", ex);
                     ErrorMessage = ex.Message.Trim();
                     IsLoading = IsBusy = false;
                     return Observable.Empty<IPullRequestModel>();
@@ -460,6 +464,7 @@ namespace GitHub.ViewModels
             }
             catch (Exception ex)
             {
+                log.Error("Error loading PullRequestModel", ex);
                 ErrorMessage = ex.Message.Trim();
             }
             finally

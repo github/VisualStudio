@@ -116,7 +116,7 @@ namespace GitHub.InlineReviews.Services
             var key = new Tuple<string, string>(baseSha, headSha);
 
             string mergeBase;
-            if(mergeBaseCache.TryGetValue(key, out mergeBase))
+            if (mergeBaseCache.TryGetValue(key, out mergeBase))
             {
                 return mergeBase;
             }
@@ -124,16 +124,18 @@ namespace GitHub.InlineReviews.Services
             var repo = await GetRepository(repository);
             var baseUrl = pullRequest.Base.RepositoryCloneUrl;
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
-            var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
             var headRef = pullRequest.Head.Ref;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
-            if (mergeBase != null)
+            try
             {
-                return mergeBaseCache[key] = mergeBase;
+                mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
             }
 
-            throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+            return mergeBaseCache[key] = mergeBase;
         }
 
         /// <inheritdoc/>
