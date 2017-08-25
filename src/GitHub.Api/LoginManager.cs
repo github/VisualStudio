@@ -23,26 +23,26 @@ namespace GitHub.Api
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginManager"/> class.
         /// </summary>
-        /// <param name="loginCache">The cache in which to store login details.</param>
+        /// <param name="keychain">The keychain in which to store credentials.</param>
         /// <param name="twoFactorChallengeHandler">The handler for 2FA challenges.</param>
         /// <param name="clientId">The application's client API ID.</param>
         /// <param name="clientSecret">The application's client API secret.</param>
         /// <param name="authorizationNote">An note to store with the authorization.</param>
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
-            IKeychain loginCache,
+            IKeychain keychain,
             ITwoFactorChallengeHandler twoFactorChallengeHandler,
             string clientId,
             string clientSecret,
             string authorizationNote = null,
             string fingerprint = null)
         {
-            Guard.ArgumentNotNull(loginCache, nameof(loginCache));
+            Guard.ArgumentNotNull(keychain, nameof(keychain));
             Guard.ArgumentNotNull(twoFactorChallengeHandler, nameof(twoFactorChallengeHandler));
             Guard.ArgumentNotEmptyString(clientId, nameof(clientId));
             Guard.ArgumentNotEmptyString(clientSecret, nameof(clientSecret));
 
-            this.keychain = loginCache;
+            this.keychain = keychain;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
