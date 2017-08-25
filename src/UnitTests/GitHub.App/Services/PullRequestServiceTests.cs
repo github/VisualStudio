@@ -64,12 +64,10 @@ public class PullRequestServiceTests : TestBaseClass
             var headSha = "headSha";
             var mergeBaseSha = null as string;
             var head = false;
-            var expectMessage = $"Couldn't find merge base. Please check your network connection and try again.";
-            var mergeBaseException = new NotFoundException(expectMessage);
+            var mergeBaseException = new NotFoundException();
 
             var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
                                 fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
-            Assert.Equal(expectMessage, ex.Message);
         }
 
         [Fact]
