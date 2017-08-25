@@ -198,7 +198,7 @@ public class GitClientTests
             {
                 await gitClient.GetPullRequestMergeBase(repo, baseUri, headUri, baseSha, headSha, baseRef, headRef);
             }
-            catch (NotFoundException) { }
+            catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
             repo.Network.Received(receivedFetch).Fetch(Arg.Any<Remote>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
         }
@@ -218,7 +218,7 @@ public class GitClientTests
             {
                 await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
             }
-            catch (NotFoundException) { }
+            catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
             repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<IEnumerable<string>>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
         }
