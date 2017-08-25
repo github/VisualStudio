@@ -138,6 +138,7 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             ILocalRepositoryModel repository,
+            string repositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -149,7 +150,7 @@ namespace GitHub.InlineReviews.Services
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
+                repositoryOwner,
                 repository.Name,
                 number,
                 body,
@@ -177,6 +178,7 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             ILocalRepositoryModel repository,
+            string repositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -186,7 +188,7 @@ namespace GitHub.InlineReviews.Services
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
+                repositoryOwner,
                 repository.Name,
                 number,
                 body,

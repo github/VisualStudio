@@ -86,6 +86,7 @@ namespace GitHub.InlineReviews.Services
         /// Posts a new PR review comment.
         /// </summary>
         /// <param name="repository">The repository.</param>
+        /// <param name="repositoryOwner">The owner of the repository fork to post to.</param>
         /// <param name="user">The user posting the comment.</param>
         /// <param name="number">The pull request number.</param>
         /// <param name="body">The comment body.</param>
@@ -95,6 +96,7 @@ namespace GitHub.InlineReviews.Services
         /// <returns>A model representing the posted comment.</returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(
             ILocalRepositoryModel repository,
+            string repositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -106,6 +108,7 @@ namespace GitHub.InlineReviews.Services
         /// Posts a PR review comment reply.
         /// </summary>
         /// <param name="repository">The repository.</param>
+        /// <param name="repositoryOwner">The owner of the repository fork to post to.</param>
         /// <param name="user">The user posting the comment.</param>
         /// <param name="number">The pull request number.</param>
         /// <param name="body">The comment body.</param>
@@ -113,6 +116,7 @@ namespace GitHub.InlineReviews.Services
         /// <returns>A model representing the posted comment.</returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(
             ILocalRepositoryModel repository,
+            string repositoryOwner,
             IAccount user,
             int number,
             string body,
