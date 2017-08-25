@@ -127,12 +127,8 @@ namespace GitHub.InlineReviews.Services
             var baseRef = pullRequest.Base.Ref;
             var headRef = pullRequest.Head.Ref;
             mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
-            if (mergeBase != null)
-            {
-                return mergeBaseCache[key] = mergeBase;
-            }
 
-            throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+            return mergeBaseCache[key] = mergeBase;
         }
 
         /// <inheritdoc/>
