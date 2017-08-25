@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
+using NLog;
 using Octokit;
 using ReactiveUI;
 
@@ -17,6 +18,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public class CommentViewModel : ReactiveObject, ICommentViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
         string body;
         string errorMessage;
         bool isReadOnly;
@@ -167,6 +169,7 @@ namespace GitHub.InlineReviews.ViewModels
                 }
 
                 ErrorMessage = message;
+                log.Error("Error posting inline comment.", e);
             }
         }
 
