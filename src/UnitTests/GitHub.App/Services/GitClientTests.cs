@@ -55,6 +55,7 @@ public class GitClientTests
             await gitClient.Push(repository, "master", "origin");
 
             repository.Network.Received().Push(origin, "HEAD", @"refs/heads/master", Arg.Any<PushOptions>());
+            // dummy commit to see if this PR branch can be reopened.
         }
 
         [Fact]
