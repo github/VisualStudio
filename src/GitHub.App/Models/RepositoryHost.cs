@@ -65,8 +65,6 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggedIn, value); }
         }
 
-        public bool SupportsGist { get; private set; }
-
         public string Title { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -155,40 +153,6 @@ namespace GitHub.Models
                 : account == unverifiedUser
                     ? AuthenticationResult.VerificationFailure
                     : AuthenticationResult.Success);
-        }
-
-        IObservable<AuthenticationResult> LoginWithApiUser(UserAndScopes userAndScopes)
-        {
-            return GetAuthenticationResultForUser(userAndScopes)
-                .SelectMany(result =>
-                {
-                    if (result.IsSuccess())
-                    {
-                        var accountCacheItem = new AccountCacheItem(userAndScopes.User);
-                        usage.IncrementLoginCount().Forget();
-                        return ModelService.InsertUser(accountCacheItem).Select(_ => result);
-                    }
-
-                    if (result == AuthenticationResult.VerificationFailure)
-                    {
-                        return loginCache.EraseLogin(Address).Select(_ => result);
-                    }
-                    return Observable.Return(result);
-                })
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Do(result =>
-                {
-                    if (result.IsSuccess())
-                    {
-                        SupportsGist = userAndScopes.Scopes?.Contains("gist") ?? true;
-                        IsLoggedIn = true;
-                    }
-
-                    log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                        userAndScopes?.User?.Login ?? "(null)",
-                        hostAddress.ApiUri,
-                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
-                });
         }
 
         IObservable<UserAndScopes> GetUserFromApi()

@@ -115,7 +115,6 @@
     <Compile Include="ViewModels\INotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\INotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\ILoggedOutViewModel.cs" />
-    <Compile Include="ViewModels\ILogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />

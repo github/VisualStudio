@@ -82,7 +82,6 @@ public class UIControllerTests
             SetupViewModel<IPullRequestDetailViewModel>(factory, GitHub.Exports.UIViewType.PRDetail);
             SetupViewModel<IPullRequestCreationViewModel>(factory, GitHub.Exports.UIViewType.PRCreation);
             SetupViewModel<IGistCreationViewModel>(factory, GitHub.Exports.UIViewType.Gist);
-            SetupViewModel<ILogoutRequiredViewModel>(factory, GitHub.Exports.UIViewType.LogoutRequired);
 
 
             SetupView<ILoginControlViewModel>(factory, GitHub.Exports.UIViewType.Login);
@@ -94,19 +93,17 @@ public class UIControllerTests
             SetupView<IPullRequestDetailViewModel>(factory, GitHub.Exports.UIViewType.PRDetail);
             SetupView<IPullRequestCreationViewModel>(factory, GitHub.Exports.UIViewType.PRCreation);
             SetupView<IGistCreationViewModel>(factory, GitHub.Exports.UIViewType.Gist);
-            SetupView<ILogoutRequiredViewModel>(factory, GitHub.Exports.UIViewType.LogoutRequired);
 
             return new UIFactory(factory);
         }
 
         protected IConnection SetupConnection(IServiceProvider provider, IRepositoryHosts hosts,
-            IRepositoryHost host, bool loggedIn = true, bool supportsGist = true)
+            IRepositoryHost host, bool loggedIn = true)
         {
             var connection = provider.GetConnection();
             connection.Login().Returns(Observable.Return(connection));
             hosts.LookupHost(connection.HostAddress).Returns(host);
             host.IsLoggedIn.Returns(loggedIn);
-            host.SupportsGist.Returns(supportsGist);
             return connection;
         }
 
@@ -563,73 +560,7 @@ public class UIControllerTests
     public class GistFlow : UIControllerTestBase
     {
         [Fact]
-        public void ShowingGistDialogWhenGistNotSupportedShowsLogoutDialog()
-        {
-            var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
-            var factory = SetupFactory(provider);
-            var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
-            cm.Connections.Returns(cons);
-
-            var host = hosts.GitHubHost;
-            // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, host, true, false));
-
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
-            {
-                var count = 0;
-                bool? success = null;
-                var flow = uiController.Configure(UIControllerFlow.Gist);
-                uiController.ListenToCompletionState()
-                    .Subscribe(s =>
-                    {
-                        success = s;
-                        Assert.Equal(3, count);
-                        count++;
-                    });
-
-                flow.Subscribe(data =>
-                {
-                    var uc = data.View;
-                    switch (++count)
-                    {
-                        case 1:
-                            Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(uc);
-                            host.IsLoggedIn.Returns(false);
-                            TriggerDone(data.View.ViewModel);
-                            break;
-                        case 2:
-                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            // login
-                            host.IsLoggedIn.Returns(true);
-                            host.SupportsGist.Returns(true);
-                            TriggerDone(data.View.ViewModel);
-                            break;
-                        case 3:
-                            Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
-                            TriggerDone(data.View.ViewModel);
-                            break;
-                        default:
-                            Assert.True(false, "Received more views than expected");
-                            break;
-                    }
-                }, () =>
-                {
-                    Assert.Equal(4, count);
-                    count++;
-                });
-
-                uiController.Start();
-                Assert.Equal(5, count);
-                Assert.True(uiController.IsStopped);
-                Assert.True(success.HasValue);
-                Assert.True(success);
-            }
-        }
-
-        [Fact]
-        public void ShowingGistDialogWhenGistSupportedShowsGistDialog()
+        public void ShowsGistDialog()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
@@ -639,7 +570,7 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
 
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true, true));
+            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true));
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {

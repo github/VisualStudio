@@ -26,7 +26,6 @@ namespace GitHub.Exports
         PRList,
         PRDetail,
         PRCreation,
-        LogoutRequired,
         GitHubPane,
         LoggedOut,
         NotAGitRepository,
