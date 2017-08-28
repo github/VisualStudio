@@ -41,11 +41,11 @@ You can also right-click on a file in the changed files tree to get more options
 
 ## Leaving Comments
 
-You can add comments to a pull request directly from Visual Studio. When a file is [open in the diff viewer](#viewing-changes) you can click the **Add Comment** (TODO: Icon here) icon in the margin to add a comment on a line.
+You can add comments to a pull request directly from Visual Studio. When a file is [open in the diff viewer](#viewing-changes) you can click the **Add Comment** icon in the margin to add a comment on a line.
 
-TODO: Screenshot
+![Hover over margin to see add comment icon](images/hover-to-add-comment.png)
+
+Then click the icon on the desired line and leave a comment.
+![Add a comment](images/add-comment.png)
 
 Existing comments left by you or other reviewers will also show up in this margin. Click the icon to open an inline conversation view from which you can review and reply to comments:
-
-
-
