@@ -27,7 +27,6 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ILoginManager loginManager;
         readonly HostAddress hostAddress;
@@ -79,7 +78,7 @@ namespace GitHub.Models
                     usage.IncrementLoginCount().Forget();
                     await ModelService.InsertUser(accountCacheItem);
 
-                    if (user != unverifiedUser.User)
+                    if (user != null)
                     {
                         IsLoggedIn = true;
                         return AuthenticationResult.Success;
@@ -110,7 +109,7 @@ namespace GitHub.Models
                 usage.IncrementLoginCount().Forget();
                 await ModelService.InsertUser(accountCacheItem);
 
-                if (user != unverifiedUser.User)
+                if (user != null)
                 {
                     IsLoggedIn = true;
                     return Observable.Return(AuthenticationResult.Success);
@@ -145,19 +144,6 @@ namespace GitHub.Models
                 {
                     IsLoggedIn = false;
                 });
-        }
-
-        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(UserAndScopes account)
-        {
-            return Observable.Return(account == null ? AuthenticationResult.CredentialFailure
-                : account == unverifiedUser
-                    ? AuthenticationResult.VerificationFailure
-                    : AuthenticationResult.Success);
-        }
-
-        IObservable<UserAndScopes> GetUserFromApi()
-        {
-            return Observable.Defer(() => ApiClient.GetUser());
         }
 
         protected virtual void Dispose(bool disposing)
