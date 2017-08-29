@@ -8,12 +8,13 @@ using ReactiveUI;
 
 namespace GitHub.SampleData
 {
-    public class StartPageCloneViewModelDesigner : BaseViewModel, IBaseCloneViewModel
+    public class StartPageCloneViewModelDesigner : DialogViewModelBase, IBaseCloneViewModel
     {
         public string BaseRepositoryPath { get; set; }
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
         public ICommand BrowseForDirectory { get; }
-        public IReactiveCommand<Unit> CloneCommand { get; }
+        public IReactiveCommand<object> CloneCommand { get; }
         public IRepositoryModel SelectedRepository { get; set; }
+        public override IObservable<Unit> Done { get; }
     }
 }

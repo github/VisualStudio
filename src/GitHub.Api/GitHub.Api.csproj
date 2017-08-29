@@ -11,7 +11,6 @@
     <AssemblyName>GitHub.Api</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,11 +37,7 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -55,10 +50,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiClientConfiguration.cs"/>
+    <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs" Condition="$(Buildtype) == 'Internal'">
+      <Link>ApiClientConfiguration_User.cs</Link>
+    </Compile>
+    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'"/>
+    <Compile Include="ILoginCache.cs" />
+    <Compile Include="ILoginManager.cs" />
+    <Compile Include="ITwoFactorChallengeHandler.cs" />
+    <Compile Include="LoginManager.cs" />
     <Compile Include="SimpleCredentialStore.cs" />
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
+    <Compile Include="WindowsLoginCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

@@ -1,30 +1,36 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Commands;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.UI.Helpers;
 using GitHub.ViewModels;
-using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
+using Task = System.Threading.Tasks.Task;
+using Microsoft.VisualStudio.TextManager.Interop;
+using System.Text;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericPullRequestDetailView : BusyStateView<IPullRequestDetailViewModel, GenericPullRequestDetailView>
+    public class GenericPullRequestDetailView : ViewBase<IPullRequestDetailViewModel, GenericPullRequestDetailView>
     { }
 
     [ExportView(ViewType = UIViewType.PRDetail)]
@@ -41,9 +47,13 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
-                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x).Forget()));
-                d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x).Forget()));
+                d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x, false).Forget()));
+                d(ViewModel.ViewFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x, false).Forget()));
+                d(ViewModel.DiffFileWithWorkingDirectory.Subscribe(x => DoDiffFile((IPullRequestFileNode)x, true).Forget()));
+                d(ViewModel.OpenFileInWorkingDirectory.Subscribe(x => DoOpenFile((IPullRequestFileNode)x, true).Forget()));
             });
+
+            bodyGrid.RequestBringIntoView += BodyFocusHack;
         }
 
         [Import]
@@ -52,6 +62,12 @@ namespace GitHub.VisualStudio.UI.Views
         [Import]
         IVisualStudioBrowser VisualStudioBrowser { get; set; }
 
+        [Import]
+        IEditorOptionsFactoryService EditorOptionsFactoryService { get; set; }
+
+        [Import]
+        IUsageTracker UsageTracker { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -59,21 +75,32 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = TeamExplorerServiceHolder.ActiveRepo;
+            var repo = ViewModel.RemoteRepository;
             var browser = VisualStudioBrowser;
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);
         }
 
-        async Task DoOpenFile(IPullRequestFileNode file)
+        async Task DoOpenFile(IPullRequestFileNode file, bool workingDirectory)
         {
             try
             {
-                var fileName = await ViewModel.ExtractFile(file);
-                var window = Services.Dte.ItemOperations.OpenFile(fileName);
+                var fullPath = ViewModel.GetLocalFilePath(file);
+                var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true);
 
-                // If the file we extracted isn't the current file on disk, make the window read-only.
-                window.Document.ReadOnly = fileName != file.DirectoryPath;
+                using (workingDirectory ? null : OpenInProvisionalTab())
+                {
+                    var window = Services.Dte.ItemOperations.OpenFile(fileName);
+                    window.Document.ReadOnly = !workingDirectory;
+
+                    var buffer = GetBufferAt(fileName);
+                    AddBufferTag(buffer, ViewModel.Session, fullPath, false);
+                }
+
+                if (workingDirectory)
+                    await UsageTracker.IncrementPRDetailsOpenFileInSolution();
+                else
+                    await UsageTracker.IncrementPRDetailsViewFile();
             }
             catch (Exception e)
             {
@@ -81,30 +108,76 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        async Task DoDiffFile(IPullRequestFileNode file)
+        async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
         {
             try
             {
-                var fileNames = await ViewModel.ExtractDiffFiles(file);
-            var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-            var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
+                var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true);
+                var leftFile = await ViewModel.ExtractFile(file, false);
+                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
+                var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = workingDirectory ? relativePath : $"{relativePath};PR {ViewModel.Model.Number}";
+                var caption = $"Diff - {file.FileName}";
+                var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
+                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
 
-            Services.DifferenceService.OpenComparisonWindow2(
-                fileNames.Item1,
-                fileNames.Item2,
-                $"{leftLabel} vs {rightLabel}",
-                file.DirectoryPath,
-                leftLabel,
-                rightLabel,
-                string.Empty,
-                string.Empty,
-                (int)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
+                if (!workingDirectory)
+                {
+                    options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
+
+                IVsWindowFrame frame;
+                using (OpenInProvisionalTab())
+                {
+                    var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
+
+                    // Diff window will open in provisional (right hand) tab until document is touched.
+                    frame = Services.DifferenceService.OpenComparisonWindow2(
+                        leftFile,
+                        rightFile,
+                        caption,
+                        tooltip,
+                        leftLabel,
+                        rightLabel,
+                        string.Empty,
+                        string.Empty,
+                        (uint)options);
+                }
+
+                object docView;
+                frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
+                var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
+
+                var session = ViewModel.Session;
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
+                AddBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
+
+                if (workingDirectory)
+                    await UsageTracker.IncrementPRDetailsCompareWithSolution();
+                else
+                    await UsageTracker.IncrementPRDetailsViewChanges();
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
+            }
+        }
+
+        void AddBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, bool isLeftBuffer)
+        {
+            buffer.Properties.GetOrCreateSingletonProperty(
+                typeof(PullRequestTextBufferInfo),
+                () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    AddBufferTag(source, session, path, isLeftBuffer);
+                }
             }
         }
 
@@ -120,22 +193,14 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (file != null)
             {
-                switch (ViewModel.OpenChangedFileAction)
-                {
-                    case OpenChangedFileAction.Open:
-                        DoOpenFile(file).Forget();
-                        break;
-                    case OpenChangedFileAction.Diff:
-                        DoDiffFile(file).Forget();
-                        break;
-                }
+                DoDiffFile(file, false).Forget();
             }
         }
 
         void FileListMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var item = (e.OriginalSource as Visual)?.GetSelfAndVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
-            
+
             if (item != null)
             {
                 // Select tree view item on right click.
@@ -143,22 +208,37 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        void ListView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        ITextBuffer GetBufferAt(string filePath)
         {
-            ApplyContextMenuBinding<ListViewItem>(sender, e);
+            var editorAdapterFactoryService = Services.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
+            IVsUIHierarchy uiHierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+
+            if (VsShellUtilities.IsDocumentOpen(
+                Services.GitHubServiceProvider,
+                filePath,
+                Guid.Empty,
+                out uiHierarchy,
+                out itemID,
+                out windowFrame))
+            {
+                IVsTextView view = VsShellUtilities.GetTextView(windowFrame);
+                IVsTextLines lines;
+                if (view.GetBuffer(out lines) == 0)
+                {
+                    var buffer = lines as IVsTextBuffer;
+                    if (buffer != null)
+                        return editorAdapterFactoryService.GetDataBuffer(buffer);
+                }
+            }
+
+            return null;
         }
 
         void TreeView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             ApplyContextMenuBinding<TreeViewItem>(sender, e);
-        }
-
-
-        void changesOptionsMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            var menu = ((Button)sender).ContextMenu;
-            menu.DataContext = DataContext;
-            menu.IsOpen = true;
         }
 
         void ApplyContextMenuBinding<TItem>(object sender, ContextMenuEventArgs e) where TItem : Control
@@ -184,6 +264,74 @@ namespace GitHub.VisualStudio.UI.Views
                     e.Handled = false;
                 }
             }
+        }
+
+        void BodyFocusHack(object sender, RequestBringIntoViewEventArgs e)
+        {
+            if (e.TargetObject == bodyMarkdown)
+            {
+                // Hack to prevent pane scrolling to top. Instead focus selected tree view item.
+                // See https://github.com/github/VisualStudio/issues/1042
+                var node = changesTree.GetTreeViewItem(changesTree.SelectedItem);
+                node?.Focus();
+                e.Handled = true;
+            }
+        }
+
+        void ViewCommentsClick(object sender, RoutedEventArgs e)
+        {
+            var model = (object)ViewModel.Model;
+            Services.Dte.Commands.Raise(
+                Guids.CommandSetString,
+                PkgCmdIDList.ShowPullRequestCommentsId,
+                ref model,
+                null);
+        }
+
+        async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var file = (e.OriginalSource as Hyperlink)?.DataContext as IPullRequestFileNode;
+
+                if (file != null)
+                {
+                    var param = (object)new InlineCommentNavigationParams
+                    {
+                        FromLine = -1,
+                    };
+
+                    await DoDiffFile(file, false);
+
+                    // HACK: We need to wait here for the diff view to set itself up and move its cursor
+                    // to the first changed line. There must be a better way of doing this.
+                    await Task.Delay(1500);
+
+                    Services.Dte.Commands.Raise(
+                        Guids.CommandSetString,
+                        PkgCmdIDList.NextInlineCommentId,
+                        ref param,
+                        null);
+                }
+            }
+            catch { }
+        }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                VisualStudioBrowser.OpenUrl(uri);
+            }
+        }
+
+        static IDisposable OpenInProvisionalTab()
+        {
+            return new NewDocumentStateScope
+                (__VSNEWDOCUMENTSTATE.NDS_Provisional,
+                VSConstants.NewDocumentStateReason.SolutionExplorer);
         }
     }
 }

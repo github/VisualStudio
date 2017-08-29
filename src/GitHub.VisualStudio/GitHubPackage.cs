@@ -17,12 +17,13 @@ using Task = System.Threading.Tasks.Task;
 using GitHub.VisualStudio.Menus;
 using System.ComponentModel.Design;
 using GitHub.ViewModels;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", System.AssemblyVersionInformation.Version, IconResourceID = 400)]
-    [Guid(GuidList.guidGitHubPkgString)]
+    [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // this is the Git service GUID, so we load whenever it loads
     [ProvideAutoLoad(Guids.GitSccProviderId)]
@@ -33,11 +34,6 @@ namespace GitHub.VisualStudio
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
-
-        static GitHubPackage()
-        {
-            AssemblyResolver.InitializeAssemblyResolver();
-        }
 
         public GitHubPackage()
         {
@@ -61,6 +57,11 @@ namespace GitHub.VisualStudio
         async Task InitializeMenus()
         {
             var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
+            if (menus == null)
+            {
+                // Ignore if null because Expression Blend doesn't support custom services or menu extensibility.
+                return;
+            }
 
             await ThreadingHelper.SwitchToMainThreadAsync();
 
@@ -92,8 +93,8 @@ namespace GitHub.VisualStudio
         }
     }
 
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
@@ -135,6 +136,7 @@ namespace GitHub.VisualStudio
         {
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
+            AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
@@ -157,7 +159,7 @@ namespace GitHub.VisualStudio
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
         {
             IVsWindowFrame frame;
-            if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint) __VSCREATETOOLWIN.CTW_fForceCreate,
+            if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
             {
                 VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
@@ -170,7 +172,7 @@ namespace GitHub.VisualStudio
             }
 
             object docView = null;
-            if (ErrorHandler.Failed(frame.GetProperty((int) __VSFPROPID.VSFPROPID_DocView, out docView)))
+            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
             {
                 VsOutputLogger.WriteLine("Unable to grab instance of GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
                 return null;
@@ -192,6 +194,20 @@ namespace GitHub.VisualStudio
                 var result = new GitHubServiceProvider(this, this);
                 await result.Initialize();
                 return result;
+            }
+            else if (serviceType == typeof(ILoginManager))
+            {
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var loginCache = serviceProvider.GetService<ILoginCache>();
+                var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
+
+                return new LoginManager(
+                    loginCache,
+                    twoFaHandler,
+                    ApiClientConfiguration.ClientId,
+                    ApiClientConfiguration.ClientSecret,
+                    ApiClientConfiguration.AuthorizationNote,
+                    ApiClientConfiguration.MachineFingerprint);
             }
             else if (serviceType == typeof(IMenuProvider))
             {

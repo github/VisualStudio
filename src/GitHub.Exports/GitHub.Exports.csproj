@@ -12,7 +12,6 @@
     <AssemblyName>GitHub.Exports</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -41,11 +40,7 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -114,6 +109,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -129,9 +128,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
+    <Compile Include="Exports\ExportForProcess.cs" />
+    <Compile Include="GitHubLogicException.cs" />
+    <Compile Include="Models\DiffChangeType.cs" />
+    <Compile Include="Models\DiffChunk.cs" />
+    <Compile Include="Models\DiffLine.cs" />
+    <Compile Include="Models\DiffUtilities.cs" />
+    <Compile Include="Models\ICommentModel.cs" />
+    <Compile Include="Models\IInlineCommentModel.cs" />
+    <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
+    <Compile Include="Settings\PkgCmdID.cs" />
+    <Compile Include="ViewModels\IHasErrorState.cs" />
+    <Compile Include="ViewModels\IHasLoading.cs" />
+    <Compile Include="ViewModels\IPanePageViewModel.cs" />
+    <Compile Include="ViewModels\IViewModel.cs" />
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
@@ -144,7 +154,6 @@
     <Compile Include="Factories\IUIFactory.cs" />
     <Compile Include="Factories\IUIPair.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Helpers\AssemblyResolver.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
     <Compile Include="Extensions\LocalRepositoryModelExtensions.cs" />
@@ -152,10 +161,13 @@
     <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />
+    <Compile Include="Models\ConnectionDetails.cs" />
+    <Compile Include="Models\CloneDialogResult.cs" />
     <Compile Include="Models\GitReferenceModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
-    <Compile Include="Models\IConnectionManager.cs" />
+    <Compile Include="Services\IConnectionCache.cs" />
+    <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\IPullRequestFileModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
@@ -169,6 +181,7 @@
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />
+    <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Services\IGitService.cs" />
     <Compile Include="Services\IMetricsService.cs" />
     <Compile Include="Services\ISelectedTextProvider.cs" />
@@ -209,10 +222,11 @@
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="UI\IView.cs" />
     <Compile Include="ViewModels\IHasBusy.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
-    <Compile Include="UI\IView.cs" />
+    <Compile Include="ViewModels\ICanNavigate.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />
     <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
@@ -233,10 +247,8 @@
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
-    <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
-    <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
   </ItemGroup>
   <ItemGroup>

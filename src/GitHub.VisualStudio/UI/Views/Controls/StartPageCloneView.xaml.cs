@@ -13,7 +13,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 using GitHub.Services;
@@ -21,7 +20,7 @@ using System.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericStartPageCloneView : SimpleViewUserControl<IBaseCloneViewModel, StartPageCloneView>
+    public class GenericStartPageCloneView : ViewBase<IBaseCloneViewModel, StartPageCloneView>
     {}
 
     /// <summary>
@@ -35,10 +34,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             InitializeComponent();
 
-            this.WhenActivated(d =>
-            {
-                d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
-            });
             IsVisibleChanged += (s, e) =>
             {
                 if (IsVisible)

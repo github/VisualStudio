@@ -1,15 +1,18 @@
 ﻿using System;
 using System.IO;
+using GitHub.Extensions;
 using GitHub.Models;
-using NullGuard;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     /// <summary>
     /// A file node in a pull request changes tree.
     /// </summary>
-    public class PullRequestFileNode : IPullRequestFileNode
+    public class PullRequestFileNode : ReactiveObject, IPullRequestFileNode
     {
+        int commentCount;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestFileNode"/> class.
         /// </summary>
@@ -18,8 +21,17 @@ namespace GitHub.ViewModels
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
-        public PullRequestFileNode(string repositoryPath, string path, string sha, PullRequestFileStatus status, [AllowNull] string statusDisplay)
+        public PullRequestFileNode(
+            string repositoryPath,
+            string path,
+            string sha,
+            PullRequestFileStatus status,
+            string statusDisplay)
         {
+            Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentNotEmptyString(sha, nameof(sha));
+
             FileName = Path.GetFileName(path);
             DirectoryPath = Path.GetDirectoryName(path);
             DisplayPath = Path.Combine(Path.GetFileName(repositoryPath), DirectoryPath);
@@ -56,6 +68,15 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the string to display in the [message] box next to the filename.
         /// </summary>
-        public string StatusDisplay { [return: AllowNull] get; }
+        public string StatusDisplay { get; }
+
+        /// <summary>
+        /// Gets or sets the number of review comments on the file.
+        /// </summary>
+        public int CommentCount
+        {
+            get { return commentCount; }
+            set { this.RaiseAndSetIfChanged(ref commentCount, value); }
+        }
     }
 }

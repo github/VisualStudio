@@ -9,13 +9,12 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.UserErrors;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericRepositoryCreationControl : SimpleViewUserControl<IRepositoryCreationViewModel, RepositoryCreationControl>
+    public class GenericRepositoryCreationControl : ViewBase<IRepositoryCreationViewModel, RepositoryCreationControl>
     { }
 
     /// <summary>
@@ -50,8 +49,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.BrowseForDirectory, v => v.browsePathButton));
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
-
-                ViewModel.CreateRepository.Subscribe(_ => NotifyDone());
             });
             IsVisibleChanged += (s, e) =>
             {

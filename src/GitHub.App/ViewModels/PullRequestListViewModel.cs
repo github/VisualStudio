@@ -5,32 +5,36 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Input;
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
-using NullGuard;
+using NLog;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
+    public class PullRequestListViewModel : PanePageViewModelBase, IPullRequestListViewModel, IDisposable
     {
-        readonly ReactiveCommand<object> openPullRequestCommand;
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IRepositoryHost repositoryHost;
-        readonly ILocalRepositoryModel repository;
+        readonly ILocalRepositoryModel localRepository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
+        readonly bool constructing;
+        IRemoteRepositoryModel remoteRepository;
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -39,6 +43,9 @@ namespace GitHub.ViewModels
             IPackageSettings settings)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
         {
+            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(teservice, nameof(teservice));
+            Guard.ArgumentNotNull(settings, nameof(settings));
         }
 
         public PullRequestListViewModel(
@@ -46,8 +53,13 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IPackageSettings settings)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotNull(settings, nameof(settings));
+
+            constructing = true;
             this.repositoryHost = repositoryHost;
-            this.repository = repository;
+            this.localRepository = repository;
             this.settings = settings;
 
             Title = Resources.PullRequestsNavigationItemText;
@@ -55,8 +67,6 @@ namespace GitHub.ViewModels
             this.listSettings = settings.UIState
                 .GetOrCreateRepositoryState(repository.CloneUrl)
                 .PullRequests;
-
-            openPullRequestCommand = ReactiveCommand.Create();
 
             States = new List<PullRequestState> {
                 new PullRequestState { IsOpen = true, Name = "Open" },
@@ -74,36 +84,55 @@ namespace GitHub.ViewModels
             Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
             Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
 
-            PullRequests = new TrackingCollection<IPullRequestModel>();
-            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
-            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            CreatePullRequests();
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor, FilterText));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
+                .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor, FilterText));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
+                .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a, FilterText));
 
             this.WhenAny(x => x.FilterText, x => x.Value)
-                .Where(x => PullRequests != null && IsLoaded)
+                .Where(x => PullRequests != null)
                 .Subscribe(f => UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, f));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
+            OpenPullRequest = ReactiveCommand.Create();
+            OpenPullRequest.Subscribe(DoOpenPullRequest);
+            CreatePullRequest = ReactiveCommand.Create();
+            CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
+
+            constructing = false;
         }
 
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
             base.Initialize(data);
+            Load().Forget();
+        }
 
-            IsLoaded = false;
+        async Task Load()
+        {
+            IsBusy = true;
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
+            if (remoteRepository == null)
+            {
+                remoteRepository = await repositoryHost.ModelService.GetRepository(
+                    localRepository.Owner,
+                    localRepository.Name);
+                Repositories = remoteRepository.IsFork ?
+                    new[] { remoteRepository.Parent, remoteRepository } :
+                    new[] { remoteRepository };
+                SelectedRepository = Repositories[0];
+            }
+
+            PullRequests = repositoryHost.ModelService.GetPullRequests(SelectedRepository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -114,12 +143,13 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
                 {
-                    // TODO: Do some decent logging here
+                    log.Info("Received AuthorizationException reading pull requests", ex);
                     return repositoryHost.LogOut();
                 })
-                .Catch<System.Reactive.Unit, Octokit.NotFoundException>(ex =>
+                .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
-                    //this is caused when repository was deleted on github
+                    // Occurs on network error, when the repository was deleted on GitHub etc.
+                    log.Info("Received Exception reading pull requests", ex);
                     return Observable.Empty<System.Reactive.Unit>();
                 })
                 .Subscribe(_ =>
@@ -133,13 +163,13 @@ namespace GitHub.ViewModels
                     {
                         SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
                     }
- 
-                    IsLoaded = true;
+
+                    IsBusy = false;
                     UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, FilterText);
                 });
         }
 
-        void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass = null, [AllowNull]IAccount aut = null, [AllowNull]string filText = null)
+        void UpdateFilter(PullRequestState state, IAccount ass, IAccount aut, string filText)
         {
             if (PullRequests == null)
                 return;
@@ -175,40 +205,45 @@ namespace GitHub.ViewModels
         }
 
         string filterText;
-        [AllowNull]
         public string FilterText
         {
             get { return filterText; }
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
-        bool isLoaded;
-        public bool IsLoaded
+        bool isBusy;
+        public bool IsBusy
         {
-            get { return isLoaded; }
-            private set { this.RaiseAndSetIfChanged(ref isLoaded, value); }
+            get { return isBusy; }
+            private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+        }
+
+        IReadOnlyList<IRemoteRepositoryModel> repositories;
+        public IReadOnlyList<IRemoteRepositoryModel> Repositories
+        {
+            get { return repositories; }
+            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
+        }
+
+        IRemoteRepositoryModel selectedRepository;
+        public IRemoteRepositoryModel SelectedRepository
+        {
+            get { return selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
 
         ITrackingCollection<IPullRequestModel> pullRequests;
         public ITrackingCollection<IPullRequestModel> PullRequests
         {
-            [return: AllowNull]
             get { return pullRequests; }
             private set { this.RaiseAndSetIfChanged(ref pullRequests, value); }
         }
 
         IPullRequestModel selectedPullRequest;
-        [AllowNull]
         public IPullRequestModel SelectedPullRequest
         {
-            [return: AllowNull]
             get { return selectedPullRequest; }
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
-        }
-
-        public ICommand OpenPullRequest
-        {
-            get { return openPullRequestCommand; }
         }
 
         IReadOnlyList<PullRequestState> states;
@@ -221,7 +256,6 @@ namespace GitHub.ViewModels
         PullRequestState selectedState;
         public PullRequestState SelectedState
         {
-            [return: AllowNull]
             get { return selectedState; }
             set { this.RaiseAndSetIfChanged(ref selectedState, value); }
         }
@@ -241,19 +275,15 @@ namespace GitHub.ViewModels
         }
 
         IAccount selectedAuthor;
-        [AllowNull]
         public IAccount SelectedAuthor
         {
-            [return: AllowNull]
             get { return selectedAuthor; }
             set { this.RaiseAndSetIfChanged(ref selectedAuthor, value); }
         }
 
         IAccount selectedAssignee;
-        [AllowNull]
         public IAccount SelectedAssignee
         {
-            [return: AllowNull]
             get { return selectedAssignee; }
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
         }
@@ -264,6 +294,12 @@ namespace GitHub.ViewModels
             get { return emptyUser; }
         }
 
+        readonly Subject<ViewWithData> navigate = new Subject<ViewWithData>();
+        public IObservable<ViewWithData> Navigate => navigate;
+
+        public ReactiveCommand<object> OpenPullRequest { get; }
+        public ReactiveCommand<object> CreatePullRequest { get; }
+
         bool disposed;
         protected void Dispose(bool disposing)
         {
@@ -273,7 +309,6 @@ namespace GitHub.ViewModels
                 pullRequests.Dispose();
                 trackingAuthors.Dispose();
                 trackingAssignees.Dispose();
-                SaveSettings();
                 disposed = true;
             }
         }
@@ -284,12 +319,51 @@ namespace GitHub.ViewModels
             GC.SuppressFinalize(this);
         }
 
+        void CreatePullRequests()
+        {
+            PullRequests = new TrackingCollection<IPullRequestModel>();
+            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+        }
+
+        void ResetAndLoad()
+        {
+            CreatePullRequests();
+            UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, FilterText);
+            Load().Forget();
+        }
+
         void SaveSettings()
         {
-            listSettings.SelectedState = SelectedState.Name;
-            listSettings.SelectedAssignee = SelectedAssignee?.Login;
-            listSettings.SelectedAuthor = SelectedAuthor?.Login;
-            settings.Save();
+            if (!constructing)
+            {
+                listSettings.SelectedState = SelectedState.Name;
+                listSettings.SelectedAssignee = SelectedAssignee?.Login;
+                listSettings.SelectedAuthor = SelectedAuthor?.Login;
+                settings.Save();
+            }
+        }
+
+        void DoOpenPullRequest(object pullRequest)
+        {
+            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+
+            var d = new ViewWithData(UIControllerFlow.PullRequestDetail)
+            {
+                Data = new PullRequestDetailArgument
+                {
+                    Repository = SelectedRepository,
+                    Number = (int)pullRequest,
+                }
+            };
+
+            navigate.OnNext(d);
+        }
+
+        void DoCreatePullRequest()
+        {
+            var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
+            navigate.OnNext(d);
         }
     }
 }

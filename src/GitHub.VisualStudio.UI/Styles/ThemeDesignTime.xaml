@@ -3,11 +3,13 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeBlue.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsColorsBlue.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsBrushesBlue.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeBlue.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-  <!-- Design time colors taken from the VS dark theme
+    <!-- Design time colors taken from the VS dark theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FF252526" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF999999" />

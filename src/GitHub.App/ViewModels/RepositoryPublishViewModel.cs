@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Exports;
@@ -14,7 +15,6 @@ using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -31,7 +31,6 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
-        readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly ObservableAsPropertyHelper<string> title;
         readonly IUsageTracker usageTracker;
 
@@ -43,6 +42,12 @@ namespace GitHub.ViewModels
             IConnectionManager connectionManager,
             IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(repositoryPublishService, nameof(repositoryPublishService));
+            Guard.ArgumentNotNull(notificationService, nameof(notificationService));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.notificationService = notificationService;
             this.hosts = hosts;
             this.usageTracker = usageTracker;
@@ -89,8 +94,7 @@ namespace GitHub.ViewModels
                 (canKeep, publishing) => canKeep && !publishing)
                 .ToProperty(this, x => x.CanKeepPrivate);
 
-            isPublishing = PublishRepository.IsExecuting
-                .ToProperty(this, x => x.IsPublishing);
+            PublishRepository.IsExecuting.Subscribe(x => IsBusy = x);
 
             var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
             if (!string.IsNullOrEmpty(defaultRepositoryName))
@@ -111,23 +115,19 @@ namespace GitHub.ViewModels
 
         public new string Title { get { return title.Value; } }
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
-        public bool IsPublishing { get { return isPublishing.Value; } }
 
         public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
         public ObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
-        [AllowNull]
         public IConnection SelectedConnection
         {
-            [return: AllowNull]
             get { return selectedConnection; }
             set { this.RaiseAndSetIfChanged(ref selectedConnection, value); }
         }
 
         IRepositoryHost SelectedHost
         {
-            [return:AllowNull]
             get { return selectedConnection != null ? hosts.LookupHost(selectedConnection.HostAddress) : null; }
         }
 
@@ -139,6 +139,11 @@ namespace GitHub.ViewModels
         public bool IsHostComboBoxVisible
         {
             get { return isHostComboBoxVisible.Value; }
+        }
+
+        public override IObservable<Unit> Done
+        {
+            get { return PublishRepository.Select(x => x == ProgressState.Success).SelectUnit(); }
         }
 
         ReactiveCommand<ProgressState> InitializePublishRepositoryCommand()

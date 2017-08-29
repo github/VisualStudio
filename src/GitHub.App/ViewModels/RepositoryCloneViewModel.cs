@@ -16,7 +16,6 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 using Rothko;
 using System.Collections.ObjectModel;
@@ -28,17 +27,13 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : DialogViewModelBase, IRepositoryCloneViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IRepositoryHost repositoryHost;
-        readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
-        readonly INotificationService notificationService;
-        readonly IUsageTracker usageTracker;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        bool isLoading;
         bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
@@ -48,25 +43,22 @@ namespace GitHub.ViewModels
         RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
-            IOperatingSystem operatingSystem,
-            INotificationService notificationService,
-            IUsageTracker usageTracker)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService, usageTracker)
+            IOperatingSystem operatingSystem)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem)
         { }
 
 
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
-            IOperatingSystem operatingSystem,
-            INotificationService notificationService,
-            IUsageTracker usageTracker)
+            IOperatingSystem operatingSystem)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
+            Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
+
             this.repositoryHost = repositoryHost;
-            this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
-            this.notificationService = notificationService;
-            this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
 
@@ -76,13 +68,28 @@ namespace GitHub.ViewModels
             repositories.Filter = FilterRepository;
             repositories.NewerComparer = OrderedComparer<IRemoteRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
 
-            filterTextIsEnabled = this.WhenAny(x => x.IsLoading,
+            filterTextIsEnabled = this.WhenAny(x => x.IsBusy,
                 loading => loading.Value || repositories.UnfilteredCount > 0 && !LoadingFailed)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
-            this.WhenAny(x => x.IsLoading, x => x.LoadingFailed,
-                (loading, failed) => !loading.Value && !failed.Value && repositories.UnfilteredCount == 0)
-                .Subscribe(x => NoRepositoriesFound = x);
+            this.WhenAny(
+                x => x.repositories.UnfilteredCount,
+                x => x.IsBusy,
+                x => x.LoadingFailed,
+                (unfilteredCount, loading, failed) =>
+                {
+                    if (loading.Value)
+                        return false;
+
+                    if (failed.Value)
+                        return false;
+
+                    return unfilteredCount.Value == 0;
+                })
+                .Subscribe(x =>
+                {
+                    NoRepositoriesFound = x;
+                });
 
             this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
@@ -106,7 +113,7 @@ namespace GitHub.ViewModels
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value != null && y.Value);
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
+            CloneCommand = ReactiveCommand.Create(canCloneObservable);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
@@ -115,27 +122,32 @@ namespace GitHub.ViewModels
             NoRepositoriesFound = true;
         }
 
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
             base.Initialize(data);
 
-            IsLoading = true;
-            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRemoteRepositoryModel>;
-            repositories.OriginalCompleted.Subscribe(
-                _ => { }
-                , ex =>
-                {
-                    LoadingFailed = true;
-                    IsLoading = false;
-                    log.Error("Error while loading repositories", ex);
-                },
-                () => IsLoading = false
+            IsBusy = true;
+            repositoryHost.ModelService.GetRepositories(repositories);
+            repositories.OriginalCompleted
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(
+                    _ => { }
+                    , ex =>
+                    {
+                        LoadingFailed = true;
+                        IsBusy = false;
+                        log.Error("Error while loading repositories", ex);
+                    },
+                    () => IsBusy = false
             );
             repositories.Subscribe();
         }
 
         bool FilterRepository(IRemoteRepositoryModel repo, int position, IList<IRemoteRepositoryModel> list)
         {
+            Guard.ArgumentNotNull(repo, nameof(repo));
+            Guard.ArgumentNotNull(list, nameof(list));
+
             if (string.IsNullOrWhiteSpace(FilterText))
                 return true;
 
@@ -143,41 +155,9 @@ namespace GitHub.ViewModels
             return repo.Name.IndexOf(FilterText ?? "", StringComparison.OrdinalIgnoreCase) != -1;
         }
 
-        IObservable<Unit> OnCloneRepository(object state)
-        {
-            return Observable.Start(() =>
-            {
-                var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                if (repository == null)
-                {
-                    notificationService.ShowError(Resources.RepositoryCloneFailedNoSelectedRepo);
-                    return Observable.Return(Unit.Default);
-                }
-
-                // The following is a noop if the directory already exists.
-                operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
-
-                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath)
-                    .ContinueAfter(() =>
-                    {
-                        usageTracker.IncrementCloneCount().Forget();
-                        return Observable.Return(Unit.Default);
-                    });
-            })
-            .SelectMany(_ => _)
-            .Catch<Unit, Exception>(e =>
-            {
-                var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                notificationService.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
-                return Observable.Return(Unit.Default);
-            });
-        }
-
         bool IsAlreadyRepoAtPath(string path)
         {
-            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
+            Guard.ArgumentNotEmptyString(path, nameof(path));
 
             bool isAlreadyRepoAtPath = false;
 
@@ -223,20 +203,18 @@ namespace GitHub.ViewModels
         /// </summary>
         public string BaseRepositoryPath
         {
-            [return: AllowNull]
             get { return baseRepositoryPath; }
             set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
         }
 
         /// <summary>
-        /// Fires off the cloning process
+        /// Signals that the user clicked the clone button.
         /// </summary>
-        public IReactiveCommand<Unit> CloneCommand { get; private set; }
+        public IReactiveCommand<object> CloneCommand { get; private set; }
 
         TrackingCollection<IRemoteRepositoryModel> repositories;
         public ObservableCollection<IRemoteRepositoryModel> Repositories
         {
-            [return: AllowNull]
             get { return repositories; }
             private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRemoteRepositoryModel>)value); }
         }
@@ -245,10 +223,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Selected repository to clone
         /// </summary>
-        [AllowNull]
         public IRepositoryModel SelectedRepository
         {
-            [return: AllowNull]
             get { return selectedRepository; }
             set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
@@ -263,18 +239,10 @@ namespace GitHub.ViewModels
         /// <summary>
         /// User text to filter the repositories list
         /// </summary>
-        [AllowNull]
         public string FilterText
         {
-            [return: AllowNull]
             get { return filterText; }
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
-        }
-
-        public bool IsLoading
-        {
-            get { return isLoading; }
-            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
         public bool LoadingFailed
@@ -304,5 +272,7 @@ namespace GitHub.ViewModels
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done => CloneCommand.SelectUnit();
     }
 }

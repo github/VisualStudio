@@ -9,6 +9,9 @@ Official builds of this extension are available at [the official website](https:
 
 [![Join the chat at freenode:github-vs](https://img.shields.io/badge/irc-freenode:%20%23github--vs-blue.svg)](http://webchat.freenode.net/?channels=%23github-vs) [![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Documentation
+Visit the [documentation](https://github.com/github/VisualStudio/tree/master/docs) for details on how to use the features in the GitHub Extension for Visual Studio.
+
 ## Installing beta versions
 
 Older and pre-release/beta/untested versions are available at [the releases page](https://github.com/github/VisualStudio/releases), and also via a custom gallery feed for Visual Studio.
@@ -19,14 +22,14 @@ Beta releases will have `(beta)` in their title in the gallery, following the ve
 
 ## Build requirements
 
-* Visual Studio 2015
+* Visual Studio 2015+
 * Visual Studio SDK
 
 ## Build
 
 Clone the repository and its submodules in a git GUI client or via the command line:
 
-```
+```txt
 git clone https://github.com/github/VisualStudio
 cd VisualStudio
 git submodule init
@@ -34,14 +37,61 @@ git submodule deinit script
 git submodule update
 ```
 
-Open the `GitHubVS.sln` solution with Visual Studio 2015.
+Visual Studio extensions have to be signed, so you need to create a signing key with the name `publickey.snk` for your build in the root of the repository:
+
+```txt
+sn -k `publickey.snk`
+```
+
+Open the `GitHubVS.sln` solution with Visual Studio 2015+.
 To be able to use the GitHub API, you'll need to:
 
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
-- Open [src/GitHub.App/Api/ApiClientConfiguration.cs](src/GitHub.App/Api/ApiClientConfiguration.cs) and fill out the clientId/clientSecret fields for your application.
+- Open [src/GitHub.Api/ApiClientConfiguration_User.cs](src/GitHub.Api/ApiClientConfiguration_User.cs) and fill out the clientId/clientSecret fields for your application. **Note this has recently changed location, so you may need to re-do this**
+
+Build using Visual Studio 2015 or:
+
+```txt
+build.cmd
+```
+
+Install in live (non-Experimental) instances of Visual Studio 2015 and 2017:
+
+```txt
+install.cmd
+```
+
+Note, the script will only install in one instance of Visual Studio 2017 (Enterprise, Professional or Community).
+
+## Build Flavors
+
+By default, building will create a VSIX with `Experimental="true"` and `AllUsers="false"` in its `extension.vsixmanifest`. These settings are necessary in order to easily install a standalone VSIX file. There is no need to uninstall the version previously installed via Visual Studio setup / Extensions and Updates.
+
+The following can be executed via `cmd.exe`.
+
+To build and install a `Debug` configuration VSIX:
+```txt
+build.cmd
+install.cmd
+```
+
+To build and install a `Release` configuration VSIX:
+```txt
+set Configuration=Release
+build.cmd
+install.cmd
+```
+
+To build a VSIX that can be installed via a gallery feed on Extensions and Updates:
+```txt
+set Configuration=Release
+set IsExperimental=false
+build.cmd
+```
+
+Note, attempting to install `IsExperimental=false` builds of the VSIX is not recommended.
 
 ## More information
-
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
 
 ## Contributing

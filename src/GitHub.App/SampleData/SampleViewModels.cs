@@ -18,11 +18,12 @@ using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : BaseViewModel, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : DialogViewModelBase, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -185,6 +186,8 @@ namespace GitHub.SampleData
             get;
             set;
         }
+
+        public override IObservable<Unit> Done { get; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -227,12 +230,6 @@ namespace GitHub.SampleData
             {
                 return true;
             }
-        }
-
-        public bool IsPublishing
-        {
-            get;
-            private set;
         }
 
         public IReactiveCommand<ProgressState> PublishRepository
@@ -324,11 +321,11 @@ namespace GitHub.SampleData
         {
             name = name ?? "octocat";
             owner = owner ?? "github";
-            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner });
+            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner }, null);
         }
     }
 
-    public class RepositoryCloneViewModelDesigner : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : DialogViewModelBase, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
@@ -353,7 +350,7 @@ namespace GitHub.SampleData
                 .IfPathNotRooted("Please enter a valid path");
         }
 
-        public IReactiveCommand<Unit> CloneCommand
+        public IReactiveCommand<object> CloneCommand
         {
             get;
             private set;
@@ -376,11 +373,6 @@ namespace GitHub.SampleData
         public string FilterText { get; set; }
 
         public new string Title { get { return "Clone a GitHub Repository"; } }
-
-        public bool IsLoading
-        {
-            get { return false; }
-        }
 
         public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
         {
@@ -422,6 +414,8 @@ namespace GitHub.SampleData
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done { get; }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection
@@ -462,6 +456,8 @@ namespace GitHub.SampleData
         {
 
         }
+
+        public ICommand OpenOnGitHub { get; }
     }
 
     public class GitHubConnectSectionDesigner : IGitHubConnectSection
@@ -482,10 +478,6 @@ namespace GitHub.SampleData
             get; set;
         }
 
-        public void DoClone()
-        {
-        }
-
         public void DoCreate()
         {
         }
@@ -504,6 +496,7 @@ namespace GitHub.SampleData
         }
 
         public IConnection SectionConnection { get; }
+        public ICommand Clone { get; }
     }
 
     public class InfoPanelDesigner

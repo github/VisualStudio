@@ -142,15 +142,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compare File.
-        /// </summary>
-        public static string CompareFile {
-            get {
-                return ResourceManager.GetString("CompareFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Compare File as Default Action.
         /// </summary>
         public static string CompareFileAsDefaultAction {
@@ -547,20 +538,20 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open File.
-        /// </summary>
-        public static string OpenFile {
-            get {
-                return ResourceManager.GetString("OpenFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open File as Default Action.
         /// </summary>
         public static string OpenFileAsDefaultAction {
             get {
                 return ResourceManager.GetString("OpenFileAsDefaultAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open File in Solution.
+        /// </summary>
+        public static string OpenFileInSolution {
+            get {
+                return ResourceManager.GetString("OpenFileInSolution", resourceCulture);
             }
         }
         
@@ -574,11 +565,47 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View Pull Request on GitHub.
+        /// </summary>
+        public static string OpenPROnGitHubToolTip {
+            get {
+                return ResourceManager.GetString("OpenPROnGitHubToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         public static string openTwoFactorAuthAppText {
             get {
                 return ResourceManager.GetString("openTwoFactorAuthAppText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show PR comments on editor margin.
+        /// </summary>
+        public static string Options_EditorCommentsLabel {
+            get {
+                return ResourceManager.GetString("Options_EditorCommentsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These features might change in a future version.
+        /// </summary>
+        public static string Options_ExperimentalNote {
+            get {
+                return ResourceManager.GetString("Options_ExperimentalNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Experimental features.
+        /// </summary>
+        public static string Options_ExperimentalTitle {
+            get {
+                return ResourceManager.GetString("Options_ExperimentalTitle", resourceCulture);
             }
         }
         
@@ -630,18 +657,18 @@ namespace GitHub.VisualStudio.UI {
         /// <summary>
         ///   Looks up a localized string similar to by.
         /// </summary>
-        public static string prOpenedByText {
+        public static string prUpdatedByText {
             get {
-                return ResourceManager.GetString("prOpenedByText", resourceCulture);
+                return ResourceManager.GetString("prUpdatedByText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to opened.
+        ///   Looks up a localized string similar to Updated.
         /// </summary>
-        public static string prOpenedText {
+        public static string prUpdatedText {
             get {
-                return ResourceManager.GetString("prOpenedText", resourceCulture);
+                return ResourceManager.GetString("prUpdatedText", resourceCulture);
             }
         }
         
@@ -781,6 +808,17 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
+        ///
+        ///[Don&apos;t show this again](dont-show-again).
+        /// </summary>
+        public static string TeamExplorerWelcomeMessage {
+            get {
+                return ResourceManager.GetString("TeamExplorerWelcomeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Title (required).
         /// </summary>
         public static string TitleRequired {
@@ -822,6 +860,33 @@ namespace GitHub.VisualStudio.UI {
         public static string verifyText {
             get {
                 return ResourceManager.GetString("verifyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Changes.
+        /// </summary>
+        public static string ViewChanges {
+            get {
+                return ResourceManager.GetString("ViewChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Changes in Solution.
+        /// </summary>
+        public static string ViewChangesInSolution {
+            get {
+                return ResourceManager.GetString("ViewChangesInSolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View File.
+        /// </summary>
+        public static string ViewFile {
+            get {
+                return ResourceManager.GetString("ViewFile", resourceCulture);
             }
         }
         

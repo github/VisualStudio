@@ -1,21 +1,22 @@
-﻿using GitHub.Exports;
+﻿using System;
+using GitHub.Exports;
 using GitHub.Services;
-using NullGuard;
-using System;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Menus
 {
-    public class OpenLink: LinkMenuBase, IDynamicMenuHandler
+    public class OpenLink : LinkMenuBase, IDynamicMenuHandler
     {
         public OpenLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidContextMenuSet;
+        public Guid Guid => Guids.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.openLinkCommand;
 
-        public async void Activate([AllowNull]object data = null)
+        public async void Activate(object data = null)
         {
             var isgithub = await IsGitHubRepo();
             if (!isgithub)

@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Shell;
 using NLog;
 using Rothko;
 using GitHub.Helpers;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
@@ -25,45 +26,50 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public RepositoryCloneService(IOperatingSystem operatingSystem, IVSGitServices vsGitServices)
+        public RepositoryCloneService(
+            IOperatingSystem operatingSystem,
+            IVSGitServices vsGitServices,
+            IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
+            this.usageTracker = usageTracker;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
-        public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
+        /// <inheritdoc/>
+        public async Task CloneRepository(
+            string cloneUrl,
+            string repositoryName,
+            string repositoryPath,
+            object progress = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryName, nameof(repositoryName));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
 
-            return Observable.StartAsync(async () =>
+            string path = Path.Combine(repositoryPath, repositoryName);
+
+            // Switch to a thread pool thread for IO then back to the main thread to call
+            // vsGitServices.Clone() as this must be called on the main thread.
+            await ThreadingHelper.SwitchToPoolThreadAsync();
+            operatingSystem.Directory.CreateDirectory(path);
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
+            try
             {
-                string path = Path.Combine(repositoryPath, repositoryName);
-
-                operatingSystem.Directory.CreateDirectory(path);
-
-                // Once we've done IO switch to the main thread to call vsGitServices.Clone() as this must be
-                // called on the main thread.
-                await ThreadingHelper.SwitchToMainThreadAsync();
-
-                try
-                {
-                    // this will throw if it can't find it
-                    vsGitServices.Clone(cloneUrl, path, true);
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Could not clone {0} to {1}. {2}", cloneUrl, path, ex);
-                    throw;
-                }
-                
-                return Unit.Default;
-            });
+                await vsGitServices.Clone(cloneUrl, path, true, progress);
+                await usageTracker.IncrementCloneCount();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Could not clone {0} to {1}. {2}", cloneUrl, path, ex);
+                throw;
+            }
         }
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)

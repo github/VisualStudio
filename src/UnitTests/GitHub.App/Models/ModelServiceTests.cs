@@ -23,17 +23,17 @@ using static GitHub.Services.ModelService;
 
 public class ModelServiceTests
 {
-    public class TheGetUserFromCacheMethod : TestBaseClass
+    public class TheGetCurrentUserMethod : TestBaseClass
     {
         [Fact]
-        public async Task RetrievesUserFromCache()
+        public async Task RetrievesCurrentUser()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = new InMemoryBlobCache();
             await cache.InsertObject<AccountCacheItem>("user", new AccountCacheItem(CreateOctokitUser("octocat")));
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var user = await modelService.GetUserFromCache();
+            var user = await modelService.GetCurrentUser();
 
             Assert.Equal("octocat", user.Login);
         }
@@ -444,6 +444,7 @@ public class ModelServiceTests
 
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.Name.Returns(reponame);
+            repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
@@ -511,6 +512,7 @@ public class ModelServiceTests
 
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.Name.Returns(reponame);
+            repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);

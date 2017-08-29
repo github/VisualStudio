@@ -2,7 +2,7 @@
                                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                                    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                     xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
                                     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,6 +11,7 @@
                                     xmlns:uir="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                                     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                                    xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
                                     DataContext="{Binding ViewModel}"
@@ -23,7 +24,8 @@
         <Binding>
             <Binding.Source>
                 <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
-                                                               TargetBranchDisplayName="master-is-always-stable">
+                                                               TargetBranchDisplayName="master-is-always-stable"
+                                                               CommentCount="10">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
@@ -46,31 +48,13 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="Separator" TargetType="Rectangle">
                 <Setter Property="Fill" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
             </Style>
 
-            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
-                <Setter Property="FontFamily" Value="Segoe UI"/>
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="TextAlignment" Value="Left"/>
-                <Setter Property="PagePadding" Value="0"/>
-
-                <Style.Resources>
-                    <Style TargetType="Image">
-                        <Setter Property="Stretch" Value="UniformToFill" />
-                        <Setter Property="StretchDirection" Value="DownOnly" /> 
-                        <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
-                    </Style>
-                </Style.Resources>
-            </Style>
-
-            <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
-            </Style>
-            
             <!-- TODO Fix this: here we change the color of TextBlock depending on the label.
                  It's a hack, it will break with localization -->
             <Style x:Key="StateIndicator" TargetType="TextBlock">
@@ -99,6 +83,10 @@
         </ResourceDictionary>
     </Control.Resources>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+    
     <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -145,13 +133,13 @@
 
                     <ui:OcticonImage Grid.Column="0" VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.5" Margin="0 0 3 0" />
                     <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
                     </Border>
 
                     <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="into" />
 
                     <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
                     </Border>
                 </Grid>
 
@@ -162,7 +150,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Opacity="0.5" Margin="0 2 0 0" VerticalAlignment="Top"
+                    <TextBlock Grid.Column="0" Opacity="0.5" VerticalAlignment="Center"
                                Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
                     <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
@@ -179,7 +167,7 @@
 
                     <!-- Pull/push buttons -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
-                                Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
+                            Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
                         <ui:OcticonImage Icon="arrow_down"/>
                         <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
                         <ui:GitHubActionLink Content="Pull"
@@ -199,9 +187,8 @@
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
-                        <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -218,31 +205,18 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
-                    </TextBlock>
-
-                    <!-- Checkout disabled message -->
-                    <TextBlock Grid.Column="2" Margin="0 0 0 4" VerticalAlignment="Center" TextWrapping="Wrap">
-                        <Run Text="{Binding CheckoutDisabledMessage}"/>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
+                    <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
+                    <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
                     </TextBlock>
                 </Grid>
             </StackPanel>
 
             <!-- Git operation error message -->
-
             <TextBox Grid.Column="0"
                      Grid.ColumnSpan="3"
                      Grid.Row="2"
                      Foreground="Red" 
-                     Margin="0 0 0 0"
+                     Margin="0 2 0 0"
                      Text="{Binding OperationError, Mode=OneWay}"
                      VerticalAlignment="Center"
                      TextWrapping="Wrap"
@@ -253,16 +227,20 @@
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,5,-8,0"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-8,0">
-            <Grid Margin="0 5 0 0">
+            <Grid Name="bodyGrid" Margin="0 5 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Author and open time -->
-                    <RowDefinition Height="Auto"/> <!-- PR body -->
-                    <RowDefinition Height="Auto"/> <!-- View on github link -->
-                    <RowDefinition Height="Auto"/> <!-- Files changed -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Author and open time -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- PR body -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- View on github link -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Files changed -->
                 </Grid.RowDefinitions>
 
                 <!-- Author and open time -->
@@ -279,14 +257,12 @@
                 </StackPanel>
 
                 <!-- PR Body -->
-                <ui:MarkdownViewer Name="bodyMarkdown"
-                                   Grid.Row="1"
-                                   Margin="2 10 10 6"
-                                   DocumentStyle="{StaticResource DocumentStyle}"
-                                   RawContent="{Binding Body}"
-                                   ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                <markdig:MarkdownViewer Name="bodyMarkdown"
+                                        Grid.Row="1"
+                                        Margin="2 10 10 6"
+                                        Markdown="{Binding Body}"/>
 
-                <!-- View on github link -->
+                <!-- View conversation on GitHub -->
                 <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
@@ -295,70 +271,25 @@
                 <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
+                                   HeaderText="{Binding Model.ChangedFiles.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0">
 
-                    <ui:SectionControl.Buttons>
-                        <ui:OcticonButton Name="changesOptionsMenuButton"
-                                          Background="Transparent"
-                                          BorderThickness="0"
-                                          Icon="three_bars"
-                                          Padding="4"
-                                          ContextMenuService.IsEnabled="False"
-                                          ContextMenuService.Placement="Bottom"
-                                          Click="changesOptionsMenuButton_Click">
-                            <ui:OcticonButton.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
-                                        <MenuItem.Style>
-                                            <Style TargetType="MenuItem">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.OpenFileAsDefaultAction}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.CompareFileAsDefaultAction}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </MenuItem.Style>
-                                    </MenuItem>
-                                    <Separator/>
-                                    <MenuItem Command="{Binding ToggleChangedFilesView}">
-                                        <MenuItem.Style>
-                                            <Style TargetType="MenuItem">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToListView}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToTreeView}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </MenuItem.Style>
-                                        <MenuItem.Icon>
-                                            <ui:OcticonPath Icon="list_unordered" Fill="Black" Height="16"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                </ContextMenu>
-                            </ui:OcticonButton.ContextMenu>
-                        </ui:OcticonButton>
-                    </ui:SectionControl.Buttons>
-                    
                     <ui:SectionControl.Content>
                         <Grid>
                             <Grid.Resources>
                                 <!-- When invoked from the TreeView and the ListView we programmatically bind the 
                                      DataContext and update the CommandParameter to the changed file -->
                                 <ContextMenu x:Key="FileContextMenu">
-                                    <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
-                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding DiffFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewChanges}" Command="{Binding DiffFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewFile}" Command="{Binding ViewFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.ViewChangesInSolution}" Command="{Binding DiffFileWithWorkingDirectory}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.OpenFileInSolution}" Command="{Binding OpenFileInWorkingDirectory}"/>
                                 </ContextMenu>
                             </Grid.Resources>
-                            
+
                             <!-- Tree View -->
-                            <TreeView ItemsSource="{Binding ChangedFilesTree}"
+                            <TreeView Name="changesTree"
+                                      ItemsSource="{Binding ChangedFilesTree}"
                                       ContextMenuOpening="TreeView_ContextMenuOpening"
                                       ContextMenu="{StaticResource FileContextMenu}"
                                       Background="Transparent"
@@ -366,15 +297,6 @@
                                       Margin="0 6 0 0"
                                       MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
-                                <TreeView.Style>
-                                    <Style TargetType="TreeView">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TreeView.Style>
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="IsExpanded" Value="True"/>
@@ -395,7 +317,6 @@
                                             <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
-                                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}" Value="Removed">
                                                                 <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
@@ -427,73 +348,29 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
+                                            <TextBlock VerticalAlignment="Center" Margin="4 0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CommentCount}" Value="0">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                                <ui:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0"/>
+                                                <Hyperlink Click="ViewFileCommentsClick">
+                                                    <Run Text="{Binding CommentCount, Mode=OneWay}"/>
+                                                </Hyperlink>
+                                            </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
                             </TreeView>
-
-                            <!-- List View -->
-                            <ListView ItemsSource="{Binding ChangedFilesList}"
-                                      Background="Transparent"
-                                      BorderThickness="0"
-                                      Foreground="{DynamicResource GitHubVsWindowText}"
-                                      Margin="0 6 0 0"                                      
-                                      ContextMenuOpening="ListView_ContextMenuOpening"
-                                      ContextMenu="{StaticResource FileContextMenu}"
-                                      ItemContainerStyle="{StaticResource FlatListViewItemStyle}"
-                                      MouseDoubleClick="FileListMouseDoubleClick">
-                                <ListView.Style>
-                                    <Style TargetType="ListView">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListView.Style>
-                                <ListView.View>
-                                    <GridView ColumnHeaderContainerStyle="{StaticResource FlatGridViewColumnHeader}">
-                                        <GridViewColumn Header="Name" Width="Auto">
-                                            <GridViewColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <ui:OcticonImage Icon="file_code"/>
-                                                        <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Status}" Value="Removed">
-                                                                            <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
-                                                                            <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                        <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
-                                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </GridViewColumn.CellTemplate>
-                                        </GridViewColumn>
-                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding DisplayPath}"/>
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>
                         </Grid>
                     </ui:SectionControl.Content>
                 </ui:SectionControl>
             </Grid>
         </ScrollViewer>
-
     </DockPanel>
 </local:GenericPullRequestDetailView>

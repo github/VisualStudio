@@ -11,6 +11,12 @@ using GitHub.Primitives;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using GitHub.Extensions;
+using System.Windows.Input;
+using ReactiveUI;
+using GitHub.VisualStudio.UI;
+using GitHub.Settings;
+using System.Windows.Threading;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -19,15 +25,40 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
     public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
+        const string TrainingUrl = "https://services.github.com/on-demand/windows/visual-studio";
+        readonly static Guid welcomeMessageGuid = new Guid(Guids.TeamExplorerWelcomeMessage);
+
+        readonly IVisualStudioBrowser visualStudioBrowser;
+        readonly ITeamExplorerServices teamExplorerServices;
+        readonly IPackageSettings settings;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            ISimpleApiClientFactory apiFactory,
+            ITeamExplorerServiceHolder holder,
+            IVisualStudioBrowser visualStudioBrowser,
+            ITeamExplorerServices teamExplorerServices,
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
             View = new GitHubHomeContent();
             View.DataContext = this;
+            this.visualStudioBrowser = visualStudioBrowser;
+            this.teamExplorerServices = teamExplorerServices;
+            this.settings = settings;
+            this.usageTracker = usageTracker;
+
+            var openOnGitHub = ReactiveCommand.Create();
+            openOnGitHub.Subscribe(_ => DoOpenOnGitHub());
+            OpenOnGitHub = openOnGitHub;
+        }
+
+        bool IsGitToolsMessageVisible()
+        {
+            return teamExplorerServices.IsNotificationVisible(new Guid(Guids.TeamExplorerInstall3rdPartyGitTools));
         }
 
         protected async override void RepoChanged(bool changed)
@@ -44,11 +75,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
+
+                // We want to display a welcome message but only if Team Explorer isn't
+                // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
+                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
+                {
+                    ShowWelcomeMessage();
+                }
+
                 Debug.Assert(SimpleApiClient != null,
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await SimpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
-                IsLoggedIn = IsUserAuthenticated();
+                IsLoggedIn = await IsUserAuthenticated();
+            }
+            else
+            {
+                teamExplorerServices.HideNotification(welcomeMessageGuid);
             }
         }
 
@@ -57,8 +100,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             IsVisible = await IsAGitHubRepo();
             if (IsVisible)
             {
-                IsLoggedIn = IsUserAuthenticated();
+                IsLoggedIn = await IsUserAuthenticated();
             }
+
             base.Refresh();
         }
 
@@ -91,6 +135,40 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             uiProvider.RunInDialog(controller);
 
             notifications.RemoveListener();
+        }
+
+        void DoOpenOnGitHub()
+        {
+            visualStudioBrowser?.OpenUrl(ActiveRepo.CloneUrl.ToRepositoryUrl());
+        }
+
+        void ShowWelcomeMessage()
+        {
+            teamExplorerServices.ShowMessage(
+                Resources.TeamExplorerWelcomeMessage,
+                new RelayCommand(o =>
+                {
+                    var str = o.ToString();
+
+                    switch (str)
+                    {
+                        case "show-training":
+                            visualStudioBrowser.OpenUrl(new Uri(TrainingUrl));
+                            usageTracker.IncrementWelcomeTrainingClicks().Forget();
+                            break;
+                        case "show-docs":
+                            visualStudioBrowser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                            usageTracker.IncrementWelcomeDocsClicks().Forget();
+                            break;
+                        case "dont-show-again":
+                            teamExplorerServices.HideNotification(welcomeMessageGuid);
+                            settings.HideTeamExplorerWelcomeMessage = true;
+                            settings.Save();
+                            break;
+                    }
+                }),
+                false,
+                welcomeMessageGuid);
         }
 
         protected GitHubHomeContent View
@@ -126,5 +204,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             get { return isLoggedIn; }
             set { isLoggedIn = value; this.RaisePropertyChange(); }
         }
+
+        public ICommand OpenOnGitHub { get; }
     }
 }

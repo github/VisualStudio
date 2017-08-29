@@ -1,18 +1,18 @@
 ﻿using System;
 using GitHub.Validation;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface ITwoFactorDialogViewModel : IReactiveViewModel
+    public interface ITwoFactorDialogViewModel : IDialogViewModel
     {
         ReactiveCommand<object> OkCommand { get; }
         ReactiveCommand<object> NavigateLearnMore { get; }
         ReactiveCommand<object> ResendCodeCommand { get; }
 
-        IObservable<RecoveryOptionResult> Show(UserError error);
+        IObservable<TwoFactorChallengeResult> Show(UserError error);
 
-        bool IsBusy { get; }
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }
         bool ShowErrorMessage { get; }

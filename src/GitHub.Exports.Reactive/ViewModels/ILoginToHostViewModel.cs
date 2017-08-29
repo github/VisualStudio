@@ -64,5 +64,10 @@ namespace GitHub.ViewModels
         /// a GitHub.com lost password flow.
         /// </summary>
         IRecoveryCommand NavigateForgotPassword { get; }
+
+        /// <summary>
+        /// Gets an error to display to the user.
+        /// </summary>
+        UserError Error { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GitHub.UI;
+﻿using System.Windows.Input;
+using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -24,6 +25,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         /// </summary>
         bool IsLoggedIn { get; }
         
+        /// <summary>
+        /// Gets a command which opens the repository on GitHub when executed.
+        /// </summary>
+        ICommand OpenOnGitHub { get; }
+
         /// <summary>
         /// Start the login flow.
         /// </summary>

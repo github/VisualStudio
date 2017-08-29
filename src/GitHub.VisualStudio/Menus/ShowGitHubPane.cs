@@ -1,21 +1,21 @@
-﻿using GitHub.VisualStudio.UI;
-using NullGuard;
-using System;
+﻿using System;
+using GitHub.Extensions;
 using GitHub.Services;
 
 namespace GitHub.VisualStudio.Menus
 {
-    public class ShowGitHubPane: MenuBase, IMenuHandler
+    public class ShowGitHubPane : MenuBase, IMenuHandler
     {
         public ShowGitHubPane(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidGitHubCmdSet;
+        public Guid Guid => Guids.guidGitHubCmdSet;
         public int CmdId => PkgCmdIDList.showGitHubPaneCommand;
 
-        public void Activate([AllowNull]object data = null)
+        public void Activate(object data = null)
         {
             ServiceProvider.TryGetService<IGitHubToolWindowManager>()?.ShowHomePane();
         }

@@ -26,19 +26,11 @@ public class LoginToGitHubViewModelTests
                 .Returns(_ => Observable.Throw<AuthenticationResult>(new ForbiddenException(response)));
             var browser = Substitute.For<IVisualStudioBrowser>();
             var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
-            var message = "";
 
-            using (UserError.RegisterHandler<UserError>(x =>
-                {
-                    message = x.ErrorMessage;
-                    return Observable.Return(RecoveryOptionResult.RetryOperation);
-                }))
-            {
-                loginViewModel.Login.Execute(null);
-            }
+            loginViewModel.Login.Execute(null);
 
             Assert.Equal("Make sure to use your password and not a Personal Access token to sign in.",
-                message);
+                loginViewModel.Error.ErrorMessage);
         }
     }
 

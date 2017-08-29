@@ -9,7 +9,6 @@ using System.Security.Cryptography;
 using System.Text;
 using GitHub.Primitives;
 using NLog;
-using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
@@ -43,12 +42,15 @@ namespace GitHub.Api
 
         public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
-            Configure();
+            ClientId = ApiClientConfiguration.ClientId;
+            ClientSecret = ApiClientConfiguration.ClientSecret;
             HostAddress = hostAddress;
             this.gitHubClient = gitHubClient;
         }
 
         partial void Configure();
+
+        public IGitHubClient GitHubClient => new GitHubClient(gitHubClient.Connection);
 
         public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
         {
@@ -57,6 +59,36 @@ namespace GitHub.Api
             var client = gitHubClient.Repository;
 
             return (isUser ? client.Create(repository) : client.Create(login, repository));
+        }
+
+        public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body,
+            string commitId,
+            string path,
+            int position)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+            Guard.ArgumentNotEmptyString(body, nameof(body));
+            Guard.ArgumentNotEmptyString(commitId, nameof(commitId));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
+            var comment = new PullRequestReviewCommentCreate(body, commitId, path, position);
+            return gitHubClient.PullRequest.ReviewComment.Create(owner, name, number, comment);
+        }
+
+        public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body,
+            int inReplyTo)
+        {
+            var comment = new PullRequestReviewCommentReplyCreate(body, inReplyTo);
+            return gitHubClient.PullRequest.ReviewComment.CreateReply(owner, name, number, comment);
         }
 
         public IObservable<Gist> CreateGist(NewGist newGist)
@@ -163,6 +195,8 @@ namespace GitHub.Api
 
         static string GetSha256Hash(string input)
         {
+            Guard.ArgumentNotEmptyString(input, nameof(input));
+
             try
             {
                 using (var sha256 = SHA256.Create())
@@ -228,26 +262,55 @@ namespace GitHub.Api
 
         public IObservable<Repository> GetRepositoriesForOrganization(string organization)
         {
+            Guard.ArgumentNotEmptyString(organization, nameof(organization));
+
             return gitHubClient.Repository.GetAllForOrg(organization);
         }
 
-        public IObservable<Unit> DeleteApplicationAuthorization(int id, [AllowNull]string twoFactorAuthorizationCode)
+        public IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode)
         {
+            Guard.ArgumentNotEmptyString(twoFactorAuthorizationCode, nameof(twoFactorAuthorizationCode));
+
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
+        }
+
+        public IObservable<IssueComment> GetIssueComments(string owner, string name, int number)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
+            return gitHubClient.Issue.Comment.GetAllForIssue(owner, name, number);
         }
 
         public IObservable<PullRequest> GetPullRequest(string owner, string name, int number)
         {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
             return gitHubClient.PullRequest.Get(owner, name, number);
         }
 
         public IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number)
         {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
             return gitHubClient.PullRequest.Files(owner, name, number);
+        }
+
+        public IObservable<PullRequestReviewComment> GetPullRequestReviewComments(string owner, string name, int number)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
+            return gitHubClient.PullRequest.ReviewComment.GetAll(owner, name, number);
         }
 
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
         {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
                 new PullRequestRequest {
                     State = ItemStateFilter.All,
@@ -258,6 +321,10 @@ namespace GitHub.Api
 
         public IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo)
         {
+            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(repo, nameof(repo));
+
             return gitHubClient.PullRequest.Create(owner, repo, pullRequest);
         }
 
@@ -268,6 +335,9 @@ namespace GitHub.Api
 
         public IObservable<Branch> GetBranches(string owner, string repo)
         {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(repo, nameof(repo));
+
 #pragma warning disable CS0618
             // GetAllBranches is obsolete, but don't want to introduce the change to fix the
             // warning in the PR, so disabling for now.
@@ -277,11 +347,19 @@ namespace GitHub.Api
 
         public IObservable<Repository> GetRepository(string owner, string repo)
         {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(repo, nameof(repo));
+
             return gitHubClient.Repository.Get(owner, repo);
         }
 
         public IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path)
         {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+            Guard.ArgumentNotEmptyString(reference, nameof(reference));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
             return gitHubClient.Repository.Content.GetAllContentsByRef(owner, name, reference, path);
         }
     }

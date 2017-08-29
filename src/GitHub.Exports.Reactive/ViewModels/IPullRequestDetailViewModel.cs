@@ -1,43 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    /// <summary>
-    /// Describes how changed files are displayed in a the pull request details view.
-    /// </summary>
-    public enum ChangedFilesViewType
-    {
-        /// <summary>
-        /// The files are displayed as a tree.
-        /// </summary>
-        TreeView,
-
-        /// <summary>
-        /// The files are displayed as a flat list.
-        /// </summary>
-        ListView,
-    }
-
-    /// <summary>
-    /// Describes how files are opened in a the pull request details view.
-    /// </summary>
-    public enum OpenChangedFileAction
-    {
-        /// <summary>
-        /// Opening the file opens a diff.
-        /// </summary>
-        Diff,
-
-        /// <summary>
-        /// Opening the file opens the file in a text editor.
-        /// </summary>
-        Open
-    }
-
     /// <summary>
     /// Holds immutable state relating to the <see cref="IPullRequestDetailViewModel.Checkout"/> command.
     /// </summary>
@@ -94,12 +65,31 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a view model for displaying details of a pull request.
     /// </summary>
-    public interface IPullRequestDetailViewModel : IViewModel, IHasBusy
+    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy, IHasErrorState
     {
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
         IPullRequestModel Model { get; }
+
+        /// <summary>
+        /// Gets the session for the pull request.
+        /// </summary>
+        IPullRequestSession Session { get; }
+
+        /// <summary>
+        /// Gets the local repository.
+        /// </summary>
+        ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
+        /// Gets the remote repository that contains the pull request.
+        /// </summary>
+        /// <remarks>
+        /// The remote repository may be different from the local repository if the local
+        /// repository is a fork and the user is viewing pull requests from the parent repository.
+        /// </remarks>
+        IRemoteRepositoryModel RemoteRepository { get; }
 
         /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
@@ -112,6 +102,16 @@ namespace GitHub.ViewModels
         string TargetBranchDisplayName { get; }
 
         /// <summary>
+        /// Gets the number of comments made on the pull request.
+        /// </summary>
+        int CommentCount { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request branch is checked out.
+        /// </summary>
+        bool IsCheckedOut { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the pull request comes from a fork.
         /// </summary>
         bool IsFromFork { get; }
@@ -122,24 +122,9 @@ namespace GitHub.ViewModels
         string Body { get; }
 
         /// <summary>
-        /// Gets or sets a value describing how changed files are displayed in a view.
-        /// </summary>
-        ChangedFilesViewType ChangedFilesViewType { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value describing how files are opened when double clicked.
-        /// </summary>
-        OpenChangedFileAction OpenChangedFileAction { get; set; }
-
-        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
-        IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
-
-        /// <summary>
-        /// Gets the changed files as a flat list.
-        /// </summary>
-        IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
+        IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }
 
         /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
@@ -177,37 +162,41 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that toggles the <see cref="ChangedFilesViewType"/> property.
-        /// </summary>
-        ReactiveCommand<object> ToggleChangedFilesView { get; }
-
-        /// <summary>
-        /// Gets a command that toggles the <see cref="OpenChangedFileAction"/> property.
-        /// </summary>
-        ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
-
-        /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
-        /// </summary>
-        ReactiveCommand<object> OpenFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
 
         /// <summary>
-        /// Gets the specified file as it appears in the pull request.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
+        /// the working directory and HEAD.
         /// </summary>
-        /// <param name="file">The file or directory node.</param>
-        /// <returns>The path to the extracted file.</returns>
-        Task<string> ExtractFile(IPullRequestFileNode file);
+        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
 
         /// <summary>
-        /// Gets the before and after files needed for viewing a diff.
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
+        /// </summary>
+        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
+        /// </summary>
+        ReactiveCommand<object> ViewFile { get; }
+
+        /// <summary>
+        /// Gets a file as it appears in the pull request.
         /// </summary>
         /// <param name="file">The changed file.</param>
-        /// <returns>A tuple containing the full path to the before and after files.</returns>
-        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
+        /// <param name="head">
+        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
+        /// </param>
+        /// <returns>The path to a temporary file.</returns>
+        Task<string> ExtractFile(IPullRequestFileNode file, bool head);
+
+        /// <summary>
+        /// Gets the full path to a file in the working directory.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>The full path to the file in the working directory.</returns>
+        string GetLocalFilePath(IPullRequestFileNode file);
     }
 }

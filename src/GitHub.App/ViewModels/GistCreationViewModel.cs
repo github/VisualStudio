@@ -1,15 +1,16 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using NLog;
-using NullGuard;
 using Octokit;
 using ReactiveUI;
 
@@ -17,7 +18,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Gist)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
+    public class GistCreationViewModel : DialogViewModelBase, IGistCreationViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
@@ -36,6 +37,12 @@ namespace GitHub.ViewModels
             IUsageTracker usageTracker)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService, usageTracker)
         {
+            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
+            Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
+            Guard.ArgumentNotNull(notificationService, nameof(notificationService));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.notificationService = notificationService;
         }
 
@@ -45,6 +52,11 @@ namespace GitHub.ViewModels
             IGistPublishService gistPublishService,
             IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
+            Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             Title = Resources.CreateGistTitle;
             apiClient = repositoryHost.ApiClient;
             this.gistPublishService = gistPublishService;
@@ -95,7 +107,6 @@ namespace GitHub.ViewModels
 
         public IAccount Account
         {
-            [return: AllowNull]
             get { return account.Value; }
         }
 
@@ -107,30 +118,26 @@ namespace GitHub.ViewModels
         }
 
         string description;
-        [AllowNull]
         public string Description
         {
-            [return: AllowNull]
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
 
         string selectedText;
-        [AllowNull]
         public string SelectedText
         {
-            [return: AllowNull]
             get { return selectedText; }
             set { this.RaiseAndSetIfChanged(ref selectedText, value); }
         } 
 
         string fileName;
-        [AllowNull]
         public string FileName
         {
-            [return: AllowNull]
             get { return fileName; }
             set { this.RaiseAndSetIfChanged(ref fileName, value); }
         }
+
+        public override IObservable<Unit> Done => CreateGist.Where(x => x != null).SelectUnit();
     }
 }

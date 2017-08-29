@@ -7,11 +7,10 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
+using System.Diagnostics;
 
 namespace GitHub.Controllers
 {
-    [NullGuard(ValidationFlags.None)]
     public class NavigationController : NotificationAwareObject, IDisposable, IHasBusy
     {
         readonly List<IUIController> history = new List<IUIController>();
@@ -66,7 +65,14 @@ namespace GitHub.Controllers
             switch (data.MainFlow)
             {
                 case UIControllerFlow.PullRequestCreation:
-                    CreateView(connection, data, onViewLoad);
+                    if (data.Data == null && Current?.SelectedFlow == UIControllerFlow.PullRequestCreation)
+                    {
+                        Reload();
+                    }
+                    else
+                    {
+                        CreateView(connection, data, onViewLoad);
+                    }
                     break;
 
                 case UIControllerFlow.PullRequestDetail:
@@ -122,10 +128,10 @@ namespace GitHub.Controllers
                 {
                     disposablesForCurrentView?.Clear();
 
-                    var action = view as ICanLoad;
+                    var action = view.ViewModel as ICanNavigate;
                     if (action != null)
                     {
-                        disposablesForCurrentView.Add(action?.Load.Subscribe(d =>
+                        disposablesForCurrentView.Add(action?.Navigate.Subscribe(d =>
                         {
                             LoadView(connection, d, onViewLoad);
                         }));

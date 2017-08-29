@@ -1,9 +1,14 @@
 ﻿<SolutionConfiguration>
   <Settings>
+    <AdditionalFilesForGridProcessing>
+      <Value>packages\Fody.1.29.4\**.*</Value>
+      <Value>packages\EntryExitDecorator.Fody.0.3.0\**.*</Value>
+    </AdditionalFilesForGridProcessing>
     <AdditionalFilesToIncludeForSolution>
       <Value>lib\**.*</Value>
     </AdditionalFilesToIncludeForSolution>
     <AllowParallelTestExecution>False</AllowParallelTestExecution>
+    <ProjectConfigStoragePathRelativeToSolutionDir>.ncrunch</ProjectConfigStoragePathRelativeToSolutionDir>
     <SolutionConfigured>True</SolutionConfigured>
   </Settings>
 </SolutionConfiguration>

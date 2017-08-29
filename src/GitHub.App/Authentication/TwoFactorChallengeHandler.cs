@@ -4,37 +4,53 @@ using System.Reactive.Linq;
 using GitHub.ViewModels;
 using Octokit;
 using ReactiveUI;
-using NullGuard;
+using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Helpers;
+using GitHub.Extensions;
 
 namespace GitHub.Authentication
 {
     [Export(typeof(ITwoFactorChallengeHandler))]
+    [Export(typeof(IDelegatingTwoFactorChallengeHandler))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorChallengeHandler : ReactiveObject, ITwoFactorChallengeHandler
+    public class TwoFactorChallengeHandler : ReactiveObject, IDelegatingTwoFactorChallengeHandler
     {
         ITwoFactorDialogViewModel twoFactorDialog;
-        [AllowNull]
         public IViewModel CurrentViewModel
         {
-            [return:AllowNull]
             get { return twoFactorDialog; }
             private set { this.RaiseAndSetIfChanged(ref twoFactorDialog, (ITwoFactorDialogViewModel)value); }
         }
 
-        public void SetViewModel([AllowNull]IViewModel vm)
+        public void SetViewModel(IViewModel vm)
         {
             CurrentViewModel = vm;
         }
 
-        public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
+        public async Task<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
         {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
             var userError = new TwoFactorRequiredUserError(exception);
-            return twoFactorDialog.Show(userError)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .SelectMany(x =>
-                    x == RecoveryOptionResult.RetryOperation
-                        ? Observable.Return(userError.ChallengeResult)
-                        : Observable.Throw<TwoFactorChallengeResult>(exception));
+            var result = await twoFactorDialog.Show(userError);
+
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                throw exception;
+            }
+        }
+
+        public async Task ChallengeFailed(Exception exception)
+        {
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            await twoFactorDialog.Cancel.ExecuteAsync(null);
         }
     }
 }

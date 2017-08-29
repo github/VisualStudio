@@ -1,0 +1,98 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:GitHub.UI"
+                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                    xmlns:c="clr-namespace:GitHub.UI.Controls;assembly=GitHub.UI">
+    
+    <!-- The control template for ViewBase when HasBusyState == false -->
+    <ControlTemplate x:Key="ViewBaseDefaultTemplate" TargetType="{x:Type local:ViewBase}">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}"
+                SnapsToDevicePixels="true">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+        </Border>
+    </ControlTemplate>
+
+    <!-- The control template for ViewBase when HasBusyState == true -->
+    <ControlTemplate x:Key="ViewBaseBusyStateTemplate" TargetType="{x:Type local:ViewBase}">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}"
+                SnapsToDevicePixels="true">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <ui:GitHubProgressBar Foreground="{DynamicResource GitHubAccentBrush}"
+                                      IsIndeterminate="True"
+                                      Style="{DynamicResource GitHubProgressBar}">
+                    <ui:GitHubProgressBar.Visibility>
+                        <MultiBinding Converter="{ui:MultiBooleanToVisibilityConverter}">
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsBusy"/>
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ShowBusyState"/>
+                        </MultiBinding>
+                    </ui:GitHubProgressBar.Visibility>
+                </ui:GitHubProgressBar>
+
+                <c:Spinner Name="spinner" 
+                           Grid.Row="1"
+                           Width="48"
+                           Height="48"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                    <c:Spinner.Visibility>
+                        <MultiBinding Converter="{ui:MultiBooleanToVisibilityConverter}">
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsLoading"/>
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ShowBusyState"/>
+                        </MultiBinding>
+                    </c:Spinner.Visibility>
+                </c:Spinner>
+                
+                <ContentPresenter Grid.Row="1"
+                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                  Visibility="{TemplateBinding ShowContent, Converter={ui:BooleanToVisibilityConverter}}"/>
+
+                <Border Grid.RowSpan="2"
+                        Background="{TemplateBinding Background}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ui:OcticonImage Icon="alert" Width="32" Height="32" Margin="8"/>
+                        <TextBlock Text="{Binding ErrorMessage}" TextAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
+    <!-- Applies the control template for ViewBase depending on HasBusyState -->
+    <Style TargetType="local:ViewBase">
+        <Style.Triggers>
+            <Trigger Property="HasState" Value="False">
+                <Setter Property="Template" Value="{StaticResource ViewBaseDefaultTemplate}"/>
+            </Trigger>
+            <Trigger Property="HasState" Value="True">
+                <Setter Property="Template" Value="{StaticResource ViewBaseBusyStateTemplate}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

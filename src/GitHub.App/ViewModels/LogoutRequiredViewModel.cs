@@ -10,16 +10,17 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using NLog;
-using NullGuard;
 using ReactiveUI;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.LogoutRequired)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LogoutRequiredViewModel : BaseViewModel, ILogoutRequiredViewModel
+    public class LogoutRequiredViewModel : DialogViewModelBase, ILogoutRequiredViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IRepositoryHosts repositoryHosts;
@@ -28,6 +29,9 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public LogoutRequiredViewModel(IRepositoryHosts repositoryHosts, INotificationService notificationService)
         {
+            Guard.ArgumentNotNull(repositoryHosts, nameof(repositoryHosts));
+            Guard.ArgumentNotNull(notificationService, nameof(notificationService));
+
             this.repositoryHosts = repositoryHosts;
             this.notificationService = notificationService;
 
@@ -36,7 +40,7 @@ namespace GitHub.ViewModels
             Icon = Octicon.mark_github;
         }
 
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
             if (data.MainFlow == UIControllerFlow.Gist)
             {
@@ -52,6 +56,11 @@ namespace GitHub.ViewModels
         }
 
         public IReactiveCommand<ProgressState> Logout { get; }
+
+        public override IObservable<Unit> Done
+        {
+            get { return Logout.Where(x => x == ProgressState.Success).SelectUnit(); }
+        }
 
         IObservable<ProgressState> OnLogout(object unused)
         {
@@ -85,7 +94,6 @@ namespace GitHub.ViewModels
         string logoutRequiredMessage;
         public string LogoutRequiredMessage
         {
-            [return: AllowNull]
             get { return logoutRequiredMessage; }
             set { this.RaiseAndSetIfChanged(ref logoutRequiredMessage, value); }
         }
