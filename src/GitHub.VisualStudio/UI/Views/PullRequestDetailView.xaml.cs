@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Globalization;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Commands;
