@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -17,8 +16,7 @@ namespace GitHub.InlineReviews.Services
     [Export(typeof(IPullRequestStatusManager))]
     public class PullRequestStatusManager : IPullRequestStatusManager
     {
-        const string SccStatusBarName = "SccStatusBar";
-        const string GitHubStatusName = "GitHubStatusView";
+        const string StatusBarPartName = "PART_SccStatusBarHost";
 
         readonly Window mainWindow;
         readonly IPullRequestSessionManager pullRequestSessionManager;
@@ -45,16 +43,15 @@ namespace GitHub.InlineReviews.Services
             var statusBar = FindSccStatusBar();
             if (statusBar != null)
             {
-                var githubStatusBar = FindPullRequestStatusView(statusBar);
-
-                // HACK: Insert every time to ensure that status shows up.
+                var githubStatusBar = Find<PullRequestStatusView>(statusBar);
                 if (githubStatusBar != null)
                 {
+                    // Replace to ensure status shows up.
                     statusBar.Items.Remove(githubStatusBar);
                 }
 
-                var view = new PullRequestStatusView { Name = GitHubStatusName, DataContext = pullRequestStatusViewModel };
-                statusBar.Items.Insert(0, view);
+                githubStatusBar = new PullRequestStatusView { DataContext = pullRequestStatusViewModel };
+                statusBar.Items.Insert(0, githubStatusBar);
             }
         }
 
@@ -63,7 +60,7 @@ namespace GitHub.InlineReviews.Services
             var statusBar = FindSccStatusBar();
             if (statusBar != null)
             {
-                var githubStatusBar = FindPullRequestStatusView(statusBar);
+                var githubStatusBar = Find<PullRequestStatusView>(statusBar);
                 if (githubStatusBar != null)
                 {
                     statusBar.Items.Remove(githubStatusBar);
@@ -92,58 +89,23 @@ namespace GitHub.InlineReviews.Services
             pullRequestStatusViewModel.Title = pullRequest?.Title;
         }
 
-        static UserControl FindPullRequestStatusView(StatusBar statusBar)
+        static T Find<T>(StatusBar statusBar)
         {
-            return FindChild<UserControl>(statusBar, GitHubStatusName);
+            foreach (var item in statusBar.Items)
+            {
+                if (item is T)
+                {
+                    return (T)item;
+                }
+            }
+
+            return default(T);
         }
 
         StatusBar FindSccStatusBar()
         {
-            return FindChild<StatusBar>(mainWindow, SccStatusBarName);
-        }
-
-        // https://stackoverflow.com/questions/636383/how-can-i-find-wpf-controls-by-name-or-type
-        static T FindChild<T>(DependencyObject parent, string childName) where T : DependencyObject
-        {
-            // Confirm parent and childName are valid. 
-            if (parent == null) return null;
-
-            T foundChild = null;
-
-            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < childrenCount; i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i);
-                // If the child is not of the request child type child
-                T childType = child as T;
-                if (childType == null)
-                {
-                    // recursively drill down the tree
-                    foundChild = FindChild<T>(child, childName);
-
-                    // If the child is found, break so we do not overwrite the found child. 
-                    if (foundChild != null) break;
-                }
-                else if (!string.IsNullOrEmpty(childName))
-                {
-                    var frameworkElement = child as FrameworkElement;
-                    // If the child's name is set for search
-                    if (frameworkElement != null && frameworkElement.Name == childName)
-                    {
-                        // if the child's name is of the request name
-                        foundChild = (T)child;
-                        break;
-                    }
-                }
-                else
-                {
-                    // child element found.
-                    foundChild = (T)child;
-                    break;
-                }
-            }
-
-            return foundChild;
+            var contentControl = mainWindow?.Template?.FindName(StatusBarPartName, mainWindow) as ContentControl;
+            return contentControl?.Content as StatusBar;
         }
 
         class RaiseVsCommand : ICommand
