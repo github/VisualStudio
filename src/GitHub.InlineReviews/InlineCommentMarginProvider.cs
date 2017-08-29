@@ -33,7 +33,6 @@ namespace GitHub.InlineReviews
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IPackageSettings packageSettings;
-        readonly IPullRequestStatusManager pullRequestStatusManager;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
@@ -41,22 +40,17 @@ namespace GitHub.InlineReviews
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
-            IPackageSettings packageSettings,
-            IPullRequestStatusManager pullRequestStatusManager)
+            IPackageSettings packageSettings)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.packageSettings = packageSettings;
-            this.pullRequestStatusManager = pullRequestStatusManager;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
-            // HACK: When should we show the PR status?
-            pullRequestStatusManager.ShowStatus();
-
             if (IsMarginDisabled(wpfTextViewHost))
             {
                 return null;
