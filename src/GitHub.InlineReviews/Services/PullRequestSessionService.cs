@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
+using NLog;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -115,7 +116,7 @@ namespace GitHub.InlineReviews.Services
             var key = new Tuple<string, string>(baseSha, headSha);
 
             string mergeBase;
-            if(mergeBaseCache.TryGetValue(key, out mergeBase))
+            if (mergeBaseCache.TryGetValue(key, out mergeBase))
             {
                 return mergeBase;
             }
@@ -123,21 +124,24 @@ namespace GitHub.InlineReviews.Services
             var repo = await GetRepository(repository);
             var baseUrl = pullRequest.Base.RepositoryCloneUrl;
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
-            var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
             var headRef = pullRequest.Head.Ref;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
-            if (mergeBase != null)
+            try
             {
-                return mergeBaseCache[key] = mergeBase;
+                mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
             }
 
-            throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+            return mergeBaseCache[key] = mergeBase;
         }
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -145,12 +149,12 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 commitId,
@@ -176,18 +180,19 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
             int inReplyTo)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 inReplyTo);

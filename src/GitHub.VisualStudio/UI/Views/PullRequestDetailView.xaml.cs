@@ -26,6 +26,7 @@ using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Text;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -87,7 +88,7 @@ namespace GitHub.VisualStudio.UI.Views
                 var fullPath = ViewModel.GetLocalFilePath(file);
                 var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true);
 
-                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                using (workingDirectory ? null : OpenInProvisionalTab())
                 {
                     var window = Services.Dte.ItemOperations.OpenFile(fileName);
                     window.Document.ReadOnly = !workingDirectory;
@@ -127,7 +128,7 @@ namespace GitHub.VisualStudio.UI.Views
                 }
 
                 IVsWindowFrame frame;
-                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                using (OpenInProvisionalTab())
                 {
                     var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
 
@@ -168,6 +169,16 @@ namespace GitHub.VisualStudio.UI.Views
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
                 () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    AddBufferTag(source, session, path, isLeftBuffer);
+                }
+            }
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
@@ -314,6 +325,13 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 VisualStudioBrowser.OpenUrl(uri);
             }
+        }
+
+        static IDisposable OpenInProvisionalTab()
+        {
+            return new NewDocumentStateScope
+                (__VSNEWDOCUMENTSTATE.NDS_Provisional,
+                VSConstants.NewDocumentStateReason.SolutionExplorer);
         }
     }
 }

@@ -82,8 +82,6 @@ namespace GitHub.Models
 
         public static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
         {
-            int j = 0;
-
             if (target.Count == 0)
             {
                 return null; // no lines to match
@@ -91,18 +89,21 @@ namespace GitHub.Models
 
             foreach (var source in diff)
             {
+                var matches = 0;
                 for (var i = source.Lines.Count - 1; i >= 0; --i)
                 {
-                    if (source.Lines[i].Content == target[j].Content)
+                    if (source.Lines[i].Content == target[matches].Content)
                     {
-                        if (++j == target.Count || i == 0)
+                        matches++;
+                        if (matches == target.Count || i == 0)
                         {
-                            return source.Lines[i + j - 1];
+                            return source.Lines[i + matches - 1];
                         }
                     }
                     else
                     {
-                        j = 0;
+                        i += matches;
+                        matches = 0;
                     }
                 }
             }
