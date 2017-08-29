@@ -326,9 +326,6 @@
     <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
       <DependentUpon>GistCreationControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\LogoutRequiredControl.xaml.cs">
-      <DependentUpon>LogoutRequiredControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
@@ -474,10 +471,6 @@
     <Page Include="UI\Views\Controls\GistCreationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\LogoutRequiredControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\StartPageCloneView.xaml">
       <Generator>MSBuild:Compile</Generator>

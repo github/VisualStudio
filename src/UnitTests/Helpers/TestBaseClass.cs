@@ -24,11 +24,6 @@ public class TestBaseClass : IEntryExitDecorator
     {
     }
 
-    protected static UserAndScopes CreateUserAndScopes(string login, string[] scopes = null)
-    {
-        return new UserAndScopes(CreateOctokitUser(login), scopes);
-    }
-
     protected static User CreateOctokitUser(string login = "login", string url = "https://url")
     {
         return new User("https://url", "bio", "blog", 1, "GitHub",
