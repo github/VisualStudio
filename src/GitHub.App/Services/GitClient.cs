@@ -98,7 +98,7 @@ namespace GitHub.Services
                     var remote = repository.Network.Remotes[remoteName];
                     repository.Network.Fetch(remote, refspecs, fetchOptions);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     log.Error("Failed to fetch", ex);
 #if DEBUG
@@ -394,7 +394,7 @@ namespace GitHub.Services
                 baseCommit = repo.Lookup<Commit>(baseSha);
                 if (baseCommit == null)
                 {
-                    return null;
+                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {baseCloneUrl}:{baseRef}.");
                 }
             }
 
@@ -405,14 +405,14 @@ namespace GitHub.Services
                 headCommit = repo.Lookup<Commit>(headSha);
                 if (headCommit == null)
                 {
-                    return null;
+                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {headCloneUrl}:{headRef}.");
                 }
             }
 
             var mergeBaseCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, headCommit);
-            if(mergeBaseCommit == null)
+            if (mergeBaseCommit == null)
             {
-                return null;
+                throw new NotFoundException($"Couldn't find merge base between {baseCommit} and {headCommit}.");
             }
 
             return mergeBaseCommit.Sha;

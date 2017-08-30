@@ -54,7 +54,7 @@ public class GitClientTests
 
             await gitClient.Push(repository, "master", "origin");
 
-            repository.Network.Received().Push(origin,"HEAD", @"refs/heads/master", Arg.Any<PushOptions>());
+            repository.Network.Received().Push(origin, "HEAD", @"refs/heads/master", Arg.Any<PushOptions>());
         }
 
         [Fact]
@@ -194,7 +194,11 @@ public class GitClientTests
             repo.Network.Remotes.Add(null, null).ReturnsForAnyArgs(remote);
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            await gitClient.GetPullRequestMergeBase(repo, baseUri, headUri, baseSha, headSha, baseRef, headRef);
+            try
+            {
+                await gitClient.GetPullRequestMergeBase(repo, baseUri, headUri, baseSha, headSha, baseRef, headRef);
+            }
+            catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
             repo.Network.Received(receivedFetch).Fetch(Arg.Any<Remote>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
         }
@@ -210,7 +214,11 @@ public class GitClientTests
             var headUrl = new UriString("https://github.com/owner/repo");
             var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
 
-            await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            try
+            {
+                await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+            }
+            catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
             repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<IEnumerable<string>>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
         }

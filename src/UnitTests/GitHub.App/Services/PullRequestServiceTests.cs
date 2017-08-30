@@ -54,7 +54,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Fact]
-        public async void MergeBaseNotAvailable_ThrowsFileNotFoundException()
+        public async void MergeBaseNotAvailable_ThrowsNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
@@ -64,11 +64,10 @@ public class PullRequestServiceTests : TestBaseClass
             var headSha = "headSha";
             var mergeBaseSha = null as string;
             var head = false;
-            var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
+            var mergeBaseException = new NotFoundException();
 
             var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                                fileName, head, Encoding.UTF8));
-            Assert.Equal(expectMessage, ex.Message);
+                                fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
         }
 
         [Fact]
@@ -150,7 +149,8 @@ public class PullRequestServiceTests : TestBaseClass
 
         static async Task<string> ExtractFile(
             string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
-            string fileName, bool head, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef")
+            string fileName, bool head, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef",
+            Exception mergeBaseException = null)
         {
             var repositoryModel = Substitute.For<ILocalRepositoryModel>();
             repositoryModel.LocalPath.Returns(repoDir);
@@ -166,7 +166,15 @@ public class PullRequestServiceTests : TestBaseClass
             var gitService = serviceProvider.GetGitService();
             var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
-            gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+            if (mergeBaseException == null)
+            {
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+            }
+            else
+            {
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
+            }
+
             gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
@@ -561,7 +569,7 @@ public class PullRequestServiceTests : TestBaseClass
         var branches = MockBranches("pr/123-foo1", "pr/123-foo1-2");
         repository.Branches.Returns(branches);
 
-        var result = Substitute.For<IGitService>();        
+        var result = Substitute.For<IGitService>();
         result.GetRepository(Arg.Any<string>()).Returns(repository);
         return result;
     }

@@ -213,7 +213,6 @@
     <Compile Include="ViewModels\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\NotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\LoggedOutViewModel.cs" />
-    <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDirectoryNode.cs" />
