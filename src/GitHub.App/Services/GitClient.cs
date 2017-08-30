@@ -380,6 +380,45 @@ namespace GitHub.Services
         }
 
         public async Task<string> GetPullRequestMergeBase(IRepository repo,
+            UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber)
+        {
+            Guard.ArgumentNotNull(repo, nameof(repo));
+            Guard.ArgumentNotNull(targetCloneUrl, nameof(targetCloneUrl));
+            Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
+
+            var baseCommit = repo.Lookup<Commit>(baseSha);
+            if (baseCommit == null)
+            {
+                await Fetch(repo, targetCloneUrl, baseRef);
+                baseCommit = repo.Lookup<Commit>(baseSha);
+                if (baseCommit == null)
+                {
+                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {targetCloneUrl}:{baseRef}.");
+                }
+            }
+
+            var headCommit = repo.Lookup<Commit>(headSha);
+            if (headCommit == null)
+            {
+                var headRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, targetCloneUrl, headRef);
+                headCommit = repo.Lookup<Commit>(headSha);
+                if (headCommit == null)
+                {
+                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {targetCloneUrl}:{headRef}.");
+                }
+            }
+
+            var mergeBaseCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, headCommit);
+            if (mergeBaseCommit == null)
+            {
+                throw new NotFoundException($"Couldn't find merge base between {baseCommit} and {headCommit}.");
+            }
+
+            return mergeBaseCommit.Sha;
+        }
+
+        public async Task<string> GetPullRequestMergeBase(IRepository repo,
             UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
         {
             Guard.ArgumentNotNull(repo, nameof(repo));

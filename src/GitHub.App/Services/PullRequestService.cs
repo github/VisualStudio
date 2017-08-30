@@ -313,11 +313,10 @@ namespace GitHub.Services
                         sha = await gitClient.GetPullRequestMergeBase(
                             repo,
                             pullRequest.Base.RepositoryCloneUrl,
-                            pullRequest.Head.RepositoryCloneUrl,
                             pullRequest.Base.Sha,
                             pullRequest.Head.Sha,
                             pullRequest.Base.Ref,
-                            pullRequest.Head.Ref);
+                            pullRequest.Number);
                     }
                     catch (NotFoundException ex)
                     {
