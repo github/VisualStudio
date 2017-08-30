@@ -386,17 +386,6 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(targetCloneUrl, nameof(targetCloneUrl));
             Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
 
-            var baseCommit = repo.Lookup<Commit>(baseSha);
-            if (baseCommit == null)
-            {
-                await Fetch(repo, targetCloneUrl, baseRef);
-                baseCommit = repo.Lookup<Commit>(baseSha);
-                if (baseCommit == null)
-                {
-                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {targetCloneUrl}:{baseRef}.");
-                }
-            }
-
             var headCommit = repo.Lookup<Commit>(headSha);
             if (headCommit == null)
             {
@@ -406,6 +395,17 @@ namespace GitHub.Services
                 if (headCommit == null)
                 {
                     throw new NotFoundException($"Couldn't find {headSha} after fetching from {targetCloneUrl}:{headRef}.");
+                }
+            }
+
+            var baseCommit = repo.Lookup<Commit>(baseSha);
+            if (baseCommit == null)
+            {
+                await Fetch(repo, targetCloneUrl, baseRef);
+                baseCommit = repo.Lookup<Commit>(baseSha);
+                if (baseCommit == null)
+                {
+                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {targetCloneUrl}:{baseRef}.");
                 }
             }
 
