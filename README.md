@@ -4,7 +4,11 @@
 
 ### VS 2017 v15.3 users, please read
 
-The Visual Studio 2017 15.3 installer [has a bug](https://github.com/github/VisualStudio/issues/1206) that causes a corruption of the installed extensions data when you revert an installation of the extension (see also [this MS issue](https://developercommunity.visualstudio.com/content/problem/102178/error-installing-github-extension.html)). Until VS 2017 15.4 comes out, avoid reverting the extension via `Extensions and Updates`. Steps for fixing the corrupted installation cache are in [#1206](https://github.com/github/VisualStudio/issues/1206)
+If you need to downgrade or uninstall the extension, **do not use** ***Revert*** in Visual Studio 2017 15.3. Instead, manually uninstall the extension with the steps listed in https://github.com/github/VisualStudio/issues/1206#issuecomment-326558902
+
+If you have a corrupted extension cache, steps for fixing it are in https://github.com/github/VisualStudio/issues/1206#issuecomment-326053090
+
+The Visual Studio 2017 15.3 installer [has a bug](https://github.com/github/VisualStudio/issues/1206) that causes a corruption of the installed extensions data when you revert an installation of the extension (see also [this MS issue](https://developercommunity.visualstudio.com/content/problem/102178/error-installing-github-extension.html)). Until VS 2017 15.4 comes out, **do not use Revert in** ***Extensions and Updates***.
 
 ### The location of the submodules has changed as of 31-01-2017
 
