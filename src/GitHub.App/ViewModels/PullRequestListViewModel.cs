@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -346,16 +345,10 @@ namespace GitHub.ViewModels
 
         void DoOpenPROnGitHub(int pullRequest)
         {
-            var repo = SelectedRepository;
             var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
-            Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
-            Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
-            if (repo == null || browser == null)
-            {
-                return;
-            }
-            var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + pullRequest);
-            browser.OpenUrl(url);
+            var repoUrl = SelectedRepository.CloneUrl.ToRepositoryUrl();
+            var url = repoUrl.Append("pull/" + pullRequest);
+            browser?.OpenUrl(url);
         }
     }
 }
