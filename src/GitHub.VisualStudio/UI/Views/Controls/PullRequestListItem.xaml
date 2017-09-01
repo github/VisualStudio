@@ -9,47 +9,47 @@
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI">
 
-    <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+  
+  <DataTemplate x:Key="PullRequestItemTemplate" DataType="models:IPullRequestModel">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="11" />
+      </Grid.ColumnDefinitions>
 
-    <DataTemplate x:Key="PullRequestItemTemplate" DataType="models:IPullRequestModel">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="12" />
-                <ColumnDefinition Width="11" />
-            </Grid.ColumnDefinitions>
-
-            <Grid 
+      <Grid 
           Grid.Row="0"
           Grid.RowSpan="2"
           Grid.Column="0"
           VerticalAlignment="Top">
 
-                <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
+          <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
 
-                <StackPanel>
-                    <StackPanel.OpacityMask>
-                        <VisualBrush Visual="{Binding ElementName=avatarMask}" />
-                    </StackPanel.OpacityMask>
-                    <Image x:Name="avatar"
+          <StackPanel>
+              <StackPanel.OpacityMask>
+                  <VisualBrush Visual="{Binding ElementName=avatarMask}" />
+              </StackPanel.OpacityMask>
+              <Image x:Name="avatar"
                      Width="30"
                      Margin="0,0,10,0"
                      Height="30"
                      RenderOptions.BitmapScalingMode="HighQuality"
                      Source="{Binding Author.Avatar}" />
-                </StackPanel>
-            </Grid>
+          </StackPanel>
+      </Grid>
 
-            <ui:GitHubActionLink x:Name="title"
+      <ui:GitHubActionLink x:Name="title"
             Grid.Row="0"
             Grid.Column="1"
             HorizontalAlignment="Left"
@@ -61,8 +61,8 @@
             ToolTip="{Binding Title}"
             Command="{Binding ViewModel.OpenPullRequest, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
             CommandParameter="{Binding Number}"/>
-
-            <ui:OcticonImage x:Name="comment_icon"
+        
+        <ui:OcticonImage x:Name="comment_icon"
                    Grid.Row="0"
                    Grid.RowSpan="2"
                    Grid.Column="2"
@@ -74,7 +74,7 @@
                    Foreground="{DynamicResource GitHubVsToolWindowText}"
                    Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}" />
 
-            <TextBlock x:Name="comment_count"
+      <TextBlock x:Name="comment_count"
                  Grid.Row="0"
                  Grid.RowSpan="2"
                  Grid.Column="3"
@@ -85,7 +85,7 @@
                  Text="{Binding CommentCount}"
                  Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}" />
 
-            <ui:OcticonImage x:Name="comment_new"
+      <ui:OcticonImage x:Name="comment_new"
                        Grid.Row="0"
                        Grid.RowSpan="2"
                        Grid.Column="4"
@@ -97,16 +97,16 @@
                        Foreground="Green"
                        Icon="primitive_dot"
                        Visibility="{Binding HasNewComments, Converter={ui:BooleanToVisibilityConverter}}" />
-            <Grid x:Name="status"
+      <Grid x:Name="status"
             Grid.Row="1"
             Grid.Column="1"
             HorizontalAlignment="Left"
             VerticalAlignment="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button x:Name="prHashtagLink"
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Button x:Name="prHashtagLink"
                 Grid.Column="0"
                 Command="{Binding ViewModel.OpenPROnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
                 CommandParameter="{Binding Number}"
@@ -114,36 +114,36 @@
                 ToolTip="{x:Static prop:Resources.OpenPROnGitHubToolTip}"
                 FontFamily="Segoe UI"
                 Style="{StaticResource HashtagActionLink}" />
-                <TextBlock x:Name="description"
+        <TextBlock x:Name="description"
                    Grid.Column="1"
                    FontFamily="Segoe UI"
                    Margin="0,0,10,0"
                    TextTrimming="CharacterEllipsis"
                    Foreground="{DynamicResource GitHubVsGrayText}">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="{} {0} {1} {2}">
+              <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
+              <Binding Source="{x:Static i18n:Resources.prUpdatedByText}" />
+              <Binding Path="Author.Login" />
+            </MultiBinding>
+          </TextBlock.Text>
+
+          <TextBlock.ToolTip>
+            <ToolTip>
+                <TextBlock>
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="{} {0} {1} {2}">
-                            <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
-                            <Binding Source="{x:Static i18n:Resources.prUpdatedByText}" />
-                            <Binding Path="Author.Login" />
+                       <MultiBinding StringFormat="{} {0} {1} {2} {3}">
+                          <Binding Source="{x:Static i18n:Resources.prUpdatedText}" />
+                          <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
+                          <Binding Source="{x:Static i18n:Resources.prUpdatedByText}" />
+                          <Binding Path="Author.Login" />
                         </MultiBinding>
                     </TextBlock.Text>
-
-                    <TextBlock.ToolTip>
-                        <ToolTip>
-                            <TextBlock>
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{} {0} {1} {2} {3}">
-                                        <Binding Source="{x:Static i18n:Resources.prUpdatedText}" />
-                                        <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
-                                        <Binding Source="{x:Static i18n:Resources.prUpdatedByText}" />
-                                        <Binding Path="Author.Login" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </ToolTip>
-                    </TextBlock.ToolTip>
+                </TextBlock>
+            </ToolTip>
+          </TextBlock.ToolTip>
         </TextBlock>
-            </Grid>
-        </Grid>
-    </DataTemplate>
+      </Grid>
+    </Grid>
+  </DataTemplate>
 </ResourceDictionary>
