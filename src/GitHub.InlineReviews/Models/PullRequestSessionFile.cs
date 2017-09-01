@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GitHub.Models;
 using ReactiveUI;
-using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Models
 {
@@ -16,7 +15,7 @@ namespace GitHub.InlineReviews.Models
     /// </remarks>
     /// <seealso cref="PullRequestSession"/>
     /// <seealso cref="PullRequestSessionManager"/>
-    class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
+    public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
         IList<DiffChunk> diff;
         string commitSha;

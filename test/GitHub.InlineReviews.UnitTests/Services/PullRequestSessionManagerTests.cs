@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Text;
 using System.Threading.Tasks;
+using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Xunit;
 
@@ -154,6 +161,259 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
         }
 
+        public class TheGetLiveFileMethod : PullRequestSessionManagerTests
+        {
+            [Fact]
+            public async Task BaseShaIsSet()
+            {
+                var textView = CreateTextView();
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    CreateSessionService(),
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile("file.cs", textView);
+
+                Assert.Same("BASESHA", file.BaseSha);
+            }
+
+            [Fact]
+            public async Task CommitShaIsSet()
+            {
+                var textView = CreateTextView();
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    CreateSessionService(),
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile("file.cs", textView);
+
+                Assert.Same("TIPSHA", file.CommitSha);
+            }
+
+            [Fact]
+            public async Task FileDiffIsSet()
+            {
+                var textView = CreateTextView();
+                var contents = Encoding.UTF8.GetBytes("File contents");
+                var diff = new List<DiffChunk>();
+                var sessionService = CreateSessionService();
+
+                sessionService.GetContents(textView.TextBuffer).Returns(contents);
+                sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
+                sessionService.Diff(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    "MERGE_BASE",
+                    "HEADSHA",
+                    "file.cs",
+                    contents).Returns(diff);
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile("file.cs", textView);
+
+                Assert.Same(diff, file.Diff);
+            }
+
+            [Fact]
+            public async Task InlineCommentThreadsIsSet()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>();
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    "file.cs",
+                    Arg.Any<IList<DiffChunk>>())
+                    .Returns(threads);
+
+                var file = await target.GetLiveFile("file.cs", textView);
+
+                Assert.Same(threads, file.InlineCommentThreads);
+            }
+
+            [Fact]
+            public async Task CreatesTrackingPointsForThreads()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>
+                {
+                    CreateInlineCommentThreadModel(1),
+                    CreateInlineCommentThreadModel(2),
+                };
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    "file.cs",
+                    Arg.Any<IList<DiffChunk>>())
+                    .Returns(threads);
+
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+
+                Assert.Equal(2, file.TrackingPoints.Count);
+            }
+
+            [Fact]
+            public async Task MovingToNoRepositoryShouldNullOutProperties()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>();
+                var teHolder = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    CreateSessionService(),
+                    CreateRepositoryHosts(),
+                    teHolder);
+
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    "file.cs",
+                    Arg.Any<IList<DiffChunk>>())
+                    .Returns(threads);
+
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+
+                Assert.NotNull(file.BaseSha);
+                Assert.NotNull(file.CommitSha);
+                Assert.NotNull(file.Diff);
+                Assert.NotNull(file.InlineCommentThreads);
+                Assert.NotNull(file.TrackingPoints);
+
+                teHolder.ActiveRepo = null;
+
+                Assert.Null(file.BaseSha);
+                Assert.Null(file.CommitSha);
+                Assert.Null(file.Diff);
+                Assert.Null(file.InlineCommentThreads);
+                Assert.Null(file.TrackingPoints);
+            }
+
+            [Fact]
+            public async Task ModifyingBufferMarksThreadsAsStaleAndSignalsRebuild()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>
+                {
+                    CreateInlineCommentThreadModel(1),
+                    CreateInlineCommentThreadModel(2),
+                };
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    "file.cs",
+                    Arg.Any<IList<DiffChunk>>())
+                    .Returns(threads);
+
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+                var threadsChangedReceived = false;
+                file.PropertyChanged += (s, e) => threadsChangedReceived |= e.PropertyName == nameof(file.InlineCommentThreads);
+
+                var ev = new TextContentChangedEventArgs(textView.TextSnapshot, textView.TextSnapshot, EditOptions.None, null);
+                textView.TextBuffer.Changed += Raise.EventWith(textView.TextBuffer, ev);
+
+                threads[0].Received().IsStale = true;
+                threads[1].Received().IsStale = true;
+
+                Assert.True(threadsChangedReceived);
+                file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
+            }
+
+            [Fact]
+            public async Task RebuildSignalUpdatesFile()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+
+                Assert.Same("TIPSHA", file.CommitSha);
+
+                sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
+                file.Rebuild.OnNext(textView.TextSnapshot);
+
+                Assert.Null(file.CommitSha);
+            }
+
+            [Fact]
+            public async Task ClosingTextViewDisposesFile()
+            {
+                var textView = CreateTextView();
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    CreateSessionService(),
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+
+                Assert.NotNull(file.ToDispose);
+
+                textView.Closed += Raise.Event();
+
+                Assert.Null(file.ToDispose);
+            }
+
+            IPullRequestSessionService CreateSessionService(bool isModified = false)
+            {
+                var sessionService = Substitute.For<IPullRequestSessionService>();
+                var rebuild = Substitute.For<ISubject<ITextSnapshot, ITextSnapshot>>();
+                sessionService.CreateRebuildSignal().Returns(rebuild);
+                sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(!isModified);
+                sessionService.GetTipSha(null).ReturnsForAnyArgs("TIPSHA");
+                return sessionService;
+            }
+
+            ITextView CreateTextView()
+            {
+                var result = Substitute.For<ITextView>();
+                var textBuffer = Substitute.For<ITextBuffer>();
+                textBuffer.Properties.Returns(new PropertyCollection());
+                result.TextBuffer.Returns(textBuffer);
+                return result;
+            }
+
+            IInlineCommentThreadModel CreateInlineCommentThreadModel(int lineNumber)
+            {
+                var result = Substitute.For<IInlineCommentThreadModel>();
+                result.LineNumber.Returns(lineNumber);
+                return result;
+            }
+        }
+
         public class TheGetSessionMethod : PullRequestSessionManagerTests
         {
             [Fact]
@@ -283,6 +543,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             var result = Substitute.For<IPullRequestModel>();
             result.Number.Returns(number);
             result.Base.Returns(new GitReferenceModel("BASEREF", "pr", "BASESHA", cloneUrl));
+            result.Head.Returns(new GitReferenceModel("HEADREF", "pr", "HEADSHA", cloneUrl));
             return result;
         }
 

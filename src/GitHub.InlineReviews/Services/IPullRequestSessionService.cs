@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -71,6 +73,22 @@ namespace GitHub.InlineReviews.Services
             string relativePath);
 
         /// <summary>
+        /// Gets the associated <see cref="ITextDocument"/> for an <see cref="ITextBuffer"/>.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>
+        /// The associated document, or null if not found.
+        /// </returns>
+        ITextDocument GetDocument(ITextBuffer buffer);
+
+        /// <summary>
+        /// Gets the contents of an <see cref="ITextBuffer"/> using the buffer's current encoding.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>The contents of the buffer.</returns>
+        byte[] GetContents(ITextBuffer buffer);
+
+        /// <summary>
         /// Gets the SHA of the tip of the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -95,6 +113,8 @@ namespace GitHub.InlineReviews.Services
         /// The merge base SHA for the PR.
         /// </returns>
         Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal();
 
         /// <summary>
         /// Posts a new PR review comment.

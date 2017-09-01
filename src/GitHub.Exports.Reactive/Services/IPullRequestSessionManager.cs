@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using GitHub.Models;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.Services
 {
@@ -19,6 +20,23 @@ namespace GitHub.Services
         /// a pull request branch.
         /// </returns>
         IPullRequestSession CurrentSession { get; }
+
+        /// <summary>
+        /// Gets an <see cref="IPullRequestSessionFile"/> that tracks the live state of a document.
+        /// </summary>
+        /// <param name="relativePath">The relative path to the file in the repository.</param>
+        /// <param name="textView">The text view that is showing the file.</param>
+        /// <returns>An <see cref="IPullRequestSessionFile"/>.</returns>
+        Task<IPullRequestSessionFile> GetLiveFile(string relativePath, ITextView textView);
+
+        /// <summary>
+        /// Converts a path to a path relative to the current repository.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>
+        /// The relative path, or null if the specified path is not in the repository.
+        /// </returns>
+        string GetRelativePath(string path);
 
         /// <summary>
         /// Gets a pull request session for a pull request that may not be checked out.

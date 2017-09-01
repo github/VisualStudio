@@ -4,6 +4,8 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
@@ -11,7 +13,10 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Projection;
 using NLog;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -83,6 +88,35 @@ namespace GitHub.InlineReviews.Services
             }
 
             return threads;
+        }
+
+        /// <inheritdoc/>
+        public byte[] GetContents(ITextBuffer buffer)
+        {
+            var encoding = GetDocument(buffer).Encoding ?? Encoding.Default;
+            return encoding.GetBytes(buffer.CurrentSnapshot.GetText());
+        }
+
+        /// <inheritdoc/>
+        public ITextDocument GetDocument(ITextBuffer buffer)
+        {
+            ITextDocument result;
+
+            if (buffer.Properties.TryGetProperty(typeof(ITextDocument), out result))
+                return result;
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    if ((result = GetDocument(source)) != null)
+                        return result;
+                }
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
@@ -170,6 +204,16 @@ namespace GitHub.InlineReviews.Services
             }
 
             return mergeBaseCache[key] = mergeBase;
+        }
+
+        public ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal()
+        {
+            var input = new Subject<ITextSnapshot>();
+            var output = Observable.Create<ITextSnapshot>(x => input
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x));
+            return Subject.Create(input, output);
         }
 
         /// <inheritdoc/>
@@ -265,6 +309,6 @@ namespace GitHub.InlineReviews.Services
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
-        }
+        }       
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -17,6 +16,11 @@ namespace GitHub.Models
     /// <seealso cref="IPullRequestSessionManager"/>
     public interface IPullRequestSessionFile : INotifyPropertyChanged
     {
+        /// <summary>
+        /// Gets the SHA of the base commit of the file in the pull request.
+        /// </summary>
+        string BaseSha { get; }
+
         /// <summary>
         /// Gets the SHA of the current commit of the file, or null if the file has uncommitted
         /// changes.

@@ -90,6 +90,7 @@ namespace GitHub.Services
         /// <returns>
         /// The relative path, or null if the specified path is not in the repository.
         /// </returns>
+        [Obsolete("Use the one in IPullRequestSessionManager. This will be removed soon.")]
         string GetRelativePath(string path);
 
         /// <summary>

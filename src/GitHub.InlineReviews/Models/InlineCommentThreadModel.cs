@@ -33,6 +33,7 @@ namespace GitHub.InlineReviews.Models
             IList<DiffLine> diffMatch,
             IEnumerable<IPullRequestReviewCommentModel> comments)
         {
+            Guard.ArgumentNotNull(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(originalCommitSha, nameof(originalCommitSha));
             Guard.ArgumentNotNull(diffMatch, nameof(diffMatch));
 
