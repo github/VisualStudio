@@ -18,6 +18,8 @@ using GitHub.Settings;
 using GitHub.UI;
 using NLog;
 using ReactiveUI;
+using System.Windows.Input;
+using GitHub.Primitives;
 
 namespace GitHub.ViewModels
 {
@@ -40,8 +42,9 @@ namespace GitHub.ViewModels
         PullRequestListViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPackageSettings settings)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
+            IPackageSettings settings,
+            IGitHubServiceProvider serviceProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, serviceProvider)
         {
             Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
@@ -51,7 +54,8 @@ namespace GitHub.ViewModels
         public PullRequestListViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IGitHubServiceProvider serviceProvider)
         {
             Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -107,6 +111,20 @@ namespace GitHub.ViewModels
             OpenPullRequest.Subscribe(DoOpenPullRequest);
             CreatePullRequest = ReactiveCommand.Create();
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
+
+            OpenPROnGitHub = new RelayCommand(x =>
+            {
+                var repo = serviceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
+                var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
+                Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
+                Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
+                if (repo == null || browser == null)
+                {
+                    return;
+                }
+                var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + x);
+                browser.OpenUrl(url);
+            });
 
             constructing = false;
         }
@@ -268,6 +286,8 @@ namespace GitHub.ViewModels
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
+
+        public ICommand OpenPROnGitHub { get; set; }
 
         bool disposed;
         protected void Dispose(bool disposing)
