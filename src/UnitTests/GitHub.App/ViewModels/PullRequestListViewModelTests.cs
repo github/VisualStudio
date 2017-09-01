@@ -20,7 +20,8 @@ namespace UnitTests.GitHub.App.ViewModels
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -35,7 +36,8 @@ namespace UnitTests.GitHub.App.ViewModels
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -56,7 +58,8 @@ namespace UnitTests.GitHub.App.ViewModels
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -71,7 +74,8 @@ namespace UnitTests.GitHub.App.ViewModels
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;

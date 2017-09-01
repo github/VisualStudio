@@ -58,6 +58,7 @@ namespace GitHub.ViewModels
             Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
 
             constructing = true;
             this.repositoryHost = repositoryHost;
