@@ -18,8 +18,6 @@ using GitHub.Settings;
 using GitHub.UI;
 using NLog;
 using ReactiveUI;
-using System.Windows.Input;
-using GitHub.Primitives;
 
 namespace GitHub.ViewModels
 {
@@ -34,6 +32,7 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
+        readonly IGitHubServiceProvider serviceProvider;
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
         IRemoteRepositoryModel remoteRepository;
@@ -65,6 +64,7 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.localRepository = repository;
             this.settings = settings;
+            this.serviceProvider = serviceProvider;
 
             Title = Resources.PullRequestsNavigationItemText;
 
@@ -112,19 +112,8 @@ namespace GitHub.ViewModels
             CreatePullRequest = ReactiveCommand.Create();
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
 
-            OpenPROnGitHub = new RelayCommand(x =>
-            {
-                var repo = SelectedRepository;
-                var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
-                Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
-                Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
-                if (repo == null || browser == null)
-                {
-                    return;
-                }
-                var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + x);
-                browser.OpenUrl(url);
-            });
+            OpenPROnGitHub = ReactiveCommand.Create();
+            OpenPROnGitHub.Subscribe(x => DoOpenPROnGitHub((int)x));
 
             constructing = false;
         }
@@ -287,7 +276,7 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
 
-        public ICommand OpenPROnGitHub { get; set; }
+        public ReactiveCommand<object> OpenPROnGitHub { get; }
 
         bool disposed;
         protected void Dispose(bool disposing)
@@ -353,6 +342,20 @@ namespace GitHub.ViewModels
         {
             var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
             navigate.OnNext(d);
+        }
+
+        void DoOpenPROnGitHub(int pullRequest)
+        {
+            var repo = SelectedRepository;
+            var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
+            Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
+            Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
+            if (repo == null || browser == null)
+            {
+                return;
+            }
+            var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + pullRequest);
+            browser.OpenUrl(url);
         }
     }
 }
