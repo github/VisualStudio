@@ -78,6 +78,12 @@ namespace GitHub.Services
             IEditorContentSource contentSource);
 
         /// <summary>
+        /// Gets the merge base SHA for the pull request.
+        /// </summary>
+        /// <returns>The merge base SHA.</returns>
+        Task<string> GetMergeBase();
+
+        /// <summary>
         /// Converts a path to a path relative to the current repository.
         /// </summary>
         /// <param name="path">The path.</param>

@@ -27,6 +27,7 @@ namespace GitHub.InlineReviews.Services
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         bool isCheckedOut;
+        string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
 
         public PullRequestSession(
@@ -100,6 +101,16 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
+        public async Task<string> GetMergeBase()
+        {
+            if (mergeBase == null)
+            {
+                mergeBase = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+            }
+
+            return mergeBase;
+        }
+
         /// <inheritdoc/>
         public string GetRelativePath(string path)
         {
@@ -158,7 +169,7 @@ namespace GitHub.InlineReviews.Services
                 var content = await GetFileContent(file);
 
                 file.CommitSha = await CalculateContentCommitSha(file, content);
-                var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+                var mergeBaseSha = await GetMergeBase();
                 var headSha = await CalculateHeadSha();
                 file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, relativePath, content);
                 file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
@@ -168,6 +179,7 @@ namespace GitHub.InlineReviews.Services
         public async Task Update(IPullRequestModel pullRequest)
         {
             PullRequest = pullRequest;
+            mergeBase = null;
 
             foreach (var file in this.fileIndex.Values.ToList())
             {
@@ -186,7 +198,7 @@ namespace GitHub.InlineReviews.Services
         async Task UpdateFile(PullRequestSessionFile file)
         {
             // NOTE: We must call GetPullRequestMergeBase before GetFileContent.
-            var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+            var mergeBaseSha = await GetMergeBase();
             var headSha = await CalculateHeadSha();
             var content = await GetFileContent(file);
 
