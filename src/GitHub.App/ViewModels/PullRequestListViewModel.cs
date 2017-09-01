@@ -114,7 +114,7 @@ namespace GitHub.ViewModels
 
             OpenPROnGitHub = new RelayCommand(x =>
             {
-                var repo = serviceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
+                var repo = SelectedRepository;
                 var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
                 Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
                 Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
