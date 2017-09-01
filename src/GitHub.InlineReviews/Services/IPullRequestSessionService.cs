@@ -27,6 +27,20 @@ namespace GitHub.InlineReviews.Services
             byte[] contents);
 
         /// <summary>
+        /// Builds a set of comment thread models for a file based on a pull request model and a diff.
+        /// </summary>
+        /// <param name="pullRequest">The pull request session.</param>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <param name="diff">The diff.</param>
+        /// <returns>
+        /// A collection of <see cref="IInlineCommentThreadModel"/> objects with updated line numbers.
+        /// </returns>
+        IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
+            IPullRequestModel pullRequest,
+            string relativePath,
+            IList<DiffChunk> diff);
+
+        /// <summary>
         /// Tests whether the contents of a file represent a commit that is pushed to origin.
         /// </summary>
         /// <param name="repository">The repository.</param>

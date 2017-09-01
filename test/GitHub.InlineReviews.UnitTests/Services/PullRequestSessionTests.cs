@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
 using Xunit;
@@ -21,131 +24,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheGetFileMethod
         {
-            [Fact]
-            public async Task MatchesReviewCommentOnOriginalLine()
-            {
-                var baseContents = @"Line 1
-Line 2
-Line 3
-Line 4";
-                var headContents = @"Line 1
-Line 2
-Line 3 with comment
-Line 4";
-
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
- Line 1
- Line 2
--Line 3
-+Line 3 with comment");
-
-                using (var diffService = new FakeDiffService())
-                {
-                    var pullRequest = CreatePullRequest(comment);
-                    var service = CreateService(diffService);
-
-                    diffService.AddFile(FilePath, baseContents);
-
-                    var target = new PullRequestSession(
-                        service,
-                        Substitute.For<IAccount>(),
-                        pullRequest,
-                        Substitute.For<ILocalRepositoryModel>(),
-                        "owner",
-                        true);
-
-                    var editor = new FakeEditorContentSource(headContents);
-                    var file = await target.GetFile(FilePath, editor);
-                    var thread = file.InlineCommentThreads.First();
-                    Assert.Equal(2, thread.LineNumber);
-                }
-            }
-
-            [Fact]
-            public async Task MatchesReviewCommentOnOriginalLineGettingContentFromDisk()
-            {
-                var baseContents = @"Line 1
-Line 2
-Line 3
-Line 4";
-                var headContents = @"Line 1
-Line 2
-Line 3 with comment
-Line 4";
-
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
- Line 1
- Line 2
--Line 3
-+Line 3 with comment");
-
-                using (var diffService = new FakeDiffService())
-                {
-                    var pullRequest = CreatePullRequest(comment);
-                    var service = CreateService(diffService);
-
-                    diffService.AddFile(FilePath, baseContents);
-                    service.ReadFileAsync(FilePath).Returns(Encoding.UTF8.GetBytes(headContents));
-
-                    var target = new PullRequestSession(
-                        service,
-                        Substitute.For<IAccount>(),
-                        pullRequest,
-                        Substitute.For<ILocalRepositoryModel>(),
-                        "owner",
-                        true);
-
-                    var file = await target.GetFile(FilePath);
-                    var thread = file.InlineCommentThreads.First();
-
-                    Assert.Equal(2, thread.LineNumber);
-                }
-            }
-
-            [Fact]
-            public async Task MatchesReviewCommentOnDifferentLine()
-            {
-                var baseContents = @"Line 1
-Line 2
-Line 3
-Line 4";
-                var headContents = @"New Line 1
-New Line 2
-Line 1
-Line 2
-Line 3 with comment
-Line 4";
-
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
- Line 1
- Line 2
--Line 3
-+Line 3 with comment");
-
-
-                using (var diffService = new FakeDiffService())
-                {
-                    var pullRequest = CreatePullRequest(comment);
-                    var service = CreateService(diffService);
-
-                    diffService.AddFile(FilePath, baseContents);
-
-                    var target = new PullRequestSession(
-                        service,
-                        Substitute.For<IAccount>(),
-                        pullRequest,
-                        Substitute.For<ILocalRepositoryModel>(),
-                        "owner",
-                        true);
-
-                    var editor = new FakeEditorContentSource(headContents);
-                    var file = await target.GetFile(FilePath, editor);
-                    var thread = file.InlineCommentThreads.First();
-
-                    Assert.Equal(4, thread.LineNumber);
-                }
-            }
-
             [Fact]
             public async Task UpdatesReviewCommentWithEditorContents()
             {
@@ -194,6 +72,7 @@ Line 4";
 
                     await target.UpdateEditorContent(FilePath);
 
+                    thread = file.InlineCommentThreads.First();
                     Assert.Equal(4, thread.LineNumber);
                 }
             }
@@ -694,6 +573,13 @@ Line 4";
         static IPullRequestSessionService CreateService(FakeDiffService diffService)
         {
             var result = Substitute.For<IPullRequestSessionService>();
+            var inner = new PullRequestSessionService(
+                Substitute.For<IGitService>(),
+                Substitute.For<IGitClient>(),
+                diffService,
+                Substitute.For<IApiClientFactory>(),
+                Substitute.For<IUsageTracker>());
+
             result.Diff(
                 Arg.Any<ILocalRepositoryModel>(),
                 Arg.Any<string>(),
@@ -709,10 +595,14 @@ Line 4";
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
 
             var diffChunk = "@@ -1,4 +1,4 @@";
+
+            result.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(i =>
+                inner.BuildCommentThreads(i.Arg<IPullRequestModel>(), i.Arg<string>(), i.Arg<IList<DiffChunk>>()));
             result.PostReviewComment(null, null, null, 0, null, 0).ReturnsForAnyArgs(i =>
                 CreateComment(diffChunk, i.ArgAt<string>(4)));
             result.PostReviewComment(null, null, null, 0, null, null, null, 0).ReturnsForAnyArgs(i =>
                 CreateComment(diffChunk, i.ArgAt<string>(4)));
+
             return result;
         }
     }

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Factories;
+using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -17,7 +19,7 @@ namespace GitHub.InlineReviews.Services
     /// Provides a common interface for services required by <see cref="PullRequestSession"/>.
     /// </summary>
     [Export(typeof(IPullRequestSessionService))]
-    class PullRequestSessionService : IPullRequestSessionService
+    public class PullRequestSessionService : IPullRequestSessionService
     {
         readonly IGitService gitService;
         readonly IGitClient gitClient;
@@ -49,6 +51,38 @@ namespace GitHub.InlineReviews.Services
         {
             var repo = await GetRepository(repository);
             return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
+            IPullRequestModel pullRequest,
+            string relativePath,
+            IList<DiffChunk> diff)
+        {
+            var commentsByPosition = pullRequest.ReviewComments
+                .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
+                .OrderBy(x => x.Id)
+                .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
+            var threads = new List<IInlineCommentThreadModel>();
+
+            foreach (var comments in commentsByPosition)
+            {
+                var hunk = comments.First().DiffHunk;
+                var chunks = DiffUtilities.ParseFragment(hunk);
+                var chunk = chunks.Last();
+                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
+                var thread = new InlineCommentThreadModel(
+                    relativePath,
+                    comments.Key.Item1,
+                    comments.Key.Item2,
+                    diffLines,
+                    comments);
+
+                thread.LineNumber = GetUpdatedLineNumber(thread, diff);
+                threads.Add(thread);
+            }
+
+            return threads;
         }
 
         /// <inheritdoc/>
@@ -212,6 +246,20 @@ namespace GitHub.InlineReviews.Services
                 CreatedAt = result.CreatedAt,
                 User = user,
             };
+        }
+
+        int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
+        {
+            var line = DiffUtilities.Match(diff, thread.DiffMatch);
+
+            if (line != null)
+            {
+                return (thread.DiffLineType == DiffChangeType.Delete) ?
+                    line.OldLineNumber - 1 :
+                    line.NewLineNumber - 1;
+            }
+
+            return -1;
         }
 
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)

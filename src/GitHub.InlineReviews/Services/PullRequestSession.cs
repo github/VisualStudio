@@ -161,12 +161,7 @@ namespace GitHub.InlineReviews.Services
                 var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
                 var headSha = await CalculateHeadSha();
                 file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, relativePath, content);
-
-                foreach (var thread in file.InlineCommentThreads)
-                {
-                    thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
-                    thread.IsStale = false;
-                }
+                file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
             }
         }
 
@@ -198,31 +193,7 @@ namespace GitHub.InlineReviews.Services
             file.BaseSha = PullRequest.Base.Sha;
             file.CommitSha = await CalculateContentCommitSha(file, content);
             file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, file.RelativePath, content);
-
-            var commentsByPosition = PullRequest.ReviewComments
-                .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)
-                .OrderBy(x => x.Id)
-                .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
-            var threads = new List<IInlineCommentThreadModel>();
-
-            foreach (var comments in commentsByPosition)
-            {
-                var hunk = comments.First().DiffHunk;
-                var chunks = DiffUtilities.ParseFragment(hunk);
-                var chunk = chunks.Last();
-                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
-                var thread = new InlineCommentThreadModel(
-                    file.RelativePath,
-                    comments.Key.Item1,
-                    comments.Key.Item2,
-                    diffLines,
-                    comments);
-
-                thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
-                threads.Add(thread);
-            }
-
-            file.InlineCommentThreads = threads;
+            file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
         }
 
         async Task<PullRequestSessionFile> CreateFile(
@@ -290,20 +261,6 @@ namespace GitHub.InlineReviews.Services
         string GetFullPath(string relativePath)
         {
             return Path.Combine(LocalRepository.LocalPath, relativePath);
-        }
-
-        int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
-        {
-            var line = DiffUtilities.Match(diff, thread.DiffMatch);
-
-            if (line != null)
-            {
-                return (thread.DiffLineType == DiffChangeType.Delete) ?
-                    line.OldLineNumber - 1 :
-                    line.NewLineNumber - 1;
-            }
-
-            return -1;
         }
 
         /// <inheritdoc/>
