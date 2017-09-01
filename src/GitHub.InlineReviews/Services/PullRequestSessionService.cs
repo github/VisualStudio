@@ -86,7 +86,11 @@ namespace GitHub.InlineReviews.Services
                     comments);
 
                 thread.LineNumber = GetUpdatedLineNumber(thread, diff);
-                threads.Add(thread);
+
+                if (thread.LineNumber >= 0)
+                {
+                    threads.Add(thread);
+                }
             }
 
             return threads;

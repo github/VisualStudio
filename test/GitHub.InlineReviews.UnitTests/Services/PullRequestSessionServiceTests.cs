@@ -50,7 +50,7 @@ Line 4";
                         FilePath,
                         diff);
 
-                    var thread = result.First();
+                    var thread = result.Single();
                     Assert.Equal(2, thread.LineNumber);
                 }
             }
@@ -86,8 +86,47 @@ Line 4";
                         FilePath,
                         diff);
 
-                    var thread = result.First();
+                    var thread = result.Single();
                     Assert.Equal(4, thread.LineNumber);
+                }
+            }
+
+            [Fact]
+            public async Task DoesntReturnNonMatchingComment()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", position: 1);
+
+                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
+-Line 1
+ Line 2
+-Line 3
++Line 3 with comment", position: 2);
+
+                using (var diffService = new FakeDiffService(FilePath, baseContents))
+                {
+                    var diff = await diffService.Diff(FilePath, headContents);
+                    var pullRequest = CreatePullRequest(FilePath, comment1, comment2);
+                    var target = CreateTarget(diffService);
+
+                    var result = target.BuildCommentThreads(
+                        pullRequest,
+                        FilePath,
+                        diff);
+
+                    Assert.Equal(1, result.Count);
                 }
             }
 
@@ -143,14 +182,15 @@ Line 4";
             static IPullRequestReviewCommentModel CreateComment(
                 string diffHunk,
                 string filePath = FilePath,
-                string body = "Comment")
+                string body = "Comment",
+                int position = 1)
             {
                 var result = Substitute.For<IPullRequestReviewCommentModel>();
                 result.Body.Returns(body);
                 result.DiffHunk.Returns(diffHunk);
                 result.Path.Returns(filePath);
                 result.OriginalCommitId.Returns("ORIG");
-                result.OriginalPosition.Returns(1);
+                result.OriginalPosition.Returns(position);
                 return result;
             }
 
