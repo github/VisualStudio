@@ -302,12 +302,10 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        void InvalidateLiveThreads(PullRequestSessionLiveFile file)
+        void InvalidateLiveThreads(PullRequestSessionLiveFile file, ITextSnapshot snapshot)
         {
             if (file.TrackingPoints != null)
             {
-                var snapshot = file.TextView.TextSnapshot;
-
                 foreach (var thread in file.InlineCommentThreads)
                 {
                     ITrackingPoint trackingPoint;
@@ -368,7 +366,7 @@ namespace GitHub.InlineReviews.Services
         {
             var textBuffer = (ITextBuffer)sender;
             var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
-            InvalidateLiveThreads(file);
+            InvalidateLiveThreads(file, e.After);
             file.Rebuild.OnNext(textBuffer.CurrentSnapshot);
         }
 

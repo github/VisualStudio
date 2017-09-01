@@ -32,7 +32,7 @@ namespace GitHub.InlineReviews.ViewModels
         ICommentThreadViewModel thread;
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
-        string fullPath;
+        string relativePath;
         bool leftBuffer;
 
         /// <summary>
@@ -108,19 +108,20 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (info != null)
             {
-                fullPath = info.FilePath;
+                relativePath = info.RelativePath;
                 leftBuffer = info.IsLeftComparisonBuffer;
                 await SessionChanged(info.Session);
             }
             else
             {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                fullPath = document.FilePath;
+                throw new NotImplementedException();
+                //var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+                //relativePath = ToRelativePath(document.FilePath);
 
-                await SessionChanged(sessionManager.CurrentSession);
-                sessionManager.WhenAnyValue(x => x.CurrentSession)
-                    .Skip(1)
-                    .Subscribe(x => SessionChanged(x).Forget());
+                //await SessionChanged(sessionManager.CurrentSession);
+                //sessionManager.WhenAnyValue(x => x.CurrentSession)
+                //    .Skip(1)
+                //    .Subscribe(x => SessionChanged(x).Forget());
             }
         }
 
@@ -176,7 +177,6 @@ namespace GitHub.InlineReviews.ViewModels
                 return;
             }
 
-            var relativePath = session.GetRelativePath(fullPath);
             file = await session.GetFile(relativePath);
             fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
         }

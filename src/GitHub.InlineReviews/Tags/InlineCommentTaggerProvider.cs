@@ -22,6 +22,7 @@ namespace GitHub.InlineReviews.Tags
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestSessionService sessionService;
         readonly IInlineCommentPeekService peekService;
 
         [ImportingConstructor]
@@ -30,6 +31,7 @@ namespace GitHub.InlineReviews.Tags
             IGitClient gitClient,
             IDiffService diffService,
             IPullRequestSessionManager sessionManager,
+            IPullRequestSessionService sessionService,
             IInlineCommentPeekService peekService)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
@@ -41,6 +43,7 @@ namespace GitHub.InlineReviews.Tags
             this.gitClient = gitClient;
             this.diffService = diffService;
             this.sessionManager = sessionManager;
+            this.sessionService = sessionService;
             this.peekService = peekService;
         }
 
@@ -54,6 +57,7 @@ namespace GitHub.InlineReviews.Tags
                     view,
                     buffer,
                     sessionManager,
+                    sessionService,
                     peekService)) as ITagger<T>;
         }
     }
