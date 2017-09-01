@@ -31,7 +31,7 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
-        readonly IGitHubServiceProvider serviceProvider;
+        readonly IVisualStudioBrowser visualStudioBrowser;
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
         IRemoteRepositoryModel remoteRepository;
@@ -41,8 +41,8 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPackageSettings settings,
-            IGitHubServiceProvider serviceProvider)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, serviceProvider)
+            IVisualStudioBrowser visualStudioBrowser)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, visualStudioBrowser)
         {
             Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
@@ -53,7 +53,7 @@ namespace GitHub.ViewModels
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
             IPackageSettings settings,
-            IGitHubServiceProvider serviceProvider)
+            IVisualStudioBrowser visualStudioBrowser)
         {
             Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -63,7 +63,7 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.localRepository = repository;
             this.settings = settings;
-            this.serviceProvider = serviceProvider;
+            this.visualStudioBrowser = visualStudioBrowser;
 
             Title = Resources.PullRequestsNavigationItemText;
 
@@ -345,10 +345,9 @@ namespace GitHub.ViewModels
 
         void DoOpenPROnGitHub(int pullRequest)
         {
-            var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
             var repoUrl = SelectedRepository.CloneUrl.ToRepositoryUrl();
             var url = repoUrl.Append("pull/" + pullRequest);
-            browser?.OpenUrl(url);
+            visualStudioBrowser.OpenUrl(url);
         }
     }
 }
