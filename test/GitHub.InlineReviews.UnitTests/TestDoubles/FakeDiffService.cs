@@ -34,7 +34,10 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         public void AddFile(string path, string contents)
         {
             var signature = new Signature("user", "user@user", DateTimeOffset.Now);
-            File.WriteAllText(Path.Combine(repository.Info.WorkingDirectory, path), contents);
+            var fullPath = Path.Combine(repository.Info.WorkingDirectory, path);
+            var directory = Path.GetDirectoryName(fullPath);
+            Directory.CreateDirectory(directory);
+            File.WriteAllText(fullPath, contents);
             repository.Stage(path);
             repository.Commit("Added " + path, signature, signature);
 

@@ -64,6 +64,8 @@ namespace GitHub.InlineReviews.Services
             string relativePath,
             IList<DiffChunk> diff)
         {
+            relativePath = relativePath.Replace("\\", "/");
+
             var commentsByPosition = pullRequest.ReviewComments
                 .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
                 .OrderBy(x => x.Id)

@@ -42,7 +42,7 @@ Line 4";
                 using (var diffService = new FakeDiffService(FilePath, baseContents))
                 {
                     var diff = await diffService.Diff(FilePath, headContents);
-                    var pullRequest = CreatePullRequest(comment);
+                    var pullRequest = CreatePullRequest(FilePath, comment);
                     var target = CreateTarget(diffService);
 
                     var result = target.BuildCommentThreads(
@@ -78,12 +78,51 @@ Line 4";
                 using (var diffService = new FakeDiffService(FilePath, baseContents))
                 {
                     var diff = await diffService.Diff(FilePath, headContents);
-                    var pullRequest = CreatePullRequest(comment);
+                    var pullRequest = CreatePullRequest(FilePath, comment);
                     var target = CreateTarget(diffService);
 
                     var result = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
+                        diff);
+
+                    var thread = result.First();
+                    Assert.Equal(4, thread.LineNumber);
+                }
+            }
+
+            [Fact]
+            public async Task HandlesDifferingPathSeparators()
+            {
+                var winFilePath = @"foo\test.cs";
+                var gitHubFilePath = "foo/test.cs";
+
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"New Line 1
+New Line 2
+Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", gitHubFilePath);
+
+                using (var diffService = new FakeDiffService(winFilePath, baseContents))
+                {
+                    var diff = await diffService.Diff(winFilePath, headContents);
+                    var pullRequest = CreatePullRequest(gitHubFilePath, comment);
+                    var target = CreateTarget(diffService);
+
+                    var result = target.BuildCommentThreads(
+                        pullRequest,
+                        winFilePath,
                         diff);
 
                     var thread = result.First();
@@ -101,21 +140,26 @@ Line 4";
                     Substitute.For<IUsageTracker>());
             }
 
-            static IPullRequestReviewCommentModel CreateComment(string diffHunk, string body = "Comment")
+            static IPullRequestReviewCommentModel CreateComment(
+                string diffHunk,
+                string filePath = FilePath,
+                string body = "Comment")
             {
                 var result = Substitute.For<IPullRequestReviewCommentModel>();
                 result.Body.Returns(body);
                 result.DiffHunk.Returns(diffHunk);
-                result.Path.Returns(FilePath);
+                result.Path.Returns(filePath);
                 result.OriginalCommitId.Returns("ORIG");
                 result.OriginalPosition.Returns(1);
                 return result;
             }
 
-            static IPullRequestModel CreatePullRequest(params IPullRequestReviewCommentModel[] comments)
+            static IPullRequestModel CreatePullRequest(
+                string filePath,
+                params IPullRequestReviewCommentModel[] comments)
             {
                 var changedFile1 = Substitute.For<IPullRequestFileModel>();
-                changedFile1.FileName.Returns("test.cs");
+                changedFile1.FileName.Returns(filePath);
                 var changedFile2 = Substitute.For<IPullRequestFileModel>();
                 changedFile2.FileName.Returns("other.cs");
 
