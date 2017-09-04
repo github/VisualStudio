@@ -105,9 +105,12 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public string GetRelativePath(string path)
+        public string GetRelativePath(ITextBuffer buffer)
         {
-            if (Path.IsPathRooted(path))
+            var document = sessionService.GetDocument(buffer);
+            var path = document?.FilePath;
+
+            if (!string.IsNullOrWhiteSpace(path) && Path.IsPathRooted(path))
             {
                 var basePath = repository.LocalPath;
 

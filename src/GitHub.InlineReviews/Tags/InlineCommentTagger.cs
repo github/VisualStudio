@@ -27,7 +27,6 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IPullRequestSessionService sessionService;
         readonly IInlineCommentPeekService peekService;
         bool needsInitialize = true;
         string relativePath;
@@ -43,7 +42,6 @@ namespace GitHub.InlineReviews.Tags
             ITextView view,
             ITextBuffer buffer,
             IPullRequestSessionManager sessionManager,
-            IPullRequestSessionService sessionService,
             IInlineCommentPeekService peekService)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
@@ -51,7 +49,6 @@ namespace GitHub.InlineReviews.Tags
             Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(peekService, nameof(peekService));
 
             this.gitService = gitService;
@@ -60,7 +57,6 @@ namespace GitHub.InlineReviews.Tags
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
-            this.sessionService = sessionService;
             this.peekService = peekService;
         }
 
@@ -163,8 +159,7 @@ namespace GitHub.InlineReviews.Tags
             }
             else
             {
-                var document = sessionService.GetDocument(buffer);
-                relativePath = sessionManager.GetRelativePath(document.FilePath);
+                relativePath = sessionManager.GetRelativePath(buffer);
 
                 if (relativePath != null)
                 {

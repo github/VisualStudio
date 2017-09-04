@@ -30,13 +30,14 @@ namespace GitHub.Services
         Task<IPullRequestSessionLiveFile> GetLiveFile(string relativePath, ITextView textView);
 
         /// <summary>
-        /// Converts a path to a path relative to the current repository.
+        /// Gets the path of a document displayed in a text buffer, relative to the current
+        /// repository.
         /// </summary>
-        /// <param name="path">The path.</param>
+        /// <param name="buffer">The text buffer.</param>
         /// <returns>
-        /// The relative path, or null if the specified path is not in the repository.
+        /// The relative path, or null if the buffer does not represent a file in the repository.
         /// </returns>
-        string GetRelativePath(string path);
+        string GetRelativePath(ITextBuffer buffer);
 
         /// <summary>
         /// Gets a pull request session for a pull request that may not be checked out.
