@@ -56,7 +56,7 @@ namespace GitHub.InlineReviews.Models
         public IEditorContentSource ContentSource { get; internal set; }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
+        public virtual IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
         {
             get { return inlineCommentThreads; }
             internal set { this.RaiseAndSetIfChanged(ref inlineCommentThreads, value); }

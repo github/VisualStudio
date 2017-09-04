@@ -26,8 +26,8 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="relativePath">The relative path to the file in the repository.</param>
         /// <param name="textView">The text view that is showing the file.</param>
-        /// <returns>An <see cref="IPullRequestSessionFile"/>.</returns>
-        Task<IPullRequestSessionFile> GetLiveFile(string relativePath, ITextView textView);
+        /// <returns>An <see cref="IPullRequestSessionLiveFile"/>.</returns>
+        Task<IPullRequestSessionLiveFile> GetLiveFile(string relativePath, ITextView textView);
 
         /// <summary>
         /// Converts a path to a path relative to the current repository.

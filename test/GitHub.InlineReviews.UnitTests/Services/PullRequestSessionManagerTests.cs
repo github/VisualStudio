@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
@@ -333,8 +334,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
-                var threadsChangedReceived = false;
-                file.PropertyChanged += (s, e) => threadsChangedReceived |= e.PropertyName == nameof(file.InlineCommentThreads);
+                var linesChangedReceived = false;
+                file.LinesChanged.Subscribe(x => linesChangedReceived = true);
 
                 var ev = new TextContentChangedEventArgs(textView.TextSnapshot, textView.TextSnapshot, EditOptions.None, null);
                 textView.TextBuffer.Changed += Raise.EventWith(textView.TextBuffer, ev);
@@ -342,7 +343,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 threads[0].Received().IsStale = true;
                 threads[1].Received().IsStale = true;
 
-                Assert.True(threadsChangedReceived);
+                Assert.True(linesChangedReceived);
                 file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
             }
 

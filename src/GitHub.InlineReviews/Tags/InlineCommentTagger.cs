@@ -34,6 +34,7 @@ namespace GitHub.InlineReviews.Tags
         bool leftHandSide;
         IPullRequestSession session;
         IPullRequestSessionFile file;
+        IDisposable fileSubscription;
 
         public InlineCommentTagger(
             IGitService gitService,
@@ -69,10 +70,8 @@ namespace GitHub.InlineReviews.Tags
 
         public void Dispose()
         {
-            if (file != null)
-            {
-                file.PropertyChanged -= LiveFilePropertyChanged;
-            }
+            fileSubscription?.Dispose();
+            fileSubscription = null;
         }
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -169,8 +168,9 @@ namespace GitHub.InlineReviews.Tags
 
                 if (relativePath != null)
                 {
-                    file = await sessionManager.GetLiveFile(relativePath, view);
-                    file.PropertyChanged += LiveFilePropertyChanged;
+                    var liveFile = await sessionManager.GetLiveFile(relativePath, view);
+                    liveFile.LinesChanged.Subscribe(NotifyTagsChanged);
+                    file = liveFile;
                 }
                 else
                 {
@@ -199,11 +199,11 @@ namespace GitHub.InlineReviews.Tags
             TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
         }
 
-        void LiveFilePropertyChanged(object sender, PropertyChangedEventArgs e)
+        void NotifyTagsChanged(IEnumerable<int> lineNumbers)
         {
-            if (e.PropertyName == nameof(file.InlineCommentThreads))
+            foreach (var lineNumber in lineNumbers)
             {
-                NotifyTagsChanged();
+                NotifyTagsChanged(lineNumber);
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
-        public async Task<IPullRequestSessionFile> GetLiveFile(string relativePath, ITextView textView)
+        public async Task<IPullRequestSessionLiveFile> GetLiveFile(string relativePath, ITextView textView)
         {
             var result = new PullRequestSessionLiveFile(
                 relativePath,
@@ -306,6 +307,8 @@ namespace GitHub.InlineReviews.Services
         {
             if (file.TrackingPoints != null)
             {
+                var linesChanged = new List<int>();
+
                 foreach (var thread in file.InlineCommentThreads)
                 {
                     ITrackingPoint trackingPoint;
@@ -317,15 +320,23 @@ namespace GitHub.InlineReviews.Services
 
                         if (lineNumber != thread.LineNumber)
                         {
+                            linesChanged.Add(lineNumber);
+                            linesChanged.Add(thread.LineNumber);
                             thread.LineNumber = lineNumber;
                             thread.IsStale = true;
                         }
                     }
                 }
 
-                // We've changed the InlineCommentThread objects in-place; raise a property
-                // changed event to notify clients.
-                file.RaisePropertyChanged(nameof(file.InlineCommentThreads));
+                linesChanged = linesChanged
+                    .Where(x => x >= 0)
+                    .Distinct()
+                    .ToList();
+
+                if (linesChanged.Count > 0)
+                {
+                    file.NotifyLinesChanged(linesChanged);
+                }
             }
         }
 
