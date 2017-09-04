@@ -73,34 +73,43 @@ namespace GitHub.InlineReviews.Services
 
         public async Task<IPullRequestSessionLiveFile> GetLiveFile(string relativePath, ITextView textView)
         {
-            var result = new PullRequestSessionLiveFile(
-                relativePath,
-                textView,
-                sessionService.CreateRebuildSignal());
-            var dispose = new CompositeDisposable();
+            PullRequestSessionLiveFile result;
 
-            await UpdateLiveFile(result);
-
-            textView.TextBuffer.Properties.AddProperty(
-                typeof(IPullRequestSessionFile),
-                result);
-
-            textView.TextBuffer.Changed += TextBufferChanged;
-            textView.Closed += TextViewClosed;
-
-            dispose.Add(Disposable.Create(() =>
+            if (!textView.TextBuffer.Properties.TryGetProperty(
+                typeof(IPullRequestSessionLiveFile),
+                out result))
             {
-                textView.TextBuffer.Changed -= TextBufferChanged;
-                textView.Closed -= TextViewClosed;
-            }));
+                var dispose = new CompositeDisposable();
 
-            dispose.Add(result.Rebuild.Subscribe(x => UpdateLiveFile(result, x).Forget()));
+                result = new PullRequestSessionLiveFile(
+                    relativePath,
+                    textView,
+                    sessionService.CreateRebuildSignal());
 
-            dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
-                .Skip(1)
-                .Subscribe(_ => UpdateLiveFile(result).Forget()));
+                textView.TextBuffer.Properties.AddProperty(
+                    typeof(IPullRequestSessionLiveFile),
+                    result);
 
-            result.ToDispose = dispose;
+                await UpdateLiveFile(result);
+
+                textView.TextBuffer.Changed += TextBufferChanged;
+                textView.Closed += TextViewClosed;
+
+                dispose.Add(Disposable.Create(() =>
+                {
+                    textView.TextBuffer.Changed -= TextBufferChanged;
+                    textView.Closed -= TextViewClosed;
+                }));
+
+                dispose.Add(result.Rebuild.Subscribe(x => UpdateLiveFile(result, x).Forget()));
+
+                dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
+                    .Skip(1)
+                    .Subscribe(_ => UpdateLiveFile(result).Forget()));
+
+                result.ToDispose = dispose;
+            }
+
             return result;
         }
 
@@ -379,7 +388,7 @@ namespace GitHub.InlineReviews.Services
         void TextBufferChanged(object sender, TextContentChangedEventArgs e)
         {
             var textBuffer = (ITextBuffer)sender;
-            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
+            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionLiveFile));
             InvalidateLiveThreads(file, e.After);
             file.Rebuild.OnNext(textBuffer.CurrentSnapshot);
         }
@@ -387,7 +396,7 @@ namespace GitHub.InlineReviews.Services
         void TextViewClosed(object sender, EventArgs e)
         {
             var textView = (ITextView)sender;
-            var file = textView.TextBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
+            var file = textView.TextBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionLiveFile));
             file.Dispose();
         }
     }

@@ -110,18 +110,18 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 relativePath = info.RelativePath;
                 leftBuffer = info.IsLeftComparisonBuffer;
-                await SessionChanged(info.Session);
+                file = await info.Session.GetFile(relativePath);
+                session = info.Session;
+                await UpdateThread();
             }
             else
             {
-                throw new NotImplementedException();
-                //var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                //relativePath = ToRelativePath(document.FilePath);
-
-                //await SessionChanged(sessionManager.CurrentSession);
-                //sessionManager.WhenAnyValue(x => x.CurrentSession)
-                //    .Skip(1)
-                //    .Subscribe(x => SessionChanged(x).Forget());
+                relativePath = sessionManager.GetRelativePath(buffer);
+                file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView);
+                await SessionChanged(sessionManager.CurrentSession);
+                sessionManager.WhenAnyValue(x => x.CurrentSession)
+                    .Skip(1)
+                    .Subscribe(x => SessionChanged(x).Forget());
             }
         }
 
