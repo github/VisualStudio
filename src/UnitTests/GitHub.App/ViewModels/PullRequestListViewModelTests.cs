@@ -93,7 +93,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
         [Theory]
         [InlineData("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
-        public void OpenPROnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
+        public void OpenPullRequestOnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
@@ -103,7 +103,7 @@ namespace UnitTests.GitHub.App.ViewModels
             prViewModel.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
             prViewModel.SelectedRepository.CloneUrl.Returns(new UriString(cloneUrl));
 
-            prViewModel.OpenPROnGitHub.Execute(pullNumber);
+            prViewModel.OpenPullRequestOnGitHub.Execute(pullNumber);
 
             browser.ReceivedWithAnyArgs(1).OpenUrl(new Uri(expectUrl));
         }

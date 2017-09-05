@@ -76,6 +76,6 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
-        public ReactiveCommand<object> OpenPROnGitHub { get; }
+        public ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
     }
 }

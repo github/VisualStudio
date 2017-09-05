@@ -112,8 +112,8 @@ namespace GitHub.ViewModels
             CreatePullRequest = ReactiveCommand.Create();
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
 
-            OpenPROnGitHub = ReactiveCommand.Create();
-            OpenPROnGitHub.Subscribe(x => DoOpenPROnGitHub((int)x));
+            OpenPullRequestOnGitHub = ReactiveCommand.Create();
+            OpenPullRequestOnGitHub.Subscribe(x => DoOpenPROnGitHub((int)x));
 
             constructing = false;
         }
@@ -276,7 +276,7 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
 
-        public ReactiveCommand<object> OpenPROnGitHub { get; }
+        public ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
 
         bool disposed;
         protected void Dispose(bool disposing)
