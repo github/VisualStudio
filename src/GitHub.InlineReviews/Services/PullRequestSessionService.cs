@@ -84,16 +84,37 @@ namespace GitHub.InlineReviews.Services
                     comments.Key.Item2,
                     diffLines,
                     comments);
+                threads.Add(thread);
+            }
 
-                thread.LineNumber = GetUpdatedLineNumber(thread, diff);
+            UpdateCommentThreads(threads, diff);
+            return threads;
+        }
 
-                if (thread.LineNumber >= 0)
+        /// <inheritdoc/>
+        public IList<int> UpdateCommentThreads(
+            IReadOnlyList<IInlineCommentThreadModel> threads,
+            IList<DiffChunk> diff)
+        {
+            var changedLines = new List<int>();
+
+            foreach (var thread in threads)
+            {
+                var hunk = thread.Comments.First().DiffHunk;
+                var chunks = DiffUtilities.ParseFragment(hunk);
+                var chunk = chunks.Last();
+                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
+                var newLineNumber = GetUpdatedLineNumber(thread, diff);
+
+                if (newLineNumber != thread.LineNumber)
                 {
-                    threads.Add(thread);
+                    if (thread.LineNumber != -1) changedLines.Add(thread.LineNumber);
+                    if (newLineNumber != -1) changedLines.Add(newLineNumber);
+                    thread.LineNumber = newLineNumber;
                 }
             }
 
-            return threads;
+            return changedLines;
         }
 
         /// <inheritdoc/>

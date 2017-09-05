@@ -90,7 +90,7 @@ namespace GitHub.InlineReviews.Services
                     typeof(IPullRequestSessionLiveFile),
                     result);
 
-                await UpdateLiveFile(result);
+                await UpdateLiveFile(result, true);
 
                 textView.TextBuffer.Changed += TextBufferChanged;
                 textView.Closed += TextViewClosed;
@@ -105,7 +105,7 @@ namespace GitHub.InlineReviews.Services
 
                 dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
-                    .Subscribe(_ => UpdateLiveFile(result).Forget()));
+                    .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
 
                 result.ToDispose = dispose;
             }
@@ -273,7 +273,7 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        async Task UpdateLiveFile(PullRequestSessionLiveFile file)
+        async Task UpdateLiveFile(PullRequestSessionLiveFile file, bool rebuildThreads)
         {
             var session = CurrentSession;
 
@@ -289,10 +289,26 @@ namespace GitHub.InlineReviews.Services
                     session.PullRequest.Head.Sha,
                     file.RelativePath,
                     contents);
-                file.InlineCommentThreads = sessionService.BuildCommentThreads(
-                    session.PullRequest,
-                    file.RelativePath,
-                    file.Diff);
+
+                if (rebuildThreads)
+                {
+                    file.InlineCommentThreads = sessionService.BuildCommentThreads(
+                        session.PullRequest,
+                        file.RelativePath,
+                        file.Diff);
+                }
+                else
+                {
+                    var changedLines = sessionService.UpdateCommentThreads(
+                        file.InlineCommentThreads,
+                        file.Diff);
+
+                    if (changedLines.Count > 0)
+                    {
+                        file.NotifyLinesChanged(changedLines);
+                    }
+                }
+
                 file.TrackingPoints = BuildTrackingPoints(
                     file.TextView.TextSnapshot,
                     file.InlineCommentThreads);
@@ -311,7 +327,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (file.TextView.TextSnapshot == snapshot)
             {
-                await UpdateLiveFile(file);
+                await UpdateLiveFile(file, false);
             }
         }
 
@@ -360,9 +376,12 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var thread in threads)
             {
-                var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
-                var p = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
-                result.Add(thread, p);
+                if (thread.LineNumber >= 0)
+                {
+                    var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
+                    var p = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
+                    result.Add(thread, p);
+                }
             }
 
             return result;

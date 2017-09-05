@@ -92,7 +92,7 @@ Line 4";
             }
 
             [Fact]
-            public async Task DoesntReturnNonMatchingComment()
+            public async Task ReturnsLineNumberMinus1ForNonMatchingComment()
             {
                 var baseContents = @"Line 1
 Line 2
@@ -126,7 +126,8 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.Equal(1, result.Count);
+                    Assert.Equal(2, result.Count);
+                    Assert.Equal(-1, result[1].LineNumber);
                 }
             }
 

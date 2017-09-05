@@ -13,7 +13,7 @@ namespace GitHub.InlineReviews.Models
     class InlineCommentThreadModel : ReactiveObject, IInlineCommentThreadModel
     {
         bool isStale;
-        int lineNumber;
+        int lineNumber = -1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadModel"/> class.

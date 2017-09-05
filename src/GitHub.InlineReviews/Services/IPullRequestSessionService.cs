@@ -43,6 +43,18 @@ namespace GitHub.InlineReviews.Services
             IList<DiffChunk> diff);
 
         /// <summary>
+        /// Updates a set of comment thread models for a file based on a new diff.
+        /// </summary>
+        /// <param name="threads">The theads to update.</param>
+        /// <param name="diff">The diff.</param>
+        /// <returns>
+        /// A collection of updated line numbers.
+        /// </returns>
+        IList<int> UpdateCommentThreads(
+            IReadOnlyList<IInlineCommentThreadModel> threads,
+            IList<DiffChunk> diff);
+
+        /// <summary>
         /// Tests whether the contents of a file represent a commit that is pushed to origin.
         /// </summary>
         /// <param name="repository">The repository.</param>
