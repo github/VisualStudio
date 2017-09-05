@@ -7,6 +7,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.ViewModels;
+using GitHub.Primitives;
 using NSubstitute;
 using Xunit;
 
@@ -88,6 +89,23 @@ namespace UnitTests.GitHub.App.ViewModels
             // the selection in the view to be set to null which will reset the filter.
             prViewModel.SelectedAuthor = prViewModel.EmptyUser;
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
+        }
+
+        [Theory]
+        [InlineData("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
+        public void OpenPROnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
+        {
+            var repositoryHost = CreateRepositoryHost();
+            var repository = Substitute.For<ILocalRepositoryModel>();
+            var settings = CreateSettings();
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
+            prViewModel.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
+            prViewModel.SelectedRepository.CloneUrl.Returns(new UriString(cloneUrl));
+
+            prViewModel.OpenPROnGitHub.Execute(pullNumber);
+
+            browser.ReceivedWithAnyArgs(1).OpenUrl(new Uri(expectUrl));
         }
 
         Func<IPullRequestModel, int, IList<IPullRequestModel>, bool> AnyFilter =>

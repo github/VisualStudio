@@ -41,5 +41,6 @@ namespace GitHub.ViewModels
         IAccount SelectedAssignee { get; set; }
         ReactiveCommand<object> OpenPullRequest { get; }
         ReactiveCommand<object> CreatePullRequest { get; }
+        ReactiveCommand<object> OpenPROnGitHub { get; }
     }
 }

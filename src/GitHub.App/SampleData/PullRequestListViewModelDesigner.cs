@@ -34,7 +34,7 @@ namespace GitHub.SampleData
                 Assignee = new AccountDesigner { Login = "haacked", IsUser = true },
             });
             prs.Add(new PullRequestModel(409, "Fix publish button style and a really, really long name for this thing... OMG look how long this name is yusssss",
-                new AccountDesigner { Login = "shana", IsUser = true },                
+                new AccountDesigner { Login = "shana", IsUser = true },
                 DateTimeOffset.Now - TimeSpan.FromHours(5))
             {
                 CommentCount = 27,
@@ -76,5 +76,6 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
+        public ReactiveCommand<object> OpenPROnGitHub { get; }
     }
 }
