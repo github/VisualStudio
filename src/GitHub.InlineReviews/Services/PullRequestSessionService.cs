@@ -121,7 +121,16 @@ namespace GitHub.InlineReviews.Services
         public byte[] GetContents(ITextBuffer buffer)
         {
             var encoding = GetDocument(buffer).Encoding ?? Encoding.Default;
-            return encoding.GetBytes(buffer.CurrentSnapshot.GetText());
+            var content = encoding.GetBytes(buffer.CurrentSnapshot.GetText());
+
+            var preamble = encoding.GetPreamble();
+            if (preamble.Length == 0) return content;
+
+            var completeContent = new byte[preamble.Length + content.Length];
+            Buffer.BlockCopy(preamble, 0, completeContent, 0, preamble.Length);
+            Buffer.BlockCopy(content, 0, completeContent, preamble.Length, content.Length);
+
+            return completeContent;
         }
 
         /// <inheritdoc/>
