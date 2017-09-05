@@ -204,6 +204,9 @@ public class GitClientTests
         [Theory]
         [InlineData("baseSha", null, "mergeBaseSha", "baseRef", 777, "refs/pull/777/head")]
         [InlineData(null, "headSha", "mergeBaseSha", "baseRef", 777, "baseRef")]
+
+        // PR base might not exist, so we must fetch `refs/pull/<PR>/head` first.
+        [InlineData(null, null, "mergeBaseSha", "baseRef", 777, "refs/pull/777/head")]
         public async Task WhatToFetch(string baseSha, string headSha, string mergeBaseSha, string baseRef, int pullNumber,
             string expectRefSpec)
         {
@@ -230,12 +233,12 @@ public class GitClientTests
 
             if (baseSha != null)
             {
-                repo.Lookup<Commit>(baseSha).Returns(baseCommit);
+                repo.Lookup<Commit>(baseSha).Returns(baseSha != null ? baseCommit : null);
             }
 
             if (headSha != null)
             {
-                repo.Lookup<Commit>(headSha).Returns(headCommit);
+                repo.Lookup<Commit>(headSha).Returns(headSha != null ? headCommit : null);
             }
 
             repo.ObjectDatabase.FindMergeBase(baseCommit, headCommit).Returns(mergeBaseCommit);

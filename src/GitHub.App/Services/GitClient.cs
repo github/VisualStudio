@@ -389,6 +389,8 @@ namespace GitHub.Services
             var headCommit = repo.Lookup<Commit>(headSha);
             if (headCommit == null)
             {
+                // The PR base branch might no longer exist, so we fetch using `refs/pull/<PR>/head` first.
+                // This will often fetch the base commits, even when the base branch no longer exists.
                 var headRef = $"refs/pull/{pullNumber}/head";
                 await Fetch(repo, targetCloneUrl, headRef);
                 headCommit = repo.Lookup<Commit>(headSha);
