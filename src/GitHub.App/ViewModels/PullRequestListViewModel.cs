@@ -113,7 +113,7 @@ namespace GitHub.ViewModels
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
 
             OpenPullRequestOnGitHub = ReactiveCommand.Create();
-            OpenPullRequestOnGitHub.Subscribe(x => DoOpenPROnGitHub((int)x));
+            OpenPullRequestOnGitHub.Subscribe(x => DoOpenPullRequestOnGitHub((int)x));
 
             constructing = false;
         }
@@ -344,7 +344,7 @@ namespace GitHub.ViewModels
             navigate.OnNext(d);
         }
 
-        void DoOpenPROnGitHub(int pullRequest)
+        void DoOpenPullRequestOnGitHub(int pullRequest)
         {
             var repoUrl = SelectedRepository.CloneUrl.ToRepositoryUrl();
             var url = repoUrl.Append("pull/" + pullRequest);
