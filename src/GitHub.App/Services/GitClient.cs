@@ -418,45 +418,6 @@ namespace GitHub.Services
             return mergeBaseCommit.Sha;
         }
 
-        public async Task<string> GetPullRequestMergeBase(IRepository repo,
-            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
-        {
-            Guard.ArgumentNotNull(repo, nameof(repo));
-            Guard.ArgumentNotNull(baseCloneUrl, nameof(baseCloneUrl));
-            Guard.ArgumentNotNull(headCloneUrl, nameof(headCloneUrl));
-            Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
-
-            var baseCommit = repo.Lookup<Commit>(baseSha);
-            if (baseCommit == null)
-            {
-                await Fetch(repo, baseCloneUrl, baseRef);
-                baseCommit = repo.Lookup<Commit>(baseSha);
-                if (baseCommit == null)
-                {
-                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {baseCloneUrl}:{baseRef}.");
-                }
-            }
-
-            var headCommit = repo.Lookup<Commit>(headSha);
-            if (headCommit == null)
-            {
-                await Fetch(repo, headCloneUrl, headRef);
-                headCommit = repo.Lookup<Commit>(headSha);
-                if (headCommit == null)
-                {
-                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {headCloneUrl}:{headRef}.");
-                }
-            }
-
-            var mergeBaseCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, headCommit);
-            if (mergeBaseCommit == null)
-            {
-                throw new NotFoundException($"Couldn't find merge base between {baseCommit} and {headCommit}.");
-            }
-
-            return mergeBaseCommit.Sha;
-        }
-
         public Task<bool> IsHeadPushed(IRepository repo)
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
