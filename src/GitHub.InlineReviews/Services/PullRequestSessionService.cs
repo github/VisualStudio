@@ -52,7 +52,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
+        public async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);
             return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
@@ -62,7 +62,7 @@ namespace GitHub.InlineReviews.Services
         public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             IPullRequestModel pullRequest,
             string relativePath,
-            IList<DiffChunk> diff)
+            IReadOnlyList<DiffChunk> diff)
         {
             relativePath = relativePath.Replace("\\", "/");
 
@@ -92,9 +92,9 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IList<int> UpdateCommentThreads(
+        public IReadOnlyList<int> UpdateCommentThreads(
             IReadOnlyList<IInlineCommentThreadModel> threads,
-            IList<DiffChunk> diff)
+            IReadOnlyList<DiffChunk> diff)
         {
             var changedLines = new List<int>();
 

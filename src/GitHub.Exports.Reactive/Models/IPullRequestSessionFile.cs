@@ -35,7 +35,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the diff between the PR merge base and the current state of the file.
         /// </summary>
-        IList<DiffChunk> Diff { get; }
+        IReadOnlyList<DiffChunk> Diff { get; }
 
         /// <summary>
         /// Gets the source for the editor contents for the file.

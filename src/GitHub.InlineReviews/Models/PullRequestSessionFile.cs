@@ -17,7 +17,7 @@ namespace GitHub.InlineReviews.Models
     /// <seealso cref="PullRequestSessionManager"/>
     public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
-        IList<DiffChunk> diff;
+        IReadOnlyList<DiffChunk> diff;
         string commitSha;
         IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
 
@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Models
         public string RelativePath { get; }
 
         /// <inheritdoc/>
-        public IList<DiffChunk> Diff
+        public IReadOnlyList<DiffChunk> Diff
         {
             get { return diff; }
             internal set { this.RaiseAndSetIfChanged(ref diff, value); }

@@ -54,22 +54,22 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             DeleteDirectory(path);
         }
 
-        public Task<IList<DiffChunk>> Diff(string path, byte[] contents)
+        public Task<IReadOnlyList<DiffChunk>> Diff(string path, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
             var blob1 = repository.Head.Tip[path]?.Target as Blob;
             var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
             var patch = repository.Diff.Compare(blob1, blob2).Patch;
-            return Task.FromResult<IList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
+            return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
-        public Task<IList<DiffChunk>> Diff(string path, string contents)
+        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
         {
             return Diff(path, Encoding.UTF8.GetBytes(contents));
         }
 
-        public Task<IList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path, byte[] contents)
+        public Task<IReadOnlyList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path, byte[] contents)
         {
             return Diff(path, contents);
         }

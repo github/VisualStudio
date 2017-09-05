@@ -597,7 +597,7 @@ Line 4";
             var diffChunk = "@@ -1,4 +1,4 @@";
 
             result.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(i =>
-                inner.BuildCommentThreads(i.Arg<IPullRequestModel>(), i.Arg<string>(), i.Arg<IList<DiffChunk>>()));
+                inner.BuildCommentThreads(i.Arg<IPullRequestModel>(), i.Arg<string>(), i.Arg<IReadOnlyList<DiffChunk>>()));
             result.PostReviewComment(null, null, null, 0, null, 0).ReturnsForAnyArgs(i =>
                 CreateComment(diffChunk, i.ArgAt<string>(4)));
             result.PostReviewComment(null, null, null, 0, null, null, null, 0).ReturnsForAnyArgs(i =>

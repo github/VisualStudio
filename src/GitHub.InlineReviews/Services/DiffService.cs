@@ -21,7 +21,7 @@ namespace GitHub.InlineReviews.Services
             this.gitClient = gitClient;
         }
 
-        public async Task<IList<DiffChunk>> Diff(
+        public async Task<IReadOnlyList<DiffChunk>> Diff(
             IRepository repo,
             string baseSha,
             string headSha,

@@ -21,7 +21,7 @@ namespace GitHub.InlineReviews.Services
         /// <param name="relativePath">The relative path to the file.</param>
         /// <param name="contents">The contents of the file.</param>
         /// <returns></returns>
-        Task<IList<DiffChunk>> Diff(
+        Task<IReadOnlyList<DiffChunk>> Diff(
             ILocalRepositoryModel repository,
             string baseSha,
             string headSha,
@@ -40,7 +40,7 @@ namespace GitHub.InlineReviews.Services
         IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             IPullRequestModel pullRequest,
             string relativePath,
-            IList<DiffChunk> diff);
+            IReadOnlyList<DiffChunk> diff);
 
         /// <summary>
         /// Updates a set of comment thread models for a file based on a new diff.
@@ -50,9 +50,9 @@ namespace GitHub.InlineReviews.Services
         /// <returns>
         /// A collection of updated line numbers.
         /// </returns>
-        IList<int> UpdateCommentThreads(
+        IReadOnlyList<int> UpdateCommentThreads(
             IReadOnlyList<IInlineCommentThreadModel> threads,
-            IList<DiffChunk> diff);
+            IReadOnlyList<DiffChunk> diff);
 
         /// <summary>
         /// Tests whether the contents of a file represent a commit that is pushed to origin.

@@ -10,7 +10,7 @@ namespace GitHub.InlineReviews.Models
 {
     public class PullRequestSessionLiveFile : PullRequestSessionFile, IPullRequestSessionLiveFile, IDisposable
     {
-        readonly Subject<IList<int>> linesChanged = new Subject<IList<int>>();
+        readonly Subject<IReadOnlyList<int>> linesChanged = new Subject<IReadOnlyList<int>>();
 
         public PullRequestSessionLiveFile(
             string relativePath,
@@ -26,7 +26,7 @@ namespace GitHub.InlineReviews.Models
         public IDisposable ToDispose { get; internal set; }
         public IDictionary<IInlineCommentThreadModel, ITrackingPoint> TrackingPoints { get; internal set; }
         public ISubject<ITextSnapshot, ITextSnapshot> Rebuild { get; }
-        public IObservable<IList<int>> LinesChanged => linesChanged;
+        public IObservable<IReadOnlyList<int>> LinesChanged => linesChanged;
 
         public override IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
         {
@@ -50,6 +50,6 @@ namespace GitHub.InlineReviews.Models
             ToDispose = null;
         }
 
-        public void NotifyLinesChanged(IList<int> lines) => linesChanged.OnNext(lines);
+        public void NotifyLinesChanged(IReadOnlyList<int> lines) => linesChanged.OnNext(lines);
     }
 }

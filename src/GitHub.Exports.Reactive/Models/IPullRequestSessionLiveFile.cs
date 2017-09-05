@@ -5,6 +5,6 @@ namespace GitHub.Models
 {
     public interface IPullRequestSessionLiveFile : IPullRequestSessionFile
     {
-        IObservable<IList<int>> LinesChanged { get; }
+        IObservable<IReadOnlyList<int>> LinesChanged { get; }
     }
 }

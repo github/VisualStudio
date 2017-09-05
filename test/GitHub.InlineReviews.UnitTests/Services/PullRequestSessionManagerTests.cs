@@ -237,7 +237,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     "file.cs",
-                    Arg.Any<IList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
                 var file = await target.GetLiveFile("file.cs", textView);
@@ -265,7 +265,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     "file.cs",
-                    Arg.Any<IList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
@@ -290,7 +290,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     "file.cs",
-                    Arg.Any<IList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
@@ -330,7 +330,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     "file.cs",
-                    Arg.Any<IList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
