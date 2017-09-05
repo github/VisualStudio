@@ -174,7 +174,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = await target.GetLiveFile("file.cs", textView);
+                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.Same("BASESHA", file.BaseSha);
             }
@@ -189,7 +189,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = await target.GetLiveFile("file.cs", textView);
+                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.Same("TIPSHA", file.CommitSha);
             }
@@ -216,7 +216,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = await target.GetLiveFile("file.cs", textView);
+                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.Same(diff, file.Diff);
             }
@@ -240,7 +240,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = await target.GetLiveFile("file.cs", textView);
+                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.Same(threads, file.InlineCommentThreads);
             }
@@ -268,7 +268,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.Equal(2, file.TrackingPoints.Count);
             }
@@ -293,7 +293,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.NotNull(file.BaseSha);
                 Assert.NotNull(file.CommitSha);
@@ -333,7 +333,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
                 var linesChangedReceived = false;
                 file.LinesChanged.Subscribe(x => linesChangedReceived = true);
 
@@ -359,12 +359,12 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.Same("TIPSHA", file.CommitSha);
 
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
-                file.Rebuild.OnNext(textView.TextSnapshot);
+                file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
 
                 Assert.Null(file.CommitSha);
             }
@@ -379,7 +379,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
 
                 Assert.NotNull(file.ToDispose);
 

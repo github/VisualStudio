@@ -26,8 +26,12 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="relativePath">The relative path to the file in the repository.</param>
         /// <param name="textView">The text view that is showing the file.</param>
+        /// <param name="textBuffer">The text buffer with the file contents.</param>
         /// <returns>An <see cref="IPullRequestSessionLiveFile"/>.</returns>
-        Task<IPullRequestSessionLiveFile> GetLiveFile(string relativePath, ITextView textView);
+        Task<IPullRequestSessionLiveFile> GetLiveFile(
+            string relativePath,
+            ITextView textView,
+            ITextBuffer textBuffer);
 
         /// <summary>
         /// Gets the path of a document displayed in a text buffer, relative to the current

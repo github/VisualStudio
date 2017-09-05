@@ -14,15 +14,15 @@ namespace GitHub.InlineReviews.Models
 
         public PullRequestSessionLiveFile(
             string relativePath,
-            ITextView textView,
+            ITextBuffer textBuffer,
             ISubject<ITextSnapshot, ITextSnapshot> rebuild)
             : base(relativePath)
         {
-            TextView = textView;
+            TextBuffer = textBuffer;
             Rebuild = rebuild;
         }
 
-        public ITextView TextView { get; }
+        public ITextBuffer TextBuffer { get; }
         public IDisposable ToDispose { get; internal set; }
         public IDictionary<IInlineCommentThreadModel, ITrackingPoint> TrackingPoints { get; internal set; }
         public ISubject<ITextSnapshot, ITextSnapshot> Rebuild { get; }

@@ -71,11 +71,14 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
-        public async Task<IPullRequestSessionLiveFile> GetLiveFile(string relativePath, ITextView textView)
+        public async Task<IPullRequestSessionLiveFile> GetLiveFile(
+            string relativePath,
+            ITextView textView,
+            ITextBuffer textBuffer)
         {
             PullRequestSessionLiveFile result;
 
-            if (!textView.TextBuffer.Properties.TryGetProperty(
+            if (!textBuffer.Properties.TryGetProperty(
                 typeof(IPullRequestSessionLiveFile),
                 out result))
             {
@@ -83,16 +86,16 @@ namespace GitHub.InlineReviews.Services
 
                 result = new PullRequestSessionLiveFile(
                     relativePath,
-                    textView,
+                    textBuffer,
                     sessionService.CreateRebuildSignal());
 
-                textView.TextBuffer.Properties.AddProperty(
+                textBuffer.Properties.AddProperty(
                     typeof(IPullRequestSessionLiveFile),
                     result);
 
                 await UpdateLiveFile(result, true);
 
-                textView.TextBuffer.Changed += TextBufferChanged;
+                textBuffer.Changed += TextBufferChanged;
                 textView.Closed += TextViewClosed;
 
                 dispose.Add(Disposable.Create(() =>
@@ -280,7 +283,7 @@ namespace GitHub.InlineReviews.Services
             if (session != null)
             {
                 var mergeBase = await session.GetMergeBase();
-                var contents = sessionService.GetContents(file.TextView.TextBuffer);
+                var contents = sessionService.GetContents(file.TextBuffer);
                 file.BaseSha = session.PullRequest.Base.Sha;
                 file.CommitSha = await CalculateCommitSha(session, file, contents);
                 file.Diff = await sessionService.Diff(
@@ -310,7 +313,7 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 file.TrackingPoints = BuildTrackingPoints(
-                    file.TextView.TextSnapshot,
+                    file.TextBuffer.CurrentSnapshot,
                     file.InlineCommentThreads);
             }
             else
@@ -325,7 +328,7 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateLiveFile(PullRequestSessionLiveFile file, ITextSnapshot snapshot)
         {
-            if (file.TextView.TextSnapshot == snapshot)
+            if (file.TextBuffer.CurrentSnapshot == snapshot)
             {
                 await UpdateLiveFile(file, false);
             }
@@ -404,6 +407,28 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
+        private void CloseLiveFiles(ITextBuffer textBuffer)
+        {
+            PullRequestSessionLiveFile file;
+
+            if (textBuffer.Properties.TryGetProperty(
+                typeof(IPullRequestSessionLiveFile),
+                out file))
+            {
+                file.Dispose();
+            }
+
+            var projection = textBuffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    CloseLiveFiles(source);
+                }
+            }
+        }
+
         void TextBufferChanged(object sender, TextContentChangedEventArgs e)
         {
             var textBuffer = (ITextBuffer)sender;
@@ -415,8 +440,7 @@ namespace GitHub.InlineReviews.Services
         void TextViewClosed(object sender, EventArgs e)
         {
             var textView = (ITextView)sender;
-            var file = textView.TextBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionLiveFile));
-            file.Dispose();
+            CloseLiveFiles(textView.TextBuffer);
         }
     }
 }

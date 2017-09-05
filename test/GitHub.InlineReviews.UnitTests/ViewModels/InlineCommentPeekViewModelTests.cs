@@ -92,7 +92,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 .Do(async x =>
                 {
                     // Simulate the thread being added to the session.
-                    var file = await sessionManager.GetLiveFile(RelativePath, peekSession.TextView);
+                    var file = await sessionManager.GetLiveFile(
+                        RelativePath,
+                        peekSession.TextView,
+                        peekSession.TextView.TextBuffer);
                     var newThread = CreateThread(8, "New Comment");
                     file.InlineCommentThreads.Returns(new[] { newThread });
                 });
@@ -120,7 +123,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
             Assert.Equal(2, target.Thread.Comments.Count);
 
-            var file = await sessionManager.GetLiveFile(RelativePath, peekSession.TextView);
+            var file = await sessionManager.GetLiveFile(
+                RelativePath,
+                peekSession.TextView,
+                peekSession.TextView.TextBuffer);
             AddCommentToExistingThread(file);
 
             Assert.Equal(3, target.Thread.Comments.Count);
@@ -147,7 +153,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             placeholder.BeginEdit.Execute(null);
             placeholder.Body = "Comment being edited";
 
-            var file = await sessionManager.GetLiveFile(RelativePath, peekSession.TextView);
+            var file = await sessionManager.GetLiveFile(
+                RelativePath,
+                peekSession.TextView,
+                peekSession.TextView.TextBuffer);
             AddCommentToExistingThread(file);
 
             placeholder = target.Thread.Comments.Last();
@@ -176,7 +185,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             sessionManager.CurrentSession.PostReviewComment(null, 0)
                 .ReturnsForAnyArgs(async x =>
                 {
-                    var file = await sessionManager.GetLiveFile(RelativePath, peekSession.TextView);
+                    var file = await sessionManager.GetLiveFile(
+                        RelativePath,
+                        peekSession.TextView,
+                        peekSession.TextView.TextBuffer);
                     AddCommentToExistingThread(file);
                     return file.InlineCommentThreads[0].Comments.Last();
                 });
@@ -283,7 +295,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             var result = Substitute.For<IPullRequestSessionManager>();
             result.CurrentSession.Returns(session);
-            result.GetLiveFile(RelativePath, Arg.Any<ITextView>()).Returns(file);
+            result.GetLiveFile(RelativePath, Arg.Any<ITextView>(), Arg.Any<ITextBuffer>()).Returns(file);
             result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(RelativePath);
 
             return result;

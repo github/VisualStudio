@@ -163,7 +163,7 @@ namespace GitHub.InlineReviews.Tags
 
                 if (relativePath != null)
                 {
-                    var liveFile = await sessionManager.GetLiveFile(relativePath, view);
+                    var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
                     liveFile.LinesChanged.Subscribe(NotifyTagsChanged);
                     file = liveFile;
                 }
