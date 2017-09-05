@@ -28,8 +28,9 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        IDisposable fileSubscription;
         ICommentThreadViewModel thread;
+        IDisposable fileSubscription;
+        IDisposable sessionSubscription;
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
         string relativePath;
@@ -97,6 +98,10 @@ namespace GitHub.InlineReviews.ViewModels
 
         public void Dispose()
         {
+            threadSubscription?.Dispose();
+            threadSubscription = null;
+            sessionSubscription?.Dispose();
+            sessionSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
         }
@@ -119,10 +124,12 @@ namespace GitHub.InlineReviews.ViewModels
                 relativePath = sessionManager.GetRelativePath(buffer);
                 file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView);
                 await SessionChanged(sessionManager.CurrentSession);
-                sessionManager.WhenAnyValue(x => x.CurrentSession)
+                sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(x => SessionChanged(x).Forget());
             }
+
+            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
         }
 
         async Task UpdateThread()
@@ -168,17 +175,18 @@ namespace GitHub.InlineReviews.ViewModels
         async Task SessionChanged(IPullRequestSession session)
         {
             this.session = session;
-            fileSubscription?.Dispose();
 
             if (session == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();
+                threadSubscription = null;
                 return;
             }
-
-            file = await session.GetFile(relativePath);
-            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
+            else
+            {
+                await UpdateThread();
+            }
         }
 
         async Task<string> GetPlaceholderBodyToPreserve()

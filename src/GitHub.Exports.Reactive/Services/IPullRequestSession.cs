@@ -84,16 +84,6 @@ namespace GitHub.Services
         Task<string> GetMergeBase();
 
         /// <summary>
-        /// Converts a path to a path relative to the current repository.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <returns>
-        /// The relative path, or null if the specified path is not in the repository.
-        /// </returns>
-        [Obsolete("Use the one in IPullRequestSessionManager. This will be removed soon.")]
-        string GetRelativePath(string path);
-
-        /// <summary>
         /// Posts a new PR review comment.
         /// </summary>
         /// <param name="body">The comment body.</param>
