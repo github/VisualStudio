@@ -495,6 +495,116 @@ Line 4";
                 }
             }
 
+            [Fact]
+            public async Task UpdatesReviewCommentWithNewBody()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var contents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Original Comment");
+                var updatedComment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Updated Comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        OwnerCloneUrl,
+                        comment);
+
+                    diffService.AddFile(FilePath, baseContents);
+
+                    var target = new PullRequestSessionManager(
+                        CreatePullRequestService(),
+                        CreateRealSessionService(diff: diffService),
+                        CreateRepositoryHosts(pullRequest),
+                        new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+
+                    Assert.Equal("Original Comment", file.InlineCommentThreads[0].Comments[0].Body);
+
+                    pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        OwnerCloneUrl,
+                        updatedComment);
+                    await target.CurrentSession.Update(pullRequest);
+
+                    await file.LinesChanged.Take(1);
+
+                    Assert.Equal("Updated Comment", file.InlineCommentThreads[0].Comments[0].Body);
+                }
+            }
+
+            [Fact]
+            public async Task AddsNewReviewCommentToThread()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var contents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment1");
+
+                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment2");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        OwnerCloneUrl,
+                        comment1);
+
+                    diffService.AddFile(FilePath, baseContents);
+
+                    var target = new PullRequestSessionManager(
+                        CreatePullRequestService(),
+                        CreateRealSessionService(diff: diffService),
+                        CreateRepositoryHosts(pullRequest),
+                        new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+
+                    Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
+
+                    pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        OwnerCloneUrl,
+                        comment1,
+                        comment2);
+                    await target.CurrentSession.Update(pullRequest);
+
+                    var linesChanged = await file.LinesChanged.Take(1);
+
+                    Assert.Equal(2, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.Equal("Comment1", file.InlineCommentThreads[0].Comments[0].Body);
+                    Assert.Equal("Comment2", file.InlineCommentThreads[0].Comments[1].Body);
+                }
+            }
+
             static IPullRequestReviewCommentModel CreateComment(
                 string diffHunk,
                 string body = "Comment",

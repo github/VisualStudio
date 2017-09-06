@@ -29,6 +29,7 @@ namespace GitHub.InlineReviews.Services
         bool isCheckedOut;
         string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
+        IPullRequestModel pullRequest;
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -45,8 +46,8 @@ namespace GitHub.InlineReviews.Services
 
             this.service = service;
             this.isCheckedOut = isCheckedOut;
+            this.pullRequest = pullRequest;
             User = user;
-            PullRequest = pullRequest;
             LocalRepository = localRepository;
             RepositoryOwner = repositoryOwner;
         }
@@ -286,7 +287,11 @@ namespace GitHub.InlineReviews.Services
         public IAccount User { get; }
 
         /// <inheritdoc/>
-        public IPullRequestModel PullRequest { get; private set; }
+        public IPullRequestModel PullRequest
+        {
+            get { return pullRequest; }
+            private set { this.RaiseAndSetIfChanged(ref pullRequest, value); }
+        }
 
         /// <inheritdoc/>
         public ILocalRepositoryModel LocalRepository { get; }
