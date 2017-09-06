@@ -24,6 +24,99 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheGetFileMethod
         {
+            [Fact]
+            public async Task BaseShaIsSet()
+            {
+                var target = new PullRequestSession(
+                    CreateService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+                var file = await target.GetFile(FilePath);
+
+                Assert.Same("BASE_SHA", file.BaseSha);
+            }
+
+            [Fact]
+            public async Task CommitShaIsSet()
+            {
+                var target = new PullRequestSession(
+                    CreateService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+                var file = await target.GetFile(FilePath);
+
+                Assert.Same("HEAD_SHA", file.CommitSha);
+            }
+
+            [Fact]
+            public async Task DiffShaIsSet()
+            {
+                var diff = new List<DiffChunk>();
+                var sessionService = CreateService();
+
+                sessionService.Diff(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    "MERGE_BASE",
+                    "HEAD_SHA",
+                    FilePath).Returns(diff);
+
+                var target = new PullRequestSession(
+                    sessionService,
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+                var file = await target.GetFile(FilePath);
+
+                Assert.Same(diff, file.Diff);
+            }
+
+            [Fact]
+            public async Task InlineCommentThreadsIsSet()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
+                    diffService.AddFile(FilePath, headContents, "HEAD_SHA");
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
+                        true);
+
+                    var file = await target.GetFile(FilePath);
+                    var thread = file.InlineCommentThreads.First();
+                    Assert.Equal(2, thread.LineNumber);
+                }
+            }
         }
 
         public class ThePostReviewCommentMethod
@@ -64,24 +157,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     1);
             }
 
-            [Fact]
-            public async Task UpdatesFileWithNewThread()
-            {
-                using (var diffService = new FakeDiffService())
-                {
-                    var target = await CreateTarget(diffService);
-                    var file = await target.GetFile(FilePath);
-
-                    Assert.Empty(file.InlineCommentThreads);
-
-                    await target.PostReviewComment("New Comment", 0);
-
-                    Assert.Equal(1, file.InlineCommentThreads.Count);
-                    Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
-                    Assert.Equal("New Comment", file.InlineCommentThreads[0].Comments[0].Body);
-                }
-            }
-
             PullRequestSession CreateTarget(
                 IPullRequestSessionService service,
                 string localRepositoryOwner,
@@ -100,35 +175,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     repository,
                     remoteRepositoryOwner,
                     true);
-            }
-
-            async Task<PullRequestSession> CreateTarget(FakeDiffService diffService)
-            {
-                var baseContents = @"Line 1
-Line 2
-Line 3
-Line 4";
-                var headContents = @"Line 1
-Line 2
-Line 3 with comment
-Line 4";
-
-                var pullRequest = CreatePullRequest();
-                var service = CreateService(diffService);
-
-                diffService.AddFile(FilePath, baseContents);
-
-                var target = new PullRequestSession(
-                    service,
-                    Substitute.For<IAccount>(),
-                    pullRequest,
-                    Substitute.For<ILocalRepositoryModel>(),
-                    "owner",
-                    true);
-
-                var editor = new FakeEditorContentSource(headContents);
-                var file = await target.GetFile(FilePath, editor);
-                return target;
             }
         }
 
@@ -160,7 +206,7 @@ Line 4";
 
                     // Simulate calling GetFile with a file that's not yet been initialized
                     // while doing the Update.
-                    service.WhenForAnyArgs(x => x.Diff(null, null, null, null, null))
+                    service.WhenForAnyArgs(x => x.Diff(null, null, null, null))
                         .Do(_ => target.GetFile("other.cs").Forget());
 
                     await target.Update(pullRequest);
@@ -207,39 +253,18 @@ Line 4";
             return result;
         }
 
-        static IPullRequestSessionService CreateService(FakeDiffService diffService)
+        static IPullRequestSessionService CreateService(IDiffService diffService = null)
         {
-            var result = Substitute.For<IPullRequestSessionService>();
-            var inner = new PullRequestSessionService(
+            var result = Substitute.ForPartsOf<PullRequestSessionService>(
                 Substitute.For<IGitService>(),
                 Substitute.For<IGitClient>(),
-                diffService,
+                diffService ?? Substitute.For<IDiffService>(),
                 Substitute.For<IApiClientFactory>(),
                 Substitute.For<IUsageTracker>());
 
-            result.Diff(
-                Arg.Any<ILocalRepositoryModel>(),
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<byte[]>())
-                .Returns(i => diffService.Diff(
-                    null,
-                    i.ArgAt<string>(1),
-                    i.ArgAt<string>(2),
-                    i.ArgAt<string>(3),
-                    i.ArgAt<byte[]>(4)));
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
-
-            var diffChunk = "@@ -1,4 +1,4 @@";
-
-            result.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(i =>
-                inner.BuildCommentThreads(i.Arg<IPullRequestModel>(), i.Arg<string>(), i.Arg<IReadOnlyList<DiffChunk>>()));
-            result.PostReviewComment(null, null, null, 0, null, 0).ReturnsForAnyArgs(i =>
-                CreateComment(diffChunk, i.ArgAt<string>(4)));
-            result.PostReviewComment(null, null, null, 0, null, null, null, 0).ReturnsForAnyArgs(i =>
-                CreateComment(diffChunk, i.ArgAt<string>(4)));
-
+            result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())
+                .Returns("MERGE_BASE");
             return result;
         }
     }

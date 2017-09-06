@@ -215,7 +215,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
 
             [Fact]
-            public async Task FileDiffIsSet()
+            public async Task DiffIsSet()
             {
                 var textView = CreateTextView();
                 var contents = Encoding.UTF8.GetBytes("File contents");
@@ -439,7 +439,7 @@ Line 4";
                         OwnerCloneUrl,
                         comment);
 
-                    diffService.AddFile(FilePath, baseContents);
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
@@ -484,7 +484,7 @@ Line 4";
                         OwnerCloneUrl,
                         comment);
 
-                    diffService.AddFile(FilePath, baseContents);
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
@@ -537,7 +537,7 @@ Line 4";
                         OwnerCloneUrl,
                         comment);
 
-                    diffService.AddFile(FilePath, baseContents);
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
@@ -591,7 +591,7 @@ Line 4";
                         OwnerCloneUrl,
                         comment1);
 
-                    diffService.AddFile(FilePath, baseContents);
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
@@ -657,6 +657,7 @@ Line 4";
                 var sessionService = Substitute.For<IPullRequestSessionService>();
                 sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(!isModified);
+                sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
                 sessionService.GetTipSha(null).ReturnsForAnyArgs("TIPSHA");
                 return sessionService;
             }
@@ -670,6 +671,8 @@ Line 4";
                     Substitute.For<IApiClientFactory>(),
                     Substitute.For<IUsageTracker>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
+                result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())
+                    .Returns("MERGE_BASE");
                 return result;
             }
 
@@ -886,7 +889,7 @@ Line 4";
             return result;
         }
 
-        ILocalRepositoryModel CreateRepositoryModel(string cloneUrl = "https://github.com/owner/repo")
+        ILocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)
         {
             var result = Substitute.For<ILocalRepositoryModel>();
             var uriString = new UriString(cloneUrl);

@@ -52,14 +52,14 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
         {
             var repo = await GetRepository(repository);
             return await diffService.Diff(repo, baseSha, headSha, relativePath);
         }
 
         /// <inheritdoc/>
-        public async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);
             return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
@@ -163,7 +163,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<string> GetTipSha(ILocalRepositoryModel repository)
+        public virtual async Task<string> GetTipSha(ILocalRepositoryModel repository)
         {
             var repo = await GetRepository(repository);
             return repo.Head.Tip.Sha;
@@ -220,7 +220,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public virtual async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             var baseSha = pullRequest.Base.Sha;
             var headSha = pullRequest.Head.Sha;

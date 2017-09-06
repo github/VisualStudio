@@ -17,6 +17,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
     {
         readonly IRepository repository;
         readonly IDiffService inner;
+        readonly Dictionary<string, string> commitAliases = new Dictionary<string, string>();
 
         public FakeDiffService()
         {
@@ -31,7 +32,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             AddFile(path, contents);
         }
 
-        public void AddFile(string path, string contents)
+        public string AddFile(string path, string contents)
         {
             var signature = new Signature("user", "user@user", DateTimeOffset.Now);
             var fullPath = Path.Combine(repository.Info.WorkingDirectory, path);
@@ -40,6 +41,14 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             File.WriteAllText(fullPath, contents);
             repository.Stage(path);
             repository.Commit("Added " + path, signature, signature);
+            return repository.Head.Tip.Sha;
+        }
+
+        public string AddFile(string path, string contents, string commitAlias)
+        {
+            var sha = AddFile(path, contents);
+            commitAliases.Add(commitAlias, sha);
+            return sha;
         }
 
         public void Dispose()
@@ -54,14 +63,17 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
 
         public Task<IReadOnlyList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path)
         {
-            throw new NotImplementedException();
+            var blob1 = GetBlob(path, baseSha);
+            var blob2 = GetBlob(path, headSha);
+            var patch = repository.Diff.Compare(blob1, blob2).Patch;
+            return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
-        public Task<IReadOnlyList<DiffChunk>> Diff(string path, byte[] contents)
+        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string baseSha, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
-            var blob1 = repository.Head.Tip[path]?.Target as Blob;
+            var blob1 = GetBlob(path, baseSha);
             var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
             var patch = repository.Diff.Compare(blob1, blob2).Patch;
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
@@ -69,12 +81,20 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
 
         public Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
         {
-            return Diff(path, Encoding.UTF8.GetBytes(contents));
+            return Diff(path, repository.Head.Tip.Sha, Encoding.UTF8.GetBytes(contents));
         }
 
         public Task<IReadOnlyList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path, byte[] contents)
         {
-            return Diff(path, contents);
+            return Diff(path, baseSha, contents);
+        }
+
+        Blob GetBlob(string path, string id)
+        {
+            string sha;
+            if (!commitAliases.TryGetValue(id, out sha)) sha = id;
+            var commit = repository.Lookup<Commit>(sha);
+            return commit?[path]?.Target as Blob;
         }
 
         static IRepository CreateRepository()
