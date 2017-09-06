@@ -28,7 +28,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task BaseShaIsSet()
             {
                 var target = new PullRequestSession(
-                    CreateService(),
+                    CreateSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task CommitShaIsSet()
             {
                 var target = new PullRequestSession(
-                    CreateService(),
+                    CreateSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -58,7 +58,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task DiffShaIsSet()
             {
                 var diff = new List<DiffChunk>();
-                var sessionService = CreateService();
+                var sessionService = CreateSessionService();
 
                 sessionService.Diff(
                     Arg.Any<ILocalRepositoryModel>(),
@@ -99,7 +99,7 @@ Line 4";
                 using (var diffService = new FakeDiffService())
                 {
                     var pullRequest = CreatePullRequest(comment);
-                    var service = CreateService(diffService);
+                    var service = CreateSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
                     diffService.AddFile(FilePath, headContents, "HEAD_SHA");
@@ -181,6 +181,56 @@ Line 4";
         public class TheUpdateMethod
         {
             [Fact]
+            public async Task AddsNewReviewCommentToThread()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment1");
+                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment2");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest(comment1);
+                    var service = CreateSessionService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
+                    diffService.AddFile(FilePath, headContents, "HEAD_SHA");
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
+                        true);
+
+                    var file = await target.GetFile(FilePath);
+
+                    Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
+
+                    pullRequest = CreatePullRequest(comment1, comment2);
+                    await target.Update(pullRequest);
+
+                    Assert.Equal(2, file.InlineCommentThreads[0].Comments.Count);
+                }
+            }
+
+            [Fact]
             public async Task DoesntThrowIfGetFileCalledDuringUpdate()
             {
                 var comment = CreateComment(@"@@ -1,4 +1,4 @@
@@ -192,7 +242,7 @@ Line 4";
                 using (var diffService = new FakeDiffService())
                 {
                     var pullRequest = CreatePullRequest(comment);
-                    var service = CreateService(diffService);
+                    var service = CreateSessionService(diffService);
 
                     var target = new PullRequestSession(
                         service,
@@ -253,7 +303,7 @@ Line 4";
             return result;
         }
 
-        static IPullRequestSessionService CreateService(IDiffService diffService = null)
+        static IPullRequestSessionService CreateSessionService(IDiffService diffService = null)
         {
             var result = Substitute.ForPartsOf<PullRequestSessionService>(
                 Substitute.For<IGitService>(),
