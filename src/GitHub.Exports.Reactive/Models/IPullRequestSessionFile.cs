@@ -5,12 +5,12 @@ using System.ComponentModel;
 namespace GitHub.Models
 {
     /// <summary>
-    /// A file in a pull request session.
+    /// Represents a file in a pull request.
     /// </summary>
     /// <remarks>
-    /// A pull request session file represents the real-time state of a file in a pull request in
-    /// the IDE. If the pull request branch is checked out, it represents the state of a file from
-    /// the pull request model updated to the current state of the code on disk and in the editor.
+    /// A <see cref="IPullRequestSessionFile"/> holds the review comments for a file in a pull
+    /// request together with associated information such as the commit SHA of the file and the
+    /// diff with the file's merge base.
     /// </remarks>
     /// <seealso cref="IPullRequestSession"/>
     /// <seealso cref="IPullRequestSessionManager"/>
