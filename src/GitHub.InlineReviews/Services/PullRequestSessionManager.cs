@@ -398,16 +398,9 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionFile file,
             byte[] content)
         {
-            if (session.IsCheckedOut)
-            {
-                var repo = session.LocalRepository;
-                return await sessionService.IsUnmodifiedAndPushed(repo, file.RelativePath, content) ?
-                       await sessionService.GetTipSha(repo) : null;
-            }
-            else
-            {
-                return session.PullRequest.Head.Sha;
-            }
+            var repo = session.LocalRepository;
+            return await sessionService.IsUnmodifiedAndPushed(repo, file.RelativePath, content) ?
+                   await sessionService.GetTipSha(repo) : null;
         }
 
         private void CloseLiveFiles(ITextBuffer textBuffer)

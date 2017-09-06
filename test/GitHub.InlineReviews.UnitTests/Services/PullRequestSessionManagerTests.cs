@@ -200,6 +200,21 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
 
             [Fact]
+            public async Task CommitShaIsNullIfModified()
+            {
+                var textView = CreateTextView();
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    CreateSessionService(true),
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+
+                Assert.Null(file.CommitSha);
+            }
+
+            [Fact]
             public async Task FileDiffIsSet()
             {
                 var textView = CreateTextView();
@@ -320,6 +335,9 @@ namespace GitHub.InlineReviews.UnitTests.Services
             {
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
+                var rebuild = Substitute.For<ISubject<ITextSnapshot, ITextSnapshot>>();
+                sessionService.CreateRebuildSignal().Returns(rebuild);
+
                 var threads = new List<IInlineCommentThreadModel>
                 {
                     CreateInlineCommentThreadModel(1),
@@ -346,8 +364,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var snapshot = textView.TextSnapshot;
                 file.TrackingPoints[file.InlineCommentThreads[0]].GetPosition(snapshot).ReturnsForAnyArgs(5);
 
-                var ev = new TextContentChangedEventArgs(textView.TextSnapshot, textView.TextSnapshot, EditOptions.None, null);
-                textView.TextBuffer.Changed += Raise.EventWith(textView.TextBuffer, ev);
+                SignalTextChanged(textView.TextBuffer);
 
                 threads[0].Received().IsStale = true;
                 threads[1].DidNotReceive().IsStale = true;
@@ -480,12 +497,7 @@ Line 4";
                     Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
 
                     textView.TextSnapshot.GetText().Returns(editorContents);
-                    textView.TextBuffer.Changed += Raise.EventWith(new TextContentChangedEventArgs(
-                        textView.TextSnapshot,
-                        textView.TextSnapshot,
-                        EditOptions.None,
-                        null));
-                    file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
+                    SignalTextChanged(textView.TextBuffer);
 
                     var linesChanged = await file.LinesChanged.Take(1);
 
@@ -605,6 +617,27 @@ Line 4";
                 }
             }
 
+            [Fact]
+            public async Task CommitShaIsUpdatedOnTextChange()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+
+                Assert.Equal("TIPSHA", file.CommitSha);
+
+                sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
+                SignalTextChanged(textView.TextBuffer);
+
+                Assert.Null(file.CommitSha);
+            }
+
             static IPullRequestReviewCommentModel CreateComment(
                 string diffHunk,
                 string body = "Comment",
@@ -622,8 +655,7 @@ Line 4";
             IPullRequestSessionService CreateSessionService(bool isModified = false)
             {
                 var sessionService = Substitute.For<IPullRequestSessionService>();
-                var rebuild = Substitute.For<ISubject<ITextSnapshot, ITextSnapshot>>();
-                sessionService.CreateRebuildSignal().Returns(rebuild);
+                sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(!isModified);
                 sessionService.GetTipSha(null).ReturnsForAnyArgs("TIPSHA");
                 return sessionService;
@@ -682,6 +714,13 @@ Line 4";
                 var result = Substitute.For<IInlineCommentThreadModel>();
                 result.LineNumber.Returns(lineNumber);
                 return result;
+            }
+
+            static void SignalTextChanged(ITextBuffer buffer)
+            {
+                var snapshot = buffer.CurrentSnapshot;
+                var ev = new TextContentChangedEventArgs(snapshot, snapshot, EditOptions.None, null);
+                buffer.Changed += Raise.EventWith(buffer, ev);
             }
         }
 
