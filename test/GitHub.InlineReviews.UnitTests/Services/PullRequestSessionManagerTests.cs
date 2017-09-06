@@ -5,12 +5,14 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -23,6 +25,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
     {
         const int CurrentBranchPullRequestNumber = 15;
         const int NotCurrentBranchPullRequestNumber = 10;
+        const string OwnerCloneUrl = "https://github.com/owner/repo";
 
         public PullRequestSessionManagerTests()
         {
@@ -164,6 +167,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheGetLiveFileMethod : PullRequestSessionManagerTests
         {
+            const string FilePath = "test.cs";
+
             [Fact]
             public async Task BaseShaIsSet()
             {
@@ -174,7 +179,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same("BASESHA", file.BaseSha);
             }
@@ -189,7 +194,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same("TIPSHA", file.CommitSha);
             }
@@ -208,7 +213,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Arg.Any<ILocalRepositoryModel>(),
                     "MERGE_BASE",
                     "HEADSHA",
-                    "file.cs",
+                    FilePath,
                     contents).Returns(diff);
 
                 var target = new PullRequestSessionManager(
@@ -216,7 +221,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same(diff, file.Diff);
             }
@@ -236,11 +241,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
-                    "file.cs",
+                    FilePath,
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same(threads, file.InlineCommentThreads);
             }
@@ -264,11 +269,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
-                    "file.cs",
+                    FilePath,
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Equal(2, file.TrackingPoints.Count);
             }
@@ -289,11 +294,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
-                    "file.cs",
+                    FilePath,
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.NotNull(file.BaseSha);
                 Assert.NotNull(file.CommitSha);
@@ -329,19 +334,23 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
-                    "file.cs",
+                    FilePath,
                     Arg.Any<IReadOnlyList<DiffChunk>>())
                     .Returns(threads);
 
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
                 var linesChangedReceived = false;
                 file.LinesChanged.Subscribe(x => linesChangedReceived = true);
+
+                // Make the first tracking points return a different value so that the thread is marked as stale.
+                var snapshot = textView.TextSnapshot;
+                file.TrackingPoints[file.InlineCommentThreads[0]].GetPosition(snapshot).ReturnsForAnyArgs(5);
 
                 var ev = new TextContentChangedEventArgs(textView.TextSnapshot, textView.TextSnapshot, EditOptions.None, null);
                 textView.TextBuffer.Changed += Raise.EventWith(textView.TextBuffer, ev);
 
                 threads[0].Received().IsStale = true;
-                threads[1].Received().IsStale = true;
+                threads[1].DidNotReceive().IsStale = true;
 
                 Assert.True(linesChangedReceived);
                 file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
@@ -359,7 +368,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same("TIPSHA", file.CommitSha);
 
@@ -379,13 +388,125 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
-                var file = (PullRequestSessionLiveFile)await target.GetLiveFile("file.cs", textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.NotNull(file.ToDispose);
 
                 textView.Closed += Raise.Event();
 
                 Assert.Null(file.ToDispose);
+            }
+
+            [Fact]
+            public async Task InlineCommentThreadsAreLoadedFromCurrentSession()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var contents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        OwnerCloneUrl,
+                        comment);
+
+                    diffService.AddFile(FilePath, baseContents);
+
+                    var target = new PullRequestSessionManager(
+                        CreatePullRequestService(),
+                        CreateRealSessionService(diff: diffService),
+                        CreateRepositoryHosts(pullRequest),
+                        new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+
+                    Assert.Equal(1, file.InlineCommentThreads.Count);
+                    Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
+                }
+            }
+
+            [Fact]
+            public async Task UpdatesInlineCommentThreadsFromEditorContent()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var contents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var editorContents = @"New Line 1
+New Line 2
+Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        OwnerCloneUrl,
+                        comment);
+
+                    diffService.AddFile(FilePath, baseContents);
+
+                    var target = new PullRequestSessionManager(
+                        CreatePullRequestService(),
+                        CreateRealSessionService(diff: diffService),
+                        CreateRepositoryHosts(pullRequest),
+                        new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+
+                    Assert.Equal(1, file.InlineCommentThreads.Count);
+                    Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
+
+                    textView.TextSnapshot.GetText().Returns(editorContents);
+                    textView.TextBuffer.Changed += Raise.EventWith(new TextContentChangedEventArgs(
+                        textView.TextSnapshot,
+                        textView.TextSnapshot,
+                        EditOptions.None,
+                        null));
+                    file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
+
+                    var linesChanged = await file.LinesChanged.Take(1);
+
+                    Assert.Equal(1, file.InlineCommentThreads.Count);
+                    Assert.Equal(4, file.InlineCommentThreads[0].LineNumber);
+                    Assert.Equal(new[] { 2, 4 }, linesChanged.ToArray());
+                }
+            }
+
+            static IPullRequestReviewCommentModel CreateComment(
+                string diffHunk,
+                string body = "Comment",
+                string filePath = FilePath)
+            {
+                var result = Substitute.For<IPullRequestReviewCommentModel>();
+                result.Body.Returns(body);
+                result.DiffHunk.Returns(diffHunk);
+                result.Path.Returns(filePath);
+                result.OriginalCommitId.Returns("ORIG");
+                result.OriginalPosition.Returns(1);
+                return result;
             }
 
             IPullRequestSessionService CreateSessionService(bool isModified = false)
@@ -398,12 +519,51 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 return sessionService;
             }
 
-            ITextView CreateTextView()
+            IPullRequestSessionService CreateRealSessionService(IDiffService diff)
             {
-                var result = Substitute.For<ITextView>();
+                var result = Substitute.ForPartsOf<PullRequestSessionService>(
+                    Substitute.For<IGitService>(),
+                    Substitute.For<IGitClient>(),
+                    diff,
+                    Substitute.For<IApiClientFactory>(),
+                    Substitute.For<IUsageTracker>());
+                result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
+                return result;
+            }
+
+            ITextView CreateTextView(string content = "Default content")
+            {
+                var snapshot = Substitute.For<ITextSnapshot>();
+                snapshot.GetText().Returns(content);
+
+                // We map snapshot positions to line numbers in tracking points, so return 100 as
+                // the length so we can map lines 0-99.
+                snapshot.Length.Returns(100);
+                snapshot.GetLineFromLineNumber(0).ReturnsForAnyArgs(x =>
+                {
+                    var line = Substitute.For<ITextSnapshotLine>();
+                    var lineNumber = x.Arg<int>();
+                    var point = new SnapshotPoint(snapshot, lineNumber);
+                    line.LineNumber.Returns(lineNumber);
+                    line.Start.Returns(point);
+                    return line;
+                });
+                snapshot.GetLineNumberFromPosition(0).ReturnsForAnyArgs(x => x.Arg<int>());
+                snapshot.CreateTrackingPoint(0, 0).ReturnsForAnyArgs(x =>
+                {
+                    var point = Substitute.For<ITrackingPoint>();
+                    point.GetPosition(snapshot).Returns(x.Arg<int>());
+                    return point;
+                });
+
                 var textBuffer = Substitute.For<ITextBuffer>();
                 textBuffer.Properties.Returns(new PropertyCollection());
+                textBuffer.CurrentSnapshot.Returns(snapshot);
+
+                var result = Substitute.For<ITextView>();
                 result.TextBuffer.Returns(textBuffer);
+                result.TextSnapshot.Returns(snapshot);
+
                 return result;
             }
 
@@ -539,12 +699,16 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
         }
 
-        IPullRequestModel CreatePullRequestModel(int number, string cloneUrl = "https://github.com/owner/repo")
+        IPullRequestModel CreatePullRequestModel(
+            int number,
+            string cloneUrl = OwnerCloneUrl,
+            params IPullRequestReviewCommentModel[] comments)
         {
             var result = Substitute.For<IPullRequestModel>();
             result.Number.Returns(number);
             result.Base.Returns(new GitReferenceModel("BASEREF", "pr", "BASESHA", cloneUrl));
             result.Head.Returns(new GitReferenceModel("HEADREF", "pr", "HEADSHA", cloneUrl));
+            result.ReviewComments.Returns(comments);
             return result;
         }
 
@@ -555,13 +719,13 @@ namespace GitHub.InlineReviews.UnitTests.Services
             return result;
         }
 
-        IRepositoryHosts CreateRepositoryHosts()
+        IRepositoryHosts CreateRepositoryHosts(IPullRequestModel pullRequest = null)
         {
             var modelService = Substitute.For<IModelService>();
             modelService.GetPullRequest(null, null, 0).ReturnsForAnyArgs(x =>
             {
                 var cloneUrl = $"https://github.com/{x.ArgAt<string>(0)}/{x.ArgAt<string>(1)}";
-                var pr = CreatePullRequestModel(x.ArgAt<int>(2), cloneUrl);
+                var pr = pullRequest ?? CreatePullRequestModel(x.ArgAt<int>(2), cloneUrl);
                 return Observable.Return(pr);
             });
 

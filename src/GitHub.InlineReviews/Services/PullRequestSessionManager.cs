@@ -202,7 +202,7 @@ namespace GitHub.InlineReviews.Services
 
                         if (pullRequest != null)
                         {
-                            var newSession = await GetSessionInternal(pullRequest); ;
+                            var newSession = await GetSessionInternal(pullRequest);
                             if (newSession != null) newSession.IsCheckedOut = true;
                             session = newSession;
                         }

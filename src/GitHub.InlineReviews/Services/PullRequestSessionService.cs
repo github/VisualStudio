@@ -120,7 +120,7 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public byte[] GetContents(ITextBuffer buffer)
         {
-            var encoding = GetDocument(buffer).Encoding ?? Encoding.Default;
+            var encoding = GetDocument(buffer)?.Encoding ?? Encoding.Default;
             var content = encoding.GetBytes(buffer.CurrentSnapshot.GetText());
 
             var preamble = encoding.GetPreamble();
@@ -242,7 +242,7 @@ namespace GitHub.InlineReviews.Services
             return mergeBaseCache[key] = mergeBase;
         }
 
-        public ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal()
+        public virtual ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal()
         {
             var input = new Subject<ITextSnapshot>();
             var output = Observable.Create<ITextSnapshot>(x => input
