@@ -137,6 +137,8 @@
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
+    <Compile Include="Models\UsageData.cs" />
+    <Compile Include="Services\IUsageService.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\IHasErrorState.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />

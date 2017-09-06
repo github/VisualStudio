@@ -75,7 +75,8 @@ namespace GitHub.Models
                 {
                     var user = await loginManager.LoginFromCache(Address, ApiClient.GitHubClient);
                     var accountCacheItem = new AccountCacheItem(user);
-                    usage.IncrementLoginCount().Forget();
+
+                    await usage.IncrementCounter(x => x.NumberOfLogins);
                     await ModelService.InsertUser(accountCacheItem);
 
                     if (user != null)
@@ -106,7 +107,8 @@ namespace GitHub.Models
             {
                 var user = await loginManager.Login(Address, ApiClient.GitHubClient, usernameOrEmail, password);
                 var accountCacheItem = new AccountCacheItem(user);
-                usage.IncrementLoginCount().Forget();
+
+                await usage.IncrementCounter(x => x.NumberOfLogins);
                 await ModelService.InsertUser(accountCacheItem);
 
                 if (user != null)

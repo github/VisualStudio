@@ -98,9 +98,9 @@ namespace GitHub.VisualStudio.UI.Views
                 }
 
                 if (workingDirectory)
-                    await UsageTracker.IncrementPRDetailsOpenFileInSolution();
+                    await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
                 else
-                    await UsageTracker.IncrementPRDetailsViewFile();
+                    await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile);
             }
             catch (Exception e)
             {
@@ -154,9 +154,9 @@ namespace GitHub.VisualStudio.UI.Views
                 AddBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
 
                 if (workingDirectory)
-                    await UsageTracker.IncrementPRDetailsCompareWithSolution();
+                    await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution);
                 else
-                    await UsageTracker.IncrementPRDetailsViewChanges();
+                    await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
             }
             catch (Exception e)
             {

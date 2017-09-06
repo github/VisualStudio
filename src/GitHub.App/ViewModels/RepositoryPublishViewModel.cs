@@ -158,7 +158,7 @@ namespace GitHub.ViewModels
             var account = SelectedAccount;
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
-                .Do(_ => usageTracker.IncrementPublishCount().Forget())
+                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposPublished).Forget())
                 .Select(_ => ProgressState.Success)
                 .Catch<ProgressState, Exception>(ex =>
                 {
