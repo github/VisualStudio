@@ -27,7 +27,6 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ILoginManager loginManager;
         readonly HostAddress hostAddress;
@@ -65,8 +64,6 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggedIn, value); }
         }
 
-        public bool SupportsGist { get; private set; }
-
         public string Title { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -82,7 +79,7 @@ namespace GitHub.Models
                     await usage.IncrementCounter(x => x.NumberOfLogins);
                     await ModelService.InsertUser(accountCacheItem);
 
-                    if (user != unverifiedUser.User)
+                    if (user != null)
                     {
                         IsLoggedIn = true;
                         return AuthenticationResult.Success;
@@ -114,7 +111,7 @@ namespace GitHub.Models
                 await usage.IncrementCounter(x => x.NumberOfLogins);
                 await ModelService.InsertUser(accountCacheItem);
 
-                if (user != unverifiedUser.User)
+                if (user != null)
                 {
                     IsLoggedIn = true;
                     return Observable.Return(AuthenticationResult.Success);
@@ -149,53 +146,6 @@ namespace GitHub.Models
                 {
                     IsLoggedIn = false;
                 });
-        }
-
-        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(UserAndScopes account)
-        {
-            return Observable.Return(account == null ? AuthenticationResult.CredentialFailure
-                : account == unverifiedUser
-                    ? AuthenticationResult.VerificationFailure
-                    : AuthenticationResult.Success);
-        }
-
-        IObservable<AuthenticationResult> LoginWithApiUser(UserAndScopes userAndScopes)
-        {
-            return GetAuthenticationResultForUser(userAndScopes)
-                .SelectMany(result =>
-                {
-                    if (result.IsSuccess())
-                    {
-                        var accountCacheItem = new AccountCacheItem(userAndScopes.User);
-                        usage.IncrementCounter(x => x.NumberOfLogins).Forget();
-                        return ModelService.InsertUser(accountCacheItem).Select(_ => result);
-                    }
-
-                    if (result == AuthenticationResult.VerificationFailure)
-                    {
-                        return loginCache.EraseLogin(Address).Select(_ => result);
-                    }
-                    return Observable.Return(result);
-                })
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Do(result =>
-                {
-                    if (result.IsSuccess())
-                    {
-                        SupportsGist = userAndScopes.Scopes?.Contains("gist") ?? true;
-                        IsLoggedIn = true;
-                    }
-
-                    log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                        userAndScopes?.User?.Login ?? "(null)",
-                        hostAddress.ApiUri,
-                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
-                });
-        }
-
-        IObservable<UserAndScopes> GetUserFromApi()
-        {
-            return Observable.Defer(() => ApiClient.GetUser());
         }
 
         protected virtual void Dispose(bool disposing)

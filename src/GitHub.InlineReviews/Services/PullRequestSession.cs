@@ -121,6 +121,7 @@ namespace GitHub.InlineReviews.Services
         {
             var model = await service.PostReviewComment(
                 LocalRepository,
+                RepositoryOwner,
                 User,
                 PullRequest.Number,
                 body,
@@ -136,6 +137,7 @@ namespace GitHub.InlineReviews.Services
         {
             var model = await service.PostReviewComment(
                 LocalRepository,
+                RepositoryOwner,
                 User,
                 PullRequest.Number,
                 body,

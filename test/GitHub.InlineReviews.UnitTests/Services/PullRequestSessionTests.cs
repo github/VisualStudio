@@ -6,6 +6,7 @@ using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
+using GitHub.Primitives;
 using LibGit2Sharp;
 using NSubstitute;
 using Xunit;
@@ -512,6 +513,42 @@ Line 4";
         public class ThePostReviewCommentMethod
         {
             [Fact]
+            public async Task PostsToCorrectFork()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+                var target = CreateTarget(service, "fork", "owner");
+
+                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", 1);
+
+                await service.Received(1).PostReviewComment(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    "owner",
+                    Arg.Any<IAccount>(),
+                    PullRequestNumber,
+                    "New Comment",
+                    "COMMIT_ID",
+                    "file.cs",
+                    1);
+            }
+
+            [Fact]
+            public async Task PostsReplyToCorrectFork()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+                var target = CreateTarget(service, "fork", "owner");
+
+                await target.PostReviewComment("New Comment", 1);
+
+                await service.Received(1).PostReviewComment(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    "owner",
+                    Arg.Any<IAccount>(),
+                    PullRequestNumber,
+                    "New Comment",
+                    1);
+            }
+
+            [Fact]
             public async Task UpdatesFileWithNewThread()
             {
                 using (var diffService = new FakeDiffService())
@@ -527,6 +564,26 @@ Line 4";
                     Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
                     Assert.Equal("New Comment", file.InlineCommentThreads[0].Comments[0].Body);
                 }
+            }
+
+            PullRequestSession CreateTarget(
+                IPullRequestSessionService service,
+                string localRepositoryOwner,
+                string remoteRepositoryOwner)
+            {
+                var repository = Substitute.For<ILocalRepositoryModel>();
+
+                repository.CloneUrl.Returns(new UriString($"https://github.com/{localRepositoryOwner}/reop"));
+                repository.Owner.Returns(localRepositoryOwner);
+                repository.Name.Returns("repo");
+
+                return new PullRequestSession(
+                    service,
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    repository,
+                    remoteRepositoryOwner,
+                    true);
             }
 
             async Task<PullRequestSession> CreateTarget(FakeDiffService diffService)
@@ -652,10 +709,10 @@ Line 4";
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
 
             var diffChunk = "@@ -1,4 +1,4 @@";
-            result.PostReviewComment(null, null, 0, null, 0).ReturnsForAnyArgs(i =>
-                CreateComment(diffChunk, i.ArgAt<string>(3)));
-            result.PostReviewComment(null, null, 0, null, null, null, 0).ReturnsForAnyArgs(i =>
-                CreateComment(diffChunk, i.ArgAt<string>(3)));
+            result.PostReviewComment(null, null, null, 0, null, 0).ReturnsForAnyArgs(i =>
+                CreateComment(diffChunk, i.ArgAt<string>(4)));
+            result.PostReviewComment(null, null, null, 0, null, null, null, 0).ReturnsForAnyArgs(i =>
+                CreateComment(diffChunk, i.ArgAt<string>(4)));
             return result;
         }
     }

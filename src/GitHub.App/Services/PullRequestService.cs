@@ -308,18 +308,20 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    sha = await gitClient.GetPullRequestMergeBase(
-                        repo,
-                        pullRequest.Base.RepositoryCloneUrl,
-                        pullRequest.Head.RepositoryCloneUrl,
-                        pullRequest.Base.Sha,
-                        pullRequest.Head.Sha,
-                        pullRequest.Base.Ref,
-                        pullRequest.Head.Ref);
-
-                    if (sha == null)
+                    try
                     {
-                        throw new NotFoundException($"Couldn't find merge base between {pullRequest.Base.Sha} and {pullRequest.Head.Sha}.");
+                        sha = await gitClient.GetPullRequestMergeBase(
+                            repo,
+                            pullRequest.Base.RepositoryCloneUrl,
+                            pullRequest.Head.RepositoryCloneUrl,
+                            pullRequest.Base.Sha,
+                            pullRequest.Head.Sha,
+                            pullRequest.Base.Ref,
+                            pullRequest.Head.Ref);
+                    }
+                    catch (NotFoundException ex)
+                    {
+                        throw new NotFoundException($"The Pull Request file failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
                     }
                 }
 
@@ -328,12 +330,14 @@ namespace GitHub.Services
             });
         }
 
-        public Encoding GetEncoding(string path)
+        public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
         {
-            if (File.Exists(path))
+            var fullPath = Path.Combine(repository.LocalPath, relativePath);
+
+            if (File.Exists(fullPath))
             {
                 var encoding = Encoding.UTF8;
-                if (HasPreamble(path, encoding))
+                if (HasPreamble(fullPath, encoding))
                 {
                     return encoding;
                 }
@@ -348,7 +352,7 @@ namespace GitHub.Services
             {
                 foreach (var b in encoding.GetPreamble())
                 {
-                    if(b != stream.ReadByte())
+                    if (b != stream.ReadByte())
                     {
                         return false;
                     }
@@ -444,7 +448,6 @@ namespace GitHub.Services
 
             Directory.CreateDirectory(tempDir);
             File.WriteAllText(tempFile, contents, encoding);
-            File.SetAttributes(tempFile, FileAttributes.ReadOnly);
             return tempFile;
         }
 
@@ -472,7 +475,7 @@ namespace GitHub.Services
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
-            return value != null && 
+            return value != null &&
                 value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
                 value.Item2 == pullRequest.Number;
         }

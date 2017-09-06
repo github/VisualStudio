@@ -47,7 +47,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Fact]
-            public void NoNewLineAtEnd_NotAtEndOfChunk()
+            public void NoNewLineNotAtEndOfChunk_CheckLineCount()
             {
                 var header =
 @"@@ -1 +1 @@
@@ -55,10 +55,24 @@ namespace GitHub.InlineReviews.UnitTests.Models
 \ No newline at end of file
 +new";
 
-                var chunks = DiffUtilities.ParseFragment(header);
+                var chunk = DiffUtilities.ParseFragment(header).First();
 
-                var chunk = chunks.First();
                 Assert.Equal(2, chunk.Lines.Count());
+            }
+
+            [Fact]
+            public void NoNewLineNotAtEndOfChunk_CheckDiffLineNumber()
+            {
+                var header =
+@"@@ -1 +1 @@
+-old
+\ No newline at end of file
++new";
+
+                var chunk = DiffUtilities.ParseFragment(header).First();
+
+                var line = chunk.Lines.Last();
+                Assert.Equal(3, line.DiffLineNumber);
             }
 
             [Fact]
@@ -171,30 +185,41 @@ namespace GitHub.InlineReviews.UnitTests.Models
 
         public class TheMatchMethod
         {
+            /// <param name="diffLines">Target diff chunk with header (with '.' as line separator)</param>
+            /// <param name="matchLines">Diff lines to match (with '.' as line separator)</param>
+            /// <param name="expectedDiffLineNumber">The DiffLineNumber that the last line of matchLines falls on</param>
             [Theory]
-            [InlineData(" 1", " 1", 0)]
-            [InlineData(" 1. 2", " 2", 1)]
-            [InlineData(" 1. 1", " 1", 1)] // match the later line
+            [InlineData(" 1", " 1", 1)]
+            [InlineData(" 1. 2", " 2", 2)]
+            [InlineData(" 1. 1", " 1", 2)] // match the later line
             [InlineData("+x", "-x", -1)]
             [InlineData("", " x", -1)]
             [InlineData(" x", "", -1)]
 
-            [InlineData(" 1. 2.", " 2. 1.", 1)] // matched full context
-            [InlineData(" 1. 2.", " 2. 3.", -1)] // didn't match full context
-            [InlineData(" 2.", " 2. 1.", 0)] // match if we run out of context lines
-            public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
+            [InlineData(" 1. 2.", " 1. 2.", 2)] // matched full context
+            [InlineData(" 1. 2.", " 3. 2.", -1)] // didn't match full context
+            [InlineData(" 2.", " 1. 2.", 1)] // match if we run out of context lines
+
+            // Tests for https://github.com/github/VisualStudio/issues/1149
+            // Matching algorithm got confused when there was a partial match.
+            [InlineData("+a.+x.+x.", "+a.+x.", 2)]
+            [InlineData("+a.+x.+x.", "+a.+x.+x.", 3)]
+            [InlineData("+a.+x.+x.+b.+x.+x.", "+a.+x.", 2)]
+            [InlineData("+a.+x.+x.+b.+x.+x.", "+b.+x.", 5)]
+            [InlineData("+a.+b.+x", "+a.+x.", -1)] // backtrack when there is a failed match
+            public void MatchLine(string diffLines, string matchLines, int expectedDiffLineNumber /* -1 for no match */)
             {
                 var header = "@@ -1 +1 @@";
-                lines1 = lines1.Replace(".", "\r\n");
-                lines2 = lines2.Replace(".", "\r\n");
-                var chunks1 = DiffUtilities.ParseFragment(header + "\n" + lines1).ToList();
-                var chunks2 = DiffUtilities.ParseFragment(header + "\n" + lines2).ToList();
-                var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
-                var targetLines = chunks2.First().Lines;
+                diffLines = diffLines.Replace(".", "\r\n");
+                matchLines = matchLines.Replace(".", "\r\n");
+                var chunks1 = DiffUtilities.ParseFragment(header + "\n" + diffLines).ToList();
+                var chunks2 = DiffUtilities.ParseFragment(header + "\n" + matchLines).ToList();
+                var targetLines = chunks2.First().Lines.Reverse().ToList();
 
                 var line = DiffUtilities.Match(chunks1, targetLines);
 
-                Assert.Equal(expectLine, line);
+                var diffLineNumber = (line != null) ? line.DiffLineNumber : -1;
+                Assert.Equal(expectedDiffLineNumber, diffLineNumber);
             }
 
             [Fact]

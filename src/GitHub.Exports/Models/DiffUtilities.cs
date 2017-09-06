@@ -41,33 +41,32 @@ namespace GitHub.Models
                     else if (chunk != null)
                     {
                         var type = GetLineChange(line[0]);
-                        if (type == DiffChangeType.Control)
-                        {
-                            // This might contain info about previous line (e.g. "\ No newline at end of file").
-                            continue;
-                        }
 
-                        chunk.Lines.Add(new DiffLine
+                        // This might contain info about previous line (e.g. "\ No newline at end of file").
+                        if (type != DiffChangeType.Control)
                         {
-                            Type = type,
-                            OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
-                            NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
-                            DiffLineNumber = diffLine,
-                            Content = line,
-                        });
+                            chunk.Lines.Add(new DiffLine
+                            {
+                                Type = type,
+                                OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
+                                NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
+                                DiffLineNumber = diffLine,
+                                Content = line,
+                            });
 
-                        switch (type)
-                        {
-                            case DiffChangeType.None:
-                                ++oldLine;
-                                ++newLine;
-                                break;
-                            case DiffChangeType.Delete:
-                                ++oldLine;
-                                break;
-                            case DiffChangeType.Add:
-                                ++newLine;
-                                break;
+                            switch (type)
+                            {
+                                case DiffChangeType.None:
+                                    ++oldLine;
+                                    ++newLine;
+                                    break;
+                                case DiffChangeType.Delete:
+                                    ++oldLine;
+                                    break;
+                                case DiffChangeType.Add:
+                                    ++newLine;
+                                    break;
+                            }
                         }
                     }
 
@@ -83,8 +82,6 @@ namespace GitHub.Models
 
         public static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
         {
-            int j = 0;
-
             if (target.Count == 0)
             {
                 return null; // no lines to match
@@ -92,18 +89,21 @@ namespace GitHub.Models
 
             foreach (var source in diff)
             {
+                var matches = 0;
                 for (var i = source.Lines.Count - 1; i >= 0; --i)
                 {
-                    if (source.Lines[i].Content == target[j].Content)
+                    if (source.Lines[i].Content == target[matches].Content)
                     {
-                        if (++j == target.Count || i == 0)
+                        matches++;
+                        if (matches == target.Count || i == 0)
                         {
-                            return source.Lines[i + j - 1];
+                            return source.Lines[i + matches - 1];
                         }
                     }
                     else
                     {
-                        j = 0;
+                        i += matches;
+                        matches = 0;
                     }
                 }
             }

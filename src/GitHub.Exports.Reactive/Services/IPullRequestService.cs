@@ -124,9 +124,12 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the encoding for the specified file.
         /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>The file's encoding</returns>
-        Encoding GetEncoding(string path);
+        /// <param name="repository">The repository.</param>
+        /// <param name="relativePath">The relative path to the file in the repository.</param>
+        /// <returns>
+        /// The file's encoding or <see cref="Encoding.Default"/> if the file doesn't exist.
+        /// </returns>
+        Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath);
 
         /// <summary>
         /// Gets a file as it appears in a pull request.
