@@ -65,19 +65,6 @@ namespace GitHub.Services
         Task<IPullRequestSessionFile> GetFile(string relativePath);
 
         /// <summary>
-        /// Gets a file touched by the pull request.
-        /// </summary>
-        /// <param name="relativePath">The relative path to the file.</param>
-        /// <param name="contentSource">The editor file content source.</param>
-        /// <returns>
-        /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
-        /// the pull request.
-        /// </returns>
-        Task<IPullRequestSessionFile> GetFile(
-            string relativePath,
-            IEditorContentSource contentSource);
-
-        /// <summary>
         /// Gets the merge base SHA for the pull request.
         /// </summary>
         /// <returns>The merge base SHA.</returns>
@@ -108,12 +95,5 @@ namespace GitHub.Services
         /// <param name="pullRequest">The new pull request model.</param>
         /// <returns>A task which completes when the session has completed updating.</returns>
         Task Update(IPullRequestModel pullRequest);
-
-        /// <summary>
-        /// Notifies the session that the contents of a file in the editor have changed.
-        /// </summary>
-        /// <param name="relativePath">The relative path to the file.</param>
-        /// <returns>A task which completes when the session has completed updating.</returns>
-        Task UpdateEditorContent(string relativePath);
     }
 }

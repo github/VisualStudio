@@ -25,6 +25,16 @@ namespace GitHub.InlineReviews.Services
             IRepository repo,
             string baseSha,
             string headSha,
+            string path)
+        {
+            var patch = await gitClient.Compare(repo, baseSha, headSha, path);
+            return DiffUtilities.ParseFragment(patch).ToList();
+        }
+
+        public async Task<IReadOnlyList<DiffChunk>> Diff(
+            IRepository repo,
+            string baseSha,
+            string headSha,
             string path,
             byte[] contents)
         {

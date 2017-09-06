@@ -13,6 +13,20 @@ namespace GitHub.InlineReviews.Services
     public interface IPullRequestSessionService
     {
         /// <summary>
+        /// Carries out a diff of a file between two commits.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="baseSha">The commit to use as the base.</param>
+        /// <param name="headSha">The commit to use as the head.</param>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <returns></returns>
+        Task<IReadOnlyList<DiffChunk>> Diff(
+            ILocalRepositoryModel repository,
+            string baseSha,
+            string headSha,
+            string relativePath);
+
+        /// <summary>
         /// Carries out a diff between a file at a commit and the current file contents.
         /// </summary>
         /// <param name="repository">The repository.</param>

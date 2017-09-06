@@ -66,14 +66,6 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSessionFile> GetFile(string relativePath)
         {
-            return await GetFile(relativePath, null);
-        }
-
-        /// <inheritdoc/>
-        public async Task<IPullRequestSessionFile> GetFile(
-            string relativePath,
-            IEditorContentSource contentSource)
-        {
             await getFilesLock.WaitAsync();
 
             try
@@ -84,14 +76,9 @@ namespace GitHub.InlineReviews.Services
 
                 if (!fileIndex.TryGetValue(relativePath, out file))
                 {
-                    // TODO: Check for binary files.
-                    file = await CreateFile(relativePath, contentSource);
+                    file = new PullRequestSessionFile(relativePath);
+                    await UpdateFile(file);
                     fileIndex.Add(relativePath, file);
-                }
-                else if (contentSource != null && file.ContentSource != contentSource)
-                {
-                    file.ContentSource = contentSource;
-                    await UpdateEditorContent(relativePath);
                 }
 
                 return file;
@@ -158,25 +145,6 @@ namespace GitHub.InlineReviews.Services
             return model;
         }
 
-        /// <inheritdoc/>
-        public async Task UpdateEditorContent(string relativePath)
-        {
-            PullRequestSessionFile file;
-
-            relativePath = relativePath.Replace("\\", "/");
-
-            if (fileIndex.TryGetValue(relativePath, out file))
-            {
-                var content = await GetFileContent(file);
-
-                file.CommitSha = await CalculateContentCommitSha(file, content);
-                var mergeBaseSha = await GetMergeBase();
-                var headSha = await CalculateHeadSha();
-                file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, relativePath, content);
-                file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
-            }
-        }
-
         public async Task Update(IPullRequestModel pullRequest)
         {
             PullRequest = pullRequest;
@@ -198,25 +166,11 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
-            // NOTE: We must call GetPullRequestMergeBase before GetFileContent.
             var mergeBaseSha = await GetMergeBase();
-            var headSha = await CalculateHeadSha();
-            var content = await GetFileContent(file);
-
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await CalculateContentCommitSha(file, content);
-            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, file.RelativePath, content);
+            file.CommitSha = PullRequest.Head.Sha;
+            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
             file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
-        }
-
-        async Task<PullRequestSessionFile> CreateFile(
-            string relativePath,
-            IEditorContentSource contentSource)
-        {
-            var file = new PullRequestSessionFile(relativePath);
-            file.ContentSource = contentSource;
-            await UpdateFile(file);
-            return file;
         }
 
         async Task<IReadOnlyList<IPullRequestSessionFile>> CreateAllFiles()
@@ -225,7 +179,8 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var path in FilePaths)
             {
-                result.Add(await CreateFile(path, null));
+                var file = await GetFile(path);
+                result.Add(file);
             }
 
             return result;
@@ -242,33 +197,6 @@ namespace GitHub.InlineReviews.Services
             {
                 return PullRequest.Head.Sha;
             }       
-        }
-
-        async Task<string> CalculateHeadSha()
-        {
-            return IsCheckedOut ? 
-                await service.GetTipSha(LocalRepository) :
-                PullRequest.Head.Sha;
-        }
-
-        Task<byte[]> GetFileContent(IPullRequestSessionFile file)
-        {
-            if (!IsCheckedOut)
-            {
-                return service.ExtractFileFromGit(
-                    LocalRepository,
-                    PullRequest.Number,
-                    PullRequest.Head.Sha,
-                    file.RelativePath);
-            }
-            else if (file.ContentSource != null)
-            {
-                return file.ContentSource?.GetContent();
-            }
-            else
-            {
-                return service.ReadFileAsync(Path.Combine(LocalRepository.LocalPath, file.RelativePath));
-            }
         }
 
         string GetFullPath(string relativePath)

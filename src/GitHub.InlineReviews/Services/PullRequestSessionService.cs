@@ -52,6 +52,13 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
+        {
+            var repo = await GetRepository(repository);
+            return await diffService.Diff(repo, baseSha, headSha, relativePath);
+        }
+
+        /// <inheritdoc/>
         public async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);

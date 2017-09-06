@@ -40,8 +40,6 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             File.WriteAllText(fullPath, contents);
             repository.Stage(path);
             repository.Commit("Added " + path, signature, signature);
-
-            var tip = repository.Head.Tip.Sha;
         }
 
         public void Dispose()
@@ -52,6 +50,11 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             // The .git folder has some files marked as readonly, meaning that a simple
             // Directory.Delete doesn't work here.
             DeleteDirectory(path);
+        }
+
+        public Task<IReadOnlyList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<IReadOnlyList<DiffChunk>> Diff(string path, byte[] contents)

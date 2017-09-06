@@ -116,7 +116,6 @@
     </Compile>
     <Compile Include="Services\DiffServiceTests.cs" />
     <Compile Include="Services\PullRequestSessionTests.cs" />
-    <Compile Include="TestDoubles\FakeEditorContentSource.cs" />
     <Compile Include="TestDoubles\FakeTeamExplorerServiceHolder.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModelTests.cs" />
     <Compile Include="ViewModels\InlineCommentThreadViewModelTests.cs" />

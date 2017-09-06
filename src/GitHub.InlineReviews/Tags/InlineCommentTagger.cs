@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews.Tags
     /// <summary>
     /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
     /// </summary>
-    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IEditorContentSource, IDisposable
+    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
         static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
         readonly IGitService gitService;
@@ -137,11 +137,6 @@ namespace GitHub.InlineReviews.Tags
             {
                 return EmptyTags;
             }
-        }
-
-        Task<byte[]> IEditorContentSource.GetContent()
-        {
-            throw new NotImplementedException();
         }
 
         async Task Initialize()

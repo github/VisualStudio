@@ -103,7 +103,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
-    <Compile Include="Models\IEditorContentSource.cs" />
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
     <Compile Include="Models\IPullRequestSessionLiveFile.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
