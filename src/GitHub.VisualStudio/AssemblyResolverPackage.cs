@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
@@ -32,9 +33,9 @@ namespace GitHub.VisualStudio
             "System.Windows.Interactivity"
         };
 
-        readonly string extensionDir;
+        string extensionDir;
 
-        public AssemblyResolverPackage()
+        protected override void Initialize()
         {
             extensionDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromExtensionDir;
@@ -49,6 +50,8 @@ namespace GitHub.VisualStudio
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
         Assembly LoadAssemblyFromExtensionDir(object sender, ResolveEventArgs e)
         {
+            Assembly resolvedAssembly = null;
+
             try
             {
                 var name = new AssemblyName(e.Name).Name;
@@ -70,7 +73,10 @@ namespace GitHub.VisualStudio
                     }
                 }
 
-                return Assembly.LoadFrom(filename);
+                resolvedAssembly = Assembly.LoadFrom(filename);
+
+                var usage = (IUsageTracker)GetService(typeof(IUsageTracker));
+                usage?.IncrementCounter(x => x.NumberOfAssemblyResolves);
             }
             catch (Exception ex)
             {
@@ -84,7 +90,7 @@ namespace GitHub.VisualStudio
                 VsOutputLogger.Write(log);
             }
 
-            return null;
+            return resolvedAssembly;
         }
     }
 }
