@@ -111,13 +111,27 @@ namespace GitHub.InlineReviews.Services
                 var chunks = DiffUtilities.ParseFragment(hunk);
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
+                var oldLineNumber = thread.LineNumber;
                 var newLineNumber = GetUpdatedLineNumber(thread, diff);
+                var changed = false;
+
+                if (thread.IsStale)
+                {
+                    thread.IsStale = false;
+                    changed = true;
+                }
 
                 if (newLineNumber != thread.LineNumber)
                 {
-                    if (thread.LineNumber != -1) changedLines.Add(thread.LineNumber);
-                    if (newLineNumber != -1) changedLines.Add(newLineNumber);
                     thread.LineNumber = newLineNumber;
+                    thread.IsStale = false;
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    if (oldLineNumber != -1) changedLines.Add(oldLineNumber);
+                    if (newLineNumber != -1 && newLineNumber != oldLineNumber) changedLines.Add(newLineNumber);
                 }
             }
 

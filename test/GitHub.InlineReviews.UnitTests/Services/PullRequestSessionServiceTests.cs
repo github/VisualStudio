@@ -15,12 +15,12 @@ namespace GitHub.InlineReviews.UnitTests.Services
 {
     public class PullRequestSessionServiceTests
     {
+        const int PullRequestNumber = 5;
+        const string RepoUrl = "https://foo.bar/owner/repo";
+        const string FilePath = "test.cs";
+
         public class TheBuildCommentThreadsMethod
         {
-            const int PullRequestNumber = 5;
-            const string RepoUrl = "https://foo.bar/owner/repo";
-            const string FilePath = "test.cs";
-
             [Fact]
             public async Task MatchesReviewCommentOnOriginalLine()
             {
@@ -169,50 +169,134 @@ Line 4";
                     Assert.Equal(4, thread.LineNumber);
                 }
             }
+        }
 
-            static PullRequestSessionService CreateTarget(IDiffService diffService)
+        public class TheUpdateCommentThreadsMethod
+        {
+            [Fact]
+            public async Task UpdatesWithNewLineNumber()
             {
-                return new PullRequestSessionService(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    diffService,
-                    Substitute.For<IApiClientFactory>(),
-                    Substitute.For<IUsageTracker>());
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var newHeadContents = @"Inserted Line
+Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService(FilePath, baseContents))
+                {
+                    var diff = await diffService.Diff(FilePath, headContents);
+                    var pullRequest = CreatePullRequest(FilePath, comment);
+                    var target = CreateTarget(diffService);
+
+                    var threads = target.BuildCommentThreads(
+                        pullRequest,
+                        FilePath,
+                        diff);
+
+                    Assert.Equal(2, threads[0].LineNumber);
+
+                    diff = await diffService.Diff(FilePath, newHeadContents);
+                    var changedLines = target.UpdateCommentThreads(threads, diff);
+
+                    Assert.Equal(3, threads[0].LineNumber);
+                    Assert.Equal(new[] { 2, 3 }, changedLines.ToArray());
+                }
             }
 
-            static IPullRequestReviewCommentModel CreateComment(
-                string diffHunk,
-                string filePath = FilePath,
-                string body = "Comment",
-                int position = 1)
+            [Fact]
+            public async Task UnmarksStaleThreads()
             {
-                var result = Substitute.For<IPullRequestReviewCommentModel>();
-                result.Body.Returns(body);
-                result.DiffHunk.Returns(diffHunk);
-                result.Path.Returns(filePath);
-                result.OriginalCommitId.Returns("ORIG");
-                result.OriginalPosition.Returns(position);
-                return result;
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService(FilePath, baseContents))
+                {
+                    var diff = await diffService.Diff(FilePath, headContents);
+                    var pullRequest = CreatePullRequest(FilePath, comment);
+                    var target = CreateTarget(diffService);
+
+                    var threads = target.BuildCommentThreads(
+                        pullRequest,
+                        FilePath,
+                        diff);
+
+                    threads[0].IsStale = true;
+                    var changedLines = target.UpdateCommentThreads(threads, diff);
+
+                    Assert.False(threads[0].IsStale);
+                    Assert.Equal(new[] { 2 }, changedLines.ToArray());
+                }
             }
+        }
 
-            static IPullRequestModel CreatePullRequest(
-                string filePath,
-                params IPullRequestReviewCommentModel[] comments)
-            {
-                var changedFile1 = Substitute.For<IPullRequestFileModel>();
-                changedFile1.FileName.Returns(filePath);
-                var changedFile2 = Substitute.For<IPullRequestFileModel>();
-                changedFile2.FileName.Returns("other.cs");
+        static PullRequestSessionService CreateTarget(IDiffService diffService)
+        {
+            return new PullRequestSessionService(
+                Substitute.For<IGitService>(),
+                Substitute.For<IGitClient>(),
+                diffService,
+                Substitute.For<IApiClientFactory>(),
+                Substitute.For<IUsageTracker>());
+        }
 
-                var result = Substitute.For<IPullRequestModel>();
-                result.Number.Returns(PullRequestNumber);
-                result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
-                result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
-                result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
-                result.ReviewComments.Returns(comments);
+        static IPullRequestReviewCommentModel CreateComment(
+            string diffHunk,
+            string filePath = FilePath,
+            string body = "Comment",
+            int position = 1)
+        {
+            var result = Substitute.For<IPullRequestReviewCommentModel>();
+            result.Body.Returns(body);
+            result.DiffHunk.Returns(diffHunk);
+            result.Path.Returns(filePath);
+            result.OriginalCommitId.Returns("ORIG");
+            result.OriginalPosition.Returns(position);
+            return result;
+        }
 
-                return result;
-            }
+        static IPullRequestModel CreatePullRequest(
+            string filePath,
+            params IPullRequestReviewCommentModel[] comments)
+        {
+            var changedFile1 = Substitute.For<IPullRequestFileModel>();
+            changedFile1.FileName.Returns(filePath);
+            var changedFile2 = Substitute.For<IPullRequestFileModel>();
+            changedFile2.FileName.Returns("other.cs");
+
+            var result = Substitute.For<IPullRequestModel>();
+            result.Number.Returns(PullRequestNumber);
+            result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
+            result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
+            result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
+            result.ReviewComments.Returns(comments);
+
+            return result;
         }
     }
 }

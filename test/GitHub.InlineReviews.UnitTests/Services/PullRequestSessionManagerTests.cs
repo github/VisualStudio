@@ -374,11 +374,17 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
 
             [Fact]
-            public async Task RebuildSignalUpdatesFile()
+            public async Task RebuildSignalUpdatesCommitSha()
             {
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
+
+                var threads = new List<IInlineCommentThreadModel>
+                {
+                    CreateInlineCommentThreadModel(1),
+                    CreateInlineCommentThreadModel(2),
+                };
 
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
