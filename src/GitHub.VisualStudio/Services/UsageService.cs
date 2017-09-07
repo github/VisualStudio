@@ -110,7 +110,7 @@ namespace GitHub.Services
 
         async Task WriteAllTextAsync(string path, string text)
         {
-            using (var s = File.OpenWrite(path))
+            using (var s = new FileStream(path, FileMode.Create))
             using (var w = new StreamWriter(s, Encoding.UTF8))
             {
                 await w.WriteAsync(text);
