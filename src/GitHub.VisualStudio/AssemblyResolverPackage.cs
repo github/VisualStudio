@@ -51,7 +51,15 @@ namespace GitHub.VisualStudio
                     if (resolvedAssembly != null)
                     {
                         var usage = (IUsageTracker)GetService(typeof(IUsageTracker));
-                        usage?.IncrementCounter(x => x.NumberOfAssemblyResolves);
+                        if (resolveAssemblyName.KeyPair != null)
+                        {
+                            usage?.IncrementCounter(x => x.NumberOfSignedAssemblyResolves);
+                        }
+                        else
+                        {
+                            usage?.IncrementCounter(x => x.NumberOfUnsignedAssemblyResolves);
+                        }
+
                         break;
                     }
                 }

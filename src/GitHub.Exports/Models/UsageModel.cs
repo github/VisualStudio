@@ -37,7 +37,8 @@ namespace GitHub.Models
         public int NumberOfPRDetailsOpenFileInSolution { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
-        public int NumberOfAssemblyResolves { get; set; }
+        public int NumberOfSignedAssemblyResolves { get; set; }
+        public int NumberOfUnsignedAssemblyResolves { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
