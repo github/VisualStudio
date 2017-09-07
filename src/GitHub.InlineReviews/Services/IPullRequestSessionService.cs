@@ -140,6 +140,18 @@ namespace GitHub.InlineReviews.Services
         /// </returns>
         Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
+        /// <summary>
+        /// Creates a rebuild signal subject for a <see cref="IPullRequestSessionLiveFile"/>.
+        /// </summary>
+        /// <returns>
+        /// A subject which is used to signal a rebuild of a live file.
+        /// </returns>
+        /// <remarks>
+        /// The creation of the rebuild signal for a <see cref="IPullRequestSessionLiveFile"/> is
+        /// abstracted out into this service for unit testing. The default behavior of this subject
+        /// is to throttle the signal for 500ms so that the live file is not updated continuously
+        /// while the user is typing.
+        /// </remarks>
         ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal();
 
         /// <summary>

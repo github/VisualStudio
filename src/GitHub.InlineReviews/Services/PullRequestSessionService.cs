@@ -263,6 +263,7 @@ namespace GitHub.InlineReviews.Services
             return mergeBaseCache[key] = mergeBase;
         }
 
+        /// <inheritdoc/>
         public virtual ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal()
         {
             var input = new Subject<ITextSnapshot>();

@@ -89,6 +89,7 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
+        /// <inheritdoc/>
         public async Task<string> GetMergeBase()
         {
             if (mergeBase == null)

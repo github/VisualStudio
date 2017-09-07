@@ -9,6 +9,9 @@ using LibGit2Sharp;
 
 namespace GitHub.InlineReviews.Services
 {
+    /// <summary>
+    /// Service for generating parsed diffs.
+    /// </summary>
     [Export(typeof(IDiffService))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DiffService : IDiffService
@@ -21,6 +24,7 @@ namespace GitHub.InlineReviews.Services
             this.gitClient = gitClient;
         }
 
+        /// <inheritdoc/>
         public async Task<IReadOnlyList<DiffChunk>> Diff(
             IRepository repo,
             string baseSha,
@@ -31,6 +35,7 @@ namespace GitHub.InlineReviews.Services
             return DiffUtilities.ParseFragment(patch).ToList();
         }
 
+        /// <inheritdoc/>
         public async Task<IReadOnlyList<DiffChunk>> Diff(
             IRepository repo,
             string baseSha,
