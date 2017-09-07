@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Globalization;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -16,61 +17,41 @@ namespace GitHub.VisualStudio
     [Guid(Guids.guidAssemblyResolverPkgString)]
     public class AssemblyResolverPackage : Package
     {
-        // list of assemblies that should be resolved by name only
-        static readonly string[] ourAssemblies =
-        {
-            // resolver is required for these
-            "GitHub.UI",
-            "GitHub.VisualStudio.UI",
+        // list of assemblies that should be considered when resolving
+        IEnumerable<ProvideDependentAssemblyAttribute> dependentAssemblies;
 
-            // these are signed by StrongNameSigner
-            "Markdig",
-            "Markdig.Wpf",
-
-            // these are included just in case
-            "GitHub.UI.Reactive",
-            "System.Windows.Interactivity"
-        };
-
-        readonly string extensionDir;
+        string packageFolder;
 
         public AssemblyResolverPackage()
         {
-            extensionDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromExtensionDir;
+            var asm = Assembly.GetExecutingAssembly();
+            packageFolder = Path.GetDirectoryName(asm.Location);
+            dependentAssemblies = asm.GetCustomAttributes<ProvideDependentAssemblyAttribute>();
+
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyFromPackageFolder;
         }
 
         protected override void Dispose(bool disposing)
         {
-            AppDomain.CurrentDomain.AssemblyResolve -= LoadAssemblyFromExtensionDir;
+            AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssemblyFromPackageFolder;
             base.Dispose(disposing);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
-        Assembly LoadAssemblyFromExtensionDir(object sender, ResolveEventArgs e)
+        Assembly ResolveAssemblyFromPackageFolder(object sender, ResolveEventArgs e)
         {
+            Assembly resolvedAssembly = null;
+
             try
             {
-                var name = new AssemblyName(e.Name).Name;
-                var filename = Path.Combine(extensionDir, name + ".dll");
-                if (!File.Exists(filename))
+                var resolveAssemblyName = new AssemblyName(e.Name);
+                foreach (var dependentAssembly in dependentAssemblies)
                 {
-                    return null;
-                }
-
-                var targetName = AssemblyName.GetAssemblyName(filename);
-
-                // Resolve any exact `FullName` matches.
-                if (e.Name != targetName.FullName)
-                {
-                    // Resolve any version of our assemblies.
-                    if (!ourAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase))
+                    resolvedAssembly = ResolveDependentAssembly(dependentAssembly, packageFolder, resolveAssemblyName);
+                    if (resolvedAssembly != null)
                     {
-                        return null;
+                        break;
                     }
                 }
-
-                return Assembly.LoadFrom(filename);
             }
             catch (Exception ex)
             {
@@ -82,6 +63,45 @@ namespace GitHub.VisualStudio
                     ex,
                     Environment.NewLine);
                 VsOutputLogger.Write(log);
+            }
+
+            return resolvedAssembly;
+        }
+
+        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
+        public static Assembly ResolveDependentAssembly(
+            ProvideDependentAssemblyAttribute dependentAssembly, string packageFolder, AssemblyName resolveAssemblyName)
+        {
+            if (dependentAssembly.AssemblyName == resolveAssemblyName.Name)
+            {
+                var file = dependentAssembly.CodeBase.Replace("$PackageFolder$", packageFolder);
+                if (File.Exists(file))
+                {
+                    var targetAssemblyName = AssemblyName.GetAssemblyName(file);
+
+                    var codeBase = dependentAssembly as ProvideCodeBaseAttribute;
+                    if (codeBase != null)
+                    {
+                        if (resolveAssemblyName.FullName == targetAssemblyName.FullName)
+                        {
+                            return Assembly.LoadFrom(file);
+                        }
+                    }
+
+                    var bindingRedirection = dependentAssembly as ProvideBindingRedirectionAttribute;
+                    if (bindingRedirection != null)
+                    {
+                        if (resolveAssemblyName.Version >= new Version(bindingRedirection.OldVersionLowerBound) &&
+                            resolveAssemblyName.Version <= new Version(bindingRedirection.OldVersionUpperBound))
+                        {
+                            resolveAssemblyName.Version = targetAssemblyName.Version;
+                            if (resolveAssemblyName.FullName == targetAssemblyName.FullName)
+                            {
+                                return Assembly.LoadFrom(file);
+                            }
+                        }
+                    }
+                }
             }
 
             return null;
