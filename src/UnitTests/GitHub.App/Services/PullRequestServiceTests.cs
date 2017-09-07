@@ -168,11 +168,11 @@ public class PullRequestServiceTests : TestBaseClass
 
             if (mergeBaseException == null)
             {
-                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
             }
             else
             {
-                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
             }
 
             gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));

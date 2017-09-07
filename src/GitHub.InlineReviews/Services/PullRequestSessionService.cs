@@ -122,13 +122,13 @@ namespace GitHub.InlineReviews.Services
             }
 
             var repo = await GetRepository(repository);
-            var baseUrl = pullRequest.Base.RepositoryCloneUrl;
+            var targetUrl = pullRequest.Base.RepositoryCloneUrl;
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
-            var headRef = pullRequest.Head.Ref;
+            var pullNumber = pullRequest.Number;
             try
             {
-                mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
+                mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
             }
             catch (NotFoundException ex)
             {
