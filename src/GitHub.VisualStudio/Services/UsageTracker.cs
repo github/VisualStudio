@@ -94,8 +94,6 @@ namespace GitHub.Services
 
         async Task TimerTick()
         {
-            await Initialize();
-
             if (firstTick)
             {
                 await IncrementLaunchCount();
