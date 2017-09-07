@@ -11,7 +11,6 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-    <ApplicationVersion>2.3.1.0</ApplicationVersion>
     <ApplicationVersion>2.3.2.32</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
