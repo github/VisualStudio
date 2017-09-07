@@ -218,7 +218,18 @@ namespace GitHub.InlineReviews.Services
         public IPullRequestModel PullRequest
         {
             get { return pullRequest; }
-            private set { this.RaiseAndSetIfChanged(ref pullRequest, value); }
+            private set
+            {
+                // PullRequestModel overrides Equals such that two PRs with the same number are
+                // considered equal. This was causing the PullRequest not to be updated on refresh:
+                // we need to use ReferenceEquals.
+                if (!ReferenceEquals(pullRequest, value))
+                {
+                    this.RaisePropertyChanging(nameof(PullRequest));
+                    pullRequest = value;
+                    this.RaisePropertyChanged(nameof(PullRequest));
+                }
+            }
         }
 
         /// <inheritdoc/>

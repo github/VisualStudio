@@ -181,6 +181,26 @@ Line 4";
         public class TheUpdateMethod
         {
             [Fact]
+            public async Task UpdatesThePullRequestModel()
+            {
+                var target = new PullRequestSession(
+                    CreateSessionService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+
+                var newPullRequest = CreatePullRequest();
+                await target.Update(newPullRequest);
+
+                // PullRequestModel overrides Equals such that two PRs with the same number are
+                // considered equal. This was causing the PullRequest not to be updated on refresh.
+                // Test that this works correctly!
+                Assert.Same(newPullRequest, target.PullRequest);
+            }
+
+            [Fact]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
@@ -288,6 +308,16 @@ Line 4";
             result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
             result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
             result.ReviewComments.Returns(comments);
+
+            result.Equals(null).ReturnsForAnyArgs(x =>
+            {
+                // PullRequestModel has the annoying behavior that Equals is overridden to compare
+                // the pull request number, meaning that when trying to refresh, RaiseAndSetIfChanged
+                // thinks the new model is the same as the old one. Make sure we replicate that
+                // behavior in the mock.
+                var other = x.ArgAt<object>(0) as IPullRequestModel;
+                return other?.Number == result.Number;
+            });
 
             return result;
         }
