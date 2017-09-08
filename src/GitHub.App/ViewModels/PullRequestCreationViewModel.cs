@@ -166,7 +166,9 @@ namespace GitHub.ViewModels
 
                     if (!string.IsNullOrWhiteSpace(x.template))
                     {
-                        prDescription = x.template;
+                        if (!string.IsNullOrEmpty(prDescription))
+                            prDescription += "\n\n";
+                        prDescription += x.template;
                     }
 
                     PRTitle = prTitle;
