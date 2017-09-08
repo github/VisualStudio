@@ -37,6 +37,7 @@ namespace GitHub.VisualStudio
             base.Dispose(disposing);
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider")]
         Assembly ResolveAssemblyFromPackageFolder(object sender, ResolveEventArgs e)
         {
             Assembly resolvedAssembly = null;
@@ -49,6 +50,7 @@ namespace GitHub.VisualStudio
                     resolvedAssembly = ResolveDependentAssembly(dependentAssembly, packageFolder, resolveAssemblyName);
                     if (resolvedAssembly != null)
                     {
+                        VsOutputLogger.WriteLine($"Resolved '{e.Name}' to '{resolvedAssembly.Location}'.");
                         break;
                     }
                 }
