@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using NLog;
 
 namespace GitHub.VisualStudio
 {
@@ -19,25 +20,34 @@ namespace GitHub.VisualStudio
     {
         // list of assemblies that should be considered when resolving
         IEnumerable<ProvideDependentAssemblyAttribute> dependentAssemblies;
-
         string packageFolder;
+
+        IDictionary<string, Assembly> resolvingAssemblies;
+        IDictionary<string, Exception> resolvingExceptions;
 
         public AssemblyResolverPackage()
         {
             var asm = Assembly.GetExecutingAssembly();
             packageFolder = Path.GetDirectoryName(asm.Location);
             dependentAssemblies = asm.GetCustomAttributes<ProvideDependentAssemblyAttribute>();
-
+            resolvingAssemblies = new Dictionary<string, Assembly>();
+            resolvingExceptions = new Dictionary<string, Exception>();
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyFromPackageFolder;
         }
 
         protected override void Dispose(bool disposing)
         {
             AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssemblyFromPackageFolder;
+
+            if (resolvingAssemblies.Count > 0 || resolvingExceptions.Count > 0)
+            {
+                // Avoid loading logging assembly unless there is something to log.
+                WriteToLog();
+            }
+
             base.Dispose(disposing);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider")]
         Assembly ResolveAssemblyFromPackageFolder(object sender, ResolveEventArgs e)
         {
             Assembly resolvedAssembly = null;
@@ -50,24 +60,31 @@ namespace GitHub.VisualStudio
                     resolvedAssembly = ResolveDependentAssembly(dependentAssembly, packageFolder, resolveAssemblyName);
                     if (resolvedAssembly != null)
                     {
-                        VsOutputLogger.WriteLine($"Resolved '{e.Name}' to '{resolvedAssembly.Location}'.");
+                        resolvingAssemblies[e.Name] = resolvedAssembly;
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                var log = string.Format(CultureInfo.CurrentCulture,
-                    "Error occurred loading {0} from {1}.{2}{3}{4}",
-                    e.Name,
-                    Assembly.GetExecutingAssembly().Location,
-                    Environment.NewLine,
-                    ex,
-                    Environment.NewLine);
-                VsOutputLogger.Write(log);
+                resolvingExceptions[e.Name] = ex;
             }
 
             return resolvedAssembly;
+        }
+
+        void WriteToLog()
+        {
+            var log = LogManager.GetCurrentClassLogger();
+            foreach (var resolvedAssembly in resolvingAssemblies)
+            {
+                log.Info(CultureInfo.InvariantCulture, "Resolved '{0}' to '{1}'.", resolvedAssembly.Key, resolvedAssembly.Value.Location);
+            }
+
+            foreach (var resolvingException in resolvingExceptions)
+            {
+                log.Error(CultureInfo.InvariantCulture, "Error occurred loading '{0}' from '{1}'.\n{2}", resolvingException.Key, packageFolder, resolvingException.Value);
+            }
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
