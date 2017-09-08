@@ -132,6 +132,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     [InlineData(8, "repo-name", "source-repo-owner", "master", true, false, "target-repo-owner", "master", "title", "description")]
     [InlineData(9, "repo-name", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "target-branch", "title", null)]
     [InlineData(10, "repo-name", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", "title", "description")]
+    [InlineData(11, "repo-name", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", null, null)]
     public async Task CreatingPRs(int testId,
         string repoName, string sourceRepoOwner, string sourceBranchName,
         bool repoIsFork, bool sourceBranchIsTracking,
@@ -151,21 +152,22 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var ms = data.ModelService;
 
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
+
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
-
         vm.Initialize();
-
-        // the user has to input this
-        vm.PRTitle = title;
-
-        // this is optional
-        if (body != null)
-            vm.Description = body;
 
         // the TargetBranch property gets set to whatever the repo default is (we assume master here),
         // so we only set it manually to emulate the user selecting a different target branch
         if (targetBranchName != "master")
             vm.TargetBranch = new BranchModel(targetBranchName, targetRepo);
+
+        if (title != null)
+            vm.PRTitle = title;
+
+        // this is optional
+        if (body != null)
+            vm.Description = body;
 
         await vm.CreatePullRequest.ExecuteAsync();
 
@@ -174,7 +176,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
             unused2 = gitClient.Received().SetTrackingBranch(l2repo, sourceBranchName, remote);
         else
             unused2 = gitClient.DidNotReceiveWithAnyArgs().SetTrackingBranch(Args.LibGit2Repo, Args.String, Args.String);
-        var unused = ms.Received().CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, title, body ?? String.Empty);
+        var unused = ms.Received().CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, title ?? "Source branch", body ?? String.Empty);
     }
 
     [Fact]

@@ -86,6 +86,19 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            ILocalRepositoryModel repository,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits)
+        {
+            return Observable.Defer(() =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                return gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits).ToObservable();
+            });
+        }
+
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
