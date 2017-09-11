@@ -16,6 +16,10 @@ using GitHub.VisualStudio.TeamExplorer;
 using System.Windows.Controls;
 using GitHub.VisualStudio.UI;
 using GitHub.ViewModels;
+using System.Globalization;
+using GitHub.Primitives;
+using Microsoft.VisualStudio;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -85,9 +89,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             InitializeSectionView();
         }
 
-        public void Connect()
+        public async Task Connect()
         {
-            ShowPublish();
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
+            else
+                await Login();
         }
 
         public void SignUp()
@@ -105,18 +113,72 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
             controller.TransitionSignal.Subscribe(data =>
             {
-                var c = data.View;
-                SectionContent = c;
-                c.IsBusy.Subscribe(x => IsBusy = x);
+                var vm = (IHasBusy)data.View.ViewModel;
+                SectionContent = data.View;
+                vm.WhenAnyValue(x => x.IsBusy).Subscribe(x => IsBusy = x);
             },
             () =>
             {
                 // there's no real cancel button in the publish form, but if support a back button there, then we want to hide the form
                 IsVisible = false;
                 if (success)
+                {
                     ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    HandleCreatedRepo(ActiveRepo);
+                }
             });
             uiProvider.Run(controller);
+        }
+
+        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        {
+            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
+            msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            ShowNotification(newrepo, msg);
+        }
+
+        private void ShowNotification(ILocalRepositoryModel newrepo, string msg)
+        {
+            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+
+            teServices.ClearNotifications();
+            teServices.ShowMessage(
+                msg,
+                new RelayCommand(o =>
+                {
+                    var str = o.ToString();
+                    /* the prefix is the action to perform:
+                     * u: launch browser with url
+                     * c: launch create new project dialog
+                     * o: launch open existing project dialog 
+                    */
+                    var prefix = str.Substring(0, 2);
+                    if (prefix == "u:")
+                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                    else if (prefix == "o:")
+                    {
+                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
+                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    }
+                    else if (prefix == "c:")
+                    {
+                        var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
+                        vsGitServices.SetDefaultProjectPath(newrepo.LocalPath);
+                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
+                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    }
+                })
+            );
+        }
+
+        async Task Login()
+        {
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
+            uiProvider.RunInDialog(UIControllerFlow.Authentication);
+
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
         }
 
         bool disposed;

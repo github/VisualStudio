@@ -11,19 +11,17 @@ using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
-using Serilog;
 using ReactiveUI;
 using GitHub.App.Factories;
 using GitHub.Exports;
 using GitHub.Controllers;
 using GitHub.Infrastructure;
+using Serilog;
 
 namespace GitHub.VisualStudio.UI
 {
     [Export(typeof(IUIProvider))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class UIProviderDispatcher : IUIProvider
     {
         readonly IUIProvider theRealProvider;
@@ -49,7 +47,6 @@ namespace GitHub.VisualStudio.UI
         public void StopUI(IUIController controller) => theRealProvider.StopUI(controller);
     }
 
-    [NullGuard(ValidationFlags.None)]
     public class UIProvider : IUIProvider, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();

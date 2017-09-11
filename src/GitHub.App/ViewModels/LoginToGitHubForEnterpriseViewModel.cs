@@ -5,12 +5,12 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Authentication;
+using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -22,6 +22,9 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IVisualStudioBrowser browser) : base(hosts, browser)
         {
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(browser, nameof(browser));
+
             EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
                 .IfNullOrEmpty(Resources.EnterpriseUrlValidatorEmpty)
                 .IfNotUri(Resources.EnterpriseUrlValidatorInvalid)
@@ -48,10 +51,8 @@ namespace GitHub.ViewModels
         }
 
         string enterpriseUrl;
-        [AllowNull]
         public string EnterpriseUrl
         {
-            [return: AllowNull]
             get { return enterpriseUrl; }
             set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
         }

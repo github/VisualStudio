@@ -8,6 +8,7 @@ using GitHub.UI;
 using GitHub.Services;
 using GitHub.Extensions;
 using System.Threading.Tasks;
+using GitHub.Exports;
 
 namespace GitHub.Models
 {
@@ -57,11 +58,12 @@ namespace GitHub.Models
         /// Generates a http(s) url to the repository in the remote server, optionally
         /// pointing to a specific file and specific line range in it.
         /// </summary>
+        /// <param name="linkType">Type of link to generate</param>
         /// <param name="path">The file to generate an url to. Optional.</param>
         /// <param name="startLine">A specific line, or (if specifying the <paramref name="endLine"/> as well) the start of a range</param>
         /// <param name="endLine">The end of a line range on the specified file.</param>
         /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
-        public async Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        public async Task<UriString> GenerateUrl(LinkType linkType, string path = null, int startLine = -1, int endLine = -1)
         {
             if (CloneUrl == null)
                 return null;
@@ -97,14 +99,15 @@ namespace GitHub.Models
                 endLine = -1;
             }
 
-            return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
+            return new UriString(GenerateUrl(linkType, CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
         }
 
         const string CommitFormat = "{0}/commit/{1}";
         const string BlobFormat = "{0}/blob/{1}/{2}";
+        const string BlameFormat = "{0}/blame/{1}/{2}";
         const string StartLineFormat = "{0}#L{1}";
         const string EndLineFormat = "{0}-L{1}";
-        static string GenerateUrl(string basePath, string sha, string path, int startLine = -1, int endLine = -1)
+        static string GenerateUrl(LinkType linkType, string basePath, string sha, string path, int startLine = -1, int endLine = -1)
         {
             if (sha == null)
                 return basePath;
@@ -112,13 +115,34 @@ namespace GitHub.Models
             if (String.IsNullOrEmpty(path))
                 return String.Format(CultureInfo.InvariantCulture, CommitFormat, basePath, sha);
 
-            var ret = String.Format(CultureInfo.InvariantCulture, BlobFormat, basePath, sha, path.Replace(@"\", "/"));
+            var ret = String.Format(CultureInfo.InvariantCulture, GetLinkFormat(linkType), basePath, sha, path.Replace(@"\", "/"));
+
             if (startLine < 0)
                 return ret;
             ret = String.Format(CultureInfo.InvariantCulture, StartLineFormat, ret, startLine);
             if (endLine < 0)
                 return ret;
             return String.Format(CultureInfo.InvariantCulture, EndLineFormat, ret, endLine);
+        }
+
+        /// <summary>
+        /// Selects the proper format for the link type, defaults to the blob url when link type is not selected.
+        /// </summary>
+        /// <param name="linkType">Type of link to generate</param>
+        /// <returns>The string format of the selected link type</returns>
+        static string GetLinkFormat(LinkType linkType)
+        {
+            switch (linkType)
+            {
+                case LinkType.Blame:
+                    return BlameFormat;
+
+                case LinkType.Blob:
+                    return BlobFormat;
+
+                default:
+                    return BlobFormat;
+            }
         }
 
         /// <summary>

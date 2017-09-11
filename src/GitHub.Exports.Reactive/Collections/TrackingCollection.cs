@@ -17,6 +17,8 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Linq;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using GitHub.Extensions;
 
 namespace GitHub.Collections
 {
@@ -75,8 +77,8 @@ namespace GitHub.Collections
             IObservable<T> selection)
             where T : class, ICopyable<T>
         {
-            Debug.Assert(stickieItemOnTop != null, "stickieItemOnTop may not be null in CreateListenerCollection");
-            Debug.Assert(selection != null, "selection may not be null in CreateListenerCollection");
+            Guard.ArgumentNotNull(stickieItemOnTop, nameof(stickieItemOnTop));
+            Guard.ArgumentNotNull(selection, nameof(selection));
 
             var stickieItems = new[] { stickieItemOnTop };
             var result = new ObservableCollection<T>(tcol);
@@ -594,6 +596,7 @@ namespace GitHub.Collections
             if (data.TheAction != TheAction.Add)
                 return data;
             data.List.Add(data.Item);
+            RaiseUnfilteredCountPropertyChange();
             return data;
         }
 
@@ -603,6 +606,7 @@ namespace GitHub.Collections
                 return data;
             data.List.Insert(data.Position, data.Item);
             UpdateIndexCache(data.Position, data.List.Count, data.List, sortedIndexCache);
+            RaiseUnfilteredCountPropertyChange();
             return data;
         }
         ActionData SortedMove(ActionData data)
@@ -624,6 +628,7 @@ namespace GitHub.Collections
             sortedIndexCache.Remove(data.Item);
             UpdateIndexCache(data.List.Count - 1, data.OldPosition, data.List, sortedIndexCache);
             data.List.Remove(data.Item);
+            RaiseUnfilteredCountPropertyChange();
             return data;
         }
 
@@ -1154,6 +1159,10 @@ namespace GitHub.Collections
             return scheduler ?? (d != null ? new DispatcherScheduler(d) : null as IScheduler) ?? CurrentThreadScheduler.Instance;
         }
 #endif
+        void RaiseUnfilteredCountPropertyChange()
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(UnfilteredCount)));
+        }
 
         void Reset()
         {

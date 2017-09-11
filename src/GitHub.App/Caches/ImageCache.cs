@@ -186,7 +186,7 @@ namespace GitHub.Caches
 
         static IObservable<BitmapImage> LoadImage(Stream sourceStream, float? desiredWidth = null, float? desiredHeight = null)
         {
-            log.Assert(sourceStream != null, "Cannot load image from a null sourceStream");
+            Guard.ArgumentNotNull(sourceStream, nameof(sourceStream));
 
             return Observable.Defer(() =>
             {

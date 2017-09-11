@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -9,13 +11,213 @@ using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
-using Octokit;
 using Rothko;
 using UnitTests;
 using Xunit;
 
 public class PullRequestServiceTests : TestBaseClass
 {
+    public class TheExtractFileMethod
+    {
+        [Fact]
+        public async Task ExtractHead()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var head = true;
+
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, head, Encoding.UTF8);
+
+            Assert.Equal(headFileContent, File.ReadAllText(file));
+        }
+
+        [Fact]
+        public async Task ExtractBase_MergeBaseAvailable_UseMergeBaseSha()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = "mergeBaseFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = "mergeBaseSha";
+            var head = false;
+
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                fileName, head, Encoding.UTF8);
+
+            Assert.Equal(mergeBaseFileContent, File.ReadAllText(file));
+        }
+
+        [Fact]
+        public async void MergeBaseNotAvailable_ThrowsNotFoundException()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = null as string;
+            var head = false;
+            var mergeBaseException = new NotFoundException();
+
+            var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                                fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
+        }
+
+        [Fact]
+        public async Task FileAdded_BaseFileEmpty()
+        {
+            var baseFileContent = null as string;
+            var headFileContent = "headFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var head = false;
+
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, head, Encoding.UTF8);
+
+            Assert.Equal(string.Empty, File.ReadAllText(file));
+        }
+
+        [Fact]
+        public async Task FileDeleted_HeadFileEmpty()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
+            var head = true;
+
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, head, Encoding.UTF8);
+
+            Assert.Equal(string.Empty, File.ReadAllText(file));
+        }
+
+        // https://github.com/github/VisualStudio/issues/1010
+        [Theory]
+        [InlineData("utf-8")]        // Unicode (UTF-8)
+        [InlineData("Windows-1252")] // Western European (Windows)        
+        public async Task ChangeEncoding(string encodingName)
+        {
+            var encoding = Encoding.GetEncoding(encodingName);
+            var repoDir = Path.GetTempPath();
+            var baseFileContent = "baseFileContent";
+            var headFileContent = null as string;
+            var fileName = "fileName.txt";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var head = false;
+
+            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, head, encoding, repoDir);
+
+            var expectedPath = Path.Combine(repoDir, fileName);
+            var expectedContent = baseFileContent;
+            File.WriteAllText(expectedPath, expectedContent, encoding);
+
+            Assert.Equal(File.ReadAllText(expectedPath), File.ReadAllText(file));
+            Assert.Equal(File.ReadAllBytes(expectedPath), File.ReadAllBytes(file));
+        }
+
+        static bool HasPreamble(string file, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(file))
+            {
+                foreach (var b in encoding.GetPreamble())
+                {
+                    if (b != stream.ReadByte())
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        static async Task<string> ExtractFile(
+            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
+            string fileName, bool head, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef",
+            Exception mergeBaseException = null)
+        {
+            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+            repositoryModel.LocalPath.Returns(repoDir);
+
+            var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Number.Returns(1);
+
+            pullRequest.Base.Returns(new GitReferenceModel(baseRef, "label", baseSha, "uri"));
+            pullRequest.Head.Returns(new GitReferenceModel("ref", "label", headSha, "uri"));
+
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitClient = MockGitClient();
+            var gitService = serviceProvider.GetGitService();
+            var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
+            if (mergeBaseException == null)
+            {
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+            }
+            else
+            {
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
+            }
+
+            gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
+
+            return await service.ExtractFile(repositoryModel, pullRequest, fileName, head, encoding);
+        }
+
+        static IObservable<string> GetFileObservable(object fileOrException)
+        {
+            if (fileOrException is string)
+            {
+                return Observable.Return((string)fileOrException);
+            }
+
+            if (fileOrException is Exception)
+            {
+                return Observable.Throw<string>((Exception)fileOrException);
+            }
+
+            return Observable.Throw<string>(new FileNotFoundException());
+        }
+
+        static Task<string> GetFileTask(object content)
+        {
+            if (content is string)
+            {
+                return Task.FromResult((string)content);
+            }
+
+            if (content is Exception)
+            {
+                return Task.FromException<string>((Exception)content);
+            }
+
+            if (content == null)
+            {
+                return Task.FromResult<string>(null);
+            }
+
+            throw new ArgumentException("Unsupported content type: " + content);
+        }
+    }
+
     [Fact]
     public void CreatePullRequestAllArgsMandatory()
     {
@@ -70,11 +272,15 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var pr = Substitute.For<IPullRequestModel>();
+            pr.Number.Returns(4);
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
 
             await service.Checkout(localRepo, pr, "pr/123-foo1");
 
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
-            Assert.Equal(1, gitClient.ReceivedCalls().Count());
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr-owner-number", "owner#4").Forget();
+
+            Assert.Equal(2, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
@@ -92,13 +298,16 @@ public class PullRequestServiceTests : TestBaseClass
 
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(5);
-            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/owner/repo"));
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+            pr.Head.Returns(new GitReferenceModel("prbranch", "owner:prbranch", "123", "https://foo.bar/owner/repo"));
 
-            await service.Checkout(localRepo, pr, "local");
+            await service.Checkout(localRepo, pr, "prbranch");
 
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
-            gitClient.Received().Checkout(Arg.Any<IRepository>(), "local").Forget();
-            Assert.Equal(3, gitClient.ReceivedCalls().Count());
+            gitClient.Received().Checkout(Arg.Any<IRepository>(), "prbranch").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.prbranch.ghfvs-pr-owner-number", "owner#5").Forget();
+
+            Assert.Equal(4, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
@@ -116,17 +325,18 @@ public class PullRequestServiceTests : TestBaseClass
 
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(5);
-            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/fork/repo.git"));
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+            pr.Head.Returns(new GitReferenceModel("prbranch", "fork:prbranch", "123", "https://foo.bar/fork/repo.git"));
 
             await service.Checkout(localRepo, pr, "pr/5-fork-branch");
 
             gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork", new Uri("https://foo.bar/fork/repo.git")).Forget();
             gitClient.Received().SetConfig(Arg.Any<IRepository>(), "remote.fork.created-by-ghfvs", "true").Forget();
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork").Forget();
-            gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "source:pr/5-fork-branch").Forget();
+            gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "prbranch:pr/5-fork-branch").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/5-fork-branch").Forget();
-            gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/source").Forget();
-            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr", "5").Forget();
+            gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/prbranch").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr-owner-number", "owner#5").Forget();
             Assert.Equal(7, gitClient.ReceivedCalls().Count());
         }
 
@@ -152,7 +362,8 @@ public class PullRequestServiceTests : TestBaseClass
 
             var pr = Substitute.For<IPullRequestModel>();
             pr.Number.Returns(5);
-            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/fork/repo.git"));
+            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+            pr.Head.Returns(new GitReferenceModel("prbranch", "fork:prbranch", "123", "https://foo.bar/fork/repo.git"));
 
             await service.Checkout(localRepo, pr, "pr/5-fork-branch");
 
@@ -233,10 +444,10 @@ public class PullRequestServiceTests : TestBaseClass
 
             var configEntry1 = Substitute.For<ConfigurationEntry<string>>();
             configEntry1.Key.Returns("branch.pr/1-foo.ghfvs-pr");
-            configEntry1.Value.Returns("1");
+            configEntry1.Value.Returns("foo#1");
             var configEntry2 = Substitute.For<ConfigurationEntry<string>>();
             configEntry2.Key.Returns("branch.pr/2-bar.ghfvs-pr");
-            configEntry2.Value.Returns("2");
+            configEntry2.Value.Returns("foo#2");
 
             config.GetEnumerator().Returns(new List<ConfigurationEntry<string>>
             {
@@ -253,6 +464,7 @@ public class PullRequestServiceTests : TestBaseClass
                 Substitute.For<IUsageTracker>());
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar.git"));
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(true));
 
@@ -267,7 +479,7 @@ public class PullRequestServiceTests : TestBaseClass
             {
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel("source", fromFork ? "fork:baz" : "foo:baz", "sha", "https://github.com/foo/bar.git"),
+                Head = new GitReferenceModel("source", fromFork ? "fork:baz" : "foo:baz", "sha", fromFork ? "https://github.com/fork/bar.git" : "https://github.com/foo/bar.git"),
                 Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
             };
         }
@@ -357,7 +569,7 @@ public class PullRequestServiceTests : TestBaseClass
         var branches = MockBranches("pr/123-foo1", "pr/123-foo1-2");
         repository.Branches.Returns(branches);
 
-        var result = Substitute.For<IGitService>();        
+        var result = Substitute.For<IGitService>();
         result.GetRepository(Arg.Any<string>()).Returns(repository);
         return result;
     }

@@ -88,8 +88,8 @@ public class RepositoryPublishViewModelTests
     public class TheConnectionsProperty : TestBaseClass
     {
         [Theory]
-        [InlineData(GitHubUrls.GitHub, "https://ghe.io" )]
-        [InlineData("https://ghe.io", null)]
+        [InlineData(GitHubUrls.GitHub, "https://github.enterprise" )]
+        [InlineData("https://github.enterprise", null)]
         [InlineData(GitHubUrls.GitHub, null)]
         public void ConnectionsMatchHosts(string arg1, string arg2)
         {
@@ -123,8 +123,8 @@ public class RepositoryPublishViewModelTests
     public class TheSelectedConnectionProperty : TestBaseClass
     {
         [Theory]
-        [InlineData(GitHubUrls.GitHub, "https://ghe.io")]
-        [InlineData("https://ghe.io", GitHubUrls.GitHub)]
+        [InlineData(GitHubUrls.GitHub, "https://github.enterprise")]
+        [InlineData("https://github.enterprise", GitHubUrls.GitHub)]
         public void DefaultsToGitHub(string arg1, string arg2)
         {
             var args = Helpers.GetArgs(arg1, arg2);
@@ -160,7 +160,7 @@ public class RepositoryPublishViewModelTests
             var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
             Helpers.SetupConnections(hosts, cm, adds, conns, hsts, GitHubUrls.GitHub);
-            Helpers.SetupConnections(hosts, cm, adds, conns, hsts, "https://ghe.io");
+            Helpers.SetupConnections(hosts, cm, adds, conns, hsts, "https://github.enterprise");
 
             var gitHubAccounts = new List<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
             var enterpriseAccounts = new List<IAccount> { Substitute.For<IAccount>() };
@@ -342,7 +342,7 @@ public class RepositoryPublishViewModelTests
         [Fact]
         public async Task ResetsWhenSwitchingHosts()
         {
-            var args = Helpers.GetArgs(GitHubUrls.GitHub, "https://ghe.io");
+            var args = Helpers.GetArgs(GitHubUrls.GitHub, "https://github.enterprise");
 
             var cm = Substitutes.ConnectionManager;
             var hosts = Substitute.For<IRepositoryHosts>();

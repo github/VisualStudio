@@ -9,7 +9,6 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using GitHub.Extensions.Reactive;
 using GitHub.Validation;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -58,7 +57,6 @@ namespace GitHub.UI
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(ValidationMessage));
         public string Text
         {
-            [return: AllowNull]
             get { return (string)GetValue(TextProperty); }
             private set { SetValue(TextProperty, value); }
         }
@@ -80,7 +78,6 @@ namespace GitHub.UI
         public static readonly DependencyProperty ValidatesControlProperty = DependencyProperty.Register("ValidatesControl", typeof(TextBox), typeof(ValidationMessage), new PropertyMetadata(default(TextBox)));
         public TextBox ValidatesControl
         {
-            [return: AllowNull]
             get { return (TextBox)GetValue(ValidatesControlProperty); }
             set { SetValue(ValidatesControlProperty, value); }
         }
@@ -88,7 +85,6 @@ namespace GitHub.UI
         public static readonly DependencyProperty ReactiveValidatorProperty = DependencyProperty.Register("ReactiveValidator", typeof(ReactivePropertyValidator), typeof(ValidationMessage));
         public ReactivePropertyValidator ReactiveValidator
         {
-            [return: AllowNull]
             get { return (ReactivePropertyValidator)GetValue(ReactiveValidatorProperty); }
             set { SetValue(ReactiveValidatorProperty, value); }
         }
@@ -96,7 +92,6 @@ namespace GitHub.UI
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(Octicon), typeof(ValidationMessage), new PropertyMetadata(Octicon.stop));
         public Octicon Icon
         {
-            [return: AllowNull]
             get { return (Octicon) GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
@@ -105,16 +100,13 @@ namespace GitHub.UI
             DependencyProperty.Register("Fill", typeof(Brush), typeof(ValidationMessage), new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0xe7, 0x4c, 0x3c))));
         public Brush Fill
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(FillProperty); }
             set { SetValue(FillProperty, value); }
         }
 
         public static readonly DependencyProperty ErrorAdornerTemplateProperty = DependencyProperty.Register("ErrorAdornerTemplate", typeof(string), typeof(ValidationMessage), new PropertyMetadata("validationTemplate"));
-        [AllowNull]
         public string ErrorAdornerTemplate
         {
-            [return: AllowNull]
             get { return (string)GetValue(ErrorAdornerTemplateProperty); }
             set { SetValue(ErrorAdornerTemplateProperty, value); }
         }

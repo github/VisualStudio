@@ -5,15 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:cache="clr-namespace:GitHub.VisualStudio.UI.Helpers"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
+             xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
              KeyboardNavigation.TabNavigation="Local"
              DataContext="{Binding ViewModel}"
-             Background="{DynamicResource GitHubVsToolWindowBackground}"
-             >
+             Background="{DynamicResource GitHubVsToolWindowBackground}" >
+    
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
@@ -146,14 +147,18 @@
   
   <DockPanel>
     <WrapPanel Orientation="Horizontal" Margin="6,0,0,6" DockPanel.Dock="Top">
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click" Content="{x:Static prop:Resources.CloneLink}"/>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static prop:Resources.CloneLink}"              
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CloneHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"/>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
-              Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+              Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SignOutHyperlink}"/>
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
-              Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+              Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SignInHyperlink}"/>
     </WrapPanel>
  
     <ListView x:Name="repositories"
@@ -172,7 +177,7 @@
               VirtualizingPanel.ScrollUnit="Pixel"
               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
               Visibility="{Binding Repositories, Converter={StaticResource HasItemsVisibilityConverter}}"
-      >
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerRepositoryListView}" >
       <ListView.ItemTemplate>
         <DataTemplate>
           <Grid>

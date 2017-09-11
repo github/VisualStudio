@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -11,7 +13,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LoginControlViewModel : BaseViewModel, ILoginControlViewModel
+    public class LoginControlViewModel : DialogViewModelBase, ILoginControlViewModel
     {
         [ImportingConstructor]
         public LoginControlViewModel(
@@ -78,6 +80,11 @@ namespace GitHub.ViewModels
         public bool IsLoginInProgress { get { return isLoginInProgress.Value; } }
 
         public IObservable<AuthenticationResult> AuthenticationResults { get; private set; }
+
+        public override IObservable<Unit> Done
+        {
+            get { return AuthenticationResults.Where(x => x == AuthenticationResult.Success).SelectUnit(); }
+        }
     }
 
     public enum LoginTarget

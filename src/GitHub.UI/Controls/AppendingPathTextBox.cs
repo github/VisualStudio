@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -12,14 +11,12 @@ namespace GitHub.UI
 
         public string ParentFolderPath
         {
-            [return: AllowNull]
             get { return (string)GetValue(ParentFolderPathProperty); }
             set { SetValue(ParentFolderPathProperty, value); }
         }
 
         public string ChildFolderName
         {
-            [return: AllowNull]
             get { return (string)GetValue(ChildFolderNameProperty); }
             set { SetValue(ChildFolderNameProperty, value); }
         }
@@ -29,7 +26,6 @@ namespace GitHub.UI
 
         public Visibility PathSeparatorVisibility
         {
-            [return: AllowNull]
             get { return (Visibility)GetValue(PathSeparatorVisibilityProperty); }
             set { SetValue(PathSeparatorVisibilityProperty, value); }
         }
@@ -39,7 +35,6 @@ namespace GitHub.UI
 
         public Visibility ChildFolderVisibility
         {
-            [return: AllowNull]
             get { return (Visibility)GetValue(ChildFolderVisibilityProperty); }
             set { SetValue(ChildFolderVisibilityProperty, value); }
         }

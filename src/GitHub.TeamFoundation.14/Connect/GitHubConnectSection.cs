@@ -14,21 +14,27 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
-using NullGuard;
 using ReactiveUI;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
 using GitHub.Primitives;
 using GitHub.Settings;
+using System.Windows.Input;
+using System.Reactive.Threading.Tasks;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
+        readonly IPackageSettings packageSettings;
+        readonly IVSServices vsServices;
         readonly int sectionIndex;
+        readonly IDialogService dialogService;
+        readonly IRepositoryCloneService cloneService;
+
         bool isCloning;
         bool isCreating;
-        IPackageSettings packageSettings;
         GitHubConnectSectionState settings;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
@@ -40,8 +46,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { SectionContent = value; }
         }
 
-        [AllowNull]
-        public IConnection SectionConnection { [return:AllowNull] get; set; }
+        public IConnection SectionConnection { get; set; }
 
         bool loggedIn;
         bool LoggedIn
@@ -68,22 +73,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         }
 
         IReactiveDerivedList<ILocalRepositoryModel> repositories;
-        [AllowNull]
         public IReactiveDerivedList<ILocalRepositoryModel> Repositories
         {
-            [return:AllowNull]
             get { return repositories; }
             set { repositories = value; this.RaisePropertyChange(); }
         }
 
         ILocalRepositoryModel selectedRepository;
-        [AllowNull]
         public ILocalRepositoryModel SelectedRepository
         {
-            [return: AllowNull]
             get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); }
         }
+
+        public ICommand Clone { get; }
 
         internal ITeamExplorerServiceHolder Holder => holder;
 
@@ -92,9 +95,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings packageSettings,
+            IVSServices vsServices,
+            IRepositoryCloneService cloneService,
+            IDialogService dialogService,
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(manager, nameof(manager));
+            Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
+            Guard.ArgumentNotNull(vsServices, nameof(vsServices));
+            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
+            Guard.ArgumentNotNull(dialogService, nameof(dialogService));
+
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
@@ -102,10 +116,37 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             sectionIndex = index;
 
             this.packageSettings = packageSettings;
+            this.vsServices = vsServices;
+            this.cloneService = cloneService;
+            this.dialogService = dialogService;
+
+            Clone = CreateAsyncCommandHack(DoClone);
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
             UpdateConnection();
+        }
+
+        async Task DoClone()
+        {
+            var result = await dialogService.ShowCloneDialog(SectionConnection);
+
+            if (result != null)
+            {
+                try
+                {
+                    ServiceProvider.GitServiceProvider = TEServiceProvider;
+                    await cloneService.CloneRepository(
+                        result.Repository.CloneUrl,
+                        result.Repository.Name,
+                        result.BasePath);
+                }
+                catch (Exception e)
+                {
+                    var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Repository.Name));
+                }
+            }
         }
 
         void RefreshConnections(object sender, NotifyCollectionChangedEventArgs e)
@@ -175,6 +216,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             base.Initialize(serviceProvider);
             UpdateConnection();
 
@@ -220,7 +263,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     try
                     {
                         // TODO: Cache the icon state.
-                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                        var api = await ApiFactory.Create(newrepo.CloneUrl);
+                        var repo = await api.GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
                     catch
@@ -244,7 +288,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         try
                         {
                             // TODO: Cache the icon state.
-                            var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
+                            var api = await ApiFactory.Create(r.CloneUrl);
+                            var repo = await api.GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
                         }
                         catch
@@ -261,6 +306,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleCreatedRepo(ILocalRepositoryModel newrepo)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
             msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
@@ -268,6 +315,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleClonedRepo(ILocalRepositoryModel newrepo)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
             if (newrepo.HasCommits() && newrepo.MightContainSolution())
                 msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
@@ -278,6 +327,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void ShowNotification(ILocalRepositoryModel newrepo, string msg)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
             
             teServices.ClearNotifications();
@@ -326,11 +377,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             StartFlow(UIControllerFlow.Create);
         }
 
-        public void DoClone()
-        {
-            StartFlow(UIControllerFlow.Clone);
-        }
-
         public void SignOut()
         {
             SectionConnection.Logout();
@@ -344,22 +390,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public bool OpenRepository()
         {
             var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
-            // open the solution selection dialog when the user wants to switch to a different repo
-            // since there's no other way of changing the source control context in VS
             if (!Equals(SelectedRepository, old))
             {
-                if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                var opened = vsServices.TryOpenRepository(SelectedRepository.LocalPath);
+                if (!opened)
                 {
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-                    return true;
-                }
-                else
-                {
-                    SelectedRepository = old;
-                    return false;
+                    // TryOpenRepository might fail because dir no longer exists. Let user find solution themselves.
+                    opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
+                    if (!opened)
+                    {
+                        return false;
+                    }
                 }
             }
-            return false;
+
+            // Navigate away when we're on the correct source control contexts.
+            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+            return true;
         }
 
         void StartFlow(UIControllerFlow controllerFlow)
@@ -404,6 +451,33 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Creates a ReactiveCommand that works like a command created via
+        /// <see cref="ReactiveCommand.CreateAsyncTask"/> but that does not hang when the async
+        /// task shows a modal dialog.
+        /// </summary>
+        /// <param name="executeAsync">Method that creates the task to run.</param>
+        /// <returns>A reactive command.</returns>
+        /// <remarks>
+        /// The <see cref="Clone"/> command needs to be disabled while a clone operation is in
+        /// progress but also needs to display a modal dialog. For some reason using
+        /// <see cref="ReactiveCommand.CreateAsyncTask"/> causes a weird UI hang in this situation
+        /// where the UI runs but WhenAny no longer responds to property changed notifications.
+        /// </remarks>
+        static ReactiveCommand<object> CreateAsyncCommandHack(Func<Task> executeAsync)
+        {
+            Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
+
+            var enabled = new BehaviorSubject<bool>(true);
+            var command = ReactiveCommand.Create(enabled);
+            command.Subscribe(async _ =>
+            {
+                enabled.OnNext(false);
+                try { await executeAsync(); }
+                finally { enabled.OnNext(true); }
+            });
+            return command;
+        }
 
         class SectionStateTracker
         {

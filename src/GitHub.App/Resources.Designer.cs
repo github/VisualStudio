@@ -214,33 +214,6 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to create a Gist.
-        /// </summary>
-        internal static string LogoutRequiredFeatureGist {
-            get {
-                return ResourceManager.GetString("LogoutRequiredFeatureGist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to To {0} you need to sign out and back in..
-        /// </summary>
-        internal static string LogoutRequiredMessage {
-            get {
-                return ResourceManager.GetString("LogoutRequiredMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sign Out Required.
-        /// </summary>
-        internal static string LogoutRequiredTitle {
-            get {
-                return ResourceManager.GetString("LogoutRequiredTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to You must pull before you can push.
         /// </summary>
         internal static string MustPullBeforePush {

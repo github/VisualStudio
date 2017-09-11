@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using Akavache;
-using NullGuard;
+using GitHub.Extensions;
 
 namespace GitHub.Caches
 {
@@ -29,6 +29,9 @@ namespace GitHub.Caches
 
         public CacheIndex Add(string indexKey, CacheItem item)
         {
+            Guard.ArgumentNotEmptyString(indexKey, nameof(indexKey));
+            Guard.ArgumentNotNull(item, nameof(item));
+
             var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", IndexKey, item.Key);
             if (!Keys.Contains(k))
                 Keys.Add(k);
@@ -39,6 +42,10 @@ namespace GitHub.Caches
         public IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, CacheItem item,
             DateTimeOffset? absoluteExpiration = null)
         {
+            Guard.ArgumentNotNull(cache, nameof(cache));
+            Guard.ArgumentNotEmptyString(indexKey, nameof(indexKey));
+            Guard.ArgumentNotNull(item, nameof(item));
+
             var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", IndexKey, item.Key);
             if (!Keys.Contains(k))
                 Keys.Add(k);
@@ -50,6 +57,10 @@ namespace GitHub.Caches
         public static IObservable<CacheIndex> AddAndSaveToIndex(IBlobCache cache, string indexKey, CacheItem item,
             DateTimeOffset? absoluteExpiration = null)
         {
+            Guard.ArgumentNotNull(cache, nameof(cache));
+            Guard.ArgumentNotEmptyString(indexKey, nameof(indexKey));
+            Guard.ArgumentNotNull(item, nameof(item));
+
             return cache.GetOrCreateObject(indexKey, () => Create(indexKey))
                 .Do(index =>
                 {
@@ -73,12 +84,13 @@ namespace GitHub.Caches
         public IObservable<CacheIndex> Save(IBlobCache cache,
             DateTimeOffset? absoluteExpiration = null)
         {
+            Guard.ArgumentNotNull(cache, nameof(cache));
+
             return cache.InsertObject(IndexKey, this, absoluteExpiration)
                 .Select(x => this);
         }
 
-        [AllowNull]
-        public string IndexKey {[return: AllowNull] get; set; }
+        public string IndexKey { get; set; }
         public List<string> Keys { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public List<string> OldKeys { get; set; }

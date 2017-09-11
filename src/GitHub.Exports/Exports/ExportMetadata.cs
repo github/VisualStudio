@@ -26,7 +26,6 @@ namespace GitHub.Exports
         PRList,
         PRDetail,
         PRCreation,
-        LogoutRequired,
         GitHubPane,
         LoggedOut,
         NotAGitRepository,
@@ -42,6 +41,15 @@ namespace GitHub.Exports
     {
         GitHubPane,
         OpenPullRequests
+    }
+
+    /// <summary>
+    /// Defines the type of repository link to navigate to
+    /// </summary>
+    public enum LinkType
+    {
+        Blob,
+        Blame
     }
 
     /// <summary>
@@ -127,7 +135,11 @@ namespace GitHub.Exports
 
         static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
         {
-            Debug.Assert(attributeData.NamedArguments != null);
+            if (attributeData.NamedArguments == null)
+            {
+                throw new GitHubLogicException("attributeData.NamedArguments may not be null");
+            }
+
             return attributeData.AttributeType == typeof(ExportViewAttribute)
                 && (UIViewType)attributeData.NamedArguments[0].TypedValue.Value == viewType;
         }
@@ -139,7 +151,11 @@ namespace GitHub.Exports
 
         static bool IsMenuType(CustomAttributeData attributeData, MenuType type)
         {
-            Debug.Assert(attributeData.NamedArguments != null);
+            if (attributeData.NamedArguments == null)
+            {
+                throw new GitHubLogicException("attributeData.NamedArguments may not be null");
+            }
+
             return attributeData.AttributeType == typeof(ExportMenuAttribute)
                 && (MenuType)attributeData.NamedArguments[0].TypedValue.Value == type;
         }

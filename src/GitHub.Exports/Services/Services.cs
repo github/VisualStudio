@@ -4,7 +4,6 @@ using EnvDTE80;
 using GitHub.Info;
 using GitHub.Primitives;
 using GitHub.Services;
-using LibGit2Sharp;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;

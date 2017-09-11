@@ -28,5 +28,10 @@ namespace GitHub.ViewModels
         /// Gets the string to display in the [message] box next to the filename.
         /// </summary>
         string StatusDisplay { get; }
+
+        /// <summary>
+        /// Gets the number of review comments on the file.
+        /// </summary>
+        int CommentCount { get; }
     }
 }

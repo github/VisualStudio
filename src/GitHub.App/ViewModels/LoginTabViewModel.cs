@@ -14,7 +14,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
-using NullGuard;
 using ReactiveUI;
 using Serilog;
 
@@ -27,6 +26,9 @@ namespace GitHub.ViewModels
 
         protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
         {
+            Guard.ArgumentNotNull(repositoryHosts, nameof(repositoryHosts));
+            Guard.ArgumentNotNull(browser, nameof(browser));
+
             RepositoryHosts = repositoryHosts;
 
             UsernameOrEmailValidator = ReactivePropertyValidator.For(this, x => x.UsernameOrEmail)
@@ -50,11 +52,11 @@ namespace GitHub.ViewModels
                 log.Information(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
                 if (ex is Octokit.ForbiddenException)
                 {
-                    UserError.Throw(new UserError(Resources.LoginFailedForbiddenMessage));
+                    Error = new UserError(Resources.LoginFailedForbiddenMessage, ex.Message);
                 }
                 else
                 {
-                    UserError.Throw(new UserError(ex.Message));
+                    Error = new UserError(ex.Message);
                 }
             });
 
@@ -83,10 +85,8 @@ namespace GitHub.ViewModels
         public IRecoveryCommand NavigateForgotPassword { get; }
 
         string usernameOrEmail;
-        [AllowNull]
         public string UsernameOrEmail
         {
-            [return: AllowNull]
             get
             { return usernameOrEmail; }
             set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
@@ -100,10 +100,8 @@ namespace GitHub.ViewModels
         }
 
         string password;
-        [AllowNull]
         public string Password
         {
-            [return: AllowNull]
             get
             { return password; }
             set { this.RaiseAndSetIfChanged(ref password, value); }
@@ -128,10 +126,19 @@ namespace GitHub.ViewModels
             get { return canLogin.Value; }
         }
 
+        UserError error;
+        public UserError Error
+        {
+            get { return error; }
+            set { this.RaiseAndSetIfChanged(ref error, value); }
+        }
+
         protected abstract IObservable<AuthenticationResult> LogIn(object args);
 
         protected IObservable<AuthenticationResult> LogInToHost(HostAddress hostAddress)
         {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+
             return Observable.Defer(() =>
             {
                 return hostAddress != null ?
@@ -143,15 +150,15 @@ namespace GitHub.ViewModels
                 switch (authResult)
                 {
                     case AuthenticationResult.CredentialFailure:
-                        UserError.Throw(new UserError(
+                        Error = new UserError(
                             Resources.LoginFailedText,
                             Resources.LoginFailedMessage,
-                            new[] { NavigateForgotPassword }));
+                            new[] { NavigateForgotPassword });
                         break;
                     case AuthenticationResult.VerificationFailure:
                         break;
                     case AuthenticationResult.EnterpriseServerNotFound:
-                        UserError.Throw(new UserError(Resources.CouldNotConnectToGitHub));
+                        Error = new UserError(Resources.CouldNotConnectToGitHub);
                         break;
                 }
             })

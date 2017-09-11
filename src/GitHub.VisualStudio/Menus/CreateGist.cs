@@ -1,8 +1,8 @@
 ﻿using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using System;
 using System.Diagnostics;
+using GitHub.Extensions;
 using GitHub.Infrastructure;
 
 namespace GitHub.VisualStudio.Menus
@@ -15,10 +15,12 @@ namespace GitHub.VisualStudio.Menus
         public CreateGist(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             selectedTextProvider = new Lazy<ISelectedTextProvider>(() => ServiceProvider.TryGetService<ISelectedTextProvider>());
         }
 
-        public Guid Guid { get { return GuidList.guidContextMenuSet; } }
+        public Guid Guid { get { return Guids.guidContextMenuSet; } }
         public int CmdId { get { return PkgCmdIDList.createGistCommand; } }
 
         public bool CanShow()
@@ -27,7 +29,7 @@ namespace GitHub.VisualStudio.Menus
             return !String.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText());
         }
 
-        public void Activate([AllowNull] object data)
+        public void Activate(object data)
         {
             StartFlow(UIControllerFlow.Gist);
         }

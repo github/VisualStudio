@@ -1,6 +1,7 @@
 ﻿using GitHub.Exports;
 using GitHub.Models;
 using System;
+using GitHub.ViewModels;
 
 namespace GitHub.UI
 {
@@ -31,9 +32,8 @@ namespace GitHub.UI
         Clone,
         Publish,
         Gist,
-        LogoutRequired,
         Home,
-        StartPageClone,
+        ReClone,
         PullRequestList,
         PullRequestDetail,
         PullRequestCreation,

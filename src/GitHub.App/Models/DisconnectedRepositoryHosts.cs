@@ -4,9 +4,9 @@ using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.Models
@@ -23,10 +23,8 @@ namespace GitHub.Models
         public HostAddress Address { get; private set; }
         public IApiClient ApiClient { get; private set; }
 
-        [AllowNull]
         public bool IsLoggedIn { get; private set; }
         public bool IsLoggingIn { get; private set; }
-        public bool SupportsGist { get; private set; }
         public ReactiveList<IAccount> Organizations { get; private set; }
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }
@@ -35,6 +33,9 @@ namespace GitHub.Models
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
+            Guard.ArgumentNotEmptyString(usernameOrEmail, nameof(usernameOrEmail));
+            Guard.ArgumentNotNull(password, nameof(password));
+
             return Observable.Return(AuthenticationResult.CredentialFailure);
         }
 

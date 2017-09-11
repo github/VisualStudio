@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubHomeContent"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:cache="clr-namespace:GitHub.VisualStudio.UI.Helpers"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
@@ -49,10 +49,11 @@
                   Text="{Binding Path=RepoName}"
                   TextTrimming="CharacterEllipsis"
                   Margin="0,-2,0,0" />
-      <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
-                  Padding="0"
-                  Text="{Binding Path=RepoUrl}"
-                  TextTrimming="CharacterEllipsis" />
+      <TextBlock Foreground="{DynamicResource GitHubVsGrayText}">
+        <Hyperlink Command="{Binding OpenOnGitHub}">
+            <TextBlock Text="{Binding RepoUrl}" TextTrimming="CharacterEllipsis"/>
+        </Hyperlink>
+      </TextBlock>
     </DockPanel>
   
     <Button Margin="0,6,0,0"

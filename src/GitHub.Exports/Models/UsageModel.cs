@@ -27,6 +27,15 @@ namespace GitHub.Models
         public int NumberOfForkPullRequestsCheckedOut { get; set; }
         public int NumberOfForkPullRequestPulls { get; set; }
         public int NumberOfForkPullRequestPushes { get; set; }
+        public int NumberOfWelcomeDocsClicks { get; set; }
+        public int NumberOfWelcomeTrainingClicks { get; set; }
+        public int NumberOfGitHubPaneHelpClicks { get; set; }
+        public int NumberOfPRDetailsViewChanges { get; set; }
+        public int NumberOfPRDetailsViewFile { get; set; }
+        public int NumberOfPRDetailsCompareWithSolution { get; set; }
+        public int NumberOfPRDetailsOpenFileInSolution { get; set; }
+        public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
+        public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
@@ -55,6 +64,15 @@ namespace GitHub.Models
                 NumberOfForkPullRequestsCheckedOut = NumberOfForkPullRequestsCheckedOut,
                 NumberOfForkPullRequestPulls = NumberOfForkPullRequestPulls,
                 NumberOfForkPullRequestPushes = NumberOfForkPullRequestPushes,
+                NumberOfWelcomeDocsClicks = NumberOfWelcomeDocsClicks,
+                NumberOfWelcomeTrainingClicks = NumberOfWelcomeTrainingClicks,
+                NumberOfGitHubPaneHelpClicks = NumberOfGitHubPaneHelpClicks,
+                NumberOfPRDetailsViewChanges = NumberOfPRDetailsViewChanges,
+                NumberOfPRDetailsViewFile = NumberOfPRDetailsViewFile,
+                NumberOfPRDetailsCompareWithSolution = NumberOfPRDetailsCompareWithSolution,
+                NumberOfPRDetailsOpenFileInSolution = NumberOfPRDetailsOpenFileInSolution,
+                NumberOfPRReviewDiffViewInlineCommentOpen = NumberOfPRReviewDiffViewInlineCommentOpen,
+                NumberOfPRReviewDiffViewInlineCommentPost = NumberOfPRReviewDiffViewInlineCommentPost,
             };
         }
     }

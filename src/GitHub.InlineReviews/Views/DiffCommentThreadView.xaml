@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="GitHub.InlineReviews.Views.DiffCommentThreadView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
+             mc:Ignorable="d" 
+             d:DesignWidth="400">
+    
+    <d:DesignProperties.DataContext>
+        <sample:DiffCommentThreadViewModelDesigner Path="src/GitHub.App.ViewModels/PullRequestListViewModel.cs">
+            <sample:DiffCommentThreadViewModelDesigner.DiffHunk xml:space="preserve">
+                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
+ 
++            this.WhenAny(x => x.SelectedSortOrder, x => x.Value)
++                .Where(x => pullRequests != null)
+            </sample:DiffCommentThreadViewModelDesigner.DiffHunk>
+            <sample:DiffCommentThreadViewModelDesigner.Comments>
+                <sample:CommentThreadViewModelDesigner>
+                    <sample:CommentThreadViewModelDesigner.Comments>
+                        <sample:CommentViewModelDesigner>
+                            <sample:CommentViewModelDesigner.Body>
+                                @StanleyGoldman Ooops, I missed a x != null check here, and it's breaking the tests. Do you want to add it or shall I?
+                            </sample:CommentViewModelDesigner.Body>
+                        </sample:CommentViewModelDesigner>
+                    </sample:CommentThreadViewModelDesigner.Comments>
+                </sample:CommentThreadViewModelDesigner>
+            </sample:DiffCommentThreadViewModelDesigner.Comments>
+        </sample:DiffCommentThreadViewModelDesigner>
+    </d:DesignProperties.DataContext>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top">
+            <Hyperlink>
+                <Run Text="{Binding Path, Mode=OneWay}"/>
+                <Run>:</Run>
+                <Run Text="{Binding LineNumber, Mode=OneWay}"/>
+            </Hyperlink>
+        </TextBlock>
+        <Border DockPanel.Dock="Top" Margin="0 4" BorderBrush="Silver" BorderThickness="1">
+            <local:DiffView Diff="{Binding DiffHunk}" TextBlock.FontFamily="Consolas"/>
+        </Border>
+        <local:CommentThreadView DataContext="{Binding Comments}"/>
+    </DockPanel>
+</UserControl>

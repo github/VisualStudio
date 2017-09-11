@@ -15,19 +15,18 @@ using System.Diagnostics.CodeAnalysis;
 using Octokit;
 using LibGit2Sharp;
 using System.Globalization;
-using GitHub.Primitives;
 using GitHub.Extensions;
 using System.Reactive.Disposables;
+using System.Reactive;
 using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.ViewModels
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
+    public class PullRequestCreationViewModel : DialogViewModelBase, IPullRequestCreationViewModel, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestCreationViewModel>();
 
@@ -36,6 +35,7 @@ namespace GitHub.ViewModels
         readonly IRepositoryHost repositoryHost;
         readonly IObservable<IRemoteRepositoryModel> githubObs;
         readonly CompositeDisposable disposables = new CompositeDisposable();
+        readonly ILocalRepositoryModel activeLocalRepo;
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
@@ -43,7 +43,7 @@ namespace GitHub.ViewModels
              IPullRequestService service, INotificationService notifications)
              : this(connectionRepositoryHostMap?.CurrentRepositoryHost, teservice?.ActiveRepo, service,
                    notifications)
-         {}
+        {}
 
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ILocalRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
@@ -54,6 +54,7 @@ namespace GitHub.ViewModels
             Extensions.Guard.ArgumentNotNull(notifications, nameof(notifications));
 
             this.repositoryHost = repositoryHost;
+            activeLocalRepo = activeRepo;
 
             var obs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
                 .Select(r => new RemoteRepositoryModel(r))
@@ -96,7 +97,7 @@ namespace GitHub.ViewModels
                 .Where(x => !x.IsValid && x.DisplayValidationError)
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
-            createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
+            CreatePullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service
                     .CreatePullRequest(repositoryHost, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
@@ -147,6 +148,8 @@ namespace GitHub.ViewModels
                 Branches = x.ToList();
                 Initialized = true;
             });
+
+            SourceBranch = activeLocalRepo.CurrentBranch;
         }
 
         void SetupValidators()
@@ -216,8 +219,7 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
 
-        IReactiveCommand<IPullRequestModel> createPullRequest;
-        public IReactiveCommand<IPullRequestModel> CreatePullRequest => createPullRequest;
+        public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
 
         string title;
         public string PRTitle
@@ -246,5 +248,7 @@ namespace GitHub.ViewModels
             get { return branchValidator; }
             set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
         }
+
+        public override IObservable<Unit> Done => CreatePullRequest.SelectUnit();
     }
 }

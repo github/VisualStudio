@@ -1,86 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using GitHub.Models;
-using GitHub.Services;
-using GitHub.Primitives;
+using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Extensions;
+using GitHub.Factories;
+using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
-    class CacheData
-    {
-        public IEnumerable<ConnectionCacheItem> connections;
-    }
-
-    class ConnectionCacheItem
-    {
-        public Uri HostUrl { get; set; }
-        public string UserName { get; set; }
-    }
-
     [Export(typeof(IConnectionManager))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ConnectionManager : IConnectionManager
     {
-        readonly string cachePath;
         readonly IVSGitServices vsGitServices;
-        const string cacheFile = "ghfvs.connections";
+        readonly IConnectionCache cache;
+        readonly ILoginManager loginManager;
+        readonly IApiClientFactory apiClientFactory;
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
 
-        Func<string, bool> fileExists;
-        Func<string, Encoding, string> readAllText;
-        Action<string, string> writeAllText;
-        Action<string> fileDelete;
-        Func<string, bool> dirExists;
-        Action<string> dirCreate;
-
         [ImportingConstructor]
-        public ConnectionManager(IProgram program, IVSGitServices vsGitServices)
+        public ConnectionManager(
+            IVSGitServices vsGitServices,
+            IConnectionCache cache,
+            ILoginManager loginManager,
+            IApiClientFactory apiClientFactory)
         {
             this.vsGitServices = vsGitServices;
-            fileExists = (path) => System.IO.File.Exists(path);
-            readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
-            writeAllText = (path, content) => System.IO.File.WriteAllText(path, content);
-            fileDelete = (path) => System.IO.File.Delete(path);
-            dirExists = (path) => System.IO.Directory.Exists(path);
-            dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
+            this.cache = cache;
+            this.loginManager = loginManager;
+            this.apiClientFactory = apiClientFactory;
 
             Connections = new ObservableCollection<IConnection>();
-            cachePath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationName,
-                cacheFile);
-
-            LoadConnectionsFromCache();
-
-            Connections.CollectionChanged += RefreshConnections;
-        }
-
-        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os, IVSGitServices vsGitServices)
-        {
-            this.vsGitServices = vsGitServices;
-            fileExists = (path) => os.File.Exists(path);
-            readAllText = (path, encoding) => os.File.ReadAllText(path, encoding);
-            writeAllText = (path, content) => os.File.WriteAllText(path, content);
-            fileDelete = (path) => os.File.Delete(path);
-            dirExists = (path) => os.Directory.Exists(path);
-            dirCreate = (path) => os.Directory.CreateDirectory(path);
-
-            Connections = new ObservableCollection<IConnection>();
-            cachePath = System.IO.Path.Combine(
-                os.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationName,
-                cacheFile);
-
-            LoadConnectionsFromCache();
-
-            Connections.CollectionChanged += RefreshConnections;
+            LoadConnectionsFromCache().Forget();
         }
 
         public IConnection CreateConnection(HostAddress address, string username)
@@ -158,71 +115,43 @@ namespace GitHub.VisualStudio
                     c.Dispose();
                 }
             }
-            SaveConnectionsToCache();
+
+            SaveConnectionsToCache().Forget();
         }
 
-        void LoadConnectionsFromCache()
+        async Task LoadConnectionsFromCache()
         {
-            EnsureCachePath();
-
-            if (!fileExists(cachePath))
-                return;
-
-            string data = readAllText(cachePath, Encoding.UTF8);
-
-            CacheData cacheData;
-            try
+            foreach (var c in await cache.Load())
             {
-                cacheData = SimpleJson.DeserializeObject<CacheData>(data);
-            }
-            catch
-            {
-                cacheData = null;
-            }
+                var client = await apiClientFactory.CreateGitHubClient(c.HostAddress);
+                var addConnection = true;
 
-            if (cacheData == null || cacheData.connections == null)
-            {
-                // cache is corrupt, remove
-                fileDelete(cachePath);
-                return;
-            }
-
-            cacheData.connections.ForEach(c =>
-            {
-                if (c.HostUrl != null)
-                    AddConnection(c.HostUrl, c.UserName);
-            });
-        }
-
-        void SaveConnectionsToCache()
-        {
-            EnsureCachePath();
-
-            var cache = new CacheData();
-            cache.connections = Connections.Select(conn =>
-                new ConnectionCacheItem
+                try
                 {
-                    HostUrl = conn.HostAddress.WebUri,
-                    UserName = conn.Username,
-                });
-            try
-            {
-                string data = SimpleJson.SerializeObject(cache);
-                writeAllText(cachePath, data);
+                    await loginManager.LoginFromCache(c.HostAddress, client);
+                }
+                catch (Octokit.ApiException e)
+                {
+                    addConnection = false;
+                    VsOutputLogger.WriteLine("Cached credentials for connection {0} were invalid: {1}", c.HostAddress, e);
+                }
+                catch (Exception)
+                {
+                    // Add the connection in this case - could be that there's no internet connection.
+                }
+
+                if (addConnection)
+                {
+                    AddConnection(c.HostAddress, c.UserName);
+                }
             }
-            catch (Exception ex)
-            {
-                Debug.Fail(ex.ToString());
-            }
+
+            Connections.CollectionChanged += RefreshConnections;
         }
 
-        void EnsureCachePath()
+        async Task SaveConnectionsToCache()
         {
-            if (fileExists(cachePath))
-                return;
-            var di = System.IO.Path.GetDirectoryName(cachePath);
-            if (!dirExists(di))
-                dirCreate(di);
+            await cache.Save(Connections.Select(x => new ConnectionDetails(x.HostAddress, x.Username)));
         }
 
         public ObservableCollection<IConnection> Connections { get; private set; }

@@ -2,7 +2,6 @@
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
-using NullGuard;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -16,10 +15,8 @@ namespace GitHub.VisualStudio.Base
         }
 
         ILocalRepositoryModel activeRepo;
-        [AllowNull]
         public ILocalRepositoryModel ActiveRepo
         {
-            [return: AllowNull]
             get { return activeRepo; }
             set
             {
@@ -34,10 +31,9 @@ namespace GitHub.VisualStudio.Base
         /// <summary>
         /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.
         /// </summary>
-        [AllowNull]
         public UriString ActiveRepoUri
         {
-            [return: AllowNull] get { return activeRepoUri; }
+            get { return activeRepoUri; }
             set { activeRepoUri = value; this.RaisePropertyChange(); }
         }
 

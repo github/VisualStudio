@@ -11,22 +11,21 @@ using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
 using System.Threading.Tasks;
 using GitHub.Helpers;
-using GitHub.Infrastructure;
+using System.Threading;
 
 namespace GitHub.Services
 {
-    public class UsageTracker : IUsageTracker
+    public sealed class UsageTracker : IUsageTracker, IDisposable
     {
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
         readonly IGitHubServiceProvider gitHubServiceProvider;
-        readonly DispatcherTimer timer;
-
         IMetricsService client;
         IConnectionManager connectionManager;
         IPackageSettings userSettings;
         IVSServices vsservices;
+        Timer timer;
         string storePath;
         bool firstRun = true;
 
@@ -62,13 +61,16 @@ namespace GitHub.Services
             };
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
-            this.timer = new DispatcherTimer(
-                TimeSpan.FromMinutes(3),
-                DispatcherPriority.Background,
+            this.timer = new Timer(
                 TimerTick,
-                ThreadingHelper.MainThreadDispatcher);
+                null,
+                TimeSpan.FromMinutes(3),
+                TimeSpan.FromHours(8));
+        }
 
-            RunTimer();
+        public void Dispose()
+        {
+            timer?.Dispose();
         }
 
         public async Task IncrementLaunchCount()
@@ -172,6 +174,76 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementWelcomeDocsClicks()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfWelcomeDocsClicks;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementWelcomeTrainingClicks()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfWelcomeTrainingClicks;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementGitHubPaneHelpClicks()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfGitHubPaneHelpClicks;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPullRequestOpened()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPullRequestsOpened;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsViewChanges()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsViewChanges;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsViewFile()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsViewFile;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsCompareWithSolution()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsCompareWithSolution;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRDetailsOpenFileInSolution()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRDetailsOpenFileInSolution;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRReviewDiffViewInlineCommentOpen()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRReviewDiffViewInlineCommentOpen;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPRReviewDiffViewInlineCommentPost()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPRReviewDiffViewInlineCommentPost;
+            SaveUsage(usage);
+        }
+
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
@@ -180,7 +252,7 @@ namespace GitHub.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = gitHubServiceProvider.GetService<IMetricsService>();
+                client = gitHubServiceProvider.TryGetService<IMetricsService>();
                 connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
                 userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
                 vsservices = gitHubServiceProvider.GetService<IVSServices>();
@@ -224,14 +296,7 @@ namespace GitHub.Services
             writeAllText(storePath, json, Encoding.UTF8);
         }
 
-        void RunTimer()
-        {
-            // The timer first ticks after 3 minutes to allow things to settle down after startup.
-            // This will be changed to 8 hours after the first tick by the TimerTick method.
-            timer.Start();
-        }
-
-        void TimerTick(object sender, EventArgs e)
+        void TimerTick(object state)
         {
             TimerTick()
                 .Catch(ex =>
@@ -248,13 +313,13 @@ namespace GitHub.Services
             if (firstRun)
             {
                 await IncrementLaunchCount();
-                timer.Interval = TimeSpan.FromHours(8);
                 firstRun = false;
             }
 
             if (client == null || !userSettings.CollectMetrics)
             {
-                timer.Stop();
+                timer.Dispose();
+                timer = null;
                 return;
             }
 
@@ -280,7 +345,10 @@ namespace GitHub.Services
 
         async Task SendUsage(UsageModel usage, bool weekly, bool monthly)
         {
-            Log.Assert(client != null, "SendUsage should not be called when there is no IMetricsService");
+            if (client == null)
+            {
+                throw new GitHubLogicException("SendUsage should not be called when there is no IMetricsService");
+            }
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
@@ -330,7 +398,16 @@ namespace GitHub.Services
             usage.NumberOfForkPullRequestsCheckedOut = 0;
             usage.NumberOfForkPullRequestPulls = 0;
             usage.NumberOfForkPullRequestPushes = 0;
-
+            usage.NumberOfGitHubPaneHelpClicks = 0;
+            usage.NumberOfWelcomeTrainingClicks = 0;
+            usage.NumberOfWelcomeDocsClicks = 0;
+            usage.NumberOfPRDetailsViewChanges = 0;
+            usage.NumberOfPRDetailsViewFile = 0;
+            usage.NumberOfPRDetailsCompareWithSolution = 0;
+            usage.NumberOfPRDetailsOpenFileInSolution = 0;
+            usage.NumberOfPRReviewDiffViewInlineCommentOpen = 0;
+            usage.NumberOfPRReviewDiffViewInlineCommentPost = 0;
+    
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;
 

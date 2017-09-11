@@ -23,17 +23,17 @@ using static GitHub.Services.ModelService;
 
 public class ModelServiceTests
 {
-    public class TheGetUserFromCacheMethod : TestBaseClass
+    public class TheGetCurrentUserMethod : TestBaseClass
     {
         [Fact]
-        public async Task RetrievesUserFromCache()
+        public async Task RetrievesCurrentUser()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = new InMemoryBlobCache();
             await cache.InsertObject<AccountCacheItem>("user", new AccountCacheItem(CreateOctokitUser("octocat")));
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var user = await modelService.GetUserFromCache();
+            var user = await modelService.GetCurrentUser();
 
             Assert.Equal("octocat", user.Login);
         }
@@ -153,7 +153,7 @@ public class ModelServiceTests
                 CreateOctokitOrganization("fake")
             };
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("snoopy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("snoopy")));
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
@@ -207,8 +207,8 @@ public class ModelServiceTests
             // This should be impossible, but let's pretend it does happen.
             var users = new[]
             {
-                CreateUserAndScopes("peppermintpatty"),
-                CreateUserAndScopes("peppermintpatty")
+                CreateOctokitUser("peppermintpatty"),
+                CreateOctokitUser("peppermintpatty")
             };
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetUser().Returns(users.ToObservable());
@@ -387,7 +387,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = CreateOctokitUser(username);
-            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
+            apiClient.GetUser().Returns(Observable.Return(user));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
@@ -438,12 +438,13 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = CreateOctokitUser(username);
-            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
+            apiClient.GetUser().Returns(Observable.Return(user));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.Name.Returns(reponame);
+            repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
@@ -505,12 +506,13 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = CreateOctokitUser(username);
-            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
+            apiClient.GetUser().Returns(Observable.Return(user));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.Name.Returns(reponame);
+            repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);

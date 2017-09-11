@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.Helpers
                 if (cc == AccentMediumDarkTheme)
                     return "Dark";
                 var brightness = color.GetBrightness();
-                var dark = brightness > 0.5f;
+                var dark = brightness < 0.5f;
                 return dark ? "Dark" : "Light";
             }
             // this throws in design time and when running outside of VS

@@ -8,7 +8,6 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
-using NullGuard;
 using ReactiveUI;
 using System;
 using System.ComponentModel.Composition;
@@ -16,12 +15,12 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
         const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequestList;
@@ -32,6 +31,8 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
         readonly IUIProvider uiProvider;
+        readonly IVisualStudioBrowser browser;
+        readonly IUsageTracker usageTracker;
         NavigationController navController;
 
         bool disabled;
@@ -41,19 +42,31 @@ namespace GitHub.VisualStudio.UI.Views
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider)
+            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser,
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(cm, nameof(cm));
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
+            Guard.ArgumentNotNull(vsBrowser, nameof(vsBrowser));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.connectionManager = cm;
             this.hosts = hosts;
             this.uiProvider = uiProvider;
+            this.usageTracker = usageTracker;
 
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
             Message = String.Empty;
+            browser = vsBrowser;
 
             this.WhenAnyValue(x => x.Control.DataContext)
-                .OfType<BaseViewModel>()
+                .OfType<IPanePageViewModel>()
                 .Select(x => x.WhenAnyValue(y => y.Title))
                 .Switch()
                 .Subscribe(x => Title = x ?? "GitHub");
@@ -61,32 +74,77 @@ namespace GitHub.VisualStudio.UI.Views
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
-            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Load(new ViewWithData(UIControllerFlow.PullRequestList)).Forget());
 
-            back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+            back = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && (navController?.HasBack ?? false),
-                () => {
+                () =>
+                {
                     DisableButtons();
                     navController.Back();
                 },
                 true);
 
-            forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+            forward = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && (navController?.HasForward ?? false),
-                () => {
+                () =>
+                {
                     DisableButtons();
                     navController.Forward();
                 },
                 true);
 
-            refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+            refresh = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled,
-                () => {
+                () =>
+                {
                     DisableButtons();
                     Refresh();
                 },
                 true);
+
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
+                () => !disabled && (RepositoryOrigin == RepositoryOrigin.DotCom || RepositoryOrigin == RepositoryOrigin.Enterprise),
+                () =>
+                {
+                    switch (navController?.Current.CurrentFlow)
+                    {
+                        case UIControllerFlow.PullRequestDetail:
+                            var prDetailViewModel = control.DataContext as IPullRequestDetailViewModel;
+                            if (prDetailViewModel != null)
+                            {
+                                browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pull/" + prDetailViewModel.Model.Number));
+                            }
+                            else
+                            {
+                                goto default;
+                            }
+                            break;
+
+                        case UIControllerFlow.PullRequestList:
+                        case UIControllerFlow.PullRequestCreation:
+                            browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pulls/"));
+                            break;
+
+                        case UIControllerFlow.Home:
+                        default:
+                            browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl());
+                            break;
+                    }
+                },
+                true);
+
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                 () => true,
+                 () =>
+                 {
+                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                     usageTracker.IncrementGitHubPaneHelpClicks().Forget();
+                 },
+                 true);
 
             initialized = true;
 
@@ -114,7 +172,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             navController
                 .WhenAnyValue(x => x.IsBusy)
-                .Subscribe(v => {
+                .Subscribe(v =>
+                {
                     if (v)
                         DisableButtons();
                     else
@@ -257,7 +316,6 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         string title;
-        [AllowNull]
         public string Title
         {
             get { return title; }
@@ -275,13 +333,12 @@ namespace GitHub.VisualStudio.UI.Views
         public bool IsLoggedIn
         {
             get { return isLoggedIn; }
-            set { isLoggedIn = value;  this.RaisePropertyChange(); }
+            set { isLoggedIn = value; this.RaisePropertyChange(); }
         }
 
         public RepositoryOrigin RepositoryOrigin { get; private set; }
 
         string message;
-        [AllowNull]
         public string Message
         {
             get { return message; }
@@ -289,7 +346,6 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         MessageType messageType;
-        [AllowNull]
         public MessageType MessageType
         {
             get { return messageType; }

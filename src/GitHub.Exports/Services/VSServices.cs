@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using System.Linq;
+using DTE = EnvDTE.DTE;
+using Rothko;
 
 namespace GitHub.Services
 {
@@ -15,6 +16,10 @@ namespace GitHub.Services
     public class VSServices : IVSServices
     {
         readonly IGitHubServiceProvider serviceProvider;
+
+        // Use a prefix (~$) that is defined in the default VS gitignore.
+        public const string TempSolutionName = "~$GitHubVSTemp$~";
+
 
         [ImportingConstructor]
         public VSServices(IGitHubServiceProvider serviceProvider)
@@ -65,6 +70,73 @@ namespace GitHub.Services
                 if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,
                             Info.ApplicationInfo.ApplicationSafeName, message)))
                     Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
+            }
+        }
+
+        /// <summary>Open a repository in Team Explorer</summary>
+        /// <remarks>
+        /// There doesn't appear to be a command that directly opens a target repo.
+        /// Our workaround is to create, open and delete a solution in the repo directory.
+        /// This triggers an event that causes the target repo to open. ;)
+        /// </remarks>
+        /// <param name="repoPath">The path to the repository to open</param>
+        /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
+        public bool TryOpenRepository(string repoPath)
+        {
+            var os = serviceProvider.TryGetService<IOperatingSystem>();
+            if (os == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                return false;
+            }
+
+            var dte = serviceProvider.TryGetService<DTE>();
+            if (dte == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find DTE service.");
+                return false;
+            }
+
+            var repoDir = os.Directory.GetDirectory(repoPath);
+            if(!repoDir.Exists)
+            {
+                return false;
+            }
+
+            bool solutionCreated = false;
+            try
+            {
+                dte.Solution.Create(repoPath, TempSolutionName);
+                solutionCreated = true;
+
+                dte.Solution.Close(false); // Don't create a .sln file when we close.
+            }
+            catch (Exception e)
+            {
+                VsOutputLogger.WriteLine("Error opening repository. {0}", e);
+            }
+            finally
+            {
+                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName);
+            }
+            return solutionCreated;
+        }
+
+        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName)
+        {
+            var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
+            try
+            {
+                // Clean up the dummy solution's subdirectory inside `.vs`.
+                var vsTempDir = os.Directory.GetDirectory(vsTempPath);
+                if (vsTempDir.Exists)
+                {
+                    vsTempDir.Delete(true);
+                }
+            }
+            catch (Exception e)
+            {
+                VsOutputLogger.WriteLine("Couldn't clean up {0}. {1}", vsTempPath, e);
             }
         }
 

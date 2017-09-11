@@ -3,7 +3,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using ReactiveUI;
 using Stateless;
 using System;
@@ -83,6 +82,7 @@ namespace GitHub.Controllers
     */
 
     using App.Factories;
+    using ViewModels;
     using StateMachineType = StateMachine<UIViewType, UIController.Trigger>;
 
     public class UIController : IUIController
@@ -144,12 +144,18 @@ namespace GitHub.Controllers
                    serviceProvider.TryGetService<IUIFactory>(),
                    serviceProvider.TryGetService<IConnectionManager>())
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
         public UIController(IGitHubServiceProvider gitHubServiceProvider,
             IRepositoryHosts hosts, IUIFactory factory,
             IConnectionManager connectionManager)
         {
+            Guard.ArgumentNotNull(gitHubServiceProvider, nameof(gitHubServiceProvider));
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(factory, nameof(factory));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+
             this.factory = factory;
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.hosts = hosts;
@@ -180,8 +186,8 @@ namespace GitHub.Controllers
         }
 
         public IObservable<LoadData> Configure(UIControllerFlow choice,
-            [AllowNull] IConnection conn = null,
-            [AllowNull] ViewWithData parameters = null)
+            IConnection conn = null,
+            ViewWithData parameters = null)
         {
             connection = conn;
             selectedFlow = choice;
@@ -314,7 +320,6 @@ namespace GitHub.Controllers
             ConfigureEntriesExitsForView(UIViewType.Login);
             ConfigureEntriesExitsForView(UIViewType.TwoFactor);
             ConfigureEntriesExitsForView(UIViewType.Gist);
-            ConfigureEntriesExitsForView(UIViewType.LogoutRequired);
             ConfigureEntriesExitsForView(UIViewType.StartPageClone);
 
             uiStateMachine.Configure(UIViewType.End)
@@ -416,12 +421,11 @@ namespace GitHub.Controllers
             ConfigureSingleViewLogic(UIControllerFlow.Create, UIViewType.Create);
             ConfigureSingleViewLogic(UIControllerFlow.Gist, UIViewType.Gist);
             ConfigureSingleViewLogic(UIControllerFlow.Home, UIViewType.PRList);
-            ConfigureSingleViewLogic(UIControllerFlow.LogoutRequired, UIViewType.LogoutRequired);
             ConfigureSingleViewLogic(UIControllerFlow.Publish, UIViewType.Publish);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestList, UIViewType.PRList);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestDetail, UIViewType.PRDetail);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestCreation, UIViewType.PRCreation);
-            ConfigureSingleViewLogic(UIControllerFlow.StartPageClone, UIViewType.StartPageClone);
+            ConfigureSingleViewLogic(UIControllerFlow.ReClone, UIViewType.StartPageClone);
         }
 
         void ConfigureSingleViewLogic(UIControllerFlow flow, UIViewType type)
@@ -443,11 +447,7 @@ namespace GitHub.Controllers
         {
             var host = connection != null ? hosts.LookupHost(connection.HostAddress) : null;
             var loggedIn = host?.IsLoggedIn ?? false;
-            if (!loggedIn || selectedFlow != UIControllerFlow.Gist)
-                return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
-
-            var supportsGist = host?.SupportsGist ?? false;
-            return supportsGist ? selectedFlow : UIControllerFlow.LogoutRequired;
+            return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
         }
 
         /// <summary>
@@ -525,13 +525,15 @@ namespace GitHub.Controllers
             if (!firstTime)
                 return;
 
-            SetupView(viewType, view);
+            SetupView(viewType, view.ViewModel);
         }
 
-        void SetupView(UIViewType viewType, IView view)
+        void SetupView(UIViewType viewType, IViewModel viewModel)
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
+            var hasDone = viewModel as IHasDone;
+            var hasCancel = viewModel as IHasCancel;
 
             // 2FA is set up when login is set up, so nothing to do
             if (viewType == UIViewType.TwoFactor)
@@ -544,29 +546,35 @@ namespace GitHub.Controllers
             if (viewType == UIViewType.Login)
             {
                 var pair2fa = list[UIViewType.TwoFactor];
-                pair2fa.AddHandler(pair2fa.ViewModel.WhenAny(x => x.IsShowing, x => x.Value)
+                pair2fa.AddHandler(((IDialogViewModel)pair2fa.ViewModel).WhenAny(x => x.IsShowing, x => x.Value)
                     .Where(x => x)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next)));
 
-                pair2fa.AddHandler(pair2fa.View.Cancel
+                pair2fa.AddHandler(((IHasCancel)pair2fa.ViewModel).Cancel
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
 
-                pair.AddHandler(view.Done
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => Fire(Trigger.Finish)));
+                if (hasDone != null)
+                {
+                    pair.AddHandler(hasDone.Done
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(_ => Fire(Trigger.Finish)));
+                }
             }
-            else
+            else if (hasDone != null)
             {
-                pair.AddHandler(view.Done
+                pair.AddHandler(hasDone.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Next) ? Trigger.Next : Trigger.Finish)));
             }
 
-            pair.AddHandler(view.Cancel
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
+            if (hasCancel != null)
+            {
+                pair.AddHandler(hasCancel.Cancel
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
+            }
         }
 
         /// <summary>

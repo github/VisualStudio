@@ -12,7 +12,6 @@
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -41,14 +40,18 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.CoreUtility.14.3.25407\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.Data, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Data.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -92,17 +95,25 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
+    <Compile Include="Models\IEditorContentSource.cs" />
+    <Compile Include="Models\IInlineCommentThreadModel.cs" />
+    <Compile Include="Models\IPullRequestSessionFile.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
-    <Compile Include="Models\UserAndScopes.cs" />
+    <Compile Include="Models\PullRequestTextBufferInfo.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />
+    <Compile Include="Services\IPullRequestSession.cs" />
     <Compile Include="Services\IPullRequestService.cs" />
+    <Compile Include="Services\IPullRequestSessionManager.cs" />
+    <Compile Include="Services\ModelServiceExtensions.cs" />
     <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
+    <Compile Include="ViewModels\IHasCancel.cs" />
+    <Compile Include="ViewModels\IHasDone.cs" />
+    <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="ViewModels\INotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\INotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\ILoggedOutViewModel.cs" />
-    <Compile Include="ViewModels\ILogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
@@ -119,15 +130,12 @@
     <Compile Include="ViewModels\IPullRequestDirectoryNode.cs" />
     <Compile Include="ViewModels\IPullRequestFileNode.cs" />
     <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
-    <Compile Include="ViewModels\IReactiveViewModel.cs" />
+    <Compile Include="ViewModels\IDialogViewModel.cs" />
     <Compile Include="ViewModels\IBaseCloneViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Models\GitIgnoreItem.cs" />
     <Compile Include="Models\LicenseItem.cs" />
@@ -138,7 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
-    <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
+    <Compile Include="Authentication\IDelegatingTwoFactorChallengeHandler.cs" />
     <Compile Include="Factories\IRepositoryHostFactory.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Collections\ISelectable.cs" />
@@ -170,6 +178,10 @@
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
+      <Project>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</Project>
+      <Name>GitHub.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>

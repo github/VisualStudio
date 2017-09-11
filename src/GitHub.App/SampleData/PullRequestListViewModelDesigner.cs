@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GitHub.UI;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestListViewModelDesigner : BaseViewModel, IPullRequestListViewModel
+    public class PullRequestListViewModelDesigner : PanePageViewModelBase, IPullRequestListViewModel
     {
         public PullRequestListViewModelDesigner()
         {
@@ -33,7 +34,7 @@ namespace GitHub.SampleData
                 Assignee = new AccountDesigner { Login = "haacked", IsUser = true },
             });
             prs.Add(new PullRequestModel(409, "Fix publish button style and a really, really long name for this thing... OMG look how long this name is yusssss",
-                new AccountDesigner { Login = "shana", IsUser = true },                
+                new AccountDesigner { Login = "shana", IsUser = true },
                 DateTimeOffset.Now - TimeSpan.FromHours(5))
             {
                 CommentCount = 27,
@@ -54,17 +55,27 @@ namespace GitHub.SampleData
             SelectedAuthor = Authors.ElementAt(1);
         }
 
+        public IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
+        public IRemoteRepositoryModel SelectedRepository { get; set; }
+
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
-        public ICommand OpenPullRequest { get; set; }
 
         public IReadOnlyList<PullRequestState> States { get; set; }
         public PullRequestState SelectedState { get; set; }
 
         public ObservableCollection<IAccount> Authors { get; set; }
         public IAccount SelectedAuthor { get; set; }
+        public bool RepositoryIsFork { get; set; } = true;
+        public bool ShowPullRequestsForFork { get; set; }
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
+        public IObservable<ViewWithData> Navigate { get; }
+        public bool IsBusy { get; }
+
+        public ReactiveCommand<object> OpenPullRequest { get; }
+        public ReactiveCommand<object> CreatePullRequest { get; }
+        public ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
     }
 }

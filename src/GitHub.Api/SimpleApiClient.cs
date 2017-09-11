@@ -133,7 +133,7 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(HostAddress.WebUri);
-            return (ret == EnterpriseProbeResult.Ok);
+            return (ret == Services.EnterpriseProbeResult.Ok);
         }
     }
 }

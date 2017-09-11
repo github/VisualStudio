@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                    xmlns:local="clr-namespace:GitHub.VisualStudio.Styles">
+                    xmlns:local="clr-namespace:GitHub.VisualStudio.Styles"
+                    xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI">
     
     <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}">
         <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}"/>
@@ -71,4 +72,63 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style x:Key="TeamExplorerPromptTextBox" TargetType="{x:Type ui:PromptTextBox}">
+        <Setter Property="TextBoxBase.CaretBrush" Value="{DynamicResource GitHubVsWindowText}" />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
+        <Setter Property="Background" Value="{DynamicResource TFTextBoxBrushKey}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TFTextBoxBorderBrushKey}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:PromptTextBox}">
+                    <Border Name="Border"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True">
+                        <Grid>
+                            <Border x:Name="PromptBorder"
+                                    Background="{DynamicResource WorkItemInvalidControlBackground}"
+                                    Focusable="False"
+                                    Padding="2 0"
+                                    IsHitTestVisible="False"
+                                    Visibility="Collapsed">
+                                <TextBlock HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                           Focusable="False"
+                                           Foreground="{DynamicResource TFTextBoxHintTextBrushKey}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           IsHitTestVisible="False"
+                                           Padding="{TemplateBinding Padding}"
+                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                           Text="{TemplateBinding PromptText}"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Padding="{TemplateBinding Padding}"
+                                          Focusable="false"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          Margin="0"/>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding Text.Length, RelativeSource={RelativeSource Self}}" Value="0">
+                            <Setter Property="BorderBrush" TargetName="Border" Value="{DynamicResource TFRequiredTextBoxBorderBrushKey}" />
+                            <Setter Property="Foreground" Value="Transparent" />
+                            <Setter Property="Visibility" TargetName="PromptBorder" Value="Visible" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

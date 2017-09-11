@@ -6,10 +6,20 @@
         "default": 'true'
     },
     {
+        "name": "EditorComments",
+        "type": "bool",
+        "default": "false"
+    },
+    {
         "name": "UIState",
         "type": "object",
         "typename": "UIState",
-        "default": 'null'
-    }
+        "default": "null"
+    },
+	{
+		"name": "HideTeamExplorerWelcomeMessage",
+		"type": "bool",
+		"default": "false"
+	}
     ]
 }
