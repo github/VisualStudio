@@ -32,7 +32,6 @@ namespace GitHub.UI
         Clone,
         Publish,
         Gist,
-        LogoutRequired,
         Home,
         ReClone,
         PullRequestList,

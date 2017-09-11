@@ -319,7 +319,6 @@ namespace GitHub.Controllers
             ConfigureEntriesExitsForView(UIViewType.Login);
             ConfigureEntriesExitsForView(UIViewType.TwoFactor);
             ConfigureEntriesExitsForView(UIViewType.Gist);
-            ConfigureEntriesExitsForView(UIViewType.LogoutRequired);
             ConfigureEntriesExitsForView(UIViewType.StartPageClone);
 
             uiStateMachine.Configure(UIViewType.End)
@@ -421,7 +420,6 @@ namespace GitHub.Controllers
             ConfigureSingleViewLogic(UIControllerFlow.Create, UIViewType.Create);
             ConfigureSingleViewLogic(UIControllerFlow.Gist, UIViewType.Gist);
             ConfigureSingleViewLogic(UIControllerFlow.Home, UIViewType.PRList);
-            ConfigureSingleViewLogic(UIControllerFlow.LogoutRequired, UIViewType.LogoutRequired);
             ConfigureSingleViewLogic(UIControllerFlow.Publish, UIViewType.Publish);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestList, UIViewType.PRList);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestDetail, UIViewType.PRDetail);
@@ -448,11 +446,7 @@ namespace GitHub.Controllers
         {
             var host = connection != null ? hosts.LookupHost(connection.HostAddress) : null;
             var loggedIn = host?.IsLoggedIn ?? false;
-            if (!loggedIn || selectedFlow != UIControllerFlow.Gist)
-                return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
-
-            var supportsGist = host?.SupportsGist ?? false;
-            return supportsGist ? selectedFlow : UIControllerFlow.LogoutRequired;
+            return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
         }
 
         /// <summary>
