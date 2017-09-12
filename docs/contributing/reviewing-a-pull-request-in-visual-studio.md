@@ -26,10 +26,26 @@ If the pull request is from a fork then a remote will be added to the forked rep
 
 > Note that you cannot check out a pull request branch when your working directory has uncommitted changes. First commit or stash your changes and then refresh the Pull Request view.
 
-## Comparing files
+## Viewing Changes
 
-To compare the contents of a file in the pull request with its content on the target branch, double click a file in the **Changed Files** tree. This will open the Visual Studio diff viewer. If the pull request has been checked out, the right hand pane will be editable.
+To view the changes in the pull request for a file, double click a file in the **Changed Files** tree. This will open the Visual Studio diff viewer.
 
 ![Diff of two files in the Visual Studio diff viewer](images/pr-diff-files.png)
 
-If the pull request is checked out, right clicking on a file on the **Changed Files** tree and selecting **Open File** will open the file for editing in Visual Studio.
+You can also right-click on a file in the changed files tree to get more options:
+
+- **View Changes**: This is the default option that is also triggered when the file is double-clicked. It shows the changes to the file that are introduced by the pull request.
+- **View File**: This opens a read-only editor showing the contents of the file in the pull request.
+- **View Changes in Solution**: This menu item is only available when the pull request branch is checked out. It shows the changes in the pull request, but the right hand side of the diff is the file in the working directory. This view allows you to use Visual Studio navigation commands such as **Go to Definition (F12)**.
+- **Open File in Solution**: This menu item opens the working directory file in an editor.
+
+## Leaving Comments
+
+You can add comments to a pull request directly from Visual Studio. When a file is [open in the diff viewer](#viewing-changes) you can click the **Add Comment** icon in the margin to add a comment on a line.
+
+![Hover over margin to see add comment icon](images/hover-to-add-comment.png)
+
+Then click the icon on the desired line and leave a comment.
+![Add a comment](images/add-comment.png)
+
+Existing comments left by you or other reviewers will also show up in this margin. Click the icon to open an inline conversation view from which you can review and reply to comments:
