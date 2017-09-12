@@ -2,7 +2,6 @@
 {
     public interface IPullRequestStatusManager
     {
-        void ShowStatus();
-        void HideStatus();
+        void Initialize();
     }
 }

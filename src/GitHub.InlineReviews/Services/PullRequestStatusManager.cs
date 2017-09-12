@@ -10,6 +10,7 @@ using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -18,60 +19,27 @@ namespace GitHub.InlineReviews.Services
     {
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
+        readonly SVsServiceProvider serviceProvider;
         readonly Window mainWindow;
         readonly IPullRequestSessionManager pullRequestSessionManager;
-        readonly PullRequestStatusViewModel pullRequestStatusViewModel;
 
         [ImportingConstructor]
         public PullRequestStatusManager(SVsServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager)
-            : this(CreatePullRequestStatusViewModel(serviceProvider))
+            : this()
         {
+            this.serviceProvider = serviceProvider;
             this.pullRequestSessionManager = pullRequestSessionManager;
-
-            RefreshCurrentSession();
-            pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
         }
 
-        public PullRequestStatusManager(PullRequestStatusViewModel pullRequestStatusViewModel)
+        public PullRequestStatusManager()
         {
-            this.pullRequestStatusViewModel = pullRequestStatusViewModel;
             mainWindow = Application.Current.MainWindow;
         }
 
-        public void ShowStatus()
+        public void Initialize()
         {
-            var statusBar = FindSccStatusBar();
-            if (statusBar != null)
-            {
-                var githubStatusBar = Find<PullRequestStatusView>(statusBar);
-                if (githubStatusBar != null)
-                {
-                    // Replace to ensure status shows up.
-                    statusBar.Items.Remove(githubStatusBar);
-                }
-
-                githubStatusBar = new PullRequestStatusView { DataContext = pullRequestStatusViewModel };
-                statusBar.Items.Insert(0, githubStatusBar);
-            }
-        }
-
-        public void HideStatus()
-        {
-            var statusBar = FindSccStatusBar();
-            if (statusBar != null)
-            {
-                var githubStatusBar = Find<PullRequestStatusView>(statusBar);
-                if (githubStatusBar != null)
-                {
-                    statusBar.Items.Remove(githubStatusBar);
-                }
-            }
-        }
-
-        static PullRequestStatusViewModel CreatePullRequestStatusViewModel(IServiceProvider serviceProvider)
-        {
-            var command = new RaiseVsCommand(serviceProvider, Guids.guidGitHubCmdSetString, PkgCmdIDList.showCurrentPullRequestCommand);
-            return new PullRequestStatusViewModel(command);
+            RefreshCurrentSession();
+            pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
         }
 
         void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -85,8 +53,37 @@ namespace GitHub.InlineReviews.Services
         void RefreshCurrentSession()
         {
             var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
-            pullRequestStatusViewModel.Number = pullRequest?.Number;
-            pullRequestStatusViewModel.Title = pullRequest?.Title;
+            var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(serviceProvider, pullRequest) : null;
+            ShowStatus(viewModel);
+        }
+
+        static PullRequestStatusViewModel CreatePullRequestStatusViewModel(IServiceProvider serviceProvider, IPullRequestModel pullRequest)
+        {
+            var command = new RaiseVsCommand(serviceProvider, Guids.guidGitHubCmdSetString, PkgCmdIDList.showCurrentPullRequestCommand);
+            var pullRequestStatusViewModel = new PullRequestStatusViewModel(command);
+            pullRequestStatusViewModel.Number = pullRequest.Number;
+            pullRequestStatusViewModel.Title = pullRequest.Title;
+            return pullRequestStatusViewModel;
+        }
+
+        void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
+        {
+            var statusBar = FindSccStatusBar();
+            if (statusBar != null)
+            {
+                var githubStatusBar = Find<PullRequestStatusView>(statusBar);
+                if (githubStatusBar != null)
+                {
+                    // Replace to ensure status shows up.
+                    statusBar.Items.Remove(githubStatusBar);
+                }
+
+                if (pullRequestStatusViewModel != null)
+                {
+                    githubStatusBar = new PullRequestStatusView { DataContext = pullRequestStatusViewModel };
+                    statusBar.Items.Insert(0, githubStatusBar);
+                }
+            }
         }
 
         static T Find<T>(StatusBar statusBar)
@@ -140,18 +137,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             public event EventHandler CanExecuteChanged;
-        }
-
-        class PullRequestStatusManagerInstaller
-        {
-            [STAThread]
-            void Install()
-            {
-                var viewModel = new PullRequestStatusViewModel(null) { Number = 666, Title = "A beast of a PR" };
-                var provider = new PullRequestStatusManager(viewModel);
-                provider.HideStatus();
-                provider.ShowStatus();
-            }
         }
     }
 }
