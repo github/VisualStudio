@@ -27,7 +27,6 @@ using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Text.Projection;
-using System.Globalization;
 
 namespace GitHub.VisualStudio.UI.Views
 {
