@@ -18,14 +18,11 @@ namespace GitHub.Logging
             const string outputTemplate =
                 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message}{NewLine}{Exception}";
 
-            //2MBs
-            const long fileSizeLimitBytes = 2L * 1024L * 1024L;
-
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()
                 .MinimumLevel.Warning()
                 .WriteTo.File(logPath,
-                    fileSizeLimitBytes: fileSizeLimitBytes,
+                    fileSizeLimitBytes: null,
                     outputTemplate: outputTemplate)
                 .CreateLogger();
         }
