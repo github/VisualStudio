@@ -25,6 +25,5 @@ using Microsoft.VisualStudio.Shell;
 [assembly: ProvideCodeBase(AssemblyName = "Serilog", CodeBase = @"$PackageFolder$\Serilog.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Serilog.Enrichers.Thread", CodeBase = @"$PackageFolder$\Serilog.Enrichers.Thread.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Serilog.Sinks.File", CodeBase = @"$PackageFolder$\Serilog.Sinks.File.dll")]
-[assembly: ProvideCodeBase(AssemblyName = "Serilog.Sinks.RollingFile", CodeBase = @"$PackageFolder$\Serilog.Sinks.RollingFile.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig", CodeBase = @"$PackageFolder$\Markdig.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig.Wpf", CodeBase = @"$PackageFolder$\Markdig.Wpf.dll")]
