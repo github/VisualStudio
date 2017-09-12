@@ -5,8 +5,6 @@ using GitHub.InlineReviews.Views;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.ComponentModelHost;
-using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews
 {
@@ -21,15 +19,6 @@ namespace GitHub.InlineReviews
         {
             base.Initialize();
             PackageResources.Register(this);
-            ShowPullRequestStatus();
-        }
-
-        void ShowPullRequestStatus()
-        {
-            var componentModel = (IComponentModel)GetService(typeof(SComponentModel));
-            var exportProvider = componentModel.DefaultExportProvider;
-            var pullRequestStatusManager = exportProvider.GetExportedValue<IPullRequestStatusManager>();
-            pullRequestStatusManager.ShowStatus();
         }
     }
 }
