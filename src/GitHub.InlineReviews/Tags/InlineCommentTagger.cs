@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -6,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
@@ -13,8 +15,8 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
-using System.Collections;
-using GitHub.VisualStudio;
+using Serilog;
+
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
@@ -22,6 +24,7 @@ namespace GitHub.InlineReviews.Tags
     /// </summary>
     sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IEditorContentSource, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
@@ -218,7 +221,7 @@ namespace GitHub.InlineReviews.Tags
 
         static void ForgetWithLogging(Task task)
         {
-            task.Catch(e => VsOutputLogger.WriteLine("Exception caught while executing background task: {0}", e)).Forget();
+            task.Catch(e => log.Error(e, "Exception caught while executing background task: {0}")).Forget();
         }
 
         void NotifyTagsChanged()

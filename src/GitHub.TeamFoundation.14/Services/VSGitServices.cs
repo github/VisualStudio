@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio;
@@ -14,6 +15,7 @@ using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -21,6 +23,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServices : IVSGitServices
     {
+        static readonly ILogger log = LogManager.ForContext<VSGitServices>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly IVsStatusbar statusBar;
 
@@ -55,7 +58,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the default cloning path from the registry '{0}'", ex));
+                log.Error(ex, "Error loading the default cloning path from the registry.");
             }
             return ret;
         }
@@ -120,7 +123,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
+                log.Error(ex, "Error loading the repository list from the registry.");
                 return Enumerable.Empty<ILocalRepositoryModel>();
             }
         }

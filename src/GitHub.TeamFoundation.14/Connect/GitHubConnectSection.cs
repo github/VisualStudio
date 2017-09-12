@@ -4,29 +4,31 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
+using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
 using ReactiveUI;
-using System.Threading.Tasks;
-using GitHub.VisualStudio.UI;
-using GitHub.Primitives;
-using GitHub.Settings;
-using System.Windows.Input;
-using System.Reactive.Threading.Tasks;
-using System.Reactive.Subjects;
+using Serilog;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
         readonly IPackageSettings packageSettings;
         readonly IVSServices vsServices;
         readonly int sectionIndex;
@@ -360,7 +362,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 })
             );
 #if DEBUG
-            VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{0} Notification", DateTime.Now));
+            log.Information("Notification");
 #endif
         }
 
@@ -518,7 +520,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (machine.PermittedTriggers.Contains(e.PropertyName))
                 {
 #if DEBUG
-                    VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{3} {0} title:{1} busy:{2}", e.PropertyName, ((ITeamExplorerSection)sender).Title, ((ITeamExplorerSection)sender).IsBusy, DateTime.Now));
+                    log.Information("{PropertyName} title:{Title} busy:{IsBusy}",
+                        e.PropertyName,
+                        ((ITeamExplorerSection)sender).Title,
+                        ((ITeamExplorerSection)sender).IsBusy);
 #endif
                     machine.Fire(e.PropertyName);
                 }

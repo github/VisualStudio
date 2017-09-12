@@ -5,10 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Rothko;
+using Serilog;
 
 namespace GitHub.VisualStudio
 {
@@ -18,6 +20,7 @@ namespace GitHub.VisualStudio
     [Export(typeof(IConnectionCache))]
     public class JsonConnectionCache : IConnectionCache
     {
+        static readonly ILogger log = LogManager.ForContext<JsonConnectionCache>();
         const string DefaultCacheFile = "ghfvs.connections";
         readonly string cachePath;
         readonly IOperatingSystem os;
@@ -56,7 +59,7 @@ namespace GitHub.VisualStudio
                     }
                     catch { }
 
-                    VsOutputLogger.WriteLine("Failed to read connection cache from {0}: {1}", cachePath, e);
+                    log.Error(e, "Failed to read connection cache from {Path}.", cachePath);
                 }
             }
 
@@ -76,7 +79,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception e)
             {
-                VsOutputLogger.WriteLine("Failed to write connection cache to {0}: {1}", cachePath, e);
+                log.Error(e, "Failed to write connection cache to {Path}.", cachePath);
             }
 
             return Task.CompletedTask;

@@ -3,12 +3,14 @@ using System.IO;
 using System.Windows;
 using System.Reflection;
 using System.Collections.Generic;
-using GitHub.VisualStudio;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub
 {
     public class LoadingResourceDictionary : ResourceDictionary
     {
+        static readonly ILogger log = LogManager.ForContext<LoadingResourceDictionary>();
         static Dictionary<string, Assembly> assemblyDicts = new Dictionary<string, Assembly>();
 
         public new Uri Source
@@ -28,7 +30,7 @@ namespace GitHub
                 var assemblyName = FindAssemblyNameFromPackUri(value);
                 if (assemblyName == null)
                 {
-                    VsOutputLogger.WriteLine($"Couldn't find assembly name in '{value}'.");
+                    log.Error("Couldn't find assembly name in '{Uri}'.", value);
                     return;
                 }
 
@@ -41,7 +43,7 @@ namespace GitHub
 
                 if (!File.Exists(assemblyFile))
                 {
-                    VsOutputLogger.WriteLine($"Couldn't find assembly at '{assemblyFile}'.");
+                    log.Error("Couldn't find assembly at '{AssemblyFile}'.", assemblyFile);
                     return;
                 }
 
@@ -50,7 +52,7 @@ namespace GitHub
             }
             catch(Exception e)
             {
-                VsOutputLogger.WriteLine($"Error loading assembly for '{value}': {e}");
+                log.Error(e, "Error loading assembly for '{Uri}'.", value);
             }
         }
 
