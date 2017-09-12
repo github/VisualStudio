@@ -9,7 +9,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
-using NLog;
 
 namespace GitHub.InlineReviews.Services
 {

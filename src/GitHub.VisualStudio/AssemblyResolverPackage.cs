@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.VisualStudio
 {
@@ -16,6 +18,8 @@ namespace GitHub.VisualStudio
     [Guid(Guids.guidAssemblyResolverPkgString)]
     public class AssemblyResolverPackage : Package
     {
+        static readonly ILogger log = LogManager.ForContext<AssemblyResolverPackage>();
+
         // list of assemblies that should be resolved by name only
         static readonly string[] ourAssemblies =
         {
@@ -74,14 +78,8 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                var log = string.Format(CultureInfo.CurrentCulture,
-                    "Error occurred loading {0} from {1}.{2}{3}{4}",
-                    e.Name,
-                    Assembly.GetExecutingAssembly().Location,
-                    Environment.NewLine,
-                    ex,
-                    Environment.NewLine);
-                VsOutputLogger.Write(log);
+                log.Error(ex, "Error occurred loading {AssemblyName} from {ExecutingAssembly}.", e.Name,
+                    Assembly.GetExecutingAssembly().Location);
             }
 
             return null;

@@ -17,6 +17,7 @@ using ReactiveUI;
 using System.ComponentModel.Composition;
 using GitHub.Services;
 using System.Linq;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {

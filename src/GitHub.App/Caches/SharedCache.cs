@@ -4,7 +4,8 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
-using NLog;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Caches
 {
@@ -16,7 +17,7 @@ namespace GitHub.Caches
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<SharedCache>();
 
         static SharedCache()
         {
@@ -26,7 +27,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                log.Error("Error while running the static inializer for SharedCache", e);
+                log.Error(e, "Error while running the static inializer for SharedCache");
             }
         }
 
@@ -45,7 +46,7 @@ namespace GitHub.Caches
                 }
                 catch (Exception e)
                 {
-                    log.Error("Failed to set up secure cache.", e);
+                    log.Error(e, "Failed to set up secure cache.");
                     secureCache = new InMemoryBlobCache();
                 }
             }
@@ -104,7 +105,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                log.Error(string.Format(CultureInfo.InvariantCulture, "Failed to set the {0} cache.", cacheName), e);
+                log.Error(e, "Failed to set the {cacheName} cache.", cacheName);
                 return new InMemoryBlobCache();
             }
         }

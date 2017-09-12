@@ -8,18 +8,17 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Exports;
 using GitHub.Services;
-using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using NLog;
 using Task = System.Threading.Tasks.Task;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using Serilog;
+using Log = GitHub.Logging.Log;
 
 namespace GitHub.VisualStudio
 {
@@ -89,13 +88,12 @@ namespace GitHub.VisualStudio
             public ComposablePart Part { get; set; }
         }
 
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProviderPackage asyncServiceProvider;
         readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         readonly Version currentVersion;
-        bool initializingLogging = false;
         bool initialized = false;
 
         public ExportProvider ExportProvider { get; private set; }
@@ -134,7 +132,7 @@ namespace GitHub.VisualStudio
         {
             IComponentModel componentModel = await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
 
-            Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+            Log.Assert(componentModel != null, "Service of type SComponentModel not found");
             if (componentModel == null)
             {
                 log.Error("Service of type SComponentModel not found");
@@ -152,24 +150,6 @@ namespace GitHub.VisualStudio
 
         public object TryGetService(Type serviceType)
         {
-            Guard.ArgumentNotNull(serviceType, nameof(serviceType));
-
-            if (!initializingLogging && log.Factory.Configuration == null)
-            {
-                initializingLogging = true;
-                try
-                {
-                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
-                    logging.Configure();
-                }
-                catch
-                {
-#if DEBUG
-                    throw;
-#endif
-                }
-            }
-
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
@@ -278,7 +258,7 @@ namespace GitHub.VisualStudio
             Guard.ArgumentNotNull(t, nameof(t));
 
             string contract = AttributedModelServices.GetContractName(t);
-            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+            Log.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
             OwnedComposablePart part;
             if (tempParts.TryGetValue(contract, out part))

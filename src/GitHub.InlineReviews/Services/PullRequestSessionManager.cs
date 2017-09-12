@@ -6,12 +6,14 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -22,6 +24,7 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : ReactiveObject, IPullRequestSessionManager
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestSessionManager>();
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
@@ -146,9 +149,9 @@ namespace GitHub.InlineReviews.Services
 
                 CurrentSession = session;
             }
-            catch
+            catch (Exception e)
             {
-                // TODO: Log
+                log.Error(e, "Error changing repository.");
             }
         }
 

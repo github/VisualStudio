@@ -1,23 +1,24 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
+using GitHub.VisualStudio.Menus;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
-using GitHub.Helpers;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
-using GitHub.VisualStudio.Menus;
-using System.ComponentModel.Design;
-using GitHub.ViewModels;
-using GitHub.Api;
 
 namespace GitHub.VisualStudio
 {
@@ -31,7 +32,6 @@ namespace GitHub.VisualStudio
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
 
@@ -106,6 +106,7 @@ namespace GitHub.VisualStudio
         public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
         const string StartPagePreview5PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
+        static readonly ILogger log = LogManager.ForContext<ServiceProviderPackage>();
 
         Version vsversion;
         Version VSVersion
@@ -162,19 +163,19 @@ namespace GitHub.VisualStudio
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
             {
-                VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                log.Error("Unable to find or create GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
             if (ErrorHandler.Failed(frame.Show()))
             {
-                VsOutputLogger.WriteLine("Unable to show GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                log.Error("Unable to show GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
 
             object docView = null;
             if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
             {
-                VsOutputLogger.WriteLine("Unable to grab instance of GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                log.Error("Unable to grab instance of GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
             return docView as GitHubPane;

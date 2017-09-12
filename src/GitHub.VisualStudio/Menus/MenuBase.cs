@@ -8,11 +8,14 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.VisualStudio
 {
     public abstract class MenuBase
     {
+        static readonly ILogger log = LogManager.ForContext<MenuBase>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly Lazy<ISimpleApiClientFactory> apiFactory;
 
@@ -58,7 +61,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
+                log.Error(ex, "Error loading the repository from '{Path}'.", path);
             }
 
             return null;
@@ -77,7 +80,7 @@ namespace GitHub.VisualStudio
                 }
                 catch (Exception ex)
                 {
-                    VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
+                    log.Error(ex, "Error loading the repository from '{Path}'.", path);
                 }
             }
             return activeRepo;
@@ -109,7 +112,7 @@ namespace GitHub.VisualStudio
                 }
                 catch (Exception ex)
                 {
-                    VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}: Error loading the repository from '{1}'. {2}", GetType(), path, ex));
+                    log.Error(ex, "Error loading the repository from '{Path}'.", path);
                 }
             }
         }
