@@ -39,50 +39,11 @@ namespace GitHub.VisualStudio
 
             if (resolvingAssemblies.Count > 0 || resolvingExceptions.Count > 0)
             {
-                // Avoid loading logging assembly unless there is something to log.
+                // Avoid executing any logging code unless there is something to log.
                 WriteToLog();
             }
 
             base.Dispose(disposing);
-        }
-
-        Assembly ResolveAssemblyFromPackageFolder(object sender, ResolveEventArgs e)
-        {
-            Assembly resolvedAssembly = null;
-
-            try
-            {
-                var resolveAssemblyName = new AssemblyName(e.Name);
-                foreach (var dependentAssembly in dependentAssemblies)
-                {
-                    resolvedAssembly = ResolveDependentAssembly(dependentAssembly, packageFolder, resolveAssemblyName);
-                    if (resolvedAssembly != null)
-                    {
-                        resolvingAssemblies[e.Name] = resolvedAssembly;
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                resolvingExceptions[e.Name] = ex;
-            }
-
-            return resolvedAssembly;
-        }
-
-        void WriteToLog()
-        {
-            var log = LogManager.GetCurrentClassLogger();
-            foreach (var resolvedAssembly in resolvingAssemblies)
-            {
-                log.Info(CultureInfo.InvariantCulture, "Resolved '{0}' to '{1}'.", resolvedAssembly.Key, resolvedAssembly.Value.Location);
-            }
-
-            foreach (var resolvingException in resolvingExceptions)
-            {
-                log.Error(CultureInfo.InvariantCulture, "Error occurred loading '{0}' from '{1}'.\n{2}", resolvingException.Key, packageFolder, resolvingException.Value);
-            }
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
@@ -122,6 +83,42 @@ namespace GitHub.VisualStudio
             }
 
             return null;
+        }
+
+        Assembly ResolveAssemblyFromPackageFolder(object sender, ResolveEventArgs e)
+        {
+            try
+            {
+                var resolveAssemblyName = new AssemblyName(e.Name);
+                foreach (var dependentAssembly in dependentAssemblies)
+                {
+                    var resolvedAssembly = ResolveDependentAssembly(dependentAssembly, packageFolder, resolveAssemblyName);
+                    if (resolvedAssembly != null)
+                    {
+                        return resolvingAssemblies[e.Name] = resolvedAssembly;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                resolvingExceptions[e.Name] = ex;
+            }
+
+            return null;
+        }
+
+        void WriteToLog()
+        {
+            var log = LogManager.GetCurrentClassLogger();
+            foreach (var resolvedAssembly in resolvingAssemblies)
+            {
+                log.Info(CultureInfo.InvariantCulture, "Resolved '{0}' to '{1}'.", resolvedAssembly.Key, resolvedAssembly.Value.Location);
+            }
+
+            foreach (var resolvingException in resolvingExceptions)
+            {
+                log.Error(CultureInfo.InvariantCulture, "Error occurred loading '{0}' from '{1}'.\n{2}", resolvingException.Key, packageFolder, resolvingException.Value);
+            }
         }
     }
 }
