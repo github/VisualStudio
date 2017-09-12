@@ -6,17 +6,17 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Text;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
-using NLog;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
