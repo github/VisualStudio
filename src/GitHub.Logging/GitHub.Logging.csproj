@@ -62,6 +62,8 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Info\ApplicationInfo.cs" />
+    <Compile Include="Logging\ILoggerExtensions.cs" />
+    <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
