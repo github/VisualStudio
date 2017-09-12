@@ -15,7 +15,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 
 namespace GitHub.Controllers
 {

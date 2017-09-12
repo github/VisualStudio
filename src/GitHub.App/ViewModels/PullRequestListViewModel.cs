@@ -11,7 +11,7 @@ using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;

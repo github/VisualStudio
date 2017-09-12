@@ -11,7 +11,7 @@ using Akavache;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Services;
 using Rothko;
 using Serilog;

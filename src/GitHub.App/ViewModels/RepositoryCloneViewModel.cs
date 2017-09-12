@@ -21,7 +21,7 @@ using System.Collections.ObjectModel;
 using GitHub.Collections;
 using GitHub.UI;
 using GitHub.Extensions.Reactive;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.ViewModels

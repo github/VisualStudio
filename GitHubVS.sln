@@ -111,6 +111,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews.UnitTests", "test\GitHub.InlineReviews.UnitTests\GitHub.InlineReviews.UnitTests.csproj", "{17EB676B-BB91-48B5-AA59-C67695C647C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Logging", "src\GitHub.Logging\GitHub.Logging.csproj", "{8D73575A-A89F-47CC-B153-B47DD06837F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -461,6 +463,18 @@ Global
 		{17EB676B-BB91-48B5-AA59-C67695C647C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{17EB676B-BB91-48B5-AA59-C67695C647C2}.Release|x86.ActiveCfg = Release|Any CPU
 		{17EB676B-BB91-48B5-AA59-C67695C647C2}.Release|x86.Build.0 = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Debug|x86.Build.0 = Debug|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Publish|x86.ActiveCfg = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Publish|x86.Build.0 = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

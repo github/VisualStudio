@@ -10,7 +10,7 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;

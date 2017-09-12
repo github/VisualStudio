@@ -17,7 +17,7 @@ using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 using ILoginCache = GitHub.Caches.ILoginCache;
 using System.Threading.Tasks;

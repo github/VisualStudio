@@ -3,7 +3,7 @@ using GitHub.UI;
 using System;
 using System.Diagnostics;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio.Menus
 {

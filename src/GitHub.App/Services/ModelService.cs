@@ -13,7 +13,7 @@ using GitHub.Caches;
 using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;

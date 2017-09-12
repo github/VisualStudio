@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Akavache;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Primitives;
 using Octokit;
 using Serilog;

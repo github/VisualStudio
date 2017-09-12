@@ -7,7 +7,7 @@ using GitHub.Services;
 using Octokit;
 using Octokit.Reactive;
 using ApiClient = GitHub.Api.ApiClient;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using System.Threading.Tasks;
 using ILoginCache = GitHub.Caches.ILoginCache;
 

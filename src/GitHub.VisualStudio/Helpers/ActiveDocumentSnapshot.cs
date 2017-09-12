@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio
 {

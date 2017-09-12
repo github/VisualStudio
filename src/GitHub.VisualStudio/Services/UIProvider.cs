@@ -15,7 +15,7 @@ using ReactiveUI;
 using GitHub.App.Factories;
 using GitHub.Exports;
 using GitHub.Controllers;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.VisualStudio.UI

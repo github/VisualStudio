@@ -9,7 +9,7 @@ using GitHub.Authentication;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Info;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;

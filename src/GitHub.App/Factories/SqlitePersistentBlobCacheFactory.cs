@@ -6,7 +6,7 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.Factories

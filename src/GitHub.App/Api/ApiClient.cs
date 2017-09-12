@@ -17,7 +17,7 @@ using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.Api

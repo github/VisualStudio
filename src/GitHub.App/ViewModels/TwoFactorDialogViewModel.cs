@@ -9,7 +9,7 @@ using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Info;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Validation;
 using Octokit;

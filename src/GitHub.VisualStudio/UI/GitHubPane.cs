@@ -10,7 +10,7 @@ using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
 using System.Diagnostics;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.VisualStudio.UI.Views;
 
 namespace GitHub.VisualStudio.UI

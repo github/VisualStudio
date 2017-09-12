@@ -11,7 +11,7 @@ using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;

@@ -20,7 +20,7 @@ using Octokit;
 using ReactiveUI;
 using Rothko;
 using GitHub.Collections;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.ViewModels

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.Services

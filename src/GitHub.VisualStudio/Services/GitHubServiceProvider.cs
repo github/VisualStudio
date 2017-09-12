@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Exports;
 using GitHub.Services;
@@ -18,7 +18,7 @@ using Task = System.Threading.Tasks.Task;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using Serilog;
-using Log = GitHub.Infrastructure.Log;
+using Log = GitHub.Logging.Log;
 
 namespace GitHub.VisualStudio
 {

@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Octokit;
 using Octokit.Internal;
 

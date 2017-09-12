@@ -4,7 +4,7 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Microsoft.VisualStudio.Shell;
 using Serilog;
 using Rothko;

@@ -5,7 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Extensions;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Primitives;
 using Serilog;
 using Serilog.Core;

@@ -18,7 +18,7 @@ using System.Globalization;
 using GitHub.Extensions;
 using System.Reactive.Disposables;
 using System.Reactive;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.ViewModels

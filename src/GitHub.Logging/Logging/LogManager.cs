@@ -1,19 +1,19 @@
 using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using GitHub.Extensions;
+using GitHub.Info;
 using Serilog;
 using Serilog.Core;
 
-namespace GitHub.Infrastructure
+namespace GitHub.Logging
 {
     public static class LogManager
     {
         static Logger CreateLogger()
         {
-            var environment = new Rothko.Environment();
-            var logPath = Path.Combine(environment.GetLocalGitHubApplicationDataPath(), "extension.log");
+            var logPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                ApplicationInfo.ApplicationName,
+                "extension.log");
 
             const string outputTemplate =
                 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message}{NewLine}{Exception}";

@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Extensions;
 using GitHub.Models;
 using System.Windows;

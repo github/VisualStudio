@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.Caches

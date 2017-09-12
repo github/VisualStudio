@@ -15,10 +15,16 @@ using Microsoft.VisualStudio.Shell;
     OldVersionLowerBound = "0.0.0.0", OldVersionUpperBound = AssemblyVersionInformation.Version)]
 [assembly: ProvideBindingRedirection(AssemblyName = "GitHub.Extensions", CodeBase = @"$PackageFolder$\GitHub.Extensions.dll",
     OldVersionLowerBound = "0.0.0.0", OldVersionUpperBound = AssemblyVersionInformation.Version)]
+[assembly: ProvideBindingRedirection(AssemblyName = "GitHub.Logging", CodeBase = @"$PackageFolder$\GitHub.Logging.dll",
+    OldVersionLowerBound = "0.0.0.0", OldVersionUpperBound = AssemblyVersionInformation.Version)]
 
 [assembly: ProvideCodeBase(AssemblyName = "Octokit", CodeBase = @"$PackageFolder$\Octokit.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "LibGit2Sharp", CodeBase = @"$PackageFolder$\LibGit2Sharp.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Splat", CodeBase = @"$PackageFolder$\Splat.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Rothko", CodeBase = @"$PackageFolder$\Rothko.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Serilog", CodeBase = @"$PackageFolder$\Serilog.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Serilog.Enrichers.Thread", CodeBase = @"$PackageFolder$\Serilog.Enrichers.Thread.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Serilog.Sinks.File", CodeBase = @"$PackageFolder$\Serilog.Sinks.File.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Serilog.Sinks.RollingFile", CodeBase = @"$PackageFolder$\Serilog.Sinks.RollingFile.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig", CodeBase = @"$PackageFolder$\Markdig.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig.Wpf", CodeBase = @"$PackageFolder$\Markdig.Wpf.dll")]
