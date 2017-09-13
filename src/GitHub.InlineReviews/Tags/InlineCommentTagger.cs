@@ -63,7 +63,14 @@ namespace GitHub.InlineReviews.Tags
             this.peekService = peekService;
         }
 
-        public bool ShowMargin => file != null;
+        public bool ShowMargin
+        {
+            get
+            {
+                var diff = file?.Diff;
+                return diff != null && diff.Count > 0;
+            }
+        }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
