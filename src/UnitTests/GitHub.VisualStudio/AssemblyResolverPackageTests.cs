@@ -13,7 +13,7 @@ namespace UnitTests.GitHub.VisualStudio
 {
     public class AssemblyResolverPackageTests
     {
-        class TheResolveDependentAssemblyMethod
+        public class TheResolveDependentAssemblyMethod
         {
             [Fact]
             public void ProvideCodeBaseAttribute_MatchFullName()
