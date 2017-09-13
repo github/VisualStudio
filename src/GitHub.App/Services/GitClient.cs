@@ -380,32 +380,34 @@ namespace GitHub.Services
         }
 
         public async Task<string> GetPullRequestMergeBase(IRepository repo,
-            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
+            UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber)
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
-            Guard.ArgumentNotNull(baseCloneUrl, nameof(baseCloneUrl));
-            Guard.ArgumentNotNull(headCloneUrl, nameof(headCloneUrl));
+            Guard.ArgumentNotNull(targetCloneUrl, nameof(targetCloneUrl));
             Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
-
-            var baseCommit = repo.Lookup<Commit>(baseSha);
-            if (baseCommit == null)
-            {
-                await Fetch(repo, baseCloneUrl, baseRef);
-                baseCommit = repo.Lookup<Commit>(baseSha);
-                if (baseCommit == null)
-                {
-                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {baseCloneUrl}:{baseRef}.");
-                }
-            }
 
             var headCommit = repo.Lookup<Commit>(headSha);
             if (headCommit == null)
             {
-                await Fetch(repo, headCloneUrl, headRef);
+                // The PR base branch might no longer exist, so we fetch using `refs/pull/<PR>/head` first.
+                // This will often fetch the base commits, even when the base branch no longer exists.
+                var headRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, targetCloneUrl, headRef);
                 headCommit = repo.Lookup<Commit>(headSha);
                 if (headCommit == null)
                 {
-                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {headCloneUrl}:{headRef}.");
+                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {targetCloneUrl}:{headRef}.");
+                }
+            }
+
+            var baseCommit = repo.Lookup<Commit>(baseSha);
+            if (baseCommit == null)
+            {
+                await Fetch(repo, targetCloneUrl, baseRef);
+                baseCommit = repo.Lookup<Commit>(baseSha);
+                if (baseCommit == null)
+                {
+                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {targetCloneUrl}:{baseRef}.");
                 }
             }
 

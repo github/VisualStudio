@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -32,6 +31,7 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
+        readonly IVisualStudioBrowser visualStudioBrowser;
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
         IRemoteRepositoryModel remoteRepository;
@@ -40,8 +40,9 @@ namespace GitHub.ViewModels
         PullRequestListViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPackageSettings settings)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
+            IPackageSettings settings,
+            IVisualStudioBrowser visualStudioBrowser)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, visualStudioBrowser)
         {
             Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
@@ -51,16 +52,19 @@ namespace GitHub.ViewModels
         public PullRequestListViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IVisualStudioBrowser visualStudioBrowser)
         {
             Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
 
             constructing = true;
             this.repositoryHost = repositoryHost;
             this.localRepository = repository;
             this.settings = settings;
+            this.visualStudioBrowser = visualStudioBrowser;
 
             Title = Resources.PullRequestsNavigationItemText;
 
@@ -107,6 +111,9 @@ namespace GitHub.ViewModels
             OpenPullRequest.Subscribe(DoOpenPullRequest);
             CreatePullRequest = ReactiveCommand.Create();
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
+
+            OpenPullRequestOnGitHub = ReactiveCommand.Create();
+            OpenPullRequestOnGitHub.Subscribe(x => DoOpenPullRequestOnGitHub((int)x));
 
             constructing = false;
         }
@@ -269,6 +276,8 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
 
+        public ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
+
         bool disposed;
         protected void Dispose(bool disposing)
         {
@@ -333,6 +342,13 @@ namespace GitHub.ViewModels
         {
             var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
             navigate.OnNext(d);
+        }
+
+        void DoOpenPullRequestOnGitHub(int pullRequest)
+        {
+            var repoUrl = SelectedRepository.CloneUrl.ToRepositoryUrl();
+            var url = repoUrl.Append("pull/" + pullRequest);
+            visualStudioBrowser.OpenUrl(url);
         }
     }
 }

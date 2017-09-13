@@ -13,6 +13,8 @@ using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
+using ReactiveUI;
+
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
@@ -34,6 +36,7 @@ namespace GitHub.InlineReviews.Tags
         IPullRequestSession session;
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
+        IDisposable sessionManagerSubscription;
 
         public InlineCommentTagger(
             IGitService gitService,
@@ -66,6 +69,8 @@ namespace GitHub.InlineReviews.Tags
 
         public void Dispose()
         {
+            sessionManagerSubscription?.Dispose();
+            sessionManagerSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
         }
@@ -78,7 +83,7 @@ namespace GitHub.InlineReviews.Tags
                 ForgetWithLogging(Initialize());
                 return EmptyTags;
             }
-            else if (file != null)
+            else if (file?.InlineCommentThreads != null)
             {
                 var result = new List<ITagSpan<InlineCommentTag>>();
                 var currentSession = session ?? sessionManager.CurrentSession;
@@ -151,21 +156,34 @@ namespace GitHub.InlineReviews.Tags
                 relativePath = bufferInfo.RelativePath;
                 file = await session.GetFile(relativePath);
                 leftHandSide = bufferInfo.IsLeftComparisonBuffer;
+                NotifyTagsChanged();
             }
             else
             {
-                relativePath = sessionManager.GetRelativePath(buffer);
+                await InitializeLiveFile();
+                sessionManagerSubscription = sessionManager
+                    .WhenAnyValue(x => x.CurrentSession)
+                    .Skip(1)
+                    .Subscribe(_ => ForgetWithLogging(InitializeLiveFile()));
+            }
+        }
 
-                if (relativePath != null)
-                {
-                    var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
-                    liveFile.LinesChanged.Subscribe(NotifyTagsChanged);
-                    file = liveFile;
-                }
-                else
-                {
-                    file = null;
-                }
+        async Task InitializeLiveFile()
+        {
+            fileSubscription?.Dispose();
+            fileSubscription = null;
+
+            relativePath = sessionManager.GetRelativePath(buffer);
+
+            if (relativePath != null)
+            {
+                var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
+                fileSubscription = liveFile.LinesChanged.Subscribe(NotifyTagsChanged);
+                file = liveFile;
+            }
+            else
+            {
+                file = null;
             }
 
             NotifyTagsChanged();
