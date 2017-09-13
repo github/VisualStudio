@@ -125,7 +125,7 @@ namespace GitHub.InlineReviews.Services
             var document = sessionService.GetDocument(buffer);
             var path = document?.FilePath;
 
-            if (!string.IsNullOrWhiteSpace(path) && Path.IsPathRooted(path))
+            if (!string.IsNullOrWhiteSpace(path) && Path.IsPathRooted(path) && repository != null)
             {
                 var basePath = repository.LocalPath;
 
