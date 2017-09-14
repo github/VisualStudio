@@ -75,7 +75,6 @@
     <Compile Include="Glyph\IGlyphFactory.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
-    <Compile Include="Models\PullRequestSessionLiveFile.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />

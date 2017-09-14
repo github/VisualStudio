@@ -94,11 +94,7 @@ namespace GitHub.VisualStudio.UI.Views
                     window.Document.ReadOnly = !workingDirectory;
 
                     var buffer = GetBufferAt(fileName);
-
-                    if (!workingDirectory)
-                    {
-                        AddBufferTag(buffer, ViewModel.Session, fullPath, false);
-                    }
+                    AddBufferTag(buffer, ViewModel.Session, fullPath, false);
                 }
 
                 if (workingDirectory)
@@ -154,12 +150,8 @@ namespace GitHub.VisualStudio.UI.Views
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
                 var session = ViewModel.Session;
-                AddBufferTag(diffViewer.LeftView.TextBuffer, session, relativePath, true);
-
-                if (!workingDirectory)
-                {
-                    AddBufferTag(diffViewer.RightView.TextBuffer, session, relativePath, false);
-                }
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
+                AddBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
 
                 if (workingDirectory)
                     await UsageTracker.IncrementPRDetailsCompareWithSolution();
