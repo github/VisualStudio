@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -11,6 +13,20 @@ namespace GitHub.InlineReviews.Services
     public interface IPullRequestSessionService
     {
         /// <summary>
+        /// Carries out a diff of a file between two commits.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="baseSha">The commit to use as the base.</param>
+        /// <param name="headSha">The commit to use as the head.</param>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <returns></returns>
+        Task<IReadOnlyList<DiffChunk>> Diff(
+            ILocalRepositoryModel repository,
+            string baseSha,
+            string headSha,
+            string relativePath);
+
+        /// <summary>
         /// Carries out a diff between a file at a commit and the current file contents.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -19,12 +35,38 @@ namespace GitHub.InlineReviews.Services
         /// <param name="relativePath">The relative path to the file.</param>
         /// <param name="contents">The contents of the file.</param>
         /// <returns></returns>
-        Task<IList<DiffChunk>> Diff(
+        Task<IReadOnlyList<DiffChunk>> Diff(
             ILocalRepositoryModel repository,
             string baseSha,
             string headSha,
             string relativePath,
             byte[] contents);
+
+        /// <summary>
+        /// Builds a set of comment thread models for a file based on a pull request model and a diff.
+        /// </summary>
+        /// <param name="pullRequest">The pull request session.</param>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <param name="diff">The diff.</param>
+        /// <returns>
+        /// A collection of <see cref="IInlineCommentThreadModel"/> objects with updated line numbers.
+        /// </returns>
+        IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
+            IPullRequestModel pullRequest,
+            string relativePath,
+            IReadOnlyList<DiffChunk> diff);
+
+        /// <summary>
+        /// Updates a set of comment thread models for a file based on a new diff.
+        /// </summary>
+        /// <param name="threads">The theads to update.</param>
+        /// <param name="diff">The diff.</param>
+        /// <returns>
+        /// A collection of updated line numbers.
+        /// </returns>
+        IReadOnlyList<int> UpdateCommentThreads(
+            IReadOnlyList<IInlineCommentThreadModel> threads,
+            IReadOnlyList<DiffChunk> diff);
 
         /// <summary>
         /// Tests whether the contents of a file represent a commit that is pushed to origin.
@@ -57,6 +99,22 @@ namespace GitHub.InlineReviews.Services
             string relativePath);
 
         /// <summary>
+        /// Gets the associated <see cref="ITextDocument"/> for an <see cref="ITextBuffer"/>.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>
+        /// The associated document, or null if not found.
+        /// </returns>
+        ITextDocument GetDocument(ITextBuffer buffer);
+
+        /// <summary>
+        /// Gets the contents of an <see cref="ITextBuffer"/> using the buffer's current encoding.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>The contents of the buffer.</returns>
+        byte[] GetContents(ITextBuffer buffer);
+
+        /// <summary>
         /// Gets the SHA of the tip of the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -81,6 +139,20 @@ namespace GitHub.InlineReviews.Services
         /// The merge base SHA for the PR.
         /// </returns>
         Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
+        /// Creates a rebuild signal subject for a <see cref="IPullRequestSessionLiveFile"/>.
+        /// </summary>
+        /// <returns>
+        /// A subject which is used to signal a rebuild of a live file.
+        /// </returns>
+        /// <remarks>
+        /// The creation of the rebuild signal for a <see cref="IPullRequestSessionLiveFile"/> is
+        /// abstracted out into this service for unit testing. The default behavior of this subject
+        /// is to throttle the signal for 500ms so that the live file is not updated continuously
+        /// while the user is typing.
+        /// </remarks>
+        ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal();
 
         /// <summary>
         /// Posts a new PR review comment.
