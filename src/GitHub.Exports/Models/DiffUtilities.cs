@@ -16,7 +16,7 @@ namespace GitHub.Models
             {
                 string line;
                 DiffChunk chunk = null;
-                int diffLine = 0;
+                int diffLine = -1;
                 int oldLine = -1;
                 int newLine = -1;
 
@@ -30,6 +30,8 @@ namespace GitHub.Models
                         {
                             yield return chunk;
                         }
+
+                        if (diffLine == -1) diffLine = 0;
 
                         chunk = new DiffChunk
                         {
@@ -70,7 +72,7 @@ namespace GitHub.Models
                         }
                     }
 
-                    ++diffLine;
+                    if (diffLine != -1) ++diffLine;
                 }
 
                 if (chunk != null)
