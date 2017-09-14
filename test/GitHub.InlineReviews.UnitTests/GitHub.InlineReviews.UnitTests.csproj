@@ -106,7 +106,6 @@
   <ItemGroup>
     <Compile Include="Models\DiffUtilitiesTests.cs" />
     <Compile Include="Services\PullRequestSessionManagerTests.cs" />
-    <Compile Include="Services\PullRequestSessionServiceTests.cs" />
     <Compile Include="TestDoubles\FakeDiffService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -116,6 +115,7 @@
     </Compile>
     <Compile Include="Services\DiffServiceTests.cs" />
     <Compile Include="Services\PullRequestSessionTests.cs" />
+    <Compile Include="TestDoubles\FakeEditorContentSource.cs" />
     <Compile Include="TestDoubles\FakeTeamExplorerServiceHolder.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModelTests.cs" />
     <Compile Include="ViewModels\InlineCommentThreadViewModelTests.cs" />

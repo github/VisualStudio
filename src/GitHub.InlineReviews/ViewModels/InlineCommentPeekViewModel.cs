@@ -28,12 +28,11 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        ICommentThreadViewModel thread;
         IDisposable fileSubscription;
-        IDisposable sessionSubscription;
+        ICommentThreadViewModel thread;
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
-        string relativePath;
+        string fullPath;
         bool leftBuffer;
 
         /// <summary>
@@ -98,10 +97,6 @@ namespace GitHub.InlineReviews.ViewModels
 
         public void Dispose()
         {
-            threadSubscription?.Dispose();
-            threadSubscription = null;
-            sessionSubscription?.Dispose();
-            sessionSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
         }
@@ -113,23 +108,20 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (info != null)
             {
-                relativePath = info.RelativePath;
+                fullPath = info.FilePath;
                 leftBuffer = info.IsLeftComparisonBuffer;
-                file = await info.Session.GetFile(relativePath);
-                session = info.Session;
-                await UpdateThread();
+                await SessionChanged(info.Session);
             }
             else
             {
-                relativePath = sessionManager.GetRelativePath(buffer);
-                file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer);
+                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+                fullPath = document.FilePath;
+
                 await SessionChanged(sessionManager.CurrentSession);
-                sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
+                sessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(x => SessionChanged(x).Forget());
             }
-
-            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
         }
 
         async Task UpdateThread()
@@ -145,7 +137,7 @@ namespace GitHub.InlineReviews.ViewModels
             var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
             var lineNumber = lineAndLeftBuffer.Item1;
             var leftBuffer = lineAndLeftBuffer.Item2;
-            var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
+            var thread = file.InlineCommentThreads.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
 
@@ -175,18 +167,18 @@ namespace GitHub.InlineReviews.ViewModels
         async Task SessionChanged(IPullRequestSession session)
         {
             this.session = session;
+            fileSubscription?.Dispose();
 
             if (session == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();
-                threadSubscription = null;
                 return;
             }
-            else
-            {
-                await UpdateThread();
-            }
+
+            var relativePath = session.GetRelativePath(fullPath);
+            file = await session.GetFile(relativePath);
+            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
         }
 
         async Task<string> GetPlaceholderBodyToPreserve()

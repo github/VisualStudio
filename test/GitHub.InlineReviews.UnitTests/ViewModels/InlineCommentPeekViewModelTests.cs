@@ -14,7 +14,6 @@ using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Octokit;
@@ -73,11 +72,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task SwitchesFromNewThreadToExistingThreadWhenCommentPosted()
         {
             var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 8),
-                peekSession,
+                CreatePeekSession(),
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>());
@@ -92,10 +90,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 .Do(async x =>
                 {
                     // Simulate the thread being added to the session.
-                    var file = await sessionManager.GetLiveFile(
-                        RelativePath,
-                        peekSession.TextView,
-                        peekSession.TextView.TextBuffer);
+                    var file = await sessionManager.CurrentSession.GetFile(RelativePath);
                     var newThread = CreateThread(8, "New Comment");
                     file.InlineCommentThreads.Returns(new[] { newThread });
                 });
@@ -109,11 +104,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task RefreshesWhenSessionInlineCommentThreadsChanges()
         {
             var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
-                peekSession,
+                CreatePeekSession(),
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>());
@@ -123,10 +117,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
             Assert.Equal(2, target.Thread.Comments.Count);
 
-            var file = await sessionManager.GetLiveFile(
-                RelativePath,
-                peekSession.TextView,
-                peekSession.TextView.TextBuffer);
+            var file = await sessionManager.CurrentSession.GetFile(RelativePath);
             AddCommentToExistingThread(file);
 
             Assert.Equal(3, target.Thread.Comments.Count);
@@ -136,7 +127,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task RetainsCommentBeingEditedWhenSessionRefreshed()
         {
             var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
@@ -153,10 +143,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             placeholder.BeginEdit.Execute(null);
             placeholder.Body = "Comment being edited";
 
-            var file = await sessionManager.GetLiveFile(
-                RelativePath,
-                peekSession.TextView,
-                peekSession.TextView.TextBuffer);
+            var file = await sessionManager.CurrentSession.GetFile(RelativePath);
             AddCommentToExistingThread(file);
 
             placeholder = target.Thread.Comments.Last();
@@ -169,11 +156,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task DoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
             var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 10),
-                peekSession,
+                CreatePeekSession(),
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>());
@@ -185,12 +171,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             sessionManager.CurrentSession.PostReviewComment(null, 0)
                 .ReturnsForAnyArgs(async x =>
                 {
-                    var file = await sessionManager.GetLiveFile(
-                        RelativePath,
-                        peekSession.TextView,
-                        peekSession.TextView.TextBuffer);
+                    var file = await sessionManager.CurrentSession.GetFile(RelativePath);
                     AddCommentToExistingThread(file);
-                    return file.InlineCommentThreads[0].Comments.Last();
                 });
 
             var placeholder = target.Thread.Comments.Last();
@@ -285,18 +267,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
             }
 
-            var file = Substitute.For<IPullRequestSessionLiveFile>();
+            var file = Substitute.For<IPullRequestSessionFile>();
             file.CommitSha.Returns(commitSha);
             file.Diff.Returns(new[] { diff });
             file.InlineCommentThreads.Returns(new[] { thread });
 
             var session = Substitute.For<IPullRequestSession>();
+            session.GetFile(RelativePath).Returns(file);
+            session.GetRelativePath(FullPath).Returns(RelativePath);
             session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
 
             var result = Substitute.For<IPullRequestSessionManager>();
             result.CurrentSession.Returns(session);
-            result.GetLiveFile(RelativePath, Arg.Any<ITextView>(), Arg.Any<ITextBuffer>()).Returns(file);
-            result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(RelativePath);
 
             return result;
         }
