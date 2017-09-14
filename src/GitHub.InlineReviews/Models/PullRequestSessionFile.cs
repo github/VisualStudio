@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GitHub.Models;
 using ReactiveUI;
-using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Models
 {
@@ -10,15 +9,15 @@ namespace GitHub.InlineReviews.Models
     /// A file in a pull request session.
     /// </summary>
     /// <remarks>
-    /// A pull request session file represents the real-time state of a file in a pull request in
-    /// the IDE. If the pull request branch is checked out, it represents the state of a file from
-    /// the pull request model updated to the current state of the code on disk and in the editor.
+    /// A <see cref="PullRequestSessionFile"/> holds the review comments for a file in a pull
+    /// request together with associated information such as the commit SHA of the file and the
+    /// diff with the file's merge base.
     /// </remarks>
     /// <seealso cref="PullRequestSession"/>
     /// <seealso cref="PullRequestSessionManager"/>
-    class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
+    public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
-        IList<DiffChunk> diff;
+        IReadOnlyList<DiffChunk> diff;
         string commitSha;
         IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
 
@@ -37,7 +36,7 @@ namespace GitHub.InlineReviews.Models
         public string RelativePath { get; }
 
         /// <inheritdoc/>
-        public IList<DiffChunk> Diff
+        public IReadOnlyList<DiffChunk> Diff
         {
             get { return diff; }
             internal set { this.RaiseAndSetIfChanged(ref diff, value); }
@@ -54,10 +53,7 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public IEditorContentSource ContentSource { get; internal set; }
-
-        /// <inheritdoc/>
-        public IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
+        public virtual IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
         {
             get { return inlineCommentThreads; }
             internal set { this.RaiseAndSetIfChanged(ref inlineCommentThreads, value); }
