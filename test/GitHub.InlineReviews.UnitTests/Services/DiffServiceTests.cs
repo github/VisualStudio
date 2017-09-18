@@ -41,17 +41,17 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 // -    public class UsageTracker : IUsageTracker
                 Assert.Equal(17, result[0].Lines[7].OldLineNumber);
                 Assert.Equal(-1, result[0].Lines[7].NewLineNumber);
-                Assert.Equal(12, result[0].Lines[7].DiffLineNumber);
+                Assert.Equal(8, result[0].Lines[7].DiffLineNumber);
 
                 // +    public sealed class UsageTracker : IUsageTracker, IDisposable
                 Assert.Equal(-1, result[0].Lines[8].OldLineNumber);
                 Assert.Equal(18, result[0].Lines[8].NewLineNumber);
-                Assert.Equal(13, result[0].Lines[8].DiffLineNumber);
+                Assert.Equal(9, result[0].Lines[8].DiffLineNumber);
 
                 //      IConnectionManager connectionManager;
                 Assert.Equal(26, result[0].Lines[17].OldLineNumber);
                 Assert.Equal(25, result[0].Lines[17].NewLineNumber);
-                Assert.Equal(22, result[0].Lines[17].DiffLineNumber);
+                Assert.Equal(18, result[0].Lines[17].DiffLineNumber);
             }
         }
     }

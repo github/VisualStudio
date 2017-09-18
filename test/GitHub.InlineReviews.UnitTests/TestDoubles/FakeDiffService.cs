@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.InlineReviews.Services;
@@ -16,6 +17,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
     {
         readonly IRepository repository;
         readonly IDiffService inner;
+        readonly Dictionary<string, string> commitAliases = new Dictionary<string, string>();
 
         public FakeDiffService()
         {
@@ -23,14 +25,30 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             this.inner = new DiffService(Substitute.For<IGitClient>());
         }
 
-        public void AddFile(string path, string contents)
+        public FakeDiffService(string path, string contents)
+        {
+            this.repository = CreateRepository();
+            this.inner = new DiffService(Substitute.For<IGitClient>());
+            AddFile(path, contents);
+        }
+
+        public string AddFile(string path, string contents)
         {
             var signature = new Signature("user", "user@user", DateTimeOffset.Now);
-            File.WriteAllText(Path.Combine(repository.Info.WorkingDirectory, path), contents);
+            var fullPath = Path.Combine(repository.Info.WorkingDirectory, path);
+            var directory = Path.GetDirectoryName(fullPath);
+            Directory.CreateDirectory(directory);
+            File.WriteAllText(fullPath, contents);
             repository.Stage(path);
             repository.Commit("Added " + path, signature, signature);
+            return repository.Head.Tip.Sha;
+        }
 
-            var tip = repository.Head.Tip.Sha;
+        public string AddFile(string path, string contents, string commitAlias)
+        {
+            var sha = AddFile(path, contents);
+            commitAliases.Add(commitAlias, sha);
+            return sha;
         }
 
         public void Dispose()
@@ -43,14 +61,40 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             DeleteDirectory(path);
         }
 
-        public Task<IList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path, byte[] contents)
+        public Task<IReadOnlyList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path)
+        {
+            var blob1 = GetBlob(path, baseSha);
+            var blob2 = GetBlob(path, headSha);
+            var patch = repository.Diff.Compare(blob1, blob2).Patch;
+            return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
+        }
+
+        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string baseSha, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
-            var blob1 = repository.Head.Tip[path]?.Target as Blob;
+            var blob1 = GetBlob(path, baseSha);
             var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
             var patch = repository.Diff.Compare(blob1, blob2).Patch;
-            return Task.FromResult<IList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
+            return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
+        }
+
+        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
+        {
+            return Diff(path, repository.Head.Tip.Sha, Encoding.UTF8.GetBytes(contents));
+        }
+
+        public Task<IReadOnlyList<DiffChunk>> Diff(IRepository repo, string baseSha, string headSha, string path, byte[] contents)
+        {
+            return Diff(path, baseSha, contents);
+        }
+
+        Blob GetBlob(string path, string id)
+        {
+            string sha;
+            if (!commitAliases.TryGetValue(id, out sha)) sha = id;
+            var commit = repository.Lookup<Commit>(sha);
+            return commit?[path]?.Target as Blob;
         }
 
         static IRepository CreateRepository()
