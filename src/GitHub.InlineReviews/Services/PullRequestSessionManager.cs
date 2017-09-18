@@ -71,7 +71,7 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
-        public async Task<IPullRequestSessionLiveFile> GetLiveFile(
+        public async Task<IPullRequestSessionFile> GetLiveFile(
             string relativePath,
             ITextView textView,
             ITextBuffer textBuffer)
@@ -79,7 +79,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestSessionLiveFile result;
 
             if (!textBuffer.Properties.TryGetProperty(
-                typeof(IPullRequestSessionLiveFile),
+                typeof(IPullRequestSessionFile),
                 out result))
             {
                 var dispose = new CompositeDisposable();
@@ -90,7 +90,7 @@ namespace GitHub.InlineReviews.Services
                     sessionService.CreateRebuildSignal());
 
                 textBuffer.Properties.AddProperty(
-                    typeof(IPullRequestSessionLiveFile),
+                    typeof(IPullRequestSessionFile),
                     result);
 
                 await UpdateLiveFile(result, true);
@@ -408,7 +408,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestSessionLiveFile file;
 
             if (textBuffer.Properties.TryGetProperty(
-                typeof(IPullRequestSessionLiveFile),
+                typeof(IPullRequestSessionFile),
                 out file))
             {
                 file.Dispose();
@@ -428,7 +428,7 @@ namespace GitHub.InlineReviews.Services
         void TextBufferChanged(object sender, TextContentChangedEventArgs e)
         {
             var textBuffer = (ITextBuffer)sender;
-            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionLiveFile));
+            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
             InvalidateLiveThreads(file, e.After);
             file.Rebuild.OnNext(textBuffer.CurrentSnapshot);
         }

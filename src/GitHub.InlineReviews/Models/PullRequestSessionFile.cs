@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Subjects;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -17,6 +19,7 @@ namespace GitHub.InlineReviews.Models
     /// <seealso cref="PullRequestSessionManager"/>
     public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
+        readonly Subject<IReadOnlyList<int>> linesChanged = new Subject<IReadOnlyList<int>>();
         IReadOnlyList<DiffChunk> diff;
         string commitSha;
         IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
@@ -53,10 +56,29 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public virtual IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
+        public IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
         {
             get { return inlineCommentThreads; }
-            internal set { this.RaiseAndSetIfChanged(ref inlineCommentThreads, value); }
+            internal set
+            {
+                var lines = inlineCommentThreads?
+                    .Concat(value ?? Enumerable.Empty<IInlineCommentThreadModel>())
+                    .Select(x => x.LineNumber)
+                    .Where(x => x >= 0)
+                    .Distinct()
+                    .ToList();
+                inlineCommentThreads = value;
+                NotifyLinesChanged(lines);
+            }
         }
+
+        /// <inheritdoc/>
+        public IObservable<IReadOnlyList<int>> LinesChanged => linesChanged;
+
+        /// <summary>
+        /// Raises the <see cref="LinesChanged"/> signal.
+        /// </summary>
+        /// <param name="lines">The lines that have changed.</param>
+        public void NotifyLinesChanged(IReadOnlyList<int> lines) => linesChanged.OnNext(lines);
     }
 }

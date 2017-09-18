@@ -285,7 +285,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
             }
 
-            var file = Substitute.For<IPullRequestSessionLiveFile>();
+            var file = Substitute.For<IPullRequestSessionFile>();
             file.CommitSha.Returns(commitSha);
             file.Diff.Returns(new[] { diff });
             file.InlineCommentThreads.Returns(new[] { thread });

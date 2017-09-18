@@ -20,7 +20,7 @@ namespace GitHub.InlineReviews.Tags
     /// <summary>
     /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
     /// </summary>
-    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
+    public sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
         static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
         readonly IGitService gitService;
@@ -29,7 +29,6 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IInlineCommentPeekService peekService;
         bool needsInitialize = true;
         string relativePath;
         bool leftHandSide;
@@ -44,15 +43,13 @@ namespace GitHub.InlineReviews.Tags
             IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
-            IPullRequestSessionManager sessionManager,
-            IInlineCommentPeekService peekService)
+            IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(peekService, nameof(peekService));
 
             this.gitService = gitService;
             this.gitClient = gitClient;
@@ -60,7 +57,6 @@ namespace GitHub.InlineReviews.Tags
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
-            this.peekService = peekService;
         }
 
         public bool ShowMargin => file != null;
@@ -155,6 +151,7 @@ namespace GitHub.InlineReviews.Tags
                 session = bufferInfo.Session;
                 relativePath = bufferInfo.RelativePath;
                 file = await session.GetFile(relativePath);
+                fileSubscription = file.LinesChanged.Subscribe(NotifyTagsChanged);
                 leftHandSide = bufferInfo.IsLeftComparisonBuffer;
                 NotifyTagsChanged();
             }
