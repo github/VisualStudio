@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
 using System.Threading;
+using System.Reactive.Subjects;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -30,6 +31,7 @@ namespace GitHub.InlineReviews.Services
         string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
         IPullRequestModel pullRequest;
+        Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -155,6 +157,8 @@ namespace GitHub.InlineReviews.Services
             {
                 await UpdateFile(file);
             }
+
+            pullRequestChanged.OnNext(pullRequest);
         }
 
         async Task AddComment(IPullRequestReviewCommentModel comment)
@@ -232,6 +236,9 @@ namespace GitHub.InlineReviews.Services
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public IObservable<IPullRequestModel> PullRequestChanged => pullRequestChanged;
 
         /// <inheritdoc/>
         public ILocalRepositoryModel LocalRepository { get; }

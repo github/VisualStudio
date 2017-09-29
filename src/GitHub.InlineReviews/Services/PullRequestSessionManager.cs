@@ -109,8 +109,7 @@ namespace GitHub.InlineReviews.Services
                 dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
-                dispose.Add(this.WhenAnyValue(x => x.CurrentSession.PullRequest)
-                    .Skip(1)
+                dispose.Add(this.WhenAnyObservable(x => x.CurrentSession.PullRequestChanged)
                     .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
 
                 result.ToDispose = dispose;
