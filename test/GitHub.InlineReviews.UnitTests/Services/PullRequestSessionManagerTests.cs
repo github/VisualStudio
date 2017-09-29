@@ -644,6 +644,36 @@ Line 4";
                 Assert.Null(file.CommitSha);
             }
 
+            [Fact]
+            public async Task UpdatingCurrentSessionPullRequestTriggersLinesChanged()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var expectedLineNumber = 2;
+                var threads = new[]
+                {
+                    CreateInlineCommentThreadModel(expectedLineNumber),
+                };
+
+                sessionService.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(threads);
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var raised = false;
+                var pullRequest = target.CurrentSession.PullRequest;
+
+                file.LinesChanged.Subscribe(x => raised = x.Count == 1 && x[0] == expectedLineNumber);
+
+                // LinesChanged should be raised even if the IPullRequestModel is the same.
+                await target.CurrentSession.Update(target.CurrentSession.PullRequest);
+
+                Assert.True(raised);
+            }
+
             static IPullRequestReviewCommentModel CreateComment(
                 string diffHunk,
                 string body = "Comment",
