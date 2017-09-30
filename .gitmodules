@@ -12,4 +12,4 @@
 	url = https://github.com/editor-tools/Akavache
 [submodule "script"]
 	path = script
-	url = git@github.com:github/VisualStudioBuildScripts
+	url = https://github.com/github/VisualStudioBuildScripts
