@@ -42,7 +42,15 @@ namespace GitHub.Models
                     }
                     else if (chunk != null)
                     {
-                        var type = GetLineChange(line[0]);
+                        DiffChangeType type;
+                        try
+                        {
+                            type = GetLineChange(line[0]);
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            throw new IndexOutOfRangeException('"' + diff + '"');
+                        }
 
                         // This might contain info about previous line (e.g. "\ No newline at end of file").
                         if (type != DiffChangeType.Control)
