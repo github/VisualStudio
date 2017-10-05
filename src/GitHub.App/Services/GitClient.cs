@@ -86,6 +86,41 @@ namespace GitHub.Services
             });
         }
 
+        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        {
+            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
+
+            var originRemote = repo.Network.Remotes[defaultOriginName];
+            if (originRemote != null && originRemote.Url == httpsUrl)
+            {
+                return Fetch(repo, defaultOriginName, refspecs);
+            }
+
+            return Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
+                    var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
+                    try
+                    {
+                        repo.Network.Fetch(remote, refspecs, fetchOptions);
+                    }
+                    finally
+                    {
+                        repo.Network.Remotes.Remove(tempRemoteName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Failed to fetch", ex);
+#if DEBUG
+                    throw;
+#endif
+                }
+            });
+        }
+
         public Task Fetch(IRepository repository, string remoteName, params string[] refspecs)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -427,41 +462,6 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 return repo.Head.TrackingDetails.AheadBy == 0;
-            });
-        }
-
-        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
-        {
-            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
-
-            var originRemote = repo.Network.Remotes[defaultOriginName];
-            if (originRemote != null && originRemote.Url == httpsUrl)
-            {
-                return Fetch(repo, defaultOriginName, refspecs);
-            }
-
-            return Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
-                    var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
-                    try
-                    {
-                        repo.Network.Fetch(remote, refspecs, fetchOptions);
-                    }
-                    finally
-                    {
-                        repo.Network.Remotes.Remove(tempRemoteName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Failed to fetch", ex);
-#if DEBUG
-                    throw;
-#endif
-                }
             });
         }
 
