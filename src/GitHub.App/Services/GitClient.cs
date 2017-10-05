@@ -36,6 +36,7 @@ namespace GitHub.Services
             };
         }
 
+#pragma warning disable 0612, 0618
         public Task Pull(IRepository repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));

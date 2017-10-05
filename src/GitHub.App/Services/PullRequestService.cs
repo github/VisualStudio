@@ -101,6 +101,7 @@ namespace GitHub.Services
             });
         }
 
+#pragma warning disable 0612, 0618
         public IObservable<Unit> Push(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
@@ -165,6 +166,7 @@ namespace GitHub.Services
             });
         }
 
+#pragma warning disable 0612, 0618
         public IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
         {
             return Observable.Defer(async () =>

@@ -25,6 +25,7 @@ namespace GitHub.Models
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
+#pragma warning disable 0612, 0618
         public BranchModel(LibGit2Sharp.Branch branch, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
