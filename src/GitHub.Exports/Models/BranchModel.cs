@@ -25,14 +25,16 @@ namespace GitHub.Models
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
-#pragma warning disable 0612, 0618
         public BranchModel(LibGit2Sharp.Branch branch, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
 
             Name = DisplayName = branch.FriendlyName;
-            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url) : repo;
+#pragma warning disable 0618 // Branch.Remote is deprecated
+            var remoteUrl = branch.Remote.Url;
+#pragma warning restore 0618
+            Repository = branch.IsRemote ? new LocalRepositoryModel(remoteUrl) : repo;
             IsTracking = branch.IsTracking;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }

@@ -36,7 +36,6 @@ namespace GitHub.Services
             };
         }
 
-#pragma warning disable 0612, 0618
         public Task Pull(IRepository repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -44,7 +43,9 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
+#pragma warning disable 0618 // Network.Pull is deprecated
                 repository.Network.Pull(signature, pullOptions);
+#pragma warning restore 0618
             });
         }
 
@@ -75,7 +76,9 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // Network.Fetch is deprecated
                     repository.Network.Fetch(remote, fetchOptions);
+#pragma warning restore 0618
                 }
                 catch (Exception ex)
                 {
@@ -132,7 +135,9 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // Network.Fetch is deprecated
                     repository.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
                 }
                 catch (Exception ex)
                 {
@@ -151,7 +156,9 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
+#pragma warning disable 0618 // IRepository.Checkout is deprecated
                 repository.Checkout(branchName);
+#pragma warning restore 0618
             });
         }
 

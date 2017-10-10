@@ -101,13 +101,15 @@ namespace GitHub.Services
             });
         }
 
-#pragma warning disable 0612, 0618
         public IObservable<Unit> Push(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+#pragma warning disable 0618 // Branch.Remote is deprecated
+                var remoteName = repo.Head.Remote.Name;
+#pragma warning restore 0618
+                var remote = await gitClient.GetHttpRemote(repo, remoteName);
                 return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
             });
         }
@@ -166,16 +168,18 @@ namespace GitHub.Services
             });
         }
 
-#pragma warning disable 0612, 0618
         public IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
 
-                if (repo.Head.Remote != null)
+#pragma warning disable 0618 // Branch.Remote is deprecated
+                var headRemote = repo.Head.Remote;
+#pragma warning restore 0618
+                if (headRemote != null)
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                    var remote = await gitClient.GetHttpRemote(repo, headRemote.Name);
                     await gitClient.Fetch(repo, remote.Name);
                 }
 
@@ -368,10 +372,12 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
+#pragma warning disable 0618 // Branch.Remote is deprecated
                 var usedRemotes = new HashSet<string>(
                     repo.Branches
                         .Where(x => !x.IsRemote && x.Remote != null)
                         .Select(x => x.Remote?.Name));
+#pragma warning restore 0618
 
                 foreach (var remote in repo.Network.Remotes)
                 {
