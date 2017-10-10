@@ -173,13 +173,10 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-
-#pragma warning disable 0618 // Branch.Remote is deprecated
-                var headRemote = repo.Head.Remote;
-#pragma warning restore 0618
-                if (headRemote != null)
+                var remoteName = repo.Head.RemoteName;
+                if (remoteName != null)
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, headRemote.Name);
+                    var remote = await gitClient.GetHttpRemote(repo, remoteName);
                     await gitClient.Fetch(repo, remote.Name);
                 }
 
