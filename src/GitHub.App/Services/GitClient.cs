@@ -108,7 +108,9 @@ namespace GitHub.Services
                     var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
                     try
                     {
+#pragma warning disable 0618 // Network.Fetch is deprecated
                         repo.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
                     }
                     finally
                     {
