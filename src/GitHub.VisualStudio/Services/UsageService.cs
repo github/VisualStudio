@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
@@ -14,10 +15,13 @@ namespace GitHub.Services
     [Export(typeof(IUsageService))]
     public class UsageService : IUsageService
     {
-        const string StoreFileName = "ghfvs.usage";
-        static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
+        const string StoreFileName = "metrics.json";
+        const string UserStoreFileName = "user.json";
+        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
         readonly IGitHubServiceProvider serviceProvider;
         string storePath;
+        string userStorePath;
+        Guid? userGuid;
 
         [ImportingConstructor]
         public UsageService(IGitHubServiceProvider serviceProvider)
@@ -25,19 +29,49 @@ namespace GitHub.Services
             this.serviceProvider = serviceProvider;
         }
 
-        public bool IsSameDay(DateTimeOffset lastUpdated)
+        public async Task<Guid> GetUserGuid()
         {
-            return lastUpdated.Date == DateTimeOffset.Now.Date;
+            await Initialize();
+
+            if (!userGuid.HasValue)
+            {
+                try
+                {
+                    if (File.Exists(userStorePath))
+                    {
+                        var json = await ReadAllTextAsync(userStorePath);
+                        var data = SimpleJson.DeserializeObject<UserData>(json);
+                        userGuid = data.UserGuid;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Failed reading user metrics GUID", ex);
+                }
+            }
+
+            if (!userGuid.HasValue || userGuid.Value == Guid.Empty)
+            {
+                userGuid = Guid.NewGuid();
+
+                try
+                {
+                    var data = new UserData { UserGuid = userGuid.Value };
+                    var json = SimpleJson.SerializeObject(data);
+                    await WriteAllTextAsync(userStorePath, json);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Failed reading writing metrics GUID", ex);
+                }
+            }
+
+            return userGuid.Value;
         }
 
-        public bool IsSameWeek(DateTimeOffset lastUpdated)
+        public bool IsToday(DateTimeOffset date)
         {
-            return GetIso8601WeekOfYear(lastUpdated) == GetIso8601WeekOfYear(DateTimeOffset.Now);
-        }
-
-        public bool IsSameMonth(DateTimeOffset lastUpdated)
-        {
-            return lastUpdated.Month == DateTimeOffset.Now.Month;
+            return date.Date == DateTimeOffset.Now.Date;
         }
 
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)
@@ -46,7 +80,7 @@ namespace GitHub.Services
                 async _ =>
                 {
                     try { await callback(); }
-                    catch { /* log.Warn("Failed submitting usage data", ex); */ }
+                    catch (Exception ex) { log.Warn("Failed submitting usage data", ex); }
                 },
                 null,
                 dueTime,
@@ -63,11 +97,11 @@ namespace GitHub.Services
             {
                 return json != null ?
                     SimpleJson.DeserializeObject<UsageData>(json) :
-                    new UsageData { Model = new UsageModel() };
+                    new UsageData { Reports = new List<UsageModel>() };
             }
             catch
             {
-                return new UsageData { Model = new UsageModel() };
+                return new UsageData { Reports = new List<UsageModel>() };
             }
         }
 
@@ -79,9 +113,9 @@ namespace GitHub.Services
                 var json = SimpleJson.SerializeObject(data);
                 await WriteAllTextAsync(storePath, json);
             }
-            catch
+            catch (Exception ex)
             {
-                // log.Warn("Failed to write usage data", ex);
+                log.Warn("Failed to write usage data", ex);
             }
         }
 
@@ -96,6 +130,10 @@ namespace GitHub.Services
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     program.ApplicationName,
                     StoreFileName);
+                userStorePath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    program.ApplicationName,
+                    UserStoreFileName);
             }
         }
 
@@ -117,20 +155,9 @@ namespace GitHub.Services
             }
         }
 
-        // http://blogs.msdn.com/b/shawnste/archive/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net.aspx
-        static int GetIso8601WeekOfYear(DateTimeOffset time)
+        class UserData
         {
-            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
-            // be the same week# as whatever Thursday, Friday or Saturday are,
-            // and we always get those right
-            DayOfWeek day = cal.GetDayOfWeek(time.UtcDateTime);
-            if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
-            {
-                time = time.AddDays(3);
-            }
-
-            // Return the week of our adjusted day
-            return cal.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            public Guid UserGuid { get; set; }
         }
     }
 }

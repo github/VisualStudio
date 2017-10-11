@@ -10,25 +10,9 @@ namespace GitHub.Services
     public interface IUsageService
     {
         /// <summary>
-        /// Checks whether the last updated date is the same day as today.
+        /// Gets a GUID that anonymously represents the user.
         /// </summary>
-        /// <param name="lastUpdated">The last updated date.</param>
-        /// <returns>True if the last updated date is the same day as today; otherwise false.</returns>
-        bool IsSameDay(DateTimeOffset lastUpdated);
-
-        /// <summary>
-        /// Checks whether the last updated date is the same week as today.
-        /// </summary>
-        /// <param name="lastUpdated">The last updated date.</param>
-        /// <returns>True if the last updated date is the same week as today; otherwise false.</returns>
-        bool IsSameWeek(DateTimeOffset lastUpdated);
-
-        /// <summary>
-        /// Checks whether the last updated date is the same month as today.
-        /// </summary>
-        /// <param name="lastUpdated">The last updated date.</param>
-        /// <returns>True if the last updated date is the same month as today; otherwise false.</returns>
-        bool IsSameMonth(DateTimeOffset lastUpdated);
+        Task<Guid> GetUserGuid();
 
         /// <summary>
         /// Starts a timer.

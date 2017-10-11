@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using GitHub.Models;
@@ -12,6 +14,8 @@ namespace UnitTests.GitHub.VisualStudio.Services
 {
     public class UsageTrackerTests
     {
+        static readonly Guid UserGuid = Guid.NewGuid();
+
         public class TheTimer : TestBaseClass
         {
             [Fact]
@@ -32,10 +36,48 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await targetAndTick.Item2();
 
                 await service.Received(1).WriteLocalData(
-                    Arg.Is<UsageData>(x => 
-                        x.Model.NumberOfStartups == 1 &&
-                        x.Model.NumberOfStartupsWeek == 1 &&
-                        x.Model.NumberOfStartupsMonth == 1));
+                    Arg.Is<UsageData>(x =>
+                        x.Reports.Count == 1 &&
+                        x.Reports[0].Guid == UserGuid &&
+                        x.Reports[0].Measures.NumberOfStartups == 1));
+            }
+
+            [Fact]
+            public async Task FirstTickShouldIncrementLaunchCountInExistingReport()
+            {
+                var model = new UsageModel
+                {
+                    Date = DateTimeOffset.Now,
+                    Measures = new UsageModel.MeasuresModel
+                    {
+                        NumberOfStartups = 4,
+                    }
+                };
+                var service = CreateUsageService(model);
+                var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
+
+                await targetAndTick.Item2();
+
+                Assert.Equal(5, model.Measures.NumberOfStartups);
+            }
+
+            [Fact]
+            public async Task FirstTickNotShouldIncrementLaunchCountInOldReport()
+            {
+                var model = new UsageModel
+                {
+                    Date = DateTimeOffset.Now - TimeSpan.FromDays(1),
+                    Measures = new UsageModel.MeasuresModel
+                    {
+                        NumberOfStartups = 4,
+                    }
+                };
+                var service = CreateUsageService(model);
+                var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
+
+                await targetAndTick.Item2();
+
+                Assert.Equal(4, model.Measures.NumberOfStartups);
             }
 
             [Fact]
@@ -85,10 +127,11 @@ namespace UnitTests.GitHub.VisualStudio.Services
             [Fact]
             public async Task TickShouldSendDataIfDifferentDay()
             {
+                var model = new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1) };
                 var serviceProvider = CreateServiceProvider();
                 var targetAndTick = CreateTargetAndGetTick(
                     serviceProvider,
-                    CreateUsageService(sameDay: false));
+                    CreateUsageService(model));
 
                 await targetAndTick.Item2();
 
@@ -97,87 +140,64 @@ namespace UnitTests.GitHub.VisualStudio.Services
             }
 
             [Fact]
-            public async Task NonWeeklyOrMonthlyCountersShouldBeZeroed()
+            public async Task TickShouldSendBacklogData()
             {
-                var service = CreateUsageService(new UsageModel
+                var models = new[]
                 {
-                    NumberOfStartups = 1,
-                    NumberOfStartupsWeek = 1,
-                    NumberOfStartupsMonth = 1,
-                    NumberOfClones = 1,
-                }, sameDay: false);
-                Func<Task> tick = null;
-
-                service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
-                    .Do(x => tick = x.ArgAt<Func<Task>>(0));
-
+                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid() },
+                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid() },
+                    new UsageModel { Date = DateTimeOffset.Now, Guid = Guid.NewGuid() },
+                };
+                var service = CreateUsageService(models);
                 var serviceProvider = CreateServiceProvider();
-                var target = new UsageTracker(serviceProvider, service);
+                var targetAndTick = CreateTargetAndGetTick(serviceProvider, service);
 
-                await tick();
+                await targetAndTick.Item2();
 
-                await service.Received().WriteLocalData(
-                    Arg.Is<UsageData>(x =>
-                        x.Model.NumberOfStartups == 0 &&
-                        x.Model.NumberOfStartupsWeek == 2 &&
-                        x.Model.NumberOfStartupsMonth == 2 &&
-                        x.Model.NumberOfClones == 0));
+                var metricsService = serviceProvider.TryGetService<IMetricsService>();
+
+                await metricsService.Received(1).PostUsage(Arg.Is<UsageModel>(x => x.Guid == models[0].Guid));
+                await metricsService.Received(1).PostUsage(Arg.Is<UsageModel>(x => x.Guid == models[1].Guid));
+                await metricsService.Received(0).PostUsage(Arg.Is<UsageModel>(x => x.Guid == models[2].Guid));
             }
 
             [Fact]
-            public async Task NonMonthlyCountersShouldBeZeroed()
+            public async Task SentReportsShouldBeRemovedFromDisk()
             {
-                var service = CreateUsageService(new UsageModel
+                var models = new[]
                 {
-                    NumberOfStartups = 1,
-                    NumberOfStartupsWeek = 1,
-                    NumberOfStartupsMonth = 1,
-                    NumberOfClones = 1,
-                }, sameDay: false, sameWeek: false);
-                Func<Task> tick = null;
-
-                service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
-                    .Do(x => tick = x.ArgAt<Func<Task>>(0));
-
+                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid() },
+                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid() },
+                    new UsageModel { Date = DateTimeOffset.Now, Guid = Guid.NewGuid() },
+                };
+                var service = CreateUsageService(models);
                 var serviceProvider = CreateServiceProvider();
-                var target = new UsageTracker(serviceProvider, service);
+                var targetAndTick = CreateTargetAndGetTick(serviceProvider, service);
 
-                await tick();
+                await targetAndTick.Item2();
 
-                await service.Received().WriteLocalData(
-                    Arg.Is<UsageData>(x =>
-                        x.Model.NumberOfStartups == 0 &&
-                        x.Model.NumberOfStartupsWeek == 0 &&
-                        x.Model.NumberOfStartupsMonth == 2 &&
-                        x.Model.NumberOfClones == 0));
+                await service.Received(1).WriteLocalData(Arg.Is<UsageData>(x => x.Reports.Count == 1));
             }
 
             [Fact]
-            public async Task AllCountersShouldBeZeroed()
+            public async Task ReportsShouldNotBeRemovedIfNotSent()
             {
-                var service = CreateUsageService(new UsageModel
+                var models = new[]
                 {
-                    NumberOfStartups = 1,
-                    NumberOfStartupsWeek = 1,
-                    NumberOfStartupsMonth = 1,
-                    NumberOfClones = 1,
-                }, sameDay: false, sameWeek: false, sameMonth: false);
-                Func<Task> tick = null;
-
-                service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
-                    .Do(x => tick = x.ArgAt<Func<Task>>(0));
-
+                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid() },
+                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid() },
+                    new UsageModel { Date = DateTimeOffset.Now, Guid = Guid.NewGuid() },
+                };
+                var service = CreateUsageService(models);
                 var serviceProvider = CreateServiceProvider();
-                var target = new UsageTracker(serviceProvider, service);
+                var targetAndTick = CreateTargetAndGetTick(serviceProvider, service);
+                var metricsService = serviceProvider.TryGetService<IMetricsService>();
 
-                await tick();
+                metricsService.PostUsage(null).ReturnsForAnyArgs(_ => { throw new Exception(); });
 
-                await service.Received().WriteLocalData(
-                    Arg.Is<UsageData>(x =>
-                        x.Model.NumberOfStartups == 0 &&
-                        x.Model.NumberOfStartupsWeek == 0 &&
-                        x.Model.NumberOfStartupsMonth == 0 &&
-                        x.Model.NumberOfClones == 0));
+                await targetAndTick.Item2();
+
+                await service.Received(1).WriteLocalData(Arg.Is<UsageData>(x => x.Reports.Count == 3));
             }
         }
 
@@ -186,20 +206,30 @@ namespace UnitTests.GitHub.VisualStudio.Services
             [Fact]
             public async Task ShouldIncrementCounter()
             {
-                var model = new UsageModel { NumberOfClones = 4 };
+                var model = new UsageModel
+                {
+                    Date = DateTimeOffset.Now,
+                    Measures = new UsageModel.MeasuresModel
+                    {
+                        NumberOfClones = 4
+                    }
+                };
                 var target = new UsageTracker(
                     CreateServiceProvider(),
                     CreateUsageService(model));
 
                 await target.IncrementCounter(x => x.NumberOfClones);
 
-                Assert.Equal(5, model.NumberOfClones);
+                Assert.Equal(5, model.Measures.NumberOfClones);
             }
 
             [Fact]
             public async Task ShouldWriteUpdatedData()
             {
-                var data = new UsageData { Model = new UsageModel() };
+                var data = new UsageModel
+                {
+                    Date = DateTimeOffset.Now,
+                };
                 var service = CreateUsageService(data);
                 var target = new UsageTracker(
                     CreateServiceProvider(),
@@ -207,7 +237,31 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await target.IncrementCounter(x => x.NumberOfClones);
 
-                await service.Received(1).WriteLocalData(data);
+                await service.Received(1).WriteLocalData(
+                    Arg.Is<UsageData>(x =>
+                        x.Reports.Count == 1 &&
+                        x.Reports[0].Measures.NumberOfClones == 1));
+            }
+
+            [Fact]
+            public async Task ShouldCreateNewRecordIfNewDay()
+            {
+                var data = new UsageModel
+                {
+                    Date = DateTimeOffset.Now - TimeSpan.FromDays(1),
+                };
+                var service = CreateUsageService(data);
+                var target = new UsageTracker(
+                    CreateServiceProvider(),
+                    service);
+
+                await target.IncrementCounter(x => x.NumberOfClones);
+
+                await service.Received(1).WriteLocalData(
+                    Arg.Is<UsageData>(x => 
+                        x.Reports.Count == 2 &&
+                        x.Reports[1].Guid == UserGuid &&
+                        x.Reports[1].Measures.NumberOfClones == 1));
             }
         }
 
@@ -231,49 +285,35 @@ namespace UnitTests.GitHub.VisualStudio.Services
             var connectionManager = Substitute.For<IConnectionManager>();
             var metricsService = Substitute.For<IMetricsService>();
             var packageSettings = Substitute.For<IPackageSettings>();
+            var vsservices = Substitute.For<IVSServices>();
 
             connectionManager.Connections.Returns(new ObservableCollection<IConnection>());
             packageSettings.CollectMetrics.Returns(true);
 
             result.GetService<IConnectionManager>().Returns(connectionManager);
             result.GetService<IPackageSettings>().Returns(packageSettings);
+            result.GetService<IVSServices>().Returns(vsservices);
             result.TryGetService<IMetricsService>().Returns(hasMetricsService ? metricsService : null);
 
             return result;
         }
 
-        static IUsageService CreateUsageService(
-            bool sameDay = true,
-            bool sameWeek = true,
-            bool sameMonth = true)
+        static IUsageService CreateUsageService(params UsageModel[] reports)
         {
-            return CreateUsageService(new UsageModel(), sameDay, sameWeek, sameMonth);
-        }
-
-        static IUsageService CreateUsageService(
-            UsageModel model,
-            bool sameDay = true,
-            bool sameWeek = true,
-            bool sameMonth = true)
-        {
-            return CreateUsageService(new UsageData
+            foreach (var report in reports)
             {
-                LastUpdated = DateTimeOffset.Now,
-                Model = model
-            }, sameDay, sameWeek, sameMonth);
+                report.Dimensions = report.Dimensions ?? new UsageModel.DimensionsModel();
+                report.Measures = report.Measures ?? new UsageModel.MeasuresModel();
+            }
+
+            return CreateUsageService(new UsageData { Reports = reports.ToList() });
         }
 
-        static IUsageService CreateUsageService(
-            UsageData data,
-            bool sameDay = true,
-            bool sameWeek = true,
-            bool sameMonth = true)
+        static IUsageService CreateUsageService(UsageData data)
         {
             var result = Substitute.For<IUsageService>();
+            result.GetUserGuid().Returns(UserGuid);
             result.ReadLocalData().Returns(data);
-            result.IsSameDay(DateTimeOffset.Now).ReturnsForAnyArgs(sameDay);
-            result.IsSameWeek(DateTimeOffset.Now).ReturnsForAnyArgs(sameWeek);
-            result.IsSameMonth(DateTimeOffset.Now).ReturnsForAnyArgs(sameMonth);
             return result;
         }
     }

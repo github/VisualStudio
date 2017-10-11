@@ -66,8 +66,8 @@ public class RepositoryHostTests
             var model = new UsageModel();
 
             await usage.Received().IncrementCounter(
-                Arg.Is<Expression<Func<UsageModel, int>>>(x => 
-                    ((MemberExpression)x.Body).Member.Name == nameof(model.NumberOfLogins)));
+                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x => 
+                    ((MemberExpression)x.Body).Member.Name == nameof(model.Measures.NumberOfLogins)));
         }
 
         [Fact]
@@ -131,8 +131,8 @@ public class RepositoryHostTests
             var model = new UsageModel();
 
             await usage.Received().IncrementCounter(
-                Arg.Is<Expression<Func<UsageModel, int>>>(x =>
-                    ((MemberExpression)x.Body).Member.Name == nameof(model.NumberOfLogins)));
+                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
+                    ((MemberExpression)x.Body).Member.Name == nameof(model.Measures.NumberOfLogins)));
         }
     }
 }
