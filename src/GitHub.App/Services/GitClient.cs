@@ -43,7 +43,9 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
+#pragma warning disable 0618 // TODO: Replace `Network.Pull` with `Commands.Pull`.
                 repository.Network.Pull(signature, pullOptions);
+#pragma warning restore 0618
             });
         }
 
@@ -74,7 +76,9 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                     repository.Network.Fetch(remote, fetchOptions);
+#pragma warning restore 0618
                 }
                 catch (Exception ex)
                 {
@@ -104,7 +108,9 @@ namespace GitHub.Services
                     var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
                     try
                     {
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                         repo.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
                     }
                     finally
                     {
@@ -131,7 +137,9 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                     repository.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
                 }
                 catch (Exception ex)
                 {
@@ -150,7 +158,9 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
+#pragma warning disable 0618 // TODO: Replace `IRepository.Checkout` with `Commands.Checkout`.
                 repository.Checkout(branchName);
+#pragma warning restore 0618
             });
         }
 

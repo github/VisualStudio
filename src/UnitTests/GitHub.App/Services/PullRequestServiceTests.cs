@@ -524,8 +524,8 @@ public class PullRequestServiceTests : TestBaseClass
             var branch2 = Substitute.For<LibGit2Sharp.Branch>();
             var branches = new List<LibGit2Sharp.Branch> { branch1, branch2 };
             var branchCollection = Substitute.For<BranchCollection>();
-            branch1.Remote.Returns(remote1);
-            branch2.Remote.Returns(remote1);
+            branch1.RemoteName.Returns("remote1");
+            branch2.RemoteName.Returns("remote1");
             branchCollection.GetEnumerator().Returns(_ => branches.GetEnumerator());
             repo.Branches.Returns(branchCollection);
 
