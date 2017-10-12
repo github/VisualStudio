@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace GitHub.Models
 {
@@ -13,6 +12,7 @@ namespace GitHub.Models
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
+            // Turn Windows line endings into Unix line endings.
             diff = NormalizeLineEndings(diff);
 
             // Optimize for common case where there are no loose carriage returns.
@@ -30,6 +30,7 @@ namespace GitHub.Models
                 int oldLine = -1;
                 int newLine = -1;
 
+                // Diff lines should only be separated using a '\n' (lines can contain a '\r').
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (hasCarriageReturn)
