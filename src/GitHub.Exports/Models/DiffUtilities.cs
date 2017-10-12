@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace GitHub.Models
 {
@@ -12,6 +13,9 @@ namespace GitHub.Models
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
+            diff = NormalizeLineEndings(diff);
+            diff = EscapeCarriageReturns(diff);
+
             using (var reader = new StringReader(diff))
             {
                 string line;
@@ -22,6 +26,8 @@ namespace GitHub.Models
 
                 while ((line = reader.ReadLine()) != null)
                 {
+                    line = UnescapeCarriageReturns(line);
+
                     var headerMatch = ChunkHeaderRegex.Match(line);
 
                     if (headerMatch.Success)
@@ -61,12 +67,14 @@ namespace GitHub.Models
                                 case DiffChangeType.None:
                                     ++oldLine;
                                     ++newLine;
+                                    newLine += CountCarriageReturns(line);
                                     break;
                                 case DiffChangeType.Delete:
                                     ++oldLine;
                                     break;
                                 case DiffChangeType.Add:
                                     ++newLine;
+                                    newLine += CountCarriageReturns(line);
                                     break;
                             }
                         }
@@ -111,6 +119,32 @@ namespace GitHub.Models
             }
 
             return null;
+        }
+
+        static string NormalizeLineEndings(string text)
+        {
+            return text.Replace("\r\n", "\n");
+        }
+
+        static string EscapeCarriageReturns(string text)
+        {
+            return text.Replace("\r", "\\r");
+        }
+
+        static string UnescapeCarriageReturns(string text)
+        {
+            return text.Replace("\\r", "\r");
+        }
+
+        static int CountCarriageReturns(string text)
+        {
+            int count = 0;
+            foreach (var ch in text)
+            {
+                if (ch == '\r') count++;
+            }
+
+            return count;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
