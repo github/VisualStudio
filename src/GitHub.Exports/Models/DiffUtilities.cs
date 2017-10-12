@@ -14,7 +14,13 @@ namespace GitHub.Models
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
             diff = NormalizeLineEndings(diff);
-            diff = EscapeCarriageReturns(diff);
+
+            // Optimize for common case where there are no loose carriage returns.
+            var hasCarriageReturn = HasCarriageReturn(diff);
+            if (hasCarriageReturn)
+            {
+                diff = EscapeCarriageReturns(diff);
+            }
 
             using (var reader = new StringReader(diff))
             {
@@ -26,7 +32,10 @@ namespace GitHub.Models
 
                 while ((line = reader.ReadLine()) != null)
                 {
-                    line = UnescapeCarriageReturns(line);
+                    if (hasCarriageReturn)
+                    {
+                        line = UnescapeCarriageReturns(line);
+                    }
 
                     var headerMatch = ChunkHeaderRegex.Match(line);
 
@@ -62,7 +71,12 @@ namespace GitHub.Models
                                 Content = line,
                             });
 
-                            var lineCount = 1 + CountCarriageReturns(line);
+                            var lineCount = 1;
+                            if (hasCarriageReturn)
+                            {
+                                lineCount += CountCarriageReturns(line);
+                            }
+
                             switch (type)
                             {
                                 case DiffChangeType.None:
@@ -123,6 +137,11 @@ namespace GitHub.Models
         static string NormalizeLineEndings(string text)
         {
             return text.Replace("\r\n", "\n");
+        }
+
+        static bool HasCarriageReturn(string text)
+        {
+            return text.IndexOf('\r') != -1;
         }
 
         static string EscapeCarriageReturns(string text)
