@@ -126,6 +126,21 @@ index b02decb..f7dadae 100644
                 Assert.Equal(lineNumber1, chunk.Lines[1].NewLineNumber);
             }
 
+            [Theory]
+            [InlineData("-foo\n-bar\n", 1, 2)]
+            [InlineData("-fo\ro\n-bar\n", 1, 3)]
+            [InlineData("-foo\r\r\n-bar\n", 1, 3)]
+            public void FirstChunk_CheckOldLineNumber(string diffLines, int lineNumber0, int lineNumber1)
+            {
+                var header = "@@ -1 +1 @@";
+                var diff = header + "\n" + diffLines;
+
+                var chunk = DiffUtilities.ParseFragment(diff).First();
+
+                Assert.Equal(lineNumber0, chunk.Lines[0].OldLineNumber);
+                Assert.Equal(lineNumber1, chunk.Lines[1].OldLineNumber);
+            }
+
             [Fact]
             public void FirstChunk_CheckDiffLineZeroBased()
             {

@@ -62,19 +62,18 @@ namespace GitHub.Models
                                 Content = line,
                             });
 
+                            var lineCount = 1 + CountCarriageReturns(line);
                             switch (type)
                             {
                                 case DiffChangeType.None:
-                                    ++oldLine;
-                                    ++newLine;
-                                    newLine += CountCarriageReturns(line);
+                                    oldLine += lineCount;
+                                    newLine += lineCount;
                                     break;
                                 case DiffChangeType.Delete:
-                                    ++oldLine;
+                                    oldLine += lineCount;
                                     break;
                                 case DiffChangeType.Add:
-                                    ++newLine;
-                                    newLine += CountCarriageReturns(line);
+                                    newLine += lineCount;
                                     break;
                             }
                         }
