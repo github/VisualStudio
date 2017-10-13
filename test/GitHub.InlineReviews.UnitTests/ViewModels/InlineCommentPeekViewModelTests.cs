@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Factories;
@@ -98,6 +99,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                         peekSession.TextView.TextBuffer);
                     var newThread = CreateThread(8, "New Comment");
                     file.InlineCommentThreads.Returns(new[] { newThread });
+                    RaiseLinesChanged(file, 8);
                 });
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
@@ -211,7 +213,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var newComments = thread.Comments.Concat(new[] { newComment }).ToList();
             thread.Comments.Returns(newComments);
             file.InlineCommentThreads.Returns(newThreads);
-            RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
+            RaiseLinesChanged(file, thread.LineNumber);
         }
 
         IApiClientFactory CreateApiClientFactory()
@@ -289,6 +291,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             file.CommitSha.Returns(commitSha);
             file.Diff.Returns(new[] { diff });
             file.InlineCommentThreads.Returns(new[] { thread });
+            file.LinesChanged.Returns(new Subject<IReadOnlyList<int>>());
 
             var session = Substitute.For<IPullRequestSession>();
             session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
@@ -299,6 +302,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(RelativePath);
 
             return result;
+        }
+
+        void RaiseLinesChanged(IPullRequestSessionFile file, params int[] lineNumbers)
+        {
+            var subject = (Subject<IReadOnlyList<int>>)file.LinesChanged;
+            subject.OnNext(lineNumbers);
         }
 
         void RaisePropertyChanged<T>(T o, string propertyName)
