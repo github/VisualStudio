@@ -4,8 +4,6 @@ namespace GitHub.Models
 {
     public class UsageModel
     {
-        public Guid Guid { get; set; }
-        public DateTimeOffset Date { get; set; }
         public DimensionsModel Dimensions { get; set; }
         public MeasuresModel Measures { get; set; }
 
@@ -13,15 +11,23 @@ namespace GitHub.Models
         {
             return new UsageModel
             {
-                Guid = guid,
-                Date = DateTime.Now,
-                Dimensions = new DimensionsModel(),
-                Measures = new MeasuresModel(),
+                Dimensions = new DimensionsModel
+                {
+                    Guid = guid,
+                    Date = DateTime.Now,
+                },
+                Measures = new MeasuresModel
+                {
+                    Guid = guid,
+                    Date = DateTime.Now,
+                },
             };
         }
 
         public class DimensionsModel
         {
+            public Guid Guid { get; set; }
+            public DateTimeOffset Date { get; set; }
             public string AppVersion { get; set; }
             public string VSVersion { get; set; }
             public string Lang { get; set; }
@@ -31,6 +37,8 @@ namespace GitHub.Models
 
         public class MeasuresModel
         {
+            public Guid Guid { get; set; }
+            public DateTimeOffset Date { get; set; }
             public int NumberOfStartups { get; set; }
             public int NumberOfUpstreamPullRequests { get; set; }
             public int NumberOfClones { get; set; }

@@ -98,7 +98,7 @@ namespace GitHub.Services
 
             for (var i = data.Reports.Count - 1; i >= 0; --i)
             {
-                if (data.Reports[i].Date.Date != DateTimeOffset.Now.Date)
+                if (data.Reports[i].Dimensions.Date.Date != DateTimeOffset.Now.Date)
                 {
                     try
                     {
@@ -121,7 +121,7 @@ namespace GitHub.Services
 
         async Task<UsageModel> GetCurrentReport(UsageData data)
         {
-            var current = data.Reports.FirstOrDefault(x => x.Date.Date == DateTimeOffset.Now.Date);
+            var current = data.Reports.FirstOrDefault(x => x.Dimensions.Date.Date == DateTimeOffset.Now.Date);
 
             if (current == null)
             {
