@@ -59,9 +59,9 @@ namespace GitHub.InlineReviews.Models
         public IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
         {
             get { return inlineCommentThreads; }
-            internal set
+            set
             {
-                var lines = inlineCommentThreads?
+                var lines = (inlineCommentThreads ?? Enumerable.Empty<IInlineCommentThreadModel>())?
                     .Concat(value ?? Enumerable.Empty<IInlineCommentThreadModel>())
                     .Select(x => x.LineNumber)
                     .Where(x => x >= 0)
