@@ -9,16 +9,17 @@ namespace GitHub.Models
     public static class DiffUtilities
     {
         static readonly Regex ChunkHeaderRegex = new Regex(@"^@@\s+\-(\d+),?\d*\s+\+(\d+),?\d*\s@@");
+        static readonly Regex ContainsLooseCarriageReturnRegex = new Regex(@"[\r]([^\n]|\z)", RegexOptions.Compiled);
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
-            // Turn Windows line endings into Unix line endings.
-            diff = NormalizeLineEndings(diff);
-
             // Optimize for common case where there are no loose carriage returns.
-            var hasCarriageReturn = HasCarriageReturn(diff);
-            if (hasCarriageReturn)
+            var containsLooseCarriageReturn = ContainsLooseCarriageReturn(diff);
+
+            if (containsLooseCarriageReturn)
             {
+                // Turn Windows line endings into Unix line endings.
+                diff = NormalizeLineEndings(diff);
                 diff = EscapeCarriageReturns(diff);
             }
 
@@ -33,7 +34,7 @@ namespace GitHub.Models
                 // Diff lines should only be separated using a '\n' (lines can contain a '\r').
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (hasCarriageReturn)
+                    if (containsLooseCarriageReturn)
                     {
                         line = UnescapeCarriageReturns(line);
                     }
@@ -73,7 +74,7 @@ namespace GitHub.Models
                             });
 
                             var lineCount = 1;
-                            if (hasCarriageReturn)
+                            if (containsLooseCarriageReturn)
                             {
                                 lineCount += CountCarriageReturns(line);
                             }
@@ -140,9 +141,9 @@ namespace GitHub.Models
             return text.Replace("\r\n", "\n");
         }
 
-        static bool HasCarriageReturn(string text)
+        static bool ContainsLooseCarriageReturn(string text)
         {
-            return text.IndexOf('\r') != -1;
+            return ContainsLooseCarriageReturnRegex.IsMatch(text);
         }
 
         static string EscapeCarriageReturns(string text)
