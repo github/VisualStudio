@@ -9,99 +9,77 @@ namespace GitHub.Models
     public static class DiffUtilities
     {
         static readonly Regex ChunkHeaderRegex = new Regex(@"^@@\s+\-(\d+),?\d*\s+\+(\d+),?\d*\s@@");
-        static readonly Regex ContainsLooseCarriageReturnRegex = new Regex(@"[\r]([^\n]|\z)", RegexOptions.Compiled);
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
-            // Optimize for common case where there are no loose carriage returns.
-            var containsLooseCarriageReturn = ContainsLooseCarriageReturn(diff);
+            var reader = new LineReader(diff);
+            string line;
+            DiffChunk chunk = null;
+            int diffLine = -1;
+            int oldLine = -1;
+            int newLine = -1;
 
-            if (containsLooseCarriageReturn)
+            while ((line = reader.ReadLine()) != null)
             {
-                // Turn Windows line endings into Unix line endings.
-                diff = NormalizeLineEndings(diff);
-                diff = EscapeCarriageReturns(diff);
+                var headerMatch = ChunkHeaderRegex.Match(line);
+
+                if (headerMatch.Success)
+                {
+                    if (chunk != null)
+                    {
+                        yield return chunk;
+                    }
+
+                    if (diffLine == -1) diffLine = 0;
+
+                    chunk = new DiffChunk
+                    {
+                        OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value),
+                        NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
+                        DiffLine = diffLine,
+                    };
+                }
+                else if (chunk != null)
+                {
+                    var type = GetLineChange(line[0]);
+
+                    // This might contain info about previous line (e.g. "\ No newline at end of file").
+                    if (type != DiffChangeType.Control)
+                    {
+                        chunk.Lines.Add(new DiffLine
+                        {
+                            Type = type,
+                            OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
+                            NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
+                            DiffLineNumber = diffLine,
+                            Content = line,
+                        });
+
+                        var lineCount = 1;
+                        lineCount += CountCarriageReturns(line);
+
+                        switch (type)
+                        {
+                            case DiffChangeType.None:
+                                oldLine += lineCount;
+                                newLine += lineCount;
+                                break;
+                            case DiffChangeType.Delete:
+                                oldLine += lineCount;
+                                break;
+                            case DiffChangeType.Add:
+                                newLine += lineCount;
+                                break;
+                        }
+                    }
+                }
+
+                if (diffLine != -1) ++diffLine;
             }
 
-            using (var reader = new StringReader(diff))
+            if (chunk != null)
             {
-                string line;
-                DiffChunk chunk = null;
-                int diffLine = -1;
-                int oldLine = -1;
-                int newLine = -1;
-
-                // Diff lines should only be separated using a '\n' (lines can contain a '\r').
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (containsLooseCarriageReturn)
-                    {
-                        line = UnescapeCarriageReturns(line);
-                    }
-
-                    var headerMatch = ChunkHeaderRegex.Match(line);
-
-                    if (headerMatch.Success)
-                    {
-                        if (chunk != null)
-                        {
-                            yield return chunk;
-                        }
-
-                        if (diffLine == -1) diffLine = 0;
-
-                        chunk = new DiffChunk
-                        {
-                            OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value),
-                            NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
-                            DiffLine = diffLine,
-                        };
-                    }
-                    else if (chunk != null)
-                    {
-                        var type = GetLineChange(line[0]);
-
-                        // This might contain info about previous line (e.g. "\ No newline at end of file").
-                        if (type != DiffChangeType.Control)
-                        {
-                            chunk.Lines.Add(new DiffLine
-                            {
-                                Type = type,
-                                OldLineNumber = type != DiffChangeType.Add ? oldLine : -1,
-                                NewLineNumber = type != DiffChangeType.Delete ? newLine : -1,
-                                DiffLineNumber = diffLine,
-                                Content = line,
-                            });
-
-                            var lineCount = 1;
-                            if (containsLooseCarriageReturn)
-                            {
-                                lineCount += CountCarriageReturns(line);
-                            }
-
-                            switch (type)
-                            {
-                                case DiffChangeType.None:
-                                    oldLine += lineCount;
-                                    newLine += lineCount;
-                                    break;
-                                case DiffChangeType.Delete:
-                                    oldLine += lineCount;
-                                    break;
-                                case DiffChangeType.Add:
-                                    newLine += lineCount;
-                                    break;
-                            }
-                        }
-                    }
-
-                    if (diffLine != -1) ++diffLine;
-                }
-
-                if (chunk != null)
-                {
-                    yield return chunk;
-                }
+                yield return chunk;
             }
         }
 
@@ -136,24 +114,50 @@ namespace GitHub.Models
             return null;
         }
 
-        static string NormalizeLineEndings(string text)
+        public class LineReader
         {
-            return text.Replace("\r\n", "\n");
-        }
+            readonly string text;
+            int index = 0;
 
-        static bool ContainsLooseCarriageReturn(string text)
-        {
-            return ContainsLooseCarriageReturnRegex.IsMatch(text);
-        }
+            public LineReader(string text)
+            {
+                this.text = text;
+            }
 
-        static string EscapeCarriageReturns(string text)
-        {
-            return text.Replace("\r", "\\r");
-        }
+            public string ReadLine()
+            {
+                if (EndOfText)
+                {
+                    if (StartOfText)
+                    {
+                        index = -1;
+                        return string.Empty;
+                    }
 
-        static string UnescapeCarriageReturns(string text)
-        {
-            return text.Replace("\\r", "\r");
+                    return null;
+                }
+
+                var startIndex = index;
+                index = text.IndexOf('\n', index);
+                var endIndex = index != -1 ? index : text.Length;
+                var length = endIndex - startIndex;
+
+                if (index != -1)
+                {
+                    if (index > 0 && text[index - 1] == '\r')
+                    {
+                        length--;
+                    }
+
+                    index++;
+                }
+
+                return text.Substring(startIndex, length);
+            }
+
+            bool StartOfText => index == 0;
+
+            bool EndOfText => index == -1 || index == text.Length;
         }
 
         static int CountCarriageReturns(string text)

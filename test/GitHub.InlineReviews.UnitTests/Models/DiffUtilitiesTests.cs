@@ -100,6 +100,7 @@ index b02decb..f7dadae 100644
             [InlineData("+foo\n+bar\n", "+foo", "+bar")]
             [InlineData("+fo\ro\n+bar\n", "+fo\ro", "+bar")]
             [InlineData("+foo\r\r\n+bar\n", "+foo\r", "+bar")]
+            [InlineData("+\\r\n+\r\n", "+\\r", "+")]
             public void FirstChunk_CheckLineContent(string diffLines, string contentLine0, string contentLine1)
             {
                 var header = "@@ -1 +1 @@";
@@ -312,6 +313,34 @@ index b02decb..f7dadae 100644
                 var line = DiffUtilities.Match(chunks, lines);
 
                 Assert.Equal(null, line);
+            }
+        }
+
+        public class TheLineReaderClass
+        {
+            [Theory]
+            [InlineData("", "", null, null)]
+            [InlineData("\n", "", null, null)]
+            [InlineData("\r\n", "", null, null)]
+            [InlineData("1", "1", null, null)]
+            [InlineData("1\n2\n", "1", "2", null)]
+            [InlineData("1\n2", "1", "2", null)]
+            [InlineData("1\r\n2\n", "1", "2", null)]
+            [InlineData("1\r\n2", "1", "2", null)]
+            [InlineData("\r", "\r", null, null)]
+            [InlineData("\r\r", "\r\r", null, null)]
+            [InlineData("\r\r\n", "\r", null, null)]
+            [InlineData("\r_\n", "\r_", null, null)]
+            public void ReadLines(string text, string line1, string line2, string line3)
+            {
+                var lines = new[] { line1, line2, line3 };
+                var lineReader = new DiffUtilities.LineReader(text);
+
+                foreach (var expectLine in lines)
+                {
+                    var line = lineReader.ReadLine();
+                    Assert.Equal(expectLine, line);
+                }
             }
         }
     }
