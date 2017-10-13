@@ -163,9 +163,11 @@ namespace GitHub.Models
         static int CountCarriageReturns(string text)
         {
             int count = 0;
-            foreach (var ch in text)
+            int index = 0;
+            while ((index = text.IndexOf('\r', index)) != -1)
             {
-                if (ch == '\r') count++;
+                index++;
+                count++;
             }
 
             return count;
