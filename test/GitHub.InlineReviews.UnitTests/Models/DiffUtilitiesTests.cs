@@ -319,28 +319,33 @@ index b02decb..f7dadae 100644
         public class TheLineReaderClass
         {
             [Theory]
-            [InlineData("", "", null, null)]
-            [InlineData("\n", "", null, null)]
-            [InlineData("\r\n", "", null, null)]
-            [InlineData("1", "1", null, null)]
-            [InlineData("1\n2\n", "1", "2", null)]
-            [InlineData("1\n2", "1", "2", null)]
-            [InlineData("1\r\n2\n", "1", "2", null)]
-            [InlineData("1\r\n2", "1", "2", null)]
-            [InlineData("\r", "\r", null, null)]
-            [InlineData("\r\r", "\r\r", null, null)]
-            [InlineData("\r\r\n", "\r", null, null)]
-            [InlineData("\r_\n", "\r_", null, null)]
-            public void ReadLines(string text, string line1, string line2, string line3)
+            [InlineData("", new[] { "", null })]
+            [InlineData("\n", new[] { "", null })]
+            [InlineData("\r\n", new[] { "", null })]
+            [InlineData("1", new[] { "1", null })]
+            [InlineData("1\n2\n", new[] { "1", "2", null })]
+            [InlineData("1\n2", new[] { "1", "2", null })]
+            [InlineData("1\r\n2\n", new[] { "1", "2", null })]
+            [InlineData("1\r\n2", new[] { "1", "2", null })]
+            [InlineData("\r", new[] { "\r", null })]
+            [InlineData("\r\r", new[] { "\r\r", null })]
+            [InlineData("\r\r\n", new[] { "\r", null })]
+            [InlineData("\r_\n", new[] { "\r_", null })]
+            public void ReadLines(string text, string[] expectLines)
             {
-                var lines = new[] { line1, line2, line3 };
                 var lineReader = new DiffUtilities.LineReader(text);
 
-                foreach (var expectLine in lines)
+                foreach (var expectLine in expectLines)
                 {
                     var line = lineReader.ReadLine();
                     Assert.Equal(expectLine, line);
                 }
+            }
+
+            [Fact]
+            public void Constructor_NullText_ArgumentNullException()
+            {
+                Assert.Throws<ArgumentNullException>(() => new DiffUtilities.LineReader(null));
             }
         }
     }

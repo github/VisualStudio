@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
@@ -121,6 +122,7 @@ namespace GitHub.Models
 
             public LineReader(string text)
             {
+                Guard.ArgumentNotNull(text, nameof(text));
                 this.text = text;
             }
 
