@@ -99,7 +99,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                         peekSession.TextView.TextBuffer);
                     var newThread = CreateThread(8, "New Comment");
                     file.InlineCommentThreads.Returns(new[] { newThread });
-                    RaiseLinesChanged(file, 8);
+                    RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
                 });
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
@@ -213,7 +213,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var newComments = thread.Comments.Concat(new[] { newComment }).ToList();
             thread.Comments.Returns(newComments);
             file.InlineCommentThreads.Returns(newThreads);
-            RaiseLinesChanged(file, thread.LineNumber);
+            RaiseLinesChanged(file, Tuple.Create(thread.LineNumber, DiffSide.Right));
         }
 
         IApiClientFactory CreateApiClientFactory()
@@ -291,7 +291,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             file.CommitSha.Returns(commitSha);
             file.Diff.Returns(new[] { diff });
             file.InlineCommentThreads.Returns(new[] { thread });
-            file.LinesChanged.Returns(new Subject<IReadOnlyList<int>>());
+            file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
 
             var session = Substitute.For<IPullRequestSession>();
             session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
@@ -304,9 +304,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        void RaiseLinesChanged(IPullRequestSessionFile file, params int[] lineNumbers)
+        void RaiseLinesChanged(IPullRequestSessionFile file, params Tuple<int, DiffSide>[] lineNumbers)
         {
-            var subject = (Subject<IReadOnlyList<int>>)file.LinesChanged;
+            var subject = (Subject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged;
             subject.OnNext(lineNumbers);
         }
 

@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.Models
     /// <seealso cref="PullRequestSessionManager"/>
     public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
-        readonly Subject<IReadOnlyList<int>> linesChanged = new Subject<IReadOnlyList<int>>();
+        readonly Subject<IReadOnlyList<Tuple<int, DiffSide>>> linesChanged = new Subject<IReadOnlyList<Tuple<int, DiffSide>>>();
         IReadOnlyList<DiffChunk> diff;
         string commitSha;
         IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
@@ -63,8 +63,8 @@ namespace GitHub.InlineReviews.Models
             {
                 var lines = (inlineCommentThreads ?? Enumerable.Empty<IInlineCommentThreadModel>())?
                     .Concat(value ?? Enumerable.Empty<IInlineCommentThreadModel>())
-                    .Select(x => x.LineNumber)
-                    .Where(x => x >= 0)
+                    .Select(x => Tuple.Create(x.LineNumber, x.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right))
+                    .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();
                 inlineCommentThreads = value;
@@ -73,12 +73,12 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public IObservable<IReadOnlyList<int>> LinesChanged => linesChanged;
+        public IObservable<IReadOnlyList<Tuple<int, DiffSide>>> LinesChanged => linesChanged;
 
         /// <summary>
         /// Raises the <see cref="LinesChanged"/> signal.
         /// </summary>
         /// <param name="lines">The lines that have changed.</param>
-        public void NotifyLinesChanged(IReadOnlyList<int> lines) => linesChanged.OnNext(lines);
+        public void NotifyLinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines) => linesChanged.OnNext(lines);
     }
 }

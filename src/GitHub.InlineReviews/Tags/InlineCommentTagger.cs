@@ -31,7 +31,7 @@ namespace GitHub.InlineReviews.Tags
         readonly IPullRequestSessionManager sessionManager;
         bool needsInitialize = true;
         string relativePath;
-        bool leftHandSide;
+        DiffSide side;
         IPullRequestSession session;
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
@@ -101,8 +101,8 @@ namespace GitHub.InlineReviews.Tags
                         var snapshot = span.Snapshot;
                         var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
 
-                        if ((leftHandSide && thread.DiffLineType == DiffChangeType.Delete) ||
-                            (!leftHandSide && thread.DiffLineType != DiffChangeType.Delete))
+                        if ((side == DiffSide.Left && thread.DiffLineType == DiffChangeType.Delete) ||
+                            (side == DiffSide.Right && thread.DiffLineType != DiffChangeType.Delete))
                         {
                             linesWithComments[thread.LineNumber - startLine] = true;
 
@@ -116,12 +116,12 @@ namespace GitHub.InlineReviews.Tags
                     {
                         foreach (var line in chunk.Lines)
                         {
-                            var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
+                            var lineNumber = (side == DiffSide.Left ? line.OldLineNumber : line.NewLineNumber) - 1;
 
                             if (lineNumber >= startLine &&
                                 lineNumber <= endLine &&
                                 !linesWithComments[lineNumber - startLine]
-                                && (!leftHandSide || line.Type == DiffChangeType.Delete))
+                                && (side == DiffSide.Right || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                 result.Add(new TagSpan<InlineCommentTag>(
@@ -151,8 +151,8 @@ namespace GitHub.InlineReviews.Tags
                 session = bufferInfo.Session;
                 relativePath = bufferInfo.RelativePath;
                 file = await session.GetFile(relativePath);
-                fileSubscription = file.LinesChanged.Subscribe(NotifyTagsChanged);
-                leftHandSide = bufferInfo.IsLeftComparisonBuffer;
+                fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+                side = bufferInfo.Side ?? DiffSide.Right;
                 NotifyTagsChanged();
             }
             else
@@ -175,7 +175,7 @@ namespace GitHub.InlineReviews.Tags
             if (relativePath != null)
             {
                 var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
-                fileSubscription = liveFile.LinesChanged.Subscribe(NotifyTagsChanged);
+                fileSubscription = liveFile.LinesChanged.Subscribe(LinesChanged);
                 file = liveFile;
             }
             else
@@ -189,6 +189,11 @@ namespace GitHub.InlineReviews.Tags
         static void ForgetWithLogging(Task task)
         {
             task.Catch(e => VsOutputLogger.WriteLine("Exception caught while executing background task: {0}", e)).Forget();
+        }
+
+        void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        {
+            NotifyTagsChanged(lines.Where(x => x.Item2 == side).Select(x => x.Item1));
         }
 
         void NotifyTagsChanged()

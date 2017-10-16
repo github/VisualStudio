@@ -509,7 +509,13 @@ Line 4";
 
                     Assert.Equal(1, file.InlineCommentThreads.Count);
                     Assert.Equal(4, file.InlineCommentThreads[0].LineNumber);
-                    Assert.Equal(new[] { 2, 4 }, linesChanged.ToArray());
+                    Assert.Equal(
+                        new[] 
+                        {
+                            Tuple.Create(2, DiffSide.Right),
+                            Tuple.Create(4, DiffSide.Right),
+                        }, 
+                        linesChanged.ToArray());
                 }
             }
 
@@ -666,7 +672,7 @@ Line 4";
                 var raised = false;
                 var pullRequest = target.CurrentSession.PullRequest;
 
-                file.LinesChanged.Subscribe(x => raised = x.Count == 1 && x[0] == expectedLineNumber);
+                file.LinesChanged.Subscribe(x => raised = x.Count == 1 && x[0].Item1 == expectedLineNumber);
 
                 // LinesChanged should be raised even if the IPullRequestModel is the same.
                 await target.CurrentSession.Update(target.CurrentSession.PullRequest);

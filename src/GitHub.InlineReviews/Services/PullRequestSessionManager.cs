@@ -340,7 +340,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (file.TrackingPoints != null)
             {
-                var linesChanged = new List<int>();
+                var linesChanged = new List<Tuple<int, DiffSide>>();
 
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -351,10 +351,10 @@ namespace GitHub.InlineReviews.Services
                         var position = trackingPoint.GetPosition(snapshot);
                         var lineNumber = snapshot.GetLineNumberFromPosition(position);
 
-                        if (lineNumber != thread.LineNumber)
+                        if (thread.DiffLineType != DiffChangeType.Delete && lineNumber != thread.LineNumber)
                         {
-                            linesChanged.Add(lineNumber);
-                            linesChanged.Add(thread.LineNumber);
+                            linesChanged.Add(Tuple.Create(lineNumber, DiffSide.Right));
+                            linesChanged.Add(Tuple.Create(thread.LineNumber, DiffSide.Right));
                             thread.LineNumber = lineNumber;
                             thread.IsStale = true;
                         }
@@ -362,7 +362,7 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 linesChanged = linesChanged
-                    .Where(x => x >= 0)
+                    .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();
 
@@ -381,7 +381,7 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var thread in threads)
             {
-                if (thread.LineNumber >= 0)
+                if (thread.LineNumber >= 0 && thread.DiffLineType != DiffChangeType.Delete)
                 {
                     var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
                     var p = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);

@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.ViewModels
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
         string relativePath;
-        bool leftBuffer;
+        DiffSide side;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
@@ -117,7 +117,7 @@ namespace GitHub.InlineReviews.ViewModels
             if (info != null)
             {
                 relativePath = info.RelativePath;
-                leftBuffer = info.IsLeftComparisonBuffer;
+                side = info.Side ?? DiffSide.Right;
                 file = await info.Session.GetFile(relativePath);
                 session = info.Session;
                 await UpdateThread();
@@ -136,13 +136,13 @@ namespace GitHub.InlineReviews.ViewModels
             fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
         }
 
-        async void LinesChanged(IReadOnlyList<int> lines)
+        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
         {
             try
             {
                 var lineNumber = peekService.GetLineNumber(peekSession, triggerPoint).Item1;
 
-                if (lines.Contains(lineNumber))
+                if (lines.Contains(Tuple.Create(lineNumber, side)))
                 {
                     await UpdateThread();
                 }

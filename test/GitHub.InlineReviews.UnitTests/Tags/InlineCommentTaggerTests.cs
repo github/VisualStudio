@@ -27,7 +27,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager(DiffSide.Right));
 
                 var result = target.GetTags(CreateSpan(10));
 
@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager(DiffSide.Right));
 
                 // Line 10 has an existing RHS comment.
                 var span = CreateSpan(10);
@@ -63,7 +63,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager(DiffSide.Right));
 
                 // Line 11 has an add diff entry.
                 var span = CreateSpan(11);
@@ -83,7 +83,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager(DiffSide.Right));
 
                 // Line 13 has an delete diff entry.
                 var span = CreateSpan(13);
@@ -102,7 +102,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: true));
+                    CreateSessionManager(DiffSide.Left));
 
                 // Line 12 has an existing LHS comment.
                 var span = CreateSpan(12);
@@ -122,7 +122,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: true));
+                    CreateSessionManager(DiffSide.Left));
 
                 // Line 13 has an delete diff entry.
                 var span = CreateSpan(13);
@@ -137,7 +137,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldRaiseTagsChangedOnFileLinesChanged()
             {
                 var file = CreateSessionFile();
-                var manager = CreateSessionManager(file, leftHandSide: false);
+                var manager = CreateSessionManager(file, DiffSide.Right);
                 var target = new InlineCommentTagger(
                     Substitute.For<IGitService>(),
                     Substitute.For<IGitClient>(),
@@ -153,7 +153,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var raised = false;
 
                 target.TagsChanged += (s, e) => raised = e.Span.Start == 140;
-                ((ISubject<IReadOnlyList<int>>)file.LinesChanged).OnNext(new[] { 14 });
+                ((ISubject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged).OnNext(new[]
+                {
+                    Tuple.Create(14, DiffSide.Right),
+                });
 
                 Assert.True(raised);
             }
@@ -187,25 +190,25 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var file = Substitute.For<IPullRequestSessionFile>();
                 file.Diff.Returns(diff);
                 file.InlineCommentThreads.Returns(threads);
-                file.LinesChanged.Returns(new Subject<IReadOnlyList<int>>());
+                file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
 
                 return file;
             }
 
-            static IPullRequestSessionManager CreateSessionManager(bool leftHandSide)
+            static IPullRequestSessionManager CreateSessionManager(DiffSide side)
             {
                 var file = CreateSessionFile();
-                return CreateSessionManager(file, leftHandSide);
+                return CreateSessionManager(file, side);
             }
 
             static IPullRequestSessionManager CreateSessionManager(
                 IPullRequestSessionFile file,
-                bool leftHandSide)
+                DiffSide side)
             {
                 var session = Substitute.For<IPullRequestSession>();
                 session.GetFile("file.cs").Returns(file);
 
-                var info = new PullRequestTextBufferInfo(session, "file.cs", leftHandSide);
+                var info = new PullRequestTextBufferInfo(session, "file.cs", side);
                 var result = Substitute.For<IPullRequestSessionManager>();
                 result.GetTextBufferInfo(null).ReturnsForAnyArgs(info);
                 return result;
@@ -223,7 +226,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager());
 
                 var result = target.GetTags(CreateSpan(10));
 
@@ -239,7 +242,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager());
 
                 // Line 10 has an existing RHS comment.
                 var span = CreateSpan(10);
@@ -259,7 +262,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager());
 
                 // Line 11 has an add diff entry.
                 var span = CreateSpan(11);
@@ -279,7 +282,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManager(leftHandSide: false));
+                    CreateSessionManager());
 
                 // Line 13 has an delete diff entry.
                 var span = CreateSpan(13);
@@ -293,7 +296,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldRaiseTagsChangedOnFileLinesChanged()
             {
                 var file = CreateSessionFile();
-                var manager = CreateSessionManager(file, leftHandSide: false);
+                var manager = CreateSessionManager(file);
                 var target = new InlineCommentTagger(
                     Substitute.For<IGitService>(),
                     Substitute.For<IGitClient>(),
@@ -308,9 +311,39 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var raised = false;
 
                 target.TagsChanged += (s, e) => raised = e.Span.Start == 140;
-                ((ISubject<IReadOnlyList<int>>)file.LinesChanged).OnNext(new[] { 14 });
+                ((ISubject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged).OnNext(new[] 
+                {
+                    Tuple.Create(14, DiffSide.Right),
+                });
 
                 Assert.True(raised);
+            }
+
+            [Fact]
+            public void ShouldNotRaiseTagsChangedOnLeftHandSideLinesChanged()
+            {
+                var file = CreateSessionFile();
+                var manager = CreateSessionManager(file);
+                var target = new InlineCommentTagger(
+                    Substitute.For<IGitService>(),
+                    Substitute.For<IGitClient>(),
+                    Substitute.For<IDiffService>(),
+                    Substitute.For<ITextView>(),
+                    CreateBuffer(),
+                    manager);
+
+                var span = CreateSpan(14);
+                var firstPass = target.GetTags(span);
+                var result = target.GetTags(span).ToList();
+                var raised = false;
+
+                target.TagsChanged += (s, e) => raised = true;
+                ((ISubject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged).OnNext(new[]
+                {
+                    Tuple.Create(14, DiffSide.Left),
+                });
+
+                Assert.False(raised);
             }
 
             static IPullRequestSessionFile CreateSessionFile()
@@ -342,20 +375,18 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var file = Substitute.For<IPullRequestSessionFile>();
                 file.Diff.Returns(diff);
                 file.InlineCommentThreads.Returns(threads);
-                file.LinesChanged.Returns(new Subject<IReadOnlyList<int>>());
+                file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
 
                 return file;
             }
 
-            static IPullRequestSessionManager CreateSessionManager(bool leftHandSide)
+            static IPullRequestSessionManager CreateSessionManager()
             {
                 var file = CreateSessionFile();
-                return CreateSessionManager(file, leftHandSide);
+                return CreateSessionManager(file);
             }
 
-            static IPullRequestSessionManager CreateSessionManager(
-                IPullRequestSessionFile file,
-                bool leftHandSide)
+            static IPullRequestSessionManager CreateSessionManager(IPullRequestSessionFile file)
             {
                 var result = Substitute.For<IPullRequestSessionManager>();
                 result.GetLiveFile("file.cs", Arg.Any<ITextView>(), Arg.Any<ITextBuffer>())
