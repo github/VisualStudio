@@ -319,27 +319,33 @@ index b02decb..f7dadae 100644
         public class TheLineReaderClass
         {
             [Theory]
-            [InlineData("", "", null, null)]
-            [InlineData("\n", "", null, null)]
-            [InlineData("\r\n", "", null, null)]
-            [InlineData("1", "1", null, null)]
-            [InlineData("1\n2\n", "1", "2", null)]
-            [InlineData("1\n2", "1", "2", null)]
-            [InlineData("1\r\n2\n", "1", "2", null)]
-            [InlineData("1\r\n2", "1", "2", null)]
-            [InlineData("\r", "\r", null, null)]
-            [InlineData("\r\r", "\r\r", null, null)]
-            [InlineData("\r\r\n", "\r", null, null)]
-            [InlineData("\r_\n", "\r_", null, null)]
-            public void ReadLines(string text, string line1, string line2, string line3)
+            [InlineData(null, new string[] { "", null })]
+            [InlineData("", new string[] { "", null })]
+            [InlineData("\n", new string[] { "", null })]
+            [InlineData("\r\n", new string[] { "", null })]
+            [InlineData("1", new string[] { "1", null })]
+            [InlineData("1\n2\n", new string[] { "1", "2", null })]
+            [InlineData("1\n2", new string[] { "1", "2", null })]
+            [InlineData("1\r\n2\n", new string[] { "1", "2", null })]
+            [InlineData("1\r\n2", new string[] { "1", "2", null })]
+            [InlineData("\r", new string[] { "\r", null, null })]
+            [InlineData("\r\r", new string[] { "\r\r", null })]
+            [InlineData("\r\r\n", new string[] { "\r", null })]
+            [InlineData("\r_\n", new string[] { "\r_", null })]
+            public void ReadLines(string text, string[] expectedLines)
             {
-                var lines = new[] { line1, line2, line3 };
+                if (text == null)
+                {
+                    Assert.Throws<ArgumentNullException>(() => new DiffUtilities.LineReader(text));
+                    return;
+                }
                 var lineReader = new DiffUtilities.LineReader(text);
 
-                foreach (var expectLine in lines)
+                foreach (var expectedLine in expectedLines)
                 {
-                    var line = lineReader.ReadLine();
-                    Assert.Equal(expectLine, line);
+                    var lineAndCarriageReturns = lineReader.ReadLine();
+                    Assert.Equal(expectedLine, lineAndCarriageReturns.Line);
+                    Assert.Equal(expectedLine?.Count(c => c == '\r') ?? 0, lineAndCarriageReturns.CarriageReturns);
                 }
             }
         }

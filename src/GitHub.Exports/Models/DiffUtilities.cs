@@ -3,6 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
@@ -13,14 +15,15 @@ namespace GitHub.Models
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
             var reader = new LineReader(diff);
-            string line;
+            LineReader.LineInformation lineInfo;
             DiffChunk chunk = null;
             int diffLine = -1;
             int oldLine = -1;
             int newLine = -1;
 
-            while ((line = reader.ReadLine()) != null)
+            while ((lineInfo = reader.ReadLine()).Line != null)
             {
+                var line = lineInfo.Line;
                 var headerMatch = ChunkHeaderRegex.Match(line);
 
                 if (headerMatch.Success)
@@ -55,8 +58,7 @@ namespace GitHub.Models
                             Content = line,
                         });
 
-                        var lineCount = 1;
-                        lineCount += CountCarriageReturns(line);
+                        var lineCount = lineInfo.CarriageReturns + 1;
 
                         switch (type)
                         {
@@ -116,61 +118,72 @@ namespace GitHub.Models
 
         public class LineReader
         {
+            static readonly LineInformation Default = new LineInformation(null, 0);
+            static readonly LineInformation Empty = new LineInformation(String.Empty, 0);
             readonly string text;
+            readonly int length = 0;
             int index = 0;
 
             public LineReader(string text)
             {
+                Guard.ArgumentNotNull(text, nameof(text));
                 this.text = text;
+                this.length = text.Length;
             }
 
-            public string ReadLine()
+            public LineInformation ReadLine()
             {
                 if (EndOfText)
                 {
                     if (StartOfText)
                     {
                         index = -1;
-                        return string.Empty;
+                        return Empty;
                     }
-
-                    return null;
+                    return Default;
                 }
 
-                var startIndex = index;
-                index = text.IndexOf('\n', index);
-                var endIndex = index != -1 ? index : text.Length;
-                var length = endIndex - startIndex;
-
-                if (index != -1)
+                var carriageReturns = 0;
+                StringBuilder sb = new StringBuilder();
+                for (; index < length; index++)
                 {
-                    if (index > 0 && text[index - 1] == '\r')
+                    if (text[index] == '\n')
                     {
-                        length--;
+                        index++;
+                        break;
                     }
-
-                    index++;
+                    else if (text[index] == '\r')
+                    {
+                        // if we're at the end or the next character isn't a new line, count this carriage return
+                        if (index == length - 1 || index < length - 1 && text[index + 1] != '\n')
+                        {
+                            carriageReturns++;
+                            sb.Append(text[index]);
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(text[index]);
+                    }
                 }
 
-                return text.Substring(startIndex, length);
+                return new LineInformation(sb.ToString(), carriageReturns);
             }
 
             bool StartOfText => index == 0;
 
-            bool EndOfText => index == -1 || index == text.Length;
-        }
+            bool EndOfText => index == -1 || index == length;
 
-        static int CountCarriageReturns(string text)
-        {
-            int count = 0;
-            int index = 0;
-            while ((index = text.IndexOf('\r', index)) != -1)
+            public class LineInformation
             {
-                index++;
-                count++;
+                public string Line { get; private set; }
+                public int CarriageReturns { get; private set; }
+                public LineInformation(string line, int carriageReturns)
+                {
+                    this.Line = line;
+                    this.CarriageReturns = carriageReturns;
+                }
             }
-
-            return count;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
