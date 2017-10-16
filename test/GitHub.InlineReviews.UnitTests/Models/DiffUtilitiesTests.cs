@@ -33,6 +33,27 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 Assert.Equal(0, chunk.Lines.Count());
             }
 
+            [Theory]
+            [InlineData("@@ -1 +2 @@", 1, 2)]
+            [InlineData("@@ -1 +2,0 @@", 1, 2)]
+            [InlineData("@@ -1,0 +2 @@", 1, 2)]
+            [InlineData("@@ -1,0 +2,0 @@", 1, 2)]
+            [InlineData("@@ -1,0 +2,0 @@ THIS IS A COMMENT THAT WILL BE IGNORED", 1, 2)]
+            [InlineData(
+@"diff --git a/src/Foo.cs b/src/Foo.cs
+index b02decb..f7dadae 100644
+--- a/src/Foo.cs
++++ b/src/Foo.cs
+@@ -1 +2 @@", 1, 2)] // Extra header info when using `Diff.Compare<Patch>`.
+            public void HeaderOnly_OldAndNewLineNumbers(string header, int expectOldLineNumber, int expectNewLineNumber)
+            {
+                var chunks = DiffUtilities.ParseFragment(header);
+                var chunk = chunks.First();
+
+                Assert.Equal(expectOldLineNumber, chunk.OldLineNumber);
+                Assert.Equal(expectNewLineNumber, chunk.NewLineNumber);
+            }
+
             [Fact]
             public void HeaderOnlyNoNewLineAtEnd_NoLines()
             {
