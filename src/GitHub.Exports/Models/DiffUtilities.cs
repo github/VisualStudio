@@ -162,7 +162,7 @@ namespace GitHub.Models
             bool EndOfText => index == -1 || index == text.Length;
         }
 
-        static int CountCarriageReturns(string text)
+        public static int CountCarriageReturns(string text)
         {
             int count = 0;
             int index = 0;

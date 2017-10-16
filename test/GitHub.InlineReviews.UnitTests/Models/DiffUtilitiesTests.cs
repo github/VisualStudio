@@ -347,6 +347,23 @@ index b02decb..f7dadae 100644
             {
                 Assert.Throws<ArgumentNullException>(() => new DiffUtilities.LineReader(null));
             }
+
+            static void Benchmark_ReadLineAndCountCarriageReturns_100000()
+            {
+
+                var file = new System.Diagnostics.StackFrame(true).GetFileName();
+                var text = File.ReadAllText(file);
+
+                for (int count = 0; count < 100000; count++)
+                {
+                    var lineReader = new DiffUtilities.LineReader(text);
+                    string line;
+                    while ((line = lineReader.ReadLine()) != null)
+                    {
+                        DiffUtilities.CountCarriageReturns(line);
+                    }
+                }
+            }
         }
     }
 }
