@@ -29,9 +29,11 @@ namespace GitHub.Models
         {
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
-
             Name = DisplayName = branch.FriendlyName;
-            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url) : repo;
+#pragma warning disable 0618 // TODO: Replace `Branch.Remote` with `Repository.Network.Remotes[branch.RemoteName]`.
+            var remoteUrl = branch.Remote.Url;
+#pragma warning restore 0618
+            Repository = branch.IsRemote ? new LocalRepositoryModel(remoteUrl) : repo;
             IsTracking = branch.IsTracking;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
