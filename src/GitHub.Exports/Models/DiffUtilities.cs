@@ -57,7 +57,7 @@ namespace GitHub.Models
                         });
 
                         var lineCount = 1;
-                        lineCount += CountCarriageReturns(line);
+                        lineCount += LineReader.CountCarriageReturns(line);
 
                         switch (type)
                         {
@@ -123,6 +123,7 @@ namespace GitHub.Models
             public LineReader(string text)
             {
                 Guard.ArgumentNotNull(text, nameof(text));
+
                 this.text = text;
             }
 
@@ -157,22 +158,24 @@ namespace GitHub.Models
                 return text.Substring(startIndex, length);
             }
 
+            public static int CountCarriageReturns(string text)
+            {
+                Guard.ArgumentNotNull(text, nameof(text));
+
+                int count = 0;
+                int index = 0;
+                while ((index = text.IndexOf('\r', index)) != -1)
+                {
+                    index++;
+                    count++;
+                }
+
+                return count;
+            }
+
             bool StartOfText => index == 0;
 
             bool EndOfText => index == -1 || index == text.Length;
-        }
-
-        public static int CountCarriageReturns(string text)
-        {
-            int count = 0;
-            int index = 0;
-            while ((index = text.IndexOf('\r', index)) != -1)
-            {
-                index++;
-                count++;
-            }
-
-            return count;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]

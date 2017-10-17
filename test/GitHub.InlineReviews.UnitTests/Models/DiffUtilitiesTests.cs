@@ -348,6 +348,25 @@ index b02decb..f7dadae 100644
                 Assert.Throws<ArgumentNullException>(() => new DiffUtilities.LineReader(null));
             }
 
+            [Theory]
+            [InlineData("", 0)]
+            [InlineData("\r", 1)]
+            [InlineData("\r\n", 1)]
+            [InlineData("\r\r", 2)]
+            [InlineData("\r-\r", 2)]
+            public void CountCarriageReturns(string text, int expectCount)
+            {
+                var count = DiffUtilities.LineReader.CountCarriageReturns(text);
+
+                Assert.Equal(expectCount, count);
+            }
+
+            [Fact]
+            public void CountCarriageReturns_NullText_ArgumentNullException()
+            {
+                Assert.Throws<ArgumentNullException>(() => DiffUtilities.LineReader.CountCarriageReturns(null));
+            }
+
             static void Benchmark_ReadLineAndCountCarriageReturns_100000()
             {
 
@@ -360,7 +379,7 @@ index b02decb..f7dadae 100644
                     string line;
                     while ((line = lineReader.ReadLine()) != null)
                     {
-                        DiffUtilities.CountCarriageReturns(line);
+                        DiffUtilities.LineReader.CountCarriageReturns(line);
                     }
                 }
             }
