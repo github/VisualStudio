@@ -4,6 +4,12 @@ using System.ComponentModel;
 
 namespace GitHub.Models
 {
+    public enum DiffSide
+    {
+        Right,
+        Left,
+    }
+
     /// <summary>
     /// Represents a file in a pull request.
     /// </summary>
@@ -41,5 +47,11 @@ namespace GitHub.Models
         /// Gets the inline comments threads for the file.
         /// </summary>
         IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads { get; }
+
+        /// <summary>
+        /// Gets an observable that is raised with a collection of 0-based line numbers when the
+        /// review comments on the file are changed.
+        /// </summary>
+        IObservable<IReadOnlyList<Tuple<int, DiffSide>>> LinesChanged { get; }
     }
 }

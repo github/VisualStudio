@@ -26,6 +26,16 @@ namespace GitHub.Services
         IPullRequestModel PullRequest { get; }
 
         /// <summary>
+        /// Gets an observable that indicates that<see cref="PullRequest"/> has been updated.
+        /// </summary>
+        /// <remarks>
+        /// This notification is different to listening for a PropertyChanged event because the
+        /// pull request model may be updated in-place which will not result in a PropertyChanged
+        /// notification.
+        /// </remarks>
+        IObservable<IPullRequestModel> PullRequestChanged { get; }
+
+        /// <summary>
         /// Gets the local repository.
         /// </summary>
         ILocalRepositoryModel LocalRepository { get; }

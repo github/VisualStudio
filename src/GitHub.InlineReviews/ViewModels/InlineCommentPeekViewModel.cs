@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -13,6 +14,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
+using NLog;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -22,6 +24,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
@@ -34,7 +37,7 @@ namespace GitHub.InlineReviews.ViewModels
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
         string relativePath;
-        bool leftBuffer;
+        DiffSide side;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
@@ -114,7 +117,7 @@ namespace GitHub.InlineReviews.ViewModels
             if (info != null)
             {
                 relativePath = info.RelativePath;
-                leftBuffer = info.IsLeftComparisonBuffer;
+                side = info.Side ?? DiffSide.Right;
                 file = await info.Session.GetFile(relativePath);
                 session = info.Session;
                 await UpdateThread();
@@ -129,7 +132,25 @@ namespace GitHub.InlineReviews.ViewModels
                     .Subscribe(x => SessionChanged(x).Forget());
             }
 
-            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
+            fileSubscription?.Dispose();
+            fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+        }
+
+        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        {
+            try
+            {
+                var lineNumber = peekService.GetLineNumber(peekSession, triggerPoint).Item1;
+
+                if (lines.Contains(Tuple.Create(lineNumber, side)))
+                {
+                    await UpdateThread();
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error("Error updating InlineCommentViewModel", e);
+            }
         }
 
         async Task UpdateThread()
@@ -156,7 +177,6 @@ namespace GitHub.InlineReviews.ViewModels
             else
             {
                 var newThread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
-                threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread().Forget());
                 Thread = newThread;
             }
 

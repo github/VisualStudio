@@ -509,7 +509,13 @@ Line 4";
 
                     Assert.Equal(1, file.InlineCommentThreads.Count);
                     Assert.Equal(4, file.InlineCommentThreads[0].LineNumber);
-                    Assert.Equal(new[] { 2, 4 }, linesChanged.ToArray());
+                    Assert.Equal(
+                        new[] 
+                        {
+                            Tuple.Create(2, DiffSide.Right),
+                            Tuple.Create(4, DiffSide.Right),
+                        }, 
+                        linesChanged.ToArray());
                 }
             }
 
@@ -642,6 +648,36 @@ Line 4";
                 SignalTextChanged(textView.TextBuffer);
 
                 Assert.Null(file.CommitSha);
+            }
+
+            [Fact]
+            public async Task UpdatingCurrentSessionPullRequestTriggersLinesChanged()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var expectedLineNumber = 2;
+                var threads = new[]
+                {
+                    CreateInlineCommentThreadModel(expectedLineNumber),
+                };
+
+                sessionService.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(threads);
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateRepositoryHosts(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var raised = false;
+                var pullRequest = target.CurrentSession.PullRequest;
+
+                file.LinesChanged.Subscribe(x => raised = x.Count == 1 && x[0].Item1 == expectedLineNumber);
+
+                // LinesChanged should be raised even if the IPullRequestModel is the same.
+                await target.CurrentSession.Update(target.CurrentSession.PullRequest);
+
+                Assert.True(raised);
             }
 
             static IPullRequestReviewCommentModel CreateComment(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Factories;
@@ -98,6 +99,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                         peekSession.TextView.TextBuffer);
                     var newThread = CreateThread(8, "New Comment");
                     file.InlineCommentThreads.Returns(new[] { newThread });
+                    RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
                 });
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
@@ -211,7 +213,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var newComments = thread.Comments.Concat(new[] { newComment }).ToList();
             thread.Comments.Returns(newComments);
             file.InlineCommentThreads.Returns(newThreads);
-            RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
+            RaiseLinesChanged(file, Tuple.Create(thread.LineNumber, DiffSide.Right));
         }
 
         IApiClientFactory CreateApiClientFactory()
@@ -285,10 +287,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
             }
 
-            var file = Substitute.For<IPullRequestSessionLiveFile>();
+            var file = Substitute.For<IPullRequestSessionFile>();
             file.CommitSha.Returns(commitSha);
             file.Diff.Returns(new[] { diff });
             file.InlineCommentThreads.Returns(new[] { thread });
+            file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
 
             var session = Substitute.For<IPullRequestSession>();
             session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
@@ -299,6 +302,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(RelativePath);
 
             return result;
+        }
+
+        void RaiseLinesChanged(IPullRequestSessionFile file, params Tuple<int, DiffSide>[] lineNumbers)
+        {
+            var subject = (Subject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged;
+            subject.OnNext(lineNumbers);
         }
 
         void RaisePropertyChanged<T>(T o, string propertyName)
