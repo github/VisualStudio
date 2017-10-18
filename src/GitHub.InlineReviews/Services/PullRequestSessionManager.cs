@@ -71,7 +71,7 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
-        public async Task<IPullRequestSessionLiveFile> GetLiveFile(
+        public async Task<IPullRequestSessionFile> GetLiveFile(
             string relativePath,
             ITextView textView,
             ITextBuffer textBuffer)
@@ -79,7 +79,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestSessionLiveFile result;
 
             if (!textBuffer.Properties.TryGetProperty(
-                typeof(IPullRequestSessionLiveFile),
+                typeof(IPullRequestSessionFile),
                 out result))
             {
                 var dispose = new CompositeDisposable();
@@ -90,7 +90,7 @@ namespace GitHub.InlineReviews.Services
                     sessionService.CreateRebuildSignal());
 
                 textBuffer.Properties.AddProperty(
-                    typeof(IPullRequestSessionLiveFile),
+                    typeof(IPullRequestSessionFile),
                     result);
 
                 await UpdateLiveFile(result, true);
@@ -109,8 +109,7 @@ namespace GitHub.InlineReviews.Services
                 dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
-                dispose.Add(this.WhenAnyValue(x => x.CurrentSession.PullRequest)
-                    .Skip(1)
+                dispose.Add(this.WhenAnyObservable(x => x.CurrentSession.PullRequestChanged)
                     .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
 
                 result.ToDispose = dispose;
@@ -341,7 +340,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (file.TrackingPoints != null)
             {
-                var linesChanged = new List<int>();
+                var linesChanged = new List<Tuple<int, DiffSide>>();
 
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -352,10 +351,10 @@ namespace GitHub.InlineReviews.Services
                         var position = trackingPoint.GetPosition(snapshot);
                         var lineNumber = snapshot.GetLineNumberFromPosition(position);
 
-                        if (lineNumber != thread.LineNumber)
+                        if (thread.DiffLineType != DiffChangeType.Delete && lineNumber != thread.LineNumber)
                         {
-                            linesChanged.Add(lineNumber);
-                            linesChanged.Add(thread.LineNumber);
+                            linesChanged.Add(Tuple.Create(lineNumber, DiffSide.Right));
+                            linesChanged.Add(Tuple.Create(thread.LineNumber, DiffSide.Right));
                             thread.LineNumber = lineNumber;
                             thread.IsStale = true;
                         }
@@ -363,7 +362,7 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 linesChanged = linesChanged
-                    .Where(x => x >= 0)
+                    .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();
 
@@ -382,7 +381,7 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var thread in threads)
             {
-                if (thread.LineNumber >= 0)
+                if (thread.LineNumber >= 0 && thread.DiffLineType != DiffChangeType.Delete)
                 {
                     var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
                     var p = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
@@ -408,7 +407,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestSessionLiveFile file;
 
             if (textBuffer.Properties.TryGetProperty(
-                typeof(IPullRequestSessionLiveFile),
+                typeof(IPullRequestSessionFile),
                 out file))
             {
                 file.Dispose();
@@ -428,7 +427,7 @@ namespace GitHub.InlineReviews.Services
         void TextBufferChanged(object sender, TextContentChangedEventArgs e)
         {
             var textBuffer = (ITextBuffer)sender;
-            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionLiveFile));
+            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
             InvalidateLiveThreads(file, e.After);
             file.Rebuild.OnNext(textBuffer.CurrentSnapshot);
         }

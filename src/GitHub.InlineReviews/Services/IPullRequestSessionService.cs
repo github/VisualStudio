@@ -64,7 +64,7 @@ namespace GitHub.InlineReviews.Services
         /// <returns>
         /// A collection of updated line numbers.
         /// </returns>
-        IReadOnlyList<int> UpdateCommentThreads(
+        IReadOnlyList<Tuple<int, DiffSide>> UpdateCommentThreads(
             IReadOnlyList<IInlineCommentThreadModel> threads,
             IReadOnlyList<DiffChunk> diff);
 
