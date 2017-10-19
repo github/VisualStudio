@@ -99,11 +99,11 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<int> UpdateCommentThreads(
+        public IReadOnlyList<Tuple<int, DiffSide>> UpdateCommentThreads(
             IReadOnlyList<IInlineCommentThreadModel> threads,
             IReadOnlyList<DiffChunk> diff)
         {
-            var changedLines = new List<int>();
+            var changedLines = new List<Tuple<int, DiffSide>>();
 
             foreach (var thread in threads)
             {
@@ -130,8 +130,9 @@ namespace GitHub.InlineReviews.Services
 
                 if (changed)
                 {
-                    if (oldLineNumber != -1) changedLines.Add(oldLineNumber);
-                    if (newLineNumber != -1 && newLineNumber != oldLineNumber) changedLines.Add(newLineNumber);
+                    var side = thread.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                    if (oldLineNumber != -1) changedLines.Add(Tuple.Create(oldLineNumber, side));
+                    if (newLineNumber != -1 && newLineNumber != oldLineNumber) changedLines.Add(Tuple.Create(newLineNumber, side));
                 }
             }
 

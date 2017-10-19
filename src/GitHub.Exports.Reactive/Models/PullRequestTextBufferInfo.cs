@@ -15,17 +15,15 @@ namespace GitHub.Models
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="relativePath">The relative path to the file in the repository.</param>
-        /// <param name="isLeftComparisonBuffer">
-        /// Whether the buffer represents the left-hand-side of a comparison.
-        /// </param>
+        /// <param name="side">Which side of a diff comparision the buffer represents.</param>
         public PullRequestTextBufferInfo(
             IPullRequestSession session,
             string relativePath,
-            bool isLeftComparisonBuffer)
+            DiffSide? side)
         {
             Session = session;
             RelativePath = relativePath;
-            IsLeftComparisonBuffer = isLeftComparisonBuffer;
+            Side = side;
         }
 
         /// <summary>
@@ -39,8 +37,8 @@ namespace GitHub.Models
         public string RelativePath { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the buffer represents the left-hand-side of a comparison.
+        /// Gets a value indicating which side of a diff comparision the buffer represents.
         /// </summary>
-        public bool IsLeftComparisonBuffer { get; }
+        public DiffSide? Side { get; }
     }
 }

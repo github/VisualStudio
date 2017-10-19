@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.InlineReviews.Services;
@@ -213,7 +211,13 @@ Line 4";
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
                     Assert.Equal(3, threads[0].LineNumber);
-                    Assert.Equal(new[] { 2, 3 }, changedLines.ToArray());
+                    Assert.Equal(
+                        new[] 
+                        {
+                            Tuple.Create(2, DiffSide.Right),
+                            Tuple.Create(3, DiffSide.Right)
+                        }, 
+                        changedLines.ToArray());
                 }
             }
 
@@ -250,7 +254,7 @@ Line 4";
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
                     Assert.False(threads[0].IsStale);
-                    Assert.Equal(new[] { 2 }, changedLines.ToArray());
+                    Assert.Equal(new[] { Tuple.Create(2, DiffSide.Right) }, changedLines.ToArray());
                 }
             }
         }
