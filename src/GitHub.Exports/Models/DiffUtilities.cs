@@ -115,6 +115,10 @@ namespace GitHub.Models
             return null;
         }
 
+        /// Here are some alternative implementations we tried:
+        /// https://gist.github.com/shana/200e4719d4f571caab9dbf5921fa5276
+        /// Scanning with `text.IndexOf('\n', index)` appears to the the best compromise for average .diff files.
+        /// It's likely that `text.IndexOfAny(new [] {'\r', '\n'}, index)` would be faster if lines were much longer.
         public class LineReader
         {
             readonly string text;
