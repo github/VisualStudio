@@ -405,19 +405,20 @@ namespace GitHub.Services
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
-                    var head = repository.Head[path];
-                    if (head.TargetType != TreeEntryTargetType.Blob)
+                    var treeEntry = repository.Head[path];
+
+                    var blob1 = treeEntry?.Target as Blob;
+                    if (blob1 != null)
                     {
-                        return false;
+                        using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
+                        {
+                            var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
+                            var diff = repository.Diff.Compare(blob1, blob2);
+                            return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
+                        }
                     }
 
-                    var blob1 = (Blob)head.Target;
-                    using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
-                    {
-                        var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
-                        var diff = repository.Diff.Compare(blob1, blob2);
-                        return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
-                    }
+                    return false;
                 }
 
                 return true;
