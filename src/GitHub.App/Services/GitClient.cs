@@ -406,19 +406,18 @@ namespace GitHub.Services
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
                     var treeEntry = repository.Head[path];
-
-                    var blob1 = treeEntry?.Target as Blob;
-                    if (blob1 != null)
+                    if (treeEntry?.TargetType != TreeEntryTargetType.Blob)
                     {
-                        using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
-                        {
-                            var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
-                            var diff = repository.Diff.Compare(blob1, blob2);
-                            return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
-                        }
+                        return false;
                     }
 
-                    return false;
+                    var blob1 = (Blob)treeEntry.Target;
+                    using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
+                    {
+                        var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
+                        var diff = repository.Diff.Compare(blob1, blob2);
+                        return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
+                    }
                 }
 
                 return true;
