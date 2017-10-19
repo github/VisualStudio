@@ -13,11 +13,15 @@ public class GitClientTests
 {
     public class TheIsModifiedMethod
     {
-        [Fact]
-        public async Task TreeEntry_Null_False()
+        [Theory]
+        [InlineData(FileStatus.Unaltered, false)]
+        [InlineData(FileStatus.ModifiedInIndex, true)]
+        [InlineData(FileStatus.ModifiedInWorkdir, true)]
+        public async Task RetrieveStatus(FileStatus fileStatus, bool expect)
         {
             var path = "path";
             var repo = Substitute.For<IRepository>();
+            repo.RetrieveStatus(path).Returns(fileStatus);
             repo.Head.Returns(Substitute.For<Branch>());
             var treeEntry = null as TreeEntry;
             repo.Head[path].Returns(treeEntry);
@@ -25,8 +29,24 @@ public class GitClientTests
 
             var modified = await gitClient.IsModified(repo, path, null);
 
-            Assert.False(modified);
+            Assert.Equal(expect, modified);
         }
+    }
+
+    [Fact]
+    public async Task TreeEntry_Null_False()
+    {
+        var path = "path";
+        var repo = Substitute.For<IRepository>();
+        repo.RetrieveStatus(path).Returns(FileStatus.Unaltered);
+        repo.Head.Returns(Substitute.For<Branch>());
+        var treeEntry = null as TreeEntry;
+        repo.Head[path].Returns(treeEntry);
+        var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+
+        var modified = await gitClient.IsModified(repo, path, null);
+
+        Assert.False(modified);
     }
 
     [Fact]
@@ -34,8 +54,10 @@ public class GitClientTests
     {
         var path = "path";
         var repo = Substitute.For<IRepository>();
+        repo.RetrieveStatus(path).Returns(FileStatus.Unaltered);
         repo.Head.Returns(Substitute.For<Branch>());
         var treeEntry = Substitute.For<TreeEntry>();
+        treeEntry.TargetType.Returns(TreeEntryTargetType.GitLink);
         treeEntry.Target.Returns(Substitute.For<GitLink>());
         repo.Head[path].Returns(treeEntry);
         var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
@@ -54,8 +76,10 @@ public class GitClientTests
     {
         var path = "path";
         var repo = Substitute.For<IRepository>();
+        repo.RetrieveStatus(path).Returns(FileStatus.Unaltered);
         repo.Head.Returns(Substitute.For<Branch>());
         var treeEntry = Substitute.For<TreeEntry>();
+        treeEntry.TargetType.Returns(TreeEntryTargetType.Blob);
         treeEntry.Target.Returns(Substitute.For<Blob>());
         repo.Head[path].Returns(treeEntry);
         var changes = Substitute.For<ContentChanges>();
