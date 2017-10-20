@@ -22,8 +22,8 @@ Push-Location $rootDirectory
 $dll = "src\$Project\bin\$Configuration\$Project.dll"
 
 if ($AppVeyor) {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.Runners.2.6.4\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit-console-x86.exe
+    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
+    $consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
     $args = "-noshadow", "-framework:net-4.5", "-exclude:Timings", $dll
     [object[]] $output = "$consoleRunner " + ($args -join " ")
     & $consoleRunner ($args | %{ "`"$_`"" })
@@ -31,8 +31,8 @@ if ($AppVeyor) {
         $host.SetShouldExit($LastExitCode)
     }
 } else {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.Runners.2.6.4\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit-console-x86.exe
+    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
+    $consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
 
     $xml = Join-Path $rootDirectory "nunit-$Project.xml"
     $outputPath = [System.IO.Path]::GetTempFileName()
