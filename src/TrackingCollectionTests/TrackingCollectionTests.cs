@@ -1980,7 +1980,7 @@ public class TrackingTests : TestBase
     }
 
     [Test]
-    public async void AddingBeforeSubscribingWorks()
+    public async Task AddingBeforeSubscribingWorks()
     {
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
         ReplaySubject<Thing> done = new ReplaySubject<Thing>();
@@ -1993,7 +1993,7 @@ public class TrackingTests : TestBase
             done.OnNext(t);
             if (++count == 2)
                 done.OnCompleted();
-        }, () => {});
+        }, () => { });
 
         await Observable.Timeout(done, TimeSpan.FromMilliseconds(500));
         Assert.AreEqual(2, col.Count);
