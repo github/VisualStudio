@@ -4,6 +4,7 @@
     <DefaultTestTimeout>2000</DefaultTestTimeout>
     <HiddenComponentWarnings>
       <Value>AbnormalReferenceResolution</Value>
+      <Value>CopyReferencedAssembliesToWorkspaceIsOn</Value>
     </HiddenComponentWarnings>
     <IgnoredTests>
       <FixtureTestSelector>
