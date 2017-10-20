@@ -37,7 +37,7 @@ if ($AppVeyor) {
     $xml = Join-Path $rootDirectory "nunit-$Project.xml"
     $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $args = "-noshadow", "-xml:$xml", "-framework:net-4.5", "-exclude:Timings", $dll
+    $args = "--result=$xml", "--framework:net-4.5", "--where:cat!=Timings", $dll
     [object[]] $output = "$consoleRunner " + ($args -join " ")
 
     $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
