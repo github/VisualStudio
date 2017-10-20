@@ -405,13 +405,13 @@ namespace GitHub.Services
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
-                    var head = repository.Head[path];
-                    if (head.TargetType != TreeEntryTargetType.Blob)
+                    var treeEntry = repository.Head[path];
+                    if (treeEntry?.TargetType != TreeEntryTargetType.Blob)
                     {
                         return false;
                     }
 
-                    var blob1 = (Blob)head.Target;
+                    var blob1 = (Blob)treeEntry.Target;
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
                         var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
