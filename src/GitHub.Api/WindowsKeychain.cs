@@ -19,17 +19,37 @@ namespace GitHub.Api
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
+            var key = GetKey(hostAddress.CredentialCacheKeyHost);
+            var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
             var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
+            Tuple<string, string> result = null;
 
-            using (var credential = new Credential())
+            // Visual Studio requires two credentials, keyed as "{hostname}" (e.g. "https://github.com/") and
+            // "git:{hostname}" (e.g. "git:https://github.com"). We have a problem in that these credentials can
+            // potentially be overwritten by other applications, so we store an extra "master" key as
+            // "GitHub for Visual Studio - {hostname}". Whenever we read the credentials we overwrite the other
+            // two keys with the value from the master key. Older versions of GHfVS did not store this master key
+            // so if it does not exist, try to get the value from the "{hostname}" key.
+            using (var credential = Credential.Load(key))
+            using (var credentialGit = Credential.Load(keyGit))
+            using (var credentialHost = Credential.Load(keyHost))
             {
-                credential.Target = keyHost;
-                credential.Type = CredentialType.Generic;
-                if (credential.Load())
-                    return Task.FromResult(Tuple.Create(credential.Username, credential.Password));
+                if (credential != null)
+                {
+                    result = Tuple.Create(credential.Username, credential.Password);
+                }
+                else if (credentialHost != null)
+                {
+                    result = Tuple.Create(credentialHost.Username, credentialHost.Password);
+                }
+
+                if (result != null)
+                {
+                    Save(result.Item1, result.Item2, hostAddress);
+                }
             }
 
-            return Task.FromResult<Tuple<string, string>>(null);
+            return Task.FromResult(result);
         }
 
         /// <inheritdoc/>
@@ -39,18 +59,13 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(password, nameof(password));
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
+            var key = GetKey(hostAddress.CredentialCacheKeyHost);
             var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
             var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
 
-            using (var credential = new Credential(userName, password, keyGit))
-            {
-                credential.Save();
-            }
-
-            using (var credential = new Credential(userName, password, keyHost))
-            {
-                credential.Save();
-            }
+            Credential.Save(key, userName, password);
+            Credential.Save(keyGit, userName, password);
+            Credential.Save(keyHost, userName, password);
 
             return Task.CompletedTask;
         }
@@ -60,24 +75,25 @@ namespace GitHub.Api
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
+            var key = GetKey(hostAddress.CredentialCacheKeyHost);
             var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
             var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
 
-            using (var credential = new Credential())
-            {
-                credential.Target = keyGit;
-                credential.Type = CredentialType.Generic;
-                credential.Delete();
-            }
-
-            using (var credential = new Credential())
-            {
-                credential.Target = keyHost;
-                credential.Type = CredentialType.Generic;
-                credential.Delete();
-            }
+            Credential.Delete(key);
+            Credential.Delete(keyGit);
+            Credential.Delete(keyHost);
 
             return Task.CompletedTask;
+        }
+
+        static string GetKey(string key)
+        {
+            key = FormatKey(key);
+            if (key.StartsWith("git:", StringComparison.Ordinal))
+                key = key.Substring("git:".Length);
+            if (!key.EndsWith("/", StringComparison.Ordinal))
+                key += '/';
+            return "GitHub for Visual Studio - " + key;
         }
 
         static string GetKeyGit(string key)
