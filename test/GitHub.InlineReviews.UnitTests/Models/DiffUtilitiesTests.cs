@@ -96,6 +96,52 @@ index b02decb..f7dadae 100644
                 Assert.Equal(3, line.DiffLineNumber);
             }
 
+            [Theory]
+            [InlineData("+foo\n+bar\n", "+foo", "+bar")]
+            [InlineData("+fo\ro\n+bar\n", "+fo\ro", "+bar")]
+            [InlineData("+foo\r\r\n+bar\n", "+foo\r", "+bar")]
+            [InlineData("+\\r\n+\r\n", "+\\r", "+")]
+            public void FirstChunk_CheckLineContent(string diffLines, string contentLine0, string contentLine1)
+            {
+                var header = "@@ -1 +1 @@";
+                var diff = header + "\n" + diffLines;
+
+                var chunk = DiffUtilities.ParseFragment(diff).First();
+
+                Assert.Equal(contentLine0, chunk.Lines[0].Content);
+                Assert.Equal(contentLine1, chunk.Lines[1].Content);
+            }
+
+            [Theory]
+            [InlineData("+foo\n+bar\n", 1, 2)]
+            [InlineData("+fo\ro\n+bar\n", 1, 3)]
+            [InlineData("+foo\r\r\n+bar\n", 1, 3)]
+            public void FirstChunk_CheckNewLineNumber(string diffLines, int lineNumber0, int lineNumber1)
+            {
+                var header = "@@ -1 +1 @@";
+                var diff = header + "\n" + diffLines;
+
+                var chunk = DiffUtilities.ParseFragment(diff).First();
+
+                Assert.Equal(lineNumber0, chunk.Lines[0].NewLineNumber);
+                Assert.Equal(lineNumber1, chunk.Lines[1].NewLineNumber);
+            }
+
+            [Theory]
+            [InlineData("-foo\n-bar\n", 1, 2)]
+            [InlineData("-fo\ro\n-bar\n", 1, 3)]
+            [InlineData("-foo\r\r\n-bar\n", 1, 3)]
+            public void FirstChunk_CheckOldLineNumber(string diffLines, int lineNumber0, int lineNumber1)
+            {
+                var header = "@@ -1 +1 @@";
+                var diff = header + "\n" + diffLines;
+
+                var chunk = DiffUtilities.ParseFragment(diff).First();
+
+                Assert.Equal(lineNumber0, chunk.Lines[0].OldLineNumber);
+                Assert.Equal(lineNumber1, chunk.Lines[1].OldLineNumber);
+            }
+
             [Fact]
             public void FirstChunk_CheckDiffLineZeroBased()
             {
@@ -267,6 +313,58 @@ index b02decb..f7dadae 100644
                 var line = DiffUtilities.Match(chunks, lines);
 
                 Assert.Equal(null, line);
+            }
+        }
+
+        public class TheLineReaderClass
+        {
+            [Theory]
+            [InlineData("", new[] { "", null })]
+            [InlineData("\n", new[] { "", null })]
+            [InlineData("\r\n", new[] { "", null })]
+            [InlineData("1", new[] { "1", null })]
+            [InlineData("1\n2\n", new[] { "1", "2", null })]
+            [InlineData("1\n2", new[] { "1", "2", null })]
+            [InlineData("1\r\n2\n", new[] { "1", "2", null })]
+            [InlineData("1\r\n2", new[] { "1", "2", null })]
+            [InlineData("\r", new[] { "\r", null })]
+            [InlineData("\r\r", new[] { "\r\r", null })]
+            [InlineData("\r\r\n", new[] { "\r", null })]
+            [InlineData("\r_\n", new[] { "\r_", null })]
+            public void ReadLines(string text, string[] expectLines)
+            {
+                var lineReader = new DiffUtilities.LineReader(text);
+
+                foreach (var expectLine in expectLines)
+                {
+                    var line = lineReader.ReadLine();
+                    Assert.Equal(expectLine, line);
+                }
+            }
+
+            [Fact]
+            public void Constructor_NullText_ArgumentNullException()
+            {
+                Assert.Throws<ArgumentNullException>(() => new DiffUtilities.LineReader(null));
+            }
+
+            [Theory]
+            [InlineData("", 0)]
+            [InlineData("\r", 1)]
+            [InlineData("\r\n", 1)]
+            [InlineData("\r\r", 2)]
+            [InlineData("\r-\r", 2)]
+            public void CountCarriageReturns(string text, int expectCount)
+            {
+                var count = DiffUtilities.LineReader.CountCarriageReturns(text);
+
+                Assert.Equal(expectCount, count);
+            }
+
+            [Fact]
+            public void CountCarriageReturns_NullText_ArgumentNullException()
+            {
+                Assert.Throws<ArgumentNullException>(() => DiffUtilities.LineReader.CountCarriageReturns(null));
             }
         }
     }
