@@ -15,7 +15,6 @@
         <FixtureName>UIProviderTests</FixtureName>
       </FixtureTestSelector>
     </IgnoredTests>
-    <PreloadReferencedAssemblies>True</PreloadReferencedAssemblies>
     <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
   </Settings>
 </ProjectConfiguration>
