@@ -95,7 +95,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CredentialManagement", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Testing_Net45", "submodules\reactiveui\ReactiveUI.Testing\ReactiveUI.Testing_Net45.csproj", "{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackingCollectionTests", "src\TrackingCollectionTests\TrackingCollectionTests.csproj", "{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackingCollectionTests", "test\TrackingCollectionTests\TrackingCollectionTests.csproj", "{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.14", "src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj", "{161DBF01-1DBF-4B00-8551-C5C00F26720D}"
 EndProject
