@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using LibGit2Sharp;
 
-public class FakeCommitLog :  List<Commit>, IQueryableCommitLog
+public class FakeCommitLog : List<Commit>, IQueryableCommitLog
 {
     public CommitSortStrategies SortedBy
     {
@@ -33,6 +33,11 @@ public class FakeCommitLog :  List<Commit>, IQueryableCommitLog
     }
 
     public IEnumerable<LogEntry> QueryBy(string path, FollowFilter filter)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<LogEntry> QueryBy(string path, CommitFilter filter)
     {
         throw new NotImplementedException();
     }

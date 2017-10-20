@@ -1,8 +1,10 @@
 ﻿<ProjectConfiguration>
   <Settings>
+    <CopyReferencedAssembliesToWorkspace>True</CopyReferencedAssembliesToWorkspace>
     <DefaultTestTimeout>2000</DefaultTestTimeout>
     <HiddenComponentWarnings>
       <Value>AbnormalReferenceResolution</Value>
+      <Value>CopyReferencedAssembliesToWorkspaceIsOn</Value>
     </HiddenComponentWarnings>
     <IgnoredTests>
       <FixtureTestSelector>
@@ -15,7 +17,6 @@
         <FixtureName>UIProviderTests</FixtureName>
       </FixtureTestSelector>
     </IgnoredTests>
-    <PreloadReferencedAssemblies>True</PreloadReferencedAssemblies>
     <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
   </Settings>
 </ProjectConfiguration>

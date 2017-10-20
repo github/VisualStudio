@@ -188,8 +188,7 @@ namespace GitHub.Services
         /// Find the merge base SHA between two commits.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="baseCloneUrl">The clone url of the PR base.</param>
-        /// <param name="headCloneUrl">The clone url of the PR head.</param>
+        /// <param name="targetCloneUrl">The clone url of the PR target repo.</param>
         /// <param name="baseSha">The PR base SHA.</param>
         /// <param name="headSha">The PR head SHA.</param>
         /// <param name="baseRef">The PR base ref (e.g. 'master').</param>
@@ -198,7 +197,7 @@ namespace GitHub.Services
         /// The merge base SHA or null.
         /// </returns>
         /// <exception cref="LibGit2Sharp.NotFoundException">Thrown when the merge base can't be found.</exception>
-        Task<string> GetPullRequestMergeBase(IRepository repo, UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef);
+        Task<string> GetPullRequestMergeBase(IRepository repo, UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber);
 
         /// Checks whether the current head is pushed to its remote tracking branch.
         /// </summary>
