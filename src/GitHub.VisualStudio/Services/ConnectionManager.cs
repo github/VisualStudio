@@ -17,7 +17,6 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ConnectionManager : IConnectionManager
     {
-        readonly IVSGitServices vsGitServices;
         readonly IConnectionCache cache;
         readonly IKeychain keychain;
         readonly ILoginManager loginManager;
@@ -27,13 +26,11 @@ namespace GitHub.VisualStudio
 
         [ImportingConstructor]
         public ConnectionManager(
-            IVSGitServices vsGitServices,
             IConnectionCache cache,
             IKeychain keychain,
             ILoginManager loginManager,
             IApiClientFactory apiClientFactory)
         {
-            this.vsGitServices = vsGitServices;
             this.cache = cache;
             this.keychain = keychain;
             this.loginManager = loginManager;
@@ -87,19 +84,6 @@ namespace GitHub.VisualStudio
             Connections.Remove(connection);
         }
 
-        public async Task RefreshRepositories()
-        {
-            var list = await Task.Run(() => vsGitServices.GetKnownRepositories());
-            list.GroupBy(r => Connections.FirstOrDefault(c => r.CloneUrl != null && c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
-                .Where(g => g.Key != null)
-                .ForEach(g =>
-            {
-                var repos = g.Key.Repositories;
-                repos.Except(g).ToList().ForEach(c => repos.Remove(c));
-                g.Except(repos).ToList().ForEach(c => repos.Add(c));
-            });
-        }
-
         IConnection SetupConnection(HostAddress address, string username)
         {
             var conn = new Connection(this, address, username);
@@ -115,7 +99,6 @@ namespace GitHub.VisualStudio
                     // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
                     if (DoLogin == null)
                         keychain.Delete(c.HostAddress).Forget();
-                    c.Dispose();
                 }
             }
 

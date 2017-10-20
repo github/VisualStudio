@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
-    public interface IConnection : IDisposable
+    public interface IConnection
     {
         HostAddress HostAddress { get; }
         string Username { get; }
         IObservable<IConnection> Login();
         void Logout();
-        ObservableCollection<ILocalRepositoryModel> Repositories { get; }
     }
 }

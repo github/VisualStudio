@@ -31,7 +31,7 @@ public class ConnectionManagerTests
             var keychain = Substitute.For<IKeychain>();
             var loginManager = Substitute.For<ILoginManager>();
             var apiClientFactory = Substitute.For<IApiClientFactory>();
-            var manager = new ConnectionManager(Substitutes.IVSGitServices, cache, keychain, loginManager, apiClientFactory);
+            var manager = new ConnectionManager(cache, keychain, loginManager, apiClientFactory);
 
             manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));
 

@@ -20,6 +20,5 @@ namespace GitHub.Services
         // for telling IRepositoryHosts that we need to login from cache
         [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         event Func<IConnection, IObservable<IConnection>> DoLogin;
-        Task RefreshRepositories();
     }
 }
