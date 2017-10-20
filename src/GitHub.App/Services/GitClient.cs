@@ -43,7 +43,9 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
+#pragma warning disable 0618 // TODO: Replace `Network.Pull` with `Commands.Pull`.
                 repository.Network.Pull(signature, pullOptions);
+#pragma warning restore 0618
             });
         }
 
@@ -74,7 +76,46 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                     repository.Network.Fetch(remote, fetchOptions);
+#pragma warning restore 0618
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Failed to fetch", ex);
+#if DEBUG
+                    throw;
+#endif
+                }
+            });
+        }
+
+        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        {
+            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
+
+            var originRemote = repo.Network.Remotes[defaultOriginName];
+            if (originRemote != null && originRemote.Url == httpsUrl)
+            {
+                return Fetch(repo, defaultOriginName, refspecs);
+            }
+
+            return Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
+                    var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
+                    try
+                    {
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
+                        repo.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
+                    }
+                    finally
+                    {
+                        repo.Network.Remotes.Remove(tempRemoteName);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -96,7 +137,9 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                     repository.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
                 }
                 catch (Exception ex)
                 {
@@ -115,7 +158,9 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
+#pragma warning disable 0618 // TODO: Replace `IRepository.Checkout` with `Commands.Checkout`.
                 repository.Checkout(branchName);
+#pragma warning restore 0618
             });
         }
 
@@ -380,32 +425,34 @@ namespace GitHub.Services
         }
 
         public async Task<string> GetPullRequestMergeBase(IRepository repo,
-            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
+            UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber)
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
-            Guard.ArgumentNotNull(baseCloneUrl, nameof(baseCloneUrl));
-            Guard.ArgumentNotNull(headCloneUrl, nameof(headCloneUrl));
+            Guard.ArgumentNotNull(targetCloneUrl, nameof(targetCloneUrl));
             Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
-
-            var baseCommit = repo.Lookup<Commit>(baseSha);
-            if (baseCommit == null)
-            {
-                await Fetch(repo, baseCloneUrl, baseRef);
-                baseCommit = repo.Lookup<Commit>(baseSha);
-                if (baseCommit == null)
-                {
-                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {baseCloneUrl}:{baseRef}.");
-                }
-            }
 
             var headCommit = repo.Lookup<Commit>(headSha);
             if (headCommit == null)
             {
-                await Fetch(repo, headCloneUrl, headRef);
+                // The PR base branch might no longer exist, so we fetch using `refs/pull/<PR>/head` first.
+                // This will often fetch the base commits, even when the base branch no longer exists.
+                var headRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, targetCloneUrl, headRef);
                 headCommit = repo.Lookup<Commit>(headSha);
                 if (headCommit == null)
                 {
-                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {headCloneUrl}:{headRef}.");
+                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {targetCloneUrl}:{headRef}.");
+                }
+            }
+
+            var baseCommit = repo.Lookup<Commit>(baseSha);
+            if (baseCommit == null)
+            {
+                await Fetch(repo, targetCloneUrl, baseRef);
+                baseCommit = repo.Lookup<Commit>(baseSha);
+                if (baseCommit == null)
+                {
+                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {targetCloneUrl}:{baseRef}.");
                 }
             }
 
@@ -426,26 +473,6 @@ namespace GitHub.Services
             {
                 return repo.Head.TrackingDetails.AheadBy == 0;
             });
-        }
-
-        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
-        {
-            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
-            if (repo.Network.Remotes[defaultOriginName]?.Url == httpsUrl)
-            {
-                return Fetch(repo, defaultOriginName, refspecs);
-            }
-
-            var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
-            repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
-            try
-            {
-                return Fetch(repo, tempRemoteName, refspecs);
-            }
-            finally
-            {
-                repo.Network.Remotes.Remove(tempRemoteName);
-            }
         }
 
         static bool IsCanonical(string s)

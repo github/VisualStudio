@@ -168,11 +168,11 @@ public class PullRequestServiceTests : TestBaseClass
 
             if (mergeBaseException == null)
             {
-                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
             }
             else
             {
-                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, headRef).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
+                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
             }
 
             gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
@@ -524,8 +524,8 @@ public class PullRequestServiceTests : TestBaseClass
             var branch2 = Substitute.For<LibGit2Sharp.Branch>();
             var branches = new List<LibGit2Sharp.Branch> { branch1, branch2 };
             var branchCollection = Substitute.For<BranchCollection>();
-            branch1.Remote.Returns(remote1);
-            branch2.Remote.Returns(remote1);
+            branch1.RemoteName.Returns("remote1");
+            branch2.RemoteName.Returns("remote1");
             branchCollection.GetEnumerator().Returns(_ => branches.GetEnumerator());
             repo.Branches.Returns(branchCollection);
 

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" />
   <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
   <PropertyGroup>
     <!-- This is added to prevent forced migrations in Visual Studio 2012 and newer -->
     <MinimumVisualStudioVersion>$(MSBuildToolsVersion)</MinimumVisualStudioVersion>
@@ -11,7 +11,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-    <ApplicationVersion>2.3.2.32</ApplicationVersion>
+    <ApplicationVersion>2.3.4.52</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
@@ -91,8 +91,8 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
-    <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+    <Reference Include="LibGit2Sharp, Version=0.24.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.24.0\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Markdig, Version=0.13.0.0, Culture=neutral, PublicKeyToken=870da25a133885f8, processorArchitecture=MSIL">
@@ -700,11 +700,11 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props'))" />
   </Target>
   <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -13,6 +14,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
+using NLog;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -22,18 +24,20 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        IDisposable fileSubscription;
         ICommentThreadViewModel thread;
+        IDisposable fileSubscription;
+        IDisposable sessionSubscription;
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
-        string fullPath;
-        bool leftBuffer;
+        string relativePath;
+        DiffSide side;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
@@ -97,6 +101,10 @@ namespace GitHub.InlineReviews.ViewModels
 
         public void Dispose()
         {
+            threadSubscription?.Dispose();
+            threadSubscription = null;
+            sessionSubscription?.Dispose();
+            sessionSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
         }
@@ -108,19 +116,40 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (info != null)
             {
-                fullPath = info.FilePath;
-                leftBuffer = info.IsLeftComparisonBuffer;
-                await SessionChanged(info.Session);
+                relativePath = info.RelativePath;
+                side = info.Side ?? DiffSide.Right;
+                file = await info.Session.GetFile(relativePath);
+                session = info.Session;
+                await UpdateThread();
             }
             else
             {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                fullPath = document.FilePath;
-
+                relativePath = sessionManager.GetRelativePath(buffer);
+                file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer);
                 await SessionChanged(sessionManager.CurrentSession);
-                sessionManager.WhenAnyValue(x => x.CurrentSession)
+                sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(x => SessionChanged(x).Forget());
+            }
+
+            fileSubscription?.Dispose();
+            fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+        }
+
+        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        {
+            try
+            {
+                var lineNumber = peekService.GetLineNumber(peekSession, triggerPoint).Item1;
+
+                if (lines.Contains(Tuple.Create(lineNumber, side)))
+                {
+                    await UpdateThread();
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error("Error updating InlineCommentViewModel", e);
             }
         }
 
@@ -137,7 +166,7 @@ namespace GitHub.InlineReviews.ViewModels
             var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
             var lineNumber = lineAndLeftBuffer.Item1;
             var leftBuffer = lineAndLeftBuffer.Item2;
-            var thread = file.InlineCommentThreads.FirstOrDefault(x =>
+            var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
 
@@ -148,7 +177,6 @@ namespace GitHub.InlineReviews.ViewModels
             else
             {
                 var newThread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
-                threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread().Forget());
                 Thread = newThread;
             }
 
@@ -167,18 +195,18 @@ namespace GitHub.InlineReviews.ViewModels
         async Task SessionChanged(IPullRequestSession session)
         {
             this.session = session;
-            fileSubscription?.Dispose();
 
             if (session == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();
+                threadSubscription = null;
                 return;
             }
-
-            var relativePath = session.GetRelativePath(fullPath);
-            file = await session.GetFile(relativePath);
-            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
+            else
+            {
+                await UpdateThread();
+            }
         }
 
         async Task<string> GetPlaceholderBodyToPreserve()
