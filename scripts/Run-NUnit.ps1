@@ -19,7 +19,7 @@ Param(
 
 $rootDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
 Push-Location $rootDirectory
-$dll = "src\$Project\bin\$Configuration\$Project.dll"
+$dll = "test\$Project\bin\$Configuration\$Project.dll"
 
 if ($AppVeyor) {
     $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
