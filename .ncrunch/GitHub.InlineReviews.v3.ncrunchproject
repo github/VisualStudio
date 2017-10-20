@@ -1,7 +1,5 @@
 ﻿<ProjectConfiguration>
   <Settings>
-    <InstrumentOutputAssembly>True</InstrumentOutputAssembly>
-    <PreventSigningOfAssembly>True</PreventSigningOfAssembly>
     <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
   </Settings>
 </ProjectConfiguration>
