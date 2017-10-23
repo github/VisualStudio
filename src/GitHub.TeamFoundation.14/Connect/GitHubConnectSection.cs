@@ -383,7 +383,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void SignOut()
         {
-            SectionConnection.Logout();
+            connectionManager.LogOut(SectionConnection.HostAddress);
         }
 
         public void Login()

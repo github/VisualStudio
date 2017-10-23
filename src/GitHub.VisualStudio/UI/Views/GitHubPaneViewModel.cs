@@ -238,11 +238,10 @@ namespace GitHub.VisualStudio.UI.Views
                 IsLoggedIn = false;
             else
             {
-                var isLoggedIn = await connection.IsLoggedIn(hosts);
                 if (reloadCallId != latestReloadCallId)
                     return;
 
-                IsLoggedIn = isLoggedIn;
+                IsLoggedIn = connection.IsLoggedIn;
             }
 
             Load(connection, data);

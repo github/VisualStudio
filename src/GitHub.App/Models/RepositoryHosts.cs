@@ -75,11 +75,6 @@ namespace GitHub.Models
                 (githubLoggedIn, enterpriseLoggedIn) => githubLoggedIn.Value || enterpriseLoggedIn.Value)
                 .ToProperty(this, x => x.IsLoggedInToAnyHost);
 
-            // This part is strictly to support having the IConnectionManager request that a connection
-            // be logged in. It doesn't know about hosts or load anything reactive, so it gets
-            // informed of logins by an observable returned by the event
-            connectionManager.DoLogin += RunLoginHandler;
-
             // monitor the list of connections so we can log out hosts when connections are removed
             disposables.Add(
                 connectionManager.Connections.CreateDerivedCollection(x => x)
@@ -98,24 +93,6 @@ namespace GitHub.Models
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
             // start tracking changes to the EnterpriseHost property and persist every change to the db
             disposables.Add(persistEntepriseHostObs.Subscribe());
-        }
-
-        IObservable<IConnection> RunLoginHandler(IConnection connection)
-        {
-            Guard.ArgumentNotNull(connection, nameof(connection));
-
-            var handler = new ReplaySubject<IConnection>();
-            var address = connection.HostAddress;
-            var host = LookupHost(address);
-            if (host == DisconnectedRepositoryHost)
-                LogInFromCache(address)
-                    .Subscribe(c => handler.OnNext(connection), () => handler.OnCompleted());
-            else
-            {
-                handler.OnNext(connection);
-                handler.OnCompleted();
-            }
-            return handler;
         }
 
         public IRepositoryHost LookupHost(HostAddress address)
@@ -164,7 +141,7 @@ namespace GitHub.Models
                             else
                                 enterpriseHost = host;
 
-                            connectionManager.AddConnection(address, usernameOrEmail);
+                            connectionManager.LogIn(address, usernameOrEmail, password);
 
                             if (isDotCom)
                                 this.RaisePropertyChanged(nameof(GitHubHost));
@@ -223,7 +200,7 @@ namespace GitHub.Models
                         GitHubHost = null;
                     else
                         EnterpriseHost = null;
-                    connectionManager.RemoveConnection(address);
+                    connectionManager.LogOut(address);
                     RepositoryHostFactory.Remove(host);
                 });
         }
@@ -237,7 +214,6 @@ namespace GitHub.Models
 
                 try
                 {
-                    connectionManager.DoLogin -= RunLoginHandler;
                     disposables.Dispose();
                 }
                 catch (Exception e)

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -12,33 +15,40 @@ namespace GitHub.Extensions
         public static IObservable<bool> IsLoggedIn(this IConnectionManager cm, IRepositoryHosts hosts)
         {
             Guard.ArgumentNotNull(hosts, nameof(hosts));
-            return cm.Connections.ToObservable()
-                    .SelectMany(c => c.Login())
-                    .Any(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
+
+            return Observable.FromAsync(async () =>
+            {
+                var connections = await cm.GetLoadedConnections();
+                return connections.Any(x => x.ConnectionError == null);
+            });
         }
 
         public static IObservable<bool> IsLoggedIn(this IConnectionManager cm, IRepositoryHosts hosts, HostAddress address)
         {
             Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(address, nameof(address));
-            return cm.Connections.ToObservable()
-                    .Where(c => c.HostAddress.Equals(address))
-                    .SelectMany(c => c.Login())
-                    .Any(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
+
+            return Observable.FromAsync(async () =>
+            {
+                var connections = await cm.GetLoadedConnections();
+                return connections.Any(x => x.HostAddress == address && x.ConnectionError == null);
+            });
         }
 
         public static IObservable<bool> IsLoggedIn(this IConnection connection, IRepositoryHosts hosts)
         {
             Guard.ArgumentNotNull(hosts, nameof(hosts));
-            return connection?.Login().Any(c => hosts.LookupHost(c.HostAddress).IsLoggedIn) ?? Observable.Return(false);
+
+            return Observable.Return(connection?.IsLoggedIn ?? false);
         }
 
         public static IObservable<IConnection> GetLoggedInConnections(this IConnectionManager cm, IRepositoryHosts hosts)
         {
             Guard.ArgumentNotNull(hosts, nameof(hosts));
-            return cm.Connections.ToObservable()
-                    .SelectMany(c => c.Login())
-                    .Where(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
+
+            return cm.GetLoadedConnections()
+                .ToObservable()
+                .Select(x => x.FirstOrDefault(y => y.IsLoggedIn));
         }
 
         public static IObservable<IConnection> LookupConnection(this IConnectionManager cm, ILocalRepositoryModel repository)

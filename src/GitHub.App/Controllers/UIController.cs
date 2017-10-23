@@ -219,13 +219,7 @@ namespace GitHub.Controllers
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
                     Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
-                connection.Login()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => { }, () =>
-                    {
-                        Debug.WriteLine("Start ({0})", GetHashCode());
-                        Fire(Trigger.Next);
-                    });
+                Fire(Trigger.Next);
             }
             else
             {

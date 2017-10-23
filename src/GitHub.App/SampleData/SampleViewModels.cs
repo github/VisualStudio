@@ -200,23 +200,15 @@ namespace GitHub.SampleData
             public string Username { get; set; }
             public ObservableCollection<ILocalRepositoryModel> Repositories { get; set;  }
 
-            public IObservable<IConnection> Login()
-            {
-                return null;
-            }
+            public Octokit.User User => null;
+            public bool IsLoggedIn => true;
 
-            public void Logout()
-            {
-            }
-
-            public void Dispose()
-            {
-            }
+            public Exception ConnectionError => null;
         }
 
         public RepositoryPublishViewModelDesigner()
         {
-            Connections = new ObservableCollection<IConnection>
+            Connections = new ObservableCollectionEx<IConnection>
             {
                 new Conn() { HostAddress = new HostAddress() },
                 new Conn() { HostAddress = HostAddress.Create("ghe.io") }
@@ -238,7 +230,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ObservableCollection<IConnection> Connections
+        public IReadOnlyObservableCollection<IConnection> Connections
         {
             get;
             private set;

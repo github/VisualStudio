@@ -117,7 +117,7 @@ namespace GitHub.ViewModels
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
         public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
-        public ObservableCollection<IConnection> Connections { get; private set; }
+        public IReadOnlyObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
         public IConnection SelectedConnection

@@ -12,6 +12,7 @@ using GitHub.Info;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GitHub.Extensions;
 
 public class RepositoryPublishViewModelTests
 {
@@ -70,7 +71,7 @@ public class RepositoryPublishViewModelTests
             var conns = new List<IConnection>();
             SetupConnections(hosts, cm, adds, conns, hsts, uri);
             hsts[0].ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
             return GetViewModel(hosts, service, notificationService, cm);
         }
 
@@ -106,7 +107,7 @@ public class RepositoryPublishViewModelTests
             foreach(var host in hsts)
                 host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
 
             var vm = Helpers.GetViewModel(hosts: hosts, connectionManager: cm);
 
@@ -140,7 +141,7 @@ public class RepositoryPublishViewModelTests
             foreach (var host in hsts)
                 host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
             var vm = Helpers.GetViewModel(hosts, connectionManager: cm);
 
             Assert.Same(adds.First(x => x.IsGitHubDotCom()), vm.SelectedConnection.HostAddress);
@@ -168,7 +169,7 @@ public class RepositoryPublishViewModelTests
             hsts.First(x => x.Address.IsGitHubDotCom()).ModelService.GetAccounts().Returns(Observable.Return(gitHubAccounts));
             hsts.First(x => !x.Address.IsGitHubDotCom()).ModelService.GetAccounts().Returns(Observable.Return(enterpriseAccounts));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
             var vm = Helpers.GetViewModel(hosts, connectionManager: cm);
 
             Assert.Equal(2, vm.Accounts.Count);
@@ -355,7 +356,7 @@ public class RepositoryPublishViewModelTests
             foreach (var host in hsts)
                 host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
 
             var notificationService = Substitute.For<INotificationService>();
 
@@ -392,7 +393,7 @@ public class RepositoryPublishViewModelTests
             var accounts = new List<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
             hsts[0].ModelService.GetAccounts().Returns(Observable.Return(accounts));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
 
             var notificationService = Substitute.For<INotificationService>();
 
