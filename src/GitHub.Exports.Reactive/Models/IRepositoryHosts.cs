@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GitHub.Authentication;
 using GitHub.Factories;
 using GitHub.Primitives;
@@ -10,11 +11,11 @@ namespace GitHub.Models
     {
         IRepositoryHost EnterpriseHost { get; set; }
         IRepositoryHost GitHubHost { get; }
+        Task EnsureInitialized();
         IObservable<AuthenticationResult> LogIn(
             HostAddress hostAddress,
-            string usernameOrEmail,
+            string username,
             string password);
-        IObservable<AuthenticationResult> LogInFromCache(HostAddress hostAddress);
         IRepositoryHostFactory RepositoryHostFactory { get; }
         bool IsLoggedInToAnyHost { get; }
         IRepositoryHost LookupHost(HostAddress address);

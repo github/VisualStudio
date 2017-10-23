@@ -148,11 +148,11 @@ namespace GitHub.ViewModels
 
             pullRequests.OriginalCompleted
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
-                {
-                    log.Info("Received AuthorizationException reading pull requests", ex);
-                    return repositoryHost.LogOut();
-                })
+                ////.Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
+                ////{
+                ////    log.Info("Received AuthorizationException reading pull requests", ex);
+                ////    return repositoryHost.LogOut();
+                ////})
                 .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
                     // Occurs on network error, when the repository was deleted on GitHub etc.

@@ -283,21 +283,6 @@ namespace GitHub.SampleData
         public void Dispose()
         {
         }
-
-        public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<AuthenticationResult> LogInFromCache()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> LogOut()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     [ExcludeFromCodeCoverage]

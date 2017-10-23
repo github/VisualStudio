@@ -14,6 +14,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Windows;
 
 namespace GitHub.Controllers
@@ -219,7 +220,13 @@ namespace GitHub.Controllers
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
                     Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
-                Fire(Trigger.Next);
+                hosts.EnsureInitialized().ToObservable()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire(Trigger.Next);
+                    });
             }
             else
             {
@@ -438,8 +445,7 @@ namespace GitHub.Controllers
 
         UIControllerFlow SelectActiveFlow()
         {
-            var host = connection != null ? hosts.LookupHost(connection.HostAddress) : null;
-            var loggedIn = host?.IsLoggedIn ?? false;
+            var loggedIn = connection?.IsLoggedIn ?? false;
             return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
         }
 
@@ -704,7 +710,7 @@ namespace GitHub.Controllers
         public bool IsStopped => uiStateMachine.IsInState(UIViewType.None) || stopping;
         public UIControllerFlow CurrentFlow => activeFlow;
         public UIControllerFlow SelectedFlow => selectedFlow;
-        bool LoggedIn => connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
+        bool LoggedIn => connection?.IsLoggedIn ?? false;
         bool? Success { get; set; }
     }
 }

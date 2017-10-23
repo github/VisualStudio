@@ -48,10 +48,5 @@ namespace GitHub.Models
         {
             return Observable.Return(Unit.Default);
         }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
     }
 }
