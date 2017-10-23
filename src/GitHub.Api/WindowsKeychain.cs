@@ -8,14 +8,14 @@ using GitHub.Primitives;
 namespace GitHub.Api
 {
     /// <summary>
-    /// A login cache that stores logins in the windows credential cache.
+    /// A keychain that stores logins in the windows credential store.
     /// </summary>
-    [Export(typeof(ILoginCache))]
+    [Export(typeof(IKeychain))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class WindowsLoginCache : ILoginCache
+    public class WindowsKeychain : IKeychain
     {
         /// <inheritdoc/>
-        public Task<Tuple<string, string>> GetLogin(HostAddress hostAddress)
+        public Task<Tuple<string, string>> Load(HostAddress hostAddress)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
@@ -29,11 +29,11 @@ namespace GitHub.Api
                     return Task.FromResult(Tuple.Create(credential.Username, credential.Password));
             }
 
-            return Task.FromResult(Tuple.Create<string, string>(null, null));
+            return Task.FromResult<Tuple<string, string>>(null);
         }
 
         /// <inheritdoc/>
-        public Task SaveLogin(string userName, string password, HostAddress hostAddress)
+        public Task Save(string userName, string password, HostAddress hostAddress)
         {
             Guard.ArgumentNotEmptyString(userName, nameof(userName));
             Guard.ArgumentNotEmptyString(password, nameof(password));
@@ -56,7 +56,7 @@ namespace GitHub.Api
         }
 
         /// <inheritdoc/>
-        public Task EraseLogin(HostAddress hostAddress)
+        public Task Delete(HostAddress hostAddress)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 

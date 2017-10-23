@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -8,7 +7,6 @@ using GitHub.Services;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using GitHub.Api;
-using ILoginCache = GitHub.Caches.ILoginCache;
 
 namespace GitHub.Factories
 {
@@ -19,7 +17,7 @@ namespace GitHub.Factories
         readonly IApiClientFactory apiClientFactory;
         readonly IHostCacheFactory hostCacheFactory;
         readonly ILoginManager loginManager;
-        readonly ILoginCache loginCache;
+        readonly IKeychain keychain;
         readonly IAvatarProvider avatarProvider;
         readonly CompositeDisposable hosts = new CompositeDisposable();
         readonly IUsageTracker usage;
@@ -29,14 +27,14 @@ namespace GitHub.Factories
             IApiClientFactory apiClientFactory,
             IHostCacheFactory hostCacheFactory,
             ILoginManager loginManager,
-            ILoginCache loginCache,
+            IKeychain keychain,
             IAvatarProvider avatarProvider,
             IUsageTracker usage)
         {
             this.apiClientFactory = apiClientFactory;
             this.hostCacheFactory = hostCacheFactory;
             this.loginManager = loginManager;
-            this.loginCache = loginCache;
+            this.keychain = keychain;
             this.avatarProvider = avatarProvider;
             this.usage = usage;
         }
@@ -46,7 +44,7 @@ namespace GitHub.Factories
             var apiClient = await apiClientFactory.Create(hostAddress);
             var hostCache = await hostCacheFactory.Create(hostAddress);
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, keychain, usage);
             hosts.Add(host);
             return host;
         }

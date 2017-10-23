@@ -19,6 +19,7 @@ namespace GitHub.VisualStudio
     {
         readonly IVSGitServices vsGitServices;
         readonly IConnectionCache cache;
+        readonly IKeychain keychain;
         readonly ILoginManager loginManager;
         readonly IApiClientFactory apiClientFactory;
 
@@ -28,11 +29,13 @@ namespace GitHub.VisualStudio
         public ConnectionManager(
             IVSGitServices vsGitServices,
             IConnectionCache cache,
+            IKeychain keychain,
             ILoginManager loginManager,
             IApiClientFactory apiClientFactory)
         {
             this.vsGitServices = vsGitServices;
             this.cache = cache;
+            this.keychain = keychain;
             this.loginManager = loginManager;
             this.apiClientFactory = apiClientFactory;
 
@@ -111,7 +114,7 @@ namespace GitHub.VisualStudio
                 {
                     // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
                     if (DoLogin == null)
-                        Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
+                        keychain.Delete(c.HostAddress).Forget();
                     c.Dispose();
                 }
             }

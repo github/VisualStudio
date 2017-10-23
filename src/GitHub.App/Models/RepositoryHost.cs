@@ -2,24 +2,20 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Net;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
-using GitHub.Extensions.Reactive;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
-using System.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Collections.Generic;
-using GitHub.Extensions;
-using ILoginCache = GitHub.Caches.ILoginCache;
-using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
@@ -30,7 +26,7 @@ namespace GitHub.Models
 
         readonly ILoginManager loginManager;
         readonly HostAddress hostAddress;
-        readonly ILoginCache loginCache;
+        readonly IKeychain keychain;
         readonly IUsageTracker usage;
 
         bool isLoggedIn;
@@ -39,13 +35,13 @@ namespace GitHub.Models
             IApiClient apiClient,
             IModelService modelService,
             ILoginManager loginManager,
-            ILoginCache loginCache,
+            IKeychain keychain,
             IUsageTracker usage)
         {
             ApiClient = apiClient;
             ModelService = modelService;
             this.loginManager = loginManager;
-            this.loginCache = loginCache;
+            this.keychain = keychain;
             this.usage = usage;
 
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
@@ -127,7 +123,7 @@ namespace GitHub.Models
 
             log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", hostAddress.ApiUri);
 
-            return loginCache.EraseLogin(Address)
+            return keychain.Delete(Address).ToObservable()
                 .Catch<Unit, Exception>(e =>
                 {
                     log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);

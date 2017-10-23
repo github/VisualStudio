@@ -5,7 +5,7 @@ namespace UnitTests.Helpers
 {
     public class TestSharedCache : SharedCache
     {
-        public TestSharedCache() : base(new InMemoryBlobCache(), new InMemoryBlobCache(), new InMemoryBlobCache())
+        public TestSharedCache() : base(new InMemoryBlobCache(), new InMemoryBlobCache())
         {
         }
     }

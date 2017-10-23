@@ -221,7 +221,6 @@
     <Compile Include="GitHub.Api\LoginManagerTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
-    <Compile Include="GitHub.App\Caches\CredentialCacheTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
     <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
@@ -265,7 +264,6 @@
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
-    <Compile Include="Helpers\TestLoginCache.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
