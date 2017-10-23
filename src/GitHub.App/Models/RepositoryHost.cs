@@ -5,6 +5,7 @@ using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
+using static System.FormattableString;
 
 namespace GitHub.Models
 {
@@ -32,5 +33,7 @@ namespace GitHub.Models
         public bool IsLoggedIn => connection.IsLoggedIn;
         public IModelService ModelService { get; }
         public string Title => ApiClient.HostAddress.Title;
+
+        internal string DebuggerDisplay => Invariant($"RepositoryHost: {Title} {Address.ApiUri}");
     }
 }
