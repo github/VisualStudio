@@ -105,7 +105,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                log.Error(e, "Failed to set the {cacheName} cache.", cacheName);
+                log.Error(e, "Failed to set the {CacheName} cache.", cacheName);
                 return new InMemoryBlobCache();
             }
         }
