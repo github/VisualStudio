@@ -49,7 +49,7 @@ namespace GitHub.VisualStudio.UI
 
     public class UIProvider : IUIProvider, IDisposable
     {
-        static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
+        static readonly ILogger log = LogManager.ForContext<UIProvider>();
 
         WindowController windowController;
 
