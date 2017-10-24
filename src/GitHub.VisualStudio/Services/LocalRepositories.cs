@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Models;
-using GitHub.Services;
 
-namespace GitHub.App.Services
+namespace GitHub.Services
 {
     /// <summary>
     /// Stores a collection of known local repositories.

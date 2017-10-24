@@ -303,6 +303,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
+    <Compile Include="Services\LocalRepositories.cs" />
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="Services\LoginManagerDispatcher.cs" />
