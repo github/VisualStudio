@@ -11,6 +11,88 @@ using System.Collections.Generic;
 
 public class GitClientTests
 {
+    public class TheIsModifiedMethod
+    {
+        [Theory]
+        [InlineData(FileStatus.Unaltered, false)]
+        [InlineData(FileStatus.ModifiedInIndex, true)]
+        [InlineData(FileStatus.ModifiedInWorkdir, true)]
+        public async Task RetrieveStatus(FileStatus fileStatus, bool expect)
+        {
+            var path = "path";
+            var repo = Substitute.For<IRepository>();
+            repo.RetrieveStatus(path).Returns(fileStatus);
+            repo.Head.Returns(Substitute.For<Branch>());
+            var treeEntry = null as TreeEntry;
+            repo.Head[path].Returns(treeEntry);
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+
+            var modified = await gitClient.IsModified(repo, path, null);
+
+            Assert.Equal(expect, modified);
+        }
+
+        [Fact]
+        public async Task TreeEntry_Null_False()
+        {
+            var path = "path";
+            var repo = Substitute.For<IRepository>();
+            repo.RetrieveStatus(path).Returns(FileStatus.Unaltered);
+            repo.Head.Returns(Substitute.For<Branch>());
+            var treeEntry = null as TreeEntry;
+            repo.Head[path].Returns(treeEntry);
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+
+            var modified = await gitClient.IsModified(repo, path, null);
+
+            Assert.False(modified);
+        }
+
+        [Fact]
+        public async Task TreeEntryTarget_GitLink_False()
+        {
+            var path = "path";
+            var repo = Substitute.For<IRepository>();
+            repo.RetrieveStatus(path).Returns(FileStatus.Unaltered);
+            repo.Head.Returns(Substitute.For<Branch>());
+            var treeEntry = Substitute.For<TreeEntry>();
+            treeEntry.TargetType.Returns(TreeEntryTargetType.GitLink);
+            treeEntry.Target.Returns(Substitute.For<GitLink>());
+            repo.Head[path].Returns(treeEntry);
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+
+            var modified = await gitClient.IsModified(repo, path, null);
+
+            Assert.False(modified);
+        }
+
+        [Theory]
+        [InlineData(0, 0, false)]
+        [InlineData(1, 0, true)]
+        [InlineData(0, 1, true)]
+        [InlineData(1, 1, true)]
+        public async Task ContentChanges(int linesAdded, int linesDeleted, bool expected)
+        {
+            var path = "path";
+            var repo = Substitute.For<IRepository>();
+            repo.RetrieveStatus(path).Returns(FileStatus.Unaltered);
+            repo.Head.Returns(Substitute.For<Branch>());
+            var treeEntry = Substitute.For<TreeEntry>();
+            treeEntry.TargetType.Returns(TreeEntryTargetType.Blob);
+            treeEntry.Target.Returns(Substitute.For<Blob>());
+            repo.Head[path].Returns(treeEntry);
+            var changes = Substitute.For<ContentChanges>();
+            changes.LinesAdded.Returns(linesAdded);
+            changes.LinesDeleted.Returns(linesDeleted);
+            repo.Diff.Compare(null, null).ReturnsForAnyArgs(changes);
+            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+
+            var modified = await gitClient.IsModified(repo, path, null);
+
+            Assert.Equal(expected, modified);
+        }
+    }
+
     public class TheIsHeadPushedMethod : TestBaseClass
     {
         [Theory]

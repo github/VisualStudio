@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Factories;
@@ -14,6 +15,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Octokit;
@@ -72,10 +74,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task SwitchesFromNewThreadToExistingThreadWhenCommentPosted()
         {
             var sessionManager = CreateSessionManager();
+            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 8),
-                CreatePeekSession(),
+                peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>());
@@ -90,9 +93,13 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 .Do(async x =>
                 {
                     // Simulate the thread being added to the session.
-                    var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+                    var file = await sessionManager.GetLiveFile(
+                        RelativePath,
+                        peekSession.TextView,
+                        peekSession.TextView.TextBuffer);
                     var newThread = CreateThread(8, "New Comment");
                     file.InlineCommentThreads.Returns(new[] { newThread });
+                    RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
                 });
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
@@ -104,10 +111,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task RefreshesWhenSessionInlineCommentThreadsChanges()
         {
             var sessionManager = CreateSessionManager();
+            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
-                CreatePeekSession(),
+                peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>());
@@ -117,7 +125,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
             Assert.Equal(2, target.Thread.Comments.Count);
 
-            var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+            var file = await sessionManager.GetLiveFile(
+                RelativePath,
+                peekSession.TextView,
+                peekSession.TextView.TextBuffer);
             AddCommentToExistingThread(file);
 
             Assert.Equal(3, target.Thread.Comments.Count);
@@ -127,6 +138,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task RetainsCommentBeingEditedWhenSessionRefreshed()
         {
             var sessionManager = CreateSessionManager();
+            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
@@ -143,7 +155,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             placeholder.BeginEdit.Execute(null);
             placeholder.Body = "Comment being edited";
 
-            var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+            var file = await sessionManager.GetLiveFile(
+                RelativePath,
+                peekSession.TextView,
+                peekSession.TextView.TextBuffer);
             AddCommentToExistingThread(file);
 
             placeholder = target.Thread.Comments.Last();
@@ -156,10 +171,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task DoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
             var sessionManager = CreateSessionManager();
+            var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
                 CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 10),
-                CreatePeekSession(),
+                peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>());
@@ -171,8 +187,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             sessionManager.CurrentSession.PostReviewComment(null, 0)
                 .ReturnsForAnyArgs(async x =>
                 {
-                    var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+                    var file = await sessionManager.GetLiveFile(
+                        RelativePath,
+                        peekSession.TextView,
+                        peekSession.TextView.TextBuffer);
                     AddCommentToExistingThread(file);
+                    return file.InlineCommentThreads[0].Comments.Last();
                 });
 
             var placeholder = target.Thread.Comments.Last();
@@ -193,7 +213,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var newComments = thread.Comments.Concat(new[] { newComment }).ToList();
             thread.Comments.Returns(newComments);
             file.InlineCommentThreads.Returns(newThreads);
-            RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
+            RaiseLinesChanged(file, Tuple.Create(thread.LineNumber, DiffSide.Right));
         }
 
         IApiClientFactory CreateApiClientFactory()
@@ -271,16 +291,23 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             file.CommitSha.Returns(commitSha);
             file.Diff.Returns(new[] { diff });
             file.InlineCommentThreads.Returns(new[] { thread });
+            file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
 
             var session = Substitute.For<IPullRequestSession>();
-            session.GetFile(RelativePath).Returns(file);
-            session.GetRelativePath(FullPath).Returns(RelativePath);
             session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
 
             var result = Substitute.For<IPullRequestSessionManager>();
             result.CurrentSession.Returns(session);
+            result.GetLiveFile(RelativePath, Arg.Any<ITextView>(), Arg.Any<ITextBuffer>()).Returns(file);
+            result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(RelativePath);
 
             return result;
+        }
+
+        void RaiseLinesChanged(IPullRequestSessionFile file, params Tuple<int, DiffSide>[] lineNumbers)
+        {
+            var subject = (Subject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged;
+            subject.OnNext(lineNumbers);
         }
 
         void RaisePropertyChanged<T>(T o, string propertyName)

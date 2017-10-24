@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
+using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Helpers;
+using GitHub.InlineReviews.Models;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
 using Serilog;
@@ -67,6 +72,72 @@ namespace GitHub.InlineReviews.Services
         {
             get { return currentSession; }
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
+        }
+
+        public async Task<IPullRequestSessionFile> GetLiveFile(
+            string relativePath,
+            ITextView textView,
+            ITextBuffer textBuffer)
+        {
+            PullRequestSessionLiveFile result;
+
+            if (!textBuffer.Properties.TryGetProperty(
+                typeof(IPullRequestSessionFile),
+                out result))
+            {
+                var dispose = new CompositeDisposable();
+
+                result = new PullRequestSessionLiveFile(
+                    relativePath,
+                    textBuffer,
+                    sessionService.CreateRebuildSignal());
+
+                textBuffer.Properties.AddProperty(
+                    typeof(IPullRequestSessionFile),
+                    result);
+
+                await UpdateLiveFile(result, true);
+
+                textBuffer.Changed += TextBufferChanged;
+                textView.Closed += TextViewClosed;
+
+                dispose.Add(Disposable.Create(() =>
+                {
+                    textView.TextBuffer.Changed -= TextBufferChanged;
+                    textView.Closed -= TextViewClosed;
+                }));
+
+                dispose.Add(result.Rebuild.Subscribe(x => UpdateLiveFile(result, x).Forget()));
+
+                dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
+                    .Skip(1)
+                    .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
+                dispose.Add(this.WhenAnyObservable(x => x.CurrentSession.PullRequestChanged)
+                    .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
+
+                result.ToDispose = dispose;
+            }
+
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public string GetRelativePath(ITextBuffer buffer)
+        {
+            var document = sessionService.GetDocument(buffer);
+            var path = document?.FilePath;
+
+            if (!string.IsNullOrWhiteSpace(path) && Path.IsPathRooted(path) && repository != null)
+            {
+                var basePath = repository.LocalPath;
+
+                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                {
+                    return path.Substring(basePath.Length + 1);
+                }
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
@@ -136,7 +207,7 @@ namespace GitHub.InlineReviews.Services
 
                         if (pullRequest != null)
                         {
-                            var newSession = await GetSessionInternal(pullRequest); ;
+                            var newSession = await GetSessionInternal(pullRequest);
                             if (newSession != null) newSession.IsCheckedOut = true;
                             session = newSession;
                         }
@@ -208,6 +279,166 @@ namespace GitHub.InlineReviews.Services
                 var hostAddress = HostAddress.Create(repository.CloneUrl);
                 await hosts.LogInFromCache(hostAddress);
             }
+        }
+
+        async Task UpdateLiveFile(PullRequestSessionLiveFile file, bool rebuildThreads)
+        {
+            var session = CurrentSession;
+
+            if (session != null)
+            {
+                var mergeBase = await session.GetMergeBase();
+                var contents = sessionService.GetContents(file.TextBuffer);
+                file.BaseSha = session.PullRequest.Base.Sha;
+                file.CommitSha = await CalculateCommitSha(session, file, contents);
+                file.Diff = await sessionService.Diff(
+                    session.LocalRepository,
+                    mergeBase,
+                    session.PullRequest.Head.Sha,
+                    file.RelativePath,
+                    contents);
+
+                if (rebuildThreads)
+                {
+                    file.InlineCommentThreads = sessionService.BuildCommentThreads(
+                        session.PullRequest,
+                        file.RelativePath,
+                        file.Diff);
+                }
+                else
+                {
+                    var changedLines = sessionService.UpdateCommentThreads(
+                        file.InlineCommentThreads,
+                        file.Diff);
+
+                    if (changedLines.Count > 0)
+                    {
+                        file.NotifyLinesChanged(changedLines);
+                    }
+                }
+
+                file.TrackingPoints = BuildTrackingPoints(
+                    file.TextBuffer.CurrentSnapshot,
+                    file.InlineCommentThreads);
+            }
+            else
+            {
+                file.BaseSha = null;
+                file.CommitSha = null;
+                file.Diff = null;
+                file.InlineCommentThreads = null;
+                file.TrackingPoints = null;
+            }
+        }
+
+        async Task UpdateLiveFile(PullRequestSessionLiveFile file, ITextSnapshot snapshot)
+        {
+            if (file.TextBuffer.CurrentSnapshot == snapshot)
+            {
+                await UpdateLiveFile(file, false);
+            }
+        }
+
+        void InvalidateLiveThreads(PullRequestSessionLiveFile file, ITextSnapshot snapshot)
+        {
+            if (file.TrackingPoints != null)
+            {
+                var linesChanged = new List<Tuple<int, DiffSide>>();
+
+                foreach (var thread in file.InlineCommentThreads)
+                {
+                    ITrackingPoint trackingPoint;
+
+                    if (file.TrackingPoints.TryGetValue(thread, out trackingPoint))
+                    {
+                        var position = trackingPoint.GetPosition(snapshot);
+                        var lineNumber = snapshot.GetLineNumberFromPosition(position);
+
+                        if (thread.DiffLineType != DiffChangeType.Delete && lineNumber != thread.LineNumber)
+                        {
+                            linesChanged.Add(Tuple.Create(lineNumber, DiffSide.Right));
+                            linesChanged.Add(Tuple.Create(thread.LineNumber, DiffSide.Right));
+                            thread.LineNumber = lineNumber;
+                            thread.IsStale = true;
+                        }
+                    }
+                }
+
+                linesChanged = linesChanged
+                    .Where(x => x.Item1 >= 0)
+                    .Distinct()
+                    .ToList();
+
+                if (linesChanged.Count > 0)
+                {
+                    file.NotifyLinesChanged(linesChanged);
+                }
+            }
+        }
+
+        private IDictionary<IInlineCommentThreadModel, ITrackingPoint> BuildTrackingPoints(
+            ITextSnapshot snapshot,
+            IReadOnlyList<IInlineCommentThreadModel> threads)
+        {
+            var result = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
+
+            foreach (var thread in threads)
+            {
+                if (thread.LineNumber >= 0 && thread.DiffLineType != DiffChangeType.Delete)
+                {
+                    var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
+                    var p = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
+                    result.Add(thread, p);
+                }
+            }
+
+            return result;
+        }
+
+        async Task<string> CalculateCommitSha(
+            IPullRequestSession session,
+            IPullRequestSessionFile file,
+            byte[] content)
+        {
+            var repo = session.LocalRepository;
+            return await sessionService.IsUnmodifiedAndPushed(repo, file.RelativePath, content) ?
+                   await sessionService.GetTipSha(repo) : null;
+        }
+
+        private void CloseLiveFiles(ITextBuffer textBuffer)
+        {
+            PullRequestSessionLiveFile file;
+
+            if (textBuffer.Properties.TryGetProperty(
+                typeof(IPullRequestSessionFile),
+                out file))
+            {
+                file.Dispose();
+            }
+
+            var projection = textBuffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    CloseLiveFiles(source);
+                }
+            }
+        }
+
+        void TextBufferChanged(object sender, TextContentChangedEventArgs e)
+        {
+            var textBuffer = (ITextBuffer)sender;
+            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
+            InvalidateLiveThreads(file, e.After);
+            file.Rebuild.OnNext(textBuffer.CurrentSnapshot);
+        }
+
+        void TextViewClosed(object sender, EventArgs e)
+        {
+            var textView = (ITextView)sender;
+            CloseLiveFiles(textView.TextBuffer);
         }
     }
 }
