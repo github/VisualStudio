@@ -68,7 +68,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Could not clone {cloneUrl} to {path}", cloneUrl, path);
+                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, path);
                 throw;
             }
         }

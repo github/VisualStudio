@@ -16,7 +16,7 @@ namespace GitHub.Logging
                 "extension.log");
 
             const string outputTemplate =
-                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message}{NewLine}{Exception}";
+                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message:lj}{NewLine}{Exception}";
 
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()

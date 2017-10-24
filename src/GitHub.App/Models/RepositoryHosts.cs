@@ -149,7 +149,7 @@ namespace GitHub.Models
                     .Do(result =>
                     {
                         bool successful = result.IsSuccess();
-                        log.Information("Log in to {host} host '{ApiUri}' with username '{usernameOrEmail}' {successful}",
+                        log.Information("Log in to {Host} host '{ApiUri}' with username '{UsernameOrEmail}' {Successful}",
                             isDotCom ? "GitHub.com" : address.WebUri.Host,
                             address.ApiUri,
                             usernameOrEmail,

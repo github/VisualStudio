@@ -354,7 +354,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<IPullRequestModel, Exception>(ex =>
                 {
-                    log.Error("Error observing GetPullRequest", ex);
+                    log.Error(ex, "Error observing GetPullRequest");
                     ErrorMessage = ex.Message.Trim();
                     IsLoading = IsBusy = false;
                     return Observable.Empty<IPullRequestModel>();
@@ -464,7 +464,7 @@ namespace GitHub.ViewModels
             }
             catch (Exception ex)
             {
-                log.Error("Error loading PullRequestModel", ex);
+                log.Error(ex, "Error loading PullRequestModel");
                 ErrorMessage = ex.Message.Trim();
             }
             finally

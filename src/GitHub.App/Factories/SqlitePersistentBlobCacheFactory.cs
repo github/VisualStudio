@@ -32,7 +32,7 @@ namespace GitHub.Factories
             }
             catch(Exception ex)
             {
-                log.Error(ex, "Error while creating SQLitePersistentBlobCache for {path}.", path);
+                log.Error(ex, "Error while creating SQLitePersistentBlobCache for {Path}.", path);
                 return new InMemoryBlobCache();
             }
         }

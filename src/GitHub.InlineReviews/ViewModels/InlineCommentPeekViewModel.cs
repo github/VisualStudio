@@ -150,7 +150,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             catch (Exception e)
             {
-                log.Error("Error updating InlineCommentViewModel", e);
+                log.Error(e, "Error updating InlineCommentViewModel");
             }
         }
 

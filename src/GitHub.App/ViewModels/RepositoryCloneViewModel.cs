@@ -192,7 +192,7 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(e, "Failed to set base repository path. {@repository}",
+                    log.Error(e, "Failed to set base repository path. {@Repository}",
                         new { localBaseRepositoryPath, BaseRepositoryPath, directory });
                 }
             }, RxApp.MainThreadScheduler);

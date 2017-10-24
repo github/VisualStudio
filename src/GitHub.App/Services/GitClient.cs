@@ -81,7 +81,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif

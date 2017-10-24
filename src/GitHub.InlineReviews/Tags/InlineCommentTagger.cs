@@ -191,7 +191,7 @@ namespace GitHub.InlineReviews.Tags
 
         static void ForgetWithLogging(Task task)
         {
-            task.Catch(e => log.Error(e, "Exception caught while executing background task: {0}")).Forget();
+            task.Catch(e => log.Error(e, "Exception caught while executing background task.")).Forget();
         }
 
         void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
