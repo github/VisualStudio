@@ -20,7 +20,7 @@ namespace GitHub.Logging
 
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()
-                .MinimumLevel.Warning()
+                .MinimumLevel.Information()
                 .WriteTo.File(logPath,
                     fileSizeLimitBytes: null,
                     outputTemplate: outputTemplate)
