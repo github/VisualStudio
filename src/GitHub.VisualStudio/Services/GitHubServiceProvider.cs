@@ -289,8 +289,8 @@ namespace GitHub.VisualStudio
             {
                 if (disposed) return;
 
-                if (disposables != null)
-                    disposables.Dispose();
+                ////if (disposables != null)
+                ////    disposables.Dispose();
                 disposables = null;
                 if (tempContainer != null)
                     tempContainer.Dispose();

@@ -345,6 +345,14 @@
       <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
       <Name>GitHub.InlineReviews</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Reactive\GitHub.Services.Reactive.csproj">
+      <Project>{ba41dd43-2a7b-47c4-842c-61b259508248}</Project>
+      <Name>GitHub.Services.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services\GitHub.Services.csproj">
+      <Project>{83fa3918-7d40-417b-8afd-1afa88ac2285}</Project>
+      <Name>GitHub.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>

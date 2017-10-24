@@ -134,6 +134,7 @@
   <ItemGroup>
     <Compile Include="Exports\ExportForProcess.cs" />
     <Compile Include="GitHubLogicException.cs" />
+    <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />

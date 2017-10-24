@@ -188,6 +188,10 @@
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
       <Name>GitHub.Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Reactive\GitHub.Services.Reactive.csproj">
+      <Project>{ba41dd43-2a7b-47c4-842c-61b259508248}</Project>
+      <Name>GitHub.Services.Reactive</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>

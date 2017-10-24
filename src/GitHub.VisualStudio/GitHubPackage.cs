@@ -38,6 +38,13 @@ namespace GitHub.VisualStudio
         public GitHubPackage()
         {
             serviceProvider = this;
+
+            AppDomain.CurrentDomain.AssemblyLoad += (s, e) =>
+            {
+                if (e.LoadedAssembly.FullName.Contains("GitHub") || e.LoadedAssembly.FullName.Contains("Reactive"))
+                {
+                }
+            };
         }
 
         public GitHubPackage(IServiceProvider serviceProvider)
