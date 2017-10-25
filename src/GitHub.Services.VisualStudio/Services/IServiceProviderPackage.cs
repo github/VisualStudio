@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace GitHub.VisualStudio
+namespace GitHub.Services
 {
     public interface IServiceProviderPackage : IServiceProvider, Microsoft.VisualStudio.Shell.IAsyncServiceProvider
     {

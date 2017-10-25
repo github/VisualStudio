@@ -1,10 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Windows.Threading;
 using GitHub.Models;
 using GitHub.Settings;
 using Task = System.Threading.Tasks.Task;

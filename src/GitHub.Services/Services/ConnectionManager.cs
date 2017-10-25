@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -22,7 +21,7 @@ namespace GitHub.VisualStudio
         readonly IVSGitServices vsGitServices;
         readonly IConnectionCache cache;
         readonly ILoginManager loginManager;
-        readonly IApiClientFactory apiClientFactory;
+        readonly ISimpleApiClientFactory apiClientFactory;
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
 
@@ -31,7 +30,7 @@ namespace GitHub.VisualStudio
             IVSGitServices vsGitServices,
             IConnectionCache cache,
             ILoginManager loginManager,
-            IApiClientFactory apiClientFactory)
+            ISimpleApiClientFactory apiClientFactory)
         {
             this.vsGitServices = vsGitServices;
             this.cache = cache;

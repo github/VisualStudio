@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
-using GitHub.Services;
 using Rothko;
 using Serilog;
 
-namespace GitHub.VisualStudio
+namespace GitHub.Services
 {
     /// <summary>
     /// Loads and saves the configured connections from/to a .json file.

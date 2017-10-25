@@ -168,6 +168,10 @@
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services\GitHub.Services.csproj">
+      <Project>{83fa3918-7d40-417b-8afd-1afa88ac2285}</Project>
+      <Name>GitHub.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
       <Name>GitHub.TeamFoundation.14</Name>

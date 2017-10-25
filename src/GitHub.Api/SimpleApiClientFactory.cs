@@ -28,13 +28,19 @@ namespace GitHub.Api
             lazyWikiProbe = wikiProbe;
         }
 
-        public Task<ISimpleApiClient> Create(UriString repositoryUrl)
+        public async Task<ISimpleApiClient> Create(UriString repositoryUrl)
         {
             var hostAddress = HostAddress.Create(repositoryUrl);
             var result = cache.GetOrAdd(repositoryUrl, new SimpleApiClient(repositoryUrl,
-                new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), hostAddress.ApiUri),
+                await CreateGitHubClient(hostAddress),
                 lazyEnterpriseProbe, lazyWikiProbe));
-            return Task.FromResult(result);
+            return result;
+        }
+
+        public Task<IGitHubClient> CreateGitHubClient(HostAddress address)
+        {
+            var result = new GitHubClient(productHeader, new SimpleCredentialStore(address), address.ApiUri);
+            return Task.FromResult<IGitHubClient>(result);
         }
 
         public void ClearFromCache(ISimpleApiClient client)

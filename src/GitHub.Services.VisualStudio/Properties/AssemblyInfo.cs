@@ -2,5 +2,5 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("GitHub.Exports")]
-[assembly: AssemblyDescription("GitHub For Visual Studio Reactive Services")]
+[assembly: AssemblyDescription("GitHub For Visual Studio Integration Services")]
 

@@ -85,6 +85,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Caches\CacheIndex.cs" />
     <Compile Include="Caches\CacheItem.cs" />
     <Compile Include="Caches\ImageCache.cs" />

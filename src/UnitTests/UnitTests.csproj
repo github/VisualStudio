@@ -349,6 +349,10 @@
       <Project>{ba41dd43-2a7b-47c4-842c-61b259508248}</Project>
       <Name>GitHub.Services.Reactive</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.VisualStudio\GitHub.Services.VisualStudio.csproj">
+      <Project>{a1081b8e-6edb-429f-9e5d-29999bbcbd30}</Project>
+      <Name>GitHub.Services.VisualStudio</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Services\GitHub.Services.csproj">
       <Project>{83fa3918-7d40-417b-8afd-1afa88ac2285}</Project>
       <Name>GitHub.Services</Name>

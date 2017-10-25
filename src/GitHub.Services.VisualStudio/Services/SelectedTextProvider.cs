@@ -1,12 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.Services;
-using GitHub.Extensions;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace GitHub.VisualStudio
+namespace GitHub.Services
 {
     [Export(typeof(ISelectedTextProvider))]
     [PartCreationPolicy(CreationPolicy.NonShared)]

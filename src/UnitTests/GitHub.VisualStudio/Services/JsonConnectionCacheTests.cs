@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.VisualStudio;
 using NSubstitute;
 using Rothko;

@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Disposables;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Exports;
@@ -20,7 +19,7 @@ using GitHub.Extensions;
 using Serilog;
 using Log = GitHub.Logging.Log;
 
-namespace GitHub.VisualStudio
+namespace GitHub.Services
 {
     /// <summary>
     /// This is a thin MEF wrapper around the GitHubServiceProvider
@@ -89,7 +88,7 @@ namespace GitHub.VisualStudio
         }
 
         static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
-        CompositeDisposable disposables = new CompositeDisposable();
+        List<IDisposable> disposables = new List<IDisposable>();
         readonly IServiceProviderPackage asyncServiceProvider;
         readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
