@@ -101,6 +101,7 @@
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\RemoteRepositoryModel.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
+    <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\EnterpriseProbe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\GistPublishService.cs" />

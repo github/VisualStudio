@@ -1,4 +1,5 @@
-﻿using GitHub.Settings;
+﻿using GitHub.Services;
+using GitHub.Settings;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
 using System;
@@ -24,7 +25,7 @@ namespace GitHub.VisualStudio
         protected override void OnActivate(CancelEventArgs e)
         {
             base.OnActivate(e);
-            packageSettings = Services.DefaultExportProvider.GetExportedValue<IPackageSettings>();
+            packageSettings = ServiceHelper.DefaultExportProvider.GetExportedValue<IPackageSettings>();
             LoadSettings();
         }
 

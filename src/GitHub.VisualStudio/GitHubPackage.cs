@@ -167,7 +167,7 @@ namespace GitHub.VisualStudio
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
         {
             IVsWindowFrame frame;
-            if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
+            if (ErrorHandler.Failed(ServiceHelper.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
             {
                 log.Error("Unable to find or create GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);

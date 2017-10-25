@@ -3,8 +3,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using GitHub.Logging;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
@@ -20,7 +20,7 @@ namespace GitHub.VisualStudio
         public ActiveDocumentSnapshot([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             StartLine = EndLine = -1;
-            var document = Services.Dte2?.ActiveDocument;
+            var document = ServiceHelper.Dte2?.ActiveDocument;
             Name = document.FullName.Equals(document.ProjectItem.FileNames[1], StringComparison.OrdinalIgnoreCase) ? document.ProjectItem.FileNames[1] : document.FullName;
 
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;

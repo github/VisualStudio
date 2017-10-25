@@ -10,8 +10,10 @@ namespace GitHub.Extensions
     {
         public static bool HasCommits(this ILocalRepositoryModel repository)
         {
-            var repo = GitService.GitServiceHelper.GetRepository(repository.LocalPath);
-            return repo?.Commits.Any() ?? false;
+            // TODO: Move this to GitClient.
+            return true;
+            //var repo = GitService.GitServiceHelper.GetRepository(repository.LocalPath);
+            //return repo?.Commits.Any() ?? false;
         }
 
         public static bool MightContainSolution(this ILocalRepositoryModel repository)

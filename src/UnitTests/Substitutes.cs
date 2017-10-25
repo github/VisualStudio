@@ -109,7 +109,7 @@ namespace UnitTests
             cc.ComposeExportedValue(gitservice);
             ((IComponentModel)cm).DefaultExportProvider.Returns(cc);
             ret.GetService(typeof(SComponentModel)).Returns(cm);
-            Services.UnitTestServiceProvider = ret;
+            ServiceHelper.UnitTestServiceProvider = ret;
 
             var os = OperatingSystem;
             var vsgit = IVSGitServices;

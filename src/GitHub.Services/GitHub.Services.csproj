@@ -65,7 +65,11 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Models\LocalRepositoryModel.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
+    <Compile Include="Services\EnterpriseProbeTask.cs" />
+    <Compile Include="Services\ExportFactoryProvider.cs" />
+    <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\UsageTracker.cs" />

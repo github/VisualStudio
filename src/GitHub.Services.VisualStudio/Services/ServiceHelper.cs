@@ -2,8 +2,6 @@
 using EnvDTE;
 using EnvDTE80;
 using GitHub.Info;
-using GitHub.Primitives;
-using GitHub.Services;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -11,9 +9,9 @@ using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 
-namespace GitHub.VisualStudio
+namespace GitHub.Services
 {
-    public static class Services
+    public static class ServiceHelper
     {
         /// <summary>
         /// Gets a service provider which can be used by unit tests to inject services.
@@ -98,16 +96,6 @@ namespace GitHub.VisualStudio
         public static IVsSolution GetSolution(this IServiceProvider provider)
         {
             return GetGlobalService<SVsSolution, IVsSolution>(provider);
-        }
-
-        public static UriString GetRepoUrlFromSolution(IVsSolution solution)
-        {
-            string solutionDir, solutionFile, userFile;
-            if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
-                return null;
-            if (solutionDir == null)
-                return null;
-            return GitService.GitServiceHelper.GetUri(solutionDir);
         }
 
         /// <summary>

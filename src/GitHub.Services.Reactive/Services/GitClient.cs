@@ -17,15 +17,19 @@ namespace GitHub.Services
     {
         const string defaultOriginName = "origin";
         static readonly ILogger log = LogManager.ForContext<GitClient>();
+        readonly IGitService gitService;
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
 
         [ImportingConstructor]
-        public GitClient(IGitHubCredentialProvider credentialProvider)
+        public GitClient(
+            IGitHubCredentialProvider credentialProvider,
+            IGitService gitService)
         {
             Guard.ArgumentNotNull(credentialProvider, nameof(credentialProvider));
 
+            this.gitService = gitService;
             pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             pullOptions = new PullOptions
@@ -337,7 +341,7 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
+                var uri = gitService.GetRemoteUri(repo, remote);
                 var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
                 var ret = repo.Network.Remotes[remoteName];
                 if (ret == null)

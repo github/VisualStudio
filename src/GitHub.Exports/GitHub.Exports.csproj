@@ -177,13 +177,10 @@
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
     <Compile Include="Models\RepositoryModel.cs" />
-    <Compile Include="Models\LocalRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Primitives\RelayCommand.cs" />
     <Compile Include="Primitives\UriStringConverter.cs" />
-    <Compile Include="Services\Connection.cs" />
-    <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />
     <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Services\IGitService.cs" />
@@ -200,7 +197,6 @@
     <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
-    <Compile Include="Services\Services.cs" />
     <Compile Include="Services\StatusBarNotificationService.cs" />
     <Compile Include="Models\IConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -212,7 +208,6 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
-    <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -242,8 +237,6 @@
     <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />
     <Compile Include="Primitives\UriString.cs" />
-    <Compile Include="Services\EnterpriseProbeTask.cs" />
-    <Compile Include="Services\ExportFactoryProvider.cs" />
     <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IGitHubServiceProvider.cs" />

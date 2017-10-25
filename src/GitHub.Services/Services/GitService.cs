@@ -71,8 +71,6 @@ namespace GitHub.Services
                 ?.Url;
         }
 
-        public static IGitService GitServiceHelper => VisualStudio.Services.DefaultExportProvider.GetExportedValueOrDefault<IGitService>() ?? new GitService();
-
         /// <summary>
         /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
         /// been found in any remote branches or the current local branch. 
