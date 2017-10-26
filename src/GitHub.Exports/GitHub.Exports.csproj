@@ -145,9 +145,7 @@
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
-    <Compile Include="..\..\script\src\MetricsService.cs" Condition="$(Buildtype) == 'Internal'">
-      <Link>Services\MetricsService.cs</Link>
-    </Compile>
+    <Compile Include="Services\MetricsService.cs" />
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
