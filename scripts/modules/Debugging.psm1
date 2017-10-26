@@ -1,8 +1,8 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$scriptsDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
-$cdb = Join-Path $scriptsDirectory "Debugging Tools for Windows\cdb.exe"
+$rootDirectory = Split-Path (Split-Path (Split-Path $MyInvocation.MyCommand.Path))
+$cdb = Join-Path $rootDirectory "tools\Debugging Tools for Windows\cdb.exe"
 
 function Get-DotNetStack([int]$ProcessId) {
     $commands = @(
