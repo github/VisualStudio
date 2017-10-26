@@ -20,9 +20,7 @@ install:
 
     nuget restore GitHubVS.sln
 build_script:
-- cmd: msbuild "GitHubVS.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0
+- ps: scripts\build.ps1
 test_script:
 - ps: >-
-    scripts\Run-Nunit.ps1 TrackingCollectionTests 180 Release -AppVeyor
-
-    scripts\Run-Xunit.ps1 UnitTests 180 Release -AppVeyor
+    scripts\Run-Tests.ps1 -AppVeyor

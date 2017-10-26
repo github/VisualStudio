@@ -27,7 +27,7 @@ if (!$git) {
   throw "Couldn't find installed an git.exe"
 }
 
-$nuget = Join-Path $rootDirectory "script\nuget\nuget.exe"
+$nuget = Join-Path $rootDirectory "tools\nuget\nuget.exe"
 
 function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet, [switch]$DontDie) {
     $output = ""
