@@ -24,6 +24,7 @@ Param(
     [string]
     $Config = "Release"
     ,
+    [switch]
     $RunTests = $false
 )
 
