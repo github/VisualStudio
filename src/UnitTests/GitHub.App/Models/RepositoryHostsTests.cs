@@ -153,7 +153,7 @@ namespace UnitTests.GitHub.App.Models
 
             result.Connections.Returns(connections);
 
-            result.LogIn(null, null, null).ReturnsForAnyArgs(x =>
+            Func<NSubstitute.Core.CallInfo, Task<IConnection>> login = async x =>
             {
                 var hostAddress = x.Arg<HostAddress>();
 
@@ -167,9 +167,17 @@ namespace UnitTests.GitHub.App.Models
                     x.ArgAt<string>(1),
                     null,
                     null);
+
+                if (result.ConnectionCreated != null)
+                {
+                    await result.ConnectionCreated(connection);
+                }
+
                 connections.Add(connection);
                 return connection;
-            });
+            };
+
+            result.LogIn(null, null, null).ReturnsForAnyArgs(login);
 
             result.LogOut(null).ReturnsForAnyArgs(x =>
             {
