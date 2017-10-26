@@ -62,7 +62,7 @@ Build-Solution GitHubVs.sln "Build" $config
 $exitCode = 0
 
 if ($RunTests) {
-    .\Run-Tests $Config
+    scripts\Run-Tests $Config
 }
 
 Pop-Location
