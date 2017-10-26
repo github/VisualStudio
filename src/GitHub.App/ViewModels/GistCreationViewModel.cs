@@ -13,6 +13,7 @@ using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels
 {
@@ -30,14 +31,14 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         GistCreationViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IConnection connection,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
             INotificationService notificationService,
             IUsageTracker usageTracker)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService, usageTracker)
+            : this(connection, selectedTextProvider, gistPublishService, usageTracker)
         {
-            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
             Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
             Guard.ArgumentNotNull(notificationService, nameof(notificationService));
@@ -47,12 +48,12 @@ namespace GitHub.ViewModels
         }
 
         public GistCreationViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
             IUsageTracker usageTracker)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
             Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));

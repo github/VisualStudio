@@ -16,8 +16,8 @@ namespace GitHub.ViewModels
     public class LoginToGitHubViewModel : LoginTabViewModel, ILoginToGitHubViewModel
     {
         [ImportingConstructor]
-        public LoginToGitHubViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
-            : base(repositoryHosts, browser)
+        public LoginToGitHubViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+            : base(connectionManager, browser)
         {
             BaseUri = HostAddress.GitHubDotComHostAddress.WebUri;
 

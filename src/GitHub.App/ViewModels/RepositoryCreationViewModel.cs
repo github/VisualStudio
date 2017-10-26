@@ -21,6 +21,7 @@ using Octokit;
 using ReactiveUI;
 using Rothko;
 using GitHub.Collections;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels
 {
@@ -32,7 +33,7 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
-        readonly IRepositoryHost repositoryHost;
+        readonly IConnection connection;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -41,30 +42,22 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         RepositoryCreationViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
-            IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService,
-            IUsageTracker usageTracker)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, usageTracker)
-        {}
-
-        public RepositoryCreationViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
             IOperatingSystem operatingSystem,
             IRepositoryCreationService repositoryCreationService,
             IUsageTracker usageTracker)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
             Guard.ArgumentNotNull(repositoryCreationService, nameof(repositoryCreationService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
-            this.repositoryHost = repositoryHost;
+            this.connection = connection;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
             this.usageTracker = usageTracker;
 
-            Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, connection.HostAddress.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
 

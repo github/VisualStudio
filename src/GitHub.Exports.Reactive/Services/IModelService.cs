@@ -4,6 +4,7 @@ using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
+using GitHub.Api;
 
 namespace GitHub.Services
 {

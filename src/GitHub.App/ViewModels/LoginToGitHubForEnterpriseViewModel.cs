@@ -20,9 +20,10 @@ namespace GitHub.ViewModels
     public class LoginToGitHubForEnterpriseViewModel : LoginTabViewModel, ILoginToGitHubForEnterpriseViewModel
     {
         [ImportingConstructor]
-        public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IVisualStudioBrowser browser) : base(hosts, browser)
+        public LoginToGitHubForEnterpriseViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+            : base(connectionManager, browser)
         {
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(browser, nameof(browser));
 
             EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)

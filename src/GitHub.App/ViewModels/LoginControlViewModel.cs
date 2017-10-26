@@ -7,6 +7,7 @@ using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -17,12 +18,12 @@ namespace GitHub.ViewModels
     {
         [ImportingConstructor]
         public LoginControlViewModel(
-            IRepositoryHosts hosts,
+            IConnectionManager connectionManager,
             ILoginToGitHubViewModel loginToGitHubViewModel,
             ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
         {
             Title = Resources.LoginTitle;
-            RepositoryHosts = hosts;
+            ConnectionManager = connectionManager;
             GitHubLogin = loginToGitHubViewModel;
             EnterpriseLogin = loginToGitHubEnterpriseViewModel;
 
@@ -66,11 +67,11 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref githubEnterprise, value); }
         }
 
-        IRepositoryHosts repositoryHosts;
-        public IRepositoryHosts RepositoryHosts
+        IConnectionManager connectionManager;
+        public IConnectionManager ConnectionManager
         {
-            get { return repositoryHosts; }
-            set { this.RaiseAndSetIfChanged(ref repositoryHosts, value); }
+            get { return connectionManager; }
+            set { this.RaiseAndSetIfChanged(ref connectionManager, value); }
         }
 
         readonly ObservableAsPropertyHelper<LoginMode> loginMode;

@@ -59,7 +59,7 @@ namespace GitHub.ViewModels
         /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IConnection connection,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,

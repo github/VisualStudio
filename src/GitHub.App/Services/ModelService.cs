@@ -33,7 +33,10 @@ namespace GitHub.Services
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
 
-        public ModelService(IApiClient apiClient, IBlobCache hostCache, IAvatarProvider avatarProvider)
+        public ModelService(
+            IApiClient apiClient,
+            IBlobCache hostCache,
+            IAvatarProvider avatarProvider)
         {
             this.apiClient = apiClient;
             this.hostCache = hostCache;

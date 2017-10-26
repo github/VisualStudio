@@ -243,49 +243,6 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public sealed class RepositoryHostDesigner : ReactiveObject, IRepositoryHost
-    {
-        public RepositoryHostDesigner(string title)
-        {
-            this.Title = title;
-        }
-
-        public HostAddress Address
-        {
-            get;
-            private set;
-        }
-
-        public IApiClient ApiClient
-        {
-            get;
-            private set;
-        }
-
-        public bool IsLoggedIn
-        {
-            get;
-            private set;
-        }
-
-        public IModelService ModelService
-        {
-            get;
-            private set;
-        }
-
-        public string Title
-        {
-            get;
-            private set;
-        }
-
-        public void Dispose()
-        {
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
     public static class RepositoryModelDesigner
     {
         public static IRemoteRepositoryModel Create(string name = null, string owner = null)

@@ -98,7 +98,6 @@ namespace GitHub.Controllers
 
         readonly IUIFactory factory;
         readonly IGitHubServiceProvider gitHubServiceProvider;
-        readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
@@ -140,7 +139,6 @@ namespace GitHub.Controllers
 
         public UIController(IGitHubServiceProvider serviceProvider)
             : this(serviceProvider,
-                   serviceProvider.TryGetService<IRepositoryHosts>(),
                    serviceProvider.TryGetService<IUIFactory>(),
                    serviceProvider.TryGetService<IConnectionManager>())
         {
@@ -148,17 +146,15 @@ namespace GitHub.Controllers
         }
 
         public UIController(IGitHubServiceProvider gitHubServiceProvider,
-            IRepositoryHosts hosts, IUIFactory factory,
+            IUIFactory factory,
             IConnectionManager connectionManager)
         {
             Guard.ArgumentNotNull(gitHubServiceProvider, nameof(gitHubServiceProvider));
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
 
             this.factory = factory;
             this.gitHubServiceProvider = gitHubServiceProvider;
-            this.hosts = hosts;
             this.connectionManager = connectionManager;
 
 #if DEBUG
@@ -220,7 +216,7 @@ namespace GitHub.Controllers
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
                     Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
-                hosts.EnsureInitialized().ToObservable()
+                connectionManager.GetLoadedConnections().ToObservable()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
                     {
@@ -231,7 +227,7 @@ namespace GitHub.Controllers
             else
             {
                 connectionManager
-                    .GetLoggedInConnections(hosts)
+                    .GetLoggedInConnections()
                     .FirstOrDefaultAsync()
                     .Select(c =>
                     {

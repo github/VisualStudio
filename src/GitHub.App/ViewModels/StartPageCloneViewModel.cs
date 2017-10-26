@@ -32,24 +32,17 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         StartPageCloneViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
-            IRepositoryCloneService repositoryCloneService,
-            IOperatingSystem operatingSystem)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem)
-        { }
-
-        public StartPageCloneViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(cloneService, nameof(cloneService));
             Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
 
             this.operatingSystem = operatingSystem;
 
-            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, connection.HostAddress.Title);
 
             var baseRepositoryPath = this.WhenAny(
                 x => x.BaseRepositoryPath,

@@ -102,10 +102,8 @@
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
-    <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
-    <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Models\PullRequestTextBufferInfo.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />
@@ -154,8 +152,6 @@
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
     <Compile Include="Authentication\IDelegatingTwoFactorChallengeHandler.cs" />
-    <Compile Include="Factories\IRepositoryHostFactory.cs" />
-    <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />

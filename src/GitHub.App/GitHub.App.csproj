@@ -183,9 +183,6 @@
     <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Infrastructure\ExportWrappers.cs" />
     <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
-    <Compile Include="Models\RepositoryHost.cs" />
-    <Compile Include="Models\RepositoryHosts.cs" />
     <Compile Include="Models\RemoteRepositoryModel.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Api\ApiClient.cs" />
@@ -209,7 +206,6 @@
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
     <Compile Include="ViewModels\PanePageViewModelBase.cs" />
     <Compile Include="ViewModels\DialogViewModelBase.cs" />
-    <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\NotAGitHubRepositoryViewModel.cs" />

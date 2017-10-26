@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Authentication;
@@ -23,12 +24,12 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
+        protected LoginTabViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
         {
-            Guard.ArgumentNotNull(repositoryHosts, nameof(repositoryHosts));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(browser, nameof(browser));
 
-            RepositoryHosts = repositoryHosts;
+            ConnectionManager = connectionManager;
 
             UsernameOrEmailValidator = ReactivePropertyValidator.For(this, x => x.UsernameOrEmail)
                 .IfNullOrEmpty(Resources.UsernameOrEmailValidatorEmpty)
@@ -76,7 +77,7 @@ namespace GitHub.ViewModels
                 return Observable.Return(Unit.Default);
             });
         }
-        protected IRepositoryHosts RepositoryHosts { get; }
+        protected IConnectionManager ConnectionManager { get; }
         protected abstract Uri BaseUri { get; }
         public IReactiveCommand<Unit> SignUp { get; }
 
@@ -142,7 +143,9 @@ namespace GitHub.ViewModels
             return Observable.Defer(() =>
             {
                 return hostAddress != null ?
-                    RepositoryHosts.LogIn(hostAddress, UsernameOrEmail, Password)
+                    ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password)
+                        .ToObservable()
+                        .Select(_ => AuthenticationResult.Success)
                     : Observable.Return(AuthenticationResult.CredentialFailure);
             })
             .ObserveOn(RxApp.MainThreadScheduler)

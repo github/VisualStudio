@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly IRepositoryHost repositoryHost;
+        readonly IConnection connection;
         readonly ILocalRepositoryModel localRepository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
@@ -38,30 +38,30 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         PullRequestListViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IConnection connection,
             ITeamExplorerServiceHolder teservice,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, visualStudioBrowser)
+            : this(connection, teservice.ActiveRepo, settings, visualStudioBrowser)
         {
-            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
             Guard.ArgumentNotNull(settings, nameof(settings));
         }
 
         public PullRequestListViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
             ILocalRepositoryModel repository,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotNull(settings, nameof(settings));
             Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
 
             constructing = true;
-            this.repositoryHost = repositoryHost;
+            this.connection = connection;
             this.localRepository = repository;
             this.settings = settings;
             this.visualStudioBrowser = visualStudioBrowser;

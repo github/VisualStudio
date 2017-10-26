@@ -31,7 +31,7 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly IRepositoryHost repositoryHost;
+        readonly IConnection connection;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         bool noRepositoriesFound;
@@ -41,26 +41,18 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         RepositoryCloneViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
-            IRepositoryCloneService repositoryCloneService,
-            IOperatingSystem operatingSystem)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem)
-        { }
-
-
-        public RepositoryCloneViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(cloneService, nameof(cloneService));
             Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
 
-            this.repositoryHost = repositoryHost;
+            this.connection = connection;
             this.operatingSystem = operatingSystem;
 
-            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, connection.HostAddress.Title);
 
             Repositories = new TrackingCollection<IRemoteRepositoryModel>();
             repositories.ProcessingDelay = TimeSpan.Zero;
