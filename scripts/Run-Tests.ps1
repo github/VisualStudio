@@ -63,3 +63,4 @@ if ($result.ExitCode -eq 0) {
 }
 
 Pop-Location
+exit $exitCode
