@@ -18,6 +18,11 @@ namespace GitHub.Validation
 {
     public class ReactivePropertyValidationResult
     {
+        static ReactivePropertyValidationResult()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         /// <summary>
         /// Describes if the property passes validation
         /// </summary>
@@ -72,6 +77,11 @@ namespace GitHub.Validation
 
     public abstract class ReactivePropertyValidator : ReactiveObject, IDisposable
     {
+        static ReactivePropertyValidator()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         public static ReactivePropertyValidator<TProp> For<TObj, TProp>(TObj This, Expression<Func<TObj, TProp>> property)
         {
             return new ReactivePropertyValidator<TObj, TProp>(This, property);
@@ -257,6 +267,11 @@ namespace GitHub.Validation
 
     public static class ReactivePropertyValidatorExtensions
     {
+        static ReactivePropertyValidatorExtensions()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         public static ReactivePropertyValidator<string> IfMatch(this ReactivePropertyValidator<string> This, string pattern, string errorMessage)
         {
             var regex = new Regex(pattern);

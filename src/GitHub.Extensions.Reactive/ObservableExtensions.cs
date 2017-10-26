@@ -13,6 +13,11 @@ namespace GitHub.Extensions.Reactive
 {
     public static class ObservableExtensions
     {
+        static ObservableExtensions()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         public static IObservable<T> WhereNotNull<T>(this IObservable<T> observable) where T : class
         {
             return observable.Where(item => item != null);

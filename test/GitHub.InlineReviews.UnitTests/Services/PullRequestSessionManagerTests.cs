@@ -85,10 +85,15 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
 
             [Fact]
-            public void CurrentSessionChangesWhenBranchChanges()
+            public async Task CurrentSessionChangesWhenBranchChanges()
             {
                 var service = CreatePullRequestService();
-                var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
+                var gitExt = Substitute.For<IVSGitExt>();
+                var activeRepos = new List<ILocalRepositoryModel>();
+                var repo = CreateRepositoryModel();
+                activeRepos.Add(repo);
+                gitExt.ActiveRepositories.Returns(activeRepos);
+                var teService = new FakeTeamExplorerServiceHolder(gitExt);
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
@@ -98,15 +103,21 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var session = target.CurrentSession;
 
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
-                teService.NotifyActiveRepoChanged();
+                gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
+                await Task.Delay(10); // need to wait because https://github.com/github/VisualStudio/blob/a62b02c3d3cf6d1236b9ea59f8ea3f1b3ff7dfe3/src/GitHub.InlineReviews/Services/PullRequestSessionManager.cs#L64 doesn't
 
                 Assert.NotSame(session, target.CurrentSession);
             }
 
             [Fact]
-            public void CurrentSessionChangesWhenRepoChanged()
+            public async Task CurrentSessionChangesWhenRepoChanged()
             {
-                var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
+                var gitExt = Substitute.For<IVSGitExt>();
+                var activeRepos = new List<ILocalRepositoryModel>();
+                activeRepos.Add(CreateRepositoryModel());
+                gitExt.ActiveRepositories.Returns(activeRepos);
+                var teService = new FakeTeamExplorerServiceHolder(gitExt);
+
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
@@ -115,15 +126,24 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var session = target.CurrentSession;
 
-                teService.ActiveRepo = CreateRepositoryModel("https://github.com/owner/other");
+                activeRepos.Clear();
+                activeRepos.Add(CreateRepositoryModel("https://github.com/owner/other"));
+                gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
+                await Task.Delay(10); // need to wait because https://github.com/github/VisualStudio/blob/a62b02c3d3cf6d1236b9ea59f8ea3f1b3ff7dfe3/src/GitHub.InlineReviews/Services/PullRequestSessionManager.cs#L64 doesn't
 
                 Assert.NotSame(session, target.CurrentSession);
             }
 
             [Fact]
-            public void RepoChangedDoesntCreateNewSessionIfNotNecessary()
+            public async Task RepoChangedDoesntCreateNewSessionIfNotNecessary()
             {
-                var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
+                var gitExt = Substitute.For<IVSGitExt>();
+                var activeRepos = new List<ILocalRepositoryModel>();
+                var repo = CreateRepositoryModel();
+                activeRepos.Add(repo);
+                gitExt.ActiveRepositories.Returns(activeRepos);
+                var teService = new FakeTeamExplorerServiceHolder(gitExt);
+
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
@@ -131,24 +151,30 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     teService);
 
                 var session = target.CurrentSession;
-
-                teService.NotifyActiveRepoChanged();
+                gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
+                await Task.Delay(10); // need to wait because https://github.com/github/VisualStudio/blob/a62b02c3d3cf6d1236b9ea59f8ea3f1b3ff7dfe3/src/GitHub.InlineReviews/Services/PullRequestSessionManager.cs#L64 doesn't
 
                 Assert.Same(session, target.CurrentSession);
             }
 
             [Fact]
-            public void RepoChangedHandlesNullRepository()
+            public async Task RepoChangedHandlesNullRepository()
             {
-                var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
+                var gitExt = Substitute.For<IVSGitExt>();
+                var activeRepos = new List<ILocalRepositoryModel>();
+                activeRepos.Add(CreateRepositoryModel());
+                gitExt.ActiveRepositories.Returns(activeRepos);
+                var teService = new FakeTeamExplorerServiceHolder(gitExt);
+
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
                     CreateRepositoryHosts(),
                     teService);
 
-                teService.ActiveRepo = null;
-
+                activeRepos.Clear();
+                gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
+                await Task.Delay(10); // need to wait because https://github.com/github/VisualStudio/blob/a62b02c3d3cf6d1236b9ea59f8ea3f1b3ff7dfe3/src/GitHub.InlineReviews/Services/PullRequestSessionManager.cs#L64 doesn't
                 Assert.Null(target.CurrentSession);
             }
 
@@ -161,6 +187,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRepositoryHosts(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
+                Assert.NotNull(target.CurrentSession);
                 Assert.Equal("this-owner", target.CurrentSession.RepositoryOwner);
             }
         }
@@ -296,16 +323,21 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Fact]
             public async Task MovingToNoRepositoryShouldNullOutProperties()
             {
+                var gitExt = Substitute.For<IVSGitExt>();
+                var activeRepos = new List<ILocalRepositoryModel>();
+                activeRepos.Add(CreateRepositoryModel());
+                gitExt.ActiveRepositories.Returns(activeRepos);
+                var teService = new FakeTeamExplorerServiceHolder(gitExt);
+
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 var threads = new List<IInlineCommentThreadModel>();
-                var teHolder = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
 
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(),
                     CreateRepositoryHosts(),
-                    teHolder);
+                    teService);
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
@@ -321,7 +353,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.NotNull(file.InlineCommentThreads);
                 Assert.NotNull(file.TrackingPoints);
 
-                teHolder.ActiveRepo = null;
+                activeRepos.Clear();
+                gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
 
                 Assert.Null(file.BaseSha);
                 Assert.Null(file.CommitSha);

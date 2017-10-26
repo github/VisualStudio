@@ -8,6 +8,7 @@ using NSubstitute;
 using Xunit;
 using GitHub.Primitives;
 using System.Collections.Generic;
+using GitHub.Api;
 
 public class GitClientTests
 {
@@ -25,7 +26,7 @@ public class GitClientTests
             repo.Head.Returns(Substitute.For<Branch>());
             var treeEntry = null as TreeEntry;
             repo.Head[path].Returns(treeEntry);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             var modified = await gitClient.IsModified(repo, path, null);
 
@@ -41,7 +42,7 @@ public class GitClientTests
             repo.Head.Returns(Substitute.For<Branch>());
             var treeEntry = null as TreeEntry;
             repo.Head[path].Returns(treeEntry);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             var modified = await gitClient.IsModified(repo, path, null);
 
@@ -59,7 +60,7 @@ public class GitClientTests
             treeEntry.TargetType.Returns(TreeEntryTargetType.GitLink);
             treeEntry.Target.Returns(Substitute.For<GitLink>());
             repo.Head[path].Returns(treeEntry);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             var modified = await gitClient.IsModified(repo, path, null);
 
@@ -85,7 +86,7 @@ public class GitClientTests
             changes.LinesAdded.Returns(linesAdded);
             changes.LinesDeleted.Returns(linesDeleted);
             repo.Diff.Compare(null, null).ReturnsForAnyArgs(changes);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             var modified = await gitClient.IsModified(repo, path, null);
 
@@ -101,7 +102,7 @@ public class GitClientTests
         [InlineData(null, false)]
         public async Task IsHeadPushed(int? aheadBy, bool expected)
         {
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
             var repository = MockTrackedBranchRepository(aheadBy);
 
             var isHeadPushed = await gitClient.IsHeadPushed(repository);
@@ -132,7 +133,7 @@ public class GitClientTests
             var repository = Substitute.For<IRepository>();
             repository.Head.Returns(head);
             repository.Network.Remotes["origin"].Returns(origin);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             await gitClient.Push(repository, "master", "origin");
 
@@ -143,7 +144,7 @@ public class GitClientTests
         public async Task DoesNotPushEmptyRepository()
         {
             var repository = Substitute.For<IRepository>();
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             await gitClient.Push(repository, "master", "origin");
 
@@ -160,7 +161,7 @@ public class GitClientTests
             var config = Substitute.For<Configuration>();
             var repository = Substitute.For<IRepository>();
             repository.Config.Returns(config);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             await gitClient.SetRemote(repository, "origin", new Uri("https://github.com/foo/bar"));
 
@@ -186,7 +187,7 @@ public class GitClientTests
             branches["refs/heads/master"].Returns(localBranch);
             branches["refs/remotes/origin/master"].Returns(remoteBranch);
 
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             await gitClient.SetTrackingBranch(repository, "master", "origin");
 
@@ -204,7 +205,7 @@ public class GitClientTests
             var repo = Substitute.For<IRepository>();
             var uri = new UriString(repoUrl);
             var refSpec = "refSpec";
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
             var expectUrl = UriString.ToUriString(uri.ToRepositoryUrl());
 
             await gitClient.Fetch(repo, uri, refSpec);
@@ -224,7 +225,7 @@ public class GitClientTests
             repo.Network.Remotes["origin"].Returns(remote);
             var fetchUri = new UriString(fetchUrl);
             var refSpec = "refSpec";
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             await gitClient.Fetch(repo, fetchUri, refSpec);
 
@@ -251,7 +252,7 @@ public class GitClientTests
             var baseRef = "master";
             var pullNumber = 0;
             var repo = MockRepo(baseSha, headSha, expectMergeBaseSha);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, targetCloneUrl, baseSha, headSha, baseRef, pullNumber);
 
@@ -272,7 +273,7 @@ public class GitClientTests
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);
             var remote = Substitute.For<Remote>();
             repo.Network.Remotes.Add(null, null).ReturnsForAnyArgs(remote);
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             try
             {
@@ -294,7 +295,7 @@ public class GitClientTests
         {
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);
             var targetCloneUri = new UriString("https://github.com/owner/repo");
-            var gitClient = new GitClient(Substitute.For<IGitHubCredentialProvider>());
+            var gitClient = new GitClient(SecureCredential.Anonymous);
 
             try
             {

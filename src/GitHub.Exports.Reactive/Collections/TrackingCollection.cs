@@ -167,6 +167,13 @@ namespace GitHub.Collections
     public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IDisposable
         where T : class, ICopyable<T>
     {
+
+        static TrackingCollection()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
+
         enum TheAction
         {
             None,

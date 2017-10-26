@@ -15,6 +15,7 @@ namespace GitHub.Api
         public UriString OriginalUrl { get; }
 
         readonly IGitHubClient client;
+        public IGitHubClient GitHubClient { get { return client; } }
         readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);

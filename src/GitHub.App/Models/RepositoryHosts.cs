@@ -21,6 +21,12 @@ namespace GitHub.Models
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryHosts : ReactiveObject, IRepositoryHosts
     {
+
+        static RepositoryHosts()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
         public static DisconnectedRepositoryHost DisconnectedRepositoryHost = new DisconnectedRepositoryHost();

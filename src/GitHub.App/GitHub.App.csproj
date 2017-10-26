@@ -150,7 +150,6 @@
     <Compile Include="Caches\ImageCache.cs" />
     <Compile Include="Controllers\NavigationController.cs" />
     <Compile Include="Extensions\AkavacheExtensions.cs" />
-    <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
@@ -174,10 +173,8 @@
     <Compile Include="Services\GitHubCredentialProvider.cs" />
     <Compile Include="Services\IGitHubCredentialProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
-    <Compile Include="Services\GitClient.cs" />
     <Compile Include="Services\ModelService.cs" />
     <Compile Include="Services\PullRequestService.cs" />
-    <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Caches\CredentialCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

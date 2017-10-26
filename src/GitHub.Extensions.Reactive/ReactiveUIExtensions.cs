@@ -12,6 +12,11 @@ namespace GitHub.Extensions
 {
     public static class ReactiveUIExtensions
     {
+        static ReactiveUIExtensions()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         /// <summary>
         /// Syntactic sugar/convenience overload for the real RxUI onewaybind allowing one to specify
         /// conversion hint as a BooleanVisibilityHint without specifying it as a named parameter.

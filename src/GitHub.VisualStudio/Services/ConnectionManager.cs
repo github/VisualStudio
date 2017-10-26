@@ -2,11 +2,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -20,7 +18,7 @@ namespace GitHub.VisualStudio
         readonly IVSGitServices vsGitServices;
         readonly IConnectionCache cache;
         readonly ILoginManager loginManager;
-        readonly IApiClientFactory apiClientFactory;
+        readonly ISimpleApiClientFactory apiClientFactory;
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
 
@@ -29,7 +27,7 @@ namespace GitHub.VisualStudio
             IVSGitServices vsGitServices,
             IConnectionCache cache,
             ILoginManager loginManager,
-            IApiClientFactory apiClientFactory)
+            ISimpleApiClientFactory apiClientFactory)
         {
             this.vsGitServices = vsGitServices;
             this.cache = cache;
@@ -111,7 +109,7 @@ namespace GitHub.VisualStudio
                 {
                     // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
                     if (DoLogin == null)
-                        Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
+                        SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
                     c.Dispose();
                 }
             }
@@ -123,12 +121,12 @@ namespace GitHub.VisualStudio
         {
             foreach (var c in await cache.Load())
             {
-                var client = await apiClientFactory.CreateGitHubClient(c.HostAddress);
+                var client = await apiClientFactory.Create(UriString.ToUriString(c.HostAddress.WebUri));
                 var addConnection = true;
 
                 try
                 {
-                    await loginManager.LoginFromCache(c.HostAddress, client);
+                    await loginManager.LoginFromCache(c.HostAddress, client.GitHubClient);
                 }
                 catch (Octokit.ApiException e)
                 {

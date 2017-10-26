@@ -153,14 +153,14 @@ public class LoginManagerTests
                 new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(loginCache, tfa, "id", "secret");
-            Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
+            await Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
                 "id",
                 "secret",
                 Arg.Any<NewAuthorization>(),
                 "111111");
-            tfa.Received(1).ChallengeFailed(loginAttemptsException);
+            await tfa.Received(1).ChallengeFailed(loginAttemptsException);
         }
 
         [Fact]

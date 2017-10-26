@@ -20,7 +20,7 @@ public class RepositoryCloneServiceTests
             await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
 
             operatingSystem.Directory.Received().CreateDirectory(@"c:\dev\bar");
-            vsGitServices.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", true);
+            await vsGitServices.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", true);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ public class RepositoryCloneServiceTests
 
             await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
 
-            usageTracker.Received().IncrementCloneCount();
+            await usageTracker.Received().IncrementCloneCount();
         }
     }
 }

@@ -15,6 +15,11 @@ namespace GitHub.Validation
 {
     public class ReactiveValidatableObject : ReactiveObject, IDataErrorInfo
     {
+        static ReactiveValidatableObject()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         static readonly ConcurrentDictionary<Type, Dictionary<string, ValidatedProperty>> typeValidatorsMap = new ConcurrentDictionary<Type, Dictionary<string, ValidatedProperty>>();
         const string isValidPropertyName = "IsValid";
         readonly IServiceProvider serviceProvider;

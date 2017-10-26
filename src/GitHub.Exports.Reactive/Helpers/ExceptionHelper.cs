@@ -7,6 +7,11 @@ namespace GitHub.Helpers
 {
     public static class ExceptionHelper
     {
+        static ExceptionHelper()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         public static IObservable<T> ObservableThrowKeyNotFoundException<T>(string key, Exception innerException = null)
         {
             return Observable.Throw<T>(

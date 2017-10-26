@@ -22,8 +22,6 @@ public class GitHubPaneViewModelTests : TestBaseClass
     readonly IServiceProvider serviceProvider;
     readonly IUIController uiController;
     readonly FakeMenuCommandService menuCommandService;
-    readonly GitHubPaneViewModel viewModel;
-    UIViewType lastUiControllerJump;
 
     public GitHubPaneViewModelTests()
     {

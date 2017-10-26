@@ -8,6 +8,7 @@ namespace GitHub.Api
     {
         HostAddress HostAddress { get; }
         UriString OriginalUrl { get; }
+        IGitHubClient GitHubClient { get; }
         Task<Repository> GetRepository();
         bool HasWiki();
         bool IsEnterprise();

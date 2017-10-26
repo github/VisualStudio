@@ -15,6 +15,19 @@ namespace GitHub.Api
             this.hostAddress = hostAddress;
         }
 
+        public Task<SecureCredential> GetSecureCredentials()
+        {
+            var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
+            using (var credential = new Credential())
+            {
+                credential.Target = keyHost;
+                credential.Type = CredentialType.Generic;
+                if (credential.Load())
+                    return Task.FromResult(new SecureCredential(credential.Username, credential.SecurePassword));
+            }
+            return Task.FromResult(SecureCredential.Anonymous);
+        }
+
         public Task<Credentials> GetCredentials()
         {
             var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);

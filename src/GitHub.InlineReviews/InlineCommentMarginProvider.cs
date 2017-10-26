@@ -28,25 +28,25 @@ namespace GitHub.InlineReviews
         const string MarginName = "InlineComment";
         const string MarginPropertiesName = "Indicator Margin"; // Same background color as Glyph margin 
 
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
-        readonly IInlineCommentPeekService peekService;
-        readonly IPullRequestSessionManager sessionManager;
-        readonly IPackageSettings packageSettings;
+        Lazy<IInlineCommentPeekService> peekService;
+        Lazy<IPullRequestSessionManager> sessionManager;
+        Lazy<IPackageSettings> packageSettings;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
+            IGitHubServiceProvider serviceProvider,
             IEditorFormatMapService editorFormatMapService,
-            IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService,
-            IPullRequestSessionManager sessionManager,
-            IPackageSettings packageSettings)
+            IViewTagAggregatorFactoryService tagAggregatorFactory)
         {
+            this.serviceProvider = serviceProvider;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
-            this.peekService = peekService;
-            this.sessionManager = sessionManager;
-            this.packageSettings = packageSettings;
+            this.peekService = new Lazy<IInlineCommentPeekService>(() => serviceProvider.TryGetService<IInlineCommentPeekService>());
+            this.sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.TryGetService<IPullRequestSessionManager>());
+            this.packageSettings = new Lazy<IPackageSettings>(() => serviceProvider.TryGetService<IPackageSettings>());
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
@@ -57,7 +57,7 @@ namespace GitHub.InlineReviews
             }
 
             var textView = wpfTextViewHost.TextView;
-            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
+            var glyphFactory = new InlineCommentGlyphFactory(peekService.Value, textView);
 
             Func<Grid> gridFactory = () => new GlyphMarginGrid();
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
@@ -79,7 +79,7 @@ namespace GitHub.InlineReviews
             return margin;
         }
 
-        bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView(textViewHost);
+        bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.Value.EditorComments && !IsDiffView(textViewHost);
 
         bool IsDiffView(IWpfTextViewHost host)
         {
@@ -95,7 +95,7 @@ namespace GitHub.InlineReviews
 
         bool IsMarginVisible(ITextBuffer buffer)
         {
-            if (sessionManager.GetTextBufferInfo(buffer) != null)
+            if (sessionManager.Value.GetTextBufferInfo(buffer) != null)
             {
                 return true;
             }

@@ -12,6 +12,12 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class NotificationDispatcher : INotificationDispatcher, IDisposable
     {
+        static NotificationDispatcher()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
+
         Subject<Notification> notifications;
         Stack<INotificationService> notificationHandlers;
 

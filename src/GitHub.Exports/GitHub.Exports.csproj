@@ -143,14 +143,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exports\ExportForProcess.cs" />
+    <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />
     <Compile Include="Models\DiffUtilities.cs" />
+    <Compile Include="Models\GitIgnoreItem.cs" />
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
+    <Compile Include="Models\LicenseItem.cs" />
+    <Compile Include="Models\LocalRepositoryModel.cs" />
+    <Compile Include="Services\GitService.cs" />
+    <Compile Include="Services\IGitClient.cs" />
+    <Compile Include="Services\IRepositoryCloneService.cs" />
+    <Compile Include="Services\Services.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\IHasErrorState.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />
@@ -185,13 +193,11 @@
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
     <Compile Include="Models\RepositoryModel.cs" />
-    <Compile Include="Models\LocalRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Primitives\RelayCommand.cs" />
     <Compile Include="Primitives\UriStringConverter.cs" />
     <Compile Include="Services\Connection.cs" />
-    <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />
     <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Services\IGitService.cs" />
@@ -209,7 +215,6 @@
     <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
     <Compile Include="Services\Logger.cs" />
-    <Compile Include="Services\Services.cs" />
     <Compile Include="Services\StatusBarNotificationService.cs" />
     <Compile Include="Models\IConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

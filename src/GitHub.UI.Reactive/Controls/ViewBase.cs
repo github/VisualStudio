@@ -71,6 +71,7 @@ namespace GitHub.UI
 
         static ViewBase()
         {
+            System.Diagnostics.Debugger.Break();
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ViewBase), new FrameworkPropertyMetadata(typeof(ViewBase)));
             FocusableProperty.OverrideMetadata(typeof(ViewBase), new FrameworkPropertyMetadata(false));
             KeyboardNavigation.IsTabStopProperty.OverrideMetadata(typeof(ViewBase), new FrameworkPropertyMetadata(false));

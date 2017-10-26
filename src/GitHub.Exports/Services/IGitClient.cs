@@ -41,7 +41,7 @@ namespace GitHub.Services
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
 
         /// <summary>
-        /// Fetches from a remote URI, using custom refspecs. 
+        /// Fetches from a remote URI, using custom refspecs.
         /// </summary>
         /// <remarks>
         /// If the URI is the same as origin then origin will be used, otherwise a

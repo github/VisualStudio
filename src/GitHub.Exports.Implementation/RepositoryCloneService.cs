@@ -1,10 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Reactive;
-using System.Reactive.Linq;
 using GitHub.Extensions;
-using Microsoft.VisualStudio.Shell;
 using NLog;
 using Rothko;
 using GitHub.Helpers;

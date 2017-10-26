@@ -9,6 +9,11 @@ namespace GitHub.Extensions
 {
     public static class ConnectionManagerExtensions
     {
+        static ConnectionManagerExtensions()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         public static IObservable<bool> IsLoggedIn(this IConnectionManager cm, IRepositoryHosts hosts)
         {
             Guard.ArgumentNotNull(hosts, nameof(hosts));

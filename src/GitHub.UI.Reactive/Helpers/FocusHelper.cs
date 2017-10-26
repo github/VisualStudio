@@ -13,6 +13,11 @@ namespace GitHub.Extensions
 {
     public static class FocusHelper
     {
+        static FocusHelper()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         /// <summary>
         /// Attempts to move focus to an element within the provided container waiting for the element to be loaded
         /// if necessary (waits max 1 second to protect against confusing focus shifts if the element gets loaded much

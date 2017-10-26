@@ -7,6 +7,11 @@ namespace GitHub.Caches
 {
     public class AccountCacheItem : IAvatarContainer
     {
+        static AccountCacheItem()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         public static AccountCacheItem Create(Account apiAccount)
         {
             return new AccountCacheItem(apiAccount);

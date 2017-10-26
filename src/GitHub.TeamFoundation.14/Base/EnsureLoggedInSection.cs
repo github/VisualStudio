@@ -15,16 +15,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
     public class EnsureLoggedInSection : TeamExplorerSectionBase
     {
-        readonly IRepositoryHosts hosts;
+        readonly Lazy<IRepositoryHosts> hosts;
         readonly ITeamExplorerServices teServices;
 
         public EnsureLoggedInSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, ITeamExplorerServices teServices)
+            IConnectionManager cm, ITeamExplorerServices teServices)
             : base(serviceProvider, apiFactory, holder, cm)
         {
             IsVisible = false;
-            this.hosts = hosts;
+            this.hosts = new Lazy<IRepositoryHosts>(() => serviceProvider.TryGetService<IRepositoryHosts>());
             this.teServices = teServices;
         }
 
@@ -52,7 +52,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
             teServices.ClearNotifications();
             var add = HostAddress.Create(ActiveRepoUri);
-            bool loggedIn = await connectionManager.IsLoggedIn(hosts, add);
+            bool loggedIn = await connectionManager.IsLoggedIn(hosts.Value, add);
             if (!loggedIn)
             {
                 var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);

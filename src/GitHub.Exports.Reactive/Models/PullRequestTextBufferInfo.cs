@@ -10,6 +10,12 @@ namespace GitHub.Models
     /// </summary>
     public class PullRequestTextBufferInfo
     {
+        static PullRequestTextBufferInfo()
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestTextBufferInfo"/> class.
         /// </summary>

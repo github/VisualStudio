@@ -12,7 +12,7 @@ using System.ComponentModel.Composition.Hosting;
 
 namespace UnitTests
 {
-    internal static class Substitutes
+    public static class Substitutes
     {
         public static T1 For<T1, T2, T3, T4>(params object[] constructorArguments)
             where T1 : class

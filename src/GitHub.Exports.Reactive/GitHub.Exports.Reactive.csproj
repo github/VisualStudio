@@ -142,7 +142,6 @@
     <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
-    <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
@@ -158,8 +157,6 @@
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
-    <Compile Include="Models\GitIgnoreItem.cs" />
-    <Compile Include="Models\LicenseItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -173,7 +170,6 @@
     <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
-    <Compile Include="Services\IRepositoryCloneService.cs" />
     <Compile Include="Services\IRepositoryCreationService.cs" />
     <Compile Include="ViewModels\IRepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationViewModel.cs" />

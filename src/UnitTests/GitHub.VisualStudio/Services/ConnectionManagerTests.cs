@@ -29,7 +29,7 @@ public class ConnectionManagerTests
             operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns("");
             var cache = Substitute.For<IConnectionCache>();
             var loginManager = Substitute.For<ILoginManager>();
-            var apiClientFactory = Substitute.For<IApiClientFactory>();
+            var apiClientFactory = Substitute.For<ISimpleApiClientFactory>();
             var manager = new ConnectionManager(Substitutes.IVSGitServices, cache, loginManager, apiClientFactory);
 
             manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));

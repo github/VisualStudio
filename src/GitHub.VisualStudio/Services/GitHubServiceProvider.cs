@@ -7,18 +7,13 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using GitHub.Infrastructure;
-using GitHub.Models;
 using GitHub.Exports;
 using GitHub.Services;
-using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NLog;
 using Task = System.Threading.Tasks.Task;
-using System.Threading.Tasks;
 using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
@@ -90,7 +85,7 @@ namespace GitHub.VisualStudio
         }
 
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        CompositeDisposable disposables = new CompositeDisposable();
+        List<IDisposable> disposables = new List<IDisposable>();
         readonly IServiceProviderPackage asyncServiceProvider;
         readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
@@ -310,7 +305,10 @@ namespace GitHub.VisualStudio
                 if (disposed) return;
 
                 if (disposables != null)
-                    disposables.Dispose();
+                {
+                    foreach (var disp in disposables)
+                        disp.Dispose();
+                }
                 disposables = null;
                 if (tempContainer != null)
                     tempContainer.Dispose();

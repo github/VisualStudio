@@ -30,19 +30,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         public const string GitHubPublishSectionId = "92655B52-360D-4BF5-95C5-D9E9E596AC76";
 
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
-        readonly IRepositoryHosts hosts;
+        readonly Lazy<IRepositoryHosts> hosts;
         bool loggedIn;
 
         [ImportingConstructor]
         public GitHubPublishSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, Lazy<IVisualStudioBrowser> browser,
-            IRepositoryHosts hosts)
+            IConnectionManager cm)
             : base(serviceProvider, apiFactory, holder, cm)
         {
 
-            lazyBrowser = browser;
-            this.hosts = hosts;
+            lazyBrowser = new Lazy<IVisualStudioBrowser>(() => serviceProvider.TryGetService<IVisualStudioBrowser>());
+            this.hosts = new Lazy<IRepositoryHosts>(() => serviceProvider.TryGetService<IRepositoryHosts>());
             Title = Resources.GitHubPublishSectionTitle;
             Name = "GitHub";
             Provider = "GitHub, Inc";
@@ -68,7 +67,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 IsVisible = true;
                 ShowGetStarted = true;
-                loggedIn = await connectionManager.IsLoggedIn(hosts);
+                loggedIn = await connectionManager.IsLoggedIn(hosts.Value);
                 ShowLogin = !loggedIn;
                 ShowSignup = !loggedIn;
             }
@@ -91,7 +90,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         public async Task Connect()
         {
-            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            loggedIn = await connectionManager.IsLoggedIn(hosts.Value);
             if (loggedIn)
                 ShowPublish();
             else
@@ -176,7 +175,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             var uiProvider = ServiceProvider.GetService<IUIProvider>();
             uiProvider.RunInDialog(UIControllerFlow.Authentication);
 
-            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            loggedIn = await connectionManager.IsLoggedIn(hosts.Value);
             if (loggedIn)
                 ShowPublish();
         }
