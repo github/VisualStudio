@@ -14,6 +14,8 @@ namespace GitHub.Services
     /// </summary>
     public interface IModelService : IDisposable
     {
+        IApiClient ApiClient { get; }
+
         IObservable<IAccount> GetCurrentUser();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();

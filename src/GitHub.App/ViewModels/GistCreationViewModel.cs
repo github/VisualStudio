@@ -8,6 +8,7 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using NLog;
@@ -32,11 +33,12 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         GistCreationViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
             INotificationService notificationService,
             IUsageTracker usageTracker)
-            : this(connection, selectedTextProvider, gistPublishService, usageTracker)
+            : this(connection, modelServiceFactory, selectedTextProvider, gistPublishService, usageTracker)
         {
             Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
@@ -49,6 +51,7 @@ namespace GitHub.ViewModels
 
         public GistCreationViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
             IUsageTracker usageTracker)
@@ -59,15 +62,17 @@ namespace GitHub.ViewModels
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             Title = Resources.CreateGistTitle;
-            apiClient = repositoryHost.ApiClient;
             this.gistPublishService = gistPublishService;
             this.usageTracker = usageTracker;
 
             FileName = VisualStudio.Services.GetFileNameFromActiveDocument() ?? Resources.DefaultGistFileName;
             SelectedText = selectedTextProvider.GetSelectedText();
 
+            var modelService = modelServiceFactory.CreateBlocking(connection);
+            apiClient = modelService.ApiClient;
+
             // This class is only instantiated after we are logged into to a github account, so we should be safe to grab the first one here as the defaut.
-            account = repositoryHost.ModelService.GetAccounts()
+            account = modelService.GetAccounts()
                 .FirstAsync()
                 .Select(a => a.First())
                 .ObserveOn(RxApp.MainThreadScheduler)

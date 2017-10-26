@@ -11,6 +11,7 @@ using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
@@ -27,6 +28,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IConnection connection;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly ILocalRepositoryModel localRepository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
@@ -35,14 +37,16 @@ namespace GitHub.ViewModels
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
         IRemoteRepositoryModel remoteRepository;
+        IModelService modelService;
 
         [ImportingConstructor]
         PullRequestListViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
-            : this(connection, teservice.ActiveRepo, settings, visualStudioBrowser)
+            : this(connection, modelServiceFactory, teservice.ActiveRepo, settings, visualStudioBrowser)
         {
             Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
@@ -51,6 +55,7 @@ namespace GitHub.ViewModels
 
         public PullRequestListViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ILocalRepositoryModel repository,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
@@ -62,6 +67,7 @@ namespace GitHub.ViewModels
 
             constructing = true;
             this.connection = connection;
+            this.modelServiceFactory = modelServiceFactory;
             this.localRepository = repository;
             this.settings = settings;
             this.visualStudioBrowser = visualStudioBrowser;
@@ -128,9 +134,14 @@ namespace GitHub.ViewModels
         {
             IsBusy = true;
 
+            if (modelService == null)
+            {
+                modelService = await modelServiceFactory.CreateAsync(connection);
+            }
+
             if (remoteRepository == null)
             {
-                remoteRepository = await repositoryHost.ModelService.GetRepository(
+                remoteRepository = await modelService.GetRepository(
                     localRepository.Owner,
                     localRepository.Name);
                 Repositories = remoteRepository.IsFork ?
@@ -139,7 +150,7 @@ namespace GitHub.ViewModels
                 SelectedRepository = Repositories[0];
             }
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(SelectedRepository, pullRequests);
+            PullRequests = modelService.GetPullRequests(SelectedRepository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);

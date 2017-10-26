@@ -17,6 +17,7 @@ using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
 using NLog;
+using GitHub.Factories;
 
 namespace GitHub.ViewModels
 {
@@ -60,12 +61,13 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
-                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                   modelServiceFactory.CreateBlocking(connection),
                    pullRequestsService,
                    sessionManager,
                    usageTracker)

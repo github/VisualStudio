@@ -1,23 +1,24 @@
 ﻿using System;
-using System.ComponentModel.Composition;
-using GitHub.Exports;
-using GitHub.Models;
 using System.Collections.Generic;
-using ReactiveUI;
-using GitHub.Services;
-using System.Reactive.Linq;
-using GitHub.Extensions.Reactive;
-using GitHub.UI;
-using System.Linq;
-using GitHub.Validation;
-using GitHub.App;
+using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
-using Octokit;
-using NLog;
 using System.Globalization;
-using GitHub.Extensions;
-using System.Reactive.Disposables;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using GitHub.App;
+using GitHub.Exports;
+using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
+using GitHub.Factories;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.Validation;
+using NLog;
+using Octokit;
+using ReactiveUI;
 using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels
@@ -40,21 +41,28 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         PullRequestCreationViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService service, INotificationService notifications)
-            : this(connection, teservice?.ActiveRepo, service, notifications)
+            : this(connection, modelServiceFactory, teservice?.ActiveRepo, service, notifications)
         {}
 
-        public PullRequestCreationViewModel(IConnection connection, ILocalRepositoryModel activeRepo,
-            IPullRequestService service, INotificationService notifications)
+        public PullRequestCreationViewModel(
+            IConnection connection,
+            IModelServiceFactory modelServiceFactory,
+            ILocalRepositoryModel activeRepo,
+            IPullRequestService service,
+            INotificationService notifications)
         {
-            Extensions.Guard.ArgumentNotNull(connection, nameof(connection));
-            Extensions.Guard.ArgumentNotNull(activeRepo, nameof(activeRepo));
-            Extensions.Guard.ArgumentNotNull(service, nameof(service));
-            Extensions.Guard.ArgumentNotNull(notifications, nameof(notifications));
+            Guard.ArgumentNotNull(connection, nameof(connection));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
+            Guard.ArgumentNotNull(activeRepo, nameof(activeRepo));
+            Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(notifications, nameof(notifications));
 
             this.connection = connection;
             activeLocalRepo = activeRepo;
+            modelService = modelServiceFactory.CreateBlocking(connection);
 
             var obs = modelService.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
                 .Select(r => new RemoteRepositoryModel(r))
@@ -99,7 +107,7 @@ namespace GitHub.ViewModels
 
             CreatePullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service
-                    .CreatePullRequest(connection, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
+                    .CreatePullRequest(modelService, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
                         log.Error(ex);

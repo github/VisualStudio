@@ -193,7 +193,6 @@
     <Compile Include="Services\ErrorMessage.cs" />
     <Compile Include="Services\ErrorMessageTranslator.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
-    <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
     <Compile Include="Services\GistPublishService.cs" />
     <Compile Include="Services\RepositoryPublishService.cs" />

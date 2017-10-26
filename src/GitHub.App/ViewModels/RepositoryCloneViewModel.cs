@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using GitHub.Collections;
 using GitHub.UI;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
 
 namespace GitHub.ViewModels
 {
@@ -32,8 +33,10 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IConnection connection;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        IModelService modelService;
         bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
@@ -42,14 +45,17 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         RepositoryCloneViewModel(
             IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
         {
             Guard.ArgumentNotNull(connection, nameof(connection));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(cloneService, nameof(cloneService));
             Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
 
             this.connection = connection;
+            this.modelServiceFactory = modelServiceFactory;
             this.operatingSystem = operatingSystem;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, connection.HostAddress.Title);
@@ -118,8 +124,13 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
+            if (modelService == null)
+            {
+                modelService = modelServiceFactory.CreateBlocking(connection);
+            }
+
             IsBusy = true;
-            repositoryHost.ModelService.GetRepositories(repositories);
+            modelService.GetRepositories(repositories);
             repositories.OriginalCompleted
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(

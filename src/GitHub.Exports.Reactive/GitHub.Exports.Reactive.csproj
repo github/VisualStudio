@@ -100,6 +100,7 @@
     <Compile Include="Collections\ITrackingCollection.cs" />
     <Compile Include="Collections\TrackingCollection.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
+    <Compile Include="Factories\IModelServiceFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IInlineCommentThreadModel.cs" />

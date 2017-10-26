@@ -10,6 +10,7 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
@@ -28,6 +29,7 @@ namespace GitHub.ViewModels
         readonly IConnectionManager connectionManager;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly INotificationService notificationService;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -39,16 +41,19 @@ namespace GitHub.ViewModels
             IRepositoryPublishService repositoryPublishService,
             INotificationService notificationService,
             IConnectionManager connectionManager,
+            IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(repositoryPublishService, nameof(repositoryPublishService));
             Guard.ArgumentNotNull(notificationService, nameof(notificationService));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
 
             this.notificationService = notificationService;
             this.connectionManager = connectionManager;
             this.usageTracker = usageTracker;
+            this.modelServiceFactory = modelServiceFactory;
 
             title = this.WhenAny(
                 x => x.SelectedConnection,
@@ -66,7 +71,8 @@ namespace GitHub.ViewModels
 
             accounts = this.WhenAnyValue(x => x.SelectedConnection)
                 .Where(x => x != null)
-                .SelectMany(host => host.ModelService.GetAccounts())
+                .SelectMany(async c => (await modelServiceFactory.CreateAsync(c)).GetAccounts())
+                .Switch()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
@@ -149,8 +155,9 @@ namespace GitHub.ViewModels
         {
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;
+            var modelService = modelServiceFactory.CreateBlocking(SelectedConnection);
 
-            return repositoryPublishService.PublishRepository(newRepository, account, SelectedConnection.ApiClient)
+            return repositoryPublishService.PublishRepository(newRepository, account, modelService.ApiClient)
                 .Do(_ => usageTracker.IncrementPublishCount().Forget())
                 .Select(_ => ProgressState.Success)
                 .Catch<ProgressState, Exception>(ex =>

@@ -28,7 +28,6 @@ namespace GitHub.VisualStudio.UI.Views
         bool initialized;
         readonly CompositeDisposable disposables = new CompositeDisposable();
 
-        readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
         readonly IUIProvider uiProvider;
         readonly IVisualStudioBrowser browser;
@@ -42,7 +41,7 @@ namespace GitHub.VisualStudio.UI.Views
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser,
+            IConnectionManager cm, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser,
             IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
@@ -50,13 +49,11 @@ namespace GitHub.VisualStudio.UI.Views
             Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(cm, nameof(cm));
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
             Guard.ArgumentNotNull(vsBrowser, nameof(vsBrowser));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             this.connectionManager = cm;
-            this.hosts = hosts;
             this.uiProvider = uiProvider;
             this.usageTracker = usageTracker;
 
@@ -150,7 +147,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             base.Initialize(serviceProvider);
 
-            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => LoadDefault());
+            ////hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => LoadDefault());
         }
 
         public void Initialize(ViewWithData data = null)
