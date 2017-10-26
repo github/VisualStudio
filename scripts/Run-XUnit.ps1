@@ -8,11 +8,19 @@ Param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $Project,
-    [int]
-    $TimeoutDuration,
+    $BasePathToProject
+    ,
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]
-    $Configuration,
+    $Project
+    ,
+    [int]
+    $TimeoutDuration
+    ,
+    [string]
+    $Configuration
+    ,
     [switch]
     $AppVeyor = $false
 )
@@ -20,7 +28,7 @@ Param(
 $rootDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
 Push-Location $rootDirectory
 
-$dll = "src\$Project\bin\$Configuration\$Project.dll"
+$dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
 
 if ($AppVeyor) {
     $xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
