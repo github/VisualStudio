@@ -28,18 +28,21 @@ namespace GitHub.VisualStudio
         readonly ILoginManager loginManager;
         readonly TaskCompletionSource<object> loaded;
         readonly Lazy<ObservableCollectionEx<IConnection>> connections;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public ConnectionManager(
             IProgram program,
             IConnectionCache cache,
             IKeychain keychain,
-            ILoginManager loginManager)
+            ILoginManager loginManager,
+            IUsageTracker usageTracker)
         {
             this.program = program;
             this.cache = cache;
             this.keychain = keychain;
             this.loginManager = loginManager;
+            this.usageTracker = usageTracker;
             loaded = new TaskCompletionSource<object>();
             connections = new Lazy<ObservableCollectionEx<IConnection>>(
                 this.CreateConnections,
@@ -84,6 +87,7 @@ namespace GitHub.VisualStudio
 
             conns.Add(connection);
             await SaveConnections();
+            await usageTracker.IncrementLoginCount();
             return connection;
         }
 
@@ -152,6 +156,7 @@ namespace GitHub.VisualStudio
                     }
 
                     result.Add(connection);
+                    await usageTracker.IncrementLoginCount();
                 }
             }
             finally
