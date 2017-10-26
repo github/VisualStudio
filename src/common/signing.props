@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <BuildType Condition="Exists('..\..\script\Key.snk')">Internal</BuildType>
+    <BuildType Condition="Exists('..\..\script\key.snk')">Internal</BuildType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(BuildType)' == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\script\key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(BuildType)' != 'Internal' and Exists('..\..\publickey.snk')">
+  <PropertyGroup Condition="'$(BuildType)' != 'Internal' and Exists('..\..\signingkey.snk')">
     <AssemblyOriginatorKeyFile>..\..\publickey.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\script\Key.snk" Condition="'$(BuildType)' == 'Internal'">
-      <Link>Key.snk</Link>
+    <None Include="..\..\script\key.snk" Condition="'$(BuildType)' == 'Internal'">
+      <Link>key.snk</Link>
     </None>
 
-    <None Include="..\..\publickey.snk" Condition="'$(BuildType)' != 'Internal' and Exists('..\..\publickey.snk')">
-      <Link>publickey.snk</Link>
+    <None Include="..\..\signingkey.snk" Condition="'$(BuildType)' != 'Internal' and Exists('..\..\signingkey.snk')">
+      <Link>signingkey.snk</Link>
     </None>
   </ItemGroup>
 </Project>
