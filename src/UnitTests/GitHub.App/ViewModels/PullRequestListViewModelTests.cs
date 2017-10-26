@@ -10,6 +10,7 @@ using GitHub.ViewModels;
 using GitHub.Primitives;
 using NSubstitute;
 using Xunit;
+using GitHub.Factories;
 
 namespace UnitTests.GitHub.App.ViewModels
 {
@@ -18,11 +19,12 @@ namespace UnitTests.GitHub.App.ViewModels
         [Fact]
         public void SelectingAssigneeShouldTriggerFilter()
         {
-            var repositoryHost = CreateRepositoryHost();
+            var connection = Substitute.For<IConnection>();
+            var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
+            var prViewModel = new PullRequestListViewModel(connection, factory, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -34,11 +36,12 @@ namespace UnitTests.GitHub.App.ViewModels
         [Fact]
         public void ResettingAssigneeToNoneShouldNotTriggerFilter()
         {
-            var repositoryHost = CreateRepositoryHost();
+            var connection = Substitute.For<IConnection>();
+            var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
+            var prViewModel = new PullRequestListViewModel(connection, factory, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -56,11 +59,12 @@ namespace UnitTests.GitHub.App.ViewModels
         [Fact]
         public void SelectingAuthorShouldTriggerFilter()
         {
-            var repositoryHost = CreateRepositoryHost();
+            var connection = Substitute.For<IConnection>();
+            var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
+            var prViewModel = new PullRequestListViewModel(connection, factory, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -72,11 +76,12 @@ namespace UnitTests.GitHub.App.ViewModels
         [Fact]
         public void ResettingAuthorToNoneShouldNotTriggerFilter()
         {
-            var repositoryHost = CreateRepositoryHost();
+            var connection = Substitute.For<IConnection>();
+            var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
+            var prViewModel = new PullRequestListViewModel(connection, factory, repository, settings, browser);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -95,11 +100,12 @@ namespace UnitTests.GitHub.App.ViewModels
         [InlineData("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
         public void OpenPullRequestOnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
         {
-            var repositoryHost = CreateRepositoryHost();
+            var connection = Substitute.For<IConnection>();
+            var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings, browser);
+            var prViewModel = new PullRequestListViewModel(connection, factory, repository, settings, browser);
             prViewModel.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
             prViewModel.SelectedRepository.CloneUrl.Returns(new UriString(cloneUrl));
 
@@ -111,9 +117,8 @@ namespace UnitTests.GitHub.App.ViewModels
         Func<IPullRequestModel, int, IList<IPullRequestModel>, bool> AnyFilter =>
             Arg.Any<Func<IPullRequestModel, int, IList<IPullRequestModel>, bool>>();
 
-        IRepositoryHost CreateRepositoryHost()
+        IModelServiceFactory CreateModelServiceFactory()
         {
-            var result = Substitute.For<IRepositoryHost>();
             var modelService = Substitute.For<IModelService>();
             var bitmapSource = Observable.Empty<BitmapImage>();
 
@@ -131,8 +136,10 @@ namespace UnitTests.GitHub.App.ViewModels
                 Arg.Any<ILocalRepositoryModel>(),
                 Arg.Any<ITrackingCollection<IPullRequestModel>>())
                .Returns(pullRequestCollection);
-            result.ModelService.Returns(modelService);
 
+            var result = Substitute.For<IModelServiceFactory>();
+            result.CreateAsync(null).ReturnsForAnyArgs(modelService);
+            result.CreateBlocking(null).ReturnsForAnyArgs(modelService);
             return result;
         }
 

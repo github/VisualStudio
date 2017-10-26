@@ -43,7 +43,7 @@ namespace GitHub.ViewModels
         bool loadingFailed;
 
         [ImportingConstructor]
-        RepositoryCloneViewModel(
+        public RepositoryCloneViewModel(
             IConnection connection,
             IModelServiceFactory modelServiceFactory,
             IRepositoryCloneService cloneService,

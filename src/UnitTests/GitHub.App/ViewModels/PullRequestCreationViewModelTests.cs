@@ -1,16 +1,17 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
-using NSubstitute;
-using Xunit;
-using UnitTests;
+using GitHub.Api;
+using GitHub.Factories;
 using GitHub.Models;
-using System;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
+using NSubstitute;
 using Octokit;
-using GitHub.Api;
-using System.ComponentModel;
-using Rothko;
+using UnitTests;
+using Xunit;
+using IConnection = GitHub.Models.IConnection;
 
 /// <summary>
 /// All the tests in this class are split in subclasses so that when they run
@@ -49,9 +50,17 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         public IGitClient GitClient;
         public IGitService GitService;
         public INotificationService NotificationService;
-        public IRepositoryHost RepositoryHost;
+        public IConnection Connection;
         public IApiClient ApiClient;
         public IModelService ModelService;
+
+        public IModelServiceFactory GetModelServiceFactory()
+        {
+            var result = Substitute.For<IModelServiceFactory>();
+            result.CreateAsync(Connection).Returns(ModelService);
+            result.CreateBlocking(Connection).Returns(ModelService);
+            return result;
+        }
     }
 
     static TestData PrepareTestData(
@@ -64,15 +73,17 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var gitService = serviceProvider.GetGitService();
         var gitClient = Substitute.For<IGitClient>();
         var notifications = Substitute.For<INotificationService>();
-        var host = Substitute.For<IRepositoryHost>();
+        var connection = Substitute.For<IConnection>();
         var api = Substitute.For<IApiClient>();
         var ms = Substitute.For<IModelService>();
+
+        connection.HostAddress.Returns(HostAddress.Create("https://github.com"));
 
         // this is the local repo instance that is available via TeamExplorerServiceHolder and friends
         var activeRepo = Substitute.For<ILocalRepositoryModel>();
         activeRepo.LocalPath.Returns("");
         activeRepo.Name.Returns(repoName);
-        activeRepo.CloneUrl.Returns(new GitHub.Primitives.UriString("http://github.com/" + sourceRepoOwner + "/" + repoName));
+        activeRepo.CloneUrl.Returns(new UriString("http://github.com/" + sourceRepoOwner + "/" + repoName));
         activeRepo.Owner.Returns(sourceRepoOwner);
 
         Repository githubRepoParent = null;
@@ -85,10 +96,8 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var targetBranch = targetBranchName != targetRepo.DefaultBranch.Name ? new BranchModel(targetBranchName, targetRepo) : targetRepo.DefaultBranch;
 
         activeRepo.CurrentBranch.Returns(sourceBranch);
-        serviceProvider.GetRepositoryHosts().GitHubHost.Returns(host);
-        host.ApiClient.Returns(api);
-        host.ModelService.Returns(ms);
         api.GetRepository(Args.String, Args.String).Returns(Observable.Return(githubRepo));
+        ms.ApiClient.Returns(api);
 
         // sets up the libgit2sharp repo and branch objects
         var l2repo = SetupLocalRepoMock(gitClient, gitService, remote, sourceBranchName, sourceBranchIsTracking);
@@ -105,7 +114,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
             GitClient = gitClient,
             GitService = gitService,
             NotificationService = notifications,
-            RepositoryHost = host,
+            Connection = connection,
             ApiClient = api,
             ModelService = ms
         };
@@ -117,7 +126,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
-        var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        var vm = new PullRequestCreationViewModel(data.Connection, data.GetModelServiceFactory(), data.ActiveRepo, prservice, data.NotificationService);
         Assert.Equal("octokit/master", vm.TargetBranch.DisplayName);
     }
 
@@ -151,7 +160,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var ms = data.ModelService;
 
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
-        var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        var vm = new PullRequestCreationViewModel(data.Connection, data.GetModelServiceFactory(), data.ActiveRepo, prservice, data.NotificationService);
 
         vm.Initialize();
 
@@ -186,7 +195,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var prservice = Substitute.For<IPullRequestService>();
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Return("Test PR template"));
 
-        var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        var vm = new PullRequestCreationViewModel(data.Connection, data.GetModelServiceFactory(), data.ActiveRepo, prservice, data.NotificationService);
         vm.Initialize();
 
         Assert.Equal("Test PR template", vm.Description);

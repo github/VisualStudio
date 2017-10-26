@@ -62,7 +62,6 @@ namespace UnitTests
         public static IRepositoryCreationService RepositoryCreationService { get { return Substitute.For<IRepositoryCreationService>(); } }
         public static IRepositoryCloneService RepositoryCloneService { get { return Substitute.For<IRepositoryCloneService>(); } }
 
-        public static IRepositoryHosts RepositoryHosts { get { return Substitute.For<IRepositoryHosts>(); } }
         public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
         public static IConnection NewConnection { get { return Substitute.For<IConnection>(); } }
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
@@ -126,7 +125,6 @@ namespace UnitTests
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
-            ret.GetService(typeof(IRepositoryHosts)).Returns(RepositoryHosts);
             ret.GetService(typeof(IExportFactoryProvider)).Returns(ExportFactoryProvider);
             ret.GetService(typeof(IUIFactory)).Returns(UIFactory);
             ret.GetService(typeof(IConnection)).Returns(Connection);
@@ -174,11 +172,6 @@ namespace UnitTests
         public static IRepositoryCreationService GetRepositoryCreationService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IRepositoryCreationService)) as IRepositoryCreationService;
-        }
-
-        public static IRepositoryHosts GetRepositoryHosts(this IServiceProvider provider)
-        {
-            return provider.GetService(typeof(IRepositoryHosts)) as IRepositoryHosts;
         }
 
         public static IExportFactoryProvider GetExportFactoryProvider(this IServiceProvider provider)

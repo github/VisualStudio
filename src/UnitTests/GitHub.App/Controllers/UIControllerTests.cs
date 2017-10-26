@@ -1,25 +1,21 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using GitHub.App.Factories;
 using GitHub.Controllers;
+using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using NSubstitute;
-using Xunit;
-using UnitTests;
 using GitHub.ViewModels;
+using NSubstitute;
 using ReactiveUI;
-using System.Collections.Generic;
-using System.Reactive.Subjects;
-using GitHub.Primitives;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-using GitHub.App.Factories;
-using System.Reactive;
-using GitHub.Extensions.Reactive;
-using System.Threading.Tasks;
-using GitHub.Extensions;
+using UnitTests;
+using Xunit;
 
 public class UIControllerTests
 {
@@ -29,10 +25,9 @@ public class UIControllerTests
         public void WithMultipleCallsDoesNotThrowException()
         {
             var uiProvider = Substitute.For<IGitHubServiceProvider>();
-            var hosts = Substitute.For<IRepositoryHosts>();
             var factory = Substitute.For<IUIFactory>();
             var cm = Substitutes.ConnectionManager;
-            var uiController = new UIController(uiProvider, hosts, factory, cm);
+            var uiController = new UIController(uiProvider, factory, cm);
 
             uiController.Dispose();
             uiController.Dispose();
@@ -99,13 +94,10 @@ public class UIControllerTests
             return new UIFactory(factory);
         }
 
-        protected IConnection SetupConnection(IServiceProvider provider, IRepositoryHosts hosts,
-            IRepositoryHost host, bool loggedIn = true)
+        protected IConnection SetupConnection(IServiceProvider provider, bool loggedIn = true)
         {
             var connection = provider.GetConnection();
-            hosts.LookupHost(connection.HostAddress).Returns(host);
             connection.IsLoggedIn.Returns(loggedIn);
-            host.IsLoggedIn.Returns(loggedIn);
             return connection;
         }
 
@@ -127,7 +119,6 @@ public class UIControllerTests
         public void RunningNonAuthFlowWithoutBeingLoggedInRunsAuthFlow()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -135,7 +126,7 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Clone);
@@ -162,7 +153,6 @@ public class UIControllerTests
 
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -171,9 +161,9 @@ public class UIControllerTests
             cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+            cons.Add(SetupConnection(provider));
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Clone);
@@ -199,7 +189,6 @@ public class UIControllerTests
         public void RunningAuthFlowWithoutBeingLoggedInRunsAuthFlow()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -207,7 +196,7 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Authentication);
@@ -233,19 +222,17 @@ public class UIControllerTests
         public void RunningAuthFlowWhenLoggedInRunsAuthFlow()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
 
             // simulate being logged in
-            var host = hosts.GitHubHost;
-            var connection = SetupConnection(provider, hosts, host);
+            var connection = SetupConnection(provider);
             var cons = new ObservableCollectionEx<IConnection> { connection };
 
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Authentication);
@@ -271,7 +258,6 @@ public class UIControllerTests
         public void AuthFlowWithout2FA()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -279,7 +265,7 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Clone);
@@ -291,7 +277,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
                             // login
-                            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+                            cons.Add(SetupConnection(provider));
                             TriggerDone(data.View.ViewModel);
                             break;
                         case 2:
@@ -311,7 +297,6 @@ public class UIControllerTests
         public void AuthFlowWith2FA()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -319,7 +304,7 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Clone);
@@ -337,7 +322,7 @@ public class UIControllerTests
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
                             // login
-                            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+                            cons.Add(SetupConnection(provider));
                             // continue by triggering done on login view
                             var vm2 = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).ViewModel;
                             TriggerDone(vm2);
@@ -359,7 +344,6 @@ public class UIControllerTests
         public void BackAndForth()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -367,7 +351,7 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Clone);
@@ -401,7 +385,7 @@ public class UIControllerTests
                         case 4: {
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
                             // login
-                            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+                            cons.Add(SetupConnection(provider));
                             var vm2 = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).ViewModel;
                             TriggerDone(vm2);
                             break;
@@ -427,7 +411,6 @@ public class UIControllerTests
         public void Flow()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -436,9 +419,9 @@ public class UIControllerTests
             cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+            cons.Add(SetupConnection(provider));
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Clone);
@@ -467,7 +450,6 @@ public class UIControllerTests
         public void Flow()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -476,9 +458,9 @@ public class UIControllerTests
             cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+            cons.Add(SetupConnection(provider));
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Create);
@@ -507,17 +489,16 @@ public class UIControllerTests
         public void FlowWithConnection()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
             cm.Connections.Returns(cons);
-            var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
+            var connection = SetupConnection(provider);
 
             // simulate being logged in
             cons.Add(connection);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Publish, connection);
@@ -544,7 +525,6 @@ public class UIControllerTests
         public void FlowWithoutConnection()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -552,12 +532,12 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             cm.GetLoadedConnections().Returns(cons);
 
-            var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
+            var connection = SetupConnection(provider);
 
             // simulate being logged in
             cons.Add(connection);
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 var flow = uiController.Configure(UIControllerFlow.Publish);
@@ -587,7 +567,6 @@ public class UIControllerTests
         public void ShowsGistDialog()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollectionEx<IConnection>();
@@ -596,9 +575,9 @@ public class UIControllerTests
             cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true));
+            cons.Add(SetupConnection(provider, true));
 
-            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, factory, cm))
             {
                 var count = 0;
                 bool? success = null;

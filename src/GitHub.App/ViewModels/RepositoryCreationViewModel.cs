@@ -43,7 +43,7 @@ namespace GitHub.ViewModels
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        RepositoryCreationViewModel(
+        public RepositoryCreationViewModel(
             IConnection connection,
             IModelServiceFactory modelServiceFactory,
             IOperatingSystem operatingSystem,
