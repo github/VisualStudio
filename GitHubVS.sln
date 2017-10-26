@@ -29,30 +29,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submodules", "Submodules", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1}"
 	ProjectSection(SolutionItems) = preProject
-		script\Modules\BuildUtils.psm1 = script\Modules\BuildUtils.psm1
-		script\Modules\Debugging.psm1 = script\Modules\Debugging.psm1
-		script\Modules\Vsix.psm1 = script\Modules\Vsix.psm1
+		scripts\Modules\BuildUtils.psm1 = scripts\Modules\BuildUtils.psm1
+		scripts\Modules\Debugging.psm1 = scripts\Modules\Debugging.psm1
+		scripts\Modules\Vsix.psm1 = scripts\Modules\Vsix.psm1
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Script", "Script", "{7B6C5F8D-14B3-443D-B044-0E209AE12BDF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C5F8D-14B3-443D-B044-0E209AE12BDF}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		script\Announce.ps1 = script\Announce.ps1
-		script\Bootstrap.ps1 = script\Bootstrap.ps1
-		build.cmd = build.cmd
-		script\Bump-Version.ps1 = script\Bump-Version.ps1
-		script\cibuild.ps1 = script\cibuild.ps1
-		script\common.ps1 = script\common.ps1
-		script\Deploy.ps1 = script\Deploy.ps1
-		script\Get-CheckedOutBranch.ps1 = script\Get-CheckedOutBranch.ps1
-		script\Get-HeadSha1.ps1 = script\Get-HeadSha1.ps1
-		script\HubotTell-NativeRoom.ps1 = script\HubotTell-NativeRoom.ps1
 		nuget.config = nuget.config
-		script\Require-CleanWorkTree.ps1 = script\Require-CleanWorkTree.ps1
-		script\Run-NUnit.ps1 = script\Run-NUnit.ps1
-		script\Run-XUnit.ps1 = script\Run-XUnit.ps1
-		script\Upload-DirectoryToS3.ps1 = script\Upload-DirectoryToS3.ps1
+		scripts\build.ps1 = scripts\build.ps1
+		scripts\Bump-Version.ps1 = scripts\Bump-Version.ps1
+		scripts\common.ps1 = scripts\common.ps1
+		scripts\Get-CheckedOutBranch.ps1 = scripts\Get-CheckedOutBranch.ps1
+		scripts\Get-HeadSha1.ps1 = scripts\Get-HeadSha1.ps1
+		scripts\Require-CleanWorkTree.ps1 = scripts\Require-CleanWorkTree.ps1
+		scripts\Run-NUnit.ps1 = scripts\Run-NUnit.ps1
+		scripts\Run-Tests.ps1 = scripts\Run-Tests.ps1
+		scripts\Run-XUnit.ps1 = scripts\Run-XUnit.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8A7DA2E7-262B-4581-807A-1C45CE79CDFD}"
