@@ -23,19 +23,6 @@ namespace GitHub.Services
         IReadOnlyObservableCollection<IConnection> Connections { get; }
 
         /// <summary>
-        /// Gets a callback that is called after a new <see cref="IConnection"/> is created but
-        /// before it is added to <see cref="Connections"/>.
-        /// </summary>
-        /// <remarks>
-        /// This is a hack and should be removed as soon as possible! It's needed because creating
-        /// a RepositoryHost is async meaning that for a short time a connection can exist without
-        /// a repository host, but other older parts of the code get confused by this. This callback
-        /// allows RepositoryHosts to hook into the creation of the connection to make sure a host
-        /// is available by the time the connection is made available.
-        /// </remarks>
-        Func<IConnection, Task> ConnectionCreated { get; set; }
-
-        /// <summary>
         /// Gets a connection with the specified host address.
         /// </summary>
         /// <param name="address">The address.</param>

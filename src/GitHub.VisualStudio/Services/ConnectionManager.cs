@@ -52,8 +52,6 @@ namespace GitHub.VisualStudio
         /// <inheritdoc/>
         public IReadOnlyObservableCollection<IConnection> Connections => connections.Value;
 
-        public Func<IConnection, Task> ConnectionCreated { get; set; }
-
         /// <inheritdoc/>
         public async Task<IConnection> GetConnection(HostAddress address)
         {
@@ -79,11 +77,6 @@ namespace GitHub.VisualStudio
             var client = CreateClient(address);
             var user = await loginManager.Login(address, client, userName, password);
             var connection = new Connection(address, userName, user, null);
-
-            if (ConnectionCreated != null)
-            {
-                await ConnectionCreated(connection);
-            }
 
             conns.Add(connection);
             await SaveConnections();
@@ -149,11 +142,6 @@ namespace GitHub.VisualStudio
                     }
 
                     var connection = new Connection(c.HostAddress, c.UserName, user, error);
-
-                    if (ConnectionCreated != null)
-                    {
-                        await ConnectionCreated(connection);
-                    }
 
                     result.Add(connection);
                     await usageTracker.IncrementLoginCount();
