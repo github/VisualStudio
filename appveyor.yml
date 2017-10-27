@@ -22,5 +22,4 @@ install:
 build_script:
 - ps: scripts\build.ps1
 test_script:
-- ps: >-
-    scripts\Run-Tests.ps1 -AppVeyor
+- ps: scripts\tests.ps1 -AppVeyor
