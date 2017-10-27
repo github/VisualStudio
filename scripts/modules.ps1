@@ -17,43 +17,97 @@ New-Module -ScriptBlock {
 
 New-Module -ScriptBlock {
     function Die([int]$exitCode, [string]$message, [object[]]$output) {
-        $host.SetShouldExit($exitCode)
+        #$host.SetShouldExit($exitCode)
         if ($output) {
             Write-Output $output
             $message += ". See output above."
         }
         Throw (New-Object -TypeName ScriptException -ArgumentList $message)
+        #throw $message
     }
 
 
-    function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet, [int]$Timeout = 0) {
-        $script = $Command
+    function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
+        Write-Output $command
+        $output = ""
+
+        $exitCode = 0
+
+        if ($Quiet) {
+            $output = & $command 2>&1 | %{ "$_" }
+        } else {
+            & $command
+        }
+
+        if (!$? -and $LastExitCode -ne 0) {
+            $exitCode = $LastExitCode
+        } elseif ($? -and $LastExitCode -ne 0) {
+            $exitCode = $LastExitCode
+        }
+
+        if ($exitCode -ne 0) {
+            if (!$Fatal) {
+                Write-Output "``$Command`` failed" $output
+            } else {
+                Die $exitCode "``$Command`` failed" $output
+            }
+        }
+        $output
+    }
+
+    function Run-Process([int]$Timeout, [string]$Command, [string[]]$Arguments, [switch]$Fatal = $false)
+    {
+        $args = ($Arguments | %{ "`"$_`"" })
+        [object[]] $output = "$Command " + $args
+        $exitCode = 0
+        $outputPath = [System.IO.Path]::GetTempFileName()
+        $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $Command ($args | %{ "`"$_`"" })
+        Wait-Process -InputObject $process -Timeout $Timeout -ErrorAction SilentlyContinue
+        if ($process.HasExited) {
+            $output += Get-Content $outputPath
+            $exitCode = $process.ExitCode
+        } else {
+            $output += "Tests timed out. Backtrace:"
+            $output += Get-DotNetStack $process.Id
+            $exitCode = 9999
+        }
+        Stop-Process -InputObject $process
+        Remove-Item $outputPath
+        if ($exitCode -ne 0) {
+            if (!$Fatal) {
+                Write-Output "``$Command`` failed" $output
+            } else {
+                Die $exitCode "``$Command`` failed" $output
+            }
+        }
+        $output
+    }
+
+    <#
+    function Run-Job([string[]]$Command, [switch]$Fatal, [switch]$Quiet, [int]$Timeout = 0) {
+        #Write-Output "ARGS $Command"
+        $cmd = $Command
 
         $output = ""
 
         $exitCode = 0
         $errorStr = "failed"
-
-        if ($Timeout -gt 0) {
-            $script = [ScriptBlock]::Create({Set-Location $using:PWD;}.ToString() + $Command.ToString() + ' 2>&1 | %{ "$_" }' + {; if ($LastExitCode -ne 0) { throw "Failed" }}.ToString())
-            & $scriptsDirectory\clearerror.cmd
-            $job = Start-Job -InitializationScript { Set-Location $PSScriptRoot } -ScriptBlock $script
-            $state = Wait-Job -Timeout $Timeout $job
-            if (!$state) {
-                $exitCode = 2
-                $errorStr = "timed out"
-            } else {
-                $output = Receive-Job $job
-                if ($job.State -eq 'Failed') {
-                    $exitCode = 1
-                }
-            }
+        set-psdebug -trace 2
+        #$script = [ScriptBlock]::Create($Command.ToString() + ' 2>&1 | %{ "$_" }' + {; if ($LastExitCode -ne 0) throw "Failed" }}.ToString())
+        #$script = [ScriptBlock]::Create("& `$args[0] " + ' 2>&1 | %{ "$_" }' + {; if ($LastExitCode -ne 0) { throw "Failed" }}.ToString())
+        #$script = { & $args[0] $args[1] 2>&1 | %{ "$_" } ; if ($LastExitCode -ne 0) { throw "Failed" }}
+        & $scriptsDirectory\clearerror.cmd
+        $script = { & (@$args[0]) }
+        $job = Start-Job -ScriptBlock $script -ArgumentList (,$cmd)
+        $state = Wait-Job -Timeout $Timeout $job
+        if (!$state) {
+            $exitCode = 2
+            $errorStr = "timed out"
         } else {
-
-            if ($Quiet) {
-                $output = & $command 2>&1 | %{ "$_" }
-            } else {
-                & $command
+            $output = Receive-Job $job
+            Write-Output $output
+            if ($job.State -eq 'Failed') {
+                $exitCode = 1
             }
         }
 
@@ -72,13 +126,14 @@ New-Module -ScriptBlock {
         }
         $output
     }
+    #>
 
     function Create-TempDirectory {
         $path = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
         New-Item -Type Directory $path
     }
 
-    Export-ModuleMember -Function Die,Run-Command,Create-TempDirectory
+    Export-ModuleMember -Function Die,Run-Command,Run-Process,Create-TempDirectory
 }
 
 New-Module -ScriptBlock {

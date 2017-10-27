@@ -19,48 +19,45 @@ Param(
     ,
     [switch]
     $AppVeyor = $false
+    ,
+    [switch]
+    $Trace = $false
 
 )
 
 Set-StrictMode -Version Latest
+if ($Trace) {
+    Set-PSDebug -Trace 1
+}
 
-$scriptsDirectory = Split-Path ($MyInvocation.MyCommand.Path)
-$rootDirectory = Split-Path ($scriptsDirectory)
-$env:PATH = "$scriptsDirectory;$env:PATH"
-
-Write-Output $scriptsDirectory $rootDirectory
-
-. $scriptsDirectory\common.ps1
-
-Push-Location $rootDirectory
+$scriptsDirectory = $PSScriptRoot
 
 Write-Output "Running Tracking Collection Tests..."
-$result = & scripts\Run-NUnit src TrackingCollectionTests $TimeoutDuration $config
-if ($result.ExitCode -eq 0) {
-} else {
-    $exitCode = $result.ExitCode
-}
-
-Write-Output "Running Unit Tests..."
-$result = & scripts\Run-XUnit src UnitTests $TimeoutDuration $config
-if ($result.ExitCode -eq 0) {
-} else {
-    $exitCode = $result.ExitCode
-}
-
-Write-Output "Running GitHub.InlineReviews.UnitTests..."
-$result = & scripts\Run-XUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config
-if ($result.ExitCode -eq 0) {
-} else {
-    $exitCode = $result.ExitCode
+& {
+    Trap {
+        $exitcode = 1
+    }
+    . $scriptsDirectory\Run-NUnit src TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 }
 
 Write-Output "Running GitHub.UI.UnitTests..."
-$result = & scripts\Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config
-if ($result.ExitCode -eq 0) {
-} else {
-    $exitCode = $result.ExitCode
+& {
+    Trap {
+        $exitcode = 1
+    }
+. $scriptsDirectory\Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 }
-
-Pop-Location
-exit $exitCode
+Write-Output "Running UnitTests..."
+& {
+    Trap {
+        $exitcode = 1
+    }
+. $scriptsDirectory\Run-XUnit src UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+}
+Write-Output "Running GitHub.InlineReviews.UnitTests..."
+& {
+    Trap {
+        $exitcode = 1
+    }
+. $scriptsDirectory\Run-XUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+}

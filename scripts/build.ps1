@@ -37,10 +37,10 @@ $scriptsDirectory = $PSScriptRoot
 $rootDirectory = Split-Path ($scriptsDirectory)
 $env:PATH = "$scriptsDirectory;$env:PATH"
 
-. $scriptsDirectory\modules.ps1
+. $scriptsDirectory\modules.ps1 | Import-Module
 
 Import-Module (Join-Path $scriptsDirectory "\Modules\Debugging.psm1")
-. $scriptsDirectory\Modules\Vsix.ps1
+. $scriptsDirectory\Modules\Vsix.ps1 | Import-Module
 
 Push-Location $rootDirectory
 
