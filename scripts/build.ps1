@@ -55,14 +55,6 @@ if ($Clean) {
 Write-Output "Building GitHub for Visual Studio..."
 Write-Output ""
 
-& {
-    Trap {
-        Write-Output $_
-        exit 1
-    }
-
-    Build-Solution GitHubVs.sln "Build" $config
-}
+Build-Solution GitHubVs.sln "Build" $config
 
 Pop-Location
-exit $LastExitCode
