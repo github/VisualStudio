@@ -2,7 +2,9 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Authentication;
+using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
@@ -79,6 +81,34 @@ public class LoginControlViewModelTests
             await enterpriseLoginCommand.ExecuteAsync();
 
             Assert.True(success);
+        }
+
+        [Fact]
+        public void LoginModeTracksAvailableConnections()
+        {
+            var connectionManager = Substitute.For<IConnectionManager>();
+            var connections = new ObservableCollectionEx<IConnection>();
+            var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
+            var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
+            var gitHubConnection = Substitute.For<IConnection>();
+            var enterpriseConnection = Substitute.For<IConnection>();
+
+            connectionManager.Connections.Returns(connections);
+            gitHubConnection.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            enterpriseConnection.HostAddress.Returns(HostAddress.Create("https://enterprise.url"));
+
+            var loginViewModel = new LoginControlViewModel(connectionManager, gitHubLogin, enterpriseLogin);
+
+            Assert.Equal(LoginMode.DotComOrEnterprise, loginViewModel.LoginMode);
+
+            connections.Add(enterpriseConnection);
+            Assert.Equal(LoginMode.DotComOnly, loginViewModel.LoginMode);
+
+            connections.Add(gitHubConnection);
+            Assert.Equal(LoginMode.None, loginViewModel.LoginMode);
+
+            connections.RemoveAt(0);
+            Assert.Equal(LoginMode.EnterpriseOnly, loginViewModel.LoginMode);
         }
     }
 }

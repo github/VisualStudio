@@ -147,7 +147,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             base.Initialize(serviceProvider);
 
-            ////hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => LoadDefault());
+            connectionManager.Connections.CollectionChanged += (_, __) => LoadDefault();
+            LoadDefault();
         }
 
         public void Initialize(ViewWithData data = null)
