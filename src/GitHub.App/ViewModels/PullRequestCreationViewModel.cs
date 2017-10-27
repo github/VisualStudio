@@ -32,7 +32,6 @@ namespace GitHub.ViewModels
 
         readonly ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
         readonly ObservableAsPropertyHelper<bool> isExecuting;
-        readonly IConnection connection;
         readonly IModelService modelService;
         readonly IObservable<IRemoteRepositoryModel> githubObs;
         readonly CompositeDisposable disposables = new CompositeDisposable();
@@ -40,11 +39,11 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
-            IConnection connection,
+            IGlobalConnection connection,
             IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService service, INotificationService notifications)
-            : this(connection, modelServiceFactory, teservice?.ActiveRepo, service, notifications)
+            : this(connection.Get(), modelServiceFactory, teservice?.ActiveRepo, service, notifications)
         {}
 
         public PullRequestCreationViewModel(
@@ -60,7 +59,6 @@ namespace GitHub.ViewModels
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(notifications, nameof(notifications));
 
-            this.connection = connection;
             activeLocalRepo = activeRepo;
             modelService = modelServiceFactory.CreateBlocking(connection);
 

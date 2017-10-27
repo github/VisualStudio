@@ -4,7 +4,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Info;
-using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;

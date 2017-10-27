@@ -131,6 +131,7 @@
     <Compile Include="Models\IssueCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
+    <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\LocalRepositories.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Caches\CacheIndex.cs" />

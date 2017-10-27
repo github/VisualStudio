@@ -34,7 +34,6 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
-        readonly IConnection connection;
         readonly IModelService modelService;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
@@ -43,6 +42,16 @@ namespace GitHub.ViewModels
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
+        public RepositoryCreationViewModel(
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
+            IOperatingSystem operatingSystem,
+            IRepositoryCreationService repositoryCreationService,
+            IUsageTracker usageTracker)
+            : this(connection.Get(), modelServiceFactory, operatingSystem, repositoryCreationService, usageTracker)
+        {
+        }
+
         public RepositoryCreationViewModel(
             IConnection connection,
             IModelServiceFactory modelServiceFactory,
@@ -56,7 +65,6 @@ namespace GitHub.ViewModels
             Guard.ArgumentNotNull(repositoryCreationService, nameof(repositoryCreationService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
-            this.connection = connection;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
             this.usageTracker = usageTracker;

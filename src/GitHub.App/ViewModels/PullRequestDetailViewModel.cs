@@ -60,14 +60,14 @@ namespace GitHub.ViewModels
         /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
-            IConnection connection,
+            IGlobalConnection connection,
             IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
-                   modelServiceFactory.CreateBlocking(connection),
+                   modelServiceFactory.CreateBlocking(connection.Get()),
                    pullRequestsService,
                    sessionManager,
                    usageTracker)

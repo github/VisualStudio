@@ -31,7 +31,15 @@ namespace GitHub.ViewModels
         string baseRepositoryPath;
 
         [ImportingConstructor]
-        StartPageCloneViewModel(
+        public StartPageCloneViewModel(
+            IGlobalConnection connection,
+            IRepositoryCloneService cloneService,
+            IOperatingSystem operatingSystem)
+            : this(connection.Get(), cloneService, operatingSystem)
+        {
+        }
+
+        public StartPageCloneViewModel(
             IConnection connection,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)

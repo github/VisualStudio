@@ -44,6 +44,15 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
+            IRepositoryCloneService cloneService,
+            IOperatingSystem operatingSystem)
+            : this(connection.Get(), modelServiceFactory, cloneService, operatingSystem)
+        {
+        }
+
+        public RepositoryCloneViewModel(
             IConnection connection,
             IModelServiceFactory modelServiceFactory,
             IRepositoryCloneService cloneService,

@@ -26,7 +26,6 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly IConnectionManager connectionManager;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly INotificationService notificationService;
         readonly IModelServiceFactory modelServiceFactory;
@@ -51,7 +50,6 @@ namespace GitHub.ViewModels
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
 
             this.notificationService = notificationService;
-            this.connectionManager = connectionManager;
             this.usageTracker = usageTracker;
             this.modelServiceFactory = modelServiceFactory;
 

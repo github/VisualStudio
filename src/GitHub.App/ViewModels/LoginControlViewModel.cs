@@ -6,7 +6,6 @@ using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
-using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;

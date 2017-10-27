@@ -41,12 +41,12 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         PullRequestListViewModel(
-            IConnection connection,
+            IGlobalConnection connection,
             IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
-            : this(connection, modelServiceFactory, teservice.ActiveRepo, settings, visualStudioBrowser)
+            : this(connection.Get(), modelServiceFactory, teservice.ActiveRepo, settings, visualStudioBrowser)
         {
             Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(teservice, nameof(teservice));

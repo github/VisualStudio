@@ -1,9 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using GitHub.Exports;
-using GitHub.Models;
 using GitHub.Services;
-using GitHub.UI;
 using ReactiveUI;
 
 namespace GitHub.ViewModels

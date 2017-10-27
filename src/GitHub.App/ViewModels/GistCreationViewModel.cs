@@ -32,13 +32,13 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         GistCreationViewModel(
-            IConnection connection,
+            IGlobalConnection connection,
             IModelServiceFactory modelServiceFactory,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
             INotificationService notificationService,
             IUsageTracker usageTracker)
-            : this(connection, modelServiceFactory, selectedTextProvider, gistPublishService, usageTracker)
+            : this(connection.Get(), modelServiceFactory, selectedTextProvider, gistPublishService, usageTracker)
         {
             Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
