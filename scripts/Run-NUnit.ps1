@@ -27,7 +27,7 @@ Param(
 
 $scriptsDirectory = $PSScriptRoot
 $rootDirectory = Split-Path ($scriptsDirectory)
-. $scriptsDirectory\modules.ps1 | Import-Module
+. $scriptsDirectory\modules.ps1 | out-null
 
 $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
 
