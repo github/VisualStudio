@@ -127,6 +127,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Factories\ModelServiceFactory.cs" />
     <Compile Include="Models\IssueCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
