@@ -29,30 +29,6 @@ if (!$git) {
 
 $nuget = Join-Path $rootDirectory "tools\nuget\nuget.exe"
 
-function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet, [switch]$DontDie) {
-    $output = ""
-    if ($Quiet) {
-        $output = & $Command 2>&1 | %{ "$_" }
-    } else {
-        & $Command
-    }
-
-    if (!$Fatal) {
-        return
-    }
-
-    $exitCode = 0
-    if (!$? -and $LastExitCode -ne 0) {
-        $exitCode = $LastExitCode
-    } elseif (!$?) {
-        $exitCode = 1
-    } else {
-        return
-    }
-
-    Die "``$Command`` failed" $output
-}
-
 function Create-TempDirectory {
     $path = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
     New-Item -Type Directory $path

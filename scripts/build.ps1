@@ -25,27 +25,24 @@ Param(
     $Config = "Release"
     ,
     [switch]
-    $RunTests = $false
+    $Trace = $false
 )
 
 Set-StrictMode -Version Latest
+if ($Trace) {
+    Set-PSDebug -Trace 1
+}
 
-$scriptsDirectory = Split-Path ($MyInvocation.MyCommand.Path)
+$scriptsDirectory = $PSScriptRoot
 $rootDirectory = Split-Path ($scriptsDirectory)
 $env:PATH = "$scriptsDirectory;$env:PATH"
 
+. $scriptsDirectory\modules.ps1
 
-Write-Output $scriptsDirectory  $rootDirectory
-
-Import-Module (Join-Path $scriptsDirectory "\Modules\BuildUtils.psm1") 3> $null # Ignore warnings
 Import-Module (Join-Path $scriptsDirectory "\Modules\Debugging.psm1")
-Import-Module (Join-Path $scriptsDirectory "\Modules\Vsix.psm1")
-
-. $scriptsDirectory\common.ps1
+. $scriptsDirectory\Modules\Vsix.ps1
 
 Push-Location $rootDirectory
-
-$nuget = Join-Path $rootDirectory "tools\nuget\nuget.exe"
 
 if ($UpdateSubmodules) {
     Update-Submodules
@@ -57,13 +54,15 @@ if ($Clean) {
 
 Write-Output "Building GitHub for Visual Studio..."
 Write-Output ""
-Build-Solution GitHubVs.sln "Build" $config
 
-$exitCode = 0
+& {
+    Trap {
+        Write-Output $_
+        exit 1
+    }
 
-if ($RunTests) {
-    scripts\Run-Tests $Config
+    Build-Solution GitHubVs.sln "Build" $config
 }
 
 Pop-Location
-exit $exitCode
+exit $LastExitCode

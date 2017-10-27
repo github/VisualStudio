@@ -25,7 +25,7 @@ Param(
     $AppVeyor = $false
 )
 
-$rootDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
+$rootDirectory = Split-Path ($PSScriptRoot)
 Push-Location $rootDirectory
 
 $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"

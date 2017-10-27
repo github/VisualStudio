@@ -25,46 +25,49 @@ Param(
     $AppVeyor = $false
 )
 
-$rootDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
-Push-Location $rootDirectory
+$scriptsDirectory = $PSScriptRoot
+$rootDirectory = Split-Path ($scriptsDirectory)
+. $scriptsDirectory\modules.ps1
 
 $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
 
-if ($AppVeyor) {
-    $xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
-    $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
-    $args = $dll, "-noshadow", "-parallel", "all", "-appveyor"
-    [object[]] $output = "$consoleRunner " + ($args -join " ")
-    & $consoleRunner ($args | %{ "`"$_`"" })
-    if($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
+& {
+    Trap {
+        Write-Output $_
+        exit 1
     }
-} else {
-    $xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
-    $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
-    $xml = Join-Path $rootDirectory "nunit-$Project.xml"
-    $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "all"
-
-    [object[]] $output = "$consoleRunner " + ($args -join " ")
-
-    $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
-    Wait-Process -InputObject $process -Timeout $TimeoutDuration -ErrorAction SilentlyContinue
-    if ($process.HasExited) {
-        $output += Get-Content $outputPath
-        $exitCode = $process.ExitCode
+    if ($AppVeyor) {
+        $xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
+        $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
+        $args = $dll, "-noshadow", "-parallel", "all", "-appveyor"
+        [object[]] $output = "$consoleRunner " + ($args -join " ")
+        Run-Command -Fatal { & $consoleRunner ($args | %{ "`"$_`"" }) }
     } else {
-        $output += "Tests timed out. Backtrace:"
-        $output += Get-DotNetStack $process.Id
-        $exitCode = 9999
-    }
-    Stop-Process -InputObject $process
-    Remove-Item $outputPath
-    Pop-Location
+        $xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
+        $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
+        $xml = Join-Path $rootDirectory "nunit-$Project.xml"
+        $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $result = New-Object System.Object
-    $result | Add-Member -Type NoteProperty -Name Output -Value $output
-    $result | Add-Member -Type NoteProperty -Name ExitCode -Value $exitCode
-    $result
+        $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "all"
+        $output = Run-Command -Fatal -Timeout $TimeoutDuration { $consoleRunner ($args | %{ "`"$_`"" }) }
+
+        #[object[]] $output = "$consoleRunner " + ($args -join " ")
+
+        #$process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
+        #Wait-Process -InputObject $process -Timeout $TimeoutDuration -ErrorAction SilentlyContinue
+        #if ($process.HasExited) {
+        #    $output += Get-Content $outputPath
+        #    $exitCode = $process.ExitCode
+        #} else {
+        #    $output += "Tests timed out. Backtrace:"
+        #    $output += Get-DotNetStack $process.Id
+        #    $exitCode = 9999
+        #}
+        #Stop-Process -InputObject $process
+        #Remove-Item $outputPath
+    }
 }
+
+$output
+exit 0
