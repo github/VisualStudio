@@ -13,7 +13,7 @@ Param(
     # It would be nice to use our Validate-Version function here, but we
     # can't because this Param definition has to come before any other code in the
     # file.
-    [ValidateScript({ ($_.Major -ge 0) -and ($_.Minor -ge 0) -and ($_.Build -ge 0) -and ($_.Revision -ge 0) })]
+    [ValidateScript({ ($_.Major -ge 0) -and ($_.Minor -ge 0) -and ($_.Build -ge 0) })]
     [System.Version]
     $NewVersion = $null
     ,
@@ -26,14 +26,11 @@ Param(
     [switch]
     $BumpPatch = $false
     ,
-    [switch]
-    $BumpBuild = $false
-    ,
     [string]
     $Branch
     ,
     [switch]
-    $NoPush = $false
+    $Push = $false
 	,
     [switch]
     $Force = $false
@@ -63,7 +60,7 @@ function Die([string]$message, [object[]]$output) {
 }
 
 function Validate-Version([System.Version]$version) {
-    ($version.Major -ge 0) -and ($version.Minor -ge 0) -and ($version.Build -ge 0) -and ($version.Revision -ge 0)
+    ($version.Major -ge 0) -and ($version.Minor -ge 0) -and ($version.Build -ge 0)
 }
 
 function Bump-Version {
@@ -84,13 +81,11 @@ function Bump-Version {
     }
 
     if ($BumpMajor) {
-        New-Object -TypeName System.Version -ArgumentList ($currentVersion.Major + 1), $currentVersion.Minor, $currentVersion.Build, $currentVersion.Revision
+        New-Object -TypeName System.Version -ArgumentList ($currentVersion.Major + 1), $currentVersion.Minor, $currentVersion.Build, 0
     } elseif ($BumpMinor) {
-        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, ($currentVersion.Minor + 1), $currentVersion.Build, $currentVersion.Revision
+        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, ($currentVersion.Minor + 1), $currentVersion.Build, 0
     } elseif ($BumpPatch) {
-        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), $currentVersion.Revision
-    } elseif ($BumpBuild) {
-        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, ($currentVersion.Revision + 1)
+        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), 0
     }
 }
 
@@ -181,12 +176,7 @@ function Write-VersionAssemblyInfo {
 	Write-Output $assemblyInfo
     $numberOfReplacements = 0
     $newContent = Get-Content $assemblyInfo | %{
-        $regex = "(Assembly(?:File)?Version)\(`"\d+\.\d+\.\d+\.\d+`"\)"
         $newString = $_
-        if ($_ -match $regex) {
-            $numberOfReplacements++
-            $newString = $_ -replace $regex, "`$1(`"$version`")"
-        }
         $regex = "(const string Version = )`"\d+\.\d+\.\d+\.\d+`";"
         if ($_ -match $regex) {
             $numberOfReplacements++
@@ -195,8 +185,8 @@ function Write-VersionAssemblyInfo {
         $newString
     }
 
-    if ($numberOfReplacements -ne 3) {
-        Die "Expected to replace the version number in 3 places in SolutionInfo.cs (AssemblyVersion, AssemblyFileVersion, const string Version) but actually replaced it in $numberOfReplacements"
+    if ($numberOfReplacements -ne 1) {
+        Die "Expected to replace the version number in 1 place in SolutionInfo.cs (AssemblyVersion, AssemblyFileVersion, const string Version) but actually replaced it in $numberOfReplacements"
     }
 
     $newContent | Set-Content $assemblyInfo
@@ -243,8 +233,8 @@ if (!$? -or ($LastExitCode -ne 0)) {
 }
 
 
-if (!$BumpMajor -and !$BumpMinor -and !$BumpPatch -and !$BumpBuild -and ($NewVersion -eq $null -or !(Validate-Version($NewVersion)))) {
-    Die "You need to indicate which part of the version to update via -BumpMajor/-BumpMinor/BumpPatch/BumpBuild flags or a custom version via -NewVersion"
+if (!$BumpMajor -and !$BumpMinor -and !$BumpPatch -and ($NewVersion -eq $null -or !(Validate-Version($NewVersion)))) {
+    Die "You need to indicate which part of the version to update via -BumpMajor/-BumpMinor/-BumpPatch flags or a custom version via -NewVersion"
 }
 
 $currentVersion = Read-CurrentVersion
@@ -252,8 +242,6 @@ $NewVersion = Bump-Version $currentVersion $NewVersion
 Write-Version $NewVersion
 Commit-VersionBump $NewVersion
 
-if ($NoPush) {
-    Write-Output "Skipping push because -NoPush"
-} else {
+if ($Push) {
     Push-Changes $Branch
 }

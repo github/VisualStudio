@@ -748,6 +748,7 @@
   <Import Project="packaging.targets" />
   <!-- For regenerating templates on build -->
   <Import Project="$(SolutionDir)\src\common\t4.targets" />
+  <Import Project="versioning.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

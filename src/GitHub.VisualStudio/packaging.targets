@@ -15,11 +15,18 @@
     <Message Importance="High" Text='Suppressed "@(SuppressPackaging)" from being included in VSIX.' />
   </Target>
 
+  <Target Name="UpdateManifestVersion" AfterTargets="DetokenizeVsixManifestFile" Outputs="$(IntermediateVsixManifest)">
+    <ReadLinesFromFile File="$(OutputPath)\version">
+      <Output TaskParameter="Lines" PropertyName="Version" />
+    </ReadLinesFromFile>
+    <Message Text="Stamping package with version '$(Version)'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Metadata/x:Identity/@Version" Value="$(Version)" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+  </Target>
 
-  <!-- Update to have AllUsers="true" and Experimental="false" when $(IsExperimental)' == 'false' -->
-  <Target Name="MakeVsixManifestAllUsers" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(IsExperimental)' == 'false' ">
-    <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to have AllUsers='true' and Experimental='false'" />
-    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="true" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
-    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="false" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+  <!-- set AllUsers="false" and Experimental="true" when $(IsExperimental)' == 'true' -->
+  <Target Name="ExperimentalManifest" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(IsExperimental)' == 'true' ">
+    <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to have AllUsers='false' and Experimental='true'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="false" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="true" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
   </Target>
 </Project>
