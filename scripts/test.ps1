@@ -32,32 +32,33 @@ if ($Trace) {
 
 $scriptsDirectory = $PSScriptRoot
 
+$exitcode = 0
+
 Write-Output "Running Tracking Collection Tests..."
-& {
-    Trap {
-        $exitcode = 1
-    }
-    . $scriptsDirectory\Run-NUnit src TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+& $scriptsDirectory\Run-NUnit src TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+if (!$?) {
+    $exitcode = 1
 }
 
 Write-Output "Running GitHub.UI.UnitTests..."
-& {
-    Trap {
-        $exitcode = 1
-    }
-. $scriptsDirectory\Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+& $scriptsDirectory\Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+if (!$?) {
+    $exitcode = 2
 }
+
 Write-Output "Running UnitTests..."
-& {
-    Trap {
-        $exitcode = 1
-    }
 . $scriptsDirectory\Run-XUnit src UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+if (!$?) {
+    $exitcode = 3
 }
+
 Write-Output "Running GitHub.InlineReviews.UnitTests..."
-& {
-    Trap {
-        $exitcode = 1
-    }
 . $scriptsDirectory\Run-XUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+if (!$?) {
+    $exitcode = 4
 }
+
+if ($exitcode -ne 0 -and $AppVeyor) {
+    $host.SetShouldExit($exitcode)
+}
+exit $exitcode

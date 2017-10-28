@@ -2,8 +2,10 @@ Add-Type -AssemblyName "System.Core"
 Add-Type -TypeDefinition @"
 public class ScriptException : System.Exception
 {
-    public ScriptException(string message) : base(message)
+    public int ExitCode { get; private set; }
+    public ScriptException(string message, int exitCode) : base(message)
     {
+        this.ExitCode = exitCode;
     }
 }
 "@
@@ -22,7 +24,12 @@ New-Module -ScriptBlock {
             Write-Output $output
             $message += ". See output above."
         }
-        Throw (New-Object -TypeName ScriptException -ArgumentList $message)
+        $hash = @{
+            Message = $message
+            ExitCode = $exitCode
+            Output = $output
+        }
+        Throw (New-Object -TypeName ScriptException -ArgumentList $message,$exitCode)
         #throw $message
     }
 

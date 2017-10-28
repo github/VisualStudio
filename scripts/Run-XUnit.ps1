@@ -33,15 +33,22 @@ $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
 
 $xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
 $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
-if ($AppVeyor) {
-    $args = $dll, "-noshadow", "-parallel", "all", "-appveyor"
-    & $consoleRunner ($args | %{ "`"$_`"" })
-    if($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
+
+& {
+    Trap {
+        exit $_.Exception.ExitCode
     }
-} else {
-    $xml = Join-Path $rootDirectory "nunit-$Project.xml"
-    $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "all"
-    Write-Output "$consoleRunner $args"
+
+    $args = @()
+    if ($AppVeyor) {
+        $args = $dll, "-noshadow", "-parallel", "all", "-appveyor"
+    } else {
+        $xml = Join-Path $rootDirectory "nunit-$Project.xml"
+        $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "all"
+    }
+
     Run-Process -Fatal $TimeoutDuration $consoleRunner $args
+    if (!$?) {
+        Die 111 "xunit $Project failed"
+    }
 }

@@ -30,19 +30,17 @@ $rootDirectory = Split-Path ($scriptsDirectory)
 . $scriptsDirectory\modules.ps1 | out-null
 
 $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
+$nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
+$consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
+$xml = Join-Path $rootDirectory "nunit-$Project.xml"
 
-    #$consoleRunner = nunit3-console
-    #$args = $dll,"--where ""cat != Timings""","--result=myresults.xml;format=AppVeyor"
-    #& $consoleRunner ($args | %{ "`"$_`"" })
-# else {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
+& {
+    Trap {
+        exit $_.Exception.ExitCode
+    }
 
-    $xml = Join-Path $rootDirectory "nunit-$Project.xml"
     Run-Process -Fatal $TimeoutDuration $consoleRunner $dll,"--where ""cat != Timings""","--result=$xml;format=AppVeyor"
-if ($AppVeyor) {
-    if($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
+    if (!$?) {
+        Die 111 "nunit $Project failed"
     }
 }
-#}
