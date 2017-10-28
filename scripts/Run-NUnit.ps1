@@ -36,11 +36,11 @@ $xml = Join-Path $rootDirectory "nunit-$Project.xml"
 
 & {
     Trap {
-        exit $_.Exception.ExitCode
+        exit 1
     }
 
     Run-Process -Fatal $TimeoutDuration $consoleRunner $dll,"--where ""cat != Timings""","--result=$xml;format=AppVeyor"
     if (!$?) {
-        Die 111 "nunit $Project failed"
+        Die 1 "nunit $Project failed"
     }
 }

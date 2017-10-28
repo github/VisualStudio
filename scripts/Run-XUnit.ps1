@@ -36,7 +36,7 @@ $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
 
 & {
     Trap {
-        exit $_.Exception.ExitCode
+        exit 1
     }
 
     $args = @()
@@ -49,6 +49,6 @@ $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
 
     Run-Process -Fatal $TimeoutDuration $consoleRunner $args
     if (!$?) {
-        Die 111 "xunit $Project failed"
+        Die 1 "xunit $Project failed"
     }
 }
