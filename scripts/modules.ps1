@@ -157,7 +157,7 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution,[string]$target,[string]$configuration, [bool]$ForVSInstaller) {
+    function Build-Solution([string]$solution,[string]$target,[string]$configuration, [switch]$ForVSInstaller, [switch]$Deploy) {
         Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
         $flag1 = ""
         $flag2 = ""
@@ -165,6 +165,10 @@ New-Module -ScriptBlock {
             $flag1 = "/p:IsProductComponent=true"
             $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
             new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
+        }
+
+        if (!$Deploy) {
+            $configuration += "WithoutVsix"
         }
 
         $msbuild = Find-MSBuild

@@ -25,6 +25,9 @@ Param(
     $Config = "Release"
     ,
     [switch]
+    $Deploy = $false
+    ,
+    [switch]
     $Trace = $false
 )
 
@@ -55,6 +58,6 @@ if ($Clean) {
 Write-Output "Building GitHub for Visual Studio..."
 Write-Output ""
 
-Build-Solution GitHubVs.sln "Build" $config
+Build-Solution GitHubVs.sln "Build" $config -Deploy:$Deploy
 
 Pop-Location

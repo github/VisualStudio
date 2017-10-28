@@ -31,7 +31,7 @@ $rootDirectory = Split-Path ($scriptsDirectory)
 
 $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
 
-$xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.1.0\tools
+$xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.3.1\tools
 $consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
 
 & {
