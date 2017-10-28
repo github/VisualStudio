@@ -31,12 +31,13 @@ $rootDirectory = Split-Path ($scriptsDirectory)
 
 $dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
 
-$xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.3.1\tools
-$consoleRunner = Join-Path $xunitDirectory xunit.console.x86.exe
+$xunitDirectory = Join-Path $rootDirectory packages\xunit.runner.console.2.3.1\tools\net452
+$consoleRunner = Join-Path $xunitDirectory xunit.console.exe
 
 & {
     Trap {
-        exit 1
+        Write-Output $_
+        exit -1
     }
 
     $args = @()

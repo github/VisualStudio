@@ -36,7 +36,8 @@ $xml = Join-Path $rootDirectory "nunit-$Project.xml"
 
 & {
     Trap {
-        exit 1
+        Write-Output $_
+        exit -1
     }
 
     Run-Process -Fatal $TimeoutDuration $consoleRunner $dll,"--where ""cat != Timings""","--result=$xml;format=AppVeyor"
