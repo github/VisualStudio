@@ -36,7 +36,7 @@ $consoleRunner = Join-Path $xunitDirectory xunit.console.exe
 
 & {
     Trap {
-        Write-Output $_
+        Write-Output "$Project tests failed"
         exit -1
     }
 
@@ -50,6 +50,6 @@ $consoleRunner = Join-Path $xunitDirectory xunit.console.exe
 
     Run-Process -Fatal $TimeoutDuration $consoleRunner $args
     if (!$?) {
-        Die 1 "xunit $Project failed"
+        Die 1 "$Project tests failed"
     }
 }

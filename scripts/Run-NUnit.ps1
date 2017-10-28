@@ -36,12 +36,12 @@ $xml = Join-Path $rootDirectory "nunit-$Project.xml"
 
 & {
     Trap {
-        Write-Output $_
+        Write-Output "$Project tests failed"
         exit -1
     }
 
     Run-Process -Fatal $TimeoutDuration $consoleRunner $dll,"--where ""cat != Timings""","--result=$xml;format=AppVeyor"
     if (!$?) {
-        Die 1 "nunit $Project failed"
+        Die 1 "$Project tests failed"
     }
 }
