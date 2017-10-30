@@ -8,7 +8,7 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
-    class CommentViewModelDesigner : ReactiveObject, ICommentViewModel
+    public class CommentViewModelDesigner : ReactiveObject, ICommentViewModel
     {
         public CommentViewModelDesigner()
         {

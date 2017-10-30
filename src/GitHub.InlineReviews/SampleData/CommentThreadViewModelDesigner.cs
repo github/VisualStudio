@@ -7,11 +7,11 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
-    class CommentThreadViewModelDesigner : ICommentThreadViewModel
+    public class CommentThreadViewModelDesigner : ICommentThreadViewModel
     {
         public ObservableCollection<ICommentViewModel> Comments { get; }
             = new ObservableCollection<ICommentViewModel>();
- 
+
         public IAccount CurrentUser { get; set; }
             = new AccountDesigner { Login = "shana", IsUser = true };
 
