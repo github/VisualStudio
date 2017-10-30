@@ -26,6 +26,7 @@ namespace GitHub.InlineReviews.Peek
 
         public void Dispose()
         {
+            Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NavigateTo(object data)
