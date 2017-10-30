@@ -24,7 +24,7 @@ $dll = "test\$Project\bin\$Configuration\$Project.dll"
 if ($AppVeyor) {
     $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
     $consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
-    $args = "-noshadow", "-framework:net-4.5", "-exclude:Timings", $dll
+    $args = "--framework:net-4.5", "--where:cat!=Timings", $dll
     [object[]] $output = "$consoleRunner " + ($args -join " ")
     & $consoleRunner ($args | %{ "`"$_`"" })
     if($LastExitCode -ne 0) {
