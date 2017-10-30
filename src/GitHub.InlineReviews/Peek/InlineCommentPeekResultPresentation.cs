@@ -40,9 +40,9 @@ namespace GitHub.InlineReviews.Peek
             }
         }
 
-        public event EventHandler IsDirtyChanged;
-        public event EventHandler IsReadOnlyChanged;
-        public event EventHandler<RecreateContentEventArgs> RecreateContent;
+        public event EventHandler IsDirtyChanged = delegate { }; // IsDirty is always false.
+        public event EventHandler IsReadOnlyChanged = delegate { }; // IsDirty is always true.
+        public event EventHandler<RecreateContentEventArgs> RecreateContent = delegate { };
         public event EventHandler<EventArgs> DesiredHeightChanged;
 
         public bool CanSave(out string defaultPath)

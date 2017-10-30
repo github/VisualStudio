@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.Peek
 
         public Action<IPeekResult, object, object> PostNavigationCallback => null;
 
-        public event EventHandler Disposed;
+        public event EventHandler Disposed = delegate { };
 
         public void Dispose()
         {
