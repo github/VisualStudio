@@ -25,7 +25,6 @@ namespace GitHub.InlineReviews.ViewModels
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
@@ -43,21 +42,18 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
         public InlineCommentPeekViewModel(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
 
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;

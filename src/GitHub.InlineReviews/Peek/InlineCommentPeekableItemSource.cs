@@ -36,7 +36,6 @@ namespace GitHub.InlineReviews.Peek
             if (session.RelationshipName == InlineCommentPeekRelationship.Instance.Name)
             {
                 var viewModel = new InlineCommentPeekViewModel(
-                    apiClientFactory,
                     peekService,
                     session,
                     sessionManager,
