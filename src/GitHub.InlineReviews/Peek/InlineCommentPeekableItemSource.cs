@@ -11,20 +11,17 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItemSource : IPeekableItemSource
     {
-        readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
 
         public InlineCommentPeekableItemSource(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.nextCommentCommand = nextCommentCommand;

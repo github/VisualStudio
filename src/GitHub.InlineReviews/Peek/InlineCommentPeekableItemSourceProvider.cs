@@ -39,7 +39,6 @@ namespace GitHub.InlineReviews.Peek
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
         {
             return new InlineCommentPeekableItemSource(
-                apiClientFactory,
                 peekService,
                 sessionManager,
                 nextCommentCommand,
