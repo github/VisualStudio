@@ -19,25 +19,25 @@ Param(
 
 $rootDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
 Push-Location $rootDirectory
-$dll = "src\$Project\bin\$Configuration\$Project.dll"
+$dll = "test\$Project\bin\$Configuration\$Project.dll"
 
 if ($AppVeyor) {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.Runners.2.6.4\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit-console-x86.exe
-    $args = "-noshadow", "-framework:net-4.5", "-exclude:Timings", $dll
+    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
+    $consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
+    $args = "--framework:net-4.5", "--where:cat!=Timings", $dll
     [object[]] $output = "$consoleRunner " + ($args -join " ")
     & $consoleRunner ($args | %{ "`"$_`"" })
     if($LastExitCode -ne 0) {
         $host.SetShouldExit($LastExitCode)
     }
 } else {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.Runners.2.6.4\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit-console-x86.exe
+    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
+    $consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
 
     $xml = Join-Path $rootDirectory "nunit-$Project.xml"
     $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $args = "-noshadow", "-xml:$xml", "-framework:net-4.5", "-exclude:Timings", $dll
+    $args = "--result=$xml", "--framework:net-4.5", "--where:cat!=Timings", $dll
     [object[]] $output = "$consoleRunner " + ($args -join " ")
 
     $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })

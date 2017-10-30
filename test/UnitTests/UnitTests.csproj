@@ -313,55 +313,55 @@
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DesignTimeStyleHelper\DesignTimeStyleHelper.csproj">
+    <ProjectReference Include="..\..\src\DesignTimeStyleHelper\DesignTimeStyleHelper.csproj">
       <Project>{b1f5c227-456f-437d-bd5f-4c11b7a8d1a0}</Project>
       <Name>DesignTimeStyleHelper</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
+    <ProjectReference Include="..\..\src\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
+    <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj">
       <Project>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</Project>
       <Name>GitHub.App</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+    <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
+    <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
       <Name>GitHub.Exports</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
+    <ProjectReference Include="..\..\src\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
       <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
       <Name>GitHub.Extensions.Reactive</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
+    <ProjectReference Include="..\..\src\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
+    <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
       <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
       <Name>GitHub.InlineReviews</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
+    <ProjectReference Include="..\..\src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
+    <ProjectReference Include="..\..\src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}</Project>
       <Name>GitHub.UI.Reactive</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
+    <ProjectReference Include="..\..\src\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
       <Name>GitHub.VisualStudio.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
       <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
       <Name>GitHub.VisualStudio</Name>
     </ProjectReference>
