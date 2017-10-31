@@ -33,8 +33,10 @@ New-Module -ScriptBlock {
         Write-VersionVsixManifest $version
         Write-VersionInstaller $version
         Write-VersionSolutionInfo $version
-        Start-Sleep -s 1
-        Set-Content $rootDirectory\build\version $version
+        Push-Location $rootDirectory
+        New-Item -Type Directory build
+        Set-Content build\version $version
+        Pop-Location
     }
 
     function Commit-Version([System.Version]$version) {
