@@ -26,7 +26,6 @@ New-Module -ScriptBlock {
 
     function Write-VersionSolutionInfo([System.Version]$version) {
         $file = Get-SolutionInfoPath
-        Write-Host $file
         $numberOfReplacements = 0
         $newContent = Get-Content $file | %{
             $newString = $_

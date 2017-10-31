@@ -156,7 +156,7 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution,[string]$target,[string]$configuration, [switch]$ForVSInstaller, [bool]$Deploy) {
+    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller, [bool]$Deploy = $false) {
         Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
         $flag1 = ""
         $flag2 = ""

@@ -17,7 +17,7 @@
       <Code Type="Fragment" Language="cs">
         <![CDATA[
             var str = File.ReadAllText(this.SolutionInfoFile);
-            var regex = new Regex(@"ShortVersion = ""([\d]+\.[\d]+\.[\d]+)""");
+            var regex = new Regex(@"ShortVersion = ""([\d]+\.[\d]+\.[\d]+.[\d]+)""");
             var v = Version.Parse(regex.Match(str).Groups[1].Value);
             this.GeneratedVersion = String.Format("{0}.{1}.{2}.{3}", v.Major, v.Minor, v.Build, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         ]]>
