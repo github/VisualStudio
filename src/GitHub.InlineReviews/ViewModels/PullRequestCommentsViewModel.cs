@@ -13,14 +13,11 @@ namespace GitHub.InlineReviews.ViewModels
 {
     class PullRequestCommentsViewModel : ReactiveObject, IPullRequestCommentsViewModel
     {
-        readonly IApiClient apiClient;
         readonly IPullRequestSession session;
 
         public PullRequestCommentsViewModel(
-            IApiClient apiClient,
             IPullRequestSession session)
         {
-            this.apiClient = apiClient;
             this.session = session;
 
             Repository = session.LocalRepository;
