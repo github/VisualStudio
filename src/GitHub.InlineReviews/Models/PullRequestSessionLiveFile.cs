@@ -17,6 +17,8 @@ namespace GitHub.InlineReviews.Models
     /// </remarks>
     public sealed class PullRequestSessionLiveFile : PullRequestSessionFile, IDisposable
     {
+        bool disposed = false;
+
         public PullRequestSessionLiveFile(
             string relativePath,
             ITextBuffer textBuffer,
@@ -50,10 +52,19 @@ namespace GitHub.InlineReviews.Models
         /// <summary>
         /// Disposes of the resources in <see cref="ToDispose"/>.
         /// </summary>
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            ToDispose?.Dispose();
-            ToDispose = null;
+            if (!disposed)
+            {
+                disposed = true;
+
+                if (disposing)
+                {
+                    ToDispose?.Dispose();
+                }
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

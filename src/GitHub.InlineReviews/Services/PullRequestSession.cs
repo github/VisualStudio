@@ -21,7 +21,7 @@ namespace GitHub.InlineReviews.Services
     /// It takes the pull request model and updates according to the current state of the
     /// repository on disk and in the editor.
     /// </remarks>
-    public class PullRequestSession : ReactiveObject, IPullRequestSession
+    public class PullRequestSession : ReactiveObject, IPullRequestSession, IDisposable
     {
         readonly IPullRequestSessionService service;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
@@ -158,6 +158,28 @@ namespace GitHub.InlineReviews.Services
             }
 
             pullRequestChanged.OnNext(pullRequestModel);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                disposed = true;
+
+                if (disposing)
+                {
+                    getFilesLock.Dispose();
+                    pullRequestChanged.Dispose();
+                }
+            }
         }
 
         async Task AddComment(IPullRequestReviewCommentModel comment)
