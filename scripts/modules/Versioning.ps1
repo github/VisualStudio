@@ -34,7 +34,7 @@ New-Module -ScriptBlock {
         Write-VersionInstaller $version
         Write-VersionSolutionInfo $version
         Push-Location $rootDirectory
-        New-Item -Type Directory build
+        New-Item -Type Directory build | out-null
         Set-Content build\version $version
         Pop-Location
     }
