@@ -59,14 +59,15 @@ if ($Clean) {
 	Clean-WorkingTree
 }
 
-if ($Deploy -and $Config -eq "Release" -and !$SkipVersionBump) {
-    Bump-Version -BumpBuild
+$fullBuild = Test-Path env:GHFVS_KEY
+$publishable = $fullBuild -and $AppVeyor -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master")
+if ($publishable) { #forcing a deploy flag for CI
+    $Deploy = $true
 }
 
-$full_build = Test-Path env:GHFVS_KEY
-$publishable = $AppVeyor -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master")
-if ($full_build -and $publishable ) { #forcing a deploy flag for CI
-    $Deploy = $true
+if ($publishable -or ($Deploy -and $Config -eq "Release" -and !$SkipVersionBump)) {
+    Write-Output "Bumping the version"
+    Bump-Version -BumpBuild
 }
 
 if ($publishable) {
