@@ -69,10 +69,8 @@ if ($NewVersion -eq $null) {
     }
 
     $currentVersion = Read-CurrentVersion
-    Write-Output $currentVersion
-
     $NewVersion = Generate-Version $currentVersion $BumpMajor $BumpMinor $BumpPatch $BumpBuild
-    Write-Output $NewVersion
+
 } elseif (!(Validate-Version($NewVersion))) {
     Die -1 "Invalid version specific - $NewVersion"
 }

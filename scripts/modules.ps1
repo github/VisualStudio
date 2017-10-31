@@ -218,6 +218,28 @@ New-Module -ScriptBlock {
         Run-Command -Fatal { git submodule foreach git clean -xdf }
     }
 
+    function Get-HeadSha {
+        Run-Command -Quiet { & $git rev-parse HEAD }
+    }
+
     $git = Find-Git
-    Export-ModuleMember -Function Find-Git,Push-Changes,Update-Submodules,Clean-WorkingTree
+    Export-ModuleMember -Function Find-Git,Push-Changes,Update-Submodules,Clean-WorkingTree,Get-HeadSha
+}
+
+New-Module -ScriptBlock {
+    function Write-Manifest([string]$directory) {
+        Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll)
+
+        $manifest = @{
+            NewestExtension = @{
+                Version = [string](Read-CurrentVersionVsix)
+                Commit = [string](Get-HeadSha)
+            }
+        }
+
+        $manifestPath = Join-Path $directory manifest
+        [Newtonsoft.Json.JsonConvert]::SerializeObject($manifest) | Out-File $manifestPath -Encoding UTF8
+    }
+
+    Export-ModuleMember -Function Write-Manifest
 }

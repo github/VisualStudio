@@ -63,31 +63,17 @@ if ($Deploy -and $Config -eq "Release" -and !$SkipVersionBump) {
     Bump-Version -BumpBuild
 }
 
-if ($AppVeyor) {
-    #& $git symbolic-ref HEAD
-    #if (!$?) { # we're in a detached head, which means we're build a PR merge
-        #$parents = Run-Command -Quiet { & $git rev-list -n1 --parents HEAD | %{$_.split(" ")} }
-        #$targetBranchHash = Run-Command -Quiet { & $git rev-parse HEAD^1 }
-        Write-Output $env:APPVEYOR_PULL_REQUEST_NUMBER
-        Write-Output $env:APPVEYOR_PULL_REQUEST_TITLE
-        Write-Output $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME
-        Write-Output $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH
-        Write-Output $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT
-        Write-Output $env:APPVEYOR_REPO_NAME
-        Write-Output $env:APPVEYOR_REPO_BRANCH
-        Write-Output $env:APPVEYOR_REPO_COMMIT
-        Write-Output $env:APPVEYOR_REPO_COMMIT_AUTHOR
-        Write-Output $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL
-        Write-Output $env:APPVEYOR_REPO_COMMIT_TIMESTAMP
-        Write-Output $env:APPVEYOR_REPO_COMMIT_MESSAGE
-        Write-Output $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED
-    #}
-    #$d = Run-Command -Quiet { & git rev-list -n1 --parents HEAD | %{$_.split(" ")} }
+$full_build = Test-Path env:GHFVS_KEY
+$publishable = $AppVeyor -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master")
+if ($full_build -and $publishable ) { #forcing a deploy flag for CI
+    $Deploy = $true
 }
 
-
-Write-Output "Building GitHub for Visual Studio..."
-Write-Output ""
+if ($publishable) {
+    Write-Output "Building and packaging GitHub for Visual Studio"
+} else {
+    Write-Output "Building GitHub for Visual Studio"
+}
 
 Build-Solution GitHubVs.sln "Build" $config $Deploy
 

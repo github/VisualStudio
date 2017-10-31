@@ -23,3 +23,5 @@ build_script:
 - ps: scripts\build.ps1 -AppVeyor
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
+on_success:
+- ps: scripts\Publish-Artifacts
