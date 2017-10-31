@@ -20,25 +20,15 @@ Param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
-$rootDirectory = Split-Path ($scriptsDirectory)
-#$git = Get-Command git.cmd
-. $scriptsDirectory\common.ps1
-
-function Die([string]$message) {
-    Write-Error $message
-    exit 1
-}
+. $PSScriptRoot\modules.ps1 | out-null
 
 # Based on git-sh-setup.sh:require_clean_work_tree in git.git, but changed not
 # to ignore submodules.
 
 Push-Location $rootDirectory
 
-& $git rev-parse --verify HEAD | Out-Null
-if (!$? -or ($LastExitCode -ne 0)) {
-    Die
-}
+Run-Command -Fatal { & $git rev-parse --verify HEAD | Out-Null }
+
 & $git update-index -q --refresh
 
 & $git diff-files --quiet
@@ -60,7 +50,7 @@ if ($error) {
     if ($WarnOnly) {
         Write-Warning "$error Continuing anyway."
     } else {
-        Die ("Cannot $Action" + ": $error")
+        Die 2 ("Cannot $Action" + ": $error")
     }
 }
 

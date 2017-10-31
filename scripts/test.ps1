@@ -30,30 +30,30 @@ if ($Trace) {
     Set-PSDebug -Trace 1
 }
 
-$scriptsDirectory = $PSScriptRoot
+$env:PATH = "$$PSScriptRoot;$env:PATH"
 
 $exitcode = 0
 
 Write-Output "Running Tracking Collection Tests..."
-& $scriptsDirectory\Run-NUnit src TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-NUnit src TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 1
 }
 
 Write-Output "Running GitHub.UI.UnitTests..."
-& $scriptsDirectory\Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 2
 }
 
 Write-Output "Running UnitTests..."
-. $scriptsDirectory\Run-XUnit src UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-XUnit src UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 3
 }
 
 Write-Output "Running GitHub.InlineReviews.UnitTests..."
-. $scriptsDirectory\Run-XUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-XUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 4
 }

@@ -16,7 +16,7 @@
   </Target>
 
   <Target Name="UpdateManifestVersion" AfterTargets="DetokenizeVsixManifestFile" Outputs="$(IntermediateVsixManifest)">
-    <ReadLinesFromFile File="$(OutputPath)\version">
+    <ReadLinesFromFile File="$(SolutionDir)\build\version">
       <Output TaskParameter="Lines" PropertyName="Version" />
     </ReadLinesFromFile>
     <Message Text="Stamping package with version '$(Version)'" />

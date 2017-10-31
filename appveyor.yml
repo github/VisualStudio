@@ -4,7 +4,7 @@ install:
     $full_build = Test-Path env:GHFVS_KEY
 
     git submodule init
-    
+
     git submodule sync
 
     if ($full_build) {
@@ -20,6 +20,6 @@ install:
 
     nuget restore GitHubVS.sln
 build_script:
-- ps: scripts\build.ps1
+- ps: scripts\build.ps1 -AppVeyor
 test_script:
 - ps: scripts\test.ps1 -AppVeyor

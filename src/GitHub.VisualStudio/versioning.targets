@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask 
+  <UsingTask
     TaskName="GenerateVersion"
     TaskFactory="CodeTaskFactory"
     AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
@@ -17,7 +17,7 @@
       <Code Type="Fragment" Language="cs">
         <![CDATA[
             var str = File.ReadAllText(this.SolutionInfoFile);
-            var regex = new Regex(@"const string Version = ""([\d]+\.[\d]+\.[\d]+\.[\d]+)""");
+            var regex = new Regex(@"ShortVersion = ""([\d]+\.[\d]+\.[\d]+)""");
             var v = Version.Parse(regex.Match(str).Groups[1].Value);
             this.GeneratedVersion = String.Format("{0}.{1}.{2}.{3}", v.Major, v.Minor, v.Build, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         ]]>
@@ -25,13 +25,13 @@
     </Task>
   </UsingTask>
 
-	<Target Name="GenerateVersionFile" AfterTargets="CoreCompile" Inputs="$(SolutionDir)\src\common\SolutionInfo.cs" Outputs="$(OutputPath)\version">
+	<Target Name="GenerateVersionFile" AfterTargets="CoreCompile" Inputs="$(SolutionDir)\src\common\SolutionInfo.cs" Outputs="$(SolutionDir)\build\version">
     <GenerateVersion SolutionInfoFile="$(SolutionDir)\src\common\SolutionInfo.cs">
       <Output TaskParameter="GeneratedVersion" PropertyName="GeneratedVersion" />
     </GenerateVersion>
 
-    <Message Text="Generating file '$(OutputPath)\version' with version '$(GeneratedVersion)'" />
+    <Message Text="Generating file '$(SolutionDir)\build\version' with version '$(GeneratedVersion)'" />
 
-    <WriteLinesToFile File="$(OutputPath)\version" Lines="$(GeneratedVersion)" Overwrite="True" />
+    <WriteLinesToFile File="$(SolutionDir)\build\version" Lines="$(GeneratedVersion)" Overwrite="True" />
 	</Target>
 </Project>
