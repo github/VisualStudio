@@ -188,11 +188,11 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task SessionChanged(IPullRequestSession session)
+        async Task SessionChanged(IPullRequestSession pullRequestSession)
         {
-            this.session = session;
+            this.session = pullRequestSession;
 
-            if (session == null)
+            if (pullRequestSession == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();
