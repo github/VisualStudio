@@ -8,7 +8,7 @@
                               $([System.String]::Copy('%(Filename)').Contains('Microsoft.')) or
                               $([System.String]::Copy('%(Extension)').Contains('.dylib')) or
                               $([System.String]::Copy('%(Extension)').Contains('.so')) or
-                              $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.*\\libgit2\\.*\.pdb'))
+                              $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.*\\LibGit2Sharp.NativeBinaries.*\\.*\.pdb'))
                              "/>
       <VSIXSourceItem Remove="@(SuppressPackaging)" />
     </ItemGroup>
