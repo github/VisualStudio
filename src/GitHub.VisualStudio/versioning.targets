@@ -25,7 +25,11 @@
     </Task>
   </UsingTask>
 
-	<Target Name="GenerateVersionFile" AfterTargets="CoreCompile" Inputs="$(SolutionDir)\src\common\SolutionInfo.cs" Outputs="$(SolutionDir)\build\version">
+	<Target Name="GenerateVersionFile"
+      Condition="$(SkipPackage) != 'Skip'"
+      AfterTargets="CoreCompile"
+      Inputs="$(SolutionDir)\src\common\SolutionInfo.cs"
+      Outputs="$(SolutionDir)\build\version">
     <GenerateVersion SolutionInfoFile="$(SolutionDir)\src\common\SolutionInfo.cs">
       <Output TaskParameter="GeneratedVersion" PropertyName="GeneratedVersion" />
     </GenerateVersion>

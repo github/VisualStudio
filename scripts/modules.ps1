@@ -164,10 +164,9 @@ New-Module -ScriptBlock {
             $flag1 = "/p:IsProductComponent=true"
             $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
             new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
-        }
-
-        if (!$Deploy) {
+        } elseif (!$Deploy) {
             $configuration += "WithoutVsix"
+            $flag1 = "/p:Package=Skip"
         }
 
         $msbuild = Find-MSBuild
