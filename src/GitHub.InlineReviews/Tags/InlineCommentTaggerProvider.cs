@@ -42,11 +42,8 @@ namespace GitHub.InlineReviews.Tags
 
         public ITagger<T> CreateTagger<T>(ITextView view, ITextBuffer buffer) where T : ITag
         {
-            return buffer.Properties.GetOrCreateSingletonProperty(()=> 
+            return buffer.Properties.GetOrCreateSingletonProperty(() =>
                 new InlineCommentTagger(
-                    gitService,
-                    gitClient,
-                    diffService,
                     view,
                     buffer,
                     sessionManager)) as ITagger<T>;

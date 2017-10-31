@@ -22,7 +22,6 @@ namespace GitHub.InlineReviews.Peek
 
         [ImportingConstructor]
         public InlineCommentPeekableItemSourceProvider(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
