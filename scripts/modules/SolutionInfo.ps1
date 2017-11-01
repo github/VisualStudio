@@ -10,7 +10,7 @@ New-Module -ScriptBlock {
         $file = Get-SolutionInfoPath
         $currentVersion = Get-Content $file | %{
             $newString = $_
-            $regex = "const string ShortVersion = `"(\d+\.\d+\.\d+\.\d+)`";"
+            $regex = "const string Version = `"(\d+\.\d+\.\d+\.\d+)`";"
             if ($_ -match $regex) {
                 $version = $matches[1]
             }
@@ -34,16 +34,11 @@ New-Module -ScriptBlock {
                 $numberOfReplacements++
                 $newString = $_ -replace $regex, "`$1`"$version`";"
             }
-            $regex = "(string ShortVersion = )`"\d+\.\d+\.\d+\.\d+`";"
-            if ($newString -match $regex) {
-                $numberOfReplacements++
-                $newString = $newString -replace $regex, "`$1`"$version`";"
-            }
             $newString
         }
 
-        if ($numberOfReplacements -ne 2) {
-            Die 1 "Expected to replace the version number in 2 places in SolutionInfo.cs (Version and ShortVersion) but actually replaced it in $numberOfReplacements"
+        if ($numberOfReplacements -ne 1) {
+            Die 1 "Expected to replace the version number in 1 place in SolutionInfo.cs (Version) but actually replaced it in $numberOfReplacements"
         }
 
         $newContent | Set-Content $file
