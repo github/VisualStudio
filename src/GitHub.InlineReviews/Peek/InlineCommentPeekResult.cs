@@ -22,10 +22,11 @@ namespace GitHub.InlineReviews.Peek
 
         public Action<IPeekResult, object, object> PostNavigationCallback => null;
 
-        public event EventHandler Disposed;
+        public event EventHandler Disposed = delegate { };
 
         public void Dispose()
         {
+            Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NavigateTo(object data)

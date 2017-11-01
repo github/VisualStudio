@@ -235,6 +235,5 @@ $RECYCLE.BIN/
 AkavacheSqliteLinkerOverride.cs
 NuGetBuild
 WiX.Toolset.DummyFile.txt
-nunit-UnitTests.xml
-nunit-TrackingCollectionTests.xml
+nunit-*.xml
 GitHubVS.sln.DotSettings
