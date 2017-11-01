@@ -17,7 +17,7 @@ install:
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
 build_script:
-- ps: scripts\build.ps1 -AppVeyor -BuildNumber:{build}
+- ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
 on_success:
