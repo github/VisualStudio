@@ -34,10 +34,15 @@ New-Module -ScriptBlock {
         }
     }
 
+    function Read-Version {
+        Read-VersionAppVeyor
+    }
+
     function Write-Version([System.Version]$version) {
         Write-VersionVsixManifest $version
         Write-VersionInstaller $version
         Write-VersionSolutionInfo $version
+        Write-VersionAppVeyor $version
         Push-Location $rootDirectory
         New-Item -Type Directory -ErrorAction SilentlyContinue build | out-null
         Set-Content build\version $version
@@ -60,5 +65,5 @@ New-Module -ScriptBlock {
         Pop-Location
     }
 
-    Export-ModuleMember -Function Validate-Version,Write-Version,Commit-Version,Generate-Version
+    Export-ModuleMember -Function Validate-Version,Write-Version,Commit-Version,Generate-Version,Read-Version
 }

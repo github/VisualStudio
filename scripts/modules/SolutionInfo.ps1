@@ -9,18 +9,11 @@ New-Module -ScriptBlock {
     function Read-VersionSolutionInfo {
         $file = Get-SolutionInfoPath
         $currentVersion = Get-Content $file | %{
-            $newString = $_
             $regex = "const string Version = `"(\d+\.\d+\.\d+\.\d+)`";"
             if ($_ -match $regex) {
-                $version = $matches[1]
+                $matches[1]
             }
-            $version
         }
-
-        if (!Validate-Version $currentVersion) {
-            Die 1 "Invalid currentVersion $currentVersion"
-        }
-
         [System.Version] $currentVersion
     }
 
@@ -29,10 +22,10 @@ New-Module -ScriptBlock {
         $numberOfReplacements = 0
         $newContent = Get-Content $file | %{
             $newString = $_
-            $regex = "(string Version = )`"\d+\.\d+\.\d+\.\d+`";"
+            $regex = "(string Version = `")\d+\.\d+\.\d+\.\d+"
             if ($_ -match $regex) {
                 $numberOfReplacements++
-                $newString = $_ -replace $regex, "`$1`"$version`";"
+                $newString = $newString -replace $regex, "string Version = `"$version"
             }
             $newString
         }
