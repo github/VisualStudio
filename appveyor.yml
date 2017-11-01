@@ -1,9 +1,8 @@
+skip_tags: true
 install:
-- ps: >-
+- ps: |
     $full_build = Test-Path env:GHFVS_KEY
-
     git submodule init
-
     git submodule sync
 
     if ($full_build) {
@@ -16,11 +15,13 @@ install:
     }
 
     git submodule update --recursive --force
-
     nuget restore GitHubVS.sln
 build_script:
-- ps: scripts\build.ps1 -AppVeyor -Version -BuildNumber:{build}
+- ps: scripts\build.ps1 -AppVeyor -BuildNumber:{build}
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
 on_success:
-- ps: scripts\Publish-Artifacts
+- ps: |
+    if ($full_build) {
+      script\Sign-Package
+    }

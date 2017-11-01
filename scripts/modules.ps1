@@ -11,8 +11,8 @@ public class ScriptException : System.Exception
 "@
 
 New-Module -ScriptBlock {
-    $scriptsDirectory = $PSScriptRoot
-    $rootDirectory = Split-Path ($scriptsDirectory)
+    $rootDirectory = Split-Path ($PSScriptRoot)
+    $scriptsDirectory = Join-Path $rootDirectory "scripts"
     $nuget = Join-Path $rootDirectory "tools\nuget\nuget.exe"
     Export-ModuleMember -Variable scriptsDirectory,rootDirectory,nuget
 }
