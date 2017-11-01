@@ -34,7 +34,7 @@ public class ConnectionManagerTests
 
             manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));
 
-            Assert.Equal(1, manager.Connections.Count);
+            Assert.Single(manager.Connections);
             cache.Received(1).Save(Arg.Is<IEnumerable<ConnectionDetails>>(x =>
                 x.SequenceEqual(new[] { new ConnectionDetails(HostAddress.GitHubDotComHostAddress, "coolio") })));
         }

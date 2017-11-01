@@ -44,7 +44,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
             }
 
@@ -61,7 +61,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<AddInlineCommentTag>(result[0].Tag);
             }
 
@@ -94,7 +94,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
             }
 
@@ -111,7 +111,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<AddInlineCommentTag>(result[0].Tag);
             }
 
@@ -222,7 +222,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
             }
 
@@ -239,7 +239,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<AddInlineCommentTag>(result[0].Tag);
             }
 

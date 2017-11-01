@@ -51,7 +51,6 @@ public class UriStringTests
         [InlineData(@"c:\dev\bar\..\exp\foo")]
         [InlineData("c:/dev/exp/foo")]
         [InlineData(@"c:\dev\exp\foo.git")]
-        [InlineData(@"c:\dev\exp\foo.git")]
         [InlineData("c:/dev/exp/foo.git")]
         [InlineData("c:/dev/exp/bar/../foo.git")]
         [InlineData("file:///C:/dev/exp/foo")]
@@ -61,9 +60,9 @@ public class UriStringTests
         {
             var cloneUrl = new UriString(path);
 
-            Assert.Equal(cloneUrl.Host, "");
-            Assert.Equal(cloneUrl.Owner, "");
-            Assert.Equal(cloneUrl.RepositoryName, "foo");
+            Assert.Equal("", cloneUrl.Host);
+            Assert.Equal("", cloneUrl.Owner);
+            Assert.Equal("foo", cloneUrl.RepositoryName);
             Assert.Equal(cloneUrl.ToString(), path.Replace('\\', '/'));
             Assert.True(cloneUrl.IsFileUri);
         }
@@ -81,7 +80,6 @@ public class UriStringTests
         [InlineData("blah@bar.com:/Windows.git", "bar.com", null, "Windows")]
         [InlineData("blah@baz.com/Windows.git", "baz.com", null, "Windows")]
         [InlineData("ssh://git@github.com:github/Windows.git", "github.com", "github", "Windows")]
-        [InlineData("ssh://git@example.com/Windows.git", "example.com", null, "Windows")]
         public void ParsesWeirdUrlsAsWellAsPossible(string url, string expectedHost, string owner, string repositoryName)
         {
             var cloneUrl = new UriString(url);
@@ -230,7 +228,7 @@ public class UriStringTests
         {
             var uri = new UriString("http://github.com/foo/bar/");
             string cloneUri = uri;
-            Assert.Equal(cloneUri, "http://github.com/foo/bar/");
+            Assert.Equal("http://github.com/foo/bar/", cloneUri);
         }
 
         [Fact]
@@ -249,7 +247,7 @@ public class UriStringTests
         public void ConvertsToCloneUri()
         {
             UriString cloneUri = "http://github.com/foo/bar/";
-            Assert.Equal(cloneUri.Host, "github.com");
+            Assert.Equal("github.com", cloneUri.Host);
         }
 
         [Fact]

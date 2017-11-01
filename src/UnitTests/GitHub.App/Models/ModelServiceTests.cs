@@ -347,11 +347,11 @@ public class ModelServiceTests
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
-            Assert.Equal(1, (await cache.GetAllObjects<AccountCacheItem>()).Count());
+            Assert.Single((await cache.GetAllObjects<AccountCacheItem>()));
 
             await modelService.InvalidateAll();
 
-            Assert.Equal(0, (await cache.GetAllObjects<AccountCacheItem>()).Count());
+            Assert.Empty((await cache.GetAllObjects<AccountCacheItem>()));
         }
 
         [Fact]
@@ -423,7 +423,7 @@ public class ModelServiceTests
             await col.OriginalCompleted;
 
             Assert.Equal(expected, col.Count);
-            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Cache")))).ToArray());
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.StartsWith("Cache", x.Title))).ToArray());
         }
 
         [Fact]
@@ -491,7 +491,7 @@ public class ModelServiceTests
 
             await done;
 
-            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.StartsWith("Live", x.Title))).ToArray());
         }
 
         [Fact]
@@ -563,12 +563,12 @@ public class ModelServiceTests
             await done;
 
             Assert.Equal(5, col.Count);
-            Assert.Collection(col, 
-                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(5, t.Number); },
-                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(6, t.Number); },
-                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(7, t.Number); },
-                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(8, t.Number); },
-                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(9, t.Number); }
+            Assert.Collection(col,
+                t => { Assert.StartsWith("Live", t.Title); Assert.Equal(5, t.Number); },
+                t => { Assert.StartsWith("Live", t.Title); Assert.Equal(6, t.Number); },
+                t => { Assert.StartsWith("Live", t.Title); Assert.Equal(7, t.Number); },
+                t => { Assert.StartsWith("Live", t.Title); Assert.Equal(8, t.Number); },
+                t => { Assert.StartsWith("Live", t.Title); Assert.Equal(9, t.Number); }
             );
         }
     }
