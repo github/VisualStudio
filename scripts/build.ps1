@@ -25,7 +25,16 @@ Param(
     $Config = "Release"
     ,
     [switch]
-    $Deploy = $false
+    $Package = $false
+    ,
+    [switch]
+    $AppVeyor = $false
+    ,
+    [switch]
+    $BumpVersion = $false
+    ,
+    [int]
+    $BuildNumber = -1
     ,
     [switch]
     $Trace = $false
@@ -36,14 +45,12 @@ if ($Trace) {
     Set-PSDebug -Trace 1
 }
 
-$scriptsDirectory = $PSScriptRoot
-$rootDirectory = Split-Path ($scriptsDirectory)
-$env:PATH = "$scriptsDirectory;$env:PATH"
+. $PSScriptRoot\modules.ps1 | out-null
+$env:PATH = "$scriptsDirectory;$scriptsDirectory\Modules;$env:PATH"
 
-. $scriptsDirectory\modules.ps1 | out-null
-
-Import-Module (Join-Path $scriptsDirectory "\Modules\Debugging.psm1")
-. $scriptsDirectory\Modules\Vsix.ps1 | out-null
+Import-Module $scriptsDirectory\Modules\Debugging.psm1
+Vsix | out-null
+WiX | out-null
 
 Push-Location $rootDirectory
 
@@ -55,9 +62,24 @@ if ($Clean) {
 	Clean-WorkingTree
 }
 
-Write-Output "Building GitHub for Visual Studio..."
-Write-Output ""
+$fullBuild = Test-Path env:GHFVS_KEY
+$publishable = $fullBuild -and $AppVeyor -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master")
+if ($publishable) { #forcing a deploy flag for CI
+    $Package = $true
+    $BumpVersion = $true
+}
 
-Build-Solution GitHubVs.sln "Build" $config -Deploy:$Deploy
+if ($BumpVersion) {
+    Write-Output "Bumping the version"
+    Bump-Version -BumpBuild -BuildNumber:$BuildNumber
+}
+
+if ($Package) {
+    Write-Output "Building and packaging GitHub for Visual Studio"
+} else {
+    Write-Output "Building GitHub for Visual Studio"
+}
+
+Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package
 
 Pop-Location

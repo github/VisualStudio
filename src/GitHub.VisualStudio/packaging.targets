@@ -8,19 +8,19 @@
                               $([System.String]::Copy('%(Filename)').Contains('Microsoft.')) or
                               $([System.String]::Copy('%(Extension)').Contains('.dylib')) or
                               $([System.String]::Copy('%(Extension)').Contains('.so')) or
-                              $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.*\\libgit2\\.*\.pdb'))
+                              $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.*\\LibGit2Sharp.NativeBinaries.*\\.*\.pdb'))
                              "/>
       <VSIXSourceItem Remove="@(SuppressPackaging)" />
     </ItemGroup>
     <Message Importance="High" Text='Suppressed "@(SuppressPackaging)" from being included in VSIX.' />
   </Target>
 
-  <Target Name="UpdateManifestVersion" AfterTargets="DetokenizeVsixManifestFile" Outputs="$(IntermediateVsixManifest)">
-    <ReadLinesFromFile File="$(OutputPath)\version">
-      <Output TaskParameter="Lines" PropertyName="Version" />
-    </ReadLinesFromFile>
-    <Message Text="Stamping package with version '$(Version)'" />
-    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Metadata/x:Identity/@Version" Value="$(Version)" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+  <Target Name="UpdateManifestVersion"
+    AfterTargets="DetokenizeVsixManifestFile"
+    DependsOnTargets="GetBuildVersion"
+    Outputs="$(IntermediateVsixManifest)">
+    <Message Text="Stamping package with version '$(BuildVersion)'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Metadata/x:Identity/@Version" Value="$(BuildVersion)" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
   </Target>
 
   <!-- set AllUsers="false" and Experimental="true" when $(IsExperimental)' == 'true' -->

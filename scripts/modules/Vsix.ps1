@@ -17,12 +17,19 @@ New-Module -ScriptBlock {
         [xml] $xmlText
     }
 
-    function Read-CurrentVersion {
-        [System.Version] (Get-VsixManifestXml).PackageManifest.Metadata.Identity.Version
-    }
-
     function Read-CurrentVersionVsix {
         [System.Version] (Get-VsixManifestXml).PackageManifest.Metadata.Identity.Version
     }
-    Export-ModuleMember -Function Read-CurrentVersion,Read-CurrentVersionVsix
+
+    function Write-VersionVsixManifest([System.Version]$version) {
+
+        $document = Get-VsixManifestXml
+
+        $numberOfReplacements = 0
+        $document.PackageManifest.Metadata.Identity.Version = $version.ToString()
+
+        $document.Save((Get-VsixManifestPath))
+    }
+
+    Export-ModuleMember -Function Read-CurrentVersionVsix,Write-VersionVsixManifest
 }

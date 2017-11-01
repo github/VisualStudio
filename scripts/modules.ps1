@@ -11,8 +11,8 @@ public class ScriptException : System.Exception
 "@
 
 New-Module -ScriptBlock {
-    $scriptsDirectory = $PSScriptRoot
-    $rootDirectory = Split-Path ($scriptsDirectory)
+    $rootDirectory = Split-Path ($PSScriptRoot)
+    $scriptsDirectory = Join-Path $rootDirectory "scripts"
     $nuget = Join-Path $rootDirectory "tools\nuget\nuget.exe"
     Export-ModuleMember -Variable scriptsDirectory,rootDirectory,nuget
 }
@@ -21,7 +21,7 @@ New-Module -ScriptBlock {
     function Die([int]$exitCode, [string]$message, [object[]]$output) {
         #$host.SetShouldExit($exitCode)
         if ($output) {
-            Write-Output $output
+            Write-Host $output
             $message += ". See output above."
         }
         $hash = @{
@@ -35,7 +35,6 @@ New-Module -ScriptBlock {
 
 
     function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
-        Write-Output $command
         $output = ""
 
         $exitCode = 0
@@ -54,7 +53,7 @@ New-Module -ScriptBlock {
 
         if ($exitCode -ne 0) {
             if (!$Fatal) {
-                Write-Output "``$Command`` failed" $output
+                Write-Host "``$Command`` failed" $output
             } else {
                 Die $exitCode "``$Command`` failed" $output
             }
@@ -82,7 +81,7 @@ New-Module -ScriptBlock {
         Remove-Item $outputPath
         if ($exitCode -ne 0) {
             if (!$Fatal) {
-                Write-Output "``$Command`` failed" $output
+                Write-Host "``$Command`` failed" $output
             } else {
                 Die $exitCode "``$Command`` failed" $output
             }
@@ -92,7 +91,7 @@ New-Module -ScriptBlock {
 
     <#
     function Run-Job([string[]]$Command, [switch]$Fatal, [switch]$Quiet, [int]$Timeout = 0) {
-        #Write-Output "ARGS $Command"
+        #Write-Host "ARGS $Command"
         $cmd = $Command
 
         $output = ""
@@ -112,7 +111,7 @@ New-Module -ScriptBlock {
             $errorStr = "timed out"
         } else {
             $output = Receive-Job $job
-            Write-Output $output
+            Write-Host $output
             if ($job.State -eq 'Failed') {
                 $exitCode = 1
             }
@@ -126,7 +125,7 @@ New-Module -ScriptBlock {
 
         if ($exitCode -ne 0) {
             if (!$Fatal) {
-                Write-Output "``$Command`` $errorStr" $output
+                Write-Host "``$Command`` $errorStr" $output
             } else {
                 Die $exitCode "``$Command`` $errorStr" $output
             }
@@ -157,7 +156,7 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution,[string]$target,[string]$configuration, [switch]$ForVSInstaller, [switch]$Deploy) {
+    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller, [bool]$Deploy = $false) {
         Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
         $flag1 = ""
         $flag2 = ""
@@ -165,15 +164,14 @@ New-Module -ScriptBlock {
             $flag1 = "/p:IsProductComponent=true"
             $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
             new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
-        }
-
-        if (!$Deploy) {
+        } elseif (!$Deploy) {
             $configuration += "WithoutVsix"
+            $flag1 = "/p:Package=Skip"
         }
 
         $msbuild = Find-MSBuild
 
-        Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2"
+        Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2"
         Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2 }
     }
 
@@ -195,7 +193,7 @@ New-Module -ScriptBlock {
     function Push-Changes([string]$branch) {
         Push-Location $rootDirectory
 
-        Write-Output "Pushing $Branch to GitHub..."
+        Write-Host "Pushing $Branch to GitHub..."
 
         Run-Command -Fatal { & $git push origin $branch }
 
@@ -203,8 +201,8 @@ New-Module -ScriptBlock {
     }
 
     function Update-Submodules {
-        Write-Output "Updating submodules..."
-        Write-Output ""
+        Write-Host "Updating submodules..."
+        Write-Host ""
 
         Run-Command -Fatal { git submodule init }
         Run-Command -Fatal { git submodule sync }
@@ -212,13 +210,35 @@ New-Module -ScriptBlock {
     }
 
     function Clean-WorkingTree {
-        Write-Output "Cleaning work tree..."
-        Write-Output ""
+        Write-Host "Cleaning work tree..."
+        Write-Host ""
 
         Run-Command -Fatal { git clean -xdf }
         Run-Command -Fatal { git submodule foreach git clean -xdf }
     }
 
+    function Get-HeadSha {
+        Run-Command -Quiet { & $git rev-parse HEAD }
+    }
+
     $git = Find-Git
-    Export-ModuleMember -Function Find-Git,Push-Changes,Update-Submodules,Clean-WorkingTree
+    Export-ModuleMember -Function Find-Git,Push-Changes,Update-Submodules,Clean-WorkingTree,Get-HeadSha
+}
+
+New-Module -ScriptBlock {
+    function Write-Manifest([string]$directory) {
+        Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll)
+
+        $manifest = @{
+            NewestExtension = @{
+                Version = [string](Read-CurrentVersionVsix)
+                Commit = [string](Get-HeadSha)
+            }
+        }
+
+        $manifestPath = Join-Path $directory manifest
+        [Newtonsoft.Json.JsonConvert]::SerializeObject($manifest) | Out-File $manifestPath -Encoding UTF8
+    }
+
+    Export-ModuleMember -Function Write-Manifest
 }
