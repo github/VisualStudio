@@ -40,7 +40,6 @@ New-Module -ScriptBlock {
 
     function Write-Version([System.Version]$version) {
         Write-VersionVsixManifest $version
-        Write-VersionInstaller $version
         Write-VersionSolutionInfo $version
         Write-VersionAppVeyor $version
         Push-Location $rootDirectory

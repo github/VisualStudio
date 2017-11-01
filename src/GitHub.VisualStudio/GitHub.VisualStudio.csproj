@@ -93,16 +93,6 @@
     <DeployExtension>False</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Publish|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <DeployExtension>False</DeployExtension>
-    <OutputPath>..\..\build\Release\</OutputPath>
-  </PropertyGroup>
   <Import Project="..\common\signing.props" />
   <ItemGroup>
     <Reference Include="EditorUtils2013">

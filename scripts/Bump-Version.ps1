@@ -51,7 +51,6 @@ if ($Trace) { Set-PSDebug -Trace 1 }
 . $PSScriptRoot\modules.ps1 | out-null
 . $scriptsDirectory\Modules\Versioning.ps1 | out-null
 . $scriptsDirectory\Modules\Vsix.ps1 | out-null
-. $scriptsDirectory\Modules\WiX.ps1 | out-null
 . $scriptsDirectory\Modules\SolutionInfo.ps1 | out-null
 . $scriptsDirectory\Modules\AppVeyor.ps1 | out-null
 

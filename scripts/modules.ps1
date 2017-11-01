@@ -89,51 +89,6 @@ New-Module -ScriptBlock {
         $output
     }
 
-    <#
-    function Run-Job([string[]]$Command, [switch]$Fatal, [switch]$Quiet, [int]$Timeout = 0) {
-        #Write-Host "ARGS $Command"
-        $cmd = $Command
-
-        $output = ""
-
-        $exitCode = 0
-        $errorStr = "failed"
-        set-psdebug -trace 2
-        #$script = [ScriptBlock]::Create($Command.ToString() + ' 2>&1 | %{ "$_" }' + {; if ($LastExitCode -ne 0) throw "Failed" }}.ToString())
-        #$script = [ScriptBlock]::Create("& `$args[0] " + ' 2>&1 | %{ "$_" }' + {; if ($LastExitCode -ne 0) { throw "Failed" }}.ToString())
-        #$script = { & $args[0] $args[1] 2>&1 | %{ "$_" } ; if ($LastExitCode -ne 0) { throw "Failed" }}
-        & $scriptsDirectory\clearerror.cmd
-        $script = { & (@$args[0]) }
-        $job = Start-Job -ScriptBlock $script -ArgumentList (,$cmd)
-        $state = Wait-Job -Timeout $Timeout $job
-        if (!$state) {
-            $exitCode = 2
-            $errorStr = "timed out"
-        } else {
-            $output = Receive-Job $job
-            Write-Host $output
-            if ($job.State -eq 'Failed') {
-                $exitCode = 1
-            }
-        }
-
-        if (!$? -and $LastExitCode -ne 0) {
-            $exitCode = $LastExitCode
-        } elseif ($? -and $LastExitCode -ne 0) {
-            $exitCode = $LastExitCode
-        }
-
-        if ($exitCode -ne 0) {
-            if (!$Fatal) {
-                Write-Host "``$Command`` $errorStr" $output
-            } else {
-                Die $exitCode "``$Command`` $errorStr" $output
-            }
-        }
-        $output
-    }
-    #>
-
     function Create-TempDirectory {
         $path = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
         New-Item -Type Directory $path
