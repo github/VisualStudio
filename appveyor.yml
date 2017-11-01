@@ -23,5 +23,5 @@ test_script:
 on_success:
 - ps: |
     if ($full_build) {
-      script\Sign-Package
+      script\Sign-Package -AppVeyor
     }
