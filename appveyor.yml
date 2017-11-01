@@ -1,4 +1,3 @@
-version: '{build}'
 install:
 - ps: >-
     $full_build = Test-Path env:GHFVS_KEY
@@ -20,7 +19,7 @@ install:
 
     nuget restore GitHubVS.sln
 build_script:
-- ps: scripts\build.ps1 -AppVeyor
+- ps: scripts\build.ps1 -AppVeyor -Version -BuildNumber:{build}
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
 on_success:

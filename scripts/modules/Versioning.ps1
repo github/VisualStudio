@@ -8,7 +8,8 @@ New-Module -ScriptBlock {
 
     function Generate-Version([System.Version]$currentVersion,
         [bool]$BumpMajor, [bool] $BumpMinor,
-        [bool]$BumpPatch, [bool] $BumpBuild) {
+        [bool]$BumpPatch, [bool] $BumpBuild,
+        [int]$BuildNumber = -1) {
 
         if (!(Validate-Version $currentVersion)) {
             Die 1 "Invalid current version $currentVersion"
@@ -21,8 +22,12 @@ New-Module -ScriptBlock {
         } elseif ($BumpPatch) {
             New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), 0
         } elseif ($BumpBuild) {
-            $timestamp = [System.DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-            [System.Version] "$($currentVersion.Major).$($currentVersion.Minor).$($currentVersion.Build).$timestamp"
+            if ($BuildNumber -ge 0) {
+                [System.Version] "$($currentVersion.Major).$($currentVersion.Minor).$($currentVersion.Build).$BuildNumber"
+            } else {
+                $timestamp = [System.DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+                [System.Version] "$($currentVersion.Major).$($currentVersion.Minor).$($currentVersion.Build).$timestamp"
+            }
         }
         else {
             $currentVersion
@@ -34,7 +39,7 @@ New-Module -ScriptBlock {
         Write-VersionInstaller $version
         Write-VersionSolutionInfo $version
         Push-Location $rootDirectory
-        New-Item -Type Directory build | out-null
+        New-Item -Type Directory -ErrorAction SilentlyContinue build | out-null
         Set-Content build\version $version
         Pop-Location
     }

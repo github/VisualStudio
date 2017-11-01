@@ -29,6 +29,9 @@ Param(
     [switch]
     $BumpBuild = $false
     ,
+    [int]
+    $BuildNumber = -1
+    ,
     [switch]
     $Commit = $false
 	,
@@ -51,6 +54,12 @@ if ($Trace) { Set-PSDebug -Trace 1 }
 . $scriptsDirectory\Modules\SolutionInfo.ps1 | out-null
 . $scriptsDirectory\Modules\Versioning.ps1 | out-null
 
+if ($NewVersion -eq $null) {
+    if (!$BumpMajor -and !$BumpMinor -and !$BumpPatch -and !$BumpBuild){
+       Die -1 "You need to indicate which part of the version to update via -BumpMajor/-BumpMinor/-BumpPatch/-BumpBuild flags or a custom version via -NewVersion"
+    }
+}
+
 if ($Push -and !$Commit) {
     Die 1 "Cannot push a version bump without -Commit"
 }
@@ -64,23 +73,19 @@ if (!$?) {
 }
 
 if ($NewVersion -eq $null) {
-    if (!$BumpMajor -and !$BumpMinor -and !$BumpPatch -and !$BumpBuild){
-       Die -1 "You need to indicate which part of the version to update via -BumpMajor/-BumpMinor/-BumpPatch flags or a custom version via -NewVersion"
-    }
-
-    $currentVersion = Read-CurrentVersion
-    $NewVersion = Generate-Version $currentVersion $BumpMajor $BumpMinor $BumpPatch $BumpBuild
-
-} elseif (!(Validate-Version($NewVersion))) {
-    Die -1 "Invalid version specific - $NewVersion"
+    $currentVersion = Read-CurrentVersionVsix
+    $NewVersion = Generate-Version $currentVersion $BumpMajor $BumpMinor $BumpPatch $BumpBuild $BuildNumber
 }
 
+Write-Output "Setting version to $NewVersion"
 Write-Version $NewVersion
 
 if ($Commit) {
+    Write-Output "Committing version change"
     Commit-Version $NewVersion
 
     if ($Push) {
+        Write-Output "Pushing version change"
         $branch = & $git rev-parse --abbrev-ref HEAD
         Push-Changes $branch
     }

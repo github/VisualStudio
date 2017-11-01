@@ -38,4 +38,10 @@
 
     <WriteLinesToFile File="$(SolutionDir)\build\version" Lines="$(GeneratedVersion)" Overwrite="True" />
 	</Target>
+
+  <Target Name="GetBuildVersion" Returns="$(BuildVersion)" DependsOnTargets="GenerateVersionFile">
+    <ReadLinesFromFile File="$(SolutionDir)\build\version">
+      <Output TaskParameter="Lines" PropertyName="BuildVersion" />
+    </ReadLinesFromFile>
+  </Target>
 </Project>

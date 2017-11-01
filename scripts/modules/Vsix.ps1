@@ -17,10 +17,6 @@ New-Module -ScriptBlock {
         [xml] $xmlText
     }
 
-    function Read-CurrentVersion {
-        [System.Version] (Get-VsixManifestXml).PackageManifest.Metadata.Identity.Version
-    }
-
     function Read-CurrentVersionVsix {
         [System.Version] (Get-VsixManifestXml).PackageManifest.Metadata.Identity.Version
     }
@@ -35,5 +31,5 @@ New-Module -ScriptBlock {
         $document.Save((Get-VsixManifestPath))
     }
 
-    Export-ModuleMember -Function Read-CurrentVersion,Read-CurrentVersionVsix,Write-VersionVsixManifest
+    Export-ModuleMember -Function Read-CurrentVersionVsix,Write-VersionVsixManifest
 }

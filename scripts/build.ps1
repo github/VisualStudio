@@ -33,6 +33,9 @@ Param(
     [switch]
     $BumpVersion = $false
     ,
+    [int]
+    $BuildNumber = -1
+    ,
     [switch]
     $Trace = $false
 )
@@ -68,7 +71,7 @@ if ($publishable) { #forcing a deploy flag for CI
 
 if ($BumpVersion) {
     Write-Output "Bumping the version"
-    Bump-Version -BumpBuild
+    Bump-Version -BumpBuild -BuildNumber:$BuildNumber
 }
 
 if ($Package) {
