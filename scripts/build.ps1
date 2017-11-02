@@ -50,7 +50,6 @@ $env:PATH = "$scriptsDirectory;$scriptsDirectory\Modules;$env:PATH"
 
 Import-Module $scriptsDirectory\Modules\Debugging.psm1
 Vsix | out-null
-WiX | out-null
 
 Push-Location $rootDirectory
 
