@@ -17,7 +17,9 @@ namespace GitHub.InlineReviews.Models
     /// </remarks>
     /// <seealso cref="PullRequestSession"/>
     /// <seealso cref="PullRequestSessionManager"/>
-    public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile, IDisposable
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "linesChanged is sharred and shouldn't be disposed")]
+    public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
         readonly Subject<IReadOnlyList<Tuple<int, DiffSide>>> linesChanged = new Subject<IReadOnlyList<Tuple<int, DiffSide>>>();
         IReadOnlyList<DiffChunk> diff;
@@ -33,27 +35,6 @@ namespace GitHub.InlineReviews.Models
         public PullRequestSessionFile(string relativePath)
         {
             RelativePath = relativePath;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        bool disposed = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                disposed = true;
-
-                if (disposing)
-                {
-                    linesChanged.Dispose();
-                }
-            }
         }
 
         /// <inheritdoc/>

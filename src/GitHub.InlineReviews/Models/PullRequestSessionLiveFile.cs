@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Subjects;
 using GitHub.Models;
 using Microsoft.VisualStudio.Text;
@@ -49,10 +48,15 @@ namespace GitHub.InlineReviews.Models
         /// </summary>
         public ISubject<ITextSnapshot, ITextSnapshot> Rebuild { get; }
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
         /// <summary>
         /// Disposes of the resources in <see cref="ToDispose"/>.
         /// </summary>
-        protected override void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (!disposed)
             {
@@ -63,8 +67,6 @@ namespace GitHub.InlineReviews.Models
                     ToDispose?.Dispose();
                 }
             }
-
-            base.Dispose(disposing);
         }
     }
 }
