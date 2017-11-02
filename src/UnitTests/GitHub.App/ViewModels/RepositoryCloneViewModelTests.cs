@@ -74,16 +74,6 @@ public class RepositoryCloneViewModelTests
     public class TheIsBusyProperty : TestBaseClass
     {
         [Fact]
-        public async Task StartsTrueBecomesFalseWhenCompleted_MultipleTimes()
-        {
-            // Run StartsTrueBecomesFalseWhenCompleted multiple times until it fails.
-            for (int count = 0; count < 100; count++)
-            {
-                await StartsTrueBecomesFalseWhenCompleted();
-            }
-        }
-
-        [Fact]
         public async Task StartsTrueBecomesFalseWhenCompleted()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
