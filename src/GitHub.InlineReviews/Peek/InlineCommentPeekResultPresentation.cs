@@ -40,8 +40,18 @@ namespace GitHub.InlineReviews.Peek
             }
         }
 
-        public event EventHandler IsDirtyChanged = delegate { }; // IsDirty is always false.
-        public event EventHandler IsReadOnlyChanged = delegate { }; // IsDirty is always true.
+        public event EventHandler IsDirtyChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler IsReadOnlyChanged
+        {
+            add { }
+            remove { }
+        }
+
         public event EventHandler<RecreateContentEventArgs> RecreateContent = delegate { };
         public event EventHandler<EventArgs> DesiredHeightChanged;
 

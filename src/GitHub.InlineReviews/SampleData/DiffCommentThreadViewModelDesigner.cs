@@ -9,7 +9,6 @@ namespace GitHub.InlineReviews.SampleData
     {
         public string DiffHunk { get; set; }
         public int LineNumber { get; set; }
-        public event EventHandler Disposed = delegate { };
         public string Path { get; set; }
         public ICommentThreadViewModel Comments { get; set; }
     }
