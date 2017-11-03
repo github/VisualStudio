@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using EnvDTE;
 
 namespace GitHub.VisualStudio
 {
@@ -32,6 +33,8 @@ namespace GitHub.VisualStudio
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
 
@@ -47,6 +50,11 @@ namespace GitHub.VisualStudio
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            var packageVersion = GetType().Assembly.GetName().Version;
+            var hostVersionInfo = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileVersionInfo;
+            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
+                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
+
             await base.InitializeAsync(cancellationToken, progress);
 
             await GetServiceAsync(typeof(IUsageTracker));
