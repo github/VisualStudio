@@ -23,6 +23,7 @@ namespace GitHub
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
         void EnsureAssemblyLoaded(Uri value)
         {
             try
@@ -59,13 +60,13 @@ namespace GitHub
         static string FindAssemblyNameFromPackUri(Uri packUri)
         {
             var path = packUri.LocalPath;
-            if (!path.StartsWith("/"))
+            if (!path.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
             var component = ";component/";
-            int componentIndex = path.IndexOf(component, 1);
+            int componentIndex = path.IndexOf(component, 1, StringComparison.OrdinalIgnoreCase);
             if (componentIndex == -1)
             {
                 return null;

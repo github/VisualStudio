@@ -26,7 +26,6 @@ namespace GitHub.InlineReviews.ViewModels
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<InlineCommentPeekViewModel>();
-        readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
@@ -44,21 +43,18 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
         public InlineCommentPeekViewModel(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
 
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
@@ -193,11 +189,11 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task SessionChanged(IPullRequestSession session)
+        async Task SessionChanged(IPullRequestSession pullRequestSession)
         {
-            this.session = session;
+            this.session = pullRequestSession;
 
-            if (session == null)
+            if (pullRequestSession == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();

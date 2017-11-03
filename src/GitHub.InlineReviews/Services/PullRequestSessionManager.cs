@@ -33,7 +33,6 @@ namespace GitHub.InlineReviews.Services
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
-        readonly ITeamExplorerServiceHolder teamExplorerService;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         IPullRequestSession currentSession;
@@ -58,12 +57,10 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(hosts, nameof(hosts));
-            Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
 
             this.service = service;
             this.sessionService = sessionService;
             this.hosts = hosts;
-            this.teamExplorerService = teamExplorerService;
             teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
         }
 
@@ -131,7 +128,7 @@ namespace GitHub.InlineReviews.Services
             {
                 var basePath = repository.LocalPath;
 
-                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
                 {
                     return path.Substring(basePath.Length + 1);
                 }
@@ -177,33 +174,33 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        async Task RepoChanged(ILocalRepositoryModel repository)
+        async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
         {
             try
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
-                await EnsureLoggedIn(repository);
+                await EnsureLoggedIn(localRepositoryModel);
 
-                if (repository != this.repository)
+                if (localRepositoryModel != repository)
                 {
-                    this.repository = repository;
+                    repository = localRepositoryModel;
                     CurrentSession = null;
                     sessions.Clear();
                 }
 
-                if (string.IsNullOrWhiteSpace(repository?.CloneUrl)) return;
+                if (string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl)) return;
 
-                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+                var modelService = hosts.LookupHost(HostAddress.Create(localRepositoryModel.CloneUrl))?.ModelService;
                 var session = CurrentSession;
 
                 if (modelService != null)
                 {
-                    var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                    var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
 
                     if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) &&
                         pr?.Item2 != (CurrentSession?.PullRequest.Number))
                     {
-                        var pullRequest = await GetPullRequestForTip(modelService, repository);
+                        var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);
 
                         if (pullRequest != null)
                         {
@@ -226,12 +223,12 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel repository)
+        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel localRepositoryModel)
         {
             if (modelService != null)
             {
-                var pr = await service.GetPullRequestForCurrentBranch(repository);
-                if (pr != null) return await modelService.GetPullRequest(pr.Item1, repository.Name, pr.Item2).ToTask();
+                var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel);
+                if (pr != null) return await modelService.GetPullRequest(pr.Item1, localRepositoryModel.Name, pr.Item2).ToTask();
             }
 
             return null;
@@ -272,11 +269,11 @@ namespace GitHub.InlineReviews.Services
             return session;
         }
 
-        async Task EnsureLoggedIn(ILocalRepositoryModel repository)
+        async Task EnsureLoggedIn(ILocalRepositoryModel localRepositoryModel)
         {
-            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(repository?.CloneUrl))
+            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl))
             {
-                var hostAddress = HostAddress.Create(repository.CloneUrl);
+                var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl);
                 await hosts.LogInFromCache(hostAddress);
             }
         }

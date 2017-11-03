@@ -61,17 +61,17 @@ namespace GitHub.InlineReviews
 
             Func<Grid> gridFactory = () => new GlyphMarginGrid();
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
-            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, parent, editorFormatMap);
+            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, editorFormatMap);
         }
 
         IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
-            IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
+            IWpfTextViewHost wpfTextViewHost, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
             var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
 
-            if(IsDiffView(wpfTextViewHost))
+            if (IsDiffView(wpfTextViewHost))
             {
                 TrackCommentGlyph(wpfTextViewHost, margin.VisualElement);
             }

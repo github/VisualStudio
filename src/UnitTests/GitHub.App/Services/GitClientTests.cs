@@ -260,11 +260,11 @@ public class GitClientTests
         }
 
         [Theory]
-        [InlineData("https://github.com/owner/repo", "baseSha", "headSha", "mergeBaseSha", 0)]
-        [InlineData("https://github.com/owner/repo", null, "headSha", "mergeBaseSha", 1)]
-        [InlineData("https://github.com/owner/repo", "baseSha", null, "mergeBaseSha", 1)]
-        [InlineData("https://github.com/owner/repo", "baseSha", "headSha", null, 0)]
-        public async Task WhenToFetch(string targetCloneUrl, string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
+        [InlineData("baseSha", "headSha", "mergeBaseSha", 0)]
+        [InlineData(null, "headSha", "mergeBaseSha", 1)]
+        [InlineData("baseSha", null, "mergeBaseSha", 1)]
+        [InlineData("baseSha", "headSha", null, 0)]
+        public async Task WhenToFetch(string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
         {
             var targetCloneUri = new UriString("https://github.com/owner/repo");
             var baseRef = "master";

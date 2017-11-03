@@ -26,9 +26,6 @@ namespace GitHub.InlineReviews.Tags
     {
         static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
         static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
@@ -41,22 +38,13 @@ namespace GitHub.InlineReviews.Tags
         IDisposable sessionManagerSubscription;
 
         public InlineCommentTagger(
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
             IPullRequestSessionManager sessionManager)
         {
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
-            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
 
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;

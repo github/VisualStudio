@@ -21,9 +21,10 @@ namespace GitHub.InlineReviews.Services
     /// It takes the pull request model and updates according to the current state of the
     /// repository on disk and in the editor.
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "PullRequestSession is shared and shouldn't be disposed")]
     public class PullRequestSession : ReactiveObject, IPullRequestSession
     {
-        static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
         readonly IPullRequestSessionService service;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
@@ -109,7 +110,7 @@ namespace GitHub.InlineReviews.Services
             {
                 var basePath = LocalRepository.LocalPath;
 
-                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
                 {
                     return path.Substring(basePath.Length + 1);
                 }
@@ -148,9 +149,9 @@ namespace GitHub.InlineReviews.Services
             return model;
         }
 
-        public async Task Update(IPullRequestModel pullRequest)
+        public async Task Update(IPullRequestModel pullRequestModel)
         {
-            PullRequest = pullRequest;
+            PullRequest = pullRequestModel;
             mergeBase = null;
 
             foreach (var file in this.fileIndex.Values.ToList())
@@ -158,7 +159,7 @@ namespace GitHub.InlineReviews.Services
                 await UpdateFile(file);
             }
 
-            pullRequestChanged.OnNext(pullRequest);
+            pullRequestChanged.OnNext(pullRequestModel);
         }
 
         async Task AddComment(IPullRequestReviewCommentModel comment)
@@ -201,7 +202,7 @@ namespace GitHub.InlineReviews.Services
             else
             {
                 return PullRequest.Head.Sha;
-            }       
+            }
         }
 
         string GetFullPath(string relativePath)
