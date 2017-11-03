@@ -398,10 +398,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\GitHub.StartPage\build\GitHub.StartPage.pkgdef" Condition="'$(NCrunch)' != '1'">
-      <Link>GitHub.StartPage.pkgdef</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\preview_200x200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
