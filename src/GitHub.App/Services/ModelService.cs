@@ -58,7 +58,7 @@ namespace GitHub.Services
                 .Select(Create)
                 .Catch<GitIgnoreItem, Exception>(e =>
                 {
-                    log.Information(e, "Failed to retrieve GitIgnoreTemplates");
+                    log.Error(e, "Failed to retrieve GitIgnoreTemplates");
                     return Observable.Empty<GitIgnoreItem>();
                 });
         }
@@ -75,7 +75,7 @@ namespace GitHub.Services
                 .Select(Create)
                 .Catch<LicenseItem, Exception>(e =>
                 {
-                    log.Information(e, "Failed to retrieve licenses");
+                    log.Error(e, "Failed to retrieve licenses");
                     return Observable.Empty<LicenseItem>();
                 });
         }

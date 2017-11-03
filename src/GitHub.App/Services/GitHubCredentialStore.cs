@@ -34,7 +34,7 @@ namespace GitHub.Services
         {
             if (loginInfo == LoginCache.EmptyLoginInfo)
             {
-                log.Debug("Could not retrieve login info from the secure cache '{CredentialCacheKeyHost}'",
+                log.Warning("Could not retrieve login info from the secure cache '{CredentialCacheKeyHost}'",
                     hostAddress.CredentialCacheKeyHost);
                 return Credentials.Anonymous;
             }

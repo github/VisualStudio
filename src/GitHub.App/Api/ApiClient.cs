@@ -213,7 +213,7 @@ namespace GitHub.Api
                 }
                 catch (Exception ex)
                 {
-                    log.Information(ex, "Failed to retrieve host name using `Environment.MachineName`");
+                    log.Warning(ex, "Failed to retrieve host name using `Environment.MachineName`");
                     return "(unknown)";
                 }
             }
@@ -234,7 +234,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Could not retrieve MAC address. Fallback to using machine name");
+                log.Warning(e, "Could not retrieve MAC address. Fallback to using machine name");
                 return GetMachineNameSafe();
             }
         }

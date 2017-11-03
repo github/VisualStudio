@@ -54,7 +54,7 @@ namespace GitHub.Caches
 
         public IObservable<Unit> Flush()
         {
-            log.Information("Flushing the login cache");
+            log.Verbose("Flushing the login cache");
             return cache.Secure.Flush();
         }
 
