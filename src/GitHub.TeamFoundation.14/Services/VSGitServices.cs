@@ -18,7 +18,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System.Threading;
 #endif
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using ReactiveUI;
 using Serilog;
 
 namespace GitHub.Services
