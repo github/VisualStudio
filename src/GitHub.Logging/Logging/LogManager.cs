@@ -16,7 +16,7 @@ namespace GitHub.Logging
                 "extension.log");
 
             const string outputTemplate =
-                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message:lj}{NewLine}{Exception}";
+                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u4} [{ThreadId:00}] {ShortSourceContext,-25} {Message:lj}{NewLine}{Exception}";
 
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()
@@ -31,9 +31,9 @@ namespace GitHub.Logging
 
         //Violates CA1004 - Generic methods should provide type parameter
 #pragma warning disable CA1004
-        public static ILogger ForContext<T>() => Logger.Value.ForContext<T>();
+        public static ILogger ForContext<T>() => ForContext(typeof(T));
 #pragma warning restore CA1004
 
-        public static ILogger ForContext(Type type) => Logger.Value.ForContext(type);
+        public static ILogger ForContext(Type type) => Logger.Value.ForContext(type).ForContext("ShortSourceContext", type.Name);
     }
 }
