@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Xunit;
+using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -413,11 +414,13 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.NotNull(file.ToDispose);
+                var compositeDisposable = file.ToDispose as CompositeDisposable;
+                Assert.NotNull(compositeDisposable);
+                Assert.False(compositeDisposable.IsDisposed);
 
                 textView.Closed += Raise.Event();
 
-                Assert.Null(file.ToDispose);
+                Assert.True(compositeDisposable.IsDisposed);
             }
 
             [Fact]
@@ -510,11 +513,11 @@ Line 4";
                     Assert.Equal(1, file.InlineCommentThreads.Count);
                     Assert.Equal(4, file.InlineCommentThreads[0].LineNumber);
                     Assert.Equal(
-                        new[] 
+                        new[]
                         {
                             Tuple.Create(2, DiffSide.Right),
                             Tuple.Create(4, DiffSide.Right),
-                        }, 
+                        },
                         linesChanged.ToArray());
                 }
             }

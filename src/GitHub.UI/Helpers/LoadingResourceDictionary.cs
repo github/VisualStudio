@@ -4,6 +4,7 @@ using System.Windows;
 using System.Reflection;
 using System.Collections.Generic;
 using GitHub.VisualStudio;
+using System.Globalization;
 
 namespace GitHub
 {
@@ -21,6 +22,7 @@ namespace GitHub
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
         void EnsureAssemblyLoaded(Uri value)
         {
             try
@@ -28,7 +30,7 @@ namespace GitHub
                 var assemblyName = FindAssemblyNameFromPackUri(value);
                 if (assemblyName == null)
                 {
-                    VsOutputLogger.WriteLine($"Couldn't find assembly name in '{value}'.");
+                    VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "Couldn't find assembly name in '{0}'.", value));
                     return;
                 }
 
@@ -41,7 +43,7 @@ namespace GitHub
 
                 if (!File.Exists(assemblyFile))
                 {
-                    VsOutputLogger.WriteLine($"Couldn't find assembly at '{assemblyFile}'.");
+                    VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "Couldn't find assembly at '{0}'.", assemblyFile));
                     return;
                 }
 
@@ -50,20 +52,20 @@ namespace GitHub
             }
             catch(Exception e)
             {
-                VsOutputLogger.WriteLine($"Error loading assembly for '{value}': {e}");
+                VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "Error loading assembly for '{0}': {1}", value, e));
             }
         }
 
         static string FindAssemblyNameFromPackUri(Uri packUri)
         {
             var path = packUri.LocalPath;
-            if (!path.StartsWith("/"))
+            if (!path.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
             var component = ";component/";
-            int componentIndex = path.IndexOf(component, 1);
+            int componentIndex = path.IndexOf(component, 1, StringComparison.OrdinalIgnoreCase);
             if (componentIndex == -1)
             {
                 return null;

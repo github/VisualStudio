@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.SampleData
 {
+    [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
     class DiffCommentThreadViewModelDesigner : IDiffCommentThreadViewModel
     {
         public string DiffHunk { get; set; }

@@ -5,6 +5,7 @@ using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.InlineReviews.Views
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public partial class InlineCommentPeekView : UserControl
     {
         readonly Subject<double> desiredHeight;
