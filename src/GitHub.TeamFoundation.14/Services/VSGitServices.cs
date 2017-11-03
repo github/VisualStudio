@@ -4,16 +4,19 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio;
+#if TEAMEXPLORER14
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
+#else
+using Microsoft.VisualStudio.Shell.Interop;
+using System.Threading;
+#endif
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Services
 {
@@ -22,7 +25,9 @@ namespace GitHub.Services
     public class VSGitServices : IVSGitServices
     {
         readonly IGitHubServiceProvider serviceProvider;
+#if TEAMEXPLORER15
         readonly IVsStatusbar statusBar;
+#endif
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -36,10 +41,10 @@ namespace GitHub.Services
         public VSGitServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+#if TEAMEXPLORER15
             this.statusBar = serviceProvider.GetService<IVsStatusbar>();
+#endif
         }
-
-        public event EventHandler ActiveRepoChanged;
 
         // The Default Repository Path that VS uses is hidden in an internal
         // service 'ISccSettingsService' registered in an internal service

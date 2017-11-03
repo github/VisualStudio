@@ -14,6 +14,7 @@ namespace GitHub.UI.Helpers
         /// <param name="tree">The tree view.</param>
         /// <param name="item">The item to search for.</param>
         /// <returns>The TreeViewItem or null if the item was null or not found.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         public static TreeViewItem GetTreeViewItem(this TreeView tree, object item)
         {
             if (item == null)
