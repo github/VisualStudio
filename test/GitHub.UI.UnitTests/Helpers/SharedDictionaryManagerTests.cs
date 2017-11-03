@@ -86,25 +86,30 @@ namespace GitHub.UI.Helpers.UnitTests
                     var disposable = Substitute.For<IDisposable>();
                     factory.TryAddDisposable(disposable);
 
-                    SharedDictionaryManager.GetCurrentDomainCachingFactory();
-
-                    disposable.Received(0).Dispose();
+                    using (SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                    {
+                        disposable.Received(0).Dispose();
+                    }
                 }
             }
 
             [Test]
             public void InvokeMethodOnNewAssembly_DisposeCalled()
             {
-                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                // HACK: Why does this need to be in app domain?
+                AppDomainContext.Invoke(new AppDomainSetup { ApplicationBase = AppDomain.CurrentDomain.BaseDirectory }, () =>
                 {
-                    var disposable = Substitute.For<IDisposable>();
-                    factory.TryAddDisposable(disposable);
-
-                    using (InvokeMethodOnNewAssembly(SharedDictionaryManager.GetCurrentDomainCachingFactory))
+                    using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
                     {
-                        disposable.Received(1).Dispose();
+                        var disposable = Substitute.For<IDisposable>();
+                        factory.TryAddDisposable(disposable);
+
+                        using (InvokeMethodOnNewAssembly(SharedDictionaryManager.GetCurrentDomainCachingFactory))
+                        {
+                            disposable.Received(1).Dispose();
+                        }
                     }
-                }
+                });
             }
 
             static IDisposable InvokeMethodOnNewAssembly<T>(Func<T> func)

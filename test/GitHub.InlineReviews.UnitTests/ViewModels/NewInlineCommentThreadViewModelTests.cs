@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 10,
                 false);
 
-            Assert.Equal(1, target.Comments.Count);
+            Assert.Single(target.Comments);
             Assert.Equal(string.Empty, target.Comments[0].Body);
             Assert.Equal(CommentEditState.Editing, target.Comments[0].EditState);
         }

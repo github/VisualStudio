@@ -52,7 +52,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         bool LoggedIn
         {
             get { return loggedIn; }
-            set {
+            set
+            {
                 loggedIn = ShowLogout = value;
                 ShowLogin = !value;
             }
@@ -308,8 +309,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
-            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
-            msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            var msg = string.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
+            msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
@@ -317,11 +318,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
-            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
+            var msg = string.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
             if (newrepo.HasCommits() && newrepo.MightContainSolution())
-                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
+                msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_OpenProject, newrepo.LocalPath);
             else
-                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+                msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
@@ -330,7 +331,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
             var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-            
+
             teServices.ClearNotifications();
             teServices.ShowMessage(
                 msg,

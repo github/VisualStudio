@@ -50,6 +50,7 @@ namespace GitHub.StartPage
             return await RunAcquisition(downloadProgress, cancellationToken, repository);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "cancellationToken")]
         async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRepositoryModel repository)
         {
             CloneDialogResult request = null;

@@ -18,35 +18,21 @@ namespace GitHub.InlineReviews.Tags
     [TagType(typeof(ShowInlineCommentTag))]
     class InlineCommentTaggerProvider : IViewTaggerProvider
     {
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
         readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
         public InlineCommentTaggerProvider(
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
             IPullRequestSessionManager sessionManager)
         {
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
 
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
             this.sessionManager = sessionManager;
         }
 
         public ITagger<T> CreateTagger<T>(ITextView view, ITextBuffer buffer) where T : ITag
         {
-            return buffer.Properties.GetOrCreateSingletonProperty(()=> 
+            return buffer.Properties.GetOrCreateSingletonProperty(() =>
                 new InlineCommentTagger(
-                    gitService,
-                    gitClient,
-                    diffService,
                     view,
                     buffer,
                     sessionManager)) as ITagger<T>;
