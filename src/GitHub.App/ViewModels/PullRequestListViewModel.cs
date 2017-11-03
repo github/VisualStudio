@@ -157,7 +157,7 @@ namespace GitHub.ViewModels
                 .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
                     // Occurs on network error, when the repository was deleted on GitHub etc.
-                    log.Information(ex, "Received Exception reading pull requests");
+                    log.Error(ex, "Received Exception reading pull requests");
                     return Observable.Empty<System.Reactive.Unit>();
                 })
                 .Subscribe(_ =>
