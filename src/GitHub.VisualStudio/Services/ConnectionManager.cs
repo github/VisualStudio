@@ -135,7 +135,7 @@ namespace GitHub.VisualStudio
                 catch (Octokit.ApiException e)
                 {
                     addConnection = false;
-                    log.Error(e, "Cached credentials for connection {Address} were invalid.", c.HostAddress);
+                    log.Error(e, "Cached credentials for connection {Address} were invalid", c.HostAddress);
                 }
                 catch (Exception)
                 {

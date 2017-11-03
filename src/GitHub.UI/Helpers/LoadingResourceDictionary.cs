@@ -31,7 +31,7 @@ namespace GitHub
                 var assemblyName = FindAssemblyNameFromPackUri(value);
                 if (assemblyName == null)
                 {
-                    log.Error("Couldn't find assembly name in '{Uri}'.", value);
+                    log.Error("Couldn't find assembly name in '{Uri}'", value);
                     return;
                 }
 
@@ -44,7 +44,7 @@ namespace GitHub
 
                 if (!File.Exists(assemblyFile))
                 {
-                    log.Error("Couldn't find assembly at '{AssemblyFile}'.", assemblyFile);
+                    log.Error("Couldn't find assembly at '{AssemblyFile}'", assemblyFile);
                     return;
                 }
 
@@ -53,7 +53,7 @@ namespace GitHub
             }
             catch(Exception e)
             {
-                log.Error(e, "Error loading assembly for '{Uri}'.", value);
+                log.Error(e, "Error loading assembly for '{Uri}'", value);
             }
         }
 

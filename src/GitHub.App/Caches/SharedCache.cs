@@ -46,7 +46,7 @@ namespace GitHub.Caches
                 }
                 catch (Exception e)
                 {
-                    log.Error(e, "Failed to set up secure cache.");
+                    log.Error(e, "Failed to set up secure cache");
                     secureCache = new InMemoryBlobCache();
                 }
             }
@@ -105,7 +105,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                log.Error(e, "Failed to set the {CacheName} cache.", cacheName);
+                log.Error(e, "Failed to set the {CacheName} cache", cacheName);
                 return new InMemoryBlobCache();
             }
         }

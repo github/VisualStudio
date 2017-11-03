@@ -275,7 +275,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         // GetRepository() may throw if the user doesn't have permissions to access the repo
                         // (because the repo no longer exists, or because the user has logged in on a different
                         // profile, or their permissions have changed remotely)
-                        log.Error(ex, "Error updating repository list.");
+                        log.Error(ex, "Error updating repository list");
                     }
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
@@ -300,7 +300,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                             // GetRepository() may throw if the user doesn't have permissions to access the repo
                             // (because the repo no longer exists, or because the user has logged in on a different
                             // profile, or their permissions have changed remotely)
-                            log.Error(ex, "Error updating repository list.");
+                            log.Error(ex, "Error updating repository list");
                         }
                     });
                 }

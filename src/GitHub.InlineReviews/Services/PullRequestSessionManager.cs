@@ -219,7 +219,7 @@ namespace GitHub.InlineReviews.Services
             }
             catch (Exception e)
             {
-                log.Error(e, "Error changing repository.");
+                log.Error(e, "Error changing repository");
             }
         }
 

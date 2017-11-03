@@ -131,7 +131,7 @@ namespace GitHub.Models
             return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
                 {
-                    log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways.");
+                    log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways");
                     return Observable.Return(Unit.Default);
                 })
                 .SelectMany(_ => ModelService.InvalidateAll())

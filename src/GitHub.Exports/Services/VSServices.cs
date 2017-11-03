@@ -89,14 +89,14 @@ namespace GitHub.Services
             var os = serviceProvider.TryGetService<IOperatingSystem>();
             if (os == null)
             {
-                log.Error("TryOpenRepository couldn't find IOperatingSystem service.");
+                log.Error("TryOpenRepository couldn't find IOperatingSystem service");
                 return false;
             }
 
             var dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
-                log.Error("TryOpenRepository couldn't find DTE service.");
+                log.Error("TryOpenRepository couldn't find DTE service");
                 return false;
             }
 
@@ -116,7 +116,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                log.Error(e, "Error opening repository.");
+                log.Error(e, "Error opening repository");
             }
             finally
             {
@@ -139,7 +139,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                log.Error(e, "Couldn't clean up {TempPath}.", vsTempPath);
+                log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
             }
         }
 

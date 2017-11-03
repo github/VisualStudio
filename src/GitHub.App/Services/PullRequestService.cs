@@ -243,7 +243,7 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
+                Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
 
                 if (branchName != null)
                 {

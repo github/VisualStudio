@@ -59,7 +59,7 @@ namespace GitHub.VisualStudio
                     }
                     catch { }
 
-                    log.Error(e, "Failed to read connection cache from {Path}.", cachePath);
+                    log.Error(e, "Failed to read connection cache from {Path}", cachePath);
                 }
             }
 
@@ -79,7 +79,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception e)
             {
-                log.Error(e, "Failed to write connection cache to {Path}.", cachePath);
+                log.Error(e, "Failed to write connection cache to {Path}", cachePath);
             }
 
             return Task.CompletedTask;

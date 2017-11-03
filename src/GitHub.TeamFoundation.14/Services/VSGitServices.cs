@@ -63,7 +63,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Error loading the default cloning path from the registry.");
+                log.Error(ex, "Error loading the default cloning path from the registry");
             }
             return ret;
         }
@@ -128,7 +128,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Error loading the repository list from the registry.");
+                log.Error(ex, "Error loading the repository list from the registry");
                 return Enumerable.Empty<ILocalRepositoryModel>();
             }
         }

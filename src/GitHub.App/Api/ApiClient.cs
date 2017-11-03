@@ -188,7 +188,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception.");
+                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception");
                 return null;
             }
         }
@@ -206,14 +206,14 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`.");
+                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`");
                 try
                 {
                     return Environment.MachineName;
                 }
                 catch (Exception ex)
                 {
-                    log.Information(ex, "Failed to retrieve host name using `Environment.MachineName`.");
+                    log.Information(ex, "Failed to retrieve host name using `Environment.MachineName`");
                     return "(unknown)";
                 }
             }
@@ -234,7 +234,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Could not retrieve MAC address. Fallback to using machine name.");
+                log.Information(e, "Could not retrieve MAC address. Fallback to using machine name");
                 return GetMachineNameSafe();
             }
         }

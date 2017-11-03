@@ -241,7 +241,7 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(e, "Failed to set base repository path. {@0}",
+                    log.Error(e, "Failed to set base repository path {@0}",
                         new { localBaseRepositoryPath, BaseRepositoryPath, directory });
                 }
             }, RxApp.MainThreadScheduler);
@@ -287,7 +287,7 @@ namespace GitHub.ViewModels
             {
                 if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
-                    log.Error(ex, "Error creating repository.");
+                    log.Error(ex, "Error creating repository");
                     UserError.Throw(TranslateRepositoryCreateException(ex));
                 }
             });

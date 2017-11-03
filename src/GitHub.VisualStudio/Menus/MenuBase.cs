@@ -61,7 +61,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Error loading the repository from '{Path}'.", path);
+                log.Error(ex, "Error loading the repository from '{Path}'", path);
             }
 
             return null;
@@ -80,7 +80,7 @@ namespace GitHub.VisualStudio
                 }
                 catch (Exception ex)
                 {
-                    log.Error(ex, "Error loading the repository from '{Path}'.", path);
+                    log.Error(ex, "Error loading the repository from '{Path}'", path);
                 }
             }
             return activeRepo;
@@ -112,7 +112,7 @@ namespace GitHub.VisualStudio
                 }
                 catch (Exception ex)
                 {
-                    log.Error(ex, "Error loading the repository from '{Path}'.", path);
+                    log.Error(ex, "Error loading the repository from '{Path}'", path);
                 }
             }
         }

@@ -125,12 +125,12 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        log.Error(e, "Retrieve user organizations failed because user is not stored in the cache.");
+                        log.Error(e, "Retrieve user organizations failed because user is not stored in the cache");
                         return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                     })
                  .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
                  {
-                     log.Error(e, "Retrieve user organizations failed.");
+                     log.Error(e, "Retrieve user organizations failed");
                      return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                  });
         }
@@ -320,7 +320,7 @@ namespace GitHub.Services
                     e =>
                     {
                         log.Error(e,
-                            "Retrieving {RepositoryType} user repositories failed because user is not stored in the cache.",
+                            "Retrieving {RepositoryType} user repositories failed because user is not stored in the cache",
                             repositoryType);
                         return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
@@ -355,7 +355,7 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        log.Error(e, "Retrieveing {Organization} org repositories failed because user is not stored in the cache.",
+                        log.Error(e, "Retrieveing {Organization} org repositories failed because user is not stored in the cache",
                             organization);
                         return Observable.Return(new IRemoteRepositoryModel[] {});
                     });

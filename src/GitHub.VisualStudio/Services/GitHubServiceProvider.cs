@@ -142,7 +142,7 @@ namespace GitHub.VisualStudio
             ExportProvider = componentModel.DefaultExportProvider;
             if (ExportProvider == null)
             {
-                log.Error("DefaultExportProvider could not be obtained.");
+                log.Error("DefaultExportProvider could not be obtained");
             }
             initialized = true;
         }

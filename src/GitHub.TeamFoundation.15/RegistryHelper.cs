@@ -116,7 +116,7 @@ namespace GitHub.TeamFoundation
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Error setting the create project path in the registry.");
+                log.Error(ex, "Error setting the create project path in the registry");
             }
             return old;
         }

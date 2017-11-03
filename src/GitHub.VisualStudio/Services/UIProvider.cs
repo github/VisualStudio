@@ -150,7 +150,7 @@ namespace GitHub.VisualStudio.UI
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Failed to dispose UI.");
+                log.Error(ex, "Failed to dispose UI");
             }
         }
 

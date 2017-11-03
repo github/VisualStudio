@@ -163,19 +163,19 @@ namespace GitHub.VisualStudio
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
             {
-                log.Error("Unable to find or create GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);
+                log.Error("Unable to find or create GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
             if (ErrorHandler.Failed(frame.Show()))
             {
-                log.Error("Unable to show GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);
+                log.Error("Unable to show GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
 
             object docView = null;
             if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
             {
-                log.Error("Unable to grab instance of GitHubPane '{Guid}'.", UI.GitHubPane.GitHubPaneGuid);
+                log.Error("Unable to grab instance of GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
             return docView as GitHubPane;

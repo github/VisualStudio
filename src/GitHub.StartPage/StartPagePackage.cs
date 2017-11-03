@@ -63,7 +63,7 @@ namespace GitHub.StartPage
             }
             catch (Exception e)
             {
-                log.Error(e, "Error showing Start Page clone dialog.");
+                log.Error(e, "Error showing Start Page clone dialog");
             }
 
             if (request == null)

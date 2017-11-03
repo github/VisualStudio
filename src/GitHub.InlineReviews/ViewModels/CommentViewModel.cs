@@ -170,7 +170,7 @@ namespace GitHub.InlineReviews.ViewModels
                 }
 
                 ErrorMessage = message;
-                log.Error(e, "Error posting inline comment.");
+                log.Error(e, "Error posting inline comment");
             }
         }
 
