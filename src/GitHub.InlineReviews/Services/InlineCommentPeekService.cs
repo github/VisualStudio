@@ -26,19 +26,16 @@ namespace GitHub.InlineReviews.Services
     [Export(typeof(IInlineCommentPeekService))]
     class InlineCommentPeekService : IInlineCommentPeekService
     {
-        readonly IApiClientFactory apiClientFactory;
         readonly IOutliningManagerService outliningService;
         readonly IPeekBroker peekBroker;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public InlineCommentPeekService(
-            IApiClientFactory apiClientFactory,
             IOutliningManagerService outliningManager,
             IPeekBroker peekBroker,
             IUsageTracker usageTracker)
         {
-            this.apiClientFactory = apiClientFactory;
             this.outliningService = outliningManager;
             this.peekBroker = peekBroker;
             this.usageTracker = usageTracker;

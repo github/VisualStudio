@@ -122,17 +122,17 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     }
 
     [Theory]
-    [InlineData(1, "repo-name", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "target-branch", "title", null)]
-    [InlineData(2, "repo-name", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "master", "title", "description")]
-    [InlineData(3, "repo-name", "source-repo-owner", "master", true, true, "target-repo-owner", "master", "title", "description")]
-    [InlineData(4, "repo-name", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "target-branch", "title", null)]
-    [InlineData(5, "repo-name", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "master", "title", "description")]
-    [InlineData(6, "repo-name", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "target-branch", "title", null)]
-    [InlineData(7, "repo-name", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "master", "title", "description")]
-    [InlineData(8, "repo-name", "source-repo-owner", "master", true, false, "target-repo-owner", "master", "title", "description")]
-    [InlineData(9, "repo-name", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "target-branch", "title", null)]
-    [InlineData(10, "repo-name", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", "title", "description")]
-    public async Task CreatingPRs(int testId,
+    [InlineData("repo-name-1", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "target-branch", "title", null)]
+    [InlineData("repo-name-2", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "master", "title", "description")]
+    [InlineData("repo-name-3", "source-repo-owner", "master", true, true, "target-repo-owner", "master", "title", "description")]
+    [InlineData("repo-name-4", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "target-branch", "title", null)]
+    [InlineData("repo-name-5", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "master", "title", "description")]
+    [InlineData("repo-name-6", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "target-branch", "title", null)]
+    [InlineData("repo-name-7", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "master", "title", "description")]
+    [InlineData("repo-name-8", "source-repo-owner", "master", true, false, "target-repo-owner", "master", "title", "description")]
+    [InlineData("repo-name-9", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "target-branch", "title", null)]
+    [InlineData("repo-name-10", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", "title", "description")]
+    public async Task CreatingPRs(
         string repoName, string sourceRepoOwner, string sourceBranchName,
         bool repoIsFork, bool sourceBranchIsTracking,
         string targetRepoOwner, string targetBranchName,

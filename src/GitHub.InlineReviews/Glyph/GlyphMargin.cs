@@ -16,12 +16,11 @@ namespace GitHub.InlineReviews.Glyph
     /// Responsibe for updating the margin when tags change.
     /// </summary>
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
-    public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag: ITag
+    public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag : ITag
     {
         bool handleZoom;
         bool isDisposed;
         Grid marginVisual;
-        double marginWidth;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
         IWpfTextView textView;
@@ -43,13 +42,12 @@ namespace GitHub.InlineReviews.Glyph
             this.isMarginVisible = isMarginVisible;
             this.marginName = marginName;
             this.handleZoom = handleZoom;
-            this.marginWidth = marginWidth;
 
             marginVisual = gridFactory();
             marginVisual.Width = marginWidth;
 
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
-                this, editorFormatMap, marginPropertiesName);
+                editorFormatMap, marginPropertiesName);
 
             // Do on Loaded to give diff view a chance to initialize.
             marginVisual.Loaded += OnLoaded;
@@ -65,9 +63,9 @@ namespace GitHub.InlineReviews.Glyph
             }
         }
 
-        public ITextViewMargin GetTextViewMargin(string marginName)
+        public ITextViewMargin GetTextViewMargin(string name)
         {
-            return (marginName == this.marginName) ? this : null;
+            return (name == marginName) ? this : null;
         }
 
         public bool Enabled

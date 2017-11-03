@@ -22,9 +22,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void FirstPassShouldReturnEmptyTags()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(DiffSide.Right));
@@ -38,9 +35,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowCommentTagForRhs()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(DiffSide.Right));
@@ -50,7 +44,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
             }
 
@@ -58,9 +52,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnAddNewCommentTagForAddedLineOnRhs()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(DiffSide.Right));
@@ -70,7 +61,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<AddInlineCommentTag>(result[0].Tag);
             }
 
@@ -78,9 +69,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(DiffSide.Right));
@@ -97,9 +85,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowCommentTagForLhs()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(DiffSide.Left));
@@ -109,7 +94,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
             }
 
@@ -117,9 +102,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnAddCommentTagForLhs()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(DiffSide.Left));
@@ -129,7 +111,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<AddInlineCommentTag>(result[0].Tag);
             }
 
@@ -139,13 +121,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file, DiffSide.Right);
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
-                
+
                 var session = manager.GetTextBufferInfo(null).Session;
                 var span = CreateSpan(14);
                 var firstPass = target.GetTags(span);
@@ -221,9 +200,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void FirstPassShouldReturnEmptyTags()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager());
@@ -237,9 +213,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowCommentTag()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager());
@@ -249,7 +222,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
             }
 
@@ -257,9 +230,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnAddNewCommentTagForAddedLine()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager());
@@ -269,7 +239,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Equal(1, result.Count);
+                Assert.Single(result);
                 Assert.IsType<AddInlineCommentTag>(result[0].Tag);
             }
 
@@ -277,9 +247,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager());
@@ -298,9 +265,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
@@ -311,7 +275,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var raised = false;
 
                 target.TagsChanged += (s, e) => raised = e.Span.Start == 140;
-                ((ISubject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged).OnNext(new[] 
+                ((ISubject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged).OnNext(new[]
                 {
                     Tuple.Create(14, DiffSide.Right),
                 });
@@ -325,9 +289,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
                 var target = new InlineCommentTagger(
-                    Substitute.For<IGitService>(),
-                    Substitute.For<IGitClient>(),
-                    Substitute.For<IDiffService>(),
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
