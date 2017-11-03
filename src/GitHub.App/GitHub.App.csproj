@@ -192,7 +192,6 @@
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Factories\ApiClientFactory.cs" />
-    <None Include="Services\Browser.cs" />
     <Compile Include="Services\EnterpriseProbe.cs" />
     <Compile Include="Services\ErrorMap.cs" />
     <Compile Include="Services\ErrorMessage.cs" />
