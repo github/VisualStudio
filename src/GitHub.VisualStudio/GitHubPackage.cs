@@ -50,16 +50,21 @@ namespace GitHub.VisualStudio
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            var packageVersion = GetType().Assembly.GetName().Version;
-            var hostVersionInfo = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileVersionInfo;
-            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
-                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
-
+            LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
 
             await GetServiceAsync(typeof(IUsageTracker));
 
             InitializeMenus().Forget();
+        }
+
+        void LogVersionInformation()
+        {
+            // This is intentionally light-weight and avoids using MEF (otherwise we code use IProgram).
+            var packageVersion = GetType().Assembly.GetName().Version;
+            var hostVersionInfo = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileVersionInfo;
+            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
+                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
         }
 
         async Task InitializeMenus()
