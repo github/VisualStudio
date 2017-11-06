@@ -20,6 +20,7 @@ using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 using EnvDTE;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio
 {
@@ -60,9 +61,8 @@ namespace GitHub.VisualStudio
 
         void LogVersionInformation()
         {
-            // Show extension and host process version information
-            var packageVersion = GetType().Assembly.GetName().Version;
-            var hostVersionInfo = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileVersionInfo;
+            var packageVersion = ApplicationInfo.GetPackageVersion(this);
+            var hostVersionInfo = ApplicationInfo.GetHostVersionInfo();
             log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
                 packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
         }
