@@ -60,7 +60,7 @@ namespace GitHub.VisualStudio
 
         void LogVersionInformation()
         {
-            // This is intentionally light-weight and avoids using MEF (otherwise we code use IProgram).
+            // Show extension and host process version information
             var packageVersion = GetType().Assembly.GetName().Version;
             var hostVersionInfo = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileVersionInfo;
             log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
