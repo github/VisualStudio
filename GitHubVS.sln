@@ -408,13 +408,10 @@ Global
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.DebugCodeAnalysis|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
-		{8D73575A-A89F-47CC-B153-B47DD06837F0}.DebugCodeAnalysis|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D73575A-A89F-47CC-B153-B47DD06837F0}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
