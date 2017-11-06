@@ -10,7 +10,9 @@ namespace GitHub.Logging
             if (!condition)
             {
                 messageTemplate = "Assertion Failed: " + messageTemplate;
+#pragma warning disable Serilog004 // propertyValues might not be strings
                 logger.Warning(messageTemplate);
+#pragma warning restore Serilog004
             }
         }
 
@@ -19,7 +21,9 @@ namespace GitHub.Logging
             if (!condition)
             {
                 messageTemplate = "Assertion Failed: " + messageTemplate;
+#pragma warning disable Serilog004 // propertyValues might not be strings
                 logger.Warning(messageTemplate, propertyValues);
+#pragma warning restore Serilog004
             }
         }
     }
