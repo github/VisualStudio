@@ -3,7 +3,7 @@ using Octokit.Internal;
 using System;
 using System.Net.Http;
 
-namespace GitHub.Logging
+namespace GitHub.Infrastructure
 {
     /// <summary>
     /// Since VS doesn't support dynamic component registration, we have to implement wrappers
