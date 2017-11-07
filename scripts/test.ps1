@@ -35,7 +35,7 @@ $env:PATH = "$$PSScriptRoot;$env:PATH"
 $exitcode = 0
 
 Write-Output "Running Tracking Collection Tests..."
-Run-NUnit src TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-NUnit test TrackingCollectionTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 1
 }
