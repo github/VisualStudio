@@ -9,13 +9,14 @@ using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
-using NLog;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -24,7 +25,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<InlineCommentPeekViewModel>();
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
@@ -145,7 +146,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             catch (Exception e)
             {
-                log.Error("Error updating InlineCommentViewModel", e);
+                log.Error(e, "Error updating InlineCommentViewModel");
             }
         }
 

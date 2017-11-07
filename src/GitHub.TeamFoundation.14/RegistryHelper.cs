@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GitHub.Models;
-using GitHub.VisualStudio;
-using Microsoft.Win32;
 using System.IO;
+using System.Linq;
+using GitHub.Logging;
+using GitHub.Models;
+using Microsoft.Win32;
+using Serilog;
 
 namespace GitHub.TeamFoundation
 {
     internal class RegistryHelper
     {
+        static readonly ILogger log = LogManager.ForContext<RegistryHelper>();
         const string TEGitKey = @"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl";
         static RegistryKey OpenGitKey(string path)
         {
@@ -114,7 +113,7 @@ namespace GitHub.TeamFoundation
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error setting the create project path in the registry '{0}'", ex));
+                log.Error(ex, "Error setting the create project path in the registry");
             }
             return old;
         }

@@ -2,14 +2,15 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Serilog;
 
 namespace GitHub.VisualStudio
 {
@@ -17,6 +18,7 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ConnectionManager : IConnectionManager
     {
+        static readonly ILogger log = LogManager.ForContext<ConnectionManager>();
         readonly IConnectionCache cache;
         readonly IKeychain keychain;
         readonly ILoginManager loginManager;
@@ -119,7 +121,7 @@ namespace GitHub.VisualStudio
                 catch (Octokit.ApiException e)
                 {
                     addConnection = false;
-                    VsOutputLogger.WriteLine("Cached credentials for connection {0} were invalid: {1}", c.HostAddress, e);
+                    log.Error(e, "Cached credentials for connection {Address} were invalid", c.HostAddress);
                 }
                 catch (Exception)
                 {
