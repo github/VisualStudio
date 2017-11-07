@@ -34,7 +34,6 @@ namespace GitHub.InlineReviews.Services
         readonly IPullRequestSessionService sessionService;
         readonly IConnectionManager connectionManager;
         readonly IModelServiceFactory modelServiceFactory;
-        readonly ITeamExplorerServiceHolder teamExplorerService;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         IPullRequestSession currentSession;
@@ -66,7 +65,6 @@ namespace GitHub.InlineReviews.Services
             this.sessionService = sessionService;
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
-            this.teamExplorerService = teamExplorerService;
             teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
         }
 

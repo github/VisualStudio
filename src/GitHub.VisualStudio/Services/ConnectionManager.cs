@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
-using IGitHubClient = Octokit.IGitHubClient;
 using GitHubClient = Octokit.GitHubClient;
+using IGitHubClient = Octokit.IGitHubClient;
 using User = Octokit.User;
-using Serilog;
-using GitHub.Logging;
-using System.Threading;
 
 namespace GitHub.VisualStudio
 {
@@ -24,8 +22,6 @@ namespace GitHub.VisualStudio
     [Export(typeof(IConnectionManager))]
     public class ConnectionManager : IConnectionManager
     {
-        static readonly ILogger log = LogManager.ForContext<ConnectionManager>();
-
         readonly IProgram program;
         readonly IConnectionCache cache;
         readonly IKeychain keychain;
