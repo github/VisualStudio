@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Diagnostics;
-using GitHub.Services;
-using Microsoft.TeamFoundation.Controls;
-using GitHub.Extensions;
-using System.ComponentModel.Composition;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Globalization;
+using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Services;
+using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Serilog;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -18,6 +20,7 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
+        static readonly ILogger log = LogManager.ForContext<TeamExplorerServiceHolder>();
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
@@ -162,11 +165,11 @@ namespace GitHub.VisualStudio.Base
                         // and try again. See issue #23
                         if (repos == null)
                         {
-                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2001: ActiveRepositories is null. GitService: '{0}'", GitService));
+                            log.Error("Error 2001: ActiveRepositories is null. GitService: '{GitService}'", GitService);
                             GitService = ServiceProvider?.GetServiceSafe<IGitExt>();
                             repos = GitService?.ActiveRepositories;
                             if (repos == null)
-                                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
+                                log.Error("Error 2002: ActiveRepositories is null. GitService: '{GitService}'", GitService);
                         }
                         return repos?.FirstOrDefault()?.ToModel();
                     });

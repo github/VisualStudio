@@ -1,14 +1,17 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using GitHub.Logging;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
+using Serilog;
 
 namespace GitHub.Extensions
 {
     public static class IServiceProviderExtensions
     {
+        static readonly ILogger log = LogManager.ForContext<VSServices>();
+
         /// <summary>
         /// Safe variant of GetService that doesn't throw exceptions if the service is
         /// not found.
@@ -40,7 +43,7 @@ namespace GitHub.Extensions
             catch (Exception ex)
             {
                 Debug.Print(ex.ToString());
-                VisualStudio.VsOutputLogger.WriteLine("GetServiceSafe: Could not obtain instance of '{0}'", type);
+                log.Error(ex, "GetServiceSafe: Could not obtain instance of '{Type}'", type);
             }
             return ui?.TryGetService(type);
         }

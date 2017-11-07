@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using GitHub.Logging;
 using Octokit;
 using Octokit.Internal;
 
@@ -39,8 +40,8 @@ namespace GitHub.Services
 
         static byte[] GetSuccessfulBytes(Uri imageUri, IResponse response)
         {
-            Debug.Assert(imageUri != null, "The imageUri cannot be null");
-            Debug.Assert(response != null, "The response cannot be null");
+            Log.Assert(imageUri != null, "The imageUri cannot be null");
+            Log.Assert(response != null, "The response cannot be null");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
