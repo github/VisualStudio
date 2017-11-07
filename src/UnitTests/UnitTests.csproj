@@ -223,6 +223,7 @@
     <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
+    <Compile Include="GitHub.App\Factories\ModelServiceFactoryTests.cs" />
     <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />

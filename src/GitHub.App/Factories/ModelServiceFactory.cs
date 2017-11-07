@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
@@ -44,6 +45,8 @@ namespace GitHub.Factories
                         await apiClientFactory.Create(connection.HostAddress),
                         await hostCacheFactory.Create(connection.HostAddress),
                         avatarProvider);
+                    result.InsertUser(AccountCacheItem.Create(connection.User));
+                    cache.Add(connection, result);
                 }
             }
             finally
