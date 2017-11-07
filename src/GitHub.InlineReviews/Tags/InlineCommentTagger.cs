@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.VisualStudio;
@@ -14,6 +15,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -22,10 +24,8 @@ namespace GitHub.InlineReviews.Tags
     /// </summary>
     public sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
         static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
@@ -38,22 +38,13 @@ namespace GitHub.InlineReviews.Tags
         IDisposable sessionManagerSubscription;
 
         public InlineCommentTagger(
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
             IPullRequestSessionManager sessionManager)
         {
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
-            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
 
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
@@ -188,7 +179,7 @@ namespace GitHub.InlineReviews.Tags
 
         static void ForgetWithLogging(Task task)
         {
-            task.Catch(e => VsOutputLogger.WriteLine("Exception caught while executing background task: {0}", e)).Forget();
+            task.Catch(e => log.Error(e, "Exception caught while executing background task")).Forget();
         }
 
         void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)

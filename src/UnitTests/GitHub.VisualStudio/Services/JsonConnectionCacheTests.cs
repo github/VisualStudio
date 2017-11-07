@@ -52,7 +52,7 @@ public class JsonConnectionCacheTests
 
             var connections = (await cache.Load()).ToList();
 
-            Assert.Equal(0, connections.Count);
+            Assert.Empty(connections);
             operatingSystem.File.Received().Delete(@"c:\fake\GHfVS\ghfvs.connections");
         }
 

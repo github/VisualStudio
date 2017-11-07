@@ -11,12 +11,14 @@ using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Helpers;
 using GitHub.InlineReviews.Models;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -27,6 +29,7 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : ReactiveObject, IPullRequestSessionManager
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestSessionManager>();
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
         readonly IConnectionManager connectionManager;
@@ -131,7 +134,7 @@ namespace GitHub.InlineReviews.Services
             {
                 var basePath = repository.LocalPath;
 
-                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
                 {
                     return path.Substring(basePath.Length + 1);
                 }
@@ -177,32 +180,32 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        async Task RepoChanged(ILocalRepositoryModel repository)
+        async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
         {
             try
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                if (repository != this.repository)
+                if (localRepositoryModel != repository)
                 {
-                    this.repository = repository;
+                    repository = localRepositoryModel;
                     CurrentSession = null;
                     sessions.Clear();
                 }
 
-                if (string.IsNullOrWhiteSpace(repository?.CloneUrl)) return;
+                if (string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl)) return;
 
                 var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
                 var session = CurrentSession;
 
                 if (modelService != null)
                 {
-                    var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                    var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
 
                     if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) &&
                         pr?.Item2 != (CurrentSession?.PullRequest.Number))
                     {
-                        var pullRequest = await GetPullRequestForTip(modelService, repository);
+                        var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);
 
                         if (pullRequest != null)
                         {
@@ -219,18 +222,18 @@ namespace GitHub.InlineReviews.Services
 
                 CurrentSession = session;
             }
-            catch
+            catch (Exception e)
             {
-                // TODO: Log
+                log.Error(e, "Error changing repository");
             }
         }
 
-        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel repository)
+        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel localRepositoryModel)
         {
             if (modelService != null)
             {
-                var pr = await service.GetPullRequestForCurrentBranch(repository);
-                if (pr != null) return await modelService.GetPullRequest(pr.Item1, repository.Name, pr.Item2).ToTask();
+                var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel);
+                if (pr != null) return await modelService.GetPullRequest(pr.Item1, localRepositoryModel.Name, pr.Item2).ToTask();
             }
 
             return null;

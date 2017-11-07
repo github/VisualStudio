@@ -51,7 +51,7 @@ public class LocalRepositoryModelTests : TestBaseClass
     [InlineData(8, LinkType.Blob, false, "https://github.com/foo/bar", "", @"src\dir\file1.cs", -1, 2, "https://github.com/foo/bar")]
     [InlineData(9, LinkType.Blob, false, "https://github.com/foo/bar", null, null, -1, -1, "https://github.com/foo/bar")]
     [InlineData(10, LinkType.Blob, false, null, "123123", @"src\dir\file1.cs", 1, 2, null)]
-    [InlineData(11, LinkType.Blob, true,  "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
+    [InlineData(11, LinkType.Blob, true, "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
     [InlineData(12, LinkType.Blob, true, "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", 1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs#L1")]
     [InlineData(13, LinkType.Blob, true, "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", 1, 1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs#L1")]
     [InlineData(14, LinkType.Blob, true, "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", 1, 2, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs#L1-L2")]
@@ -69,8 +69,6 @@ public class LocalRepositoryModelTests : TestBaseClass
     [InlineData(22, LinkType.Blame, true, "git@github.com/foo/bar", "123123", @"src\dir\ThisIsFile1.cs", -1, -1, "https://github.com/foo/bar/blame/123123/src/dir/ThisIsFile1.cs")]
     [InlineData(23, LinkType.Blame, true, "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blame/123123/src/dir/file1.cs")]
     [InlineData(24, LinkType.Blame, false, "https://github.com/foo/bar", "123123", "", 1, 2, "https://github.com/foo/bar/commit/123123")]
-    [InlineData(25, null, false, "git@github.com/foo/bar", "123123", @"src\dir\ThisIsFile1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/ThisIsFile1.cs")]
-
     public async void GenerateUrl(int testid, LinkType linkType, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
     {
         using (var temp = new TempDirectory())

@@ -15,7 +15,6 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
-using NLog;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
@@ -107,10 +106,6 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var thread in threads)
             {
-                var hunk = thread.Comments.First().DiffHunk;
-                var chunks = DiffUtilities.ParseFragment(hunk);
-                var chunk = chunks.Last();
-                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var oldLineNumber = thread.LineNumber;
                 var newLineNumber = GetUpdatedLineNumber(thread, diff);
                 var changed = false;
@@ -368,6 +363,6 @@ namespace GitHub.InlineReviews.Services
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
-        }       
+        }
     }
 }

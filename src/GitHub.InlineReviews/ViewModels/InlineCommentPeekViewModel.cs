@@ -9,13 +9,14 @@ using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
-using NLog;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -24,8 +25,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-        readonly IApiClientFactory apiClientFactory;
+        static readonly ILogger log = LogManager.ForContext<InlineCommentPeekViewModel>();
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
@@ -43,21 +43,18 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
         public InlineCommentPeekViewModel(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
 
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
@@ -149,7 +146,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             catch (Exception e)
             {
-                log.Error("Error updating InlineCommentViewModel", e);
+                log.Error(e, "Error updating InlineCommentViewModel");
             }
         }
 
@@ -192,11 +189,11 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task SessionChanged(IPullRequestSession session)
+        async Task SessionChanged(IPullRequestSession pullRequestSession)
         {
-            this.session = session;
+            this.session = pullRequestSession;
 
-            if (session == null)
+            if (pullRequestSession == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();

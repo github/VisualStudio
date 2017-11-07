@@ -34,7 +34,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             // There is an existing comment thread at line 10.
             var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 CreateSessionManager(),
@@ -56,7 +55,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             // There is no existing comment thread at line 9, but there is a + diff entry.
             var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 9),
                 CreatePeekSession(),
                 CreateSessionManager(),
@@ -76,7 +74,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
-                CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 8),
                 peekSession,
                 sessionManager,
@@ -113,7 +110,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,
@@ -140,7 +136,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 sessionManager,
@@ -173,7 +168,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
             var target = new InlineCommentPeekViewModel(
-                CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,

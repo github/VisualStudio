@@ -2,10 +2,11 @@ using System;
 using System.ComponentModel.Composition;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Shell;
-using NLog;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -13,7 +14,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     class GitHubCredentialProvider : IGitHubCredentialProvider
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitHubCredentialProvider>();
         readonly IKeychain keychain;
 
         [ImportingConstructor]
@@ -46,7 +47,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                log.Error("Error loading credentials in GitHubCredentialProvider.", e);
+                log.Error(e, "Error loading credentials in GitHubCredentialProvider");
                 return null;
             }
         }

@@ -10,12 +10,13 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
-using NLog;
 using ReactiveUI;
 using Rothko;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -23,7 +24,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class StartPageCloneViewModel : DialogViewModelBase, IBaseCloneViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<PullRequestListViewModel>();
 
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
@@ -113,9 +114,8 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
-                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                    log.Error(e, "Failed to set base repository path. localBaseRepositoryPath = {0} BaseRepositoryPath = {1} Chosen directory = {2}",
+                        localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)");
                 }
             }, RxApp.MainThreadScheduler);
         }

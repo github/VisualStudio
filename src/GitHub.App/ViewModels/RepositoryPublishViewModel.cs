@@ -11,12 +11,13 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
-using NLog;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -24,7 +25,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryPublishViewModel : RepositoryFormViewModel, IRepositoryPublishViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryPublishViewModel>();
 
         readonly IRepositoryPublishService repositoryPublishService;
         readonly INotificationService notificationService;
@@ -162,7 +163,7 @@ namespace GitHub.ViewModels
                 {
                     if (!ex.IsCriticalException())
                     {
-                        log.Error(ex);
+                        log.Error(ex, "Error Publishing Repository");
                         var error = new PublishRepositoryUserError(ex.Message);
                         notificationService.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
                     }

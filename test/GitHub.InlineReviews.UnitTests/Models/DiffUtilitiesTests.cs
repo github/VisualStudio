@@ -15,7 +15,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             {
                 var chunks = DiffUtilities.ParseFragment("");
 
-                Assert.Equal(0, chunks.Count());
+                Assert.Empty(chunks);
             }
 
             [Theory]
@@ -28,9 +28,9 @@ namespace GitHub.InlineReviews.UnitTests.Models
             {
                 var chunks = DiffUtilities.ParseFragment(header);
 
-                Assert.Equal(1, chunks.Count());
+                Assert.Single(chunks);
                 var chunk = chunks.First();
-                Assert.Equal(0, chunk.Lines.Count());
+                Assert.Empty(chunk.Lines);
             }
 
             [Theory]
@@ -64,7 +64,7 @@ index b02decb..f7dadae 100644
                 var chunks = DiffUtilities.ParseFragment(header);
 
                 var chunk = chunks.First();
-                Assert.Equal(0, chunk.Lines.Count());
+                Assert.Empty(chunk.Lines);
             }
 
             [Fact]
@@ -312,7 +312,7 @@ index b02decb..f7dadae 100644
 
                 var line = DiffUtilities.Match(chunks, lines);
 
-                Assert.Equal(null, line);
+                Assert.Null(line);
             }
         }
 

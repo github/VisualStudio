@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
 using GitHub.App;
+using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
-using GitHub.Models;
-using GitHub.Services;
-using GitHub.Validation;
-using NLog;
-using ReactiveUI;
-using Rothko;
-using System.Collections.ObjectModel;
-using GitHub.Collections;
-using GitHub.UI;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
+using GitHub.Logging;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.Validation;
+using ReactiveUI;
+using Rothko;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -30,7 +29,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneViewModel : DialogViewModelBase, IRepositoryCloneViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCloneViewModel>();
 
         readonly IConnection connection;
         readonly IModelServiceFactory modelServiceFactory;
@@ -148,7 +147,7 @@ namespace GitHub.ViewModels
                     {
                         LoadingFailed = true;
                         IsBusy = false;
-                        log.Error("Error while loading repositories", ex);
+                        log.Error(ex, "Error while loading repositories");
                     },
                     () => IsBusy = false
             );
@@ -203,9 +202,8 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
-                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                    log.Error(e, "Failed to set base repository path. {@Repository}",
+                        new { localBaseRepositoryPath, BaseRepositoryPath, directory });
                 }
             }, RxApp.MainThreadScheduler);
         }

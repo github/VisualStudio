@@ -9,20 +9,21 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.App;
+using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
-using NLog;
 using Octokit;
 using ReactiveUI;
 using Rothko;
-using GitHub.Collections;
+using Serilog;
 using IConnection = GitHub.Models.IConnection;
-using GitHub.Factories;
 
 namespace GitHub.ViewModels
 {
@@ -30,7 +31,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCreationViewModel : RepositoryFormViewModel, IRepositoryCreationViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCreationViewModel>();
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
@@ -247,9 +248,8 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
-                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                    log.Error(e, "Failed to set base repository path {@0}",
+                        new { localBaseRepositoryPath, BaseRepositoryPath, directory });
                 }
             }, RxApp.MainThreadScheduler);
         }
@@ -294,7 +294,7 @@ namespace GitHub.ViewModels
             {
                 if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
-                    log.Error("Error creating repository.", ex);
+                    log.Error(ex, "Error creating repository");
                     UserError.Throw(TranslateRepositoryCreateException(ex));
                 }
             });
