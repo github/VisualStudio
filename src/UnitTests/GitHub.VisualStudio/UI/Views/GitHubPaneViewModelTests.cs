@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using UnitTests;
 using Xunit;
+using GitHub.Extensions;
 
 public class GitHubPaneViewModelTests : TestBaseClass
 {
@@ -45,10 +46,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         var connection = Substitutes.Connection;
         var connectionHostAddress = HostAddress.Create(activeRepo.CloneUrl.ToString());
         connection.HostAddress.Returns(connectionHostAddress);
-        connectionManager.Connections.Returns(new ObservableCollection<IConnection>(new[] {
+        connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>(new[] {
                 connection
             }));
-        connection.Login().Returns(Observable.Return(connection));
 
         var host = Substitute.For<IRepositoryHost>();
         host.IsLoggedIn.Returns(true);

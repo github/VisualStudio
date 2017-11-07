@@ -1,22 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Authentication;
-using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Primitives;
 using GitHub.Services;
-using Octokit;
 using ReactiveUI;
 using Serilog;
+using static System.FormattableString;
 
 namespace GitHub.Models
 {
@@ -25,145 +16,28 @@ namespace GitHub.Models
     {
         static readonly ILogger log = LogManager.ForContext<RepositoryHosts>();
 
-        readonly ILoginManager loginManager;
-        readonly HostAddress hostAddress;
-        readonly IKeychain keychain;
-        readonly IUsageTracker usage;
-
-        bool isLoggedIn;
+        readonly IConnection connection;
 
         public RepositoryHost(
+            IConnection connection,
             IApiClient apiClient,
-            IModelService modelService,
-            ILoginManager loginManager,
-            IKeychain keychain,
-            IUsageTracker usage)
+            IModelService modelService)
         {
+            Guard.ArgumentNotNull(connection, nameof(connection));
+            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
+            Guard.ArgumentNotNull(modelService, nameof(modelService));
+
+            this.connection = connection;
             ApiClient = apiClient;
             ModelService = modelService;
-            this.loginManager = loginManager;
-            this.keychain = keychain;
-            this.usage = usage;
-
-            log.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
-            Address = apiClient.HostAddress;
-            hostAddress = apiClient.HostAddress;
-            Title = apiClient.HostAddress.Title;
         }
 
-        public HostAddress Address { get; private set; }
+        public HostAddress Address => ApiClient.HostAddress;
+        public IApiClient ApiClient { get;}
+        public bool IsLoggedIn => connection.IsLoggedIn;
+        public IModelService ModelService { get; }
+        public string Title => ApiClient.HostAddress.Title;
 
-        public IApiClient ApiClient { get; private set; }
-
-        public bool IsLoggedIn
-        {
-            get { return isLoggedIn; }
-            private set { this.RaiseAndSetIfChanged(ref isLoggedIn, value); }
-        }
-
-        public string Title { get; private set; }
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public IObservable<AuthenticationResult> LogInFromCache()
-        {
-            Func<Task<AuthenticationResult>> f = async () =>
-            {
-                try
-                {
-                    var user = await loginManager.LoginFromCache(Address, ApiClient.GitHubClient);
-                    var accountCacheItem = new AccountCacheItem(user);
-                    usage.IncrementLoginCount().Forget();
-                    await ModelService.InsertUser(accountCacheItem);
-
-                    if (user != null)
-                    {
-                        IsLoggedIn = true;
-                        return AuthenticationResult.Success;
-                    }
-                    else
-                    {
-                        return AuthenticationResult.VerificationFailure;
-                    }
-                }
-                catch (AuthorizationException)
-                {
-                    return AuthenticationResult.CredentialFailure;
-                }
-            };
-
-            return f().ToObservable();
-        }
-
-        public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
-        {
-            Guard.ArgumentNotEmptyString(usernameOrEmail, nameof(usernameOrEmail));
-            Guard.ArgumentNotEmptyString(password, nameof(password));
-
-            return Observable.Defer(async () =>
-            {
-                var user = await loginManager.Login(Address, ApiClient.GitHubClient, usernameOrEmail, password);
-                var accountCacheItem = new AccountCacheItem(user);
-                usage.IncrementLoginCount().Forget();
-                await ModelService.InsertUser(accountCacheItem);
-
-                if (user != null)
-                {
-                    IsLoggedIn = true;
-                    return Observable.Return(AuthenticationResult.Success);
-                }
-                else
-                {
-                    return Observable.Return(AuthenticationResult.VerificationFailure);
-                }
-            });
-        }
-
-        public IObservable<Unit> LogOut()
-        {
-            if (!IsLoggedIn) return Observable.Return(Unit.Default);
-
-            log.Information("Logged off of host '{ApiUri}'", hostAddress.ApiUri);
-
-            return keychain.Delete(Address).ToObservable()
-                .Catch<Unit, Exception>(e =>
-                {
-                    log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways");
-                    return Observable.Return(Unit.Default);
-                })
-                .SelectMany(_ => ModelService.InvalidateAll())
-                .Catch<Unit, Exception>(e =>
-                {
-                    log.Warning(e, "ASSERT! Failed to invaldiate caches");
-                    return Observable.Return(Unit.Default);
-                })
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Finally(() =>
-                {
-                    IsLoggedIn = false;
-                });
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {}
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        internal string DebuggerDisplay
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, hostAddress.ApiUri);
-            }
-        }
-
-        public IModelService ModelService
-        {
-            get;
-            private set;
-        }
+        internal string DebuggerDisplay => Invariant($"RepositoryHost: {Title} {Address.ApiUri}");
     }
 }

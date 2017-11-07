@@ -4,28 +4,36 @@ using GitHub.Primitives;
 
 namespace GitHub.Services
 {
+    /// <summary>
+    /// Represents a configured connection to a GitHub account.
+    /// </summary>
     public class Connection : IConnection
     {
-        readonly IConnectionManager manager;
-
-        public Connection(IConnectionManager cm, HostAddress hostAddress, string userName)
+        public Connection(
+            HostAddress hostAddress,
+            string userName,
+            Octokit.User user,
+            Exception connectionError)
         {
-            manager = cm;
             HostAddress = hostAddress;
             Username = userName;
+            User = user;
+            ConnectionError = connectionError;
         }
 
-        public HostAddress HostAddress { get; private set; }
-        public string Username { get; private set; }
+        /// <inheritdoc/>
+        public HostAddress HostAddress { get; }
 
-        public IObservable<IConnection> Login()
-        {
-            return manager.RequestLogin(this);
-        }
+        /// <inheritdoc/>
+        public string Username { get; }
 
-        public void Logout()
-        {
-            manager.RequestLogout(this);
-        }
+        /// <inheritdoc/>
+        public Octokit.User User { get; }
+
+        /// <inheritdoc/>
+        public bool IsLoggedIn => ConnectionError == null;
+
+        /// <inheritdoc/>
+        public Exception ConnectionError { get; }
     }
 }

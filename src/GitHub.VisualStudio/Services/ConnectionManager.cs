@@ -1,147 +1,179 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Factories;
-using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using IGitHubClient = Octokit.IGitHubClient;
+using GitHubClient = Octokit.GitHubClient;
+using User = Octokit.User;
 using Serilog;
+using GitHub.Logging;
+using System.Threading;
 
 namespace GitHub.VisualStudio
 {
+    /// <summary>
+    /// Manages the configured <see cref="IConnection"/>s to GitHub instances.
+    /// </summary>
     [Export(typeof(IConnectionManager))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class ConnectionManager : IConnectionManager
     {
         static readonly ILogger log = LogManager.ForContext<ConnectionManager>();
+
+        readonly IProgram program;
         readonly IConnectionCache cache;
         readonly IKeychain keychain;
         readonly ILoginManager loginManager;
-        readonly IApiClientFactory apiClientFactory;
-
-        public event Func<IConnection, IObservable<IConnection>> DoLogin;
+        readonly TaskCompletionSource<object> loaded;
+        readonly Lazy<ObservableCollectionEx<IConnection>> connections;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public ConnectionManager(
+            IProgram program,
             IConnectionCache cache,
             IKeychain keychain,
             ILoginManager loginManager,
-            IApiClientFactory apiClientFactory)
+            IUsageTracker usageTracker)
         {
+            this.program = program;
             this.cache = cache;
             this.keychain = keychain;
             this.loginManager = loginManager;
-            this.apiClientFactory = apiClientFactory;
-
-            Connections = new ObservableCollection<IConnection>();
-            LoadConnectionsFromCache().Forget();
+            this.usageTracker = usageTracker;
+            loaded = new TaskCompletionSource<object>();
+            connections = new Lazy<ObservableCollectionEx<IConnection>>(
+                this.CreateConnections,
+                LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
-        public IConnection CreateConnection(HostAddress address, string username)
+        /// <inheritdoc/>
+        public IReadOnlyObservableCollection<IConnection> Connections => connections.Value;
+
+        public Func<IConnection, Task> ConnectionCreated { get; set; }
+
+        /// <inheritdoc/>
+        public async Task<IConnection> GetConnection(HostAddress address)
         {
-            return SetupConnection(address, username);
+            return (await GetLoadedConnections()).FirstOrDefault(x => x.HostAddress == address);
         }
 
-        public bool AddConnection(HostAddress address, string username)
+        /// <inheritdoc/>
+        public async Task<IReadOnlyObservableCollection<IConnection>> GetLoadedConnections()
         {
-            if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
-                return false;
-            Connections.Add(SetupConnection(address, username));
-            return true;
+            return await GetLoadedConnectionsInternal();
         }
 
-        void AddConnection(Uri hostUrl, string username)
+        /// <inheritdoc/>
+        public async Task<IConnection> LogIn(HostAddress address, string userName, string password)
         {
-            var address = HostAddress.Create(hostUrl);
-            if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
-                return;
-            var conn = SetupConnection(address, username);
-            Connections.Add(conn);
-        }
+            var conns = await GetLoadedConnectionsInternal();
 
-        public bool RemoveConnection(HostAddress address)
-        {
-            var c = Connections.FirstOrDefault(x => x.HostAddress.Equals(address));
-            if (c == null)
-                return false;
-            RequestLogout(c);
-            return true;
-        }
-
-        public IObservable<IConnection> RequestLogin(IConnection connection)
-        {
-            var handler = DoLogin;
-            if (handler == null)
-                return null;
-            return handler(connection);
-        }
-
-        public void RequestLogout(IConnection connection)
-        {
-            Connections.Remove(connection);
-        }
-
-        IConnection SetupConnection(HostAddress address, string username)
-        {
-            var conn = new Connection(this, address, username);
-            return conn;
-        }
-
-        void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            if (conns.Any(x => x.HostAddress == address))
             {
-                foreach (IConnection c in e.OldItems)
-                {
-                    // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
-                    if (DoLogin == null)
-                        keychain.Delete(c.HostAddress).Forget();
-                }
+                throw new InvalidOperationException($"A connection to {address} already exists.");
             }
 
-            SaveConnectionsToCache().Forget();
-        }
+            var client = CreateClient(address);
+            var user = await loginManager.Login(address, client, userName, password);
+            var connection = new Connection(address, userName, user, null);
 
-        async Task LoadConnectionsFromCache()
-        {
-            foreach (var c in await cache.Load())
+            if (ConnectionCreated != null)
             {
-                var client = await apiClientFactory.CreateGitHubClient(c.HostAddress);
-                var addConnection = true;
-
-                try
-                {
-                    await loginManager.LoginFromCache(c.HostAddress, client);
-                }
-                catch (Octokit.ApiException e)
-                {
-                    addConnection = false;
-                    log.Error(e, "Cached credentials for connection {Address} were invalid", c.HostAddress);
-                }
-                catch (Exception)
-                {
-                    // Add the connection in this case - could be that there's no internet connection.
-                }
-
-                if (addConnection)
-                {
-                    AddConnection(c.HostAddress, c.UserName);
-                }
+                await ConnectionCreated(connection);
             }
 
-            Connections.CollectionChanged += RefreshConnections;
+            conns.Add(connection);
+            await SaveConnections();
+            await usageTracker.IncrementLoginCount();
+            return connection;
         }
 
-        async Task SaveConnectionsToCache()
+        /// <inheritdoc/>
+        public async Task LogOut(HostAddress address)
         {
-            await cache.Save(Connections.Select(x => new ConnectionDetails(x.HostAddress, x.Username)));
+            var connection = await GetConnection(address);
+
+            if (connection == null)
+            {
+                throw new KeyNotFoundException($"Could not find a connection to {address}.");
+            }
+
+            var client = CreateClient(address);
+            await loginManager.Logout(address, client);
+            connections.Value.Remove(connection);
+            await SaveConnections();
         }
 
-        public ObservableCollection<IConnection> Connections { get; private set; }
+        ObservableCollectionEx<IConnection> CreateConnections()
+        {
+            var result = new ObservableCollectionEx<IConnection>();
+            LoadConnections(result).Forget();
+            return result;
+        }
+
+        IGitHubClient CreateClient(HostAddress address)
+        {
+            return new GitHubClient(
+                program.ProductHeader,
+                new KeychainCredentialStore(keychain, address),
+                address.ApiUri);
+        }
+
+        async Task<ObservableCollectionEx<IConnection>> GetLoadedConnectionsInternal()
+        {
+            var result = Connections;
+            await loaded.Task;
+            return connections.Value;
+        }
+
+        async Task LoadConnections(ObservableCollection<IConnection> result)
+        {
+            try
+            {
+                foreach (var c in await cache.Load())
+                {
+                    var client = CreateClient(c.HostAddress);
+                    User user = null;
+                    Exception error = null;
+
+                    try
+                    {
+                        user = await loginManager.LoginFromCache(c.HostAddress, client);
+                    }
+                    catch (Exception e)
+                    {
+                        error = e;
+                    }
+
+                    var connection = new Connection(c.HostAddress, c.UserName, user, error);
+
+                    if (ConnectionCreated != null)
+                    {
+                        await ConnectionCreated(connection);
+                    }
+
+                    result.Add(connection);
+                    await usageTracker.IncrementLoginCount();
+                }
+            }
+            finally
+            {
+                loaded.SetResult(null);
+            }
+        }
+
+        async Task SaveConnections()
+        {
+            var conns = await GetLoadedConnectionsInternal();
+            var details = conns.Select(x => new ConnectionDetails(x.HostAddress, x.Username));
+            await cache.Save(details);
+        }
     }
 }

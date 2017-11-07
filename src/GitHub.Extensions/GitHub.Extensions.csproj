@@ -63,6 +63,7 @@
     <Compile Include="IReadOnlyObservableCollection.cs" />
     <Compile Include="LambdaComparer.cs" />
     <Compile Include="ObservableCollectionEx.cs" />
+    <Compile Include="ObservableCollectionExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

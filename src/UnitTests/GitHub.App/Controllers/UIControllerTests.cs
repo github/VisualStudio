@@ -18,6 +18,8 @@ using System.Collections.ObjectModel;
 using GitHub.App.Factories;
 using System.Reactive;
 using GitHub.Extensions.Reactive;
+using System.Threading.Tasks;
+using GitHub.Extensions;
 
 public class UIControllerTests
 {
@@ -101,8 +103,8 @@ public class UIControllerTests
             IRepositoryHost host, bool loggedIn = true)
         {
             var connection = provider.GetConnection();
-            connection.Login().Returns(Observable.Return(connection));
             hosts.LookupHost(connection.HostAddress).Returns(host);
+            connection.IsLoggedIn.Returns(loggedIn);
             host.IsLoggedIn.Returns(loggedIn);
             return connection;
         }
@@ -128,8 +130,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
@@ -155,13 +159,16 @@ public class UIControllerTests
 
         [Fact]
         public void RunningNonAuthFlowWhenLoggedInRunsNonAuthFlow()
+
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
@@ -195,8 +202,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
@@ -231,8 +240,10 @@ public class UIControllerTests
             // simulate being logged in
             var host = hosts.GitHubHost;
             var connection = SetupConnection(provider, hosts, host);
-            var cons = new ObservableCollection<IConnection> { connection };
+            var cons = new ObservableCollectionEx<IConnection> { connection };
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
@@ -263,8 +274,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
@@ -301,8 +314,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
@@ -347,8 +362,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
@@ -413,8 +430,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
@@ -451,8 +470,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
@@ -489,7 +510,7 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
             cm.Connections.Returns(cons);
             var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
 
@@ -526,8 +547,11 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
+
             var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
 
             // simulate being logged in
@@ -566,8 +590,10 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
+            var cons = new ObservableCollectionEx<IConnection>();
+
             cm.Connections.Returns(cons);
+            cm.GetLoadedConnections().Returns(cons);
 
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true));

@@ -7,16 +7,12 @@ using GitHub.Services;
 
 namespace GitHub.Models
 {
-    public interface IRepositoryHost : IDisposable
+    public interface IRepositoryHost
     {
         HostAddress Address { get; }
         IApiClient ApiClient { get; }
         IModelService ModelService { get; }
         bool IsLoggedIn { get; }
         string Title { get; }
-
-        IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password);
-        IObservable<AuthenticationResult> LogInFromCache();
-        IObservable<Unit> LogOut();
     }
 }

@@ -179,7 +179,6 @@ namespace GitHub.InlineReviews.Services
             try
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
-                await EnsureLoggedIn(localRepositoryModel);
 
                 if (localRepositoryModel != repository)
                 {
@@ -267,15 +266,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             return session;
-        }
-
-        async Task EnsureLoggedIn(ILocalRepositoryModel localRepositoryModel)
-        {
-            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl))
-            {
-                var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl);
-                await hosts.LogInFromCache(hostAddress);
-            }
         }
 
         async Task UpdateLiveFile(PullRequestSessionLiveFile file, bool rebuildThreads)
