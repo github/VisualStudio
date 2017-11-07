@@ -20,7 +20,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheIsWorkingDirectoryCleanMethod
     {
         [Fact]
-        public async Task NewRepo_IsWorkingDirectoryClean_True()
+        public async Task NewRepo_True()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -35,14 +35,14 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Fact]
-        public async Task UntrackedFile_IsWorkingDirectoryClean_True()
+        public async Task UntrackedFile_True()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
             {
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
-                var file = Path.Combine(repo.Info.WorkingDirectory, "untracked.txt");
+                var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
                 File.WriteAllText(file, "contents");
 
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
@@ -51,17 +51,38 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
+
         [Fact]
-        public async Task StagedFile_IsWorkingDirectoryClean_False()
+        public async Task CommitFile_True()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
             {
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
-                var file = Path.Combine(repo.Info.WorkingDirectory, "modified.txt");
+                var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
                 File.WriteAllText(file, "contents");
                 Commands.Stage(repo, file);
+                repo.Commit("foo", Author, Author);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.True(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task AddedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
 
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
@@ -70,22 +91,137 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Fact]
-        public async Task CommittedFile_IsWorkingDirectoryClean_True()
+        public async Task ModifiedFile_False()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
             {
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
-                var file = Path.Combine(repo.Info.WorkingDirectory, "modified.txt");
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
                 File.WriteAllText(file, "contents");
-                Commands.Stage(repo, file);
-                var author = new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
-                repo.Commit("foo", author, author);
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
 
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-                Assert.True(isClean);
+                Assert.False(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task StagedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
+                Commands.Stage(repo, path);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task MissingFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Delete(file);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task RemovedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Delete(file);
+                Commands.Stage(repo, path);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task RenamedInIndexFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var renamedPath = "renamed.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                var renamedFile = Path.Combine(repo.Info.WorkingDirectory, renamedPath);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Move(file, renamedFile);
+                Commands.Stage(repo, path);
+                Commands.Stage(repo, renamedPath);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task RenamedInWorkingDirFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var renamedPath = "renamed.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                var renamedFile = Path.Combine(repo.Info.WorkingDirectory, renamedPath);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Move(file, renamedFile);
+                // NOTE: Renamed files appear as Missing and Untracked rather than RenamedInWorkingDir. Is this a bug?
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
             }
         }
 
@@ -113,6 +249,7 @@ public class PullRequestServiceTests : TestBaseClass
             return repositoryModel;
         }
 
+        static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
     }
 
     public class TheExtractFileMethod
