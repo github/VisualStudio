@@ -118,6 +118,10 @@
       <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -163,7 +167,6 @@
     <Compile Include="Extensions\LocalRepositoryModelExtensions.cs" />
     <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Helpers\ThreadingHelper.cs" />
-    <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />
     <Compile Include="Models\ConnectionDetails.cs" />
     <Compile Include="Models\CloneDialogResult.cs" />
@@ -200,7 +203,6 @@
     <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
-    <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Services.cs" />
     <Compile Include="Services\StatusBarNotificationService.cs" />
     <Compile Include="Models\IConnection.cs" />
@@ -265,6 +267,10 @@
       <Name>GitHub.Extensions</Name>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Settings\generated\IPackageSettings.tt">
@@ -274,6 +280,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\SerilogAnalyzer.0.12.0.0\analyzers\dotnet\cs\SerilogAnalyzer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\src\common\t4.targets" />

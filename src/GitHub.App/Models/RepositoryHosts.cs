@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using GitHub.Authentication;
 using GitHub.Extensions;
 using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.Models
 {
@@ -17,8 +19,7 @@ namespace GitHub.Models
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryHosts : ReactiveObject, IRepositoryHosts
     {
-        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
-
+        static readonly ILogger log = LogManager.ForContext<RepositoryHosts>();
         public static DisconnectedRepositoryHost DisconnectedRepositoryHost = new DisconnectedRepositoryHost();
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;
@@ -106,7 +107,7 @@ namespace GitHub.Models
                 }
                 catch (Exception e)
                 {
-                    log.Warn("Exception occured while disposing RepositoryHosts", e);
+                    log.Warning(e, "Exception occured while disposing RepositoryHosts");
                 }
                 disposed = true;
             }
@@ -157,7 +158,7 @@ namespace GitHub.Models
             }
             catch (Exception e)
             {
-                log.Error("Error adding repository host.", e);
+                log.Error(e, "Error adding repository host");
             }
         }
 
@@ -189,7 +190,7 @@ namespace GitHub.Models
             }
             catch (Exception e)
             {
-                log.Error("Error loading repository hosts.", e);
+                log.Error(e, "Error loading repository hosts.");
             }
             finally
             {

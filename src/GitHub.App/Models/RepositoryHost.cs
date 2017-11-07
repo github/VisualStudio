@@ -2,9 +2,11 @@
 using System.Diagnostics;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
+using Serilog;
 using static System.FormattableString;
 
 namespace GitHub.Models
@@ -12,6 +14,8 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
+        static readonly ILogger log = LogManager.ForContext<RepositoryHosts>();
+
         readonly IConnection connection;
 
         public RepositoryHost(

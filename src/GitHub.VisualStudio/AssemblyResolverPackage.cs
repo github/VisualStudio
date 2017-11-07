@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.VisualStudio
 {

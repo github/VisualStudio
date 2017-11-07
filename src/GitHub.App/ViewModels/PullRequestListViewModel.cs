@@ -11,12 +11,13 @@ using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
-using NLog;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -24,7 +25,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : PanePageViewModelBase, IPullRequestListViewModel, IDisposable
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<PullRequestListViewModel>();
 
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel localRepository;
@@ -156,7 +157,7 @@ namespace GitHub.ViewModels
                 .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
                     // Occurs on network error, when the repository was deleted on GitHub etc.
-                    log.Info("Received Exception reading pull requests", ex);
+                    log.Error(ex, "Received Exception reading pull requests");
                     return Observable.Empty<System.Reactive.Unit>();
                 })
                 .Subscribe(_ =>

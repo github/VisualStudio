@@ -18,11 +18,10 @@ namespace GitHub.Factories
         readonly ProductHeaderValue productHeader;
 
         [ImportingConstructor]
-        public ApiClientFactory(IKeychain keychain, IProgram program, ILoggingConfiguration config)
+        public ApiClientFactory(IKeychain keychain, IProgram program)
         {
             Keychain = keychain;
             productHeader = program.ProductHeader;
-            config.Configure();
         }
 
         public Task<IGitHubClient> CreateGitHubClient(HostAddress hostAddress)
