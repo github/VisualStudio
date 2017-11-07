@@ -17,6 +17,104 @@ using Xunit;
 
 public class PullRequestServiceTests : TestBaseClass
 {
+    public class TheIsWorkingDirectoryCleanMethod
+    {
+        [Fact]
+        public async Task NewRepo_IsWorkingDirectoryClean_True()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.True(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task UntrackedFile_IsWorkingDirectoryClean_True()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "untracked.txt");
+                File.WriteAllText(file, "contents");
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.True(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task StagedFile_IsWorkingDirectoryClean_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "modified.txt");
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, file);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
+            }
+        }
+
+        [Fact]
+        public async Task CommittedFile_IsWorkingDirectoryClean_True()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "modified.txt");
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, file);
+                var author = new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
+                repo.Commit("foo", author, author);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.True(isClean);
+            }
+        }
+
+        static Repository CreateRepository(TempDirectory tempDirectory)
+        {
+            var repoDir = tempDirectory.Directory.FullName;
+            return new Repository(Repository.Init(repoDir));
+        }
+
+        static IPullRequestService CreatePullRequestService(Repository repo)
+        {
+            var repoDir = repo.Info.WorkingDirectory;
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitService = serviceProvider.GetGitService();
+            gitService.GetRepository(repoDir).Returns(repo);
+            var service = new PullRequestService(Substitute.For<IGitClient>(), gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+            return service;
+        }
+
+        static ILocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
+        {
+            var repoDir = repo.Info.WorkingDirectory;
+            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+            repositoryModel.LocalPath.Returns(repoDir);
+            return repositoryModel;
+        }
+
+    }
+
     public class TheExtractFileMethod
     {
         [Fact]
