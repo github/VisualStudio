@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Reactive.Disposables;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio.UI.Views
 {

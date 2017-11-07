@@ -63,7 +63,6 @@
     </Compile>
     <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
     <Compile Include="IKeychain.cs" />
-    <Compile Include="ILoginCache.cs" />
     <Compile Include="ILoginManager.cs" />
     <Compile Include="ITwoFactorChallengeHandler.cs" />
     <Compile Include="LoginManager.cs" />
@@ -94,6 +93,10 @@
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

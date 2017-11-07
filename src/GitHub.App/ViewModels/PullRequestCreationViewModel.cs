@@ -13,11 +13,13 @@ using GitHub.Validation;
 using GitHub.App;
 using System.Diagnostics.CodeAnalysis;
 using Octokit;
-using NLog;
+using LibGit2Sharp;
 using System.Globalization;
 using GitHub.Extensions;
 using System.Reactive.Disposables;
 using System.Reactive;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -26,7 +28,7 @@ namespace GitHub.ViewModels
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class PullRequestCreationViewModel : DialogViewModelBase, IPullRequestCreationViewModel, IDisposable
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<PullRequestCreationViewModel>();
 
         readonly ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
         readonly ObservableAsPropertyHelper<bool> isExecuting;
@@ -100,7 +102,7 @@ namespace GitHub.ViewModels
                     .CreatePullRequest(repositoryHost, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
-                        log.Error(ex);
+                        log.Error(ex, "Error creating pull request");
 
                         //TODO:Will need a uniform solution to HTTP exception message handling
                         var apiException = ex as ApiValidationException;
