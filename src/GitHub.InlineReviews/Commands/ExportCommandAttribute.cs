@@ -13,7 +13,7 @@ namespace GitHub.InlineReviews.Commands
     /// </remarks>
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    class ExportCommandAttribute : ExportAttribute
+    sealed class ExportCommandAttribute : ExportAttribute
     {
         public ExportCommandAttribute(Type packageType)
             : base(typeof(IPackageResource))

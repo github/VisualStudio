@@ -75,7 +75,7 @@ namespace GitHub.InlineReviews.Commands
     /// <see cref="RegisterPackageCommands{TPackage}(TPackage)"/>.
     /// </para>
     /// </remarks>
-    abstract class VsCommand<TParam> : VsCommandBase, IVsCommand<TParam>, ICommand
+    public abstract class VsCommand<TParam> : VsCommandBase, IVsCommand<TParam>, ICommand
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="VsCommand"/> class.

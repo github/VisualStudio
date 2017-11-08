@@ -15,7 +15,7 @@ namespace GitHub.InlineReviews.Commands
     /// Shows the pull request comments view for a specified pull request.
     /// </summary>
     [ExportCommand(typeof(InlineReviewsPackage))]
-    class ShowPullRequestCommentsCommand : VsCommand<IPullRequestModel>
+    public class ShowPullRequestCommentsCommand : VsCommand<IPullRequestModel>
     {
         public static readonly Guid CommandSet = Guids.CommandSetGuid;
         public const int CommandId = PkgCmdIDList.ShowPullRequestCommentsId;

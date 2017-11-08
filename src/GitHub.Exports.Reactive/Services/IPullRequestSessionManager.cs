@@ -38,7 +38,7 @@ namespace GitHub.Services
         /// <param name="textView">The text view that is showing the file.</param>
         /// <param name="textBuffer">The text buffer with the file contents.</param>
         /// <returns>An <see cref="IPullRequestSessionLiveFile"/>.</returns>
-        Task<IPullRequestSessionLiveFile> GetLiveFile(
+        Task<IPullRequestSessionFile> GetLiveFile(
             string relativePath,
             ITextView textView,
             ITextBuffer textBuffer);

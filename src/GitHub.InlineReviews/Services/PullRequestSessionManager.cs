@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.InlineReviews.Models;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -17,6 +18,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -27,10 +29,10 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : ReactiveObject, IPullRequestSessionManager
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestSessionManager>();
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
-        readonly ITeamExplorerServiceHolder teamExplorerService;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         IPullRequestSession currentSession;
@@ -55,12 +57,10 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(hosts, nameof(hosts));
-            Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
 
             this.service = service;
             this.sessionService = sessionService;
             this.hosts = hosts;
-            this.teamExplorerService = teamExplorerService;
             teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
         }
 
@@ -71,7 +71,7 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
-        public async Task<IPullRequestSessionLiveFile> GetLiveFile(
+        public async Task<IPullRequestSessionFile> GetLiveFile(
             string relativePath,
             ITextView textView,
             ITextBuffer textBuffer)
@@ -79,7 +79,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestSessionLiveFile result;
 
             if (!textBuffer.Properties.TryGetProperty(
-                typeof(IPullRequestSessionLiveFile),
+                typeof(IPullRequestSessionFile),
                 out result))
             {
                 var dispose = new CompositeDisposable();
@@ -90,7 +90,7 @@ namespace GitHub.InlineReviews.Services
                     sessionService.CreateRebuildSignal());
 
                 textBuffer.Properties.AddProperty(
-                    typeof(IPullRequestSessionLiveFile),
+                    typeof(IPullRequestSessionFile),
                     result);
 
                 await UpdateLiveFile(result, true);
@@ -109,8 +109,7 @@ namespace GitHub.InlineReviews.Services
                 dispose.Add(this.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
-                dispose.Add(this.WhenAnyValue(x => x.CurrentSession.PullRequest)
-                    .Skip(1)
+                dispose.Add(this.WhenAnyObservable(x => x.CurrentSession.PullRequestChanged)
                     .Subscribe(_ => UpdateLiveFile(result, true).Forget()));
 
                 result.ToDispose = dispose;
@@ -129,7 +128,7 @@ namespace GitHub.InlineReviews.Services
             {
                 var basePath = repository.LocalPath;
 
-                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
                 {
                     return path.Substring(basePath.Length + 1);
                 }
@@ -175,33 +174,33 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        async Task RepoChanged(ILocalRepositoryModel repository)
+        async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
         {
             try
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
-                await EnsureLoggedIn(repository);
+                await EnsureLoggedIn(localRepositoryModel);
 
-                if (repository != this.repository)
+                if (localRepositoryModel != repository)
                 {
-                    this.repository = repository;
+                    repository = localRepositoryModel;
                     CurrentSession = null;
                     sessions.Clear();
                 }
 
-                if (string.IsNullOrWhiteSpace(repository?.CloneUrl)) return;
+                if (string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl)) return;
 
-                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+                var modelService = hosts.LookupHost(HostAddress.Create(localRepositoryModel.CloneUrl))?.ModelService;
                 var session = CurrentSession;
 
                 if (modelService != null)
                 {
-                    var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                    var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
 
                     if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) &&
                         pr?.Item2 != (CurrentSession?.PullRequest.Number))
                     {
-                        var pullRequest = await GetPullRequestForTip(modelService, repository);
+                        var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);
 
                         if (pullRequest != null)
                         {
@@ -218,18 +217,18 @@ namespace GitHub.InlineReviews.Services
 
                 CurrentSession = session;
             }
-            catch
+            catch (Exception e)
             {
-                // TODO: Log
+                log.Error(e, "Error changing repository");
             }
         }
 
-        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel repository)
+        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel localRepositoryModel)
         {
             if (modelService != null)
             {
-                var pr = await service.GetPullRequestForCurrentBranch(repository);
-                if (pr != null) return await modelService.GetPullRequest(pr.Item1, repository.Name, pr.Item2).ToTask();
+                var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel);
+                if (pr != null) return await modelService.GetPullRequest(pr.Item1, localRepositoryModel.Name, pr.Item2).ToTask();
             }
 
             return null;
@@ -270,11 +269,11 @@ namespace GitHub.InlineReviews.Services
             return session;
         }
 
-        async Task EnsureLoggedIn(ILocalRepositoryModel repository)
+        async Task EnsureLoggedIn(ILocalRepositoryModel localRepositoryModel)
         {
-            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(repository?.CloneUrl))
+            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl))
             {
-                var hostAddress = HostAddress.Create(repository.CloneUrl);
+                var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl);
                 await hosts.LogInFromCache(hostAddress);
             }
         }
@@ -341,7 +340,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (file.TrackingPoints != null)
             {
-                var linesChanged = new List<int>();
+                var linesChanged = new List<Tuple<int, DiffSide>>();
 
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -352,10 +351,10 @@ namespace GitHub.InlineReviews.Services
                         var position = trackingPoint.GetPosition(snapshot);
                         var lineNumber = snapshot.GetLineNumberFromPosition(position);
 
-                        if (lineNumber != thread.LineNumber)
+                        if (thread.DiffLineType != DiffChangeType.Delete && lineNumber != thread.LineNumber)
                         {
-                            linesChanged.Add(lineNumber);
-                            linesChanged.Add(thread.LineNumber);
+                            linesChanged.Add(Tuple.Create(lineNumber, DiffSide.Right));
+                            linesChanged.Add(Tuple.Create(thread.LineNumber, DiffSide.Right));
                             thread.LineNumber = lineNumber;
                             thread.IsStale = true;
                         }
@@ -363,7 +362,7 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 linesChanged = linesChanged
-                    .Where(x => x >= 0)
+                    .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();
 
@@ -382,7 +381,7 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var thread in threads)
             {
-                if (thread.LineNumber >= 0)
+                if (thread.LineNumber >= 0 && thread.DiffLineType != DiffChangeType.Delete)
                 {
                     var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
                     var p = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
@@ -408,7 +407,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestSessionLiveFile file;
 
             if (textBuffer.Properties.TryGetProperty(
-                typeof(IPullRequestSessionLiveFile),
+                typeof(IPullRequestSessionFile),
                 out file))
             {
                 file.Dispose();
@@ -428,7 +427,7 @@ namespace GitHub.InlineReviews.Services
         void TextBufferChanged(object sender, TextContentChangedEventArgs e)
         {
             var textBuffer = (ITextBuffer)sender;
-            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionLiveFile));
+            var file = textBuffer.Properties.GetProperty<PullRequestSessionLiveFile>(typeof(IPullRequestSessionFile));
             InvalidateLiveThreads(file, e.After);
             file.Rebuild.OnNext(textBuffer.CurrentSnapshot);
         }

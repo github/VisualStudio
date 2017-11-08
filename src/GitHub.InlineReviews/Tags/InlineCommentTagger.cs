@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.VisualStudio;
@@ -14,53 +15,39 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
     /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
     /// </summary>
-    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
+    public sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
         static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IInlineCommentPeekService peekService;
         bool needsInitialize = true;
         string relativePath;
-        bool leftHandSide;
+        DiffSide side;
         IPullRequestSession session;
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
         IDisposable sessionManagerSubscription;
 
         public InlineCommentTagger(
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
-            IPullRequestSessionManager sessionManager,
-            IInlineCommentPeekService peekService)
+            IPullRequestSessionManager sessionManager)
         {
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
-            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(peekService, nameof(peekService));
 
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
-            this.peekService = peekService;
         }
 
         public bool ShowMargin
@@ -112,8 +99,8 @@ namespace GitHub.InlineReviews.Tags
                         var snapshot = span.Snapshot;
                         var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
 
-                        if ((leftHandSide && thread.DiffLineType == DiffChangeType.Delete) ||
-                            (!leftHandSide && thread.DiffLineType != DiffChangeType.Delete))
+                        if ((side == DiffSide.Left && thread.DiffLineType == DiffChangeType.Delete) ||
+                            (side == DiffSide.Right && thread.DiffLineType != DiffChangeType.Delete))
                         {
                             linesWithComments[thread.LineNumber - startLine] = true;
 
@@ -127,12 +114,12 @@ namespace GitHub.InlineReviews.Tags
                     {
                         foreach (var line in chunk.Lines)
                         {
-                            var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
+                            var lineNumber = (side == DiffSide.Left ? line.OldLineNumber : line.NewLineNumber) - 1;
 
                             if (lineNumber >= startLine &&
                                 lineNumber <= endLine &&
                                 !linesWithComments[lineNumber - startLine]
-                                && (!leftHandSide || line.Type == DiffChangeType.Delete))
+                                && (side == DiffSide.Right || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                 result.Add(new TagSpan<InlineCommentTag>(
@@ -162,7 +149,8 @@ namespace GitHub.InlineReviews.Tags
                 session = bufferInfo.Session;
                 relativePath = bufferInfo.RelativePath;
                 file = await session.GetFile(relativePath);
-                leftHandSide = bufferInfo.IsLeftComparisonBuffer;
+                fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+                side = bufferInfo.Side ?? DiffSide.Right;
                 NotifyTagsChanged();
             }
             else
@@ -185,7 +173,7 @@ namespace GitHub.InlineReviews.Tags
             if (relativePath != null)
             {
                 var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
-                fileSubscription = liveFile.LinesChanged.Subscribe(NotifyTagsChanged);
+                fileSubscription = liveFile.LinesChanged.Subscribe(LinesChanged);
                 file = liveFile;
             }
             else
@@ -198,7 +186,12 @@ namespace GitHub.InlineReviews.Tags
 
         static void ForgetWithLogging(Task task)
         {
-            task.Catch(e => VsOutputLogger.WriteLine("Exception caught while executing background task: {0}", e)).Forget();
+            task.Catch(e => log.Error(e, "Exception caught while executing background task")).Forget();
+        }
+
+        void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        {
+            NotifyTagsChanged(lines.Where(x => x.Item2 == side).Select(x => x.Item1));
         }
 
         void NotifyTagsChanged()

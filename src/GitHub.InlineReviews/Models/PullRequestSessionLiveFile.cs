@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Subjects;
 using GitHub.Models;
 using Microsoft.VisualStudio.Text;
@@ -11,13 +10,13 @@ namespace GitHub.InlineReviews.Models
     /// A file in a pull request session that tracks editor content.
     /// </summary>
     /// <remarks>
-    /// A live session file extends <see cref="IPullRequestSessionFile"/> to update the file's
+    /// A live session file extends <see cref="PullRequestSessionFile"/> to update the file's
     /// review comments in real time, based on the contents of an editor and
     /// <see cref="IPullRequestSessionManager.CurrentSession"/>.
     /// </remarks>
-    public sealed class PullRequestSessionLiveFile : PullRequestSessionFile, IPullRequestSessionLiveFile, IDisposable
+    public sealed class PullRequestSessionLiveFile : PullRequestSessionFile, IDisposable
     {
-        readonly Subject<IReadOnlyList<int>> linesChanged = new Subject<IReadOnlyList<int>>();
+        bool disposed = false;
 
         public PullRequestSessionLiveFile(
             string relativePath,
@@ -49,39 +48,25 @@ namespace GitHub.InlineReviews.Models
         /// </summary>
         public ISubject<ITextSnapshot, ITextSnapshot> Rebuild { get; }
 
-        /// <inheritdoc/>
-        public IObservable<IReadOnlyList<int>> LinesChanged => linesChanged;
-
-        /// <inheritdoc/>
-        public override IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
+        public void Dispose()
         {
-            get { return base.InlineCommentThreads; }
-            internal set
-            {
-                var lines = base.InlineCommentThreads?
-                    .Concat(value ?? Enumerable.Empty<IInlineCommentThreadModel>())
-                    .Select(x => x.LineNumber)
-                    .Where(x => x >= 0)
-                    .Distinct()
-                    .ToList();
-                base.InlineCommentThreads = value;
-                NotifyLinesChanged(lines);
-            }
+            Dispose(true);
         }
 
         /// <summary>
         /// Disposes of the resources in <see cref="ToDispose"/>.
         /// </summary>
-        public void Dispose()
+        void Dispose(bool disposing)
         {
-            ToDispose?.Dispose();
-            ToDispose = null;
-        }
+            if (!disposed)
+            {
+                disposed = true;
 
-        /// <summary>
-        /// Raises the <see cref="LinesChanged"/> signal.
-        /// </summary>
-        /// <param name="lines">The lines that have changed.</param>
-        public void NotifyLinesChanged(IReadOnlyList<int> lines) => linesChanged.OnNext(lines);
+                if (disposing)
+                {
+                    ToDispose?.Dispose();
+                }
+            }
+        }
     }
 }

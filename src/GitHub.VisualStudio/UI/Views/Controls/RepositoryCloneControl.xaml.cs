@@ -17,6 +17,7 @@ using ReactiveUI;
 using System.ComponentModel.Composition;
 using GitHub.Services;
 using System.Linq;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -88,8 +89,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
-                Guard.ArgumentNotNull(culture, nameof(culture));
-
                 var repo = item as IRemoteRepositoryModel;
                 var name = repo?.Owner ?? string.Empty;
                 RepositoryGroup group;

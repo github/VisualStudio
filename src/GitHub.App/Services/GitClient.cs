@@ -2,12 +2,12 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using NLog;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -16,8 +16,7 @@ namespace GitHub.Services
     public class GitClient : IGitClient
     {
         const string defaultOriginName = "origin";
-
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
@@ -82,7 +81,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif
@@ -119,7 +118,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif
@@ -143,7 +142,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif
@@ -405,13 +404,13 @@ namespace GitHub.Services
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
-                    var head = repository.Head[path];
-                    if (head.TargetType != TreeEntryTargetType.Blob)
+                    var treeEntry = repository.Head[path];
+                    if (treeEntry?.TargetType != TreeEntryTargetType.Blob)
                     {
                         return false;
                     }
 
-                    var blob1 = (Blob)head.Target;
+                    var blob1 = (Blob)treeEntry.Target;
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
                         var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
