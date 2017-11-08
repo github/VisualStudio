@@ -1,5 +1,7 @@
 # GitHub Extension for Visual Studio
 
+[![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
+
 ## Notices
 
 ### VS 2017 v15.3 users, please read
