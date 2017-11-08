@@ -4,15 +4,16 @@ using System.Threading.Tasks;
 using Akavache;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
+using GitHub.Logging;
 using GitHub.Primitives;
-using NLog;
 using Octokit;
+using Serilog;
 
 namespace GitHub.Services
 {
     public class GitHubCredentialStore : ICredentialStore
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitHubCredentialStore>();
         readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
 
@@ -33,7 +34,7 @@ namespace GitHub.Services
         {
             if (loginInfo == LoginCache.EmptyLoginInfo)
             {
-                log.Debug(CultureInfo.InvariantCulture, "Could not retrieve login info from the secure cache '{0}'",
+                log.Warning("Could not retrieve login info from the secure cache '{CredentialCacheKeyHost}'",
                     hostAddress.CredentialCacheKeyHost);
                 return Credentials.Anonymous;
             }

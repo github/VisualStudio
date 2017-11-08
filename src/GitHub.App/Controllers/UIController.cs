@@ -15,6 +15,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
+using GitHub.Logging;
 
 namespace GitHub.Controllers
 {
@@ -166,12 +167,12 @@ namespace GitHub.Controllers
                 var waitDispatcher = RxApp.MainThreadScheduler as WaitForDispatcherScheduler;
                 if (waitDispatcher != null)
                 {
-                    Debug.Assert(DispatcherScheduler.Current.Dispatcher == Application.Current.Dispatcher,
+                    Log.Assert(DispatcherScheduler.Current.Dispatcher == Application.Current.Dispatcher,
                        "DispatcherScheduler is set correctly");
                 }
                 else
                 {
-                    Debug.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
+                    Log.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
                         "The MainThreadScheduler is using the wrong dispatcher");
                 }
             }
@@ -217,7 +218,7 @@ namespace GitHub.Controllers
                 if (selectedFlow != UIControllerFlow.Authentication)
                     gitHubServiceProvider.AddService(this, connection);
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
-                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
+                    Log.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
                 connection.Login()
                     .ObserveOn(RxApp.MainThreadScheduler)
