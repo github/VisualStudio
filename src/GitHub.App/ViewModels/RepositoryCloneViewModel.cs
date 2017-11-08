@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
 using GitHub.App;
+using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
+using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.UI;
 using GitHub.Validation;
 using ReactiveUI;
 using Rothko;
-using System.Collections.ObjectModel;
-using GitHub.Collections;
-using GitHub.UI;
-using GitHub.Extensions.Reactive;
-using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.ViewModels
@@ -32,36 +31,42 @@ namespace GitHub.ViewModels
     {
         static readonly ILogger log = LogManager.ForContext<RepositoryCloneViewModel>();
 
-        readonly IRepositoryHost repositoryHost;
+        readonly IConnection connection;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        IModelService modelService;
         bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
         bool loadingFailed;
 
         [ImportingConstructor]
-        RepositoryCloneViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
-            IRepositoryCloneService repositoryCloneService,
+        public RepositoryCloneViewModel(
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
+            IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem)
-        { }
-
+            : this(connection.Get(), modelServiceFactory, cloneService, operatingSystem)
+        {
+        }
 
         public RepositoryCloneViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(cloneService, nameof(cloneService));
             Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
 
-            this.repositoryHost = repositoryHost;
+            this.connection = connection;
+            this.modelServiceFactory = modelServiceFactory;
             this.operatingSystem = operatingSystem;
 
-            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, connection.HostAddress.Title);
 
             Repositories = new TrackingCollection<IRemoteRepositoryModel>();
             repositories.ProcessingDelay = TimeSpan.Zero;
@@ -127,8 +132,13 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
+            if (modelService == null)
+            {
+                modelService = modelServiceFactory.CreateBlocking(connection);
+            }
+
             IsBusy = true;
-            repositoryHost.ModelService.GetRepositories(repositories);
+            modelService.GetRepositories(repositories);
             repositories.OriginalCompleted
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(

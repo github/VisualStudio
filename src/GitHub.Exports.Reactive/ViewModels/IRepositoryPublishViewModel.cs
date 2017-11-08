@@ -2,12 +2,13 @@
 using GitHub.Models;
 using ReactiveUI;
 using System.Collections.ObjectModel;
+using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {
     public interface IRepositoryPublishViewModel : IRepositoryForm
     {
-        ObservableCollection<IConnection> Connections { get; }
+        IReadOnlyObservableCollection<IConnection> Connections { get; }
 
         /// <summary>
         /// Command that creates the repository.

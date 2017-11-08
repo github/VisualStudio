@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Authentication;
@@ -10,7 +10,6 @@ using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Info;
 using GitHub.Logging;
-using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
@@ -24,12 +23,12 @@ namespace GitHub.ViewModels
     {
         static readonly ILogger log = LogManager.ForContext<LoginTabViewModel>();
 
-        protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
+        protected LoginTabViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
         {
-            Guard.ArgumentNotNull(repositoryHosts, nameof(repositoryHosts));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(browser, nameof(browser));
 
-            RepositoryHosts = repositoryHosts;
+            ConnectionManager = connectionManager;
 
             UsernameOrEmailValidator = ReactivePropertyValidator.For(this, x => x.UsernameOrEmail)
                 .IfNullOrEmpty(Resources.UsernameOrEmailValidatorEmpty)
@@ -76,7 +75,7 @@ namespace GitHub.ViewModels
                 return Observable.Return(Unit.Default);
             });
         }
-        protected IRepositoryHosts RepositoryHosts { get; }
+        protected IConnectionManager ConnectionManager { get; }
         protected abstract Uri BaseUri { get; }
         public IReactiveCommand<Unit> SignUp { get; }
 
@@ -142,7 +141,9 @@ namespace GitHub.ViewModels
             return Observable.Defer(() =>
             {
                 return hostAddress != null ?
-                    RepositoryHosts.LogIn(hostAddress, UsernameOrEmail, Password)
+                    ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password)
+                        .ToObservable()
+                        .Select(_ => AuthenticationResult.Success)
                     : Observable.Return(AuthenticationResult.CredentialFailure);
             })
             .ObserveOn(RxApp.MainThreadScheduler)

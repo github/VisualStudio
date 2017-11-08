@@ -6,7 +6,8 @@ using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
-using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -17,12 +18,12 @@ namespace GitHub.ViewModels
     {
         [ImportingConstructor]
         public LoginControlViewModel(
-            IRepositoryHosts hosts,
+            IConnectionManager connectionManager,
             ILoginToGitHubViewModel loginToGitHubViewModel,
             ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
         {
             Title = Resources.LoginTitle;
-            RepositoryHosts = hosts;
+            ConnectionManager = connectionManager;
             GitHubLogin = loginToGitHubViewModel;
             EnterpriseLogin = loginToGitHubEnterpriseViewModel;
 
@@ -32,20 +33,8 @@ namespace GitHub.ViewModels
                 (x, y) => x.Value || y.Value
             ).ToProperty(this, vm => vm.IsLoginInProgress);
 
-            loginMode = this.WhenAny(
-                x => x.RepositoryHosts.GitHubHost.IsLoggedIn,
-                x => x.RepositoryHosts.EnterpriseHost.IsLoggedIn,
-                (x, y) =>
-                {
-                    var canLogInToGitHub = x.Value == false;
-                    var canLogInToEnterprise = y.Value == false;
-
-                    return canLogInToGitHub && canLogInToEnterprise ? LoginMode.DotComOrEnterprise
-                        : canLogInToGitHub ? LoginMode.DotComOnly
-                        : canLogInToEnterprise ? LoginMode.EnterpriseOnly
-                        : LoginMode.None;
-
-                }).ToProperty(this, x => x.LoginMode);
+            UpdateLoginMode();
+            connectionManager.Connections.CollectionChanged += (_, __) => UpdateLoginMode();
 
             AuthenticationResults = Observable.Merge(
                 loginToGitHubViewModel.Login,
@@ -66,15 +55,19 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref githubEnterprise, value); }
         }
 
-        IRepositoryHosts repositoryHosts;
-        public IRepositoryHosts RepositoryHosts
+        IConnectionManager connectionManager;
+        public IConnectionManager ConnectionManager
         {
-            get { return repositoryHosts; }
-            set { this.RaiseAndSetIfChanged(ref repositoryHosts, value); }
+            get { return connectionManager; }
+            set { this.RaiseAndSetIfChanged(ref connectionManager, value); }
         }
 
-        readonly ObservableAsPropertyHelper<LoginMode> loginMode;
-        public LoginMode LoginMode { get { return loginMode.Value; } }
+        LoginMode loginMode;
+        public LoginMode LoginMode
+        {
+            get { return loginMode; }
+            private set { this.RaiseAndSetIfChanged(ref loginMode, value); }
+        }
 
         readonly ObservableAsPropertyHelper<bool> isLoginInProgress;
         public bool IsLoginInProgress { get { return isLoginInProgress.Value; } }
@@ -85,21 +78,18 @@ namespace GitHub.ViewModels
         {
             get { return AuthenticationResults.Where(x => x == AuthenticationResult.Success).SelectUnit(); }
         }
-    }
 
-    public enum LoginTarget
-    {
-        None = 0,
-        DotCom = 1,
-        Enterprise = 2,
-    }
+        void UpdateLoginMode()
+        {
+            var result = LoginMode.DotComOrEnterprise;
 
-    public enum VisualState
-    {
-        None = 0,
-        DotCom = 1,
-        Enterprise = 2,
-        DotComOnly = 3,
-        EnterpriseOnly = 4
+            foreach (var connection in connectionManager.Connections)
+            {
+                result &= ~((connection.HostAddress == HostAddress.GitHubDotComHostAddress) ?
+                    LoginMode.DotComOnly : LoginMode.EnterpriseOnly);
+            }
+
+            LoginMode = result;
+        }
     }
 }

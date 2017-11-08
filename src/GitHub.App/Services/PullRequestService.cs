@@ -51,13 +51,13 @@ namespace GitHub.Services
             this.usageTracker = usageTracker;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
+        public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body
         )
         {
-            Extensions.Guard.ArgumentNotNull(host, nameof(host));
+            Extensions.Guard.ArgumentNotNull(modelService, nameof(modelService));
             Extensions.Guard.ArgumentNotNull(sourceRepository, nameof(sourceRepository));
             Extensions.Guard.ArgumentNotNull(targetRepository, nameof(targetRepository));
             Extensions.Guard.ArgumentNotNull(sourceBranch, nameof(sourceBranch));
@@ -65,7 +65,7 @@ namespace GitHub.Services
             Extensions.Guard.ArgumentNotNull(title, nameof(title));
             Extensions.Guard.ArgumentNotNull(body, nameof(body));
 
-            return PushAndCreatePR(host, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
+            return PushAndCreatePR(modelService, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
         public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
@@ -488,7 +488,7 @@ namespace GitHub.Services
             await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
         }
 
-        async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
+        async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
@@ -504,7 +504,7 @@ namespace GitHub.Services
             if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
-            var ret = await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
+            var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
             await usageTracker.IncrementUpstreamPullRequestCount();
             return ret;
         }

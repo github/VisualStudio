@@ -34,6 +34,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly int sectionIndex;
         readonly IDialogService dialogService;
         readonly IRepositoryCloneService cloneService;
+        readonly ILocalRepositories localRepositories;
 
         bool isCloning;
         bool isCreating;
@@ -101,6 +102,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IVSServices vsServices,
             IRepositoryCloneService cloneService,
             IDialogService dialogService,
+            ILocalRepositories localRepositories,
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
@@ -111,6 +113,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(vsServices, nameof(vsServices));
             Guard.ArgumentNotNull(cloneService, nameof(cloneService));
             Guard.ArgumentNotNull(dialogService, nameof(dialogService));
+            Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
 
             Title = "GitHub";
             IsEnabled = true;
@@ -122,6 +125,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             this.vsServices = vsServices;
             this.cloneService = cloneService;
             this.dialogService = dialogService;
+            this.localRepositories = localRepositories;
 
             Clone = CreateAsyncCommandHack(DoClone);
 
@@ -197,8 +201,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (connection != SectionConnection)
                 {
                     SectionConnection = connection;
-                    Repositories = SectionConnection.Repositories.CreateDerivedCollection(x => x,
-                                        orderer: OrderedComparer<ILocalRepositoryModel>.OrderBy(x => x.Name).Compare);
+                    Repositories?.Dispose();
+                    Repositories = localRepositories.GetRepositoriesForAddress(connection.HostAddress);
                     Repositories.CollectionChanged += UpdateRepositoryList;
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
@@ -371,7 +375,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             // TODO: This is wasteful as we can be calling it multiple times for a single changed
             // signal, once from each section. Needs refactoring.
-            await connectionManager.RefreshRepositories();
+            await localRepositories.Refresh();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
@@ -382,7 +386,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void SignOut()
         {
-            SectionConnection.Logout();
+            connectionManager.LogOut(SectionConnection.HostAddress);
         }
 
         public void Login()

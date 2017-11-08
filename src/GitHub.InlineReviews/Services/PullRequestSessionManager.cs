@@ -8,11 +8,11 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Helpers;
 using GitHub.InlineReviews.Models;
 using GitHub.Logging;
 using GitHub.Models;
-using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -32,7 +32,8 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionManager>();
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
-        readonly IRepositoryHosts hosts;
+        readonly IConnectionManager connectionManager;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         IPullRequestSession currentSession;
@@ -41,26 +42,29 @@ namespace GitHub.InlineReviews.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionManager"/> class.
         /// </summary>
-        /// <param name="gitService">The git service to use.</param>
-        /// <param name="gitClient">The git client to use.</param>
-        /// <param name="diffService">The diff service to use.</param>
-        /// <param name="service">The pull request service to use.</param>
-        /// <param name="hosts">The repository hosts.</param>
+        /// <param name="service">The PR service to use.</param>
+        /// <param name="sessionService">The PR session service to use.</param>
+        /// <param name="connectionManager">The connectionManager to use.</param>
+        /// <param name="modelServiceFactory">The ModelService factory.</param>
         /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
             IPullRequestService service,
             IPullRequestSessionService sessionService,
-            IRepositoryHosts hosts,
+            IConnectionManager connectionManager,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teamExplorerService)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
+            Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
 
             this.service = service;
             this.sessionService = sessionService;
-            this.hosts = hosts;
+            this.connectionManager = connectionManager;
+            this.modelServiceFactory = modelServiceFactory;
             teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
         }
 
@@ -179,7 +183,6 @@ namespace GitHub.InlineReviews.Services
             try
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
-                await EnsureLoggedIn(localRepositoryModel);
 
                 if (localRepositoryModel != repository)
                 {
@@ -190,7 +193,7 @@ namespace GitHub.InlineReviews.Services
 
                 if (string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl)) return;
 
-                var modelService = hosts.LookupHost(HostAddress.Create(localRepositoryModel.CloneUrl))?.ModelService;
+                var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
                 var session = CurrentSession;
 
                 if (modelService != null)
@@ -247,7 +250,7 @@ namespace GitHub.InlineReviews.Services
 
             if (session == null)
             {
-                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+                var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
 
                 if (modelService != null)
                 {
@@ -267,15 +270,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             return session;
-        }
-
-        async Task EnsureLoggedIn(ILocalRepositoryModel localRepositoryModel)
-        {
-            if (!hosts.IsLoggedInToAnyHost && !string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl))
-            {
-                var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl);
-                await hosts.LogInFromCache(hostAddress);
-            }
         }
 
         async Task UpdateLiveFile(PullRequestSessionLiveFile file, bool rebuildThreads)

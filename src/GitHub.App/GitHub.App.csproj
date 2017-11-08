@@ -129,9 +129,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Factories\ModelServiceFactory.cs" />
     <Compile Include="Models\IssueCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
+    <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Caches\CacheIndex.cs" />
     <Compile Include="Caches\CacheItem.cs" />
@@ -183,9 +185,6 @@
     <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Infrastructure\ExportWrappers.cs" />
     <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
-    <Compile Include="Models\RepositoryHost.cs" />
-    <Compile Include="Models\RepositoryHosts.cs" />
     <Compile Include="Models\RemoteRepositoryModel.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Api\ApiClient.cs" />
@@ -195,7 +194,6 @@
     <Compile Include="Services\ErrorMessage.cs" />
     <Compile Include="Services\ErrorMessageTranslator.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
-    <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
     <Compile Include="Services\GistPublishService.cs" />
     <Compile Include="Services\RepositoryPublishService.cs" />
@@ -208,7 +206,6 @@
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
     <Compile Include="ViewModels\PanePageViewModelBase.cs" />
     <Compile Include="ViewModels\DialogViewModelBase.cs" />
-    <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\NotAGitHubRepositoryViewModel.cs" />

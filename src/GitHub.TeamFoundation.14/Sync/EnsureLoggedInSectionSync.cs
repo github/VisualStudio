@@ -1,8 +1,6 @@
 using System.ComponentModel.Composition;
 using GitHub.Api;
-using GitHub.Models;
 using GitHub.Services;
-using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -17,8 +15,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         [ImportingConstructor]
         public EnsureLoggedInSectionSync(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, ITeamExplorerServices teServices)
-            : base(serviceProvider, apiFactory, holder, cm, hosts, teServices)
+            IConnectionManager cm, ITeamExplorerServices teServices)
+            : base(serviceProvider, apiFactory, holder, cm, teServices)
         {}
     }
 }

@@ -1,25 +1,26 @@
 ﻿using System;
-using System.ComponentModel.Composition;
-using GitHub.Exports;
-using GitHub.Models;
 using System.Collections.Generic;
-using ReactiveUI;
-using GitHub.Services;
-using System.Reactive.Linq;
-using GitHub.Extensions.Reactive;
-using GitHub.UI;
-using System.Linq;
-using GitHub.Validation;
-using GitHub.App;
+using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
-using Octokit;
-using LibGit2Sharp;
 using System.Globalization;
-using GitHub.Extensions;
-using System.Reactive.Disposables;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using GitHub.App;
+using GitHub.Exports;
+using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
+using GitHub.Factories;
 using GitHub.Logging;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.Validation;
+using Octokit;
+using ReactiveUI;
 using Serilog;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels
 {
@@ -32,31 +33,37 @@ namespace GitHub.ViewModels
 
         readonly ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
         readonly ObservableAsPropertyHelper<bool> isExecuting;
-        readonly IRepositoryHost repositoryHost;
+        readonly IModelService modelService;
         readonly IObservable<IRemoteRepositoryModel> githubObs;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly ILocalRepositoryModel activeLocalRepo;
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
-             IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice,
-             IPullRequestService service, INotificationService notifications)
-             : this(connectionRepositoryHostMap?.CurrentRepositoryHost, teservice?.ActiveRepo, service,
-                   notifications)
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
+            ITeamExplorerServiceHolder teservice,
+            IPullRequestService service, INotificationService notifications)
+            : this(connection.Get(), modelServiceFactory, teservice?.ActiveRepo, service, notifications)
         {}
 
-        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ILocalRepositoryModel activeRepo,
-            IPullRequestService service, INotificationService notifications)
+        public PullRequestCreationViewModel(
+            IConnection connection,
+            IModelServiceFactory modelServiceFactory,
+            ILocalRepositoryModel activeRepo,
+            IPullRequestService service,
+            INotificationService notifications)
         {
-            Extensions.Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
-            Extensions.Guard.ArgumentNotNull(activeRepo, nameof(activeRepo));
-            Extensions.Guard.ArgumentNotNull(service, nameof(service));
-            Extensions.Guard.ArgumentNotNull(notifications, nameof(notifications));
+            Guard.ArgumentNotNull(connection, nameof(connection));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
+            Guard.ArgumentNotNull(activeRepo, nameof(activeRepo));
+            Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(notifications, nameof(notifications));
 
-            this.repositoryHost = repositoryHost;
             activeLocalRepo = activeRepo;
+            modelService = modelServiceFactory.CreateBlocking(connection);
 
-            var obs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
+            var obs = modelService.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
                 .Select(r => new RemoteRepositoryModel(r))
                 .PublishLast();
             disposables.Add(obs.Connect());
@@ -99,7 +106,7 @@ namespace GitHub.ViewModels
 
             CreatePullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service
-                    .CreatePullRequest(repositoryHost, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
+                    .CreatePullRequest(modelService, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
                         log.Error(ex, "Error creating pull request");
@@ -134,12 +141,12 @@ namespace GitHub.ViewModels
                 var b = Observable.Empty<IBranch>();
                 if (r.IsFork)
                 {
-                    b = repositoryHost.ModelService.GetBranches(r.Parent).Select(x =>
+                    b = modelService.GetBranches(r.Parent).Select(x =>
                     {
                         return x;
                     });
                 }
-                return b.Concat(repositoryHost.ModelService.GetBranches(r));
+                return b.Concat(modelService.GetBranches(r));
             })
             .ToList()
             .ObserveOn(RxApp.MainThreadScheduler)

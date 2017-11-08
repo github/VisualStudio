@@ -11,6 +11,7 @@ using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -27,7 +28,8 @@ namespace GitHub.ViewModels
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestListViewModel>();
 
-        readonly IRepositoryHost repositoryHost;
+        readonly IConnection connection;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly ILocalRepositoryModel localRepository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
@@ -36,33 +38,37 @@ namespace GitHub.ViewModels
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
         IRemoteRepositoryModel remoteRepository;
+        IModelService modelService;
 
         [ImportingConstructor]
         PullRequestListViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings, visualStudioBrowser)
+            : this(connection.Get(), modelServiceFactory, teservice.ActiveRepo, settings, visualStudioBrowser)
         {
-            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(teservice, nameof(teservice));
             Guard.ArgumentNotNull(settings, nameof(settings));
         }
 
         public PullRequestListViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ILocalRepositoryModel repository,
             IPackageSettings settings,
             IVisualStudioBrowser visualStudioBrowser)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotNull(settings, nameof(settings));
             Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
 
             constructing = true;
-            this.repositoryHost = repositoryHost;
+            this.connection = connection;
+            this.modelServiceFactory = modelServiceFactory;
             this.localRepository = repository;
             this.settings = settings;
             this.visualStudioBrowser = visualStudioBrowser;
@@ -129,9 +135,14 @@ namespace GitHub.ViewModels
         {
             IsBusy = true;
 
+            if (modelService == null)
+            {
+                modelService = await modelServiceFactory.CreateAsync(connection);
+            }
+
             if (remoteRepository == null)
             {
-                remoteRepository = await repositoryHost.ModelService.GetRepository(
+                remoteRepository = await modelService.GetRepository(
                     localRepository.Owner,
                     localRepository.Name);
                 Repositories = remoteRepository.IsFork ?
@@ -140,7 +151,7 @@ namespace GitHub.ViewModels
                 SelectedRepository = Repositories[0];
             }
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(SelectedRepository, pullRequests);
+            PullRequests = modelService.GetPullRequests(SelectedRepository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -149,11 +160,11 @@ namespace GitHub.ViewModels
 
             pullRequests.OriginalCompleted
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
-                {
-                    log.Error(ex, "Authorization error listing pull requests");
-                    return repositoryHost.LogOut();
-                })
+                ////.Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
+                ////{
+                ////    log.Info("Received AuthorizationException reading pull requests", ex);
+                ////    return repositoryHost.LogOut();
+                ////})
                 .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
                     // Occurs on network error, when the repository was deleted on GitHub etc.

@@ -2,7 +2,10 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Authentication;
+using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using ReactiveUI;
@@ -15,7 +18,7 @@ public class LoginControlViewModelTests
         [Fact]
         public async Task SucessfulGitHubLoginSignalsDone()
         {
-            var repositoryHosts = Substitute.For<IRepositoryHosts>();
+            var connectionManager = Substitute.For<IConnectionManager>();
 
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
             var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
@@ -23,7 +26,7 @@ public class LoginControlViewModelTests
             gitHubLogin.Login.Returns(gitHubLoginCommand);
             var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
 
-            var loginViewModel = new LoginControlViewModel(repositoryHosts, gitHubLogin, enterpriseLogin);
+            var loginViewModel = new LoginControlViewModel(connectionManager, gitHubLogin, enterpriseLogin);
             var signalled = false;
 
             loginViewModel.Done.Subscribe(_ => signalled = true);
@@ -35,7 +38,7 @@ public class LoginControlViewModelTests
         [Fact]
         public async Task FailedGitHubLoginDoesNotSignalDone()
         {
-            var repositoryHosts = Substitute.For<IRepositoryHosts>();
+            var connectionManager = Substitute.For<IConnectionManager>();
 
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
             var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
@@ -43,7 +46,7 @@ public class LoginControlViewModelTests
             gitHubLogin.Login.Returns(gitHubLoginCommand);
             var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
 
-            var loginViewModel = new LoginControlViewModel(repositoryHosts, gitHubLogin, enterpriseLogin);
+            var loginViewModel = new LoginControlViewModel(connectionManager, gitHubLogin, enterpriseLogin);
             var signalled = false;
 
             loginViewModel.Done.Subscribe(_ => signalled = true);
@@ -55,7 +58,7 @@ public class LoginControlViewModelTests
         [Fact]
         public async Task AllowsLoginFromEnterpriseAfterGitHubLoginHasFailed()
         {
-            var repositoryHosts = Substitute.For<IRepositoryHosts>();
+            var connectionManager = Substitute.For<IConnectionManager>();
 
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
             var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ => 
@@ -67,7 +70,7 @@ public class LoginControlViewModelTests
                 Observable.Return(AuthenticationResult.Success));
             enterpriseLogin.Login.Returns(enterpriseLoginCommand);
 
-            var loginViewModel = new LoginControlViewModel(repositoryHosts, gitHubLogin, enterpriseLogin);
+            var loginViewModel = new LoginControlViewModel(connectionManager, gitHubLogin, enterpriseLogin);
             var success = false;
 
             loginViewModel.AuthenticationResults
@@ -78,6 +81,34 @@ public class LoginControlViewModelTests
             await enterpriseLoginCommand.ExecuteAsync();
 
             Assert.True(success);
+        }
+
+        [Fact]
+        public void LoginModeTracksAvailableConnections()
+        {
+            var connectionManager = Substitute.For<IConnectionManager>();
+            var connections = new ObservableCollectionEx<IConnection>();
+            var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
+            var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
+            var gitHubConnection = Substitute.For<IConnection>();
+            var enterpriseConnection = Substitute.For<IConnection>();
+
+            connectionManager.Connections.Returns(connections);
+            gitHubConnection.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            enterpriseConnection.HostAddress.Returns(HostAddress.Create("https://enterprise.url"));
+
+            var loginViewModel = new LoginControlViewModel(connectionManager, gitHubLogin, enterpriseLogin);
+
+            Assert.Equal(LoginMode.DotComOrEnterprise, loginViewModel.LoginMode);
+
+            connections.Add(enterpriseConnection);
+            Assert.Equal(LoginMode.DotComOnly, loginViewModel.LoginMode);
+
+            connections.Add(gitHubConnection);
+            Assert.Equal(LoginMode.None, loginViewModel.LoginMode);
+
+            connections.RemoveAt(0);
+            Assert.Equal(LoginMode.EnterpriseOnly, loginViewModel.LoginMode);
         }
     }
 }

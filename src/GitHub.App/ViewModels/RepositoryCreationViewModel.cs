@@ -9,9 +9,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.App;
+using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
@@ -19,9 +22,8 @@ using GitHub.Validation;
 using Octokit;
 using ReactiveUI;
 using Rothko;
-using GitHub.Collections;
-using GitHub.Logging;
 using Serilog;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels
 {
@@ -33,7 +35,7 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
-        readonly IRepositoryHost repositoryHost;
+        readonly IModelService modelService;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -41,35 +43,40 @@ namespace GitHub.ViewModels
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        RepositoryCreationViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+        public RepositoryCreationViewModel(
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
             IOperatingSystem operatingSystem,
             IRepositoryCreationService repositoryCreationService,
             IUsageTracker usageTracker)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, usageTracker)
-        {}
+            : this(connection.Get(), modelServiceFactory, operatingSystem, repositoryCreationService, usageTracker)
+        {
+        }
 
         public RepositoryCreationViewModel(
-            IRepositoryHost repositoryHost,
+            IConnection connection,
+            IModelServiceFactory modelServiceFactory,
             IOperatingSystem operatingSystem,
             IRepositoryCreationService repositoryCreationService,
             IUsageTracker usageTracker)
         {
-            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(connection, nameof(connection));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
             Guard.ArgumentNotNull(repositoryCreationService, nameof(repositoryCreationService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
-            this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
             this.usageTracker = usageTracker;
 
-            Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, connection.HostAddress.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
 
-            accounts = repositoryHost.ModelService.GetAccounts()
+            modelService = modelServiceFactory.CreateBlocking(connection);
+
+            accounts = modelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
@@ -117,7 +124,7 @@ namespace GitHub.ViewModels
                 .ToProperty(this, x => x.IsCreating);
 
             GitIgnoreTemplates = TrackingCollection.CreateListenerCollectionAndRun(
-                repositoryHost.ModelService.GetGitIgnoreTemplates(),
+                modelService.GetGitIgnoreTemplates(),
                 new[] { GitIgnoreItem.None },
                 OrderedComparer<GitIgnoreItem>.OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name)).Compare,
                 x =>
@@ -127,7 +134,7 @@ namespace GitHub.ViewModels
                 });
 
             Licenses = TrackingCollection.CreateListenerCollectionAndRun(
-                repositoryHost.ModelService.GetLicenses(),
+                modelService.GetLicenses(),
                 new[] { LicenseItem.None },
                 OrderedComparer<LicenseItem>.OrderByDescending(item => LicenseItem.IsRecommended(item.Name)).Compare);
 
@@ -272,7 +279,7 @@ namespace GitHub.ViewModels
                 newRepository,
                 SelectedAccount,
                 BaseRepositoryPath,
-                repositoryHost.ApiClient)
+                modelService.ApiClient)
                 .Do(_ => usageTracker.IncrementCreateCount().Forget());
         }
 

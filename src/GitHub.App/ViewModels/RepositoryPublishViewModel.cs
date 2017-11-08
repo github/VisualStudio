@@ -10,6 +10,7 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -26,9 +27,9 @@ namespace GitHub.ViewModels
     {
         static readonly ILogger log = LogManager.ForContext<RepositoryPublishViewModel>();
 
-        readonly IRepositoryHosts hosts;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly INotificationService notificationService;
+        readonly IModelServiceFactory modelServiceFactory;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -37,26 +38,26 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         public RepositoryPublishViewModel(
-            IRepositoryHosts hosts,
             IRepositoryPublishService repositoryPublishService,
             INotificationService notificationService,
             IConnectionManager connectionManager,
+            IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker)
         {
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(repositoryPublishService, nameof(repositoryPublishService));
             Guard.ArgumentNotNull(notificationService, nameof(notificationService));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
 
             this.notificationService = notificationService;
-            this.hosts = hosts;
             this.usageTracker = usageTracker;
+            this.modelServiceFactory = modelServiceFactory;
 
             title = this.WhenAny(
-                x => x.SelectedHost,
+                x => x.SelectedConnection,
                 x => x.Value != null ?
-                    string.Format(CultureInfo.CurrentCulture, Resources.PublishToTitle, x.Value.Title) :
+                    string.Format(CultureInfo.CurrentCulture, Resources.PublishToTitle, x.Value.HostAddress.Title) :
                     Resources.PublishTitle
             )
             .ToProperty(this, x => x.Title);
@@ -67,9 +68,10 @@ namespace GitHub.ViewModels
             if (Connections.Any())
                 SelectedConnection = Connections.FirstOrDefault(x => x.HostAddress.IsGitHubDotCom()) ?? Connections[0];
 
-            accounts = this.WhenAny(x => x.SelectedConnection, x => x.Value != null ? hosts.LookupHost(x.Value.HostAddress) : RepositoryHosts.DisconnectedRepositoryHost)
-                .Where(x => !(x is DisconnectedRepositoryHost))
-                .SelectMany(host => host.ModelService.GetAccounts())
+            accounts = this.WhenAnyValue(x => x.SelectedConnection)
+                .Where(x => x != null)
+                .SelectMany(async c => (await modelServiceFactory.CreateAsync(c)).GetAccounts())
+                .Switch()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
@@ -118,18 +120,13 @@ namespace GitHub.ViewModels
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
         public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
-        public ObservableCollection<IConnection> Connections { get; private set; }
+        public IReadOnlyObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
         public IConnection SelectedConnection
         {
             get { return selectedConnection; }
             set { this.RaiseAndSetIfChanged(ref selectedConnection, value); }
-        }
-
-        IRepositoryHost SelectedHost
-        {
-            get { return selectedConnection != null ? hosts.LookupHost(selectedConnection.HostAddress) : null; }
         }
 
         public IReadOnlyList<IAccount> Accounts
@@ -157,8 +154,9 @@ namespace GitHub.ViewModels
         {
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;
+            var modelService = modelServiceFactory.CreateBlocking(SelectedConnection);
 
-            return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
+            return repositoryPublishService.PublishRepository(newRepository, account, modelService.ApiClient)
                 .Do(_ => usageTracker.IncrementPublishCount().Forget())
                 .Select(_ => ProgressState.Success)
                 .Catch<ProgressState, Exception>(ex =>

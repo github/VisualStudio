@@ -225,11 +225,11 @@
     <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
+    <Compile Include="GitHub.App\Factories\ModelServiceFactoryTests.cs" />
     <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\PullRequestModelTests.cs" />
-    <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
@@ -247,6 +247,7 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\TwoFactorDialogViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
+    <Compile Include="GitHub.Exports.Reactive\Extensions\ConnectionManagerExtensionsTests.cs" />
     <Compile Include="GitHub.Exports\GitServiceTests.cs" />
     <Compile Include="GitHub.Exports\VSServicesTests.cs" />
     <Compile Include="GitHub.Exports\HostAddressTests.cs" />
