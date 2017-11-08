@@ -94,7 +94,11 @@ namespace GitHub.VisualStudio.UI.Views
                     window.Document.ReadOnly = !workingDirectory;
 
                     var buffer = GetBufferAt(fileName);
-                    AddBufferTag(buffer, ViewModel.Session, fullPath, false);
+
+                    if (!workingDirectory)
+                    {
+                        AddBufferTag(buffer, ViewModel.Session, fullPath, null);
+                    }
                 }
 
                 if (workingDirectory)
@@ -150,8 +154,12 @@ namespace GitHub.VisualStudio.UI.Views
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
                 var session = ViewModel.Session;
-                AddBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
-                AddBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, relativePath, DiffSide.Left);
+
+                if (!workingDirectory)
+                {
+                    AddBufferTag(diffViewer.RightView.TextBuffer, session, relativePath, DiffSide.Right);
+                }
 
                 if (workingDirectory)
                     await UsageTracker.IncrementPRDetailsCompareWithSolution();
@@ -164,11 +172,11 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        void AddBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, bool isLeftBuffer)
+        void AddBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, DiffSide? side)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
+                () => new PullRequestTextBufferInfo(session, path, side));
 
             var projection = buffer as IProjectionBuffer;
 
@@ -176,7 +184,7 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 foreach (var source in projection.SourceBuffers)
                 {
-                    AddBufferTag(source, session, path, isLeftBuffer);
+                    AddBufferTag(source, session, path, side);
                 }
             }
         }

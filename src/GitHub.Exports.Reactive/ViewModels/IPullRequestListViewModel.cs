@@ -42,5 +42,6 @@ namespace GitHub.ViewModels
         string FilterText { get; set; }
         ReactiveCommand<object> OpenPullRequest { get; }
         ReactiveCommand<object> CreatePullRequest { get; }
+        ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
     }
 }

@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
 using System.Threading;
+using System.Reactive.Subjects;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -20,14 +21,18 @@ namespace GitHub.InlineReviews.Services
     /// It takes the pull request model and updates according to the current state of the
     /// repository on disk and in the editor.
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "PullRequestSession is shared and shouldn't be disposed")]
     public class PullRequestSession : ReactiveObject, IPullRequestSession
     {
-        static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
         readonly IPullRequestSessionService service;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         bool isCheckedOut;
+        string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
+        IPullRequestModel pullRequest;
+        Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -44,8 +49,8 @@ namespace GitHub.InlineReviews.Services
 
             this.service = service;
             this.isCheckedOut = isCheckedOut;
+            this.pullRequest = pullRequest;
             User = user;
-            PullRequest = pullRequest;
             LocalRepository = localRepository;
             RepositoryOwner = repositoryOwner;
         }
@@ -64,14 +69,6 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSessionFile> GetFile(string relativePath)
         {
-            return await GetFile(relativePath, null);
-        }
-
-        /// <inheritdoc/>
-        public async Task<IPullRequestSessionFile> GetFile(
-            string relativePath,
-            IEditorContentSource contentSource)
-        {
             await getFilesLock.WaitAsync();
 
             try
@@ -82,14 +79,9 @@ namespace GitHub.InlineReviews.Services
 
                 if (!fileIndex.TryGetValue(relativePath, out file))
                 {
-                    // TODO: Check for binary files.
-                    file = await CreateFile(relativePath, contentSource);
+                    file = new PullRequestSessionFile(relativePath);
+                    await UpdateFile(file);
                     fileIndex.Add(relativePath, file);
-                }
-                else if (contentSource != null && file.ContentSource != contentSource)
-                {
-                    file.ContentSource = contentSource;
-                    await UpdateEditorContent(relativePath);
                 }
 
                 return file;
@@ -101,13 +93,24 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<string> GetMergeBase()
+        {
+            if (mergeBase == null)
+            {
+                mergeBase = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+            }
+
+            return mergeBase;
+        }
+
+        /// <inheritdoc/>
         public string GetRelativePath(string path)
         {
             if (Path.IsPathRooted(path))
             {
                 var basePath = LocalRepository.LocalPath;
 
-                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
                 {
                     return path.Substring(basePath.Length + 1);
                 }
@@ -146,38 +149,17 @@ namespace GitHub.InlineReviews.Services
             return model;
         }
 
-        /// <inheritdoc/>
-        public async Task UpdateEditorContent(string relativePath)
+        public async Task Update(IPullRequestModel pullRequestModel)
         {
-            PullRequestSessionFile file;
-
-            relativePath = relativePath.Replace("\\", "/");
-
-            if (fileIndex.TryGetValue(relativePath, out file))
-            {
-                var content = await GetFileContent(file);
-
-                file.CommitSha = await CalculateContentCommitSha(file, content);
-                var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
-                var headSha = await CalculateHeadSha();
-                file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, relativePath, content);
-
-                foreach (var thread in file.InlineCommentThreads)
-                {
-                    thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
-                    thread.IsStale = false;
-                }
-            }
-        }
-
-        public async Task Update(IPullRequestModel pullRequest)
-        {
-            PullRequest = pullRequest;
+            PullRequest = pullRequestModel;
+            mergeBase = null;
 
             foreach (var file in this.fileIndex.Values.ToList())
             {
                 await UpdateFile(file);
             }
+
+            pullRequestChanged.OnNext(pullRequestModel);
         }
 
         async Task AddComment(IPullRequestReviewCommentModel comment)
@@ -190,49 +172,11 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
-            // NOTE: We must call GetPullRequestMergeBase before GetFileContent.
-            var mergeBaseSha = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
-            var headSha = await CalculateHeadSha();
-            var content = await GetFileContent(file);
-
+            var mergeBaseSha = await GetMergeBase();
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await CalculateContentCommitSha(file, content);
-            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, headSha, file.RelativePath, content);
-
-            var commentsByPosition = PullRequest.ReviewComments
-                .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)
-                .OrderBy(x => x.Id)
-                .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
-            var threads = new List<IInlineCommentThreadModel>();
-
-            foreach (var comments in commentsByPosition)
-            {
-                var hunk = comments.First().DiffHunk;
-                var chunks = DiffUtilities.ParseFragment(hunk);
-                var chunk = chunks.Last();
-                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
-                var thread = new InlineCommentThreadModel(
-                    file.RelativePath,
-                    comments.Key.Item1,
-                    comments.Key.Item2,
-                    diffLines,
-                    comments);
-
-                thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
-                threads.Add(thread);
-            }
-
-            file.InlineCommentThreads = threads;
-        }
-
-        async Task<PullRequestSessionFile> CreateFile(
-            string relativePath,
-            IEditorContentSource contentSource)
-        {
-            var file = new PullRequestSessionFile(relativePath);
-            file.ContentSource = contentSource;
-            await UpdateFile(file);
-            return file;
+            file.CommitSha = PullRequest.Head.Sha;
+            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
+            file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
         }
 
         async Task<IReadOnlyList<IPullRequestSessionFile>> CreateAllFiles()
@@ -241,7 +185,8 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var path in FilePaths)
             {
-                result.Add(await CreateFile(path, null));
+                var file = await GetFile(path);
+                result.Add(file);
             }
 
             return result;
@@ -252,58 +197,17 @@ namespace GitHub.InlineReviews.Services
             if (IsCheckedOut)
             {
                 return await service.IsUnmodifiedAndPushed(LocalRepository, file.RelativePath, content) ?
-                        await service.GetTipSha(LocalRepository) : null;
+                       await service.GetTipSha(LocalRepository) : null;
             }
             else
             {
                 return PullRequest.Head.Sha;
-            }       
-        }
-
-        async Task<string> CalculateHeadSha()
-        {
-            return IsCheckedOut ? 
-                await service.GetTipSha(LocalRepository) :
-                PullRequest.Head.Sha;
-        }
-
-        Task<byte[]> GetFileContent(IPullRequestSessionFile file)
-        {
-            if (!IsCheckedOut)
-            {
-                return service.ExtractFileFromGit(
-                    LocalRepository,
-                    PullRequest.Number,
-                    PullRequest.Head.Sha,
-                    file.RelativePath);
-            }
-            else if (file.ContentSource != null)
-            {
-                return file.ContentSource?.GetContent();
-            }
-            else
-            {
-                return service.ReadFileAsync(Path.Combine(LocalRepository.LocalPath, file.RelativePath));
             }
         }
 
         string GetFullPath(string relativePath)
         {
             return Path.Combine(LocalRepository.LocalPath, relativePath);
-        }
-
-        int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
-        {
-            var line = DiffUtilities.Match(diff, thread.DiffMatch);
-
-            if (line != null)
-            {
-                return (thread.DiffLineType == DiffChangeType.Delete) ?
-                    line.OldLineNumber - 1 :
-                    line.NewLineNumber - 1;
-            }
-
-            return -1;
         }
 
         /// <inheritdoc/>
@@ -317,7 +221,25 @@ namespace GitHub.InlineReviews.Services
         public IAccount User { get; }
 
         /// <inheritdoc/>
-        public IPullRequestModel PullRequest { get; private set; }
+        public IPullRequestModel PullRequest
+        {
+            get { return pullRequest; }
+            private set
+            {
+                // PullRequestModel overrides Equals such that two PRs with the same number are
+                // considered equal. This was causing the PullRequest not to be updated on refresh:
+                // we need to use ReferenceEquals.
+                if (!ReferenceEquals(pullRequest, value))
+                {
+                    this.RaisePropertyChanging(nameof(PullRequest));
+                    pullRequest = value;
+                    this.RaisePropertyChanged(nameof(PullRequest));
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IObservable<IPullRequestModel> PullRequestChanged => pullRequestChanged;
 
         /// <inheritdoc/>
         public ILocalRepositoryModel LocalRepository { get; }

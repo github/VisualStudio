@@ -77,12 +77,6 @@ namespace GitHub.InlineReviews.ViewModels
         public IPullRequestSession Session { get; }
 
         /// <summary>
-        /// Gets an observable that is fired with a single value when a comment is sucessfully
-        /// posted and therefore this is no loner a new comment thread.
-        /// </summary>
-        public IObservable<Unit> Finished => finished;
-
-        /// <summary>
         /// Gets a value indicating whether the user must commit and push their changes before
         /// leaving a comment on the requested line.
         /// </summary>
