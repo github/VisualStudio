@@ -562,7 +562,6 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.Checkout(repository, Arg.Any<IPullRequestModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
             pullRequestService.GetDefaultLocalBranchName(repository, Arg.Any<int>(), Arg.Any<string>()).Returns(x => Observable.Return($"pr/{x[1]}"));
             pullRequestService.IsPullRequestFromRepository(repository, Arg.Any<IPullRequestModel>()).Returns(!prFromFork);
-            pullRequestService.IsWorkingDirectoryClean(repository).Returns(Observable.Return(!dirty));
             pullRequestService.Pull(repository).Returns(x => Throws("Pull threw"));
             pullRequestService.Push(repository).Returns(x => Throws("Push threw"));
             pullRequestService.SwitchToBranch(repository, Arg.Any<IPullRequestModel>())

@@ -436,16 +436,11 @@ namespace GitHub.ViewModels
                     var caption = localBranches.Count > 0 ?
                         string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
                         string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
-                    var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
                     if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
                     {
                         disabled = Resources.SourceRepositoryNoLongerAvailable;
-                    }
-                    else if (!clean)
-                    {
-                        disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
                     }
 
                     CheckoutState = new CheckoutCommandState(caption, disabled);

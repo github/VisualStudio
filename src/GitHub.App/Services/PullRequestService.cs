@@ -87,12 +87,6 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
-        {
-            var repo = gitService.GetRepository(repository.LocalPath);
-            return Observable.Return(!repo.RetrieveStatus().IsDirty);
-        }
-
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)
         {
             return Observable.Defer(() =>
