@@ -218,6 +218,9 @@ public class PullRequestServiceTests : TestBaseClass
                 repo.Commit("foo", Author, Author);
                 File.Move(file, renamedFile);
 
+                // NOTE: `RetrieveStatus(new StatusOptions { DetectRenamesInWorkDir = true })` would need to be used
+                // for renamed files to appear as `RenamedInWorkingDir` rather than `Missing` and `Untracked`.
+                // This isn't required in the current implementation.
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
                 Assert.False(isClean);
