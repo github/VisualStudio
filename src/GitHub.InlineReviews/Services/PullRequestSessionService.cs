@@ -15,7 +15,6 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
-using NLog;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services

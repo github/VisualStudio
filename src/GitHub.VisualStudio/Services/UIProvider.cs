@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -10,11 +11,12 @@ using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using NLog;
 using ReactiveUI;
 using GitHub.App.Factories;
 using GitHub.Exports;
 using GitHub.Controllers;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -47,7 +49,7 @@ namespace GitHub.VisualStudio.UI
 
     public class UIProvider : IUIProvider, IDisposable
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<UIProvider>();
 
         WindowController windowController;
 
@@ -148,7 +150,7 @@ namespace GitHub.VisualStudio.UI
             }
             catch (Exception ex)
             {
-                log.Error("Failed to dispose UI. {0}", ex);
+                log.Error(ex, "Failed to dispose UI");
             }
         }
 
