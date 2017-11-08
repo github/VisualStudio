@@ -79,8 +79,6 @@ namespace GitHub.ViewModels
             });
 
             SourceBranch = activeRepo.CurrentBranch;
-            service.GetPullRequestTemplate(activeRepo)
-                .Subscribe(x => Description = x ?? String.Empty, () => Description = Description ?? String.Empty);
 
             this.WhenAnyValue(x => x.Branches)
                 .WhereNotNull()
@@ -92,6 +90,31 @@ namespace GitHub.ViewModels
                 });
 
             SetupValidators();
+
+            var uniqueCommits = this.WhenAnyValue(
+                x => x.SourceBranch,
+                x => x.TargetBranch)
+                .Where(x => x.Item1 != null && x.Item2 != null)
+                .Select(branches =>
+                {
+                    var baseBranch = branches.Item1.Name;
+                    var compareBranch = branches.Item2.Name;
+
+                    // We only need to get max two commits for what we're trying to achieve here.
+                    // If there's no commits we want to block creation of the PR, if there's one commits
+                    // we wan't to use its commit message as the PR title/body and finally if there's more
+                    // than one we'll use the branch name for the title.
+                    return service.GetMessagesForUniqueCommits(activeRepo, baseBranch, compareBranch, maxCommits: 2)
+                        .Catch<IReadOnlyList<CommitMessage>, Exception>(ex =>
+                        {
+                            log.Warning(ex, "Could not load unique commits");
+                            return Observable.Empty<IReadOnlyList<CommitMessage>>();
+                        });
+                })
+                .Switch()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Replay(1)
+                .RefCount();
 
             var whenAnyValidationResultChanges = this.WhenAny(
                 x => x.TitleValidator.ValidationResult,
@@ -128,6 +151,37 @@ namespace GitHub.ViewModels
             this.WhenAnyValue(x => x.Initialized, x => x.GitHubRepository, x => x.Description, x => x.IsExecuting)
                 .Select(x => !(x.Item1 && x.Item2 != null && x.Item3 != null && !x.Item4))
                 .Subscribe(x => IsBusy = x);
+
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.SourceBranch),
+                uniqueCommits,
+                service.GetPullRequestTemplate(activeRepo).DefaultIfEmpty(string.Empty),
+                (compare, commits, template) => new { compare, commits, template })
+                .Subscribe(x =>
+                {
+                    var prTitle = string.Empty;
+                    var prDescription = string.Empty;
+
+                    if (x.commits.Count == 1)
+                    {
+                        prTitle = x.commits[0].Summary;
+                        prDescription = x.commits[0].Details;
+                    }
+                    else
+                    {
+                        prTitle = x.compare.Name.Humanize();
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(x.template))
+                    {
+                        if (!string.IsNullOrEmpty(prDescription))
+                            prDescription += "\n\n";
+                        prDescription += x.template;
+                    }
+
+                    PRTitle = prTitle;
+                    Description = prDescription;
+                });
         }
 
         public override void Initialize(ViewWithData data = null)
