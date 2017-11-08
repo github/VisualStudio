@@ -217,7 +217,6 @@ public class PullRequestServiceTests : TestBaseClass
                 Commands.Stage(repo, path);
                 repo.Commit("foo", Author, Author);
                 File.Move(file, renamedFile);
-                // NOTE: Renamed files appear as Missing and Untracked rather than RenamedInWorkingDir. Is this a bug?
 
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
