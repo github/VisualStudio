@@ -8,7 +8,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Base class for <see cref="VsCommand"/> and <see cref="VsCommand{TParam}"/>.
     /// </summary>
-    abstract class VsCommandBase : IVsCommandBase
+    public abstract class VsCommandBase : IVsCommandBase
     {
         EventHandler canExecuteChanged;
 
@@ -68,7 +68,7 @@ namespace GitHub.InlineReviews.Commands
         /// Implements the event handler for <see cref="OleMenuCommand.BeforeQueryStatus"/>.
         /// </summary>
         /// <param name="command">The event parameter.</param>
-        protected void BeforeQueryStatus(OleMenuCommand command)
+        protected void BeforeQueryStatus(MenuCommand command)
         {
             command.Enabled = IsEnabled;
             command.Visible = IsVisible;
@@ -86,7 +86,7 @@ namespace GitHub.InlineReviews.Commands
         /// </summary>
         /// <param name="package">The package.</param>
         /// <param name="command">The command.</param>
-        protected void Register(IServiceProvider package, OleMenuCommand command)
+        protected void Register(IServiceProvider package, MenuCommand command)
         {
             Package = package;
             var serviceProvider = (IServiceProvider)package;

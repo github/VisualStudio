@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace GitHub.Extensions
 {
@@ -195,6 +197,30 @@ namespace GitHub.Extensions
             Uri uri;
             Uri.TryCreate(url, UriKind.Absolute, out uri);
             return uri;
+        }
+
+        /// <summary>
+        /// Returns an alphanumeric sentence cased string with dashes and underscores as spaces.
+        /// </summary>
+        /// <param name="s">The string to format.</param>
+        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
+        public static string Humanize(this string s)
+        {
+            if (String.IsNullOrWhiteSpace(s))
+            {
+                return s;
+            }
+
+            var matches = Regex.Matches(s, @"[a-zA-Z\d]{1,}", RegexOptions.None);
+
+            if (matches.Count == 0)
+            {
+                return s;
+            }
+
+            var result = matches.Cast<Match>().Select(match => match.Value.ToLower(CultureInfo.InvariantCulture));
+            var combined = String.Join(" ", result);
+            return Char.ToUpper(combined[0], CultureInfo.InvariantCulture) + combined.Substring(1);
         }
     }
 }

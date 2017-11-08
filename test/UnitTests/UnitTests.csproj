@@ -1,0 +1,412 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props')" />
+  <Import Project="..\..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props" Condition="Exists('..\..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props')" />
+  <Import Project="..\..\packages\xunit.core.2.3.1\build\xunit.core.props" Condition="Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.props')" />
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{596595A6-2A3C-469E-9386-9E3767D863A5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UnitTests</RootNamespace>
+    <AssemblyName>UnitTests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="LibGit2Sharp, Version=0.24.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.24.0\lib\net40\LibGit2Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Client">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Common">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Controls">
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Client">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Controls">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Provider, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="EntryExitDecoratorInterfaces, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EntryExitDecorator.Fody.0.3.0\lib\net45\EntryExitDecoratorInterfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Reactive.Testing, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Testing.2.2.5-custom\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.ComponentModelHost.14.0.25424\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.CoreUtility.14.3.25407\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Language.Intellisense.14.3.25407\lib\net45\Microsoft.VisualStudio.Language.Intellisense.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6070\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.14.0.14.3.25407\lib\Microsoft.VisualStudio.Shell.14.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Immutable.10.0.10.0.30319\lib\net40\Microsoft.VisualStudio.Shell.Immutable.10.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Immutable.11.0.11.0.50727\lib\net45\Microsoft.VisualStudio.Shell.Immutable.11.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Immutable.12.0.12.0.21003\lib\net45\Microsoft.VisualStudio.Shell.Immutable.12.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.7.10.6071\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.10.0.10.0.30319\lib\Microsoft.VisualStudio.Shell.Interop.10.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.11.0.11.0.61030\lib\Microsoft.VisualStudio.Shell.Interop.11.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.12.0.12.0.30110\lib\Microsoft.VisualStudio.Shell.Interop.12.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.9.0.9.0.30729\lib\Microsoft.VisualStudio.Shell.Interop.9.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.Data, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Data.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Logic.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Logic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.UI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.UI.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.UI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.UI.Wpf.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.UI.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.7.10.6070\lib\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NSubstitute, Version=2.0.3.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NSubstitute.2.0.3\lib\net45\NSubstitute.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.assert.2.3.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.core, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.extensibility.core.2.3.1\lib\netstandard1.1\xunit.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.extensibility.execution.2.3.1\lib\net452\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Args.cs" />
+    <Compile Include="GitHub.Api\LoginManagerTests.cs" />
+    <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
+    <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
+    <Compile Include="GitHub.App\Caches\CredentialCacheTests.cs" />
+    <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
+    <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
+    <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
+    <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
+    <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
+    <Compile Include="GitHub.App\Models\PullRequestModelTests.cs" />
+    <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
+    <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
+    <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
+    <Compile Include="GitHub.App\Services\GitClientTests.cs" />
+    <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />
+    <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
+    <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GistCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\LoginControlViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\PullRequestCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\PullRequestDetailViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\PullRequestListViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\TwoFactorDialogViewModelTests.cs" />
+    <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
+    <Compile Include="GitHub.Exports\GitServiceTests.cs" />
+    <Compile Include="GitHub.Exports\VSServicesTests.cs" />
+    <Compile Include="GitHub.Exports\HostAddressTests.cs" />
+    <Compile Include="GitHub.Exports\LocalRepositoryModelTests.cs" />
+    <Compile Include="GitHub.Extensions\GuardTests.cs" />
+    <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
+    <Compile Include="GitHub.Primitives\UriStringTests.cs" />
+    <Compile Include="GitHub.UI\Converters.cs" />
+    <Compile Include="GitHub.UI\TestAutomation\ResourceValueTests.cs" />
+    <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\JsonConnectionCacheTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\UsageTrackerTests.cs" />
+    <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
+    <Compile Include="GitHub.VisualStudio\UI\Views\GitHubPaneViewModelTests.cs" />
+    <Compile Include="Helpers\CommandTestHelpers.cs" />
+    <Compile Include="Helpers\LazySubstitute.cs" />
+    <Compile Include="Helpers\ReactiveTestHelper.cs" />
+    <Compile Include="Helpers\TestBaseClass.cs" />
+    <Compile Include="Helpers\TestLoginCache.cs" />
+    <Compile Include="Helpers\TestSharedCache.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Substitutes.cs" />
+    <Compile Include="TestDoubles\FakeCommitLog.cs" />
+    <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\TestImageCache.cs" />
+    <Compile Include="XUnit\ConditionalFactAttribute.cs" />
+    <Compile Include="XUnit\DelayedMessageBus.cs" />
+    <Compile Include="XUnit\RetryFactAttribute.cs" />
+    <Compile Include="XUnit\RetryFactDiscoverer.cs" />
+    <Compile Include="XUnit\RetryTestCase.cs" />
+    <Compile Include="XUnit\STAFactAttribute.cs" />
+    <Compile Include="XUnit\STAFactDiscoverer.cs" />
+    <Compile Include="XUnit\STATestCase.cs" />
+    <Compile Include="XUnit\STATheoryAttribute.cs" />
+    <Compile Include="XUnit\STATheoryDiscoverer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
+      <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
+      <Name>Akavache_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
+      <Project>{674B69B8-0780-4D54-AE2B-C15821FA51CB}</Project>
+      <Name>Octokit.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
+      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
+      <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\DesignTimeStyleHelper\DesignTimeStyleHelper.csproj">
+      <Project>{b1f5c227-456f-437d-bd5f-4c11b7a8d1a0}</Project>
+      <Name>DesignTimeStyleHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Api\GitHub.Api.csproj">
+      <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
+      <Name>GitHub.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj">
+      <Project>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</Project>
+      <Name>GitHub.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
+      <Name>GitHub.Exports.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
+      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
+      <Name>GitHub.Extensions.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Extensions\GitHub.Extensions.csproj">
+      <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
+      <Name>GitHub.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
+      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
+      <Name>GitHub.InlineReviews</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
+      <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
+      <Name>GitHub.TeamFoundation.14</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
+      <Project>{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}</Project>
+      <Name>GitHub.UI.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.UI\GitHub.UI.csproj">
+      <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
+      <Name>GitHub.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
+      <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
+      <Name>GitHub.VisualStudio.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
+      <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
+      <Name>GitHub.VisualStudio</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\xunit.analyzers.0.7.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.3.1\build\xunit.core.props'))" />
+    <Error Condition="!Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.3.1\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('..\..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props'))" />
+    <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props'))" />
+  </Target>
+  <Import Project="..\..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
+  <Import Project="..\..\packages\xunit.core.2.3.1\build\xunit.core.targets" Condition="Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

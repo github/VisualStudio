@@ -6,17 +6,17 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Text;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
-using NLog;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
@@ -354,7 +354,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<IPullRequestModel, Exception>(ex =>
                 {
-                    log.Error("Error observing GetPullRequest", ex);
+                    log.Error(ex, "Error observing GetPullRequest");
                     ErrorMessage = ex.Message.Trim();
                     IsLoading = IsBusy = false;
                     return Observable.Empty<IPullRequestModel>();
@@ -464,7 +464,7 @@ namespace GitHub.ViewModels
             }
             catch (Exception ex)
             {
-                log.Error("Error loading PullRequestModel", ex);
+                log.Error(ex, "Error loading PullRequestModel");
                 ErrorMessage = ex.Message.Trim();
             }
             finally

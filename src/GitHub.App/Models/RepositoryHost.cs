@@ -11,13 +11,14 @@ using GitHub.Caches;
 using GitHub.Extensions.Reactive;
 using GitHub.Primitives;
 using GitHub.Services;
-using NLog;
 using Octokit;
 using ReactiveUI;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
 using GitHub.Extensions;
+using GitHub.Logging;
+using Serilog;
 using ILoginCache = GitHub.Caches.ILoginCache;
 using System.Threading.Tasks;
 
@@ -26,7 +27,7 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryHosts>();
 
         readonly ILoginManager loginManager;
         readonly HostAddress hostAddress;
@@ -48,7 +49,7 @@ namespace GitHub.Models
             this.loginCache = loginCache;
             this.usage = usage;
 
-            Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
+            log.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
             hostAddress = apiClient.HostAddress;
             Title = apiClient.HostAddress.Title;
@@ -127,18 +128,18 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", hostAddress.ApiUri);
+            log.Information("Logged off of host '{ApiUri}'", hostAddress.ApiUri);
 
             return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
                 {
-                    log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);
+                    log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways");
                     return Observable.Return(Unit.Default);
                 })
                 .SelectMany(_ => ModelService.InvalidateAll())
                 .Catch<Unit, Exception>(e =>
                 {
-                    log.Warn("ASSERT! Failed to invaldiate caches", e);
+                    log.Warning(e, "ASSERT! Failed to invaldiate caches");
                     return Observable.Return(Unit.Default);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)

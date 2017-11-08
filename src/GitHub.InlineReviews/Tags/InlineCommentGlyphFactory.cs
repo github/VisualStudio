@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Text.Classification;
 using GitHub.InlineReviews.Services;
-using GitHub.Models;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -46,6 +44,7 @@ namespace GitHub.InlineReviews.Tags
             };
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
         static UserControl CreateGlyph(InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;

@@ -132,8 +132,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         void HandleCreatedRepo(ILocalRepositoryModel newrepo)
         {
-            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
-            msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            var msg = String.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
+            msg += " " + String.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 

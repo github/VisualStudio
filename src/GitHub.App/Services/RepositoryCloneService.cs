@@ -4,8 +4,9 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Extensions;
+using GitHub.Logging;
 using Microsoft.VisualStudio.Shell;
-using NLog;
+using Serilog;
 using Rothko;
 using GitHub.Helpers;
 using Task = System.Threading.Tasks.Task;
@@ -21,7 +22,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCloneService>();
 
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
@@ -67,7 +68,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                log.Error("Could not clone {0} to {1}. {2}", cloneUrl, path, ex);
+                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, path);
                 throw;
             }
         }
