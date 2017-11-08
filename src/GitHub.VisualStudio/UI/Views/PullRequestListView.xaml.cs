@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Reactive.Disposables;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -26,36 +27,15 @@ namespace GitHub.VisualStudio.UI.Views
         readonly Subject<int> open = new Subject<int>();
         readonly Subject<object> create = new Subject<object>();
 
+        [ImportingConstructor]
         public PullRequestListView()
         {
             InitializeComponent();
-        }
-
-        [ImportingConstructor]
-        public PullRequestListView(IGitHubServiceProvider serviceProvider)
-        {
-            InitializeComponent();
-
-            OpenPROnGitHub = new RelayCommand(x =>
-            {
-                var repo = serviceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
-                var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
-                Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
-                Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
-                if (repo == null || browser == null)
-                {
-                    return;
-                }
-                var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + x);
-                browser.OpenUrl(url);
-            });
 
             this.WhenActivated(d =>
             {
             });
         }
-
-        public ICommand OpenPROnGitHub { get; set; }
 
         bool disposed;
         protected override void Dispose(bool disposing)

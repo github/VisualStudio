@@ -56,18 +56,12 @@ namespace GitHub.VisualStudio.Base
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
 
-#if DEBUG
-            //VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize", DateTime.Now, GetType());
-#endif
             TEServiceProvider = serviceProvider;
             Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
             if (holder == null)
                 return;
             holder.ServiceProvider = TEServiceProvider;
             SubscribeToRepoChanges();
-#if DEBUG
-            //VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize DONE", DateTime.Now, GetType());
-#endif
         }
 
 

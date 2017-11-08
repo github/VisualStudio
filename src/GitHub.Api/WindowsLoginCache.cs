@@ -39,7 +39,13 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(password, nameof(password));
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
+            var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
             var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
+
+            using (var credential = new Credential(userName, password, keyGit))
+            {
+                credential.Save();
+            }
 
             using (var credential = new Credential(userName, password, keyHost))
             {
@@ -54,7 +60,15 @@ namespace GitHub.Api
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
+            var keyGit = GetKeyGit(hostAddress.CredentialCacheKeyHost);
             var keyHost = GetKeyHost(hostAddress.CredentialCacheKeyHost);
+
+            using (var credential = new Credential())
+            {
+                credential.Target = keyGit;
+                credential.Type = CredentialType.Generic;
+                credential.Delete();
+            }
 
             using (var credential = new Credential())
             {
@@ -64,6 +78,17 @@ namespace GitHub.Api
             }
 
             return Task.CompletedTask;
+        }
+
+        static string GetKeyGit(string key)
+        {
+            key = FormatKey(key);
+            // it appears this is how MS expects the host key
+            if (!key.StartsWith("git:", StringComparison.Ordinal))
+                key = "git:" + key;
+            if (key.EndsWith("/", StringComparison.Ordinal))
+                key = key.Substring(0, key.Length - 1);
+            return key;
         }
 
         static string GetKeyHost(string key)

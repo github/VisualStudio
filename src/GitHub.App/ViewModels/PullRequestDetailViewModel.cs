@@ -6,16 +6,17 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Text;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -26,6 +27,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
+
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
@@ -93,7 +96,7 @@ namespace GitHub.ViewModels
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
                     .Cast<CheckoutCommandState>()
-                    .Select(x => x != null && x.IsEnabled), 
+                    .Select(x => x != null && x.IsEnabled),
                 DoCheckout);
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
             SubscribeOperationError(Checkout);
@@ -351,6 +354,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<IPullRequestModel, Exception>(ex =>
                 {
+                    log.Error(ex, "Error observing GetPullRequest");
                     ErrorMessage = ex.Message.Trim();
                     IsLoading = IsBusy = false;
                     return Observable.Empty<IPullRequestModel>();
@@ -460,6 +464,7 @@ namespace GitHub.ViewModels
             }
             catch (Exception ex)
             {
+                log.Error(ex, "Error loading PullRequestModel");
                 ErrorMessage = ex.Message.Trim();
             }
             finally
@@ -475,20 +480,13 @@ namespace GitHub.ViewModels
         /// <param name="head">
         /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
         /// </param>
-        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The path to a temporary file.</returns>
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head, Encoding encoding)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
-            var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractFile(LocalRepository, model, path, head, encoding).ToTask();
+            var relativePath = Path.Combine(file.DirectoryPath, file.FileName);
+            var encoding = pullRequestsService.GetEncoding(LocalRepository, relativePath);
+            return pullRequestsService.ExtractFile(LocalRepository, model, relativePath, head, encoding).ToTask();
         }
-
-        /// <summary>
-        /// Gets the encoding for the specified file.
-        /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>The file's encoding</returns>
-        public Encoding GetEncoding(string path) => pullRequestsService.GetEncoding(path);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.

@@ -16,12 +16,11 @@ namespace GitHub.InlineReviews.Glyph.Implementation
     /// Manage the MarginVisual element.
     /// </summary>
     /// <typeparam name="TGlyphTag">The type of tag we're managing.</typeparam>
-    internal class GlyphMarginVisualManager<TGlyphTag> where TGlyphTag: ITag
+    internal class GlyphMarginVisualManager<TGlyphTag> where TGlyphTag : ITag
     {
         readonly IEditorFormatMap editorFormatMap;
         readonly IGlyphFactory<TGlyphTag> glyphFactory;
         readonly Grid glyphMarginGrid;
-        readonly IWpfTextViewMargin margin;
         readonly string marginPropertiesName;
         readonly IWpfTextView textView;
         readonly Dictionary<Type, Canvas> visuals;
@@ -29,10 +28,9 @@ namespace GitHub.InlineReviews.Glyph.Implementation
         Dictionary<UIElement, GlyphData<TGlyphTag>> glyphs;
 
         public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory, Grid glyphMarginGrid,
-            IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName)
+            IEditorFormatMap editorFormatMap, string marginPropertiesName)
         {
             this.textView = textView;
-            this.margin = margin;
             this.marginPropertiesName = marginPropertiesName;
             this.editorFormatMap = editorFormatMap;
             this.editorFormatMap.FormatMappingChanged += OnFormatMappingChanged;

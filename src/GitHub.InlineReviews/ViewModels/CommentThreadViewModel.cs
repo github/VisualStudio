@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentModels">The thread comments.</param>
-        public CommentThreadViewModel(IAccount currentUser)
+        protected CommentThreadViewModel(IAccount currentUser)
         {
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 

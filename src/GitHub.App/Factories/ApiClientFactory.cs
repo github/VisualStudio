@@ -7,7 +7,7 @@ using GitHub.Services;
 using Octokit;
 using Octokit.Reactive;
 using ApiClient = GitHub.Api.ApiClient;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using System.Threading.Tasks;
 using ILoginCache = GitHub.Caches.ILoginCache;
 
@@ -20,11 +20,10 @@ namespace GitHub.Factories
         readonly ProductHeaderValue productHeader;
 
         [ImportingConstructor]
-        public ApiClientFactory(ILoginCache loginCache, IProgram program, ILoggingConfiguration config)
+        public ApiClientFactory(ILoginCache loginCache, IProgram program)
         {
             LoginCache = loginCache;
             productHeader = program.ProductHeader;
-            config.Configure();
         }
 
         public Task<IGitHubClient> CreateGitHubClient(HostAddress hostAddress)
