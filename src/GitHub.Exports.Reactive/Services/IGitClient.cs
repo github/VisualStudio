@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using LibGit2Sharp;
 using GitHub.Primitives;
+using System.Collections.Generic;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -204,5 +206,21 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
         Task<bool> IsHeadPushed(IRepository repo);
+
+        /// <summary>
+        /// Gets the unique commits from <paramref name="compareBranch"/> to the merge base of 
+        /// <paramref name="baseBranch"/> and <paramref name="compareBranch"/> and returns their
+        /// commit messages.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="baseBranch">The base branch to find a merge base with.</param>
+        /// <param name="compareBranch">The compare branch to find a merge base with.</param>
+        /// <param name="maxCommits">The maximum number of commits to return.</param>
+        /// <returns>An enumerable of unique commits from the merge base to the compareBranch.</returns>
+        Task<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            IRepository repo,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits);
     }
 }
