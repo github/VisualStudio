@@ -32,6 +32,10 @@
         </ResourceDictionary>
     </FrameworkElement.Resources>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+
     <Grid>
         <!-- Displays an existing comment-->
         <StackPanel Orientation="Vertical" Margin="4">

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
+using GitHub.Logging;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Serilog;
 
 namespace GitHub.InlineReviews.Commands
 {
@@ -22,6 +23,7 @@ namespace GitHub.InlineReviews.Commands
     /// </summary>
     abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
     {
+        static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
 
@@ -98,72 +100,83 @@ namespace GitHub.InlineReviews.Commands
         /// </remarks>
         protected IEnumerable<ITextView> GetCurrentTextViews()
         {
-            var serviceProvider = Package;
-            var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
-            if (monitorSelection == null)
-            {
-                yield break;
-            }
+            var result = new List<ITextView>();
 
-            object curDocument;
-            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
+            try
             {
-                yield break;
-            }
-
-            IVsWindowFrame frame = curDocument as IVsWindowFrame;
-            if (frame == null)
-            {
-                yield break;
-            }
-
-            object docView = null;
-            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
-            {
-                yield break;
-            }
-
-            if (docView is IVsDifferenceCodeWindow)
-            {
-                var diffWindow = (IVsDifferenceCodeWindow)docView;
-                
-                switch (diffWindow.DifferenceViewer.ViewMode)
+                var serviceProvider = Package;
+                var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
+                if (monitorSelection == null)
                 {
-                    case DifferenceViewMode.Inline:
-                        yield return diffWindow.DifferenceViewer.InlineView;
-                        break;
-                    case DifferenceViewMode.SideBySide:
-                        switch (diffWindow.DifferenceViewer.ActiveViewType)
-                        {
-                            case DifferenceViewType.LeftView:
-                                yield return diffWindow.DifferenceViewer.LeftView;
-                                yield return diffWindow.DifferenceViewer.RightView;
-                                break;
-                            case DifferenceViewType.RightView:
-                                yield return diffWindow.DifferenceViewer.RightView;
-                                yield return diffWindow.DifferenceViewer.LeftView;
-                                break;
-                        }
-                        yield return diffWindow.DifferenceViewer.LeftView;
-                        break;
-                    case DifferenceViewMode.RightViewOnly:
-                        yield return diffWindow.DifferenceViewer.RightView;
-                        break;
-                }
-            }
-            else if (docView is IVsCodeWindow)
-            {
-                IVsTextView textView;
-                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
-                {
-                    yield break;
+                    return result;
                 }
 
-                var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
-                var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
-                var wpfTextView = adapterFactory.GetWpfTextView(textView);
-                yield return wpfTextView;
+                object curDocument;
+                if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
+                {
+                    return result;
+                }
+
+                IVsWindowFrame frame = curDocument as IVsWindowFrame;
+                if (frame == null)
+                {
+                    return result;
+                }
+
+                object docView = null;
+                if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+                {
+                    return result;
+                }
+
+                if (docView is IVsDifferenceCodeWindow)
+                {
+                    var diffWindow = (IVsDifferenceCodeWindow)docView;
+
+                    switch (diffWindow.DifferenceViewer.ViewMode)
+                    {
+                        case DifferenceViewMode.Inline:
+                            result.Add(diffWindow.DifferenceViewer.InlineView);
+                            break;
+                        case DifferenceViewMode.SideBySide:
+                            switch (diffWindow.DifferenceViewer.ActiveViewType)
+                            {
+                                case DifferenceViewType.LeftView:
+                                    result.Add(diffWindow.DifferenceViewer.LeftView);
+                                    result.Add(diffWindow.DifferenceViewer.RightView);
+                                    break;
+                                case DifferenceViewType.RightView:
+                                    result.Add(diffWindow.DifferenceViewer.RightView);
+                                    result.Add(diffWindow.DifferenceViewer.LeftView);
+                                    break;
+                            }
+                            result.Add(diffWindow.DifferenceViewer.LeftView);
+                            break;
+                        case DifferenceViewMode.RightViewOnly:
+                            result.Add(diffWindow.DifferenceViewer.RightView);
+                            break;
+                    }
+                }
+                else if (docView is IVsCodeWindow)
+                {
+                    IVsTextView textView;
+                    if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
+                    {
+                        return result;
+                    }
+
+                    var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+                    var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
+                    var wpfTextView = adapterFactory.GetWpfTextView(textView);
+                    result.Add(wpfTextView);
+                }
             }
+            catch (Exception e)
+            {
+                log.Error(e, "Exception in InlineCommentNavigationCommand.GetCurrentTextViews()");
+            }
+
+            return result;
         }
 
         /// <summary>

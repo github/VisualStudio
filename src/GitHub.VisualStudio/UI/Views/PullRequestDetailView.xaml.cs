@@ -27,6 +27,7 @@ using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Text;
 using System.Globalization;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -92,15 +93,19 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fullPath = ViewModel.GetLocalFilePath(file);
-                var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true, Encoding.UTF8);
+                var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true);
 
-                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                using (workingDirectory ? null : OpenInProvisionalTab())
                 {
                     var window = Services.Dte.ItemOperations.OpenFile(fileName);
                     window.Document.ReadOnly = !workingDirectory;
 
                     var buffer = GetBufferAt(fileName);
-                    AddBufferTag(buffer, ViewModel.Session, fullPath, false);
+
+                    if (!workingDirectory)
+                    {
+                        AddBufferTag(buffer, ViewModel.Session, fullPath, null);
+                    }
                 }
 
                 if (workingDirectory)
@@ -119,9 +124,8 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
-                var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true, Encoding.UTF8);
-                var encoding = ViewModel.GetEncoding(rightFile);
-                var leftFile = await ViewModel.ExtractFile(file, false, encoding);
+                var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true);
+                var leftFile = await ViewModel.ExtractFile(file, false);
                 var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
                 var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
                 var rightLabel = workingDirectory ? relativePath : $"{relativePath};PR {ViewModel.Model.Number}";
@@ -135,7 +139,7 @@ namespace GitHub.VisualStudio.UI.Views
                 }
 
                 IVsWindowFrame frame;
-                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                using (OpenInProvisionalTab())
                 {
                     var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
 
@@ -157,8 +161,12 @@ namespace GitHub.VisualStudio.UI.Views
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
                 var session = ViewModel.Session;
-                AddBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
-                AddBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, relativePath, DiffSide.Left);
+
+                if (!workingDirectory)
+                {
+                    AddBufferTag(diffViewer.RightView.TextBuffer, session, relativePath, DiffSide.Right);
+                }
 
                 if (workingDirectory)
                     await UsageTracker.IncrementPRDetailsCompareWithSolution();
@@ -171,11 +179,21 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        void AddBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, bool isLeftBuffer)
+        void AddBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, DiffSide? side)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
+                () => new PullRequestTextBufferInfo(session, path, side));
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    AddBufferTag(source, session, path, side);
+                }
+            }
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
@@ -312,6 +330,23 @@ namespace GitHub.VisualStudio.UI.Views
                 }
             }
             catch { }
+        }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                VisualStudioBrowser.OpenUrl(uri);
+            }
+        }
+
+        static IDisposable OpenInProvisionalTab()
+        {
+            return new NewDocumentStateScope
+                (__VSNEWDOCUMENTSTATE.NDS_Provisional,
+                VSConstants.NewDocumentStateReason.SolutionExplorer);
         }
     }
 }

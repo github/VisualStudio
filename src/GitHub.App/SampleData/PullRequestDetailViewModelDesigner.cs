@@ -99,12 +99,10 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
         public ReactiveCommand<object> ViewFile { get; }
 
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head, Encoding encoding)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
             return null;
         }
-
-        public Encoding GetEncoding(string path) => Encoding.UTF8;
 
         public string GetLocalFilePath(IPullRequestFileNode file)
         {

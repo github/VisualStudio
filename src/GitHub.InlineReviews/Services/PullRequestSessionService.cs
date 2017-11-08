@@ -2,13 +2,20 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Factories;
+using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Projection;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -16,7 +23,7 @@ namespace GitHub.InlineReviews.Services
     /// Provides a common interface for services required by <see cref="PullRequestSession"/>.
     /// </summary>
     [Export(typeof(IPullRequestSessionService))]
-    class PullRequestSessionService : IPullRequestSessionService
+    public class PullRequestSessionService : IPullRequestSessionService
     {
         readonly IGitService gitService;
         readonly IGitClient gitClient;
@@ -44,14 +51,129 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
+        {
+            var repo = await GetRepository(repository);
+            return await diffService.Diff(repo, baseSha, headSha, relativePath);
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);
             return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
         }
 
         /// <inheritdoc/>
-        public async Task<string> GetTipSha(ILocalRepositoryModel repository)
+        public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
+            IPullRequestModel pullRequest,
+            string relativePath,
+            IReadOnlyList<DiffChunk> diff)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            var commentsByPosition = pullRequest.ReviewComments
+                .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
+                .OrderBy(x => x.Id)
+                .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
+            var threads = new List<IInlineCommentThreadModel>();
+
+            foreach (var comments in commentsByPosition)
+            {
+                var hunk = comments.First().DiffHunk;
+                var chunks = DiffUtilities.ParseFragment(hunk);
+                var chunk = chunks.Last();
+                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
+                var thread = new InlineCommentThreadModel(
+                    relativePath,
+                    comments.Key.Item1,
+                    comments.Key.Item2,
+                    diffLines,
+                    comments);
+                threads.Add(thread);
+            }
+
+            UpdateCommentThreads(threads, diff);
+            return threads;
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<Tuple<int, DiffSide>> UpdateCommentThreads(
+            IReadOnlyList<IInlineCommentThreadModel> threads,
+            IReadOnlyList<DiffChunk> diff)
+        {
+            var changedLines = new List<Tuple<int, DiffSide>>();
+
+            foreach (var thread in threads)
+            {
+                var oldLineNumber = thread.LineNumber;
+                var newLineNumber = GetUpdatedLineNumber(thread, diff);
+                var changed = false;
+
+                if (thread.IsStale)
+                {
+                    thread.IsStale = false;
+                    changed = true;
+                }
+
+                if (newLineNumber != thread.LineNumber)
+                {
+                    thread.LineNumber = newLineNumber;
+                    thread.IsStale = false;
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    var side = thread.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                    if (oldLineNumber != -1) changedLines.Add(Tuple.Create(oldLineNumber, side));
+                    if (newLineNumber != -1 && newLineNumber != oldLineNumber) changedLines.Add(Tuple.Create(newLineNumber, side));
+                }
+            }
+
+            return changedLines;
+        }
+
+        /// <inheritdoc/>
+        public byte[] GetContents(ITextBuffer buffer)
+        {
+            var encoding = GetDocument(buffer)?.Encoding ?? Encoding.Default;
+            var content = encoding.GetBytes(buffer.CurrentSnapshot.GetText());
+
+            var preamble = encoding.GetPreamble();
+            if (preamble.Length == 0) return content;
+
+            var completeContent = new byte[preamble.Length + content.Length];
+            Buffer.BlockCopy(preamble, 0, completeContent, 0, preamble.Length);
+            Buffer.BlockCopy(content, 0, completeContent, preamble.Length, content.Length);
+
+            return completeContent;
+        }
+
+        /// <inheritdoc/>
+        public ITextDocument GetDocument(ITextBuffer buffer)
+        {
+            ITextDocument result;
+
+            if (buffer.Properties.TryGetProperty(typeof(ITextDocument), out result))
+                return result;
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    if ((result = GetDocument(source)) != null)
+                        return result;
+                }
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<string> GetTipSha(ILocalRepositoryModel repository)
         {
             var repo = await GetRepository(repository);
             return repo.Head.Tip.Sha;
@@ -61,9 +183,10 @@ namespace GitHub.InlineReviews.Services
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
             var repo = await GetRepository(repository);
+            var modified = await gitClient.IsModified(repo, relativePath, contents);
+            var pushed = await gitClient.IsHeadPushed(repo);
 
-            return !await gitClient.IsModified(repo, relativePath, contents) &&
-                   await gitClient.IsHeadPushed(repo);
+            return !modified && pushed;
         }
 
         public async Task<byte[]> ExtractFileFromGit(
@@ -107,36 +230,50 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public virtual async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             var baseSha = pullRequest.Base.Sha;
             var headSha = pullRequest.Head.Sha;
             var key = new Tuple<string, string>(baseSha, headSha);
 
             string mergeBase;
-            if(mergeBaseCache.TryGetValue(key, out mergeBase))
+            if (mergeBaseCache.TryGetValue(key, out mergeBase))
             {
                 return mergeBase;
             }
 
             var repo = await GetRepository(repository);
-            var baseUrl = pullRequest.Base.RepositoryCloneUrl;
+            var targetUrl = pullRequest.Base.RepositoryCloneUrl;
             var headUrl = pullRequest.Head.RepositoryCloneUrl;
-            var headCloneUrl = pullRequest.Head.RepositoryCloneUrl;
             var baseRef = pullRequest.Base.Ref;
-            var headRef = pullRequest.Head.Ref;
-            mergeBase = await gitClient.GetPullRequestMergeBase(repo, baseUrl, headUrl, baseSha, headSha, baseRef, headRef);
-            if (mergeBase != null)
+            var pullNumber = pullRequest.Number;
+            try
             {
-                return mergeBaseCache[key] = mergeBase;
+                mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
             }
 
-            throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+            return mergeBaseCache[key] = mergeBase;
+        }
+
+        /// <inheritdoc/>
+        public virtual ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal()
+        {
+            var input = new Subject<ITextSnapshot>();
+            var output = Observable.Create<ITextSnapshot>(x => input
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x));
+            return Subject.Create(input, output);
         }
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
@@ -144,12 +281,12 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 commitId,
@@ -175,18 +312,19 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
             int inReplyTo)
         {
-            var address = HostAddress.Create(repository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
             var result = await apiClient.CreatePullRequestReviewComment(
-                repository.Owner,
-                repository.Name,
+                remoteRepositoryOwner,
+                localRepository.Name,
                 number,
                 body,
                 inReplyTo);
@@ -206,6 +344,20 @@ namespace GitHub.InlineReviews.Services
                 CreatedAt = result.CreatedAt,
                 User = user,
             };
+        }
+
+        int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
+        {
+            var line = DiffUtilities.Match(diff, thread.DiffMatch);
+
+            if (line != null)
+            {
+                return (thread.DiffLineType == DiffChangeType.Delete) ?
+                    line.OldLineNumber - 1 :
+                    line.NewLineNumber - 1;
+            }
+
+            return -1;
         }
 
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)

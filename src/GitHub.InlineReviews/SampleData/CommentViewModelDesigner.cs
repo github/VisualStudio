@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Diagnostics.CodeAnalysis;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.SampleData;
@@ -8,6 +9,7 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
+    [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
     class CommentViewModelDesigner : ReactiveObject, ICommentViewModel
     {
         public CommentViewModelDesigner()

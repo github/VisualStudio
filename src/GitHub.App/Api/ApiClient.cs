@@ -8,7 +8,6 @@ using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using GitHub.Primitives;
-using NLog;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
@@ -18,6 +17,8 @@ using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Extensions;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Api
 {
@@ -25,8 +26,7 @@ namespace GitHub.Api
     {
         const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
+        static readonly ILogger log = LogManager.ForContext<ApiClient>();
 
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
@@ -77,7 +77,7 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(path, nameof(path));
 
             var comment = new PullRequestReviewCommentCreate(body, commitId, path, position);
-            return gitHubClient.PullRequest.Comment.Create(owner, name, number, comment);
+            return gitHubClient.PullRequest.ReviewComment.Create(owner, name, number, comment);
         }
 
         public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
@@ -88,7 +88,7 @@ namespace GitHub.Api
             int inReplyTo)
         {
             var comment = new PullRequestReviewCommentReplyCreate(body, inReplyTo);
-            return gitHubClient.PullRequest.Comment.CreateReply(owner, name, number, comment);
+            return gitHubClient.PullRequest.ReviewComment.CreateReply(owner, name, number, comment);
         }
 
         public IObservable<Gist> CreateGist(NewGist newGist)
@@ -96,30 +96,9 @@ namespace GitHub.Api
             return gitHubClient.Gist.Create(newGist);
         }
 
-        public IObservable<UserAndScopes> GetUser()
+        public IObservable<User> GetUser()
         {
-            return GetUserInternal().ToObservable();
-        }
-
-        async Task<UserAndScopes> GetUserInternal()
-        {
-            var response = await gitHubClient.Connection.Get<User>(
-                userEndpoint, null, null).ConfigureAwait(false);
-            var scopes = default(string[]);
-
-            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
-            {
-                scopes = response.HttpResponse.Headers[ScopesHeader]
-                    .Split(',')
-                    .Select(x => x.Trim())
-                    .ToArray();
-            }
-            else
-            {
-                log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
-            }
-
-            return new UserAndScopes(response.Body, scopes);
+            return gitHubClient.User.Current();
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
@@ -209,7 +188,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Error("IMPOSSIBLE! Generating Sha256 hash caused an exception.", e);
+                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception");
                 return null;
             }
         }
@@ -227,14 +206,14 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Info("Failed to retrieve host name using `DNS.GetHostName`.", e);
+                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`");
                 try
                 {
                     return Environment.MachineName;
                 }
                 catch (Exception ex)
                 {
-                    log.Info("Failed to retrieve host name using `Environment.MachineName`.", ex);
+                    log.Warning(ex, "Failed to retrieve host name using `Environment.MachineName`");
                     return "(unknown)";
                 }
             }
@@ -255,7 +234,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Info("Could not retrieve MAC address. Fallback to using machine name.", e);
+                log.Warning(e, "Could not retrieve MAC address. Fallback to using machine name");
                 return GetMachineNameSafe();
             }
         }
@@ -303,7 +282,7 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
             Guard.ArgumentNotEmptyString(name, nameof(name));
 
-            return gitHubClient.PullRequest.Comment.GetAll(owner, name, number);
+            return gitHubClient.PullRequest.ReviewComment.GetAll(owner, name, number);
         }
 
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)

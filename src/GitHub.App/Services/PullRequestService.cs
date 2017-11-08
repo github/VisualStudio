@@ -15,6 +15,7 @@ using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
 using System.Diagnostics;
+using GitHub.Logging;
 
 namespace GitHub.Services
 {
@@ -86,6 +87,19 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            ILocalRepositoryModel repository,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits)
+        {
+            return Observable.Defer(() =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                return gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits).ToObservable();
+            });
+        }
+
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
@@ -106,7 +120,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                var remoteName = repo.Head.RemoteName;
+                var remote = await gitClient.GetHttpRemote(repo, remoteName);
                 return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
             });
         }
@@ -170,10 +185,10 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-
-                if (repo.Head.Remote != null)
+                var remoteName = repo.Head.RemoteName;
+                if (remoteName != null)
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                    var remote = await gitClient.GetHttpRemote(repo, remoteName);
                     await gitClient.Fetch(repo, remote.Name);
                 }
 
@@ -241,7 +256,7 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
+                Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
 
                 if (branchName != null)
                 {
@@ -308,18 +323,19 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    sha = await gitClient.GetPullRequestMergeBase(
-                        repo,
-                        pullRequest.Base.RepositoryCloneUrl,
-                        pullRequest.Head.RepositoryCloneUrl,
-                        pullRequest.Base.Sha,
-                        pullRequest.Head.Sha,
-                        pullRequest.Base.Ref,
-                        pullRequest.Head.Ref);
-
-                    if (sha == null)
+                    try
                     {
-                        throw new NotFoundException($"Couldn't find merge base between {pullRequest.Base.Sha} and {pullRequest.Head.Sha}.");
+                        sha = await gitClient.GetPullRequestMergeBase(
+                            repo,
+                            pullRequest.Base.RepositoryCloneUrl,
+                            pullRequest.Base.Sha,
+                            pullRequest.Head.Sha,
+                            pullRequest.Base.Ref,
+                            pullRequest.Number);
+                    }
+                    catch (NotFoundException ex)
+                    {
+                        throw new NotFoundException($"The Pull Request file failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
                     }
                 }
 
@@ -328,12 +344,14 @@ namespace GitHub.Services
             });
         }
 
-        public Encoding GetEncoding(string path)
+        public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
         {
-            if (File.Exists(path))
+            var fullPath = Path.Combine(repository.LocalPath, relativePath);
+
+            if (File.Exists(fullPath))
             {
                 var encoding = Encoding.UTF8;
-                if (HasPreamble(path, encoding))
+                if (HasPreamble(fullPath, encoding))
                 {
                     return encoding;
                 }
@@ -348,7 +366,7 @@ namespace GitHub.Services
             {
                 foreach (var b in encoding.GetPreamble())
                 {
-                    if(b != stream.ReadByte())
+                    if (b != stream.ReadByte())
                     {
                         return false;
                     }
@@ -365,8 +383,8 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var usedRemotes = new HashSet<string>(
                     repo.Branches
-                        .Where(x => !x.IsRemote && x.Remote != null)
-                        .Select(x => x.Remote?.Name));
+                        .Where(x => !x.IsRemote && x.RemoteName != null)
+                        .Select(x => x.RemoteName));
 
                 foreach (var remote in repo.Network.Remotes)
                 {
@@ -444,7 +462,6 @@ namespace GitHub.Services
 
             Directory.CreateDirectory(tempDir);
             File.WriteAllText(tempFile, contents, encoding);
-            File.SetAttributes(tempFile, FileAttributes.ReadOnly);
             return tempFile;
         }
 
@@ -472,7 +489,7 @@ namespace GitHub.Services
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
-            return value != null && 
+            return value != null &&
                 value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
                 value.Item2 == pullRequest.Number;
         }

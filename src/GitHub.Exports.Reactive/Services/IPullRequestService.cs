@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Text;
+using System.Threading.Tasks;
 using GitHub.Models;
 using LibGit2Sharp;
 using Octokit;
@@ -124,9 +126,12 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the encoding for the specified file.
         /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>The file's encoding</returns>
-        Encoding GetEncoding(string path);
+        /// <param name="repository">The repository.</param>
+        /// <param name="relativePath">The relative path to the file in the repository.</param>
+        /// <returns>
+        /// The file's encoding or <see cref="Encoding.Default"/> if the file doesn't exist.
+        /// </returns>
+        Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath);
 
         /// <summary>
         /// Gets a file as it appears in a pull request.
@@ -153,5 +158,21 @@ namespace GitHub.Services
         IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Gets the unique commits from <paramref name="compareBranch"/> to the merge base of 
+        /// <paramref name="baseBranch"/> and <paramref name="compareBranch"/> and returns their
+        /// commit messages.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="baseBranch">The base branch to find a merge base with.</param>
+        /// <param name="compareBranch">The compare branch to find a merge base with.</param>
+        /// <param name="maxCommits">The maximum number of commits to return.</param>
+        /// <returns>An enumerable of unique commits from the merge base to the compareBranch.</returns>
+        IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            ILocalRepositoryModel repository,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits);
     }
 }

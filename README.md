@@ -1,6 +1,20 @@
 # GitHub Extension for Visual Studio
 
-**The location of the submodules has changed as of 31-01-2017.** If you have an existing clone, make sure to run `git submodule sync` to update your local clone with the new locations for the submodules.
+## Notices
+
+### VS 2017 v15.3 users, please read
+
+If you need to downgrade or uninstall the extension, **do not use** ***Revert*** in Visual Studio 2017 15.3. Instead, manually uninstall the extension with the steps listed in https://github.com/github/VisualStudio/issues/1206#issuecomment-326558902
+
+If you have a corrupted extension cache, steps for fixing it are in https://github.com/github/VisualStudio/issues/1206#issuecomment-326053090
+
+The Visual Studio 2017 15.3 installer [has a bug](https://github.com/github/VisualStudio/issues/1206) that causes a corruption of the installed extensions data when you revert an installation of the extension (see also [this MS issue](https://developercommunity.visualstudio.com/content/problem/102178/error-installing-github-extension.html)). Until VS 2017 15.4 comes out, **do not use Revert in** ***Extensions and Updates***.
+
+### The location of the submodules has changed as of 31-01-2017
+
+If you have an existing clone, make sure to run `git submodule sync` to update your local clone with the new locations for the submodules.
+
+## About
 
 The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015.
 Most of the extension UI lives in the Team Explorer pane, which is available from the View menu.
@@ -37,12 +51,6 @@ git submodule deinit script
 git submodule update
 ```
 
-Visual Studio extensions have to be signed, so you need to create a signing key with the name `publickey.snk` for your build in the root of the repository:
-
-```txt
-sn -k `publickey.snk`
-```
-
 Open the `GitHubVS.sln` solution with Visual Studio 2015+.
 To be able to use the GitHub API, you'll need to:
 
@@ -65,31 +73,19 @@ Note, the script will only install in one instance of Visual Studio 2017 (Enterp
 
 ## Build Flavors
 
-By default, building will create a VSIX with `Experimental="true"` and `AllUsers="false"` in its `extension.vsixmanifest`. These settings are necessary in order to easily install a standalone VSIX file. There is no need to uninstall the version previously installed via Visual Studio setup / Extensions and Updates.
-
 The following can be executed via `cmd.exe`.
 
 To build and install a `Debug` configuration VSIX:
 ```txt
-build.cmd
-install.cmd
+build.cmd Debug
+install.cmd Debug
 ```
 
 To build and install a `Release` configuration VSIX:
 ```txt
-set Configuration=Release
-build.cmd
-install.cmd
+build.cmd Release
+install.cmd Release
 ```
-
-To build a VSIX that can be installed via a gallery feed on Extensions and Updates:
-```txt
-set Configuration=Release
-set IsExperimental=false
-build.cmd
-```
-
-Note, attempting to install `IsExperimental=false` builds of the VSIX is not recommended.
 
 ## More information
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.

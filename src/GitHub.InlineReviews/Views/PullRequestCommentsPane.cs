@@ -30,18 +30,18 @@ namespace GitHub.InlineReviews.Views
         }
 
         public async Task Initialize(
-            IPullRequestSession session,
+            IPullRequestSession pullRequestSession,
             IApiClient apiClient)
         {
-            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotNull(pullRequestSession, nameof(pullRequestSession));
             Guard.ArgumentNotNull(apiClient, nameof(apiClient));
 
             if (this.session != null)
                 return;
 
-            this.session = session;
+            this.session = pullRequestSession;
 
-            var viewModel = new PullRequestCommentsViewModel(apiClient, session);
+            var viewModel = new PullRequestCommentsViewModel(pullRequestSession);
             await viewModel.Initialize();
             view.DataContext = viewModel;
         }

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio
 {
@@ -23,7 +24,7 @@ namespace GitHub.VisualStudio
             Name = document.FullName.Equals(document.ProjectItem.FileNames[1], StringComparison.OrdinalIgnoreCase) ? document.ProjectItem.FileNames[1] : document.FullName;
 
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
-            Debug.Assert(textManager != null, "No SVsTextManager service available");
+            Log.Assert(textManager != null, "No SVsTextManager service available");
             if (textManager == null)
                 return;
             IVsTextView view;
