@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "src\UnitTests\UnitTests.csproj", "{596595A6-2A3C-469E-9386-9E3767D863A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "test\UnitTests\UnitTests.csproj", "{596595A6-2A3C-469E-9386-9E3767D863A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
 EndProject
@@ -88,7 +88,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat-Portable", "submodule
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CredentialManagement", "src\CredentialManagement\CredentialManagement.csproj", "{41A47C5B-C606-45B4-B83C-22B9239E4DA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackingCollectionTests", "src\TrackingCollectionTests\TrackingCollectionTests.csproj", "{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackingCollectionTests", "test\TrackingCollectionTests\TrackingCollectionTests.csproj", "{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.14", "src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj", "{161DBF01-1DBF-4B00-8551-C5C00F26720D}"
 EndProject
