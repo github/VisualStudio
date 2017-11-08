@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 10,
                 false);
 
-            Assert.Equal(1, target.Comments.Count);
+            Assert.Single(target.Comments);
             Assert.Equal(string.Empty, target.Comments[0].Body);
             Assert.Equal(CommentEditState.Editing, target.Comments[0].EditState);
         }
@@ -117,23 +117,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "COMMIT_SHA",
                 "file.cs",
                 7);
-        }
-
-        [Fact]
-        public void SignalsFinishedWhenCommentPosted()
-        {
-            var session = CreateSession();
-            var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
-            var signalled = false;
-
-            target.Finished.Subscribe(_ => signalled = true);
-            Assert.False(signalled);
-
-            target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
-
-            Assert.True(signalled);
         }
 
         IApiClient CreateApiClient()

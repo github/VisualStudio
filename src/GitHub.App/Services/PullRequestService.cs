@@ -15,6 +15,7 @@ using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
 using System.Diagnostics;
+using GitHub.Logging;
 
 namespace GitHub.Services
 {
@@ -119,7 +120,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                var remoteName = repo.Head.RemoteName;
+                var remote = await gitClient.GetHttpRemote(repo, remoteName);
                 return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
             });
         }
@@ -183,10 +185,10 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-
-                if (repo.Head.Remote != null)
+                var remoteName = repo.Head.RemoteName;
+                if (remoteName != null)
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
+                    var remote = await gitClient.GetHttpRemote(repo, remoteName);
                     await gitClient.Fetch(repo, remote.Name);
                 }
 
@@ -254,7 +256,7 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
+                Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
 
                 if (branchName != null)
                 {
@@ -381,8 +383,8 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var usedRemotes = new HashSet<string>(
                     repo.Branches
-                        .Where(x => !x.IsRemote && x.Remote != null)
-                        .Select(x => x.Remote?.Name));
+                        .Where(x => !x.IsRemote && x.RemoteName != null)
+                        .Select(x => x.RemoteName));
 
                 foreach (var remote in repo.Network.Remotes)
                 {

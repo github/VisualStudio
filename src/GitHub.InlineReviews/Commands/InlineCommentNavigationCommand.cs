@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
-using GitHub.VisualStudio;
+using GitHub.Logging;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
@@ -15,6 +14,7 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Serilog;
 
 namespace GitHub.InlineReviews.Commands
 {
@@ -23,6 +23,7 @@ namespace GitHub.InlineReviews.Commands
     /// </summary>
     abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
     {
+        static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
 
@@ -172,7 +173,7 @@ namespace GitHub.InlineReviews.Commands
             }
             catch (Exception e)
             {
-                VsOutputLogger.WriteLine("Exception in InlineCommentNavigationCommand.GetCurrentTextViews(): {0}", e);
+                log.Error(e, "Exception in InlineCommentNavigationCommand.GetCurrentTextViews()");
             }
 
             return result;

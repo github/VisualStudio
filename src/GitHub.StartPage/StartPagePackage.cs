@@ -1,23 +1,21 @@
 ﻿using System;
+using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Shell;
-using GitHub.Services;
-using GitHub.UI;
-using GitHub.ViewModels;
-using System.IO;
-using Microsoft.TeamFoundation.Controls;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Microsoft.VisualStudio.Shell.CodeContainerManagement;
-using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
-using CodeContainer = Microsoft.VisualStudio.Shell.CodeContainerManagement.CodeContainer;
-using Task = System.Threading.Tasks.Task;
-using System.ComponentModel;
+using GitHub.Logging;
 using GitHub.Models;
-using GitHub.Extensions;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.VisualStudio;
+using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.CodeContainerManagement;
+using Serilog;
+using CodeContainer = Microsoft.VisualStudio.Shell.CodeContainerManagement.CodeContainer;
+using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.StartPage
 {
@@ -38,6 +36,8 @@ namespace GitHub.StartPage
     [Guid(Guids.CodeContainerProviderId)]
     public class GitHubContainerProvider : ICodeContainerProvider
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubContainerProvider>();
+
         public async Task<CodeContainer> AcquireCodeContainerAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
 
@@ -50,6 +50,7 @@ namespace GitHub.StartPage
             return await RunAcquisition(downloadProgress, cancellationToken, repository);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "cancellationToken")]
         async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRepositoryModel repository)
         {
             CloneDialogResult request = null;
@@ -60,9 +61,9 @@ namespace GitHub.StartPage
                 await ShowTeamExplorerPage(uiProvider);
                 request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
             }
-            catch
+            catch (Exception e)
             {
-                // TODO: log
+                log.Error(e, "Error showing Start Page clone dialog");
             }
 
             if (request == null)
