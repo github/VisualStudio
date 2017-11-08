@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using GitHub.Logging;
@@ -38,7 +40,6 @@ namespace GitHub.Services
         public Task Pull(IRepository repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-
             return Task.Factory.StartNew(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
@@ -471,6 +472,39 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 return repo.Head.TrackingDetails.AheadBy == 0;
+            });
+        }
+
+        public Task<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            IRepository repo,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var baseCommit = repo.Lookup<Commit>(baseBranch);
+                var compareCommit = repo.Lookup<Commit>(compareBranch);
+                if (baseCommit == null || compareCommit == null)
+                {
+                    var missingBranch = baseCommit == null ? baseBranch : compareBranch;
+                    throw new NotFoundException(missingBranch);
+                }
+
+                var mergeCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, compareCommit);
+                var commitFilter = new CommitFilter
+                {
+                    IncludeReachableFrom = baseCommit,
+                    ExcludeReachableFrom = mergeCommit,
+                };
+
+                var commits = repo.Commits
+                    .QueryBy(commitFilter)
+                    .Take(maxCommits)
+                    .Select(c => new CommitMessage(c.Message))
+                    .ToList();
+
+                return (IReadOnlyList<CommitMessage>)commits;
             });
         }
 
