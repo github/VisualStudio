@@ -182,21 +182,6 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             [Fact]
-            public async Task NotCheckedOutWithWorkingDirectoryDirty()
-            {
-                var target = CreateTarget(
-                    currentBranch: "master",
-                    existingPrBranch: "pr/123",
-                    dirty: true);
-                var repo = Substitute.For<IRemoteRepositoryModel>();
-
-                await target.Load(repo, CreatePullRequest());
-
-                Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.ToolTip);
-            }
-
-            [Fact]
             public async Task CheckoutExistingLocalBranch()
             {
                 var target = CreateTarget(
@@ -515,7 +500,6 @@ namespace UnitTests.GitHub.App.ViewModels
             string currentBranch = "master",
             string existingPrBranch = null,
             bool prFromFork = false,
-            bool dirty = false,
             int aheadBy = 0,
             int behindBy = 0,
             IPullRequestSessionManager sessionManager = null)
@@ -524,7 +508,6 @@ namespace UnitTests.GitHub.App.ViewModels
                 currentBranch: currentBranch,
                 existingPrBranch: existingPrBranch,
                 prFromFork: prFromFork,
-                dirty: dirty,
                 aheadBy: aheadBy,
                 behindBy: behindBy,
                 sessionManager: sessionManager).Item1;
