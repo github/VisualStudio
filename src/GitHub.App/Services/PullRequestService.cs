@@ -15,6 +15,7 @@ using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
 using System.Diagnostics;
+using GitHub.Logging;
 
 namespace GitHub.Services
 {
@@ -257,7 +258,7 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
+                Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
 
                 if (branchName != null)
                 {
