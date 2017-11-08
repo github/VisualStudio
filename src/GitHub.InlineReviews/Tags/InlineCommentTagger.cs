@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Services;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -50,7 +47,7 @@ namespace GitHub.InlineReviews.Tags
             this.sessionManager = sessionManager;
         }
 
-        public bool ShowMargin => file != null;
+        public bool ShowMargin => file?.Diff?.Count > 0;
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
