@@ -148,13 +148,13 @@ namespace GitHub.ViewModels
         public ILocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
-        /// Gets the remote repository that contains the pull request.
+        /// Gets the owner of the remote repository that contains the pull request.
         /// </summary>
         /// <remarks>
         /// The remote repository may be different from the local repository if the local
         /// repository is a fork and the user is viewing pull requests from the parent repository.
         /// </remarks>
-        public IRemoteRepositoryModel RemoteRepository { get; private set; }
+        public string RemoteRepositoryOwner { get; private set; }
 
         /// <summary>
         /// Gets the session for the pull request.
@@ -326,13 +326,13 @@ namespace GitHub.ViewModels
         public override void Initialize(ViewWithData data)
         {
             int number;
-            var repo = RemoteRepository;
+            var repoOwner = RemoteRepositoryOwner;
 
             if (data != null)
             {
                 var arg = (PullRequestDetailArgument)data.Data;
                 number = arg.Number;
-                repo = arg.Repository;
+                repoOwner = arg.RepositoryOwner;
             }
             else
             {
@@ -349,7 +349,7 @@ namespace GitHub.ViewModels
             }
 
             ErrorMessage = OperationError = null;
-            modelService.GetPullRequest(repo, number)
+            modelService.GetPullRequest(repoOwner, LocalRepository.Name, number)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<IPullRequestModel, Exception>(ex =>
@@ -359,23 +359,23 @@ namespace GitHub.ViewModels
                     IsLoading = IsBusy = false;
                     return Observable.Empty<IPullRequestModel>();
                 })
-                .Subscribe(x => Load(repo, x).Forget());
+                .Subscribe(x => Load(repoOwner, x).Forget());
         }
 
         /// <summary>
         /// Loads the view model from octokit models.
         /// </summary>
-        /// <param name="remoteRepository">The remote repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the remote repository.</param>
         /// <param name="pullRequest">The pull request model.</param>
-        public async Task Load(IRemoteRepositoryModel remoteRepository, IPullRequestModel pullRequest)
+        public async Task Load(string remoteRepositoryOwner, IPullRequestModel pullRequest)
         {
-            Guard.ArgumentNotNull(remoteRepository, nameof(remoteRepository));
+            Guard.ArgumentNotNull(remoteRepositoryOwner, nameof(remoteRepositoryOwner));
 
             try
             {
                 var firstLoad = (Model == null);
                 Model = pullRequest;
-                RemoteRepository = remoteRepository;
+                RemoteRepositoryOwner = remoteRepositoryOwner;
                 Session = await sessionManager.GetSession(pullRequest);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
