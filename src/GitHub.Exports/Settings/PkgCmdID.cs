@@ -9,6 +9,7 @@ namespace GitHub.VisualStudio
         public const int idGitHubToolbar = 0x1120;
         public const int showGitHubPaneCommand = 0x200;
         public const int openPullRequestsCommand = 0x201;
+        public const int showCurrentPullRequestCommand = 0x202;
         public const int backCommand = 0x300;
         public const int forwardCommand = 0x301;
         public const int refreshCommand = 0x302;
