@@ -64,7 +64,7 @@ public class TestBaseClass : IEntryExitDecorator
             null, null, null);
         return new PullRequest(0, uri, uri, uri, uri, uri, uri,
             id, state, title, "", createdAt, updatedAt,
-            null, null, 
+            null, null,
             new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
             new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
             user, null, null, false, null,
@@ -87,7 +87,22 @@ public class TestBaseClass : IEntryExitDecorator
 
         public void Dispose()
         {
+            // Remove any read-only attributes
+            SetFileAttributes(Directory, FileAttributes.Normal);
             Directory.Delete(true);
+        }
+
+        static void SetFileAttributes(DirectoryInfo dir, FileAttributes attributes)
+        {
+            foreach (DirectoryInfo subdir in dir.GetDirectories())
+            {
+                SetFileAttributes(subdir, attributes);
+            }
+
+            foreach (var file in dir.GetFiles())
+            {
+                File.SetAttributes(file.FullName, attributes);
+            }
         }
     }
 
