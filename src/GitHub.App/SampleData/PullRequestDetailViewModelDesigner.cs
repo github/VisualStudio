@@ -36,7 +36,7 @@ namespace GitHub.SampleData
         {
             var repoPath = @"C:\Repo";
 
-            Model = new PullRequestModel(419, 
+            Model = new PullRequestModel(419,
                 "Error handling/bubbling from viewmodels to views to viewhosts",
                  new AccountDesigner { Login = "shana", IsUser = true },
                  DateTime.Now.Subtract(TimeSpan.FromDays(3)))
@@ -75,7 +75,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestModel Model { get; }
         public IPullRequestSession Session { get; }
         public ILocalRepositoryModel LocalRepository { get; }
-        public IRemoteRepositoryModel RemoteRepository { get; }
+        public string RemoteRepositoryOwner { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public int CommentCount { get; set; }

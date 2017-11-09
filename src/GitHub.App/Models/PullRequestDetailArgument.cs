@@ -1,5 +1,6 @@
 ﻿using System;
 using GitHub.ViewModels;
+using GitHub.Primitives;
 
 namespace GitHub.Models
 {
@@ -9,9 +10,9 @@ namespace GitHub.Models
     public class PullRequestDetailArgument
     {
         /// <summary>
-        /// Gets or sets the repository containing the pull request.
+        /// Gets or sets the owner of the repository containing the pull request.
         /// </summary>
-        public IRemoteRepositoryModel Repository { get; set; }
+        public string RepositoryOwner { get; set; }
 
         /// <summary>
         /// Gets or sets the number of the pull request.
