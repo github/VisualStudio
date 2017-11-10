@@ -120,6 +120,15 @@ namespace GitHub.VisualStudio.UI
             }
         }
 
+        public override void OnToolWindowCreated()
+        {
+            base.OnToolWindowCreated();
+
+            ((IVsWindowFrame)Frame)?.SetProperty(
+                (int)__VSFPROPID5.VSFPROPID_SearchPlacement,
+                __VSSEARCHPLACEMENT.SP_STRETCH);
+        }
+
         void UpdateSearchHost(bool enabled, string query)
         {
             if (SearchHost != null)
