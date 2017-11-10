@@ -88,6 +88,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubCmdSet" id="showCurrentPullRequestCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Show Current Pull Request</ButtonText>
+          <CanonicalName>GitHub.ShowCurrentPullRequest</CanonicalName>
+          <LocCanonicalName>GitHub.ShowCurrentPullRequest</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
         <Icon guid="guidImages" id="arrow_left" />
@@ -181,13 +191,13 @@
           <ButtonText>Blame</ButtonText>
         </Strings>
       </Button>
-      
+
     </Buttons>
 
   </Commands>
 
   <CommandPlacements>
-    
+
     <!-- context menu -->
     <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
       <Parent guid="GUID_XAML_EDITOR" id="ID_XAML_CTXT"/>
@@ -260,7 +270,7 @@
     </CommandPlacement>
 
   </CommandPlacements>
-  
+
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidGitHubPkg" value="{c3d3dc68-c977-411f-b3e8-03b0dccf7dfc}" />
@@ -271,13 +281,14 @@
       <IDSymbol name="idGitHubMenuGroup" value="0x1020"/>
       <IDSymbol name="addConnectionCommand" value="0x110"/>
       <IDSymbol name="showGitHubPaneCommand" value="0x200"/>
+      <IDSymbol name="showCurrentPullRequestCommand" value="0x202"/>
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->
     <GuidSymbol name="guidManageConnections" value="{0A014553-A0AA-46DD-8D6B-B8E3178CA435}">
       <IDSymbol name="idManageConnections" value="0x1009"/>
     </GuidSymbol>
-    
+
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
       <IDSymbol name="logo" value="1" />
       <IDSymbol name="arrow_left" value="2" />
@@ -313,7 +324,7 @@
       <IDSymbol name="idBlameCommand" value="0x0500" />
 
     </GuidSymbol>
-    
+
     <GuidSymbol name="GUID_XAML_EDITOR" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">
       <IDSymbol name="ID_XAML_CTXT" value="259"/>
     </GuidSymbol>

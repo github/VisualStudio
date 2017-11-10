@@ -366,7 +366,7 @@ namespace GitHub.ViewModels
             {
                 Data = new PullRequestDetailArgument
                 {
-                    Repository = SelectedRepository,
+                    RepositoryOwner = SelectedRepository.Owner,
                     Number = (int)pullRequest,
                 }
             };
