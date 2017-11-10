@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
@@ -98,6 +99,7 @@ namespace GitHub.VisualStudio.UI
             View.ViewModel?.Initialize(data);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "WTF CA, I'm overriding!")]
         public override IVsSearchTask CreateSearch(uint dwCookie, IVsSearchQuery pSearchQuery, IVsSearchCallback pSearchCallback)
         {
             var pane = View.ViewModel as IGitHubPaneViewModel;
@@ -124,9 +126,9 @@ namespace GitHub.VisualStudio.UI
         {
             base.OnToolWindowCreated();
 
-            ((IVsWindowFrame)Frame)?.SetProperty(
+            Marshal.ThrowExceptionForHR(((IVsWindowFrame)Frame)?.SetProperty(
                 (int)__VSFPROPID5.VSFPROPID_SearchPlacement,
-                __VSSEARCHPLACEMENT.SP_STRETCH);
+                __VSSEARCHPLACEMENT.SP_STRETCH) ?? 0);
         }
 
         void UpdateSearchHost(bool enabled, string query)
