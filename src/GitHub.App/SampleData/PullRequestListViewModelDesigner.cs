@@ -70,7 +70,7 @@ namespace GitHub.SampleData
         public IAccount SelectedAuthor { get; set; }
         public bool RepositoryIsFork { get; set; } = true;
         public bool ShowPullRequestsForFork { get; set; }
-        public string FilterText { get; set; }
+        public string SearchQuery { get; set; }
         public bool IsLoaded { get; }
 
         public ObservableCollection<IAccount> Assignees { get; set; }

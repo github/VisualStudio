@@ -16,6 +16,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Info;
+using GitHub.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -34,6 +35,7 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IVisualStudioBrowser browser;
         readonly IUsageTracker usageTracker;
         NavigationController navController;
+        IViewModel controlViewModel;
 
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
@@ -66,10 +68,16 @@ namespace GitHub.VisualStudio.UI.Views
             browser = vsBrowser;
 
             this.WhenAnyValue(x => x.Control.DataContext)
-                .OfType<IPanePageViewModel>()
-                .Select(x => x.WhenAnyValue(y => y.Title))
-                .Switch()
-                .Subscribe(x => Title = x ?? "GitHub");
+                .Subscribe(x =>
+                {
+                    var pageViewModel = x as IPanePageViewModel;
+                    var searchable = x as ISearchablePanePageViewModel;
+                    controlViewModel = x as IViewModel;
+
+                    Title = pageViewModel?.Title ?? "GitHub";
+                    IsSearchEnabled = searchable != null;
+                    SearchQuery = searchable?.SearchQuery;
+                });
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -360,6 +368,39 @@ namespace GitHub.VisualStudio.UI.Views
                     (bool?)null :
                     RepositoryOrigin == UI.RepositoryOrigin.DotCom ||
                     RepositoryOrigin == UI.RepositoryOrigin.Enterprise;
+            }
+        }
+
+        bool isSearchEnabled;
+        public bool IsSearchEnabled
+        {
+            get { return isSearchEnabled; }
+            private set { isSearchEnabled = value; this.RaisePropertyChange(); }
+        }
+
+        string searchQuery;
+        public string SearchQuery
+        {
+            get { return searchQuery; }
+            set
+            {
+                var searchable = controlViewModel as ISearchablePanePageViewModel;
+                value = searchable != null ? value : null;
+
+                if (searchQuery != value)
+                {
+                    searchQuery = value;
+
+                    ThreadingHelper.MainThreadDispatcher.Invoke(() =>
+                    {
+                        this.RaisePropertyChange();
+
+                        if (searchable != null)
+                        {
+                            searchable.SearchQuery = searchQuery;
+                        }
+                    });
+                }
             }
         }
 

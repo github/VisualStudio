@@ -12,6 +12,7 @@ using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -94,17 +95,17 @@ namespace GitHub.ViewModels
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
-                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor, FilterText));
+                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor, SearchQuery));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
                 .Where(x => PullRequests != null && x != EmptyUser)
-                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor, FilterText));
+                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor, SearchQuery));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
                 .Where(x => PullRequests != null && x != EmptyUser)
-                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a, FilterText));
+                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a, SearchQuery));
 
-            this.WhenAny(x => x.FilterText, x => x.Value)
+            this.WhenAny(x => x.SearchQuery, x => x.Value)
                 .Where(x => PullRequests != null)
                 .Subscribe(f => UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, f));
 
@@ -174,7 +175,7 @@ namespace GitHub.ViewModels
                     }
 
                     IsBusy = false;
-                    UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, FilterText);
+                    UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, SearchQuery);
                 });
         }
 
@@ -193,7 +194,7 @@ namespace GitHub.ViewModels
 
                 var hasText = !string.IsNullOrEmpty(filText);
 
-                if (hasText && filterText.StartsWith("#", StringComparison.CurrentCultureIgnoreCase))
+                if (hasText && filText.StartsWith("#", StringComparison.CurrentCultureIgnoreCase))
                 {
                     filterTextIsNumber = int.TryParse(filText.Substring(1), out filterPullRequestNumber);
                 }
@@ -213,11 +214,11 @@ namespace GitHub.ViewModels
                 (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
         }
 
-        string filterText;
-        public string FilterText
+        string searchQuery;
+        public string SearchQuery
         {
-            get { return filterText; }
-            set { this.RaiseAndSetIfChanged(ref filterText, value); }
+            get { return searchQuery; }
+            set { this.RaiseAndSetIfChanged(ref searchQuery, value); }
         }
 
         bool isBusy;
@@ -303,6 +304,8 @@ namespace GitHub.ViewModels
             get { return emptyUser; }
         }
 
+        public bool IsSearchEnabled => true;
+
         readonly Subject<ViewWithData> navigate = new Subject<ViewWithData>();
         public IObservable<ViewWithData> Navigate => navigate;
 
@@ -340,7 +343,7 @@ namespace GitHub.ViewModels
         void ResetAndLoad()
         {
             CreatePullRequests();
-            UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, FilterText);
+            UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, SearchQuery);
             Load().Forget();
         }
 

@@ -107,12 +107,6 @@
 
   <DockPanel Margin="6,6,6,0">
 
-    <ui:FilterTextBox x:Name="filterText"
-            IsEnabled="{Binding IsLoaded}"
-            Margin="0,0,0,5"
-            DockPanel.Dock="Top" 
-            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
-
     <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
