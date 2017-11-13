@@ -148,8 +148,10 @@
     <Compile Include="Models\IInlineCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
+    <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
     <Compile Include="ViewModels\IHasErrorState.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />
+    <Compile Include="ViewModels\ISearchablePageViewModel.cs" />
     <Compile Include="ViewModels\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <None Include="..\common\settings.json">
@@ -252,7 +254,6 @@
     <Compile Include="Services\IGitHubServiceProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
-    <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />

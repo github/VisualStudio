@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
         }
     }
 
-    public interface IPullRequestListViewModel : IViewModel, ICanNavigate, IHasBusy
+    public interface IPullRequestListViewModel : ISearchablePanePageViewModel, ICanNavigate, IHasBusy
     {
         IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
         IRemoteRepositoryModel SelectedRepository { get; set; }
