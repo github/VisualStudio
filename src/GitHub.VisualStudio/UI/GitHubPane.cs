@@ -88,9 +88,6 @@ namespace GitHub.VisualStudio.UI
                 var vm = View.ViewModel as IServiceProviderAware;
                 Log.Assert(vm != null, "vm != null");
                 vm?.Initialize(serviceProvider);
-
-                var pane = vm as IGitHubPaneViewModel;
-                UpdateSearchHost(pane?.IsSearchEnabled ?? false, pane?.SearchQuery);
             }
         }
 
@@ -129,6 +126,9 @@ namespace GitHub.VisualStudio.UI
             Marshal.ThrowExceptionForHR(((IVsWindowFrame)Frame)?.SetProperty(
                 (int)__VSFPROPID5.VSFPROPID_SearchPlacement,
                 __VSSEARCHPLACEMENT.SP_STRETCH) ?? 0);
+
+            var pane = View.ViewModel as IGitHubPaneViewModel;
+            UpdateSearchHost(pane?.IsSearchEnabled ?? false, pane?.SearchQuery);
         }
 
         void UpdateSearchHost(bool enabled, string query)
