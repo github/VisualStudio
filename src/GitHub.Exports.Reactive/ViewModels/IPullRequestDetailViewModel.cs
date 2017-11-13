@@ -162,6 +162,11 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
+        /// Gets a command that navigates to the Changes page on Team Explorer.
+        /// </summary>
+        ReactiveCommand<object> NavigateToGitChanges { get; }
+
+        /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }

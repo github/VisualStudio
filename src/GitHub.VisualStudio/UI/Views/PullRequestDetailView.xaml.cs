@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using System.Text;
 using System.Globalization;
 using Microsoft.VisualStudio.Text.Projection;
+using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -48,6 +49,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
+                d(ViewModel.NavigateToGitChanges.Subscribe(_ => DoNavigateToGitChanges()));
                 d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x, false).Forget()));
                 d(ViewModel.ViewFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x, false).Forget()));
                 d(ViewModel.DiffFileWithWorkingDirectory.Subscribe(x => DoDiffFile((IPullRequestFileNode)x, true).Forget()));
@@ -69,6 +71,9 @@ namespace GitHub.VisualStudio.UI.Views
         [Import]
         IUsageTracker UsageTracker { get; set; }
 
+        [Import]
+        IGitHubServiceProvider ServiceProvider { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -86,6 +91,11 @@ namespace GitHub.VisualStudio.UI.Views
         {
             var url = string.Format(CultureInfo.InvariantCulture, "https://{0}/{1}/{2}/pull/{3}", host, owner, repositoryName, number);
             return new Uri(url);
+        }
+
+        void DoNavigateToGitChanges()
+        {
+            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.GitChanges), null);
         }
 
         async Task DoOpenFile(IPullRequestFileNode file, bool workingDirectory)

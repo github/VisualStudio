@@ -116,6 +116,7 @@ namespace GitHub.ViewModels
             SubscribeOperationError(Push);
 
             OpenOnGitHub = ReactiveCommand.Create();
+            NavigateToGitChanges = ReactiveCommand.Create();
             DiffFile = ReactiveCommand.Create();
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
@@ -297,6 +298,11 @@ namespace GitHub.ViewModels
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to the Changes page on Team Explorer.
+        /// </summary>
+        public ReactiveCommand<object> NavigateToGitChanges { get; }
 
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
