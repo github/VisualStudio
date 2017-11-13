@@ -102,9 +102,13 @@ namespace GitHub.Services
 
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
-            var isClean = !IsFilthy(repo.RetrieveStatus());
-            return Observable.Return(isClean);
+            // The `using` appears to resolve this issue:
+            // https://github.com/github/VisualStudio/issues/1306
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                var isClean = !IsFilthy(repo.RetrieveStatus());
+                return Observable.Return(isClean);
+            }
         }
 
         static bool IsFilthy(RepositoryStatus status)
