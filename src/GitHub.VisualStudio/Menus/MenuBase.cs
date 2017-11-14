@@ -131,7 +131,8 @@ namespace GitHub.VisualStudio
             if (!isdotcom)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                return (repo.FullName == ActiveRepo.Name || repo.Id == 0) && SimpleApiClient.IsEnterprise();
+                var activeRepoFullName = ActiveRepo.Owner + '/' + ActiveRepo.Name;
+                return (repo.FullName == activeRepoFullName || repo.Id == 0) && SimpleApiClient.IsEnterprise();
             }
             return isdotcom;
         }

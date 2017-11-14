@@ -102,8 +102,27 @@ namespace GitHub.Services
 
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
-            return Observable.Return(!repo.RetrieveStatus().IsDirty);
+            // The `using` appears to resolve this issue:
+            // https://github.com/github/VisualStudio/issues/1306
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                var isClean = !IsFilthy(repo.RetrieveStatus());
+                return Observable.Return(isClean);
+            }
+        }
+
+        static bool IsFilthy(RepositoryStatus status)
+        {
+            if (status.IsDirty)
+            {
+                // This is similar to IsDirty, but also allows NewInWorkdir files
+                return status.Any(entry =>
+                    entry.State != FileStatus.Ignored &&
+                    entry.State != FileStatus.Unaltered &&
+                    entry.State != FileStatus.NewInWorkdir);
+            }
+
+            return false;
         }
 
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)
