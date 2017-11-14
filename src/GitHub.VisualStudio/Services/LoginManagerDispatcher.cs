@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Exports;
@@ -25,6 +26,16 @@ namespace GitHub.Services
         public Task<User> Login(HostAddress hostAddress, IGitHubClient client, string userName, string password)
         {
             return inner.Login(hostAddress, client, userName, password);
+        }
+
+        public Task<User> LoginViaOAuth(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            IOauthClient oauthClient,
+            Action<Uri> openBrowser,
+            CancellationToken cancel)
+        {
+            return inner.LoginViaOAuth(hostAddress, client, oauthClient, openBrowser, cancel);
         }
 
         public Task<User> LoginFromCache(HostAddress hostAddress, IGitHubClient client)

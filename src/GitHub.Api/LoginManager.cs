@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
@@ -12,13 +13,13 @@ namespace GitHub.Api
     /// </summary>
     public class LoginManager : ILoginManager
     {
-        readonly string[] scopes = { "user", "repo", "gist", "write:public_key" };
         readonly IKeychain keychain;
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
         readonly string authorizationNote;
         readonly string fingerprint;
+        IOAuthCallbackListener oauthListener;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginManager"/> class.
@@ -32,6 +33,7 @@ namespace GitHub.Api
         public LoginManager(
             IKeychain keychain,
             ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            IOAuthCallbackListener oauthListener,
             string clientId,
             string clientSecret,
             string authorizationNote = null,
@@ -44,6 +46,7 @@ namespace GitHub.Api
 
             this.keychain = keychain;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
+            this.oauthListener = oauthListener;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
             this.authorizationNote = authorizationNote;
@@ -68,7 +71,7 @@ namespace GitHub.Api
 
             var newAuth = new NewAuthorization
             {
-                Scopes = scopes,
+                Scopes = ApiClientConfiguration.Scopes,
                 Note = authorizationNote,
                 Fingerprint = fingerprint,
             };
@@ -106,24 +109,33 @@ namespace GitHub.Api
             } while (auth == null);
 
             await keychain.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
+            return await ReadUserWithRetry(client);
+        }
 
-            var retry = 0;
+        /// <inheritdoc/>
+        public async Task<User> LoginViaOAuth(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            IOauthClient oauthClient,
+            Action<Uri> openBrowser,
+            CancellationToken cancel)
+        {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+            Guard.ArgumentNotNull(client, nameof(client));
+            Guard.ArgumentNotNull(oauthClient, nameof(oauthClient));
+            Guard.ArgumentNotNull(openBrowser, nameof(openBrowser));
 
-            while (true)
-            {
-                try
-                {
-                    return await client.User.Current().ConfigureAwait(false);
-                }
-                catch (AuthorizationException)
-                {
-                    if (retry++ == 3) throw;
-                }
+            var state = Guid.NewGuid().ToString();
+            var loginUrl = GetLoginUrl(oauthClient, state);
 
-                // It seems that attempting to use a token immediately sometimes fails, retry a few
-                // times with a delay of of 1s to allow the token to propagate.
-                await Task.Delay(1000);
-            }
+            openBrowser(loginUrl);
+
+            var code = await oauthListener.Listen(state, cancel);
+            var request = new OauthTokenRequest(clientId, clientSecret, code);
+            var token = await oauthClient.CreateAccessToken(request);
+
+            await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
+            return await ReadUserWithRetry(client);
         }
 
         /// <inheritdoc/>
@@ -257,6 +269,41 @@ namespace GitHub.Api
                 (e is NotFoundException ||
                  e is ForbiddenException ||
                  apiException?.StatusCode == (HttpStatusCode)422);
+        }
+
+        async Task<User> ReadUserWithRetry(IGitHubClient client)
+        {
+            var retry = 0;
+
+            while (true)
+            {
+                try
+                {
+                    return await client.User.Current().ConfigureAwait(false);
+                }
+                catch (AuthorizationException)
+                {
+                    if (retry++ == 3) throw;
+                }
+
+                // It seems that attempting to use a token immediately sometimes fails, retry a few
+                // times with a delay of of 1s to allow the token to propagate.
+                await Task.Delay(1000);
+            }
+        }
+
+        static Uri GetLoginUrl(IOauthClient client, string state)
+        {
+            var request = new OauthLoginRequest(ApiClientConfiguration.ClientId);
+
+            request.State = state;
+
+            foreach (var scope in ApiClientConfiguration.Scopes)
+            {
+                request.Scopes.Add(scope);
+            }
+
+            return client.GetGitHubLoginUrl(request);
         }
     }
 }

@@ -14,7 +14,6 @@ namespace GitHub.Api
         public HostAddress HostAddress { get; }
         public UriString OriginalUrl { get; }
 
-        readonly IGitHubClient client;
         readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);
@@ -32,10 +31,12 @@ namespace GitHub.Api
 
             HostAddress = HostAddress.Create(repoUrl);
             OriginalUrl = repoUrl;
-            client = githubClient;
+            Client = githubClient;
             this.enterpriseProbe = enterpriseProbe;
             this.wikiProbe = wikiProbe;
         }
+
+        public IGitHubClient Client { get; }
 
         public async Task<Repository> GetRepository()
         {
@@ -51,7 +52,7 @@ namespace GitHub.Api
         {
             // this doesn't account for auth revoke on the server but its much faster 
             // than doing the API hit.
-            var authType = client.Connection.Credentials?.AuthenticationType ?? AuthenticationType.Anonymous;
+            var authType = Client.Connection.Credentials?.AuthenticationType ?? AuthenticationType.Anonymous;
             return authType != AuthenticationType.Anonymous;
         }
 
@@ -67,7 +68,7 @@ namespace GitHub.Api
 
                     if (ownerLogin != null && repositoryName != null)
                     {
-                        var repo = await client.Repository.Get(ownerLogin, repositoryName);
+                        var repo = await Client.Repository.Get(ownerLogin, repositoryName);
                         if (repo != null)
                         {
                             hasWiki = await HasWikiInternal(repo);

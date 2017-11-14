@@ -38,6 +38,7 @@ namespace GitHub.ViewModels
 
             AuthenticationResults = Observable.Merge(
                 loginToGitHubViewModel.Login,
+                loginToGitHubViewModel.LoginViaOAuth,
                 EnterpriseLogin.Login);
         }
 

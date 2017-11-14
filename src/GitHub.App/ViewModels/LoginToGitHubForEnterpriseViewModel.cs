@@ -19,7 +19,9 @@ namespace GitHub.ViewModels
     public class LoginToGitHubForEnterpriseViewModel : LoginTabViewModel, ILoginToGitHubForEnterpriseViewModel
     {
         [ImportingConstructor]
-        public LoginToGitHubForEnterpriseViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+        public LoginToGitHubForEnterpriseViewModel(
+            IConnectionManager connectionManager,
+            IVisualStudioBrowser browser)
             : base(connectionManager, browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
@@ -37,6 +39,10 @@ namespace GitHub.ViewModels
                 (x, y, z) => x.Value && y.Value && z.Value)
                 .ToProperty(this, x => x.CanLogin);
 
+            canSsoLogin = this.WhenAnyValue(
+                x => x.EnterpriseUrlValidator.ValidationResult.IsValid)
+                .ToProperty(this, x => x.CanLogin);
+
             NavigateLearnMore = ReactiveCommand.CreateAsyncObservable(_ =>
             {
                 browser.OpenUrl(GitHubUrls.LearnMore);
@@ -48,6 +54,11 @@ namespace GitHub.ViewModels
         protected override IObservable<AuthenticationResult> LogIn(object args)
         {
             return LogInToHost(HostAddress.Create(EnterpriseUrl));
+        }
+
+        protected override Task<AuthenticationResult> LogInViaOAuth(object args)
+        {
+            throw new NotImplementedException();
         }
 
         string enterpriseUrl;

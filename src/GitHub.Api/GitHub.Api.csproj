@@ -64,6 +64,7 @@
     <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
     <Compile Include="IKeychain.cs" />
     <Compile Include="ILoginManager.cs" />
+    <Compile Include="IOAuthCallbackListener.cs" />
     <Compile Include="ITwoFactorChallengeHandler.cs" />
     <Compile Include="LoginManager.cs" />
     <Compile Include="KeychainCredentialStore.cs" />

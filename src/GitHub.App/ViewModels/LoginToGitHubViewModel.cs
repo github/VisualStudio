@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using GitHub.Authentication;
 using GitHub.Info;
 using GitHub.Primitives;
@@ -15,7 +16,9 @@ namespace GitHub.ViewModels
     public class LoginToGitHubViewModel : LoginTabViewModel, ILoginToGitHubViewModel
     {
         [ImportingConstructor]
-        public LoginToGitHubViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+        public LoginToGitHubViewModel(
+            IConnectionManager connectionManager,
+            IVisualStudioBrowser browser)
             : base(connectionManager, browser)
         {
             BaseUri = HostAddress.GitHubDotComHostAddress.WebUri;
@@ -35,6 +38,12 @@ namespace GitHub.ViewModels
         protected override IObservable<AuthenticationResult> LogIn(object args)
         {
             return LogInToHost(HostAddress.GitHubDotComHostAddress);
+        }
+
+        protected override async Task<AuthenticationResult> LogInViaOAuth(object args)
+        {
+            await LoginToHostViaOAuth(HostAddress.GitHubDotComHostAddress);
+            return AuthenticationResult.Success;
         }
     }
 }

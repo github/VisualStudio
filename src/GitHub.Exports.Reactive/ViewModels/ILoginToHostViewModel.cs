@@ -36,6 +36,11 @@ namespace GitHub.ViewModels
         IReactiveCommand<AuthenticationResult> Login { get; }
 
         /// <summary>
+        /// Gets a command which, when invoked, performs an OAuth login.
+        /// </summary>
+        IReactiveCommand<AuthenticationResult> LoginViaOAuth { get; }
+
+        /// <summary>
         /// Gets a command which, when invoked, direct the user to a
         /// GitHub.com sign up flow
         /// </summary>

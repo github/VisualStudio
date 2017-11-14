@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Authentication;
@@ -23,7 +24,9 @@ namespace GitHub.ViewModels
     {
         static readonly ILogger log = LogManager.ForContext<LoginTabViewModel>();
 
-        protected LoginTabViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+        protected LoginTabViewModel(
+            IConnectionManager connectionManager,
+            IVisualStudioBrowser browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(browser, nameof(browser));
@@ -59,6 +62,10 @@ namespace GitHub.ViewModels
                 }
             });
 
+            LoginViaOAuth = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.IsLoggingIn, x => !x),
+                LogInViaOAuth);
+
             isLoggingIn = Login.IsExecuting.ToProperty(this, x => x.IsLoggingIn);
 
             Reset = ReactiveCommand.CreateAsyncTask(_ => Clear());
@@ -80,6 +87,7 @@ namespace GitHub.ViewModels
         public IReactiveCommand<Unit> SignUp { get; }
 
         public IReactiveCommand<AuthenticationResult> Login { get; }
+        public IReactiveCommand<AuthenticationResult> LoginViaOAuth { get; }
         public IReactiveCommand<Unit> Reset { get; }
         public IRecoveryCommand NavigateForgotPassword { get; }
 
@@ -125,6 +133,12 @@ namespace GitHub.ViewModels
             get { return canLogin.Value; }
         }
 
+        protected ObservableAsPropertyHelper<bool> canSsoLogin;
+        public bool CanSsoLogin
+        {
+            get { return canSsoLogin.Value; }
+        }
+
         UserError error;
         public UserError Error
         {
@@ -133,6 +147,7 @@ namespace GitHub.ViewModels
         }
 
         protected abstract IObservable<AuthenticationResult> LogIn(object args);
+        protected abstract Task<AuthenticationResult> LogInViaOAuth(object args);
 
         protected IObservable<AuthenticationResult> LogInToHost(HostAddress hostAddress)
         {
@@ -181,6 +196,18 @@ namespace GitHub.ViewModels
                             new InvalidOperationException("Unknown EnterpriseLoginResult: " + authResult));
                 }
             });
+        }
+
+        protected async Task LoginToHostViaOAuth(HostAddress address)
+        {
+            try
+            {
+                await ConnectionManager.LogInViaOAuth(address, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Error = new UserError(e.Message);
+            }
         }
 
         async Task Clear()

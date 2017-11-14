@@ -110,7 +110,9 @@
                             <uirx:ValidationMessage
                                 x:Name="dotComPasswordValidationMessage"
                                 ValidatesControl="{Binding ElementName=dotComPassword}" />
-                            
+
+                            <ui:GitHubActionLink x:Name="dotComSsaLogInButton">Login with your browser</ui:GitHubActionLink>
+                          
                         </StackPanel>
                     </StackPanel>
                 </DockPanel>
@@ -157,6 +159,8 @@
 
                         <uirx:UserErrorMessages x:Name="enterpriseErrorMessage" Margin="0,10">
                         </uirx:UserErrorMessages>
+                      
+                        <ui:GitHubActionLink x:Name="enterpriseSsaLogInButton">Login with your browser</ui:GitHubActionLink>
                     </StackPanel>
                 </DockPanel>
             </TabItem>

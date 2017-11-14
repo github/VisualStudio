@@ -114,10 +114,6 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
@@ -149,6 +145,7 @@
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
+    <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\IHasErrorState.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />
@@ -249,7 +246,6 @@
     <Compile Include="Primitives\UriString.cs" />
     <Compile Include="Services\EnterpriseProbeTask.cs" />
     <Compile Include="Services\ExportFactoryProvider.cs" />
-    <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IGitHubServiceProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
@@ -263,6 +259,10 @@
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
+      <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
+      <Name>Rothko</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>

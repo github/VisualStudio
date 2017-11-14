@@ -214,10 +214,12 @@ namespace GitHub.VisualStudio
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var keychain = serviceProvider.GetService<IKeychain>();
                 var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
+                var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
 
                 return new LoginManager(
                     keychain,
                     twoFaHandler,
+                    oauthListener,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
                     ApiClientConfiguration.AuthorizationNote,

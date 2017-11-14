@@ -23,8 +23,9 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await target.Login(host, client, "foo", "bar");
 
             await keychain.Received().Save("foo", "123abc", host);
@@ -41,8 +42,9 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             var result = await target.Login(host, client, "foo", "bar");
 
             Assert.Same(user, result);
@@ -64,8 +66,9 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             var result = await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
@@ -86,9 +89,10 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received().GetOrCreateApplicationAuthentication(
@@ -113,11 +117,12 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.HandleTwoFactorException(exception).Returns(
                 new TwoFactorChallengeResult("111111"),
                 new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
@@ -148,19 +153,20 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.HandleTwoFactorException(twoFaException).Returns(
                 new TwoFactorChallengeResult("111111"),
                 new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
-            Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
+            await Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
                 "id",
                 "secret",
                 Arg.Any<NewAuthorization>(),
                 "111111");
-            tfa.Received(1).ChallengeFailed(loginAttemptsException);
+            await tfa.Received(1).ChallengeFailed(loginAttemptsException);
         }
 
         [Fact]
@@ -178,11 +184,12 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.HandleTwoFactorException(exception).Returns(
                 TwoFactorChallengeResult.RequestResendCode,
                 new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
@@ -203,8 +210,9 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await target.Login(enterprise, client, "foo", "bar");
 
             await keychain.Received().Save("foo", "bar", enterprise);
@@ -221,8 +229,9 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
 
             await keychain.Received().Delete(enterprise);
@@ -239,8 +248,9 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
@@ -261,9 +271,10 @@ public class LoginManagerTests
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, "id", "secret");
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret");
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
