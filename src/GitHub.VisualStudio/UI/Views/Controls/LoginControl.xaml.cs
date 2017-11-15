@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
 using GitHub.Controls;
 using GitHub.Exports;
@@ -38,6 +39,12 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 if (IsVisible)
                     dotComUserNameOrEmail.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
             };
+
+            // Refocus VS after a SSO login attempt.
+            this.WhenAnyObservable(
+                x => x.ViewModel.GitHubLogin.LoginViaOAuth,
+                x => x.ViewModel.EnterpriseLogin.LoginViaOAuth)
+                .Subscribe(_ => Application.Current.MainWindow?.Activate());
         }
 
         void SetupDotComBindings(Action<IDisposable> d)
