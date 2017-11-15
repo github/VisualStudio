@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Collections.Generic;
 using GitHub.Extensions;
+using System.Globalization;
 
 namespace GitHub.UI.Helpers
 {
@@ -137,7 +138,7 @@ namespace GitHub.UI.Helpers
 
             var url = inUri.ToString();
             var assemblyPrefix = "/src/";
-            var assemblyIndex = url.LastIndexOf(assemblyPrefix);
+            var assemblyIndex = url.LastIndexOf(assemblyPrefix, StringComparison.OrdinalIgnoreCase);
             if (assemblyIndex == -1)
             {
                 return inUri;
@@ -153,7 +154,7 @@ namespace GitHub.UI.Helpers
             var assemblyName = url.Substring(assemblyIndex, pathIndex - assemblyIndex);
             var path = url.Substring(pathIndex + 1);
 
-            return new Uri($"pack://application:,,,/{assemblyName};component/{path}");
+            return new Uri(String.Format(CultureInfo.InvariantCulture, "pack://application:,,,/{0};component/{1}", assemblyName, path));
         }
     }
 }
