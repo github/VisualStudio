@@ -41,9 +41,6 @@ namespace GitHub.Services
 
         public async Task<string> Listen(string id, CancellationToken cancel)
         {
-            var internalCancel = new CancellationTokenSource();
-            var combinedCancel = CancellationTokenSource.CreateLinkedTokenSource(cancel, internalCancel.Token);
-
             if (httpListener.IsListening) httpListener.Stop();
             httpListener.Start();
 

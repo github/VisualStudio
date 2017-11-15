@@ -74,5 +74,10 @@ namespace GitHub.ViewModels
         /// Gets an error to display to the user.
         /// </summary>
         UserError Error { get; }
+
+        /// <summary>
+        /// Called when the login UI is hidden or dismissed.
+        /// </summary>
+        void Deactivated();
     }
 }

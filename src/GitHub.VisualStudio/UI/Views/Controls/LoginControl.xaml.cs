@@ -32,6 +32,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
+                d(Disposable.Create(Deactivate));
             });
 
             IsVisibleChanged += (s, e) =>
@@ -45,6 +46,27 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 x => x.ViewModel.GitHubLogin.LoginViaOAuth,
                 x => x.ViewModel.EnterpriseLogin.LoginViaOAuth)
                 .Subscribe(_ => Application.Current.MainWindow?.Activate());
+
+            hostTabControl.SelectionChanged += (s, e) =>
+            {
+                foreach (var i in e.RemovedItems)
+                {
+                    if (i == dotComTab)
+                    {
+                        ViewModel?.GitHubLogin.Deactivated();
+                    }
+                    else if (i == enterpriseTab)
+                    {
+                        ViewModel?.EnterpriseLogin.Deactivated();
+                    }
+                }
+            };
+        }
+
+        void Deactivate()
+        {
+            ViewModel?.GitHubLogin.Deactivated();
+            ViewModel?.EnterpriseLogin.Deactivated();
         }
 
         void SetupDotComBindings(Action<IDisposable> d)
