@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="GitHub.InlineReviews.Steven Kirk.56b6fdce-e5b1-4ec3-9837-af4545ba933e" Version="1.0" Language="en-US" Publisher="Steven Kirk" />
+    <Identity Id="GitHub.InlineReviews.56b6fdce-e5b1-4ec3-9837-af4545ba933e" Version="2.0" Language="en-US" Publisher="GitHub, Inc" />
     <DisplayName>GitHub Inline Reviews</DisplayName>
     <Description xml:space="preserve">Inline reviews for GitHub pull requests</Description>
   </Metadata>
