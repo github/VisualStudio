@@ -7,17 +7,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Primitives;
 using Octokit;
 using Octokit.Reactive;
-using ReactiveUI;
-using System.Threading.Tasks;
-using System.Reactive.Threading.Tasks;
-using Octokit.Internal;
-using System.Collections.Generic;
-using GitHub.Models;
-using GitHub.Extensions;
-using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.Api
@@ -29,8 +23,6 @@ namespace GitHub.Api
         static readonly ILogger log = LogManager.ForContext<ApiClient>();
 
         readonly IObservableGitHubClient gitHubClient;
-        readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
-        readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
         string ClientId { get; set; }
         string ClientSecret { get; set; }
