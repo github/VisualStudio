@@ -135,7 +135,9 @@ namespace GitHub.Api
             var token = await oauthClient.CreateAccessToken(request);
 
             await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
-            return await ReadUserWithRetry(client);
+            var user = await ReadUserWithRetry(client);
+            await keychain.Save(user.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
+            return user;
         }
 
         /// <inheritdoc/>
