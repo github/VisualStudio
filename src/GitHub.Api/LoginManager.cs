@@ -127,10 +127,11 @@ namespace GitHub.Api
 
             var state = Guid.NewGuid().ToString();
             var loginUrl = GetLoginUrl(oauthClient, state);
+            var listen = oauthListener.Listen(state, cancel);
 
             openBrowser(loginUrl);
 
-            var code = await oauthListener.Listen(state, cancel);
+            var code = await listen;
             var request = new OauthTokenRequest(clientId, clientSecret, code);
             var token = await oauthClient.CreateAccessToken(request);
 
