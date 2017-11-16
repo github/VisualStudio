@@ -46,22 +46,21 @@ namespace GitHub.Services
 
             try
             {
-                var complete = new TaskCompletionSource<HttpListenerContext>();
-
                 using (cancel.Register(httpListener.Stop))
                 {
-                    var context = await httpListener.GetContextAsync();
-                    var foo = context.Request;
-                    var queryParts = HttpUtility.ParseQueryString(context.Request.Url.Query);
-
-                    if (queryParts["state"] == id)
+                    while (true)
                     {
-                        context.Response.Close();
-                        return queryParts["code"];
+                        var context = await httpListener.GetContextAsync();
+                        var foo = context.Request;
+                        var queryParts = HttpUtility.ParseQueryString(context.Request.Url.Query);
+
+                        if (queryParts["state"] == id)
+                        {
+                            context.Response.Close();
+                            return queryParts["code"];
+                        }
                     }
                 }
-
-                throw new WebException("The login returned an unexpected response.");
             }
             finally
             {
