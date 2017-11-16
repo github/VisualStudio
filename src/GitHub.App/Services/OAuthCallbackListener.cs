@@ -50,7 +50,7 @@ namespace GitHub.Services
                 {
                     while (true)
                     {
-                        var context = await httpListener.GetContextAsync();
+                        var context = await httpListener.GetContextAsync().ConfigureAwait(false);
                         var foo = context.Request;
                         var queryParts = HttpUtility.ParseQueryString(context.Request.Url.Query);
 
