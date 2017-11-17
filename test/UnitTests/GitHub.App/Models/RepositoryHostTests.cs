@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -62,8 +63,11 @@ public class RepositoryHostTests
             var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             var result = await host.LogIn("baymax", "aPassword");
+            var model = new UsageModel();
 
-            await usage.Received().IncrementLoginCount();
+            await usage.Received().IncrementCounter(
+                Arg.Is<Expression<Func<UsageModel, int>>>(x => 
+                    ((MemberExpression)x.Body).Member.Name == nameof(model.NumberOfLogins)));
         }
 
         [Fact]
@@ -124,8 +128,11 @@ public class RepositoryHostTests
             var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             var result = await host.LogInFromCache();
+            var model = new UsageModel();
 
-            await usage.Received().IncrementLoginCount();
+            await usage.Received().IncrementCounter(
+                Arg.Is<Expression<Func<UsageModel, int>>>(x =>
+                    ((MemberExpression)x.Body).Member.Name == nameof(model.NumberOfLogins)));
         }
     }
 }

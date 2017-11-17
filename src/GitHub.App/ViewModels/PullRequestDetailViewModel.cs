@@ -454,7 +454,7 @@ namespace GitHub.ViewModels
 
                 if (firstLoad)
                 {
-                    usageTracker.IncrementPullRequestOpened().Forget();
+                    usageTracker.IncrementCounter(x => x.NumberOfPullRequestsOpened).Forget();
                 }
 
                 if (!isInCheckout)
@@ -604,19 +604,37 @@ namespace GitHub.ViewModels
                         .GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.Checkout(LocalRepository, Model, x));
                 }
-            }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
+            }).Do(_ =>
+            {
+                if (IsFromFork)
+                    usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestsCheckedOut).Forget();
+                else
+                    usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestsCheckedOut).Forget();
+            });
         }
 
         IObservable<Unit> DoPull(object unused)
         {
             return pullRequestsService.Pull(LocalRepository)
-                .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
+                .Do(_ =>
+                {
+                    if (IsFromFork)
+                        usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestPulls).Forget();
+                    else
+                        usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPulls).Forget();
+                });
         }
 
         IObservable<Unit> DoPush(object unused)
         {
             return pullRequestsService.Push(LocalRepository)
-                .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+                .Do(_ =>
+                {
+                    if (IsFromFork)
+                        usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestPushes).Forget();
+                    else
+                        usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPushes).Forget();
+                });
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
