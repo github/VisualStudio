@@ -321,6 +321,7 @@
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
     <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="Services\LoginManagerDispatcher.cs" />
     <Compile Include="Services\UsageTrackerDispatcher.cs" />
