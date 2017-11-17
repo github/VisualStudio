@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -63,12 +65,31 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a view model for displaying details of a pull request.
     /// </summary>
-    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy
+    public interface IPullRequestDetailViewModel : IViewModel, IHasLoading, IHasBusy, IHasErrorState
     {
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
         IPullRequestModel Model { get; }
+
+        /// <summary>
+        /// Gets the session for the pull request.
+        /// </summary>
+        IPullRequestSession Session { get; }
+
+        /// <summary>
+        /// Gets the local repository.
+        /// </summary>
+        ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
+        /// Gets the owner of the remote repository that contains the pull request.
+        /// </summary>
+        /// <remarks>
+        /// The remote repository may be different from the local repository if the local
+        /// repository is a fork and the user is viewing pull requests from the parent repository.
+        /// </remarks>
+        string RemoteRepositoryOwner { get; }
 
         /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
@@ -79,6 +100,11 @@ namespace GitHub.ViewModels
         /// Gets a string describing how to display the pull request's target branch.
         /// </summary>
         string TargetBranchDisplayName { get; }
+
+        /// <summary>
+        /// Gets the number of comments made on the pull request.
+        /// </summary>
+        int CommentCount { get; }
 
         /// <summary>
         /// Gets a value indicating whether the pull request branch is checked out.
@@ -136,21 +162,35 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
-        /// </summary>
-        ReactiveCommand<object> OpenFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
 
         /// <summary>
-        /// Gets the before and after files needed for viewing a diff.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
+        /// the working directory and HEAD.
+        /// </summary>
+        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
+        /// </summary>
+        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
+        /// </summary>
+        ReactiveCommand<object> ViewFile { get; }
+
+        /// <summary>
+        /// Gets a file as it appears in the pull request.
         /// </summary>
         /// <param name="file">The changed file.</param>
-        /// <returns>A tuple containing the full path to the before and after files.</returns>
-        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
+        /// <param name="head">
+        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
+        /// </param>
+        /// <returns>The path to a temporary file.</returns>
+        Task<string> ExtractFile(IPullRequestFileNode file, bool head);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.

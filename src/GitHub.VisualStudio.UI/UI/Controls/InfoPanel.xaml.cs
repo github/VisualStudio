@@ -14,7 +14,6 @@ using Colors = System.Windows.Media.Colors;
 
 namespace GitHub.VisualStudio.UI.Controls
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public partial class InfoPanel : UserControl, IInfoPanel, INotifyPropertyChanged, INotifyPropertySource
     {
         static SolidColorBrush WarningColorBrush = new SolidColorBrush(Colors.DarkRed);
@@ -52,13 +51,6 @@ namespace GitHub.VisualStudio.UI.Controls
             private set { iconColor = value; RaisePropertyChanged(nameof(IconColor)); }
         }
 
-        ICommand linkCommand;
-        public ICommand LinkCommand
-        {
-            get { return linkCommand; }
-            set { linkCommand = value; RaisePropertyChanged(nameof(LinkCommand)); }
-        }
-
         static InfoPanel()
         {
             WarningColorBrush.Freeze();
@@ -83,12 +75,14 @@ namespace GitHub.VisualStudio.UI.Controls
             DataContext = this;
             Icon = Octicon.info;
             IconColor = InfoColorBrush;
+        }
 
-            LinkCommand = new RelayCommand(x =>
-            {
-                if (!String.IsNullOrEmpty(x as string))
-                    Browser.OpenUrl(new Uri((string)x));
-            });
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            var url = e.Parameter.ToString();
+
+            if (!string.IsNullOrEmpty(url))
+                Browser.OpenUrl(new Uri(url));
         }
 
         static void UpdateMessage(DependencyObject d, DependencyPropertyChangedEventArgs e)

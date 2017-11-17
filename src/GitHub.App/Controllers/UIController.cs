@@ -3,7 +3,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using ReactiveUI;
 using Stateless;
 using System;
@@ -16,6 +15,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
+using GitHub.Logging;
 
 namespace GitHub.Controllers
 {
@@ -144,12 +144,18 @@ namespace GitHub.Controllers
                    serviceProvider.TryGetService<IUIFactory>(),
                    serviceProvider.TryGetService<IConnectionManager>())
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
         public UIController(IGitHubServiceProvider gitHubServiceProvider,
             IRepositoryHosts hosts, IUIFactory factory,
             IConnectionManager connectionManager)
         {
+            Guard.ArgumentNotNull(gitHubServiceProvider, nameof(gitHubServiceProvider));
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(factory, nameof(factory));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+
             this.factory = factory;
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.hosts = hosts;
@@ -161,12 +167,12 @@ namespace GitHub.Controllers
                 var waitDispatcher = RxApp.MainThreadScheduler as WaitForDispatcherScheduler;
                 if (waitDispatcher != null)
                 {
-                    Debug.Assert(DispatcherScheduler.Current.Dispatcher == Application.Current.Dispatcher,
+                    Log.Assert(DispatcherScheduler.Current.Dispatcher == Application.Current.Dispatcher,
                        "DispatcherScheduler is set correctly");
                 }
                 else
                 {
-                    Debug.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
+                    Log.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
                         "The MainThreadScheduler is using the wrong dispatcher");
                 }
             }
@@ -180,8 +186,8 @@ namespace GitHub.Controllers
         }
 
         public IObservable<LoadData> Configure(UIControllerFlow choice,
-            [AllowNull] IConnection conn = null,
-            [AllowNull] ViewWithData parameters = null)
+            IConnection conn = null,
+            ViewWithData parameters = null)
         {
             connection = conn;
             selectedFlow = choice;
@@ -212,7 +218,7 @@ namespace GitHub.Controllers
                 if (selectedFlow != UIControllerFlow.Authentication)
                     gitHubServiceProvider.AddService(this, connection);
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
-                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
+                    Log.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
                 connection.Login()
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -314,7 +320,6 @@ namespace GitHub.Controllers
             ConfigureEntriesExitsForView(UIViewType.Login);
             ConfigureEntriesExitsForView(UIViewType.TwoFactor);
             ConfigureEntriesExitsForView(UIViewType.Gist);
-            ConfigureEntriesExitsForView(UIViewType.LogoutRequired);
             ConfigureEntriesExitsForView(UIViewType.StartPageClone);
 
             uiStateMachine.Configure(UIViewType.End)
@@ -416,7 +421,6 @@ namespace GitHub.Controllers
             ConfigureSingleViewLogic(UIControllerFlow.Create, UIViewType.Create);
             ConfigureSingleViewLogic(UIControllerFlow.Gist, UIViewType.Gist);
             ConfigureSingleViewLogic(UIControllerFlow.Home, UIViewType.PRList);
-            ConfigureSingleViewLogic(UIControllerFlow.LogoutRequired, UIViewType.LogoutRequired);
             ConfigureSingleViewLogic(UIControllerFlow.Publish, UIViewType.Publish);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestList, UIViewType.PRList);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestDetail, UIViewType.PRDetail);
@@ -443,11 +447,7 @@ namespace GitHub.Controllers
         {
             var host = connection != null ? hosts.LookupHost(connection.HostAddress) : null;
             var loggedIn = host?.IsLoggedIn ?? false;
-            if (!loggedIn || selectedFlow != UIControllerFlow.Gist)
-                return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
-
-            var supportsGist = host?.SupportsGist ?? false;
-            return supportsGist ? selectedFlow : UIControllerFlow.LogoutRequired;
+            return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
         }
 
         /// <summary>

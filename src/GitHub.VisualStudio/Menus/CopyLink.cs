@@ -1,24 +1,24 @@
 ﻿using GitHub.Exports;
 using GitHub.Services;
 using GitHub.VisualStudio.UI;
-using NullGuard;
 using System;
 using System.Windows;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Menus
 {
     public class CopyLink : LinkMenuBase, IDynamicMenuHandler
     {
-
         public CopyLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidContextMenuSet;
+        public Guid Guid => Guids.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.copyLinkCommand;
 
-        public async void Activate([AllowNull]object data = null)
+        public async void Activate(object data = null)
         {
             var isgithub = await IsGitHubRepo();
             if (!isgithub)
@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Menus
                 Clipboard.SetText(link);
                 var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
-                await UsageTracker.IncrementLinkToGitHubCount();
+                await UsageTracker.IncrementCounter(x => x.NumberOfLinkToGitHub);
             }
             catch
             {

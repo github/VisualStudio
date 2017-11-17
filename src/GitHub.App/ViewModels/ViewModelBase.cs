@@ -1,6 +1,5 @@
 ﻿using System;
 using GitHub.UI;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -11,7 +10,7 @@ namespace GitHub.ViewModels
     public abstract class ViewModelBase : ReactiveObject, IViewModel
     {
         /// <inheritdoc/>
-        public virtual void Initialize([AllowNull] ViewWithData data)
+        public virtual void Initialize(ViewWithData data)
         {
         }
     }

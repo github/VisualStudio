@@ -1,6 +1,6 @@
-using NullGuard;
 using System;
 using System.Collections.Generic;
+using GitHub.Extensions;
 
 namespace GitHub.Collections
 {
@@ -14,23 +14,25 @@ namespace GitHub.Collections
         {
         }
 
-        public LambdaComparer(Func<T, T, int> lambdaComparer, [AllowNull] Func<T, int> lambdaHash)
+        public LambdaComparer(Func<T, T, int> lambdaComparer, Func<T, int> lambdaHash)
         {
+            Guard.ArgumentNotNull(lambdaComparer, nameof(lambdaComparer));
+
             this.lambdaComparer = lambdaComparer;
             this.lambdaHash = lambdaHash;
         }
 
-        public int Compare([AllowNull] T x, [AllowNull] T y)
+        public int Compare(T x, T y)
         {
             return lambdaComparer(x, y);
         }
 
-        public bool Equals([AllowNull] T x, [AllowNull] T y)
+        public bool Equals(T x, T y)
         {
             return lambdaComparer(x, y) == 0;
         }
 
-        public int GetHashCode([AllowNull] T obj)
+        public int GetHashCode(T obj)
         {
             return lambdaHash != null
                 ? lambdaHash(obj)

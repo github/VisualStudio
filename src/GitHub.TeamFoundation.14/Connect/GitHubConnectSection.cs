@@ -4,30 +4,31 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
+using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
-using NullGuard;
 using ReactiveUI;
-using System.Threading.Tasks;
-using GitHub.VisualStudio.UI;
-using GitHub.Primitives;
-using GitHub.Settings;
-using System.Windows.Input;
-using System.Reactive.Threading.Tasks;
-using System.Reactive.Subjects;
+using Serilog;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
         readonly IPackageSettings packageSettings;
         readonly IVSServices vsServices;
         readonly int sectionIndex;
@@ -47,14 +48,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { SectionContent = value; }
         }
 
-        [AllowNull]
-        public IConnection SectionConnection { [return:AllowNull] get; set; }
+        public IConnection SectionConnection { get; set; }
 
         bool loggedIn;
         bool LoggedIn
         {
             get { return loggedIn; }
-            set {
+            set
+            {
                 loggedIn = ShowLogout = value;
                 ShowLogin = !value;
             }
@@ -75,19 +76,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         }
 
         IReactiveDerivedList<ILocalRepositoryModel> repositories;
-        [AllowNull]
         public IReactiveDerivedList<ILocalRepositoryModel> Repositories
         {
-            [return:AllowNull]
             get { return repositories; }
             set { repositories = value; this.RaisePropertyChange(); }
         }
 
         ILocalRepositoryModel selectedRepository;
-        [AllowNull]
         public ILocalRepositoryModel SelectedRepository
         {
-            [return: AllowNull]
             get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); }
         }
@@ -107,6 +104,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(manager, nameof(manager));
+            Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
+            Guard.ArgumentNotNull(vsServices, nameof(vsServices));
+            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
+            Guard.ArgumentNotNull(dialogService, nameof(dialogService));
+
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
@@ -214,6 +219,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             base.Initialize(serviceProvider);
             UpdateConnection();
 
@@ -259,15 +266,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     try
                     {
                         // TODO: Cache the icon state.
-                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                        var api = await ApiFactory.Create(newrepo.CloneUrl);
+                        var repo = await api.GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         // GetRepository() may throw if the user doesn't have permissions to access the repo
                         // (because the repo no longer exists, or because the user has logged in on a different
                         // profile, or their permissions have changed remotely)
-                        // TODO: Log
+                        log.Error(ex, "Error updating repository list");
                     }
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
@@ -283,15 +291,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         try
                         {
                             // TODO: Cache the icon state.
-                            var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
+                            var api = await ApiFactory.Create(r.CloneUrl);
+                            var repo = await api.GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             // GetRepository() may throw if the user doesn't have permissions to access the repo
                             // (because the repo no longer exists, or because the user has logged in on a different
                             // profile, or their permissions have changed remotely)
-                            // TODO: Log
+                            log.Error(ex, "Error updating repository list");
                         }
                     });
                 }
@@ -300,25 +309,31 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleCreatedRepo(ILocalRepositoryModel newrepo)
         {
-            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
-            msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
+            var msg = string.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
+            msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
         void HandleClonedRepo(ILocalRepositoryModel newrepo)
         {
-            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
+            var msg = string.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
             if (newrepo.HasCommits() && newrepo.MightContainSolution())
-                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
+                msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_OpenProject, newrepo.LocalPath);
             else
-                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+                msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
         void ShowNotification(ILocalRepositoryModel newrepo, string msg)
         {
+            Guard.ArgumentNotNull(newrepo, nameof(newrepo));
+
             var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-            
+
             teServices.ClearNotifications();
             teServices.ShowMessage(
                 msg,
@@ -348,7 +363,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 })
             );
 #if DEBUG
-            VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{0} Notification", DateTime.Now));
+            log.Information("Notification");
 #endif
         }
 
@@ -454,6 +469,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         /// </remarks>
         static ReactiveCommand<object> CreateAsyncCommandHack(Func<Task> executeAsync)
         {
+            Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
+
             var enabled = new BehaviorSubject<bool>(true);
             var command = ReactiveCommand.Create(enabled);
             command.Subscribe(async _ =>
@@ -504,7 +521,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (machine.PermittedTriggers.Contains(e.PropertyName))
                 {
 #if DEBUG
-                    VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{3} {0} title:{1} busy:{2}", e.PropertyName, ((ITeamExplorerSection)sender).Title, ((ITeamExplorerSection)sender).IsBusy, DateTime.Now));
+                    log.Information("{PropertyName} title:{Title} busy:{IsBusy}",
+                        e.PropertyName,
+                        ((ITeamExplorerSection)sender).Title,
+                        ((ITeamExplorerSection)sender).IsBusy);
 #endif
                     machine.Fire(e.PropertyName);
                 }

@@ -8,12 +8,12 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
-using NLog;
-using NullGuard;
 using Octokit;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -21,7 +21,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : DialogViewModelBase, IGistCreationViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GistCreationViewModel>();
 
         readonly IApiClient apiClient;
         readonly ObservableAsPropertyHelper<IAccount> account;
@@ -38,6 +38,12 @@ namespace GitHub.ViewModels
             IUsageTracker usageTracker)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService, usageTracker)
         {
+            Guard.ArgumentNotNull(connectionRepositoryHostMap, nameof(connectionRepositoryHostMap));
+            Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
+            Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
+            Guard.ArgumentNotNull(notificationService, nameof(notificationService));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.notificationService = notificationService;
         }
 
@@ -47,6 +53,11 @@ namespace GitHub.ViewModels
             IGistPublishService gistPublishService,
             IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
+            Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             Title = Resources.CreateGistTitle;
             apiClient = repositoryHost.ApiClient;
             this.gistPublishService = gistPublishService;
@@ -80,12 +91,12 @@ namespace GitHub.ViewModels
             newGist.Files.Add(FileName, SelectedText);
 
             return gistPublishService.PublishGist(apiClient, newGist)
-                .Do(_ => usageTracker.IncrementCreateGistCount().Forget())
+                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfGists).Forget())
                 .Catch<Gist, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
                     {
-                        log.Error(ex);
+                        log.Error(ex, "Error Creating Gist");
                         var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.GistCreateFailed);
                         notificationService.ShowError(error);
                     }
@@ -97,7 +108,6 @@ namespace GitHub.ViewModels
 
         public IAccount Account
         {
-            [return: AllowNull]
             get { return account.Value; }
         }
 
@@ -109,28 +119,22 @@ namespace GitHub.ViewModels
         }
 
         string description;
-        [AllowNull]
         public string Description
         {
-            [return: AllowNull]
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
 
         string selectedText;
-        [AllowNull]
         public string SelectedText
         {
-            [return: AllowNull]
             get { return selectedText; }
             set { this.RaiseAndSetIfChanged(ref selectedText, value); }
         } 
 
         string fileName;
-        [AllowNull]
         public string FileName
         {
-            [return: AllowNull]
             get { return fileName; }
             set { this.RaiseAndSetIfChanged(ref fileName, value); }
         }

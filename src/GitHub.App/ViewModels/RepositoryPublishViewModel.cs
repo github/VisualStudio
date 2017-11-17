@@ -10,13 +10,13 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
-using NLog;
-using NullGuard;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -24,7 +24,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryPublishViewModel : RepositoryFormViewModel, IRepositoryPublishViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryPublishViewModel>();
 
         readonly IRepositoryHosts hosts;
         readonly IRepositoryPublishService repositoryPublishService;
@@ -43,6 +43,12 @@ namespace GitHub.ViewModels
             IConnectionManager connectionManager,
             IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(repositoryPublishService, nameof(repositoryPublishService));
+            Guard.ArgumentNotNull(notificationService, nameof(notificationService));
+            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.notificationService = notificationService;
             this.hosts = hosts;
             this.usageTracker = usageTracker;
@@ -115,17 +121,14 @@ namespace GitHub.ViewModels
         public ObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
-        [AllowNull]
         public IConnection SelectedConnection
         {
-            [return: AllowNull]
             get { return selectedConnection; }
             set { this.RaiseAndSetIfChanged(ref selectedConnection, value); }
         }
 
         IRepositoryHost SelectedHost
         {
-            [return:AllowNull]
             get { return selectedConnection != null ? hosts.LookupHost(selectedConnection.HostAddress) : null; }
         }
 
@@ -156,13 +159,13 @@ namespace GitHub.ViewModels
             var account = SelectedAccount;
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
-                .Do(_ => usageTracker.IncrementPublishCount().Forget())
+                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposPublished).Forget())
                 .Select(_ => ProgressState.Success)
                 .Catch<ProgressState, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
                     {
-                        log.Error(ex);
+                        log.Error(ex, "Error Publishing Repository");
                         var error = new PublishRepositoryUserError(ex.Message);
                         notificationService.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
                     }

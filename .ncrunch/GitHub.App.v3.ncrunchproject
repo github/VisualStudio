@@ -1,6 +1,6 @@
 ﻿<ProjectConfiguration>
   <Settings>
-    <PreventSigningOfAssembly>True</PreventSigningOfAssembly>
+    <PreloadReferencedAssemblies>False</PreloadReferencedAssemblies>
     <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
   </Settings>
 </ProjectConfiguration>

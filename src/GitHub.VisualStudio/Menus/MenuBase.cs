@@ -3,16 +3,19 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
-using NullGuard;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using GitHub.Extensions;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.VisualStudio
 {
     public abstract class MenuBase
     {
+        static readonly ILogger log = LogManager.ForContext<MenuBase>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly Lazy<ISimpleApiClientFactory> apiFactory;
 
@@ -22,10 +25,8 @@ namespace GitHub.VisualStudio
 
         protected ISimpleApiClient simpleApiClient;
 
-        [AllowNull]
         protected ISimpleApiClient SimpleApiClient
         {
-            [return: AllowNull]
             get { return simpleApiClient; }
             set
             {
@@ -42,8 +43,28 @@ namespace GitHub.VisualStudio
 
         protected MenuBase(IGitHubServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             this.serviceProvider = serviceProvider;
             apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
+        }
+
+        protected ILocalRepositoryModel GetRepositoryByPath(string path)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(path))
+                {
+                    var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
+                    return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error loading the repository from '{Path}'", path);
+            }
+
+            return null;
         }
 
         protected ILocalRepositoryModel GetActiveRepo()
@@ -59,7 +80,7 @@ namespace GitHub.VisualStudio
                 }
                 catch (Exception ex)
                 {
-                    VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
+                    log.Error(ex, "Error loading the repository from '{Path}'", path);
                 }
             }
             return activeRepo;
@@ -91,7 +112,7 @@ namespace GitHub.VisualStudio
                 }
                 catch (Exception ex)
                 {
-                    VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}: Error loading the repository from '{1}'. {2}", GetType(), path, ex));
+                    log.Error(ex, "Error loading the repository from '{Path}'", path);
                 }
             }
         }
@@ -104,13 +125,14 @@ namespace GitHub.VisualStudio
             if (uri == null)
                 return false;
 
-            SimpleApiClient = ApiFactory.Create(uri);
+            SimpleApiClient = await ApiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
             if (!isdotcom)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                return (repo.FullName == ActiveRepo.Name || repo.Id == 0) && SimpleApiClient.IsEnterprise();
+                var activeRepoFullName = ActiveRepo.Owner + '/' + ActiveRepo.Name;
+                return (repo.FullName == activeRepoFullName || repo.Id == 0) && SimpleApiClient.IsEnterprise();
             }
             return isdotcom;
         }

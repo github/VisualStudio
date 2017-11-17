@@ -108,7 +108,7 @@
         </Grid.ColumnDefinitions>
         <Button x:Name="prHashtagLink"
                 Grid.Column="0"
-                Command="{Binding OpenPROnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+                Command="{Binding ViewModel.OpenPullRequestOnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
                 CommandParameter="{Binding Number}"
                 Content="{Binding Number}"
                 ToolTip="{x:Static prop:Resources.OpenPROnGitHubToolTip}"
@@ -123,7 +123,7 @@
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2}">
               <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
-              <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
+              <Binding Source="{x:Static i18n:Resources.prUpdatedByText}" />
               <Binding Path="Author.Login" />
             </MultiBinding>
           </TextBlock.Text>
@@ -133,9 +133,9 @@
                 <TextBlock>
                     <TextBlock.Text>
                        <MultiBinding StringFormat="{} {0} {1} {2} {3}">
-                          <Binding Source="{x:Static i18n:Resources.prOpenedText}" />
+                          <Binding Source="{x:Static i18n:Resources.prUpdatedText}" />
                           <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
-                          <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
+                          <Binding Source="{x:Static i18n:Resources.prUpdatedByText}" />
                           <Binding Path="Author.Login" />
                         </MultiBinding>
                     </TextBlock.Text>

@@ -16,12 +16,12 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
-using NLog;
-using NullGuard;
 using Octokit;
 using ReactiveUI;
 using Rothko;
 using GitHub.Collections;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -29,7 +29,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCreationViewModel : RepositoryFormViewModel, IRepositoryCreationViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCreationViewModel>();
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
@@ -55,6 +55,11 @@ namespace GitHub.ViewModels
             IRepositoryCreationService repositoryCreationService,
             IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Guard.ArgumentNotNull(operatingSystem, nameof(operatingSystem));
+            Guard.ArgumentNotNull(repositoryCreationService, nameof(repositoryCreationService));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
@@ -135,7 +140,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public string BaseRepositoryPath
         {
-            [return: AllowNull]
             get { return baseRepositoryPath; }
             set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, StripSurroundingQuotes(value)); }
         }
@@ -170,7 +174,6 @@ namespace GitHub.ViewModels
         }
 
         GitIgnoreItem selectedGitIgnoreTemplate;
-        [AllowNull]
         public GitIgnoreItem SelectedGitIgnoreTemplate
         {
             get { return selectedGitIgnoreTemplate; }
@@ -178,7 +181,6 @@ namespace GitHub.ViewModels
         }
 
         LicenseItem selectedLicense;
-        [AllowNull]
         public LicenseItem SelectedLicense
         {
             get { return selectedLicense; }
@@ -239,15 +241,16 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
-                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                    log.Error(e, "Failed to set base repository path {@0}",
+                        new { localBaseRepositoryPath, BaseRepositoryPath, directory });
                 }
             }, RxApp.MainThreadScheduler);
         }
 
         bool IsAlreadyRepoAtPath(string potentialRepositoryName)
         {
+            Guard.ArgumentNotNull(potentialRepositoryName, nameof(potentialRepositoryName));
+
             bool isAlreadyRepoAtPath = false;
             var validationResult = BaseRepositoryPathValidator.ValidationResult;
             string safeRepositoryName = GetSafeRepositoryName(potentialRepositoryName);
@@ -270,7 +273,7 @@ namespace GitHub.ViewModels
                 SelectedAccount,
                 BaseRepositoryPath,
                 repositoryHost.ApiClient)
-                .Do(_ => usageTracker.IncrementCreateCount().Forget());
+                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposCreated).Forget());
         }
 
         ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
@@ -284,7 +287,7 @@ namespace GitHub.ViewModels
             {
                 if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
-                    log.Error("Error creating repository.", ex);
+                    log.Error(ex, "Error creating repository");
                     UserError.Throw(TranslateRepositoryCreateException(ex));
                 }
             });
@@ -294,6 +297,8 @@ namespace GitHub.ViewModels
 
         static string StripSurroundingQuotes(string path)
         {
+            Guard.ArgumentNotNull(path, nameof(path));
+
             if (string.IsNullOrEmpty(path)
                 || path.Length < 2
                 || !path.StartsWith("\"", StringComparison.Ordinal)
@@ -307,6 +312,8 @@ namespace GitHub.ViewModels
 
         PublishRepositoryUserError TranslateRepositoryCreateException(Exception ex)
         {
+            Guard.ArgumentNotNull(ex, nameof(ex));
+
             var existsException = ex as RepositoryExistsException;
             if (existsException != null && SelectedAccount != null)
             {

@@ -1,9 +1,9 @@
-﻿using System.Reactive.Linq;
-using GitHub.Models;
-using System;
-using ReactiveUI;
-using GitHub.Primitives;
+﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
+using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.Extensions
 {

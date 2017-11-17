@@ -11,8 +11,8 @@ namespace GitHub.Models
             Status = status;
         }
 
-        public string FileName { get; set; }
-        public string Sha { get; set; }
-        public PullRequestFileStatus Status { get; set; }
+        public string FileName { get; }
+        public string Sha { get; }
+        public PullRequestFileStatus Status { get; }
     }
 }

@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using LibGit2Sharp;
-using NullGuard;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -24,20 +25,23 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        readonly ILocalRepositoryModel repository;
+        static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
+
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
+        readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
+        int commentCount;
         string body;
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
+        string errorMessage;
         string operationError;
         bool isBusy;
         bool isLoading;
@@ -51,42 +55,48 @@ namespace GitHub.ViewModels
         /// <param name="connectionRepositoryHostMap">The connection repository host map.</param>
         /// <param name="teservice">The team explorer service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
-        /// <param name="avatarProvider">The avatar provider.</param>
+        /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
+            IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
-                  connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
-                  pullRequestsService,
-                  usageTracker)
+                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                   pullRequestsService,
+                   sessionManager,
+                   usageTracker)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
-        /// <param name="repositoryHost">The repository host.</param>
-        /// <param name="teservice">The team explorer service.</param>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="modelService">The model service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
-        /// <param name="avatarProvider">The avatar provider.</param>
+        /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="usageTracker">The usage tracker.</param>
         public PullRequestDetailViewModel(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
+            IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
         {
-            this.repository = repository;
+            this.LocalRepository = localRepository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
+            this.sessionManager = sessionManager;
             this.usageTracker = usageTracker;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
                     .Cast<CheckoutCommandState>()
-                    .Select(x => x != null && x.IsEnabled), 
+                    .Select(x => x != null && x.IsEnabled),
                 DoCheckout);
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
             SubscribeOperationError(Checkout);
@@ -106,8 +116,10 @@ namespace GitHub.ViewModels
             SubscribeOperationError(Push);
 
             OpenOnGitHub = ReactiveCommand.Create();
-            OpenFile = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             DiffFile = ReactiveCommand.Create();
+            DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
+            OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
+            ViewFile = ReactiveCommand.Create();
         }
 
         /// <summary>
@@ -131,6 +143,25 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets the local repository.
+        /// </summary>
+        public ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
+        /// Gets the owner of the remote repository that contains the pull request.
+        /// </summary>
+        /// <remarks>
+        /// The remote repository may be different from the local repository if the local
+        /// repository is a fork and the user is viewing pull requests from the parent repository.
+        /// </remarks>
+        public string RemoteRepositoryOwner { get; private set; }
+
+        /// <summary>
+        /// Gets the session for the pull request.
+        /// </summary>
+        public IPullRequestSession Session { get; private set; }
+
+        /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
         /// </summary>
         public string SourceBranchDisplayName
@@ -146,6 +177,15 @@ namespace GitHub.ViewModels
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        /// <summary>
+        /// Gets the number of comments made on the pull request.
+        /// </summary>
+        public int CommentCount
+        {
+            get { return commentCount; }
+            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
         }
 
         /// <summary>
@@ -211,6 +251,15 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets an error message to display if loading fails.
+        /// </summary>
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
+            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
+        }
+
+        /// <summary>
         /// Gets the error message to be displayed in the action area as a result of an error in a
         /// git operation.
         /// </summary>
@@ -250,134 +299,193 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
-        /// </summary>
-        public ReactiveCommand<object> OpenFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
         public ReactiveCommand<object> DiffFile { get; }
+
+        /// <summary>
+        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
+        /// the working directory and HEAD.
+        /// </summary>
+        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
+        /// </summary>
+        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
+        /// </summary>
+        public ReactiveCommand<object> ViewFile { get; }
 
         /// <summary>
         /// Initializes the view model with new data.
         /// </summary>
         /// <param name="data"></param>
-        public override void Initialize([AllowNull] ViewWithData data)
+        public override void Initialize(ViewWithData data)
         {
-            var prNumber = data?.Data != null ? (int)data.Data : Model.Number;
+            int number;
+            var repoOwner = RemoteRepositoryOwner;
+
+            if (data != null)
+            {
+                var arg = (PullRequestDetailArgument)data.Data;
+                number = arg.Number;
+                repoOwner = arg.RepositoryOwner;
+            }
+            else
+            {
+                number = Model.Number;
+            }
 
             if (Model == null)
+            {
                 IsLoading = true;
+            }
             else
+            {
                 IsBusy = true;
+            }
 
-            OperationError = null;
-            modelService.GetPullRequest(repository, prNumber)
+            ErrorMessage = OperationError = null;
+            modelService.GetPullRequest(repoOwner, LocalRepository.Name, number)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => Load(x).Forget());
+                .Catch<IPullRequestModel, Exception>(ex =>
+                {
+                    log.Error(ex, "Error observing GetPullRequest");
+                    ErrorMessage = ex.Message.Trim();
+                    IsLoading = IsBusy = false;
+                    return Observable.Empty<IPullRequestModel>();
+                })
+                .Subscribe(x => Load(repoOwner, x).Forget());
         }
 
         /// <summary>
         /// Loads the view model from octokit models.
         /// </summary>
+        /// <param name="remoteRepositoryOwner">The owner of the remote repository.</param>
         /// <param name="pullRequest">The pull request model.</param>
-        /// <param name="files">The pull request's changed files.</param>
-        public async Task Load(IPullRequestModel pullRequest)
+        public async Task Load(string remoteRepositoryOwner, IPullRequestModel pullRequest)
         {
-            Model = pullRequest;
-            Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
+            Guard.ArgumentNotNull(remoteRepositoryOwner, nameof(remoteRepositoryOwner));
 
-            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
-            SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
-
-            var changes = await pullRequestsService.GetTreeChanges(repository, pullRequest);
-            ChangedFilesTree = CreateChangedFilesTree(pullRequest, changes).Children.ToList();
-
-            var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
-
-            IsCheckedOut = localBranches.Contains(repository.CurrentBranch);
-
-            if (IsCheckedOut)
+            try
             {
-                var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
-                var pullEnabled = divergence.BehindBy > 0;
-                var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
-                string pullToolTip;
-                string pushToolTip;
+                var firstLoad = (Model == null);
+                Model = pullRequest;
+                RemoteRepositoryOwner = remoteRepositoryOwner;
+                Session = await sessionManager.GetSession(pullRequest);
+                Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-                if (pullEnabled)
+                IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
+                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
+                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
+                CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
+                Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
+
+                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
+                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+
+                var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
+
+                IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
+
+                if (IsCheckedOut)
                 {
-                    pullToolTip = string.Format(
-                        Resources.PullRequestDetailsPullToolTip,
-                        IsFromFork ? Resources.Fork : Resources.Remote,
-                        SourceBranchDisplayName);
+                    var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
+                    var pullEnabled = divergence.BehindBy > 0;
+                    var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                    string pullToolTip;
+                    string pushToolTip;
+
+                    if (pullEnabled)
+                    {
+                        pullToolTip = string.Format(
+                            Resources.PullRequestDetailsPullToolTip,
+                            IsFromFork ? Resources.Fork : Resources.Remote,
+                            SourceBranchDisplayName);
+                    }
+                    else
+                    {
+                        pullToolTip = Resources.NoCommitsToPull;
+                    }
+
+                    if (pushEnabled)
+                    {
+                        pushToolTip = string.Format(
+                            Resources.PullRequestDetailsPushToolTip,
+                            IsFromFork ? Resources.Fork : Resources.Remote,
+                            SourceBranchDisplayName);
+                    }
+                    else if (divergence.AheadBy == 0)
+                    {
+                        pushToolTip = Resources.NoCommitsToPush;
+                    }
+                    else
+                    {
+                        pushToolTip = Resources.MustPullBeforePush;
+                    }
+
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    CheckoutState = null;
                 }
                 else
                 {
-                    pullToolTip = Resources.NoCommitsToPull;
+                    var caption = localBranches.Count > 0 ?
+                        string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
+                        string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
+                    var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
+                    string disabled = null;
+
+                    if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                    {
+                        disabled = Resources.SourceRepositoryNoLongerAvailable;
+                    }
+                    else if (!clean)
+                    {
+                        disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
+                    }
+
+                    CheckoutState = new CheckoutCommandState(caption, disabled);
+                    UpdateState = null;
                 }
 
-                if (pushEnabled)
+                if (firstLoad)
                 {
-                    pushToolTip = string.Format(
-                        Resources.PullRequestDetailsPushToolTip,
-                        IsFromFork ? Resources.Fork : Resources.Remote,
-                        SourceBranchDisplayName);
-                }
-                else if (divergence.AheadBy == 0)
-                {
-                    pushToolTip = Resources.NoCommitsToPush;
-                }
-                else
-                {
-                    pushToolTip = Resources.MustPullBeforePush;
+                    usageTracker.IncrementCounter(x => x.NumberOfPullRequestsOpened).Forget();
                 }
 
-                UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
-                CheckoutState = null;
+                if (!isInCheckout)
+                {
+                    pullRequestsService.RemoveUnusedRemotes(LocalRepository).Subscribe(_ => { });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var caption = localBranches.Count > 0 ?
-                    string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
-                var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
-                string disabled = null;
-
-                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
-                {
-                    disabled = Resources.SourceRepositoryNoLongerAvailable;
-                }
-                else if (!clean)
-                {
-                    disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
-                }
-
-                CheckoutState = new CheckoutCommandState(caption, disabled);
-                UpdateState = null;
+                log.Error(ex, "Error loading PullRequestModel");
+                ErrorMessage = ex.Message.Trim();
             }
-
-            IsLoading = IsBusy = false;
-
-            if (!isInCheckout)
+            finally
             {
-                pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
+                IsLoading = IsBusy = false;
             }
         }
 
         /// <summary>
-        /// Gets the before and after files needed for viewing a diff.
+        /// Gets a file as it appears in the pull request.
         /// </summary>
         /// <param name="file">The changed file.</param>
-        /// <returns>A tuple containing the full path to the before and after files.</returns>
-        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        /// <param name="head">
+        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
+        /// </param>
+        /// <returns>The path to a temporary file.</returns>
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
-            var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path, file.Sha, IsCheckedOut).ToTask();
+            var relativePath = Path.Combine(file.DirectoryPath, file.FileName);
+            var encoding = pullRequestsService.GetEncoding(LocalRepository, relativePath);
+            return pullRequestsService.ExtractFile(LocalRepository, model, relativePath, head, encoding).ToTask();
         }
 
         /// <summary>
@@ -387,7 +495,7 @@ namespace GitHub.ViewModels
         /// <returns>The full path to the file in the working directory.</returns>
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
-            return Path.Combine(repository.LocalPath, file.DirectoryPath, file.FileName);
+            return Path.Combine(LocalRepository.LocalPath, file.DirectoryPath, file.FileName);
         }
 
         void SubscribeOperationError(ReactiveCommand<Unit> command)
@@ -396,7 +504,7 @@ namespace GitHub.ViewModels
             command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        IPullRequestDirectoryNode CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
+        async Task<IPullRequestDirectoryNode> CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
         {
             var dirs = new Dictionary<string, PullRequestDirectoryNode>
             {
@@ -406,11 +514,16 @@ namespace GitHub.ViewModels
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
                 var node = new PullRequestFileNode(
-                    repository.LocalPath,
+                    LocalRepository.LocalPath,
                     changedFile.FileName,
                     changedFile.Sha,
                     changedFile.Status,
                     GetStatusDisplay(changedFile, changes));
+
+                var file = await Session.GetFile(changedFile.FileName);
+                var fileCommentCount = file?.WhenAnyValue(x => x.InlineCommentThreads)
+                    .Subscribe(x => node.CommentCount = x.Count(y => y.LineNumber != -1));
+
                 var dir = GetDirectory(node.DirectoryPath, dirs);
                 dir.Files.Add(node);
             }
@@ -479,31 +592,49 @@ namespace GitHub.ViewModels
         {
             return Observable.Defer(async () =>
             {
-                var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
+                var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, Model).ToList();
 
                 if (localBranches.Count > 0)
                 {
-                    return pullRequestsService.SwitchToBranch(repository, Model);
+                    return pullRequestsService.SwitchToBranch(LocalRepository, Model);
                 }
                 else
                 {
                     return pullRequestsService
-                        .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
-                        .SelectMany(x => pullRequestsService.Checkout(repository, Model, x));
+                        .GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title)
+                        .SelectMany(x => pullRequestsService.Checkout(LocalRepository, Model, x));
                 }
-            }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
+            }).Do(_ =>
+            {
+                if (IsFromFork)
+                    usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestsCheckedOut).Forget();
+                else
+                    usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestsCheckedOut).Forget();
+            });
         }
 
         IObservable<Unit> DoPull(object unused)
         {
-            return pullRequestsService.Pull(repository)
-                .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
+            return pullRequestsService.Pull(LocalRepository)
+                .Do(_ =>
+                {
+                    if (IsFromFork)
+                        usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestPulls).Forget();
+                    else
+                        usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPulls).Forget();
+                });
         }
 
         IObservable<Unit> DoPush(object unused)
         {
-            return pullRequestsService.Push(repository)
-                .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+            return pullRequestsService.Push(LocalRepository)
+                .Do(_ =>
+                {
+                    if (IsFromFork)
+                        usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestPushes).Forget();
+                    else
+                        usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPushes).Forget();
+                });
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

@@ -156,11 +156,8 @@
   <data name="gistCreationFailedMessage" xml:space="preserve">
     <value>Failed to create gist</value>
   </data>
-  <data name="prOpenedByText" xml:space="preserve">
+  <data name="prUpdatedByText" xml:space="preserve">
     <value>by</value>
-  </data>
-  <data name="prOpenedText" xml:space="preserve">
-    <value>opened</value>
   </data>
   <data name="Options_PrivacyTitle" xml:space="preserve">
     <value>Privacy</value>
@@ -354,14 +351,14 @@
   <data name="ChangesCountFormat" xml:space="preserve">
     <value>Changes ({0})</value>
   </data>
-  <data name="CompareFile" xml:space="preserve">
-    <value>Compare File</value>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>View Changes</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
     <value>Compare File as Default Action</value>
   </data>
-  <data name="OpenFile" xml:space="preserve">
-    <value>Open File</value>
+  <data name="ViewFile" xml:space="preserve">
+    <value>View File</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
     <value>Open File as Default Action</value>
@@ -382,5 +379,23 @@
     <value>Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
 
 [Don't show this again](dont-show-again)</value>
+  </data>
+  <data name="prUpdatedText" xml:space="preserve">
+    <value>Updated</value>
+  </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>Show PR comments on editor margin</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>Experimental features</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>These features might change in a future version</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>View Changes in Solution</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>Open File in Solution</value>
   </data>
 </root>

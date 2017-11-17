@@ -6,9 +6,9 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
-using NullGuard;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.UI;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -18,10 +18,9 @@ namespace GitHub.VisualStudio.Base
         protected ITeamExplorerServiceHolder holder;
 
         ISimpleApiClient simpleApiClient;
-        [AllowNull]
         public ISimpleApiClient SimpleApiClient
         {
-            [return: AllowNull] get { return simpleApiClient; }
+            get { return simpleApiClient; }
             set
             {
                 if (simpleApiClient != value && value == null)
@@ -35,6 +34,9 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider, ITeamExplorerServiceHolder holder)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+
             this.holder = holder;
         }
 
@@ -42,24 +44,24 @@ namespace GitHub.VisualStudio.Base
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
             : base(serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+
             this.apiFactory = apiFactory;
             this.holder = holder;
         }
 
         public virtual void Initialize(IServiceProvider serviceProvider)
         {
-#if DEBUG
-            //VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize", DateTime.Now, GetType());
-#endif
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             TEServiceProvider = serviceProvider;
             Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
             if (holder == null)
                 return;
             holder.ServiceProvider = TEServiceProvider;
             SubscribeToRepoChanges();
-#if DEBUG
-            //VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize DONE", DateTime.Now, GetType());
-#endif
         }
 
 
@@ -112,7 +114,7 @@ namespace GitHub.VisualStudio.Base
                 return RepositoryOrigin.Other;
 
             Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
-            SimpleApiClient = apiFactory.Create(uri);
+            SimpleApiClient = await apiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
 
@@ -139,7 +141,7 @@ namespace GitHub.VisualStudio.Base
             return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
         }
 
-        protected bool IsUserAuthenticated()
+        protected async Task<bool> IsUserAuthenticated()
         {
             if (SimpleApiClient == null)
             {
@@ -150,7 +152,7 @@ namespace GitHub.VisualStudio.Base
                 if (uri == null)
                     return false;
 
-                SimpleApiClient = apiFactory.Create(uri);
+                SimpleApiClient = await apiFactory.Create(uri);
             }
 
             return SimpleApiClient?.IsAuthenticated() ?? false;
@@ -185,7 +187,6 @@ namespace GitHub.VisualStudio.Base
         }
 
         string text;
-        [AllowNull]
         public string Text
         {
             get { return text; }

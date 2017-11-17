@@ -55,4 +55,12 @@
   <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FFF5D367" />
 
   <SolidColorBrush x:Key="GitHubBranchNameBackgroundBrush" Color="#FFDAE8F6" />
+
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.Add" Color="#FFE4E6F2" />
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.Delete" Color="#FFE4E6F2" />
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="{DynamicResource Color.Window}" />
+
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#9EC7FF" />
+
+  <SolidColorBrush x:Key="GitHubPeekViewBackground" Color="#F5F5F5" />
 </ResourceDictionary>

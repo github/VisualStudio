@@ -8,7 +8,8 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
-             Background="Beige"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             Background="{DynamicResource VsBrush.InfoBackground}"
              d:DataContext="{d:DesignInstance Type=sampleData:InfoPanelDesigner, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -19,6 +20,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="DocumentStyle" TargetType="FlowDocument">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -32,6 +34,10 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
+
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
 
     <DockPanel Margin="8" LastChildFill="True">
         <ui:OcticonImage Width="16"
@@ -51,17 +57,14 @@
                           Foreground="Black"
                           Icon="x"/>
 
-        <ui:MarkdownViewer x:Name="document"
-                           Margin="8,0"
-                           VerticalAlignment="Top"
-                           DockPanel.Dock="Top"
-                           DocumentStyle="{StaticResource DocumentStyle}"
-                           Foreground="Black"
-                           LinkStyle="{StaticResource LinkStyle}"
-                           RawContent="{Binding Message}"
-                           HyperlinkCommand="{Binding LinkCommand}"
-                           ScrollViewer.CanContentScroll="False"
-                           ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                           ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+        <markdig:MarkdownViewer x:Name="document"
+                                Margin="8,0"
+                                VerticalAlignment="Top"
+                                DockPanel.Dock="Top"
+                                Foreground="Black"
+                                Markdown="{Binding Message}"
+                                ScrollViewer.CanContentScroll="False"
+                                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
     </DockPanel>
 </UserControl>

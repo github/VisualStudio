@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using ReactiveUI;
-using NullGuard;
 using GitHub.Services;
 using GitHub.Extensions;
 
@@ -24,8 +23,10 @@ namespace GitHub.Validation
         readonly Dictionary<string, bool> enabledProperties = new Dictionary<string, bool>();
         bool validationEnabled = true;
 
-        public ReactiveValidatableObject([AllowNull]IGitHubServiceProvider serviceProvider)
+        public ReactiveValidatableObject(IGitHubServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             validatedProperties = typeValidatorsMap.GetOrAdd(GetType(), GetValidatedProperties);
             this.serviceProvider = serviceProvider; // This is allowed to be null.
 
@@ -39,6 +40,8 @@ namespace GitHub.Validation
         {
             get
             {
+                Guard.ArgumentNotNull(propertyName, nameof(propertyName));
+
                 if (!validationEnabled || !enabledProperties.ContainsKey(propertyName)) return null;
 
                 string errorMessage = GetErrorMessage(propertyName);
@@ -113,6 +116,8 @@ namespace GitHub.Validation
         // raise a property changed event.
         void TriggerValidationForProperty(string propertyName)
         {
+            Guard.ArgumentNotNull(propertyName, nameof(propertyName));
+
             this.RaisePropertyChanged(propertyName);
         }
 
@@ -124,6 +129,8 @@ namespace GitHub.Validation
 
         string GetErrorMessage(string propertyName)
         {
+            Guard.ArgumentNotEmptyString(propertyName, nameof(propertyName));
+
             ValidatedProperty validatedProperty;
             if (!validatedProperties.TryGetValue(propertyName, out validatedProperty))
                 return null; // TODO: This would be a good place to do default data type validation as the need arises.
@@ -147,6 +154,8 @@ namespace GitHub.Validation
 
         static Dictionary<string, ValidatedProperty> GetValidatedProperties(Type type)
         {
+            Guard.ArgumentNotNull(type, nameof(type));
+
             return (from property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     let validated = new ValidatedProperty(property)
                     where validated.Validators.Any()
@@ -159,6 +168,8 @@ namespace GitHub.Validation
 
             public ValidatedProperty(PropertyInfo property)
             {
+                Guard.ArgumentNotNull(property, nameof(property));
+
                 Property = property;
                 validators = property.GetCustomAttributes(typeof(ValidationAttribute), true).Cast<ValidationAttribute>().ToList();
                 Validators = validators.Where(v => !(v is ValidateIfAttribute));
@@ -167,11 +178,16 @@ namespace GitHub.Validation
 
             public void AddValidator(ValidationAttribute validator)
             {
+                Guard.ArgumentNotNull(validator, nameof(validator));
+
                 validators.Add(validator);
             }
 
             public ValidationResult GetFirstValidationError(object instance, IServiceProvider serviceProvider)
             {
+                Guard.ArgumentNotNull(instance, nameof(instance));
+                Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
                 var validationContext = new ValidationContext(instance, serviceProvider, null) { MemberName = Property.Name };
 
                 if (ConditionalValidation != null && !ConditionalValidation.IsValidationRequired(validationContext))
@@ -204,12 +220,18 @@ namespace GitHub.Validation
 
             public SetErrorValidator(string errorMessage, object originalValue)
             {
+                Guard.ArgumentNotEmptyString(errorMessage, nameof(errorMessage));
+                Guard.ArgumentNotNull(originalValue, nameof(originalValue));
+
                 this.errorMessage = errorMessage;
                 this.originalValue = originalValue;
             }
 
             protected override ValidationResult IsValid(object value, ValidationContext validationContext)
             {
+                Guard.ArgumentNotNull(value, nameof(value));
+                Guard.ArgumentNotNull(validationContext, nameof(validationContext));
+
                 if (originalValue.Equals(value))
                     return new ValidationResult(errorMessage);
 

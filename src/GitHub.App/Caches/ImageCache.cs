@@ -11,8 +11,10 @@ using Akavache;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
+using GitHub.Logging;
 using GitHub.Services;
 using Rothko;
+using Serilog;
 
 namespace GitHub.Caches
 {
@@ -20,7 +22,7 @@ namespace GitHub.Caches
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class ImageCache : IImageCache
     {
-        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<ImageCache>();
 
         public const string ImageCacheFileName = "images.cache.db";
         readonly IObservable<IBlobCache> cacheFactory;
@@ -159,7 +161,7 @@ namespace GitHub.Caches
                 .SelectMany(Observable.Defer(() => blobCache.Insert(key, new byte[] { 1 })))
                 .Catch<Unit, Exception>(ex =>
                 {
-                    log.Error("Could not vacuum image cache", ex);
+                    log.Error(ex, "Could not vacuum image cache");
                     return Observable.Return(Unit.Default);
                 })
                 .AsCompletion();
@@ -184,7 +186,7 @@ namespace GitHub.Caches
 
         static IObservable<BitmapImage> LoadImage(Stream sourceStream, float? desiredWidth = null, float? desiredHeight = null)
         {
-            Debug.Assert(sourceStream != null, "Cannot load image from a null sourceStream");
+            Guard.ArgumentNotNull(sourceStream, nameof(sourceStream));
 
             return Observable.Defer(() =>
             {

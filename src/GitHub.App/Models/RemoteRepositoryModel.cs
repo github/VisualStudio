@@ -1,5 +1,4 @@
 ﻿using GitHub.Primitives;
-using NullGuard;
 using System;
 using System.Globalization;
 using GitHub.Extensions;
@@ -21,9 +20,13 @@ namespace GitHub.Models
         /// <param name="isPrivate">Whether the repository is private.</param>
         /// <param name="isFork">Whether the repository is a fork.</param>
         /// <param name="ownerAccount">The repository owner account.</param>
-        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+        /// <param name="parent">The parent repository if this repository is a fork.</param>
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount, IRemoteRepositoryModel parent)
             : base(name, cloneUrl)
         {
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+            Guard.ArgumentNotNull(ownerAccount, nameof(ownerAccount));
+
             Id = id;
             OwnerAccount = ownerAccount;
             IsFork = isFork;
@@ -31,6 +34,7 @@ namespace GitHub.Models
             // this is an assumption, we'd have to load the repo information from octokit to know for sure
             // probably not worth it for this ctor
             DefaultBranch = new BranchModel("master", this);
+            Parent = parent;
         }
 
         /// <summary>
@@ -40,6 +44,8 @@ namespace GitHub.Models
         public RemoteRepositoryModel(Octokit.Repository repository)
             : base(repository.Name, repository.CloneUrl)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+
             Id = repository.Id;
             IsFork = repository.Fork;
             SetIcon(repository.Private, IsFork);
@@ -63,7 +69,7 @@ namespace GitHub.Models
             return Id.GetHashCode();
         }
 
-        public override bool Equals([AllowNull]object obj)
+        public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj))
                 return true;
@@ -71,50 +77,50 @@ namespace GitHub.Models
             return Equals(other);
         }
 
-        public bool Equals([AllowNull]IRemoteRepositoryModel other)
+        public bool Equals(IRemoteRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
         }
 
-        public bool Equals([AllowNull]RemoteRepositoryModel other)
+        public bool Equals(RemoteRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
         }
 
-        public int CompareTo([AllowNull]IRemoteRepositoryModel other)
+        public int CompareTo(IRemoteRepositoryModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
-        public int CompareTo([AllowNull]RemoteRepositoryModel other)
+        public int CompareTo(RemoteRepositoryModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
-        public static bool operator >([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
+        public static bool operator >(RemoteRepositoryModel lhs, RemoteRepositoryModel rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return lhs?.CompareTo(rhs) > 0;
         }
 
-        public static bool operator <([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
+        public static bool operator <(RemoteRepositoryModel lhs, RemoteRepositoryModel rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return (object)lhs == null || lhs.CompareTo(rhs) < 0;
         }
 
-        public static bool operator ==([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
+        public static bool operator ==(RemoteRepositoryModel lhs, RemoteRepositoryModel rhs)
         {
             return ReferenceEquals(lhs, rhs);
         }
 
-        public static bool operator !=([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
+        public static bool operator !=(RemoteRepositoryModel lhs, RemoteRepositoryModel rhs)
         {
             return !(lhs == rhs);
         }
@@ -148,7 +154,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the repository from which this repository was forked, if any.
         /// </summary>
-        [AllowNull] public IRemoteRepositoryModel Parent { [return: AllowNull] get; }
+        public IRemoteRepositoryModel Parent { get; }
 
         /// <summary>
         /// Gets the default branch for the repository.

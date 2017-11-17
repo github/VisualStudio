@@ -8,7 +8,6 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
-using NullGuard;
 using ReactiveUI;
 using System;
 using System.ComponentModel.Composition;
@@ -22,7 +21,6 @@ namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [NullGuard(ValidationFlags.None)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
         const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequestList;
@@ -48,6 +46,15 @@ namespace GitHub.VisualStudio.UI.Views
             IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+            Guard.ArgumentNotNull(holder, nameof(holder));
+            Guard.ArgumentNotNull(cm, nameof(cm));
+            Guard.ArgumentNotNull(hosts, nameof(hosts));
+            Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
+            Guard.ArgumentNotNull(vsBrowser, nameof(vsBrowser));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.connectionManager = cm;
             this.hosts = hosts;
             this.uiProvider = uiProvider;
@@ -67,10 +74,12 @@ namespace GitHub.VisualStudio.UI.Views
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
-            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Load(new ViewWithData(UIControllerFlow.PullRequestList)).Forget());
 
-            back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+            back = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && (navController?.HasBack ?? false),
                 () =>
                 {
@@ -79,7 +88,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+            forward = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && (navController?.HasForward ?? false),
                 () =>
                 {
@@ -88,7 +97,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+            refresh = serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled,
                 () =>
                 {
@@ -97,7 +106,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
                 () => !disabled && (RepositoryOrigin == RepositoryOrigin.DotCom || RepositoryOrigin == RepositoryOrigin.Enterprise),
                 () =>
                 {
@@ -128,14 +137,14 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-           serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                () => true,
-                () =>
-                {
-                    browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                    usageTracker.IncrementGitHubPaneHelpClicks().Forget();
-                },
-                true);
+            serviceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                 () => true,
+                 () =>
+                 {
+                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+                 },
+                 true);
 
             initialized = true;
 
@@ -307,7 +316,6 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         string title;
-        [AllowNull]
         public string Title
         {
             get { return title; }
@@ -331,7 +339,6 @@ namespace GitHub.VisualStudio.UI.Views
         public RepositoryOrigin RepositoryOrigin { get; private set; }
 
         string message;
-        [AllowNull]
         public string Message
         {
             get { return message; }
@@ -339,7 +346,6 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         MessageType messageType;
-        [AllowNull]
         public MessageType MessageType
         {
             get { return messageType; }

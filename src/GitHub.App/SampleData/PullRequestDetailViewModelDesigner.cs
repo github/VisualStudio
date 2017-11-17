@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels;
 using ReactiveUI;
 
@@ -34,7 +36,7 @@ namespace GitHub.SampleData
         {
             var repoPath = @"C:\Repo";
 
-            Model = new PullRequestModel(419, 
+            Model = new PullRequestModel(419,
                 "Error handling/bubbling from viewmodels to views to viewhosts",
                  new AccountDesigner { Login = "shana", IsUser = true },
                  DateTime.Now.Subtract(TimeSpan.FromDays(3)))
@@ -71,8 +73,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         }
 
         public IPullRequestModel Model { get; }
+        public IPullRequestSession Session { get; }
+        public ILocalRepositoryModel LocalRepository { get; }
+        public string RemoteRepositoryOwner { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
+        public int CommentCount { get; set; }
         public bool IsLoading { get; }
         public bool IsBusy { get; }
         public bool IsCheckedOut { get; }
@@ -82,15 +88,18 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
+        public string ErrorMessage { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
+        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+        public ReactiveCommand<object> ViewFile { get; }
 
-        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
             return null;
         }

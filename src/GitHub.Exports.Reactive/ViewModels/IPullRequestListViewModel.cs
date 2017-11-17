@@ -29,6 +29,8 @@ namespace GitHub.ViewModels
 
     public interface IPullRequestListViewModel : IViewModel, ICanNavigate, IHasBusy
     {
+        IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
+        IRemoteRepositoryModel SelectedRepository { get; set; }
         ITrackingCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
         IReadOnlyList<PullRequestState> States { get; set; }
@@ -39,5 +41,6 @@ namespace GitHub.ViewModels
         IAccount SelectedAssignee { get; set; }
         ReactiveCommand<object> OpenPullRequest { get; }
         ReactiveCommand<object> CreatePullRequest { get; }
+        ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
     }
 }

@@ -4,26 +4,33 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio;
+#if TEAMEXPLORER14
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
+#else
+using Microsoft.VisualStudio.Shell.Interop;
+using System.Threading;
+#endif
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Serilog;
 
 namespace GitHub.Services
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(IVSGitServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServices : IVSGitServices
     {
+        static readonly ILogger log = LogManager.ForContext<VSGitServices>();
         readonly IGitHubServiceProvider serviceProvider;
+#if TEAMEXPLORER15
         readonly IVsStatusbar statusBar;
+#endif
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -37,7 +44,9 @@ namespace GitHub.Services
         public VSGitServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+#if TEAMEXPLORER15
             this.statusBar = serviceProvider.GetService<IVsStatusbar>();
+#endif
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -54,7 +63,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the default cloning path from the registry '{0}'", ex));
+                log.Error(ex, "Error loading the default cloning path from the registry");
             }
             return ret;
         }
@@ -119,7 +128,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
+                log.Error(ex, "Error loading the repository list from the registry");
                 return Enumerable.Empty<ILocalRepositoryModel>();
             }
         }
