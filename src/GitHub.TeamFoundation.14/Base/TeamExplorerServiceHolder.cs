@@ -21,7 +21,6 @@ namespace GitHub.VisualStudio.Base
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
         static readonly ILogger log = LogManager.ForContext<TeamExplorerServiceHolder>();
-        readonly IVSUIContextFactory uiContextFactory;
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
@@ -29,13 +28,21 @@ namespace GitHub.VisualStudio.Base
         IServiceProvider serviceProvider;
         IVSGitExt gitService;
         IVSUIContext gitUIContext;
+        IVSUIContextFactory uiContextFactory;
 
         // ActiveRepositories PropertyChanged event comes in on a non-main thread
         readonly SynchronizationContext syncContext;
 
-        public TeamExplorerServiceHolder(IVSUIContextFactory uiContextFactory, IVSGitExt gitService)
+        /// <summary>
+        /// This class relies on IVSUIContextFactory to get the UIContext object that provides information
+        /// when VS switches repositories. Unfortunately, for some reason MEF fails to create the instance
+        /// when imported from the constructor, so it's imported manually when first accessed via the
+        /// ServiceProvider instance (when mocking, make sure that the ServiceProvider includes this factory)
+        /// </summary>
+        /// <param name="gitService"></param>
+        [ImportingConstructor]
+        public TeamExplorerServiceHolder(IVSGitExt gitService)
         {
-            this.uiContextFactory = uiContextFactory;
             this.GitService = gitService;
             syncContext = SynchronizationContext.Current;
         }
@@ -52,7 +59,7 @@ namespace GitHub.VisualStudio.Base
                 serviceProvider = value;
                 if (serviceProvider == null)
                     return;
-                GitUIContext = GitUIContext ?? uiContextFactory.GetUIContext(new Guid(Guids.GitSccProviderId));
+                GitUIContext = GitUIContext ?? UIContextFactory.GetUIContext(new Guid(Guids.GitSccProviderId));
                 UIContextChanged(GitUIContext?.IsActive ?? false, false);
             }
         }
@@ -80,7 +87,7 @@ namespace GitHub.VisualStudio.Base
 
             bool notificationsExist;
             ILocalRepositoryModel repo;
-            lock(activeRepoHandlers)
+            lock (activeRepoHandlers)
             {
                 repo = ActiveRepo;
                 notificationsExist = activeRepoNotified;
@@ -128,7 +135,7 @@ namespace GitHub.VisualStudio.Base
 
         public void Refresh()
         {
-            GitUIContext = GitUIContext ?? uiContextFactory.GetUIContext(new Guid(Guids.GitSccProviderId));
+            GitUIContext = GitUIContext ?? UIContextFactory.GetUIContext(new Guid(Guids.GitSccProviderId));
             UIContextChanged(GitUIContext?.IsActive ?? false, true);
         }
 
@@ -142,7 +149,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        void UIContextChanged(object sender, UIContextChangedEventArgs e)
+        void UIContextChanged(object sender, IVSUIContextChangedEventArgs e)
         {
             Guard.ArgumentNotNull(e, nameof(e));
 
@@ -150,6 +157,11 @@ namespace GitHub.VisualStudio.Base
             UIContextChanged(e.Activated, false);
         }
 
+        /// <summary>
+        /// This is called on a background thread. Do not do synchronous GetService calls here.
+        /// </summary>
+        /// <param name="active"></param>
+        /// <param name="refresh"></param>
         async void UIContextChanged(bool active, bool refresh)
         {
             Debug.Assert(ServiceProvider != null, "UIContextChanged called before service provider is set");
@@ -170,7 +182,7 @@ namespace GitHub.VisualStudio.Base
                         {
                             log.Error("Error 2001: ActiveRepositories is null. GitService: '{GitService}'", GitService);
                             GitService.Refresh(ServiceProvider);
-                            repos = GitService?.ActiveRepositories;
+                            repos = GitService.ActiveRepositories;
                             if (repos == null)
                                 log.Error("Error 2002: ActiveRepositories is null. GitService: '{GitService}'", GitService);
                         }
@@ -243,6 +255,74 @@ namespace GitHub.VisualStudio.Base
                 gitService = value;
                 if (gitService != null)
                     gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
+            }
+        }
+
+        IVSUIContextFactory UIContextFactory
+        {
+            get
+            {
+                if (uiContextFactory == null)
+                {
+                    uiContextFactory = ServiceProvider.GetServiceSafe<IVSUIContextFactory>();
+                }
+                return uiContextFactory;
+            }
+        }
+    }
+
+    [Export(typeof(IVSUIContextFactory))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    class VSUIContextFactory : IVSUIContextFactory
+    {
+        public IVSUIContext GetUIContext(Guid contextGuid)
+        {
+            return new VSUIContext(UIContext.FromUIContextGuid(contextGuid));
+        }
+    }
+
+    class VSUIContextChangedEventArgs : IVSUIContextChangedEventArgs
+    {
+        public bool Activated { get; }
+
+        public VSUIContextChangedEventArgs(bool activated)
+        {
+            Activated = activated;
+        }
+    }
+
+    class VSUIContext : IVSUIContext
+    {
+        readonly UIContext context;
+        readonly Dictionary<EventHandler<IVSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>> handlers =
+            new Dictionary<EventHandler<IVSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>>();
+        public VSUIContext(UIContext context)
+        {
+            this.context = context;
+        }
+
+        public bool IsActive { get { return context.IsActive; } }
+
+        public event EventHandler<IVSUIContextChangedEventArgs> UIContextChanged
+        {
+            add
+            {
+                EventHandler<UIContextChangedEventArgs> handler = null;
+                if (!handlers.TryGetValue(value, out handler))
+                {
+                    handler = (s, e) => value.Invoke(s, new VSUIContextChangedEventArgs(e.Activated));
+                    handlers.Add(value, handler);
+                }
+                context.UIContextChanged += handler;
+            }
+            remove
+            {
+                EventHandler<UIContextChangedEventArgs> handler = null;
+                if (handlers.TryGetValue(value, out handler))
+                {
+                    handlers.Remove(value);
+                    context.UIContextChanged -= handler;
+                }
             }
         }
     }
