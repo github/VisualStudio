@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace GitHub.Models
 {
@@ -39,41 +40,26 @@ namespace GitHub.Models
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
-            return new UsageModel
+            var result = new UsageModel();
+            var properties = result.GetType().GetRuntimeProperties();
+
+            foreach (var property in properties)
             {
-                IsGitHubUser = IsGitHubUser,
-                IsEnterpriseUser = IsEnterpriseUser,
-                AppVersion = AppVersion,
-                VSVersion = VSVersion,
-                Lang = Lang,
-                NumberOfStartups = NumberOfStartups,
-                NumberOfStartupsWeek = includeWeekly ? NumberOfStartupsWeek : 0,
-                NumberOfStartupsMonth = includeMonthly ? NumberOfStartupsMonth : 0,
-                NumberOfUpstreamPullRequests = NumberOfUpstreamPullRequests,
-                NumberOfClones = NumberOfClones,
-                NumberOfReposCreated = NumberOfReposCreated,
-                NumberOfReposPublished = NumberOfReposPublished,
-                NumberOfGists = NumberOfGists,
-                NumberOfOpenInGitHub = NumberOfOpenInGitHub,
-                NumberOfLinkToGitHub = NumberOfLinkToGitHub,
-                NumberOfLogins = NumberOfLogins,
-                NumberOfPullRequestsOpened = NumberOfPullRequestsOpened,
-                NumberOfLocalPullRequestsCheckedOut = NumberOfLocalPullRequestsCheckedOut,
-                NumberOfLocalPullRequestPulls = NumberOfLocalPullRequestPulls,
-                NumberOfLocalPullRequestPushes = NumberOfLocalPullRequestPushes,
-                NumberOfForkPullRequestsCheckedOut = NumberOfForkPullRequestsCheckedOut,
-                NumberOfForkPullRequestPulls = NumberOfForkPullRequestPulls,
-                NumberOfForkPullRequestPushes = NumberOfForkPullRequestPushes,
-                NumberOfWelcomeDocsClicks = NumberOfWelcomeDocsClicks,
-                NumberOfWelcomeTrainingClicks = NumberOfWelcomeTrainingClicks,
-                NumberOfGitHubPaneHelpClicks = NumberOfGitHubPaneHelpClicks,
-                NumberOfPRDetailsViewChanges = NumberOfPRDetailsViewChanges,
-                NumberOfPRDetailsViewFile = NumberOfPRDetailsViewFile,
-                NumberOfPRDetailsCompareWithSolution = NumberOfPRDetailsCompareWithSolution,
-                NumberOfPRDetailsOpenFileInSolution = NumberOfPRDetailsOpenFileInSolution,
-                NumberOfPRReviewDiffViewInlineCommentOpen = NumberOfPRReviewDiffViewInlineCommentOpen,
-                NumberOfPRReviewDiffViewInlineCommentPost = NumberOfPRReviewDiffViewInlineCommentPost,
-            };
+                var cloneValue = property.PropertyType == typeof(int);
+
+                if (property.Name == nameof(result.NumberOfStartupsWeek))
+                    cloneValue = includeWeekly;
+                else if (property.Name == nameof(result.NumberOfStartupsMonth))
+                    cloneValue = includeMonthly;
+
+                if (cloneValue)
+                {
+                    var value = property.GetValue(this);
+                    property.SetValue(result, value);
+                }
+            }
+
+            return result;
         }
     }
 }
