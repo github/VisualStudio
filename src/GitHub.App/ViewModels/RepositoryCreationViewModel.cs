@@ -280,7 +280,7 @@ namespace GitHub.ViewModels
                 SelectedAccount,
                 BaseRepositoryPath,
                 modelService.ApiClient)
-                .Do(_ => usageTracker.IncrementCreateCount().Forget());
+                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposCreated).Forget());
         }
 
         ReactiveCommand<Unit> InitializeCreateRepositoryCommand()

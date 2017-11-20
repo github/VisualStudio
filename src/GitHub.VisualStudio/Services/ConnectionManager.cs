@@ -80,7 +80,7 @@ namespace GitHub.VisualStudio
 
             conns.Add(connection);
             await SaveConnections();
-            await usageTracker.IncrementLoginCount();
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
             return connection;
         }
 
@@ -144,7 +144,7 @@ namespace GitHub.VisualStudio
                     var connection = new Connection(c.HostAddress, c.UserName, user, error);
 
                     result.Add(connection);
-                    await usageTracker.IncrementLoginCount();
+                    await usageTracker.IncrementCounter(x => x.NumberOfLogins);
                 }
             }
             finally

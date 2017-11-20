@@ -157,7 +157,7 @@ namespace GitHub.ViewModels
             var modelService = modelServiceFactory.CreateBlocking(SelectedConnection);
 
             return repositoryPublishService.PublishRepository(newRepository, account, modelService.ApiClient)
-                .Do(_ => usageTracker.IncrementPublishCount().Forget())
+                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposPublished).Forget())
                 .Select(_ => ProgressState.Success)
                 .Catch<ProgressState, Exception>(ex =>
                 {

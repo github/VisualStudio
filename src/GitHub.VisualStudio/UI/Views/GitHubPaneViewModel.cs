@@ -139,7 +139,7 @@ namespace GitHub.VisualStudio.UI.Views
                  () =>
                  {
                      browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                     usageTracker.IncrementGitHubPaneHelpClicks().Forget();
+                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
                  },
                  true);
 
