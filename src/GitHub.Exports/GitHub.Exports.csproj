@@ -265,6 +265,8 @@
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
+    <Compile Include="Services\IVSGitExt.cs" />
+    <Compile Include="Services\IVSUIContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
