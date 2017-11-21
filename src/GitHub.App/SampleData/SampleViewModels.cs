@@ -200,23 +200,15 @@ namespace GitHub.SampleData
             public string Username { get; set; }
             public ObservableCollection<ILocalRepositoryModel> Repositories { get; set;  }
 
-            public IObservable<IConnection> Login()
-            {
-                return null;
-            }
+            public Octokit.User User => null;
+            public bool IsLoggedIn => true;
 
-            public void Logout()
-            {
-            }
-
-            public void Dispose()
-            {
-            }
+            public Exception ConnectionError => null;
         }
 
         public RepositoryPublishViewModelDesigner()
         {
-            Connections = new ObservableCollection<IConnection>
+            Connections = new ObservableCollectionEx<IConnection>
             {
                 new Conn() { HostAddress = new HostAddress() },
                 new Conn() { HostAddress = HostAddress.Create("ghe.io") }
@@ -238,7 +230,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ObservableCollection<IConnection> Connections
+        public IReadOnlyObservableCollection<IConnection> Connections
         {
             get;
             private set;
@@ -247,64 +239,6 @@ namespace GitHub.SampleData
         public IConnection SelectedConnection
         {
             get; set;
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public sealed class RepositoryHostDesigner : ReactiveObject, IRepositoryHost
-    {
-        public RepositoryHostDesigner(string title)
-        {
-            this.Title = title;
-        }
-
-        public HostAddress Address
-        {
-            get;
-            private set;
-        }
-
-        public IApiClient ApiClient
-        {
-            get;
-            private set;
-        }
-
-        public bool IsLoggedIn
-        {
-            get;
-            private set;
-        }
-
-        public IModelService ModelService
-        {
-            get;
-            private set;
-        }
-
-        public string Title
-        {
-            get;
-            private set;
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<AuthenticationResult> LogInFromCache()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> LogOut()
-        {
-            throw new NotImplementedException();
         }
     }
 

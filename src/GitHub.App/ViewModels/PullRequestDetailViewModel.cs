@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -59,13 +60,14 @@ namespace GitHub.ViewModels
         /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
-                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                   modelServiceFactory.CreateBlocking(connection.Get()),
                    pullRequestsService,
                    sessionManager,
                    usageTracker)

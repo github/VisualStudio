@@ -1,19 +1,15 @@
-﻿using GitHub.Api;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Reactive.Linq;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
-using GitHub.VisualStudio;
 using GitHub.VisualStudio.UI.Views;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Reactive.Linq;
 using UnitTests;
 using Xunit;
 
@@ -27,9 +23,6 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     public GitHubPaneViewModelTests()
     {
-        var repositoryHosts = Substitutes.RepositoryHosts;
-        repositoryHosts.IsLoggedInToAnyHost.Returns(true);
-
         var teamExplorerServiceHolder = Substitute.For<ITeamExplorerServiceHolder>();
         var activeRepo = Substitute.For<ILocalRepositoryModel>();
         activeRepo.CloneUrl.Returns(new UriString("https://github.com/foo/foo"));
@@ -45,14 +38,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
         var connection = Substitutes.Connection;
         var connectionHostAddress = HostAddress.Create(activeRepo.CloneUrl.ToString());
         connection.HostAddress.Returns(connectionHostAddress);
-        connectionManager.Connections.Returns(new ObservableCollection<IConnection>(new[] {
+        connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>(new[] {
                 connection
             }));
-        connection.Login().Returns(Observable.Return(connection));
-
-        var host = Substitute.For<IRepositoryHost>();
-        host.IsLoggedIn.Returns(true);
-        repositoryHosts.LookupHost(connectionHostAddress).Returns(host);
+        connection.IsLoggedIn.Returns(true);
 
         serviceProvider = Substitutes.GetFullyMockedServiceProvider();
         menuCommandService = new FakeMenuCommandService();

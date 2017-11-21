@@ -1,56 +1,39 @@
 ﻿using System;
 using GitHub.Models;
 using GitHub.Primitives;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 
 namespace GitHub.Services
 {
+    /// <summary>
+    /// Represents a configured connection to a GitHub account.
+    /// </summary>
     public class Connection : IConnection
     {
-        readonly IConnectionManager manager;
-
-        public Connection(IConnectionManager cm, HostAddress hostAddress, string userName)
+        public Connection(
+            HostAddress hostAddress,
+            string userName,
+            Octokit.User user,
+            Exception connectionError)
         {
-            manager = cm;
             HostAddress = hostAddress;
             Username = userName;
-            Repositories = new ObservableCollection<ILocalRepositoryModel>();
+            User = user;
+            ConnectionError = connectionError;
         }
 
-        public HostAddress HostAddress { get; private set; }
-        public string Username { get; private set; }
-        public ObservableCollection<ILocalRepositoryModel> Repositories { get; }
+        /// <inheritdoc/>
+        public HostAddress HostAddress { get; }
 
-        public IObservable<IConnection> Login()
-        {
-            return manager.RequestLogin(this);
-        }
+        /// <inheritdoc/>
+        public string Username { get; }
 
-        public void Logout()
-        {
-            manager.RequestLogout(this);
-        }
+        /// <inheritdoc/>
+        public Octokit.User User { get; }
 
-        #region IDisposable Support
-        private bool disposed = false; // To detect redundant calls
+        /// <inheritdoc/>
+        public bool IsLoggedIn => ConnectionError == null;
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                    Repositories.Clear();
-                disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
+        /// <inheritdoc/>
+        public Exception ConnectionError { get; }
     }
 }
