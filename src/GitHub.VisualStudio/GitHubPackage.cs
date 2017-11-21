@@ -220,6 +220,7 @@ namespace GitHub.VisualStudio
                     twoFaHandler,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
+                    ApiClientConfiguration.RequiredScopes,
                     ApiClientConfiguration.AuthorizationNote,
                     ApiClientConfiguration.MachineFingerprint);
             }
