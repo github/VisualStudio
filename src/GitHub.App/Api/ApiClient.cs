@@ -23,8 +23,6 @@ namespace GitHub.Api
         static readonly ILogger log = LogManager.ForContext<ApiClient>();
 
         readonly IObservableGitHubClient gitHubClient;
-        readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
-        readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
         string ClientId { get; set; }
         string ClientSecret { get; set; }
