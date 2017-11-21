@@ -138,13 +138,20 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
-                return hostAddress != null ?
-                    ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password)
-                        .ToObservable()
-                        .Select(_ => AuthenticationResult.Success)
-                    : Observable.Return(AuthenticationResult.CredentialFailure);
+                if (hostAddress != null)
+                {
+                    if (await ConnectionManager.IsLoggedIn(hostAddress))
+                    {
+                        await ConnectionManager.LogOut(hostAddress);
+                    }
+
+                    await ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password);
+                    return Observable.Return(AuthenticationResult.Success);
+                }
+
+                return Observable.Return(AuthenticationResult.CredentialFailure);
             })
             .ObserveOn(RxApp.MainThreadScheduler)
             .Do(authResult => {
