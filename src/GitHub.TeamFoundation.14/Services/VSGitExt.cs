@@ -33,7 +33,7 @@ namespace GitHub.VisualStudio.Base
             ActiveRepositoriesChanged?.Invoke();
         }
 
-        public IEnumerable<ILocalRepositoryModel> ActiveRepositories => gitService?.ActiveRepositories.Select(x => IGitRepositoryInfoExtensions.ToModel(x));
+        public IEnumerable<ILocalRepositoryModel> ActiveRepositories => gitService?.ActiveRepositories.Select(x => x.ToModel());
         public event Action ActiveRepositoriesChanged;
     }
 }
