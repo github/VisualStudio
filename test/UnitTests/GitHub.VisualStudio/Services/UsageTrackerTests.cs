@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
@@ -232,7 +233,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
             var metricsService = Substitute.For<IMetricsService>();
             var packageSettings = Substitute.For<IPackageSettings>();
 
-            connectionManager.Connections.Returns(new ObservableCollection<IConnection>());
+            connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>());
             packageSettings.CollectMetrics.Returns(true);
 
             result.GetService<IConnectionManager>().Returns(connectionManager);

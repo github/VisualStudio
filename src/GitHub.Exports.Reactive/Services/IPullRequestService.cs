@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using LibGit2Sharp;
 using Octokit;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.Services
 {
     public interface IPullRequestService
     {
-        IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
+        IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body);

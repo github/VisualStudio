@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reactive.Linq;
+using GitHub.Api;
 using GitHub.Factories;
+using GitHub.Models;
+using GitHub.SampleData;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
+using ReactiveUI;
 using UnitTests;
 using Xunit;
-using System.Reactive.Linq;
-using GitHub.Models;
-using ReactiveUI;
-using GitHub.SampleData;
+using IConnection = GitHub.Models.IConnection;
 
 public class GistCreationViewModelTests
 {
@@ -21,11 +20,19 @@ public class GistCreationViewModelTests
     {
         var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
         selectedTextProvider.GetSelectedText().Returns(selectedText);
-        var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
+
         var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
-        repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
+        var modelService = Substitute.For<IModelService>();
+        modelService.GetAccounts().Returns(Observable.Return(accounts));
+
+        var modelServiceFactory = Substitute.For<IModelServiceFactory>();
+        modelServiceFactory.CreateAsync(null).ReturnsForAnyArgs(modelService);
+        modelServiceFactory.CreateBlocking(null).ReturnsForAnyArgs(modelService);
+
         var gistPublishService = provider.GetGistPublishService();
-        return new GistCreationViewModel(repositoryHost, selectedTextProvider, gistPublishService, Substitute.For<IUsageTracker>())
+        var connection = Substitute.For<IConnection>();
+
+        return new GistCreationViewModel(connection, modelServiceFactory, selectedTextProvider, gistPublishService, Substitute.For<IUsageTracker>())
         {
             FileName = fileName,
             IsPrivate = isPrivate
@@ -42,13 +49,12 @@ public class GistCreationViewModelTests
             var provider = Substitutes.ServiceProvider;
             var vm = CreateViewModel(provider, selectedText, fileName, isPrivate);
             var gistPublishService = provider.GetGistPublishService();
-            var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
             vm.CreateGist.Execute(null);
 
             gistPublishService
                 .Received()
                 .PublishGist(
-                    repositoryHost.ApiClient,
+                    Arg.Any<IApiClient>(),
                     Arg.Is<NewGist>(g => g.Public == !isPrivate
                         && g.Files.First().Key == fileName
                         && g.Files.First().Value == selectedText));

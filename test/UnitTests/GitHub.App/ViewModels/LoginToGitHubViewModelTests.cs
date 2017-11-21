@@ -14,60 +14,60 @@ using Xunit;
 
 public class LoginToGitHubViewModelTests
 {
-    public class TheLoginCommand : TestBaseClass
-    {
-        [Fact]
-        public void ShowsHelpfulTooltipWhenForbiddenResponseReceived()
-        {
-            var response = Substitute.For<IResponse>();
-            response.StatusCode.Returns(HttpStatusCode.Forbidden);
-            var repositoryHosts = Substitute.For<IRepositoryHosts>();
-            repositoryHosts.LogIn(HostAddress.GitHubDotComHostAddress, Args.String, Args.String)
-                .Returns(_ => Observable.Throw<AuthenticationResult>(new ForbiddenException(response)));
-            var browser = Substitute.For<IVisualStudioBrowser>();
-            var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
+    //public class TheLoginCommand : TestBaseClass
+    //{
+    //    [Fact]
+    //    public void ShowsHelpfulTooltipWhenForbiddenResponseReceived()
+    //    {
+    //        var response = Substitute.For<IResponse>();
+    //        response.StatusCode.Returns(HttpStatusCode.Forbidden);
+    //        var repositoryHosts = Substitute.For<IRepositoryHosts>();
+    //        repositoryHosts.LogIn(HostAddress.GitHubDotComHostAddress, Args.String, Args.String)
+    //            .Returns(_ => Observable.Throw<AuthenticationResult>(new ForbiddenException(response)));
+    //        var browser = Substitute.For<IVisualStudioBrowser>();
+    //        var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
 
-            loginViewModel.Login.Execute(null);
+    //        loginViewModel.Login.Execute(null);
 
-            Assert.Equal("Make sure to use your password and not a Personal Access token to sign in.",
-                loginViewModel.Error.ErrorMessage);
-        }
-    }
+    //        Assert.Equal("Make sure to use your password and not a Personal Access token to sign in.",
+    //            loginViewModel.Error.ErrorMessage);
+    //    }
+    //}
 
-    public class TheSignupCommand : TestBaseClass
-    {
-        [Fact]
-        public void LaunchesBrowserToSignUpPage()
-        {
-            var repositoryHosts = Substitute.For<IRepositoryHosts>();
-            var gitHubHost = Substitute.For<IRepositoryHost>();
-            gitHubHost.Address.Returns(HostAddress.GitHubDotComHostAddress);
-            repositoryHosts.GitHubHost.Returns(gitHubHost);
-            var browser = Substitute.For<IVisualStudioBrowser>();
-            var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
+    //public class TheSignupCommand : TestBaseClass
+    //{
+    //    [Fact]
+    //    public void LaunchesBrowserToSignUpPage()
+    //    {
+    //        var repositoryHosts = Substitute.For<IRepositoryHosts>();
+    //        var gitHubHost = Substitute.For<IRepositoryHost>();
+    //        gitHubHost.Address.Returns(HostAddress.GitHubDotComHostAddress);
+    //        repositoryHosts.GitHubHost.Returns(gitHubHost);
+    //        var browser = Substitute.For<IVisualStudioBrowser>();
+    //        var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
 
-            loginViewModel.SignUp.Execute(null);
+    //        loginViewModel.SignUp.Execute(null);
 
-            browser.Received().OpenUrl(GitHubUrls.Plans);
-        }
-    }
+    //        browser.Received().OpenUrl(GitHubUrls.Plans);
+    //    }
+    //}
 
-    public class TheForgotPasswordCommand : TestBaseClass
-    {
-        [Fact]
-        public void LaunchesBrowserToForgotPasswordPage()
-        {
-            var repositoryHosts = Substitute.For<IRepositoryHosts>();
-            var gitHubHost = Substitute.For<IRepositoryHost>();
-            gitHubHost.Address.Returns(HostAddress.GitHubDotComHostAddress);
-            repositoryHosts.GitHubHost.Returns(gitHubHost);
-            var browser = Substitute.For<IVisualStudioBrowser>();
-            var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
+    //public class TheForgotPasswordCommand : TestBaseClass
+    //{
+    //    [Fact]
+    //    public void LaunchesBrowserToForgotPasswordPage()
+    //    {
+    //        var repositoryHosts = Substitute.For<IRepositoryHosts>();
+    //        var gitHubHost = Substitute.For<IRepositoryHost>();
+    //        gitHubHost.Address.Returns(HostAddress.GitHubDotComHostAddress);
+    //        repositoryHosts.GitHubHost.Returns(gitHubHost);
+    //        var browser = Substitute.For<IVisualStudioBrowser>();
+    //        var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
 
-            loginViewModel.NavigateForgotPassword.Execute(null);
+    //        loginViewModel.NavigateForgotPassword.Execute(null);
 
-            browser.Received().OpenUrl(new Uri(HostAddress.GitHubDotComHostAddress.WebUri, GitHubUrls.ForgotPasswordPath));
-        }
-    }
+    //        browser.Received().OpenUrl(new Uri(HostAddress.GitHubDotComHostAddress.WebUri, GitHubUrls.ForgotPasswordPath));
+    //    }
+    //}
 }
   

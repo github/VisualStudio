@@ -16,10 +16,12 @@ public class SimpleApiClientFactoryTests
         {
             const string url = "https://github.com/github/CreatesNewInstanceOfSimpleApiClient";
             var program = new Program();
+            var keychain = Substitute.For<IKeychain>();
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var factory = new SimpleApiClientFactory(
                 program,
+                CreateKeychain(),
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
@@ -42,6 +44,7 @@ public class SimpleApiClientFactoryTests
             var wikiProbe = Substitute.For<IWikiProbe>();
             var factory = new SimpleApiClientFactory(
                 program,
+                CreateKeychain(),
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
@@ -50,5 +53,12 @@ public class SimpleApiClientFactoryTests
 
             Assert.NotSame(client, factory.Create(url));
         }
+    }
+
+    static IKeychain CreateKeychain()
+    {
+        var result = Substitute.For<IKeychain>();
+        result.Load(null).ReturnsForAnyArgs(Tuple.Create("user", "pass"));
+        return result;
     }
 }

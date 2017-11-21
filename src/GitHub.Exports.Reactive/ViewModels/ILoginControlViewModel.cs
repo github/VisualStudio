@@ -1,15 +1,15 @@
-﻿using System.ComponentModel;
-using System.Reactive;
+﻿using System;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
+    [Flags]
     public enum LoginMode
     {
-        None = 0,
-        DotComOrEnterprise,
-        DotComOnly = 3,
-        EnterpriseOnly = 4,
+        None = 0x00,
+        DotComOnly = 0x01,
+        EnterpriseOnly = 0x02,
+        DotComOrEnterprise = 0x03,
     }
 
     /// <summary>

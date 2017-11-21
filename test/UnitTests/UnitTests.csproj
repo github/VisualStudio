@@ -223,14 +223,13 @@
     <Compile Include="GitHub.Api\LoginManagerTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
-    <Compile Include="GitHub.App\Caches\CredentialCacheTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
+    <Compile Include="GitHub.App\Factories\ModelServiceFactoryTests.cs" />
     <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\PullRequestModelTests.cs" />
-    <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
@@ -268,7 +267,6 @@
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
-    <Compile Include="Helpers\TestLoginCache.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -366,9 +364,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
