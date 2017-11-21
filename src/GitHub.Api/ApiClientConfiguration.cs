@@ -35,7 +35,7 @@ namespace GitHub.Api
         /// <summary>
         /// Gets the scopes required by the application.
         /// </summary>
-        public static IReadOnlyList<string> Scopes { get; } = new[] { "user", "repo", "gist", "write:public_key" };
+        public static IReadOnlyList<string> RequiredScopes { get; } = new[] { "user", "repo", "gist", "write:public_key" };
 
         /// <summary>
         /// Gets a note that will be stored with the OAUTH token.

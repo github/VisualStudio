@@ -30,7 +30,7 @@ namespace GitHub.VisualStudio.Menus
             var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
 
-            await UsageTracker.IncrementOpenInGitHubCount();
+            await UsageTracker.IncrementCounter(x => x.NumberOfOpenInGitHub);
         }
     }
 }
