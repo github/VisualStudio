@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -18,7 +19,7 @@ public class LoginManagerTests
         [Fact]
         public async Task LoginTokenIsSavedToCache()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns(new ApplicationAuthorization("123abc"));
 
@@ -35,11 +36,10 @@ public class LoginManagerTests
         [Fact]
         public async Task LoggedInUserIsReturned()
         {
-            var client = Substitute.For<IGitHubClient>();
             var user = new User();
+            var client = CreateClient(user);
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns(new ApplicationAuthorization("123abc"));
-            client.User.Current().Returns(user);
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = Substitute.For<ITwoFactorChallengeHandler>();
@@ -57,7 +57,7 @@ public class LoginManagerTests
             // If GetOrCreateApplicationAuthentication is called and a matching token already exists,
             // the returned token will be null because it is assumed that the token will be stored
             // locally. In this case, the existing token should be first deleted.
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var user = new User();
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns(
@@ -80,7 +80,7 @@ public class LoginManagerTests
         [Fact]
         public async Task TwoFactorExceptionIsPassedToHandler()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var exception = new TwoFactorChallengeFailedException();
 
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
@@ -106,7 +106,7 @@ public class LoginManagerTests
         [Fact]
         public async Task Failed2FACodeResultsInRetry()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var exception = new TwoFactorChallengeFailedException();
 
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
@@ -141,7 +141,7 @@ public class LoginManagerTests
         [Fact]
         public async Task HandlerNotifiedOfExceptionIn2FAChallengeResponse()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var twoFaException = new TwoFactorChallengeFailedException();
             var forbiddenResponse = Substitute.For<IResponse>();
             forbiddenResponse.StatusCode.Returns(HttpStatusCode.Forbidden);
@@ -173,7 +173,7 @@ public class LoginManagerTests
         [Fact]
         public async Task RequestResendCodeResultsInRetryingLogin()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var exception = new TwoFactorChallengeFailedException();
             var user = new User();
 
@@ -199,11 +199,11 @@ public class LoginManagerTests
         [Fact]
         public async Task UsesUsernameAndPasswordInsteadOfAuthorizationTokenWhenEnterpriseAndAPIReturns404()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var user = new User();
 
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
-                .Returns<ApplicationAuthorization>(_ => 
+                .Returns<ApplicationAuthorization>(_ =>
                 {
                     throw new NotFoundException("Not there", HttpStatusCode.NotFound);
                 });
@@ -222,7 +222,7 @@ public class LoginManagerTests
         [Fact]
         public async Task ErasesLoginWhenUnauthorized()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var user = new User();
 
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
@@ -241,7 +241,7 @@ public class LoginManagerTests
         [Fact]
         public async Task ErasesLoginWhenNonOctokitExceptionThrown()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var user = new User();
 
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
@@ -260,7 +260,7 @@ public class LoginManagerTests
         [Fact]
         public async Task ErasesLoginWhenNonOctokitExceptionThrownIn2FA()
         {
-            var client = Substitute.For<IGitHubClient>();
+            var client = CreateClient();
             var user = new User();
             var exception = new TwoFactorChallengeFailedException();
 
@@ -279,6 +279,35 @@ public class LoginManagerTests
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
+        }
+
+        [Fact]
+        public async Task InvalidResponseScopesCauseException()
+        {
+            var client = CreateClient(responseScopes: new[] { "user", "repo" });
+            client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
+                .Returns(new ApplicationAuthorization("123abc"));
+
+            var keychain = Substitute.For<IKeychain>();
+            var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
+
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+
+            await Assert.ThrowsAsync<IncorrectScopesException>(() => target.Login(host, client, "foo", "bar"));
+        }
+
+        IGitHubClient CreateClient(User user = null, string[] responseScopes = null)
+        {
+            var result = Substitute.For<IGitHubClient>();
+            var userResponse = Substitute.For<IApiResponse<User>>();
+            userResponse.HttpResponse.Headers.Returns(new Dictionary<string, string>
+            {
+                {  "X-OAuth-Scopes", string.Join(",", responseScopes ?? scopes) }
+            });
+            userResponse.Body.Returns(user ?? new User());
+            result.Connection.Get<User>(new Uri("user", UriKind.Relative), null, null).Returns(userResponse);
+            return result;
         }
     }
 }
