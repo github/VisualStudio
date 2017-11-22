@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Extensions;
@@ -10,6 +11,7 @@ using GitHub.Info;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -18,14 +20,24 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginToGitHubForEnterpriseViewModel : LoginTabViewModel, ILoginToGitHubForEnterpriseViewModel
     {
+        readonly ISimpleApiClientFactory apiClientFactory;
+        readonly IEnterpriseProbe enterpriseProbe;
+
         [ImportingConstructor]
         public LoginToGitHubForEnterpriseViewModel(
             IConnectionManager connectionManager,
+            ISimpleApiClientFactory apiClientFactory,
+            IEnterpriseProbe enterpriseProbe,
             IVisualStudioBrowser browser)
             : base(connectionManager, browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
+            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
+            Guard.ArgumentNotNull(enterpriseProbe, nameof(enterpriseProbe));
             Guard.ArgumentNotNull(browser, nameof(browser));
+
+            this.apiClientFactory = apiClientFactory;
+            this.enterpriseProbe = enterpriseProbe;
 
             EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
                 .IfNullOrEmpty(Resources.EnterpriseUrlValidatorEmpty)
@@ -43,11 +55,15 @@ namespace GitHub.ViewModels
                 x => x.EnterpriseUrlValidator.ValidationResult.IsValid)
                 .ToProperty(this, x => x.CanLogin);
 
+            this.WhenAnyValue(x => x.EnterpriseUrl, x => x.EnterpriseUrlValidator.ValidationResult)
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => EnterpriseUrlChanged(x.Item1, x.Item2.IsValid));
+
             NavigateLearnMore = ReactiveCommand.CreateAsyncObservable(_ =>
             {
                 browser.OpenUrl(GitHubUrls.LearnMore);
                 return Observable.Return(Unit.Default);
-
             });
         }
 
@@ -56,9 +72,10 @@ namespace GitHub.ViewModels
             return LogInToHost(HostAddress.Create(EnterpriseUrl));
         }
 
-        protected override Task<AuthenticationResult> LogInViaOAuth(object args)
+        protected override async Task<AuthenticationResult> LogInViaOAuth(object args)
         {
-            throw new NotImplementedException();
+            await LoginToHostViaOAuth(HostAddress.Create(EnterpriseUrl));
+            return AuthenticationResult.Success;
         }
 
         string enterpriseUrl;
@@ -66,6 +83,20 @@ namespace GitHub.ViewModels
         {
             get { return enterpriseUrl; }
             set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
+        }
+
+        bool? isEnterpriseInstance;
+        public bool? IsEnterpriseInstance
+        {
+            get { return isEnterpriseInstance; }
+            private set { this.RaiseAndSetIfChanged(ref isEnterpriseInstance, value); }
+        }
+
+        bool? supportsUserNameAndPassword;
+        public bool? SupportsUserNameAndPassword
+        {
+            get { return supportsUserNameAndPassword; }
+            private set { this.RaiseAndSetIfChanged(ref supportsUserNameAndPassword, value); }
         }
 
         public ReactivePropertyValidator EnterpriseUrlValidator { get; }
@@ -81,6 +112,39 @@ namespace GitHub.ViewModels
         {
             EnterpriseUrl = null;
             await EnterpriseUrlValidator.ResetAsync();
+        }
+
+        async void EnterpriseUrlChanged(string url, bool valid)
+        {
+            var enterpriseInstance = false;
+            var passwordAuth = (bool?)null;
+
+            try
+            {
+                if (valid)
+                {
+                    IsEnterpriseInstance = SupportsUserNameAndPassword = null;
+
+                    if (await enterpriseProbe.Probe(new Uri(url)) == EnterpriseProbeResult.Ok)
+                    {
+                        var client = await apiClientFactory.Create(new UriString(url));
+                        var meta = await client.GetMetadata();
+
+                        enterpriseInstance = true;
+                        passwordAuth = meta.VerifiablePasswordAuthentication;
+                    }
+                }
+            }
+            catch
+            {
+                enterpriseInstance = false;
+            }
+
+            if (url == EnterpriseUrl)
+            {
+                IsEnterpriseInstance = enterpriseInstance;
+                SupportsUserNameAndPassword = passwordAuth;
+            }
         }
     }
 }

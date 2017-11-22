@@ -89,7 +89,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         void SetupEnterpriseBindings(Action<IDisposable> d)
         {
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, x => x.enterpriseloginControlsPanel.IsEnabled, x => x == false));
-
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsEnterpriseInstance, x => x.enterpriseValidUrlPanel.Visibility, x => x == true ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportsUserNameAndPassword, x => x.enterpriseUsernamePasswordPanel.Visibility, x => x == true ? Visibility.Visible : Visibility.Collapsed));
+            
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmail, x => x.enterpriseUserNameOrEmail.Text));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmailValidator, v => v.enterpriseUserNameOrEmailValidationMessage.ReactiveValidator));
 

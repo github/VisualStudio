@@ -38,6 +38,8 @@ namespace GitHub.Api
 
         public IGitHubClient Client { get; }
 
+        public Task<Meta> GetMetadata() => Client.Miscellaneous.GetMetadata();
+
         public async Task<Repository> GetRepository()
         {
             // fast path to avoid locking when the cache has already been set

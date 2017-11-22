@@ -200,6 +200,11 @@ namespace GitHub.ViewModels
         {
             oauthCancel = new CancellationTokenSource();
 
+            if (await ConnectionManager.GetConnection(address) != null)
+            {
+                await ConnectionManager.LogOut(address);
+            }
+
             try
             {
                 await ConnectionManager.LogInViaOAuth(address, oauthCancel.Token);

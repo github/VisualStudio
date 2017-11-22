@@ -9,6 +9,7 @@ namespace GitHub.Api
         IGitHubClient Client { get; }
         HostAddress HostAddress { get; }
         UriString OriginalUrl { get; }
+        Task<Meta> GetMetadata();
         Task<Repository> GetRepository();
         bool HasWiki();
         bool IsEnterprise();
