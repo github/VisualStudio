@@ -96,6 +96,8 @@ public class LoginControlViewModelTests
             connectionManager.Connections.Returns(connections);
             gitHubConnection.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
             enterpriseConnection.HostAddress.Returns(HostAddress.Create("https://enterprise.url"));
+            gitHubConnection.IsLoggedIn.Returns(true);
+            enterpriseConnection.IsLoggedIn.Returns(true);
 
             var loginViewModel = new LoginControlViewModel(connectionManager, gitHubLogin, enterpriseLogin);
 
