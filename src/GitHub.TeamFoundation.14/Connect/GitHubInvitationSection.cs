@@ -11,6 +11,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Media;
 using GitHub.VisualStudio.UI;
+using System.Linq;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -40,9 +41,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 OnThemeChanged();
             };
 
-            IsVisible = cm.Connections.Count == 0;
+            IsVisible = !cm.Connections.Where(x => x.IsLoggedIn).Any();
 
-            cm.Connections.CollectionChanged += (s, e) => IsVisible = cm.Connections.Count == 0;
+            cm.Connections.CollectionChanged += (s, e) => IsVisible = !cm.Connections.Where(x => x.IsLoggedIn).Any();
         }
 
         public override void Connect()

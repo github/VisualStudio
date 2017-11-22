@@ -142,7 +142,7 @@ namespace GitHub.ViewModels
             {
                 if (hostAddress != null)
                 {
-                    if (await ConnectionManager.IsLoggedIn(hostAddress))
+                    if (await ConnectionManager.GetConnection(hostAddress) != null)
                     {
                         await ConnectionManager.LogOut(hostAddress);
                     }
