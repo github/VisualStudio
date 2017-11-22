@@ -5,6 +5,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using NSubstitute;
+using Octokit;
 using Xunit;
 
 public class SimpleApiClientFactoryTests
@@ -17,12 +18,12 @@ public class SimpleApiClientFactoryTests
             const string url = "https://github.com/github/CreatesNewInstanceOfSimpleApiClient";
             var program = new Program();
             var keychain = Substitute.For<IKeychain>();
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var factory = new SimpleApiClientFactory(
                 program,
                 CreateKeychain(),
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var client = await factory.Create(url);
@@ -40,12 +41,12 @@ public class SimpleApiClientFactoryTests
         {
             const string url = "https://github.com/github/RemovesClientFromCache";
             var program = new Program();
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var factory = new SimpleApiClientFactory(
                 program,
                 CreateKeychain(),
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var client = await factory.Create(url);

@@ -252,9 +252,7 @@
     <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />
     <Compile Include="Primitives\UriString.cs" />
-    <Compile Include="Services\EnterpriseProbeTask.cs" />
     <Compile Include="Services\ExportFactoryProvider.cs" />
-    <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IGitHubServiceProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />

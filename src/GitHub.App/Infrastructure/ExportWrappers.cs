@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.Composition;
+using GitHub.Models;
+using Octokit;
 using Octokit.Internal;
-using System;
-using System.Net.Http;
 
 namespace GitHub.Infrastructure
 {
@@ -15,5 +15,15 @@ namespace GitHub.Infrastructure
         public ExportedHttpClient() :
             base(HttpMessageHandlerFactory.CreateDefault)
         {}
+    }
+
+    [Export(typeof(IEnterpriseProbe))]
+    public class ExportedEnterpriseProbe : EnterpriseProbe
+    {
+        [ImportingConstructor]
+        public ExportedEnterpriseProbe(IProgram program, IHttpClient client)
+            : base(program.ProductHeader, client)
+        {
+        }
     }
 }

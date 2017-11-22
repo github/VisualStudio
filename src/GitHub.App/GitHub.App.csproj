@@ -189,11 +189,9 @@
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Factories\ApiClientFactory.cs" />
-    <Compile Include="Services\EnterpriseProbe.cs" />
     <Compile Include="Services\ErrorMap.cs" />
     <Compile Include="Services\ErrorMessage.cs" />
     <Compile Include="Services\ErrorMessageTranslator.cs" />
-    <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
     <Compile Include="Services\GistPublishService.cs" />
     <Compile Include="Services\RepositoryPublishService.cs" />

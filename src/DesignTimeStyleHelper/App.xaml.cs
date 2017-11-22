@@ -73,7 +73,7 @@ namespace DesignTimeStyleHelper
                 new AssemblyCatalog(typeof(GitHub.Api.ApiClient).Assembly), // GitHub.App
                 new AssemblyCatalog(typeof(GitHub.Api.SimpleApiClient).Assembly), // GitHub.Api
                 new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // Rothko
-                new AssemblyCatalog(typeof(EnterpriseProbeTask).Assembly) // GitHub.Exports
+                new AssemblyCatalog(typeof(WikiProbe).Assembly) // GitHub.Exports
             );
             container = new CompositionContainer(catalog, CompositionOptions.IsThreadSafe | CompositionOptions.DisableSilentRejection);
 
