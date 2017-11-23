@@ -214,7 +214,7 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                // TODO: Find out if BranchTrackingDetails depends on Repository
+                // BranchTrackingDetails doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var remoteName = repo.Head.RemoteName;
@@ -233,7 +233,7 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                // TODO: Find out if TreeChanges depends on Repository
+                // TreeChanges doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
@@ -248,7 +248,7 @@ namespace GitHub.Services
         {
             return Observable.Defer(() =>
             {
-                // TODO: Find out if IBranch depends on Repository
+                // BranchModel doesn't keep a reference to repo
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
@@ -325,7 +325,6 @@ namespace GitHub.Services
 
                         await gitClient.Checkout(repo, branchName);
                         await MarkBranchAsPullRequest(repo, branchName, pullRequest);
-
                     }
                 }
 
@@ -556,7 +555,7 @@ namespace GitHub.Services
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
         {
-            // TODO: Find out if IPullRequestModel depends on Repository
+            // PullRequestModel doesn't keep a reference to repo
             using (var repo = await Task.Run(() => gitService.GetRepository(sourceRepository.LocalPath)))
             {
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
