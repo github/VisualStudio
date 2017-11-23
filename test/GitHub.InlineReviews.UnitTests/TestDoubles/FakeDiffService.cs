@@ -54,7 +54,9 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         public void Dispose()
         {
             var path = repository.Info.WorkingDirectory;
-            repository.Dispose();
+
+            // NOTE: IDiffService doesn't own the Repository object
+            //repository.Dispose();
 
             // The .git folder has some files marked as readonly, meaning that a simple
             // Directory.Delete doesn't work here.
