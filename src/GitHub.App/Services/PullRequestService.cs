@@ -93,12 +93,13 @@ namespace GitHub.Services
             string compareBranch,
             int maxCommits)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 // CommitMessage doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    return gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits).ToObservable();
+                    var messages = await gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits);
+                    return Observable.Return(messages);
                 }
             });
         }
@@ -130,11 +131,12 @@ namespace GitHub.Services
 
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    return gitClient.Pull(repo).ToObservable();
+                    await gitClient.Pull(repo);
+                    return Observable.Return(Unit.Default);
                 }
             });
         }
@@ -147,7 +149,8 @@ namespace GitHub.Services
                 {
                     var remoteName = repo.Head.RemoteName;
                     var remote = await gitClient.GetHttpRemote(repo, remoteName);
-                    return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
+                    await gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name);
+                    return Observable.Return(Unit.Default);
                 }
             });
         }
