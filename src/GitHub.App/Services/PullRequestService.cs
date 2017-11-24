@@ -251,11 +251,11 @@ namespace GitHub.Services
         {
             return Observable.Defer(() =>
             {
-                // BranchModel doesn't keep a reference to repo
+                // BranchModel doesn't keep a reference to rep
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
-                    return result.ToObservable();
+                    return result.ToList().ToObservable();
                 }
             });
         }
