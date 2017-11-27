@@ -166,9 +166,6 @@
                                          ToolTip="{Binding CheckoutState.ToolTip}"
                                          ToolTipService.ShowOnDisabled="True"
                                          Margin="4 0" />
-
-                        <!-- Navigate to Git changes -->
-                        <ui:GitHubActionLink Command="{Binding NavigateToGitChanges}" Content="[GitChanges]" Margin="4 0" />
                     </StackPanel>
 
                     <!-- Pull/push buttons -->
@@ -190,6 +187,12 @@
                                              ToolTip="{Binding UpdateState.PushToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
+
+                        <!-- Navigate to Git changes -->
+                        <ui:GitHubActionLink Command="{Binding NavigateToGitChanges}" Content="[GitChanges]" Margin="4 0" />
+
+                        <!-- Sync submodules -->
+                        <ui:GitHubActionLink Command="{Binding SyncSubmodules}" Content="[SyncSubmodules]" Margin="4 0" />
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->

@@ -66,6 +66,16 @@ namespace GitHub.Services
             });
         }
 
+        public Task SyncSubmodules(IRepository repository)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+
+            return Task.Factory.StartNew(() =>
+            {
+                // TODO: Sync Submodules!
+            });
+        }
+
         public Task Fetch(IRepository repository, string remoteName)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));

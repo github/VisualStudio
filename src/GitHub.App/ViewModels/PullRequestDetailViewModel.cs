@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
-using GitHub.App;
+﻿using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Logging;
@@ -17,6 +8,15 @@ using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace GitHub.ViewModels
 {
@@ -114,6 +114,13 @@ namespace GitHub.ViewModels
                     .Select(x => x != null && x.PushEnabled),
                 DoPush);
             SubscribeOperationError(Push);
+
+            SyncSubmodules = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.SyncSubmodulesEnabled),
+                DoSyncSubmodules);
+            SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create();
             NavigateToGitChanges = ReactiveCommand.Create();
@@ -293,6 +300,11 @@ namespace GitHub.ViewModels
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
         public ReactiveCommand<Unit> Push { get; }
+
+        /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        public ReactiveCommand<Unit> SyncSubmodules { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
@@ -620,6 +632,14 @@ namespace GitHub.ViewModels
                 .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
         }
 
+
+        IObservable<Unit> DoSyncSubmodules(object unused)
+        {
+            return pullRequestsService.SyncSubmodules(LocalRepository);
+            // TODO: UsageTracker
+            // .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+        }
+
         class CheckoutCommandState : IPullRequestCheckoutState
         {
             public CheckoutCommandState(string caption, string disabledMessage)
@@ -653,9 +673,17 @@ namespace GitHub.ViewModels
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
-            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0 && !SyncSubmodulesEnabled;
             public bool PullEnabled { get; }
             public bool PushEnabled { get; }
+            public bool SyncSubmodulesEnabled
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
             public string PullToolTip { get; }
             public string PushToolTip { get; }
         }
