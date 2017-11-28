@@ -42,6 +42,16 @@ namespace GitHub.Extensions
             return Observable.Return(connection?.IsLoggedIn ?? false);
         }
 
+        public static IObservable<IConnection> GetConnection(this IConnectionManager cm, HostAddress address)
+        {
+            Guard.ArgumentNotNull(cm, nameof(cm));
+            Guard.ArgumentNotNull(address, nameof(address));
+
+            return cm.GetLoadedConnections()
+                .ToObservable()
+                .Select(x => x.FirstOrDefault(y => y.HostAddress == address));
+        }
+
         public static IObservable<IConnection> GetLoggedInConnections(this IConnectionManager cm)
         {
             Guard.ArgumentNotNull(cm, nameof(cm));

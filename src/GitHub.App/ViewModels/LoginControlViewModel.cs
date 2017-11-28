@@ -85,8 +85,11 @@ namespace GitHub.ViewModels
 
             foreach (var connection in connectionManager.Connections)
             {
-                result &= ~((connection.HostAddress == HostAddress.GitHubDotComHostAddress) ?
-                    LoginMode.DotComOnly : LoginMode.EnterpriseOnly);
+                if (connection.IsLoggedIn)
+                {
+                    result &= ~((connection.HostAddress == HostAddress.GitHubDotComHostAddress) ?
+                        LoginMode.DotComOnly : LoginMode.EnterpriseOnly);
+                }
             }
 
             LoginMode = result;

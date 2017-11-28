@@ -71,7 +71,7 @@ namespace GitHub.VisualStudio
 
             if (conns.Any(x => x.HostAddress == address))
             {
-                throw new InvalidOperationException($"A connection to {address} already exists.");
+                throw new InvalidOperationException($"A connection to {address.Title} already exists.");
             }
 
             var client = CreateClient(address);
@@ -91,7 +91,7 @@ namespace GitHub.VisualStudio
 
             if (connection == null)
             {
-                throw new KeyNotFoundException($"Could not find a connection to {address}.");
+                throw new KeyNotFoundException($"Could not find a connection to {address.Title}.");
             }
 
             var client = CreateClient(address);

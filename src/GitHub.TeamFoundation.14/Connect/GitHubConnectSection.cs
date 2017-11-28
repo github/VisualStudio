@@ -174,7 +174,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         protected void Refresh(IConnection connection)
         {
-            if (connection == null)
+            if (connection == null || !connection.IsLoggedIn)
             {
                 LoggedIn = false;
                 IsVisible = false;
