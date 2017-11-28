@@ -18,6 +18,7 @@ namespace GitHub.VisualStudio
         static readonly ILogger log = LogManager.ForContext<MenuBase>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly Lazy<ISimpleApiClientFactory> apiFactory;
+        readonly Lazy<IDialogService> dialogService;
 
         protected IGitHubServiceProvider ServiceProvider { get { return serviceProvider; } }
 
@@ -37,6 +38,7 @@ namespace GitHub.VisualStudio
         }
 
         protected ISimpleApiClientFactory ApiFactory => apiFactory.Value;
+        protected IDialogService DialogService => dialogService.Value;
 
         protected MenuBase()
         {}
@@ -47,6 +49,7 @@ namespace GitHub.VisualStudio
 
             this.serviceProvider = serviceProvider;
             apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
+            dialogService = new Lazy<IDialogService>(() => ServiceProvider.TryGetService<IDialogService>());
         }
 
         protected ILocalRepositoryModel GetRepositoryByPath(string path)
