@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -72,7 +73,18 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                // TODO: Sync Submodules!
+                var workingDir = repository.Info.WorkingDirectory;
+                var script =
+@"git submodule init
+git submodule sync --recursive
+git submodule update --recursive
+pause";
+                var scriptFile = Path.Combine(Path.GetTempPath(), "SyncSubmodules.cmd");
+                File.WriteAllText(scriptFile, script);
+                using (var process = Process.Start(new ProcessStartInfo { FileName = scriptFile, WorkingDirectory = workingDir }))
+                {
+                    process.WaitForExit();
+                }
             });
         }
 
