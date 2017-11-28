@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Extensions.Reactive;
+using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.SampleData;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
@@ -12,11 +16,7 @@ using Octokit;
 using Rothko;
 using UnitTests;
 using Xunit;
-using GitHub.Extensions;
-using GitHub.SampleData;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reactive.Subjects;
+using IConnection = GitHub.Models.IConnection;
 
 public class RepositoryCreationViewModelTests
 {
@@ -24,18 +24,29 @@ public class RepositoryCreationViewModelTests
 
     static IRepositoryCreationViewModel GetMeAViewModel(
         IServiceProvider provider = null,
-        IRepositoryCreationService creationService = null)
+        IRepositoryCreationService creationService = null,
+        IModelService modelService = null)
     {
         if (provider == null)
             provider = Substitutes.ServiceProvider;
-        var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
         var os = provider.GetOperatingSystem();
         creationService = creationService ?? provider.GetRepositoryCreationService();
         var avatarProvider = provider.GetAvatarProvider();
         var connection = provider.GetConnection();
+        connection.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
         var usageTracker = Substitute.For<IUsageTracker>();
+        modelService = modelService ?? Substitute.For<IModelService>();
+        var factory = GetMeAFactory(modelService);
 
-        return new RepositoryCreationViewModel(repositoryHost, os, creationService, usageTracker);
+        return new RepositoryCreationViewModel(connection, factory, os, creationService, usageTracker);
+    }
+
+    static IModelServiceFactory GetMeAFactory(IModelService ms)
+    {
+        var result = Substitute.For<IModelServiceFactory>();
+        result.CreateAsync(null).ReturnsForAnyArgs(ms);
+        result.CreateBlocking(null).ReturnsForAnyArgs(ms);
+        return result;
     }
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
@@ -330,10 +341,13 @@ public class RepositoryCreationViewModelTests
         public void IsPopulatedByTheRepositoryHost()
         {
             var accounts = new List<IAccount> { new AccountDesigner(), new AccountDesigner() };
-            var repositoryHost = Substitute.For<IRepositoryHost>();
-            repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
+            var connection = Substitute.For<IConnection>();
+            var modelService = Substitute.For<IModelService>();
+            connection.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            modelService.GetAccounts().Returns(Observable.Return(accounts));
             var vm = new RepositoryCreationViewModel(
-                repositoryHost,
+                connection,
+                GetMeAFactory(modelService),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IRepositoryCreationService>(),
                 Substitute.For<IUsageTracker>());
@@ -356,13 +370,11 @@ public class RepositoryCreationViewModelTests
                 "WordPress"
             }.Select(GitIgnoreItem.Create);
             var provider = Substitutes.ServiceProvider;
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService
+            var modelService = Substitute.For<IModelService>();
+            modelService
                 .GetGitIgnoreTemplates()
                 .Returns(gitIgnoreTemplates.ToObservable());
-            var vm = GetMeAViewModel(provider);
+            var vm = GetMeAViewModel(provider, modelService: modelService);
 
             // this is how long the default collection waits to process about 5 things with the default UI settings
             await Task.Delay(100);
@@ -396,13 +408,11 @@ public class RepositoryCreationViewModelTests
                 new LicenseItem("artistic-2.0", "Artistic License 2.0")
             };
             var provider = Substitutes.ServiceProvider;
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService
+            var modelService = Substitute.For<IModelService>();
+            modelService
                 .GetLicenses()
                 .Returns(licenses.ToObservable());
-            var vm = GetMeAViewModel(provider);
+            var vm = GetMeAViewModel(provider, modelService: modelService);
 
             // this is how long the default collection waits to process about 5 things with the default UI settings
             await Task.Delay(100);
@@ -437,13 +447,11 @@ public class RepositoryCreationViewModelTests
                 GitIgnoreItem.Create("VisualStudio"),
             };
             var provider = Substitutes.ServiceProvider;
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService
+            var modelService = Substitute.For<IModelService>();
+            modelService
                 .GetGitIgnoreTemplates()
                 .Returns(gitignores.ToObservable());
-            var vm = GetMeAViewModel(provider);
+            var vm = GetMeAViewModel(provider, modelService: modelService);
 
             // this is how long the default collection waits to process about 5 things with the default UI settings
             await Task.Delay(100);
@@ -461,13 +469,11 @@ public class RepositoryCreationViewModelTests
                 GitIgnoreItem.Create("Node"),
             };
             var provider = Substitutes.ServiceProvider;
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService
+            var modelService = Substitute.For<IModelService>();
+            modelService
                 .GetGitIgnoreTemplates()
                 .Returns(gitignores.ToObservable());
-            var vm = GetMeAViewModel(provider);
+            var vm = GetMeAViewModel(provider, modelService: modelService);
 
             Assert.Equal("None", vm.SelectedGitIgnoreTemplate.Name);
         }
@@ -502,11 +508,9 @@ public class RepositoryCreationViewModelTests
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
 
             var account = Substitute.For<IAccount>();
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
-            var vm = GetMeAViewModel(provider);
+            var modelService = Substitute.For<IModelService>();
+            modelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
+            var vm = GetMeAViewModel(provider, modelService: modelService);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;
@@ -533,11 +537,9 @@ public class RepositoryCreationViewModelTests
             var creationService = Substitutes.RepositoryCreationService;
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
             var account = Substitute.For<IAccount>();
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
-            var vm = GetMeAViewModel(provider);
+            var modelService = Substitute.For<IModelService>();
+            modelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
+            var vm = GetMeAViewModel(provider, modelService: modelService);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;
@@ -565,11 +567,9 @@ public class RepositoryCreationViewModelTests
             var creationService = Substitutes.RepositoryCreationService;
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
             var account = Substitute.For<IAccount>();
-            var hosts = provider.GetRepositoryHosts();
-            var host = hosts.GitHubHost;
-            hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
-            var vm = GetMeAViewModel(provider);
+            var modelService = Substitute.For<IModelService>();
+            modelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
+            var vm = GetMeAViewModel(provider, modelService: modelService);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;

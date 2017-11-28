@@ -212,11 +212,11 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(ILoginManager))
             {
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                var loginCache = serviceProvider.GetService<ILoginCache>();
+                var keychain = serviceProvider.GetService<IKeychain>();
                 var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
 
                 return new LoginManager(
-                    loginCache,
+                    keychain,
                     twoFaHandler,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
@@ -230,8 +230,10 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IUsageTracker))
             {
-                var uiProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UsageTracker(uiProvider);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var usageService = serviceProvider.GetService<IUsageService>();
+                return new UsageTracker(serviceProvider, usageService);
             }
             else if (serviceType == typeof(IUIProvider))
             {

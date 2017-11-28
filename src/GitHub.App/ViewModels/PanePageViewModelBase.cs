@@ -1,5 +1,4 @@
 ﻿using ReactiveUI;
-using GitHub.UI;
 
 namespace GitHub.ViewModels
 {

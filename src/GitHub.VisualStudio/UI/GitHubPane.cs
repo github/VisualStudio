@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using System.ComponentModel.Design;
-using System.Windows.Controls;
-using GitHub.Services;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using GitHub.Extensions;
-using GitHub.Models;
+using GitHub.Logging;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
-using System.Diagnostics;
-using GitHub.Logging;
-using GitHub.VisualStudio.UI.Views;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -32,11 +31,27 @@ namespace GitHub.VisualStudio.UI
     {
         public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
         bool initialized = false;
+        IDisposable viewSubscription;
 
         IView View
         {
             get { return Content as IView; }
-            set { Content = value; }
+            set
+            {
+                viewSubscription?.Dispose();
+                viewSubscription = null;
+
+                Content = value;
+
+                viewSubscription = value.WhenAnyValue(x => x.ViewModel)
+                    .SelectMany(x =>
+                    {
+                        var pane = x as IGitHubPaneViewModel;
+                        return pane?.WhenAnyValue(p => p.IsSearchEnabled, p => p.SearchQuery)
+                            ?? Observable.Return(Tuple.Create<bool, string>(false, null));
+                    })
+                    .Subscribe(x => UpdateSearchHost(x.Item1, x.Item2));
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -55,6 +70,8 @@ namespace GitHub.VisualStudio.UI
             var uiProvider = provider.GetServiceSafe<IUIProvider>();
             View = uiProvider.GetView(Exports.UIViewType.GitHubPane);
         }
+
+        public override bool SearchEnabled => true;
 
         protected override void Initialize()
         {
@@ -77,6 +94,90 @@ namespace GitHub.VisualStudio.UI
         public void ShowView(ViewWithData data)
         {
             View.ViewModel?.Initialize(data);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "WTF CA, I'm overriding!")]
+        public override IVsSearchTask CreateSearch(uint dwCookie, IVsSearchQuery pSearchQuery, IVsSearchCallback pSearchCallback)
+        {
+            var pane = View.ViewModel as IGitHubPaneViewModel;
+
+            if (pane != null)
+            {
+                return new SearchTask(pane, dwCookie, pSearchQuery, pSearchCallback);
+            }
+
+            return null;
+        }
+
+        public override void ClearSearch()
+        {
+            var pane = View.ViewModel as IGitHubPaneViewModel;
+
+            if (pane != null)
+            {
+                pane.SearchQuery = null;
+            }
+        }
+
+        public override void OnToolWindowCreated()
+        {
+            base.OnToolWindowCreated();
+
+            Marshal.ThrowExceptionForHR(((IVsWindowFrame)Frame)?.SetProperty(
+                (int)__VSFPROPID5.VSFPROPID_SearchPlacement,
+                __VSSEARCHPLACEMENT.SP_STRETCH) ?? 0);
+
+            var pane = View.ViewModel as IGitHubPaneViewModel;
+            UpdateSearchHost(pane?.IsSearchEnabled ?? false, pane?.SearchQuery);
+        }
+
+        void UpdateSearchHost(bool enabled, string query)
+        {
+            if (SearchHost != null)
+            {
+                SearchHost.IsEnabled = enabled;
+
+                if (SearchHost.SearchQuery?.SearchString != query)
+                {
+                    SearchHost.SearchAsync(query != null ? new SearchQuery(query) : null);
+                }
+            }
+        }
+
+        class SearchTask : VsSearchTask
+        {
+            readonly IGitHubPaneViewModel viewModel;
+
+            public SearchTask(
+                IGitHubPaneViewModel viewModel,
+                uint dwCookie,
+                IVsSearchQuery pSearchQuery,
+                IVsSearchCallback pSearchCallback)
+                : base(dwCookie, pSearchQuery, pSearchCallback)
+            {
+                this.viewModel = viewModel;
+            }
+
+            protected override void OnStartSearch()
+            {
+                viewModel.SearchQuery = SearchQuery.SearchString;
+                base.OnStartSearch();
+            }
+
+            protected override void OnStopSearch() => viewModel.SearchQuery = null;
+        }
+
+        class SearchQuery : IVsSearchQuery
+        {
+            public SearchQuery(string query)
+            {
+                SearchString = query;
+            }
+
+            public uint ParseError => 0;
+            public string SearchString { get; }
+
+            public uint GetTokens(uint dwMaxTokens, IVsSearchToken[] rgpSearchTokens) => 0;
         }
     }
 }

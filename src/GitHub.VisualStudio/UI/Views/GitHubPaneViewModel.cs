@@ -16,6 +16,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Info;
+using GitHub.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -28,12 +29,12 @@ namespace GitHub.VisualStudio.UI.Views
         bool initialized;
         readonly CompositeDisposable disposables = new CompositeDisposable();
 
-        readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
         readonly IUIProvider uiProvider;
         readonly IVisualStudioBrowser browser;
         readonly IUsageTracker usageTracker;
         NavigationController navController;
+        IViewModel controlViewModel;
 
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
@@ -42,7 +43,7 @@ namespace GitHub.VisualStudio.UI.Views
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser,
+            IConnectionManager cm, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser,
             IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
@@ -50,13 +51,11 @@ namespace GitHub.VisualStudio.UI.Views
             Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(cm, nameof(cm));
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
             Guard.ArgumentNotNull(vsBrowser, nameof(vsBrowser));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             this.connectionManager = cm;
-            this.hosts = hosts;
             this.uiProvider = uiProvider;
             this.usageTracker = usageTracker;
 
@@ -66,10 +65,16 @@ namespace GitHub.VisualStudio.UI.Views
             browser = vsBrowser;
 
             this.WhenAnyValue(x => x.Control.DataContext)
-                .OfType<IPanePageViewModel>()
-                .Select(x => x.WhenAnyValue(y => y.Title))
-                .Switch()
-                .Subscribe(x => Title = x ?? "GitHub");
+                .Subscribe(x =>
+                {
+                    var pageViewModel = x as IPanePageViewModel;
+                    var searchable = x as ISearchablePanePageViewModel;
+                    controlViewModel = x as IViewModel;
+
+                    Title = pageViewModel?.Title ?? "GitHub";
+                    IsSearchEnabled = searchable != null;
+                    SearchQuery = searchable?.SearchQuery;
+                });
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -142,7 +147,7 @@ namespace GitHub.VisualStudio.UI.Views
                  () =>
                  {
                      browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                     usageTracker.IncrementGitHubPaneHelpClicks().Forget();
+                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
                  },
                  true);
 
@@ -150,7 +155,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             base.Initialize(serviceProvider);
 
-            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => LoadDefault());
+            connectionManager.Connections.CollectionChanged += (_, __) => LoadDefault();
+            LoadDefault();
         }
 
         public void Initialize(ViewWithData data = null)
@@ -238,11 +244,10 @@ namespace GitHub.VisualStudio.UI.Views
                 IsLoggedIn = false;
             else
             {
-                var isLoggedIn = await connection.IsLoggedIn(hosts);
                 if (reloadCallId != latestReloadCallId)
                     return;
 
-                IsLoggedIn = isLoggedIn;
+                IsLoggedIn = connection.IsLoggedIn;
             }
 
             Load(connection, data);
@@ -360,6 +365,39 @@ namespace GitHub.VisualStudio.UI.Views
                     (bool?)null :
                     RepositoryOrigin == UI.RepositoryOrigin.DotCom ||
                     RepositoryOrigin == UI.RepositoryOrigin.Enterprise;
+            }
+        }
+
+        bool isSearchEnabled;
+        public bool IsSearchEnabled
+        {
+            get { return isSearchEnabled; }
+            private set { isSearchEnabled = value; this.RaisePropertyChange(); }
+        }
+
+        string searchQuery;
+        public string SearchQuery
+        {
+            get { return searchQuery; }
+            set
+            {
+                var searchable = controlViewModel as ISearchablePanePageViewModel;
+                value = searchable != null ? value : null;
+
+                if (searchQuery != value)
+                {
+                    searchQuery = value;
+
+                    ThreadingHelper.MainThreadDispatcher.Invoke(() =>
+                    {
+                        this.RaisePropertyChange();
+
+                        if (searchable != null)
+                        {
+                            searchable.SearchQuery = searchQuery;
+                        }
+                    });
+                }
             }
         }
 

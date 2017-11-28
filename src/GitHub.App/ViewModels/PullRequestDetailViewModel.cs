@@ -1,6 +1,7 @@
 ﻿using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -59,13 +60,14 @@ namespace GitHub.ViewModels
         /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IGlobalConnection connection,
+            IModelServiceFactory modelServiceFactory,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
-                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                   modelServiceFactory.CreateBlocking(connection.Get()),
                    pullRequestsService,
                    sessionManager,
                    usageTracker)
@@ -403,8 +405,10 @@ namespace GitHub.ViewModels
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
-                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+                using (var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest))
+                {
+                    ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+                }
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
@@ -467,7 +471,7 @@ namespace GitHub.ViewModels
 
                 if (firstLoad)
                 {
-                    usageTracker.IncrementPullRequestOpened().Forget();
+                    usageTracker.IncrementCounter(x => x.NumberOfPullRequestsOpened).Forget();
                 }
 
                 if (!isInCheckout)
@@ -617,19 +621,37 @@ namespace GitHub.ViewModels
                         .GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.Checkout(LocalRepository, Model, x));
                 }
-            }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
+            }).Do(_ =>
+            {
+                if (IsFromFork)
+                    usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestsCheckedOut).Forget();
+                else
+                    usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestsCheckedOut).Forget();
+            });
         }
 
         IObservable<Unit> DoPull(object unused)
         {
             return pullRequestsService.Pull(LocalRepository)
-                .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
+                .Do(_ =>
+                {
+                    if (IsFromFork)
+                        usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestPulls).Forget();
+                    else
+                        usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPulls).Forget();
+                });
         }
 
         IObservable<Unit> DoPush(object unused)
         {
             return pullRequestsService.Push(LocalRepository)
-                .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+                .Do(_ =>
+                {
+                    if (IsFromFork)
+                        usageTracker.IncrementCounter(x => x.NumberOfForkPullRequestPushes).Forget();
+                    else
+                        usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPushes).Forget();
+                });
         }
 
 

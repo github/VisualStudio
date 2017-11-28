@@ -14,6 +14,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Windows;
 using GitHub.Logging;
 
@@ -98,7 +99,6 @@ namespace GitHub.Controllers
 
         readonly IUIFactory factory;
         readonly IGitHubServiceProvider gitHubServiceProvider;
-        readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
@@ -140,7 +140,6 @@ namespace GitHub.Controllers
 
         public UIController(IGitHubServiceProvider serviceProvider)
             : this(serviceProvider,
-                   serviceProvider.TryGetService<IRepositoryHosts>(),
                    serviceProvider.TryGetService<IUIFactory>(),
                    serviceProvider.TryGetService<IConnectionManager>())
         {
@@ -148,17 +147,15 @@ namespace GitHub.Controllers
         }
 
         public UIController(IGitHubServiceProvider gitHubServiceProvider,
-            IRepositoryHosts hosts, IUIFactory factory,
+            IUIFactory factory,
             IConnectionManager connectionManager)
         {
             Guard.ArgumentNotNull(gitHubServiceProvider, nameof(gitHubServiceProvider));
-            Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
 
             this.factory = factory;
             this.gitHubServiceProvider = gitHubServiceProvider;
-            this.hosts = hosts;
             this.connectionManager = connectionManager;
 
 #if DEBUG
@@ -220,7 +217,7 @@ namespace GitHub.Controllers
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
                     Log.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
-                connection.Login()
+                connectionManager.GetLoadedConnections().ToObservable()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
                     {
@@ -231,7 +228,7 @@ namespace GitHub.Controllers
             else
             {
                 connectionManager
-                    .GetLoggedInConnections(hosts)
+                    .GetLoggedInConnections()
                     .FirstOrDefaultAsync()
                     .Select(c =>
                     {
@@ -445,8 +442,7 @@ namespace GitHub.Controllers
 
         UIControllerFlow SelectActiveFlow()
         {
-            var host = connection != null ? hosts.LookupHost(connection.HostAddress) : null;
-            var loggedIn = host?.IsLoggedIn ?? false;
+            var loggedIn = connection?.IsLoggedIn ?? false;
             return loggedIn ? selectedFlow : UIControllerFlow.Authentication;
         }
 
@@ -711,7 +707,7 @@ namespace GitHub.Controllers
         public bool IsStopped => uiStateMachine.IsInState(UIViewType.None) || stopping;
         public UIControllerFlow CurrentFlow => activeFlow;
         public UIControllerFlow SelectedFlow => selectedFlow;
-        bool LoggedIn => connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
+        bool LoggedIn => connection?.IsLoggedIn ?? false;
         bool? Success { get; set; }
     }
 }

@@ -12,6 +12,8 @@ using GitHub.Info;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GitHub.Extensions;
+using GitHub.Factories;
 
 public class RepositoryPublishViewModelTests
 {
@@ -19,59 +21,46 @@ public class RepositoryPublishViewModelTests
     {
         public static IRepositoryPublishViewModel GetViewModel(IRepositoryPublishService service = null)
         {
-            return GetViewModel(null, service, null);
+            return GetViewModel(service);
         }
 
         public static IRepositoryPublishViewModel GetViewModel(
-            IRepositoryHosts hosts = null,
             IRepositoryPublishService service = null,
             INotificationService notificationService = null,
-            IConnectionManager connectionManager = null)
+            IConnectionManager connectionManager = null,
+            IModelServiceFactory factory = null)
         {
-            hosts = hosts ?? Substitutes.RepositoryHosts;
             service = service ?? Substitute.For<IRepositoryPublishService>();
             notificationService = notificationService ?? Substitute.For<INotificationService>();
             connectionManager = connectionManager ?? Substitutes.ConnectionManager;
-            return new RepositoryPublishViewModel(hosts, service, notificationService, connectionManager,
-                Substitute.For<IUsageTracker>());
+            factory = factory ?? Substitute.For<IModelServiceFactory>();
+
+            return new RepositoryPublishViewModel(service, notificationService, connectionManager,
+                factory, Substitute.For<IUsageTracker>());
         }
 
-        public static void SetupConnections(IRepositoryHosts hosts, IConnectionManager cm,
-            List<HostAddress> adds, List<IConnection> conns, List<IRepositoryHost> hsts,
-            string uri)
+        public static void SetupConnections(List<HostAddress> adds, List<IConnection> conns, string uri)
         {
             var add = HostAddress.Create(new Uri(uri));
-            var host = Substitute.For<IRepositoryHost>();
             var conn = Substitute.For<IConnection>();
-            host.Address.Returns(add);
             conn.HostAddress.Returns(add);
             adds.Add(add);
-            hsts.Add(host);
             conns.Add(conn);
-
-            if (add.IsGitHubDotCom())
-                hosts.GitHubHost.Returns(host);
-            else
-                hosts.EnterpriseHost.Returns(host);
-            hosts.LookupHost(Arg.Is(add)).Returns(host);
         }
 
         public static IRepositoryPublishViewModel SetupConnectionsAndViewModel(
-            IRepositoryHosts hosts = null,
             IRepositoryPublishService service = null,
             INotificationService notificationService = null,
             IConnectionManager cm = null,
             string uri = GitHubUrls.GitHub)
         {
             cm = cm ?? Substitutes.ConnectionManager;
-            hosts = hosts ?? Substitute.For<IRepositoryHosts>();
             var adds = new List<HostAddress>();
-            var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
-            SetupConnections(hosts, cm, adds, conns, hsts, uri);
-            hsts[0].ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
-            return GetViewModel(hosts, service, notificationService, cm);
+            SetupConnections(adds, conns, uri);
+            //hsts[0].ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
+            return GetViewModel(service, notificationService, cm);
         }
 
         public static string[] GetArgs(params string[] args)
@@ -88,35 +77,24 @@ public class RepositoryPublishViewModelTests
     public class TheConnectionsProperty : TestBaseClass
     {
         [Theory]
-        [InlineData(GitHubUrls.GitHub, "https://github.enterprise" )]
+        [InlineData(GitHubUrls.GitHub, "https://github.enterprise")]
         [InlineData("https://github.enterprise", null)]
         [InlineData(GitHubUrls.GitHub, null)]
-        public void ConnectionsMatchHosts(string arg1, string arg2)
+        public void ConnectionsMatchConnectionManager(string arg1, string arg2)
         {
             var args = Helpers.GetArgs(arg1, arg2);
 
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
             var adds = new List<HostAddress>();
-            var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
             foreach (var uri in args)
-                Helpers.SetupConnections(hosts, cm, adds, conns, hsts, uri);
+                Helpers.SetupConnections(adds, conns, uri);
 
-            foreach(var host in hsts)
-                host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            var vm = Helpers.GetViewModel(connectionManager: cm);
 
-            var vm = Helpers.GetViewModel(hosts: hosts, connectionManager: cm);
-
-            var connections = vm.Connections;
-
-            Assert.Equal(args.Length, connections.Count);
-            for (int i = 0; i < conns.Count; i++)
-            {
-                Assert.Same(hsts[i], hosts.LookupHost(conns[i].HostAddress));
-            }
+            Assert.Equal(conns, vm.Connections);
         }
     }
 
@@ -130,22 +108,16 @@ public class RepositoryPublishViewModelTests
             var args = Helpers.GetArgs(arg1, arg2);
 
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
             var adds = new List<HostAddress>();
-            var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
             foreach (var uri in args)
-                Helpers.SetupConnections(hosts, cm, adds, conns, hsts, uri);
+                Helpers.SetupConnections(adds, conns, uri);
 
-            foreach (var host in hsts)
-                host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
-
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
-            var vm = Helpers.GetViewModel(hosts, connectionManager: cm);
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
+            var vm = Helpers.GetViewModel(connectionManager: cm);
 
             Assert.Same(adds.First(x => x.IsGitHubDotCom()), vm.SelectedConnection.HostAddress);
             Assert.Same(conns.First(x => x.HostAddress.IsGitHubDotCom()), vm.SelectedConnection);
-            Assert.Same(hsts.First(x => x.Address.IsGitHubDotCom()), hosts.LookupHost(vm.SelectedConnection.HostAddress));
         }
     }
 
@@ -155,21 +127,25 @@ public class RepositoryPublishViewModelTests
         public void IsPopulatedByTheAccountsForTheSelectedHost()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
             var adds = new List<HostAddress>();
-            var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
-            Helpers.SetupConnections(hosts, cm, adds, conns, hsts, GitHubUrls.GitHub);
-            Helpers.SetupConnections(hosts, cm, adds, conns, hsts, "https://github.enterprise");
+            Helpers.SetupConnections(adds, conns, GitHubUrls.GitHub);
+            Helpers.SetupConnections(adds, conns, "https://github.enterprise");
 
             var gitHubAccounts = new List<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
             var enterpriseAccounts = new List<IAccount> { Substitute.For<IAccount>() };
 
-            hsts.First(x => x.Address.IsGitHubDotCom()).ModelService.GetAccounts().Returns(Observable.Return(gitHubAccounts));
-            hsts.First(x => !x.Address.IsGitHubDotCom()).ModelService.GetAccounts().Returns(Observable.Return(enterpriseAccounts));
+            var gitHubModelService = Substitute.For<IModelService>();
+            var enterpriseModelService = Substitute.For<IModelService>();
+            gitHubModelService.GetAccounts().Returns(Observable.Return(gitHubAccounts));
+            enterpriseModelService.GetAccounts().Returns(Observable.Return(enterpriseAccounts));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
-            var vm = Helpers.GetViewModel(hosts, connectionManager: cm);
+            var factory = Substitute.For<IModelServiceFactory>();
+            factory.CreateAsync(conns[0]).Returns(gitHubModelService);
+            factory.CreateAsync(conns[1]).Returns(enterpriseModelService);
+
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
+            var vm = Helpers.GetViewModel(connectionManager: cm, factory: factory);
 
             Assert.Equal(2, vm.Accounts.Count);
             Assert.Same(gitHubAccounts[0], vm.SelectedAccount);
@@ -187,8 +163,7 @@ public class RepositoryPublishViewModelTests
         public void IsTheSameAsTheRepositoryNameWhenTheInputIsSafe()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "this-is-bad";
 
@@ -199,8 +174,7 @@ public class RepositoryPublishViewModelTests
         public void IsConvertedWhenTheRepositoryNameIsNotSafe()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "this is bad";
 
@@ -211,8 +185,7 @@ public class RepositoryPublishViewModelTests
         public void IsNullWhenRepositoryNameIsNull()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             Assert.Null(vm.SafeRepositoryName);
             vm.RepositoryName = "not-null";
@@ -228,8 +201,7 @@ public class RepositoryPublishViewModelTests
         public void IsFalseWhenRepoNameEmpty()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "";
 
@@ -241,8 +213,7 @@ public class RepositoryPublishViewModelTests
         public void IsFalseWhenAfterBeingTrue()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "repo";
 
@@ -260,8 +231,7 @@ public class RepositoryPublishViewModelTests
         public void IsTrueWhenRepositoryNameIsValid()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "thisisfine";
 
@@ -276,8 +246,7 @@ public class RepositoryPublishViewModelTests
         public void IsTrueWhenRepoNameIsSafe()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "this-is-bad";
 
@@ -288,8 +257,7 @@ public class RepositoryPublishViewModelTests
         public void IsFalseWhenRepoNameIsNotSafe()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "this is bad";
 
@@ -301,8 +269,7 @@ public class RepositoryPublishViewModelTests
         public void ResetsSafeNameValidator()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, cm: cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(cm: cm);
 
             vm.RepositoryName = "this";
             Assert.True(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
@@ -323,13 +290,12 @@ public class RepositoryPublishViewModelTests
         public async Task RepositoryExistsCallsNotificationServiceWithError()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
             var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, notificationService, cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(repositoryPublishService, notificationService, cm);
             vm.RepositoryName = "repo-name";
 
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
@@ -345,24 +311,19 @@ public class RepositoryPublishViewModelTests
             var args = Helpers.GetArgs(GitHubUrls.GitHub, "https://github.enterprise");
 
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
             var adds = new List<HostAddress>();
-            var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
             foreach (var uri in args)
-                Helpers.SetupConnections(hosts, cm, adds, conns, hsts, uri);
+                Helpers.SetupConnections(adds, conns, uri);
 
-            foreach (var host in hsts)
-                host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
-
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
 
             var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
-            var vm = Helpers.GetViewModel(hosts, repositoryPublishService, notificationService, cm);
+            var vm = Helpers.GetViewModel(repositoryPublishService, notificationService, cm);
 
             vm.RepositoryName = "repo-name";
 
@@ -383,23 +344,20 @@ public class RepositoryPublishViewModelTests
         public async Task ResetsWhenSwitchingAccounts()
         {
             var cm = Substitutes.ConnectionManager;
-            var hosts = Substitute.For<IRepositoryHosts>();
             var adds = new List<HostAddress>();
-            var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
-                Helpers.SetupConnections(hosts, cm, adds, conns, hsts, GitHubUrls.GitHub);
+            Helpers.SetupConnections(adds, conns, GitHubUrls.GitHub);
 
             var accounts = new List<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
-            hsts[0].ModelService.GetAccounts().Returns(Observable.Return(accounts));
 
-            cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
+            cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
 
             var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
-            var vm = Helpers.GetViewModel(hosts, repositoryPublishService, notificationService, cm);
+            var vm = Helpers.GetViewModel(repositoryPublishService, notificationService, cm);
 
             vm.RepositoryName = "repo-name";
 

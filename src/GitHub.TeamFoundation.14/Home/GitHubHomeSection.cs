@@ -154,11 +154,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                     {
                         case "show-training":
                             visualStudioBrowser.OpenUrl(new Uri(TrainingUrl));
-                            usageTracker.IncrementWelcomeTrainingClicks().Forget();
+                            usageTracker.IncrementCounter(x => x.NumberOfWelcomeTrainingClicks).Forget();
                             break;
                         case "show-docs":
                             visualStudioBrowser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                            usageTracker.IncrementWelcomeDocsClicks().Forget();
+                            usageTracker.IncrementCounter(x => x.NumberOfWelcomeDocsClicks).Forget();
                             break;
                         case "dont-show-again":
                             teamExplorerServices.HideNotification(welcomeMessageGuid);

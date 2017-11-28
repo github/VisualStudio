@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
         protected ISimpleApiClientFactory ApiFactory => apiFactory.Value;
 
         protected MenuBase()
-        {}
+        { }
 
         protected MenuBase(IGitHubServiceProvider serviceProvider)
         {
@@ -55,8 +55,10 @@ namespace GitHub.VisualStudio
             {
                 if (!string.IsNullOrEmpty(path))
                 {
-                    var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
-                    return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
+                    using (var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path))
+                    {
+                        return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
+                    }
                 }
             }
             catch (Exception ex)
