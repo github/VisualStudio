@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
@@ -124,13 +125,13 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             var login = Substitute.For<ILoginViewModel>();
             login.Done.Returns(new Subject<object>());
 
-            var serviceProvider = Substitute.For<IGitHubServiceProvider>();
-            serviceProvider.GetService<ILoginViewModel>().Returns(login);
+            var factory = Substitute.For<IViewViewModelFactory>();
+            factory.CreateViewModel<ILoginViewModel>().Returns(login);
 
             connectionManager = connectionManager ?? Substitute.For<IConnectionManager>();
 
             return new GitHubDialogWindowViewModel(
-                serviceProvider,
+                factory,
                 new Lazy<IConnectionManager>(() => connectionManager));
         }
 
