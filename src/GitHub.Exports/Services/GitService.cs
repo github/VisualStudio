@@ -85,30 +85,31 @@ namespace GitHub.Services
         public Task<string> GetLatestPushedSha(string path)
         {
             Guard.ArgumentNotNull(path, nameof(path));
-            using (var repo = GetRepository(path))
+
+            return Task.Factory.StartNew(() =>
             {
-                if (repo == null)
-                    return null;
-
-                if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
+                using (var repo = GetRepository(path))
                 {
-                    return Task.FromResult(repo.Head.Tip.Sha);
-                }
-
-                return Task.Factory.StartNew(() =>
-                {
-                    var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
-
-                    foreach (var c in repo.Commits)
+                    if (repo != null)
                     {
-                        if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
+                        if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
                         {
-                            return c.Sha;
+                            return repo.Head.Tip.Sha;
+                        }
+
+                        var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
+                        foreach (var c in repo.Commits)
+                        {
+                            if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
+                            {
+                                return c.Sha;
+                            }
                         }
                     }
+
                     return null;
-                });
-            }
+                }
+            });
         }
     }
 }
