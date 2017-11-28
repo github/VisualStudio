@@ -222,7 +222,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
@@ -245,7 +244,6 @@
     <Compile Include="Models\IProgram.cs" />
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
-    <Compile Include="Authentication\AuthenticationResult.cs" />
     <Compile Include="Models\IRemoteRepositoryModel.cs" />
     <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />

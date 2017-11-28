@@ -166,7 +166,6 @@
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
     <Compile Include="Authentication\IDelegatingTwoFactorChallengeHandler.cs" />
-    <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
     <Compile Include="Services\IRepositoryCloneService.cs" />
