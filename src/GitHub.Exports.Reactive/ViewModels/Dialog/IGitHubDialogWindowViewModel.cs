@@ -9,17 +9,17 @@ namespace GitHub.ViewModels.Dialog
     public interface IGitHubDialogWindowViewModel : IDisposable
     {
         /// <summary>
+        /// Gets the content to display in the dialog.
+        /// </summary>
+        IDialogContentViewModel Content { get; }
+
+        /// <summary>
         /// Gets an observable that is signalled when when the dialog should be closed.
         /// </summary>
         /// <remarks>
         /// If the content being displayed has a return value, then this wil be returned here.
         /// </remarks>
         IObservable<object> Done { get; }
-
-        /// <summary>
-        /// Gets the content to display in the dialog.
-        /// </summary>
-        IDialogContentViewModel Content { get; }
 
         /// <summary>
         /// Starts displaying a view model.

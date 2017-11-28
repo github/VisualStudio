@@ -4,17 +4,21 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
 {
+    /// <summary>
+    /// Represents the top-level view model for the GitHub dialog.
+    /// </summary>
     [Export(typeof(IGitHubDialogWindowViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public sealed class GitHubDialogWindowViewModel : ViewModelBase, IGitHubDialogWindowViewModel
     {
-        readonly IGitHubServiceProvider serviceProvider;
+        readonly IViewViewModelFactory factory;
         readonly Lazy<IConnectionManager> connectionManager;
         IDialogContentViewModel content;
         Subject<object> done = new Subject<object>();
@@ -22,27 +26,31 @@ namespace GitHub.ViewModels.Dialog
 
         [ImportingConstructor]
         public GitHubDialogWindowViewModel(
-            IGitHubServiceProvider serviceProvider,
+            IViewViewModelFactory factory,
             Lazy<IConnectionManager> connectionManager)
         {
-            this.serviceProvider = serviceProvider;
+            this.factory = factory;
             this.connectionManager = connectionManager;
         }
 
+        /// <inheritdoc/>
         public IDialogContentViewModel Content
         {
             get { return content; }
             private set { this.RaiseAndSetIfChanged(ref content, value); }
         }
 
+        /// <inheritdoc/>
         public IObservable<object> Done => done;
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             subscription?.Dispose();
             subscription = null;
         }
 
+        /// <inheritdoc/>
         public void Start(IDialogContentViewModel viewModel)
         {
             subscription?.Dispose();
@@ -50,6 +58,7 @@ namespace GitHub.ViewModels.Dialog
             subscription = viewModel.Done.Subscribe(done);
         }
 
+        /// <inheritdoc/>
         public async Task StartWithConnection<T>(T viewModel)
             where T : IDialogContentViewModel, IConnectionInitializedViewModel
         {
@@ -86,7 +95,7 @@ namespace GitHub.ViewModels.Dialog
 
         ILoginViewModel CreateLoginViewModel()
         {
-            return serviceProvider.GetService<ILoginViewModel>();
+            return factory.CreateViewModel<ILoginViewModel>();
         }
     }
 }
