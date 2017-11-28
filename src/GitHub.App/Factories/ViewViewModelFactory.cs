@@ -9,6 +9,9 @@ using GitHub.ViewModels;
 
 namespace GitHub.Factories
 {
+    /// <summary>
+    /// Factory for creating views and view models.
+    /// </summary>
     [Export(typeof(IViewViewModelFactory))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ViewViewModelFactory : IViewViewModelFactory
@@ -26,16 +29,19 @@ namespace GitHub.Factories
             cc.SatisfyImportsOnce(this);
         }
 
+        /// <inheritdoc/>
         public TViewModel CreateViewModel<TViewModel>() where TViewModel : IViewModel
         {
             return serviceProvider.ExportProvider.GetExport<TViewModel>().Value;
         }
 
+        /// <inheritdoc/>
         public FrameworkElement CreateView<TViewModel>() where TViewModel : IViewModel
         {
             return CreateView(typeof(TViewModel));
         }
 
+        /// <inheritdoc/>
         public FrameworkElement CreateView(Type viewModel)
         {
             var f = views.FirstOrDefault(x => x.Metadata.ViewModelType == viewModel);
