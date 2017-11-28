@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
         protected ISimpleApiClientFactory ApiFactory => apiFactory.Value;
 
         protected MenuBase()
-        { }
+        {}
 
         protected MenuBase(IGitHubServiceProvider serviceProvider)
         {
@@ -55,10 +55,8 @@ namespace GitHub.VisualStudio
             {
                 if (!string.IsNullOrEmpty(path))
                 {
-                    using (var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path))
-                    {
-                        return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
-                    }
+                    var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
+                    return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
                 }
             }
             catch (Exception ex)
@@ -86,18 +84,6 @@ namespace GitHub.VisualStudio
                 }
             }
             return activeRepo;
-        }
-
-        protected void StartFlow(UIControllerFlow controllerFlow)
-        {
-            IConnection connection = null;
-            if (controllerFlow != UIControllerFlow.Authentication)
-            {
-                var activeRepo = GetActiveRepo();
-                connection = ServiceProvider.TryGetService<IConnectionManager>()?.Connections
-                    .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
-            }
-            ServiceProvider.TryGetService<IUIProvider>().RunInDialog(controllerFlow, connection);
         }
 
         void RefreshRepo()

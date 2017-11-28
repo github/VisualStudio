@@ -9,6 +9,7 @@ namespace GitHub.VisualStudio.Menus
 {
     public class CreateGist : MenuBase, IDynamicMenuHandler
     {
+        readonly Lazy<IDialogService> dialogService;
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
         ISelectedTextProvider SelectedTextProvider => selectedTextProvider.Value;
 
@@ -17,6 +18,7 @@ namespace GitHub.VisualStudio.Menus
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
 
+            dialogService = new Lazy<IDialogService>(() => ServiceProvider.TryGetService<IDialogService>());
             selectedTextProvider = new Lazy<ISelectedTextProvider>(() => ServiceProvider.TryGetService<ISelectedTextProvider>());
         }
 
@@ -31,7 +33,7 @@ namespace GitHub.VisualStudio.Menus
 
         public void Activate(object data)
         {
-            StartFlow(UIControllerFlow.Gist);
+            dialogService.Value?.ShowCreateGist();
         }
     }
 }

@@ -97,11 +97,6 @@ namespace GitHub.InlineReviews.ViewModels
         {
         }
 
-        public void Initialize(ViewWithData data)
-        {
-            // Nothing to do here: initialized in constructor.
-        }
-
         /// <summary>
         /// Creates a placeholder comment which can be used to add a new comment to a thread.
         /// </summary>
