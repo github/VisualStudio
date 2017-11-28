@@ -116,7 +116,12 @@ namespace GitHub.Services
             if (repo != null)
                 ret = repo.RepositoryPath;
             if (ret == null)
-                ret = serviceProvider.GetSolution().GetRepositoryFromSolution()?.Info?.Path;
+            {
+                using (var repository = serviceProvider.GetSolution().GetRepositoryFromSolution())
+                {
+                    ret = repository?.Info?.Path;
+                }
+            }
             return ret ?? String.Empty;
         }
 

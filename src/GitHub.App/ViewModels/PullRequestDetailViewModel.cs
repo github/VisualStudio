@@ -387,8 +387,10 @@ namespace GitHub.ViewModels
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
-                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+                using (var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest))
+                {
+                    ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+                }
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 

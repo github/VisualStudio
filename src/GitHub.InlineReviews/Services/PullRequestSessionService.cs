@@ -53,15 +53,19 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
         {
-            var repo = await GetRepository(repository);
-            return await diffService.Diff(repo, baseSha, headSha, relativePath);
+            using (var repo = await GetRepository(repository))
+            {
+                return await diffService.Diff(repo, baseSha, headSha, relativePath);
+            }
         }
 
         /// <inheritdoc/>
         public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
-            var repo = await GetRepository(repository);
-            return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
+            using (var repo = await GetRepository(repository))
+            {
+                return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
+            }
         }
 
         /// <inheritdoc/>
@@ -175,18 +179,22 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public virtual async Task<string> GetTipSha(ILocalRepositoryModel repository)
         {
-            var repo = await GetRepository(repository);
-            return repo.Head.Tip.Sha;
+            using (var repo = await GetRepository(repository))
+            {
+                return repo.Head.Tip.Sha;
+            }
         }
 
         /// <inheritdoc/>
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
-            var repo = await GetRepository(repository);
-            var modified = await gitClient.IsModified(repo, relativePath, contents);
-            var pushed = await gitClient.IsHeadPushed(repo);
+            using (var repo = await GetRepository(repository))
+            {
+                var modified = await gitClient.IsModified(repo, relativePath, contents);
+                var pushed = await gitClient.IsHeadPushed(repo);
 
-            return !modified && pushed;
+                return !modified && pushed;
+            }
         }
 
         public async Task<byte[]> ExtractFileFromGit(
@@ -195,17 +203,18 @@ namespace GitHub.InlineReviews.Services
             string sha,
             string relativePath)
         {
-            var repo = await GetRepository(repository);
-
-            try
+            using (var repo = await GetRepository(repository))
             {
-                return await gitClient.ExtractFileBinary(repo, sha, relativePath);
-            }
-            catch (FileNotFoundException)
-            {
-                var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
-                await gitClient.Fetch(repo, "origin", sha, pullHeadRef);
-                return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                try
+                {
+                    return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                }
+                catch (FileNotFoundException)
+                {
+                    var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
+                    await gitClient.Fetch(repo, "origin", sha, pullHeadRef);
+                    return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                }
             }
         }
 
@@ -242,21 +251,23 @@ namespace GitHub.InlineReviews.Services
                 return mergeBase;
             }
 
-            var repo = await GetRepository(repository);
-            var targetUrl = pullRequest.Base.RepositoryCloneUrl;
-            var headUrl = pullRequest.Head.RepositoryCloneUrl;
-            var baseRef = pullRequest.Base.Ref;
-            var pullNumber = pullRequest.Number;
-            try
+            using (var repo = await GetRepository(repository))
             {
-                mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
-            }
+                var targetUrl = pullRequest.Base.RepositoryCloneUrl;
+                var headUrl = pullRequest.Head.RepositoryCloneUrl;
+                var baseRef = pullRequest.Base.Ref;
+                var pullNumber = pullRequest.Number;
+                try
+                {
+                    mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
+                }
+                catch (NotFoundException ex)
+                {
+                    throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
+                }
 
-            return mergeBaseCache[key] = mergeBase;
+                return mergeBaseCache[key] = mergeBase;
+            }
         }
 
         /// <inheritdoc/>
