@@ -338,7 +338,7 @@ namespace GitHub.ViewModels.GitHubPane
                 IsBusy = true;
                 IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
                 SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
-                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
+                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
