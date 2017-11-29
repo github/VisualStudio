@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -67,6 +68,7 @@ namespace GitHub.Exports
     /// </remarks>
     public interface IViewModelMetadata
     {
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         Type[] ViewModelType { get; }
     }
 
