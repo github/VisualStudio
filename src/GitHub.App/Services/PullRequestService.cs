@@ -104,6 +104,39 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<bool> IsSyncSubmodulesRequired(ILocalRepositoryModel repository)
+        {
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                foreach (var submodule in repo.Submodules)
+                {
+                    var status = submodule.RetrieveStatus();
+
+                    if ((status & SubmoduleStatus.WorkDirAdded) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirDeleted) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirModified) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirUninitialized) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+                }
+
+                return Observable.Return(false);
+            }
+        }
+
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
             // The `using` appears to resolve this issue:
