@@ -30,7 +30,7 @@ namespace GitHub.Exports
     /// <see cref="ViewModelType"/> metadata.
     /// </summary>
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class ExportViewForAttribute : ExportAttribute
     {
         public ExportViewForAttribute(Type viewModelType)
@@ -67,7 +67,7 @@ namespace GitHub.Exports
     /// </remarks>
     public interface IViewModelMetadata
     {
-        Type ViewModelType { get; }
+        Type[] ViewModelType { get; }
     }
 
     /// <summary>

@@ -348,6 +348,7 @@
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ContentView.cs" />
     <Compile Include="Views\Dialog\GistCreationView.xaml.cs">
       <DependentUpon>GistCreationView.xaml</DependentUpon>
     </Compile>
@@ -356,9 +357,6 @@
     </Compile>
     <Compile Include="Views\Dialog\LoginCredentialsView.xaml.cs">
       <DependentUpon>LoginCredentialsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Dialog\LoginView.xaml.cs">
-      <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\Login2FaView.xaml.cs">
       <DependentUpon>Login2FaView.xaml</DependentUpon>
@@ -374,9 +372,6 @@
     </Compile>
     <Compile Include="Views\GitHubPane\LoggedOutView.xaml.cs">
       <DependentUpon>LoggedOutView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\GitHubPane\NavigationView.xaml.cs">
-      <DependentUpon>NavigationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
@@ -509,10 +504,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Dialog\LoginView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Dialog\Login2FaView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -532,10 +523,6 @@
     <Page Include="Views\GitHubPane\LoggedOutView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\GitHubPane\NavigationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
       <SubType>Designer</SubType>

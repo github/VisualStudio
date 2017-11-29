@@ -74,3 +74,4 @@ namespace GitHub.VisualStudio.Views.Dialog
 }
 ```
 
+> Note: this is such a common pattern, you don't actually need to define your own view! Simply add the `[ExportViewFor(...)]` attribute to the existing `ContentView` class.

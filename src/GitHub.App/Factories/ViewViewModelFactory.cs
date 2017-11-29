@@ -17,8 +17,6 @@ namespace GitHub.Factories
     public class ViewViewModelFactory : IViewViewModelFactory
     {
         readonly IGitHubServiceProvider serviceProvider;
-        [ImportMany(AllowRecomposition = true)]
-        IEnumerable<ExportFactory<FrameworkElement, IViewModelMetadata>> views { get; set; }
 
         [ImportingConstructor]
         public ViewViewModelFactory(
@@ -28,6 +26,9 @@ namespace GitHub.Factories
             this.serviceProvider = serviceProvider;
             cc.SatisfyImportsOnce(this);
         }
+
+        [ImportMany(AllowRecomposition = true)]
+        IEnumerable<ExportFactory<FrameworkElement, IViewModelMetadata>> Views { get; set; }
 
         /// <inheritdoc/>
         public TViewModel CreateViewModel<TViewModel>() where TViewModel : IViewModel
@@ -44,7 +45,7 @@ namespace GitHub.Factories
         /// <inheritdoc/>
         public FrameworkElement CreateView(Type viewModel)
         {
-            var f = views.FirstOrDefault(x => x.Metadata.ViewModelType == viewModel);
+            var f = Views.FirstOrDefault(x => x.Metadata.ViewModelType.Contains(viewModel));
             return f?.CreateExport().Value;
         }
     }
