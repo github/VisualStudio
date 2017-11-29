@@ -148,6 +148,26 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             viewModelFactory.DidNotReceive().CreateViewModel<IPullRequestListViewModel>();
         }
+
+        [Fact]
+        public async Task HasNoEffectWhenAlreadyCurrentPage()
+        {
+            var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
+            var cm = CreateConnectionManager(ValidGitHubRepo);
+            var nav = new NavigationViewModel();
+            var target = CreateTarget(
+                teServiceHolder: te,
+                connectionManager: cm,
+                navigator: nav);
+
+            await Initialize(target);
+            Assert.Same(nav, target.Content);
+            Assert.IsAssignableFrom<IPullRequestListViewModel>(nav.Content);
+
+            await target.ShowPullRequests();
+
+            Assert.Equal(1, nav.History.Count);
+        }
     }
 
     static GitHubPaneViewModel CreateTarget(

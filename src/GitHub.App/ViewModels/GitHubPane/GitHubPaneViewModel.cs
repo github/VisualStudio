@@ -122,7 +122,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x => NavigateTo(x).Forget());
 
             this.WhenAnyValue(x => x.SearchQuery)
-                .Where(x => navigator.Content != null)
+                .Where(x => navigator.Content is ISearchablePageViewModel)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => ((ISearchablePageViewModel)navigator.Content).SearchQuery = x);
         }
@@ -280,7 +280,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         async Task NavigateTo<TViewModel>(Func<TViewModel, Task> initialize, Func<TViewModel, bool> match = null)
-            where TViewModel : IPanePageViewModel
+            where TViewModel : class, IPanePageViewModel
         {
             Guard.ArgumentNotNull(initialize, nameof(initialize));
 
@@ -299,7 +299,7 @@ namespace GitHub.ViewModels.GitHubPane
                     navigator.NavigateTo(viewModel);
                     await initialize(viewModel);
                 }
-                else
+                else if (navigator.Content != viewModel)
                 {
                     navigator.NavigateTo(viewModel);
                 }
