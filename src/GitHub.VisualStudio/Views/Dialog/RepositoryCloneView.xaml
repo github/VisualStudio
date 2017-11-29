@@ -155,6 +155,12 @@
                       IsEnabled="{Binding FilterTextIsEnabled, Mode=OneWay}"
                       AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SearchRepositoryTextBox}" />
 
+    <ui:GitHubProgressBar DockPanel.Dock="Top"
+                          Foreground="{DynamicResource GitHubAccentBrush}"
+                          IsIndeterminate="True"
+                          Style="{DynamicResource GitHubProgressBar}"
+                          Visibility="{Binding IsBusy, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+
     <StackPanel x:Name="loadingFailedPanel"
                 Margin="0,4,0,4"
                 HorizontalAlignment="Center"
