@@ -13,6 +13,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly Uri paneUri = new Uri("github://pane");
         Subject<Uri> navigate = new Subject<Uri>();
+        Exception error;
         bool isBusy;
         bool isLoading;
         string title;
@@ -27,6 +28,13 @@ namespace GitHub.ViewModels.GitHubPane
         ~PanePageViewModelBase()
         {
             Dispose(false);
+        }
+
+        /// <inheritdoc/>
+        public Exception Error
+        {
+            get { return error; }
+            protected set { this.RaiseAndSetIfChanged(ref error, value); }
         }
 
         /// <inheritdoc/>

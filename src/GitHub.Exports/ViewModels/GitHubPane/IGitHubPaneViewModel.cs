@@ -5,6 +5,28 @@ using GitHub.Models;
 namespace GitHub.ViewModels.GitHubPane
 {
     /// <summary>
+    /// Describes the ways that the display of <see cref="IGitHubPaneViewModel.Content"/> can
+    /// be overridden.
+    /// </summary>
+    public enum ContentOverride
+    {
+        /// <summary>
+        /// No override, display the content.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Display a spinner instead of the content.
+        /// </summary>
+        Spinner,
+
+        /// <summary>
+        /// Display an error instead of the content.
+        /// </summary>
+        Error
+    }
+
+    /// <summary>
     /// The view model for the GitHub Pane.
     /// </summary>
     public interface IGitHubPaneViewModel : IViewModel
@@ -18,6 +40,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the content to display in the GitHub pane.
         /// </summary>
         IViewModel Content { get; }
+
+        /// <summary>
+        /// Gets a value describing whether to display the <see cref="Content"/> or to override
+        /// it with another view.
+        /// </summary>
+        ContentOverride ContentOverride { get; }
 
         /// <summary>
         /// Gets a value indicating whether search is available on the current page.

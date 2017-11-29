@@ -10,6 +10,11 @@ namespace GitHub.ViewModels.GitHubPane
     public interface IPanePageViewModel : IViewModel
     {
         /// <summary>
+        /// Gets an exception representing an error state to display.
+        /// </summary>
+        Exception Error { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the page is busy.
         /// </summary>
         /// <remarks>

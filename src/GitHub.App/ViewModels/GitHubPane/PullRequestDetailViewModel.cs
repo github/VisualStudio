@@ -41,7 +41,6 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
-        string errorMessage;
         string operationError;
         bool isCheckedOut;
         bool isFromFork;
@@ -218,15 +217,6 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
-        /// Gets an error message to display if loading fails.
-        /// </summary>
-        public string ErrorMessage
-        {
-            get { return errorMessage; }
-            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
-        }
-
-        /// <summary>
         /// Gets the error message to be displayed in the action area as a result of an error in a
         /// git operation.
         /// </summary>
@@ -335,7 +325,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Loads the view model from octokit models.
         /// </summary>
-        /// <param name="remoteRepositoryOwner">The owner of the remote repository.</param>
         /// <param name="pullRequest">The pull request model.</param>
         public async Task Load(IPullRequestModel pullRequest)
         {
@@ -430,11 +419,6 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestsService.RemoveUnusedRemotes(LocalRepository).Subscribe(_ => { });
                 }
             }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Error loading PullRequestModel");
-                ErrorMessage = ex.Message.Trim();
-            }
             finally
             {
                 IsBusy = false;
@@ -448,7 +432,9 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
+                Error = null;
                 OperationError = null;
+                IsBusy = true;
                 var pullRequest = await modelService.GetPullRequest(RemoteRepositoryOwner, LocalRepository.Name, Number);
                 await Load(pullRequest);
             }
@@ -461,7 +447,8 @@ namespace GitHub.ViewModels.GitHubPane
                     LocalRepository.Name,
                     Number,
                     modelService.ApiClient.HostAddress.Title);
-                ErrorMessage = ex.Message.Trim();
+                Error = ex;
+                IsBusy = false;
             }
         }
 

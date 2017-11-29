@@ -40,6 +40,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
         readonly INotAGitRepositoryViewModel notAGitRepository;
         readonly SemaphoreSlim navigating = new SemaphoreSlim(1);
+        readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
         readonly ObservableAsPropertyHelper<bool> isSearchEnabled;
         readonly ObservableAsPropertyHelper<string> title;
         readonly ReactiveCommand<Unit> refresh;
@@ -90,6 +91,17 @@ namespace GitHub.ViewModels.GitHubPane
                 navigator.WhenAnyValue(x => x.Content))
                 .Select(x => x[0] == navigator ? x[1] as IPanePageViewModel : null);
 
+            contentOverride = currentPage
+                .SelectMany(x => x?.WhenAnyValue(y => y.IsLoading, y => y.Error) ??
+                                 Observable.Return<Tuple<bool, Exception>>(null))
+                .Select(x =>
+                {
+                    if (x == null || x.Item1) return ContentOverride.Spinner;
+                    else if (x.Item2 != null) return ContentOverride.Error;
+                    else return ContentOverride.None;
+                })
+                .ToProperty(this, x => x.ContentOverride);
+
             title = currentPage
                 .SelectMany(x => x?.WhenAnyValue(y => y.Title) ?? Observable.Return<string>(null))
                 .Select(x => x ?? "GitHub")
@@ -106,6 +118,7 @@ namespace GitHub.ViewModels.GitHubPane
                         (loading, busy) => !loading && !busy)
                             ?? Observable.Return(false)),
                 _ => navigator.Content.Refresh());
+            refresh.ThrownExceptions.Subscribe();
 
             showPullRequests = ReactiveCommand.CreateAsyncTask(
                 this.WhenAny(x => x.Content, x => x.Value == navigator),
@@ -140,6 +153,9 @@ namespace GitHub.ViewModels.GitHubPane
             get { return content; }
             private set { this.RaiseAndSetIfChanged(ref content, value); }
         }
+
+        /// <inheritdoc/>
+        public ContentOverride ContentOverride => contentOverride.Value;
 
         /// <inheritdoc/>
         public bool IsSearchEnabled => isSearchEnabled.Value;

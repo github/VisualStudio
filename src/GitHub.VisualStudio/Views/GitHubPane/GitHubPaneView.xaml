@@ -69,7 +69,7 @@
                Style="{StaticResource PaneHorizontalSeparator}" />
 
     <Grid>
-      <DockPanel Visibility="{Binding Content.Content.IsLoading, Converter={u:BooleanToInverseVisibilityConverter}, FallbackValue=Visible}">
+      <DockPanel Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter None}}">
         <u:GitHubProgressBar DockPanel.Dock="Top"
                              Foreground="{DynamicResource GitHubAccentBrush}"
                              IsIndeterminate="True"
@@ -81,7 +81,16 @@
                   Height="48"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
-                  Visibility="{Binding Content.Content.IsLoading, Converter={u:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                  Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter Spinner}, FallbackValue=Collapsed}"/>
+      <Border Background="White"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter Error}, FallbackValue=Collapsed}">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+          <u:OcticonImage Icon="alert" Width="32" Height="32" Margin="8"/>
+          <TextBlock Text="{Binding Content.Content.Error.Message}" TextAlignment="Center" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
     </Grid>
   </DockPanel>
 </local:GenericGitHubPaneView>
