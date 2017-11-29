@@ -1,5 +1,4 @@
 ﻿using System;
-using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -9,7 +8,7 @@ namespace GitHub.ViewModels.Dialog
     public interface IDialogContentViewModel : IViewModel
     {
         /// <summary>
-        /// Gets a title to display in the dialog titlebar.
+        /// Gets a title to display in the dialog title bar.
         /// </summary>
         string Title { get; }
 

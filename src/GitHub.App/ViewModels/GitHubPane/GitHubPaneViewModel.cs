@@ -20,6 +20,9 @@ using OleMenuCommand = Microsoft.VisualStudio.Shell.OleMenuCommand;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// The view model for the GitHub Pane.
+    /// </summary>
     [Export(typeof(IGitHubPaneViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public sealed class GitHubPaneViewModel : ViewModelBase, IGitHubPaneViewModel, IDisposable
@@ -124,39 +127,47 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x => ((ISearchablePageViewModel)navigator.Content).SearchQuery = x);
         }
 
+        /// <inheritdoc/>
         public IConnection Connection
         {
             get;
             private set;
         }
 
+        /// <inheritdoc/>
         public IViewModel Content
         {
             get { return content; }
             private set { this.RaiseAndSetIfChanged(ref content, value); }
         }
 
+        /// <inheritdoc/>
         public bool IsSearchEnabled => isSearchEnabled.Value;
 
+        /// <inheritdoc/>
         public ILocalRepositoryModel LocalRepository
         {
             get { return localRepository; }
             private set { this.RaiseAndSetIfChanged(ref localRepository, value); }
         }
 
+        /// <inheritdoc/>
         public string SearchQuery
         {
             get { return searchQuery; }
             set { this.RaiseAndSetIfChanged(ref searchQuery, value); }
         }
 
+        /// <inheritdoc/>
         public string Title => title.Value;
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             navigating.Dispose();
         }
 
+        /// <inheritdoc/>
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
             await UpdateContent(teServiceHolder.ActiveRepo);
@@ -177,6 +188,7 @@ namespace GitHub.ViewModels.GitHubPane
                  });
         }
 
+        /// <inheritdoc/>
         public async Task NavigateTo(Uri uri)
         {
             Guard.ArgumentNotNull(uri, nameof(uri));
@@ -221,16 +233,19 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
+        /// <inheritdoc/>
         public Task ShowCreatePullRequest()
         {
             return NavigateTo<IPullRequestCreationViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
         }
 
+        /// <inheritdoc/>
         public Task ShowPullRequests()
         {
             return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection)); 
         }
 
+        /// <inheritdoc/>
         public Task ShowPullRequest(string owner, string repo, int number)
         {
             Guard.ArgumentNotNull(owner, nameof(owner));

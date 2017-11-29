@@ -7,6 +7,9 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
 {
+    /// <summary>
+    /// Represents the Login dialog content.
+    /// </summary>
     [Export(typeof(ILoginViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginViewModel : PagedDialogViewModelBase, ILoginViewModel
@@ -31,6 +34,7 @@ namespace GitHub.ViewModels.Dialog
                 });
         }
 
+        /// <inheritdoc/>
         public override IObservable<object> Done { get; }
     }
 }
