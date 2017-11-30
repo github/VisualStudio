@@ -419,7 +419,6 @@ namespace GitHub.ViewModels
                     var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
                     var pullEnabled = divergence.BehindBy > 0;
                     var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
-                    var syncSubmodulesEnabled = await pullRequestsService.IsSyncSubmodulesRequired(LocalRepository);
 
                     string pullToolTip;
                     string pushToolTip;
@@ -451,6 +450,8 @@ namespace GitHub.ViewModels
                     {
                         pushToolTip = Resources.MustPullBeforePush;
                     }
+
+                    var syncSubmodulesEnabled = await pullRequestsService.IsSyncSubmodulesRequired(LocalRepository);
 
                     UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesEnabled);
                     CheckoutState = null;
