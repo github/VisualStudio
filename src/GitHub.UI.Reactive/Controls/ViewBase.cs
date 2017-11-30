@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Automation.Peers;
 using GitHub.ViewModels;
 using ReactiveUI;
+using System.Reactive.Linq;
 
 namespace GitHub.UI
 {
@@ -23,7 +24,7 @@ namespace GitHub.UI
         public ViewBase()
         {
             DataContextChanged += (s, e) => ViewModel = (TInterface)e.NewValue;
-            this.WhenAnyValue(x => x.ViewModel).Subscribe(x => DataContext = x);
+            this.WhenAnyValue(x => x.ViewModel).Skip(1).Subscribe(x => DataContext = x);
         }
 
         /// <summary>
