@@ -419,6 +419,8 @@ namespace GitHub.ViewModels
                     var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
                     var pullEnabled = divergence.BehindBy > 0;
                     var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                    var syncSubmodulesEnabled = await pullRequestsService.IsSyncSubmodulesRequired(LocalRepository);
+
                     string pullToolTip;
                     string pushToolTip;
 
@@ -450,7 +452,7 @@ namespace GitHub.ViewModels
                         pushToolTip = Resources.MustPullBeforePush;
                     }
 
-                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesEnabled);
                     CheckoutState = null;
                 }
                 else
@@ -683,7 +685,8 @@ namespace GitHub.ViewModels
                 bool pullEnabled,
                 bool pushEnabled,
                 string pullToolTip,
-                string pushToolTip)
+                string pushToolTip,
+                bool syncSubmodulesEnabled)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
@@ -691,6 +694,7 @@ namespace GitHub.ViewModels
                 PullEnabled = pullEnabled;
                 PullToolTip = pullToolTip;
                 PushToolTip = pushToolTip;
+                SyncSubmodulesEnabled = syncSubmodulesEnabled;
             }
 
             public int CommitsAhead { get; }
@@ -698,14 +702,7 @@ namespace GitHub.ViewModels
             public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0 && !SyncSubmodulesEnabled;
             public bool PullEnabled { get; }
             public bool PushEnabled { get; }
-            public bool SyncSubmodulesEnabled
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
+            public bool SyncSubmodulesEnabled { get; }
             public string PullToolTip { get; }
             public string PushToolTip { get; }
         }

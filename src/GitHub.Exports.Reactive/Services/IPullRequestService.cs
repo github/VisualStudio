@@ -174,5 +174,12 @@ namespace GitHub.Services
             string baseBranch,
             string compareBranch,
             int maxCommits);
+
+        /// <summary>
+        /// Check if user needs to sync submodules on current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns>True if submodules need to be synced.</returns>
+        IObservable<bool> IsSyncSubmodulesRequired(ILocalRepositoryModel repository);
     }
 }
