@@ -452,8 +452,9 @@ namespace GitHub.ViewModels
                     }
 
                     var syncSubmodulesEnabled = await pullRequestsService.IsSyncSubmodulesRequired(LocalRepository);
+                    var changesEnabled = !await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
 
-                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesEnabled);
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesEnabled, changesEnabled);
                     CheckoutState = null;
                 }
                 else
@@ -687,7 +688,8 @@ namespace GitHub.ViewModels
                 bool pushEnabled,
                 string pullToolTip,
                 string pushToolTip,
-                bool syncSubmodulesEnabled)
+                bool syncSubmodulesEnabled,
+                bool changesEnabled)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
@@ -696,6 +698,7 @@ namespace GitHub.ViewModels
                 PullToolTip = pullToolTip;
                 PushToolTip = pushToolTip;
                 SyncSubmodulesEnabled = syncSubmodulesEnabled;
+                ChangesEnabled = changesEnabled;
             }
 
             public int CommitsAhead { get; }
@@ -704,6 +707,7 @@ namespace GitHub.ViewModels
             public bool PullEnabled { get; }
             public bool PushEnabled { get; }
             public bool SyncSubmodulesEnabled { get; }
+            public bool ChangesEnabled { get; }
             public string PullToolTip { get; }
             public string PushToolTip { get; }
         }

@@ -189,12 +189,16 @@
                                              VerticalAlignment="Center"/>
 
                         <!-- Navigate to Git changes -->
-                        <ui:GitHubActionLink Command="{Binding NavigateToGitChanges}" Content="[GitChanges]" Margin="4 0" />
+                        <ui:GitHubActionLink
+                            Command="{Binding NavigateToGitChanges}"
+                            Content="[GitChanges]" Margin="4 0"
+                            Visibility="{Binding UpdateState.ChangesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
 
                         <!-- Sync submodules -->
                         <ui:GitHubActionLink Command="{Binding SyncSubmodules}"
                             Content="[SyncSubmodules]" Margin="4 0"
                             Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
+
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->
