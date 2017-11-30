@@ -85,22 +85,34 @@ namespace GitHub.ViewModels.GitHubPane
             this.notAGitHubRepository = notAGitHubRepository;
             this.notAGitRepository = notAGitRepository;
 
-            // Returns navigator.Current if Content == navigator, otherwise null.
-            var currentPage = Observable.CombineLatest(
+            var contentAndNavigatorContent = Observable.CombineLatest(
                 this.WhenAnyValue(x => x.Content),
-                navigator.WhenAnyValue(x => x.Content))
-                .Select(x => x[0] == navigator ? x[1] as IPanePageViewModel : null);
+                navigator.WhenAnyValue(x => x.Content),
+                (c, nc) => new { Content = c, NavigatorContent = nc });
 
-            contentOverride = currentPage
-                .SelectMany(x => x?.WhenAnyValue(y => y.IsLoading, y => y.Error) ??
-                                 Observable.Return<Tuple<bool, Exception>>(null))
-                .Select(x =>
+            contentOverride = contentAndNavigatorContent
+                .SelectMany(x =>
                 {
-                    if (x == null || x.Item1) return ContentOverride.Spinner;
-                    else if (x.Item2 != null) return ContentOverride.Error;
-                    else return ContentOverride.None;
+                    if (x.Content == null) return Observable.Return(ContentOverride.Spinner);
+                    else if (x.Content == navigator && x.NavigatorContent != null)
+                    {
+                        return x.NavigatorContent.WhenAnyValue(
+                            y => y.IsLoading,
+                            y => y.Error,
+                            (l, e) =>
+                            {
+                                if (l) return ContentOverride.Spinner;
+                                if (e != null) return ContentOverride.Error;
+                                else return ContentOverride.None;
+                            });
+                    }
+                    else return Observable.Return(ContentOverride.None);
                 })
                 .ToProperty(this, x => x.ContentOverride);
+
+            // Returns navigator.Content if Content == navigator, otherwise null.
+            var currentPage = contentAndNavigatorContent
+                .Select(x => x.Content == navigator ? x.NavigatorContent : null);
 
             title = currentPage
                 .SelectMany(x => x?.WhenAnyValue(y => y.Title) ?? Observable.Return<string>(null))
@@ -330,6 +342,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             LocalRepository = repository;
             Connection = null;
+
+            Content = null;
 
             if (repository == null)
             {
