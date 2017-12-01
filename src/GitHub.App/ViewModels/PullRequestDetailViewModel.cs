@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IDisposable
+    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -86,7 +86,7 @@ namespace GitHub.ViewModels
         }
 
         // HACK: This is a workaround for models not being automatically disposed.
-        class AutoDispose
+        static class AutoDispose
         {
             static IDisposable previous;
 
