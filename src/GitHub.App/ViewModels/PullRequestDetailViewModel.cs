@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
+    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -34,6 +34,7 @@ namespace GitHub.ViewModels
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
+        readonly IVSGitExt vsGitExt;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -65,13 +66,35 @@ namespace GitHub.ViewModels
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            IVSGitExt vsGitExt)
             : this(teservice.ActiveRepo,
                    modelServiceFactory.CreateBlocking(connection.Get()),
                    pullRequestsService,
                    sessionManager,
                    usageTracker)
         {
+            this.vsGitExt = vsGitExt;
+
+            AutoDispose.DisposePrevious(this);
+            vsGitExt.ActiveRepositoriesChanged += Refresh;
+        }
+
+        public void Dispose()
+        {
+            vsGitExt.ActiveRepositoriesChanged -= Refresh;
+        }
+
+        // HACK: This is a workaround for models not being automatically disposed.
+        class AutoDispose
+        {
+            static IDisposable previous;
+
+            internal static void DisposePrevious(IDisposable disposable)
+            {
+                previous?.Dispose();
+                previous = disposable;
+            }
         }
 
         /// <summary>
@@ -500,6 +523,18 @@ namespace GitHub.ViewModels
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
             return Path.Combine(LocalRepository.LocalPath, file.DirectoryPath, file.FileName);
+        }
+
+        async void Refresh()
+        {
+            try
+            {
+                await Load(RemoteRepositoryOwner, Model);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error refreshing model");
+            }
         }
 
         void SubscribeOperationError(ReactiveCommand<Unit> command)
