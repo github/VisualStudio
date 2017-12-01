@@ -32,7 +32,7 @@ public class MainWindow : Window
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MyApp"
         Content="{Binding}">
-</pfui:DialogWindow>
+<Window>
 
 ```
 
@@ -51,7 +51,7 @@ One can choose to display the `ViewModel` instance in any way we want by using a
       
       <!-- Display ViewModel.Greeting in a red border with rounded corners -->
 	  <Border Background="Red" CornerRadius="8">
-        <TextBlock Binding="{Binding Greeting}"
+        <TextBlock Binding="{Binding Greeting}"/>
       </Border>
         
     </DataTemplate>
