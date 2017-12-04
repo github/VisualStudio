@@ -73,6 +73,12 @@ namespace GitHub.ViewModels.GitHubPane
         Task InitializeAsync(IServiceProvider paneServiceProvider);
 
         /// <summary>
+        /// Navigates to a GitHub Pane URL.
+        /// </summary>
+        /// <param name="uri">The URL.</param>
+        Task NavigateTo(Uri uri);
+
+        /// <summary>
         /// Shows the pull reqest list in the GitHub pane.
         /// </summary>
         Task ShowPullRequests();
