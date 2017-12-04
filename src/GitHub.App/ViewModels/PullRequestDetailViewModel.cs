@@ -76,25 +76,12 @@ namespace GitHub.ViewModels
         {
             this.vsGitExt = vsGitExt;
 
-            AutoDispose.DisposePrevious(this);
             vsGitExt.ActiveRepositoriesChanged += Refresh;
         }
 
         public void Dispose()
         {
             vsGitExt.ActiveRepositoriesChanged -= Refresh;
-        }
-
-        // HACK: This is a workaround for models not being automatically disposed.
-        static class AutoDispose
-        {
-            static IDisposable previous;
-
-            internal static void DisposePrevious(IDisposable disposable)
-            {
-                previous?.Dispose();
-                previous = disposable;
-            }
         }
 
         /// <summary>
