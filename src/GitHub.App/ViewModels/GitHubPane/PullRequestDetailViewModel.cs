@@ -24,7 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     [Export(typeof(IPullRequestDetailViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
+    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -32,6 +32,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
+        readonly IVSGitExt vsGitExt;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -55,12 +56,14 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="usageTracker">The usage tracker.</param>
+        /// <param name="vsGitExt">The Visual Studio git service.</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            IVSGitExt vsGitExt)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -71,6 +74,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
+            this.vsGitExt = vsGitExt;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -98,7 +102,7 @@ namespace GitHub.ViewModels.GitHubPane
             DiffFile = ReactiveCommand.Create();
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
-            ViewFile = ReactiveCommand.Create();
+            ViewFile = ReactiveCommand.Create();            
         }
 
         /// <summary>
@@ -314,6 +318,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Number = number;
                 WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
+                vsGitExt.ActiveRepositoriesChanged += ActiveRepositoriesChanged;
                 await Refresh();
             }
             finally
@@ -476,6 +481,19 @@ namespace GitHub.ViewModels.GitHubPane
         {
             return Path.Combine(LocalRepository.LocalPath, file.DirectoryPath, file.FileName);
         }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                vsGitExt.ActiveRepositoriesChanged -= ActiveRepositoriesChanged;
+            }
+        }
+
+        void ActiveRepositoriesChanged() => Refresh().Forget();
 
         void SubscribeOperationError(ReactiveCommand<Unit> command)
         {
