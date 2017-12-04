@@ -539,7 +539,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
 
             [Fact] // WorkDirModified
-            public async Task ChangedSubmodule_False()
+            public async Task ChangedSubmodule_True()
             {
                 using (var subRepoDir = new TempDirectory())
                 using (var subRepo = CreateRepository(subRepoDir))
@@ -558,7 +558,7 @@ public class PullRequestServiceTests : TestBaseClass
 
                     var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-                    Assert.False(isClean);
+                    Assert.True(isClean);
                 }
             }
         }
