@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Factories;
+using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -511,15 +512,23 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void ActiveRepositoriesChanged()
+        async void ActiveRepositoriesChanged()
         {
-            if (active)
+            try
             {
-                Refresh().Forget();
+                if (active)
+                {
+                    await ThreadingHelper.SwitchToMainThreadAsync();
+                    await Refresh();
+                }
+                else
+                {
+                    refreshOnActivate = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                refreshOnActivate = true;
+                log.Error(ex, "Error refreshing in ActiveRepositoriesChanged.");
             }
         }
 
