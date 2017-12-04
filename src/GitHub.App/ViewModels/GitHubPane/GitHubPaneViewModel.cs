@@ -262,6 +262,9 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public Task ShowDefaultPage() => ShowPullRequests();
+
+        /// <inheritdoc/>
         public Task ShowCreatePullRequest()
         {
             return NavigateTo<IPullRequestCreationViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
@@ -371,7 +374,7 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     navigator.Clear();
                     Content = navigator;
-                    await ShowPullRequests();
+                    await ShowDefaultPage();
                 }
                 else
                 {
