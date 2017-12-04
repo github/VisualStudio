@@ -56,7 +56,7 @@ One can choose to display the `ViewModel` instance in any way we want by using a
         
     </DataTemplate>
   </Window.Resources>
-</pfui:DialogWindow>
+</Window>
 ```
 
 This is the basis for converting view models to views.

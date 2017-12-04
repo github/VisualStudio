@@ -4,8 +4,6 @@ GitHub for Visual Studio has a common dialog which is used to show the login, cl
 
 ## Create a View Model and Interface
 
-> TODO: `NewViewModelBase` will become simply `ViewModelBase` once the MVVM refactor is completed.
-
 - Create an interface for the view model that implements `IDialogContentViewModel` in `GitHub.Exports.Reactive\ViewModels\Dialog`
 - Create a view model that inherits from `NewViewModelBase` and implements the interface in `GitHub.App\ViewModels\Dialog`
 - Export the view model with the interface as the contract and add a `[PartCreationPolicy(CreationPolicy.NonShared)]` attribute
@@ -34,7 +32,7 @@ namespace GitHub.ViewModels.Dialog
 {
     [Export(typeof(IExampleDialogViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class ExampleDialogViewModel : NewViewModelBase, IExampleDialogViewModel
+    public class ExampleDialogViewModel : ViewModelBase, IExampleDialogViewModel
     {
         [ImportingConstructor]
         public ExampleDialogViewModel()
@@ -52,8 +50,6 @@ namespace GitHub.ViewModels.Dialog
 ```
 
 ## Create a View
-
-> TODO: Decide if `GitHub.VisualStudio\Views` is the best place for views
 
 - Create a WPF `UserControl` under `GitHub.VisualStudio\Views\Dialog` 
 - Add an `ExportViewFor` attribute with the type of the view model interface
@@ -93,7 +89,7 @@ namespace GitHub.VisualStudio.Views.Dialog
 
 ## Show the Dialog!
 
-To show the dialog you will need an instance of the `IShowDialog` service. Once you have that, simply call the `Show` method with an instance of your view model.
+To show the dialog you will need an instance of the `IShowDialogService` service. Once you have that, simply call the `Show` method with an instance of your view model.
 
 ```csharp
 var viewModel = new ExampleDialogViewModel();
