@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
@@ -133,10 +132,101 @@ public class NavigationViewModelTests
             Assert.False(target.NavigateBack.CanExecute(null));
             Assert.True(target.NavigateForward.CanExecute(null));
         }
+
+        [Fact]
+        public void BackShouldCallActivatedOnNewPage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+            var second = CreatePage();
+
+            target.NavigateTo(first);
+            target.NavigateTo(second);
+
+            first.ClearReceivedCalls();
+            target.Back();
+
+            first.Received(1).Activated();
+        }
+
+        [Fact]
+        public void BackShouldCallDeactivatedOnOldPage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+            var second = CreatePage();
+
+            target.NavigateTo(first);
+            target.NavigateTo(second);
+
+            second.ClearReceivedCalls();
+            target.Back();
+
+            second.Received(1).Deactivated();
+        }
+
+        [Fact]
+        public void ForwardShouldCallActivatedOnNewPage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+            var second = CreatePage();
+
+            target.NavigateTo(first);
+            target.NavigateTo(second);
+            target.Back();
+
+            second.ClearReceivedCalls();
+            target.Forward();
+
+            second.Received(1).Activated();
+        }
+
+        [Fact]
+        public void ForwardShouldCallDeactivatedOnOldPage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+            var second = CreatePage();
+
+            target.NavigateTo(first);
+            target.NavigateTo(second);
+            target.Back();
+
+            first.ClearReceivedCalls();
+            target.Forward();
+
+            first.Received(1).Deactivated();
+        }
     }
 
     public class TheNavigateToMethod
     {
+        [Fact]
+        public void ShouldCallActivatedOnNewPage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+
+            target.NavigateTo(first);
+
+            first.Received(1).Activated();
+        }
+
+        [Fact]
+        public void ShouldCallDeactivatedOnOldPage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+            var second = CreatePage();
+
+            target.NavigateTo(first);
+            first.ClearReceivedCalls();
+            target.NavigateTo(second);
+
+            first.Received(1).Deactivated();
+        }
+
         [Fact]
         public void CloseRequestedShouldRemovePage()
         {
@@ -152,6 +242,21 @@ public class NavigationViewModelTests
 
             Assert.Single(target.History);
             Assert.Same(first, target.History[0]);
+        }
+
+        [Fact]
+        public void NavigatingToExistingPageInForwardHistoryShouldNotDisposePage()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+            var second = CreatePage();
+
+            target.NavigateTo(first);
+            target.NavigateTo(second);
+            target.Back();
+            target.NavigateTo(second);
+
+            second.DidNotReceive().Dispose();
         }
     }
 
@@ -174,17 +279,34 @@ public class NavigationViewModelTests
         }
 
         [Fact]
-        public void DisposesRegisteredResources()
+        public void DisposesPages()
         {
             var target = new NavigationViewModel();
             var first = CreatePage();
             var disposed = false;
 
+            first.When(x => x.Dispose()).Do(_ => disposed = true);
+
             target.NavigateTo(first);
-            target.RegisterDispose(first, Disposable.Create(() => disposed = true));
             target.Clear();
 
             Assert.True(disposed);
+        }
+
+        [Fact]
+        public void CallsDeactivatedAndThenDisposedOnPages()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+
+            target.NavigateTo(first);
+            target.Clear();
+
+            Received.InOrder(() =>
+            {
+                first.Deactivated();
+                first.Dispose();
+            });
         }
     }
 
@@ -256,17 +378,34 @@ public class NavigationViewModelTests
         }
 
         [Fact]
-        public void RemovingItemDisposesRegisteredResources()
+        public void RemovingItemCallsDispose()
         {
             var target = new NavigationViewModel();
             var first = CreatePage();
             var disposed = false;
 
+            first.When(x => x.Dispose()).Do(_ => disposed = true);
+
             target.NavigateTo(first);
-            target.RegisterDispose(first, Disposable.Create(() => disposed = true));
             target.RemoveAll(first);
 
             Assert.True(disposed);
+        }
+
+        [Fact]
+        public void CallsDeactivatedAndThenDisposedOnPages()
+        {
+            var target = new NavigationViewModel();
+            var first = CreatePage();
+
+            target.NavigateTo(first);
+            target.RemoveAll(first);
+
+            Received.InOrder(() =>
+            {
+                first.Deactivated();
+                first.Dispose();
+            });
         }
     }
 

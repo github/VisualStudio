@@ -65,6 +65,16 @@ namespace GitHub.ViewModels.GitHubPane
         public IObservable<Uri> NavigationRequested => navigate;
 
         /// <inheritdoc/>
+        public virtual void Activated()
+        {
+        }
+
+        /// <inheritdoc/>
+        public virtual void Deactivated()
+        {
+        }
+
+        /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);

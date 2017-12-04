@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using GitHub.Extensions;
 using ReactiveUI;
@@ -19,7 +17,6 @@ namespace GitHub.ViewModels.GitHubPane
     {
         readonly ReactiveList<IPanePageViewModel> history;
         readonly ObservableAsPropertyHelper<IPanePageViewModel> content;
-        Dictionary<IPanePageViewModel, CompositeDisposable> pageDispose;
         int index = -1;
 
         /// <summary>
@@ -41,6 +38,13 @@ namespace GitHub.ViewModels.GitHubPane
                 .Select(x => x.Index != -1 ? history[x.Index] : null)
                 .StartWith((IPanePageViewModel)null)
                 .ToProperty(this, x => x.Content);
+
+            this.WhenAnyValue(x => x.Content)
+              .Buffer(2, 1)
+              .Subscribe(x => {
+                  if (x[0] != null && history.Contains(x[0])) x[0].Deactivated();
+                  x[1]?.Activated();
+              });
 
             NavigateBack = ReactiveCommand.Create(pos.Select(x => x.Index > 0));
             NavigateBack.Subscribe(_ => Back());
@@ -72,13 +76,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             Guard.ArgumentNotNull(page, nameof(page));
 
+            history.Insert(index + 1, page);
+            ++Index;
+
             if (index < history.Count - 1)
             {
                 history.RemoveRange(index + 1, history.Count - (index + 1));
             }
-
-            history.Add(page);
-            ++Index;
         }
 
         /// <inheritdoc/>
@@ -103,7 +107,7 @@ namespace GitHub.ViewModels.GitHubPane
         public void Clear()
         {
             Index = -1;
-            history.Clear();
+            history.RemoveRange(0, history.Count);
         }
 
         public int RemoveAll(IPanePageViewModel page)
@@ -113,31 +117,11 @@ namespace GitHub.ViewModels.GitHubPane
             return count;
         }
              
-        public void RegisterDispose(IPanePageViewModel page, IDisposable dispose)
-        {
-            if (pageDispose == null)
-            {
-                pageDispose = new Dictionary<IPanePageViewModel, CompositeDisposable>();
-            }
-
-            CompositeDisposable item;
-
-            if (!pageDispose.TryGetValue(page, out item))
-            {
-                item = new CompositeDisposable();
-                pageDispose.Add(page, item);
-            }
-
-            item.Add(dispose);
-        }
-
         void BeforeItemAdded(IPanePageViewModel page)
         {
             if (page.CloseRequested != null && !history.Contains(page))
             {
-                RegisterDispose(
-                    page,
-                    page.CloseRequested.Subscribe(_ => RemoveAll(page)));
+                page.CloseRequested.Subscribe(_ => RemoveAll(page));
             }
         }
 
@@ -150,13 +134,8 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (!history.Contains(page))
             {
-                CompositeDisposable dispose = null;
-
-                if (pageDispose?.TryGetValue(page, out dispose) == true)
-                {
-                    dispose.Dispose();
-                    pageDispose.Remove(page);
-                }
+                if (Content == page) page.Deactivated();
+                page.Dispose();
             }
         }
 
@@ -177,16 +156,7 @@ namespace GitHub.ViewModels.GitHubPane
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
-                        if (pageDispose != null)
-                        {
-                            foreach (var dispose in pageDispose.Values)
-                            {
-                                dispose.Dispose();
-                            }
-
-                            pageDispose.Clear();
-                        }
-                        break;
+                        throw new NotSupportedException();
 
                     default:
                         throw new NotImplementedException();
