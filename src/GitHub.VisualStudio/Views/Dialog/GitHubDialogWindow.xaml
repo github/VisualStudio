@@ -7,7 +7,7 @@
                    xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.Exports.Reactive"
                    xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
                    mc:Ignorable="d"
-                   Title="{Binding Title}"
+                   Title="{Binding Content.Title, FallbackValue=GitHub}"
                    Width="414"
                    Height="460"
                    MinWidth="414"
