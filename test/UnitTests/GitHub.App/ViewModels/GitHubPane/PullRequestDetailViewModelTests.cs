@@ -554,7 +554,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 pullRequestService,
                 sessionManager ?? Substitute.For<IPullRequestSessionManager>(),
                 Substitute.For<IModelServiceFactory>(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVSGitExt>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
