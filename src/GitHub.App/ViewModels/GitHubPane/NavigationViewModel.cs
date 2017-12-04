@@ -119,7 +119,7 @@ namespace GitHub.ViewModels.GitHubPane
              
         void BeforeItemAdded(IPanePageViewModel page)
         {
-            if (page.CloseRequested != null && !history.Contains(page))
+            if (!history.Contains(page))
             {
                 page.CloseRequested.Subscribe(_ => RemoveAll(page));
             }

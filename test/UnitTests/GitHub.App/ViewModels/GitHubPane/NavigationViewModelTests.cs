@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
@@ -412,7 +413,7 @@ public class NavigationViewModelTests
     static IPanePageViewModel CreatePage()
     {
         var result = Substitute.For<IPanePageViewModel>();
-        result.CloseRequested.Returns((IObservable<Unit>)null);
+        result.CloseRequested.Returns(Observable.Never<Unit>());
         return result;
     }
 }
