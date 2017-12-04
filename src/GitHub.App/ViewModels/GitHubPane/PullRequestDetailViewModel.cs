@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -46,6 +47,8 @@ namespace GitHub.ViewModels.GitHubPane
         bool isCheckedOut;
         bool isFromFork;
         bool isInCheckout;
+        bool active;
+        bool refreshOnActivate;
         Uri webUrl;
 
         /// <summary>
@@ -483,6 +486,21 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public override void Activated()
+        {
+            active = true;
+
+            if (refreshOnActivate)
+            {
+                Refresh().Forget();
+                refreshOnActivate = false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Deactivated() => active = false;
+
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -493,7 +511,17 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void ActiveRepositoriesChanged() => Refresh().Forget();
+        void ActiveRepositoriesChanged()
+        {
+            if (active)
+            {
+                Refresh().Forget();
+            }
+            else
+            {
+                refreshOnActivate = true;
+            }
+        }
 
         void SubscribeOperationError(ReactiveCommand<Unit> command)
         {
