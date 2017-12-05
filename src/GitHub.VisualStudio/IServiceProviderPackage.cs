@@ -1,6 +1,6 @@
-﻿using GitHub.ViewModels;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
+using GitHub.ViewModels.GitHubPane;
 
 namespace GitHub.VisualStudio
 {
@@ -12,6 +12,6 @@ namespace GitHub.VisualStudio
     [ComVisible(true)]
     public interface IGitHubToolWindowManager
     {
-        IViewHost ShowHomePane();
+        IGitHubPaneViewModel ShowHomePane();
     }
 }

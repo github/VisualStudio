@@ -31,7 +31,7 @@ namespace GitHub.VisualStudio.Menus
 
         public void Activate(object data)
         {
-            StartFlow(UIControllerFlow.Gist);
+            DialogService?.ShowCreateGist();
         }
     }
 }
