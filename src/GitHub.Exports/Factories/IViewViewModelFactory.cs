@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using GitHub.ViewModels;
 
@@ -21,6 +22,7 @@ namespace GitHub.Factories
         /// </summary>
         /// <typeparam name="TViewModel">The view model interface type.</typeparam>
         /// <returns>The view.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         FrameworkElement CreateView<TViewModel>() where TViewModel : IViewModel;
 
         /// <summary>
