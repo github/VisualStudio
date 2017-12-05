@@ -46,6 +46,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        bool initialized;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -343,10 +344,13 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task UpdateContent(ILocalRepositoryModel repository)
         {
+            if (initialized && Equals(repository, LocalRepository)) return;
+
+            initialized = true;
             LocalRepository = repository;
             Connection = null;
-
             Content = null;
+            navigator.Clear();
 
             if (repository == null)
             {
@@ -372,7 +376,6 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (Connection != null)
                 {
-                    navigator.Clear();
                     Content = navigator;
                     await ShowDefaultPage();
                 }
