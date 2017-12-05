@@ -1,15 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Input;
+using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Models;
-using GitHub.ViewModels;
-using System.Collections.Generic;
+using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
-using System.Collections.ObjectModel;
-using System.Linq;
-using GitHub.UI;
 
 namespace GitHub.SampleData
 {
@@ -75,11 +74,12 @@ namespace GitHub.SampleData
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
-        public IObservable<ViewWithData> Navigate { get; }
-        public bool IsBusy { get; }
+        public Uri WebUrl { get; set; }
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
         public ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
+
+        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
 }

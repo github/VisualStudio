@@ -22,7 +22,7 @@ namespace GitHub.VisualStudio.Menus
         public void Activate(object data = null)
         {
             var host = ServiceProvider.TryGetService<IGitHubToolWindowManager>().ShowHomePane();
-            host?.ShowView(new ViewWithData(UIControllerFlow.PullRequestList));
+            host.ShowPullRequests().Forget();
         }
     }
 }

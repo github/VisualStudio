@@ -1,0 +1,167 @@
+﻿<local:GenericRepositoryPublishView x:Class="GitHub.VisualStudio.Views.TeamExplorer.RepositoryPublishView"
+                                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                       xmlns:helpers="clr-namespace:GitHub.VisualStudio.Helpers"
+                                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                       xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+                                       xmlns:local="clr-namespace:GitHub.VisualStudio.Views.TeamExplorer"
+                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                       xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                                       xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                                       xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
+                                       Margin="0"
+                                       d:DesignHeight="440"
+                                       d:DesignWidth="414"
+                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                       d:DataContext="{d:DesignInstance Type=sampleData:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
+                                       mc:Ignorable="d"
+                                       AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerSyncGitHubRepositoryPublishCustom}" 
+                                       IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}">
+   
+  <Control.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+        
+        <Style x:Key="VSStyledCheckBox" BasedOn="{StaticResource VsCheckBoxStyleKey}" TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
+            <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
+            <Style.Triggers>
+                <Trigger Property="UIElement.IsMouseOver" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="VSStyledComboBox" BasedOn="{StaticResource VsComboBoxStyleKey}" TargetType="{x:Type ComboBox}"/>
+        <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource TeamExplorerPromptTextBox}" />
+
+        <Style BasedOn="{StaticResource VSStyledComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="23" />
+        </Style>
+    </ResourceDictionary>
+  </Control.Resources>
+
+  <StackPanel Margin="8,6,18,0"
+              Orientation="Vertical"
+              Style="{DynamicResource DialogContainerStackPanel}">
+
+    <DockPanel Margin="0,0,0,13" VerticalAlignment="Top">
+      <ui:OcticonImage x:Name="octokit"
+                       Width="32"
+                       Height="32"
+                       Margin="0,6,8,0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left"
+                       Foreground="{DynamicResource GitHubVsToolWindowText}"
+                       Icon="mark_github" />
+      <Border Height="32"
+              Margin="0,6,0,0"
+              DockPanel.Dock="Right">
+        <TextBlock HorizontalAlignment="Stretch"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource GitHubVsGrayText}"
+                   Text="{x:Static prop:Resources.RepoDoesNotHaveRemoteText}"
+                   TextTrimming="CharacterEllipsis"
+                   TextWrapping="Wrap"
+                   ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+      </Border>
+    </DockPanel>
+
+    <ComboBox x:Name="hostsComboBox"
+              ItemsSource="{Binding Connections, Mode=OneWay}"
+              SelectedItem="{Binding SelectedConnection}"
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishHostComboBox}" >
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding HostAddress.Title}" />
+          </StackPanel>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <ComboBox x:Name="accountsComboBox"
+              ItemsSource="{Binding Accounts, Mode=OneWay}"
+              SelectedItem="{Binding SelectedAccount}"
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishAccountComboBox}" >
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <Image Width="15"
+                   Height="15"
+                   Margin="0,0,8,0"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Source="{Binding Avatar}" />
+            <TextBlock Text="{Binding Login}" />
+          </StackPanel>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <Grid>
+            <ui:PromptTextBox x:Name="nameText"
+               Height="23"
+               Margin="0"
+               Background="{DynamicResource GitHubVsSearchBoxBackground}"
+               Foreground="{DynamicResource GitHubVsWindowText}"
+               MaxLength="{x:Static helpers:Constants.MaxRepositoryNameLength}"
+               Text="{Binding RepositoryName}"
+               PromptText="{x:Static prop:Resources.RepoNameText}" 
+               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishRepositoryNameTextBox}"
+               VerticalContentAlignment="Center"/>
+    </Grid>
+    
+    <Grid>
+      <ui:PromptTextBox x:Name="description"
+               Height="52"
+               Margin="0,8,0,0"
+               AcceptsReturn="True"
+               Background="{DynamicResource GitHubVsSearchBoxBackground}"
+               Foreground="{DynamicResource GitHubVsWindowText}"
+               Text="{Binding Description}"
+               TextWrapping="WrapWithOverflow"
+               PromptText="{x:Static prop:Resources.DescriptionOptional}" 
+               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}" />
+    </Grid>
+
+        <CheckBox x:Name="makePrivate"
+              Margin="0,8,0,0"
+              IsChecked="{Binding KeepPrivate}"
+              IsEnabled="{Binding CanKeepPrivate}"
+              Style="{StaticResource VSStyledCheckBox}"
+              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPrivateRepositoryCheckBox}" >
+            <TextBlock Background="{DynamicResource GitHubVsToolWindowBackground}"
+                 Foreground="{DynamicResource GitHubVsToolWindowText}"
+                 TextWrapping="Wrap">
+                <TextBlock.Resources>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Resources>
+                <TextBlock.Inlines>
+                    <Run Text="{x:Static prop:Resources.makePrivateContent}" />
+                </TextBlock.Inlines>
+            </TextBlock>
+        </CheckBox>
+
+        <Button x:Name="publishRepositoryButton"
+            Margin="0,8,0,0"
+            HorizontalAlignment="Left"
+            IsDefault="True"
+            Style="{StaticResource GitHubVsButton}"
+            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishRepositoryButton}" >
+            <TextBlock Text="{x:Static prop:Resources.publishText}" />
+        </Button>
+
+  </StackPanel>
+</local:GenericRepositoryPublishView>
