@@ -1,4 +1,5 @@
-﻿using GitHub.Authentication;
+﻿using GitHub.App.Factories;
+using GitHub.Authentication;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.VisualStudio;
@@ -8,7 +9,7 @@ using Rothko;
 using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using GitHub.Factories;
+using GitHub.Api;
 
 namespace UnitTests
 {
@@ -55,16 +56,20 @@ namespace UnitTests
             }
         }
 
-        public static IViewViewModelFactory ViewViewModelFactory { get { return Substitute.For<IViewViewModelFactory>(); } }
+        public static IExportFactoryProvider ExportFactoryProvider { get { return Substitute.For<IExportFactoryProvider>(); } }
+        public static IUIFactory UIFactory { get { return Substitute.For<IUIFactory>(); } }
 
         public static IRepositoryCreationService RepositoryCreationService { get { return Substitute.For<IRepositoryCreationService>(); } }
         public static IRepositoryCloneService RepositoryCloneService { get { return Substitute.For<IRepositoryCloneService>(); } }
 
         public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
+        public static IConnection NewConnection { get { return Substitute.For<IConnection>(); } }
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
+        public static IConnectionManager NewConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
         public static IDelegatingTwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<IDelegatingTwoFactorChallengeHandler>(); } }
         public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
         public static IPullRequestService PullRequestService { get { return Substitute.For<IPullRequestService>(); } }
+        public static IUIProvider UIProvider { get { return Substitute.For<IUIProvider>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -120,13 +125,17 @@ namespace UnitTests
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
-            ret.GetService(typeof(IViewViewModelFactory)).Returns(ViewViewModelFactory);
+            ret.GetService(typeof(IExportFactoryProvider)).Returns(ExportFactoryProvider);
+            ret.GetService(typeof(IUIFactory)).Returns(UIFactory);
             ret.GetService(typeof(IConnection)).Returns(Connection);
+            ret.GetService(typeof(IConnection)).Returns(NewConnection);
             ret.GetService(typeof(IConnectionManager)).Returns(ConnectionManager);
+            ret.GetService(typeof(IConnectionManager)).Returns(NewConnectionManager);
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
             ret.GetService(typeof(IDelegatingTwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
             ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
             ret.GetService(typeof(IPullRequestService)).Returns(PullRequestService);
+            ret.GetService(typeof(IUIProvider)).Returns(UIProvider);
             return ret;
         }
 
@@ -165,9 +174,13 @@ namespace UnitTests
             return provider.GetService(typeof(IRepositoryCreationService)) as IRepositoryCreationService;
         }
 
-        public static IViewViewModelFactory GetExportFactoryProvider(this IServiceProvider provider)
+        public static IExportFactoryProvider GetExportFactoryProvider(this IServiceProvider provider)
         {
-            return provider.GetService(typeof(IViewViewModelFactory)) as IViewViewModelFactory;
+            return provider.GetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
+        }
+        public static IUIFactory GetUIFactory(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IUIFactory)) as IUIFactory;
         }
 
         public static IConnection GetConnection(this IServiceProvider provider)
@@ -175,7 +188,17 @@ namespace UnitTests
             return provider.GetService(typeof(IConnection)) as IConnection;
         }
 
+        public static IConnection GetNewConnection(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IConnection)) as IConnection;
+        }
+
         public static IConnectionManager GetConnectionManager(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IConnectionManager)) as IConnectionManager;
+        }
+
+        public static IConnectionManager GetNewConnectionManager(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IConnectionManager)) as IConnectionManager;
         }
@@ -198,6 +221,11 @@ namespace UnitTests
         public static IPullRequestService GetPullRequestsService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IPullRequestService)) as IPullRequestService;
+        }
+
+        public static IUIProvider GetUIProvider(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IUIProvider)) as IUIProvider;
         }
     }
 }

@@ -174,7 +174,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         protected void Refresh(IConnection connection)
         {
-            if (connection == null || !connection.IsLoggedIn)
+            if (connection == null)
             {
                 LoggedIn = false;
                 IsVisible = false;
@@ -381,7 +381,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void DoCreate()
         {
-            dialogService.ShowCreateRepositoryDialog(SectionConnection);
+            StartFlow(UIControllerFlow.Create);
         }
 
         public void SignOut()
@@ -391,7 +391,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void Login()
         {
-            dialogService.ShowLoginDialog();
+            StartFlow(UIControllerFlow.Authentication);
         }
 
         public bool OpenRepository()
@@ -414,6 +414,31 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // Navigate away when we're on the correct source control contexts.
             ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             return true;
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var notifications = ServiceProvider.TryGetService<INotificationDispatcher>();
+            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+            notifications.AddListener(teServices);
+
+            ServiceProvider.GitServiceProvider = TEServiceProvider;
+            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
+            var controller = uiProvider.Configure(controllerFlow, SectionConnection);
+            controller.ListenToCompletionState()
+                .Subscribe(success =>
+                {
+                    if (success)
+                    {
+                        if (controllerFlow == UIControllerFlow.Clone)
+                            isCloning = true;
+                        else if (controllerFlow == UIControllerFlow.Create)
+                            isCreating = true;
+                    }
+                });
+            uiProvider.RunInDialog(controller);
+
+            notifications.RemoveListener();
         }
 
         bool disposed;

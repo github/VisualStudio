@@ -1,5 +1,5 @@
 ﻿using System.Reactive;
-using GitHub.Models;
+using GitHub.Authentication;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -33,7 +33,7 @@ namespace GitHub.ViewModels
         /// Gets a command which, when invoked, performs the actual 
         /// login procedure.
         /// </summary>
-        IReactiveCommand<IConnection> Login { get; }
+        IReactiveCommand<AuthenticationResult> Login { get; }
 
         /// <summary>
         /// Gets a command which, when invoked, direct the user to a

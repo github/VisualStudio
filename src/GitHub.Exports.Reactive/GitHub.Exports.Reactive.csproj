@@ -118,41 +118,37 @@
     <Compile Include="Services\IPullRequestSession.cs" />
     <Compile Include="Services\IPullRequestService.cs" />
     <Compile Include="Services\IPullRequestSessionManager.cs" />
-    <Compile Include="Services\IShowDialogService.cs" />
     <Compile Include="Services\LocalRepositoriesExtensions.cs" />
     <Compile Include="Services\ModelServiceExtensions.cs" />
-    <Compile Include="ViewModels\Dialog\IDialogContentViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\IGitHubDialogWindowViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\IGistCreationViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ILogin2FaViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ILoginCredentialsViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ILoginViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\IRepositoryCloneViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\IRepositoryCreationViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\IRepositoryRecloneViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\ISearchablePageViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPullRequestCreationViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPullRequestDetailViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\INotAGitHubRepositoryViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\INotAGitRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
+    <Compile Include="ViewModels\IHasCancel.cs" />
+    <Compile Include="ViewModels\IHasDone.cs" />
+    <Compile Include="ViewModels\ILoginViewModel.cs" />
+    <Compile Include="ViewModels\INotAGitRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\INotAGitHubRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\ILoggedOutViewModel.cs" />
+    <Compile Include="ViewModels\ILoginControlViewModel.cs" />
+    <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
+    <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
     <Compile Include="Caches\IImageCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
     <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPullRequestChangeNode.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPullRequestDirectoryNode.cs" />
-    <Compile Include="ViewModels\GitHubPane\IPullRequestFileNode.cs" />
-    <Compile Include="ViewModels\Dialog\IRepositoryCreationTarget.cs" />
-    <Compile Include="ViewModels\Dialog\ILoginToGitHubForEnterpriseViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ILoginToGitHubViewModel.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestChangeNode.cs" />
+    <Compile Include="ViewModels\IPullRequestDirectoryNode.cs" />
+    <Compile Include="ViewModels\IPullRequestFileNode.cs" />
+    <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\IDialogViewModel.cs" />
+    <Compile Include="ViewModels\IBaseCloneViewModel.cs" />
+    <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
+    <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
+    <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Models\GitIgnoreItem.cs" />
     <Compile Include="Models\LicenseItem.cs" />
@@ -160,16 +156,17 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="ViewModels\TeamExplorer\IRepositoryPublishViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
     <Compile Include="Authentication\IDelegatingTwoFactorChallengeHandler.cs" />
+    <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
     <Compile Include="Services\IRepositoryCloneService.cs" />
     <Compile Include="Services\IRepositoryCreationService.cs" />
+    <Compile Include="ViewModels\IRepositoryCloneViewModel.cs" />
+    <Compile Include="ViewModels\IRepositoryCreationViewModel.cs" />
     <Compile Include="Validation\ReactivePropertyValidator.cs" />
   </ItemGroup>
   <ItemGroup>

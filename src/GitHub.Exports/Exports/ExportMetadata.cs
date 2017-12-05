@@ -1,13 +1,39 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics.CodeAnalysis;
+using GitHub.UI;
+using GitHub.ViewModels;
+using System.Windows.Controls;
 using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
-using System.Windows;
 using GitHub.VisualStudio;
 
 namespace GitHub.Exports
 {
+    /// <summary>
+    /// Defines the type of a view or view model.
+    /// </summary>
+    public enum UIViewType
+    {
+        None,
+        End,
+        Login,
+        TwoFactor,
+        Create,
+        Clone,
+        Publish,
+        Gist,
+        PRList,
+        PRDetail,
+        PRCreation,
+        GitHubPane,
+        LoggedOut,
+        NotAGitRepository,
+        NotAGitHubRepository,
+        StartPageClone,
+
+    }
+
     /// <summary>
     /// Defines the types of global visual studio menus available.
     /// </summary>
@@ -27,20 +53,32 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// A MEF export attribute that defines an export of type <see cref="FrameworkElement"/> with
-    /// <see cref="ViewModelType"/> metadata.
+    /// A MEF export attribute that defines an export of type <see cref="IViewModel"/> with
+    /// <see cref="UIViewType"/> metadata.
     /// </summary>
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class ExportViewForAttribute : ExportAttribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public sealed class ExportViewModelAttribute : ExportAttribute
     {
-        public ExportViewForAttribute(Type viewModelType)
-            : base(typeof(FrameworkElement))
+        public ExportViewModelAttribute() : base(typeof(IViewModel))
+        {}
+
+        public UIViewType ViewType { get; set; }
+    }
+
+    /// <summary>
+    /// A MEF export attribute that defines an export of type <see cref="IView"/> with
+    /// <see cref="UIViewType"/> metadata.
+    /// </summary>
+    [MetadataAttribute]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public sealed class ExportViewAttribute : ExportAttribute
+    {
+        public ExportViewAttribute() : base(typeof(IView))
         {
-            ViewModelType = viewModelType;
         }
 
-        public Type ViewModelType { get; }
+        public UIViewType ViewType { get; set; }
     }
 
     /// <summary>
@@ -59,8 +97,8 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// Defines a MEF metadata view that matches <see cref="ExportViewModelForAttribute"/> and
-    /// <see cref="ExportViewForAttribute"/>.
+    /// Defines a MEF metadata view that matches <see cref="ExportViewModelAttribute"/> and
+    /// <see cref="ExportViewAttribute"/>.
     /// </summary>
     /// <remarks>
     /// For more information see the Metadata and Metadata views section at
@@ -68,8 +106,7 @@ namespace GitHub.Exports
     /// </remarks>
     public interface IViewModelMetadata
     {
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
-        Type[] ViewModelType { get; }
+        UIViewType ViewType { get; }
     }
 
     /// <summary>
@@ -86,6 +123,27 @@ namespace GitHub.Exports
 
     public static class ExportMetadataAttributeExtensions
     {
+        public static bool IsViewType(this UserControl c, UIViewType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
+        }
+
+        public static bool IsViewType(this IView c, UIViewType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
+        }
+
+        static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
+        {
+            if (attributeData.NamedArguments == null)
+            {
+                throw new GitHubLogicException("attributeData.NamedArguments may not be null");
+            }
+
+            return attributeData.AttributeType == typeof(ExportViewAttribute)
+                && (UIViewType)attributeData.NamedArguments[0].TypedValue.Value == viewType;
+        }
+
         public static bool IsMenuType(this IMenuHandler c, MenuType type)
         {
             return c.GetType().GetCustomAttributesData().Any(attr => IsMenuType(attr, type));

@@ -17,6 +17,10 @@ namespace GitHub.InlineReviews.SampleData
             User = new AccountDesigner { Login = "shana", IsUser = true };
         }
 
+        public void Initialize(ViewWithData data)
+        {
+        }
+
         public int Id { get; set; }
         public string Body { get; set; }
         public string ErrorMessage { get; set; }

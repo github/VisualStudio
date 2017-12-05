@@ -8,18 +8,11 @@ namespace GitHub.Authentication
     public class TwoFactorRequiredUserError : UserError
     {
         public TwoFactorRequiredUserError(TwoFactorAuthorizationException exception)
-            : this(exception, exception.TwoFactorType)
-        {
-        }
-
-        public TwoFactorRequiredUserError(
-            TwoFactorAuthorizationException exception,
-            TwoFactorType twoFactorType)
             : base(exception.Message, innerException: exception)
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
 
-            TwoFactorType = twoFactorType;
+            TwoFactorType = exception.TwoFactorType;
             RetryFailed = exception is TwoFactorChallengeFailedException;
         }
 

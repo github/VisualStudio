@@ -149,19 +149,17 @@
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
-    <Compile Include="Services\EnterpriseProbeTask.cs" />
-    <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
-    <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Models\UsageData.cs" />
     <Compile Include="Services\IUsageService.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
-    <Compile Include="ViewModels\GitHubPane\IGitHubPaneViewModel.cs" />
-    <Compile Include="ViewModels\IConnectionInitializedViewModel.cs" />
-    <Compile Include="ViewModels\IInfoPanel.cs" />
+    <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
+    <Compile Include="ViewModels\IHasErrorState.cs" />
+    <Compile Include="ViewModels\IHasLoading.cs" />
+    <Compile Include="ViewModels\ISearchablePageViewModel.cs" />
+    <Compile Include="ViewModels\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
-    <Compile Include="ViewModels\IOpenInBrowser.cs" />
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
@@ -169,6 +167,8 @@
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
+    <Compile Include="Factories\IUIFactory.cs" />
+    <Compile Include="Factories\IUIPair.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
@@ -183,7 +183,7 @@
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Services\IConnectionCache.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
-    <Compile Include="Factories\IViewViewModelFactory.cs" />
+    <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\IPullRequestFileModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
@@ -207,6 +207,7 @@
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Services\IUIProvider.cs" />
     <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
@@ -222,6 +223,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
@@ -236,7 +238,11 @@
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="UI\IView.cs" />
+    <Compile Include="ViewModels\IHasBusy.cs" />
+    <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
+    <Compile Include="ViewModels\ICanNavigate.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />
     <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
@@ -244,14 +250,20 @@
     <Compile Include="Models\IProgram.cs" />
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
+    <Compile Include="Authentication\AuthenticationResult.cs" />
     <Compile Include="Models\IRemoteRepositoryModel.cs" />
     <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />
     <Compile Include="Primitives\UriString.cs" />
+    <Compile Include="Services\EnterpriseProbeTask.cs" />
+    <Compile Include="Services\ExportFactoryProvider.cs" />
+    <Compile Include="Services\IVisualStudioBrowser.cs" />
+    <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IGitHubServiceProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
+    <Compile Include="UI\IUIController.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
     <Compile Include="Services\IVSGitExt.cs" />
     <Compile Include="Services\IVSUIContext.cs" />

@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+using GitHub.ViewModels;
+using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Validation;
-using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
+using System;
+using System.Reactive;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestCreationViewModelDesigner : PanePageViewModelBase, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModelDesigner : DialogViewModelBase, IPullRequestCreationViewModel
     {
         public PullRequestCreationViewModelDesigner()
         {
@@ -41,7 +41,6 @@ namespace GitHub.SampleData
         public List<string> Users { get; set; }
 
         public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
-        public IReactiveCommand<object> Cancel { get; }
 
         public string PRTitle { get; set; }
 
@@ -49,6 +48,6 @@ namespace GitHub.SampleData
 
         public ReactivePropertyValidator BranchValidator { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
+        public override IObservable<Unit> Done { get; }
     }
 }

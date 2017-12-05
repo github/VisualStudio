@@ -11,7 +11,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Base class for the Repository publish/create dialogs. It represents the details about the repository itself.
     /// </summary>
-    public abstract class RepositoryFormViewModel : ViewModelBase
+    public abstract class RepositoryFormViewModel : DialogViewModelBase
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 

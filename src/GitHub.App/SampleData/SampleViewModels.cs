@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using GitHub.Api;
+using GitHub.Authentication;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.Validation;
 using GitHub.ViewModels;
-using GitHub.ViewModels.Dialog;
-using GitHub.ViewModels.TeamExplorer;
-using GitHub.VisualStudio.TeamExplorer.Connect;
 using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
+using GitHub.VisualStudio.TeamExplorer.Connect;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : ViewModelBase, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : DialogViewModelBase, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -52,7 +55,7 @@ namespace GitHub.SampleData
             SelectedLicense = Licenses[0];
         }
 
-        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+        public new string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         public IReadOnlyList<IAccount> Accounts
         {
@@ -184,9 +187,7 @@ namespace GitHub.SampleData
             set;
         }
 
-        public IObservable<object> Done { get; }
-
-        public Task InitializeAsync(IConnection connection) => Task.CompletedTask;
+        public override IObservable<Unit> Done { get; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -214,8 +215,6 @@ namespace GitHub.SampleData
             };
             SelectedConnection = Connections[0];
         }
-
-        public bool IsBusy { get; set; }
 
         public bool IsHostComboBoxVisible
         {
@@ -254,7 +253,7 @@ namespace GitHub.SampleData
         }
     }
 
-    public class RepositoryCloneViewModelDesigner : ViewModelBase, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : DialogViewModelBase, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
@@ -301,7 +300,7 @@ namespace GitHub.SampleData
 
         public string FilterText { get; set; }
 
-        public string Title { get { return "Clone a GitHub Repository"; } }
+        public new string Title { get { return "Clone a GitHub Repository"; } }
 
         public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
         {
@@ -344,9 +343,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IObservable<object> Done { get; }
-
-        public Task InitializeAsync(IConnection connection) => Task.CompletedTask;
+        public override IObservable<Unit> Done { get; }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection
