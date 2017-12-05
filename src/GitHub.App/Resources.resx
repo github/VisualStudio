@@ -282,7 +282,4 @@
   <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
     <value>The source repository is no longer available.</value>
   </data>
-  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Cannot checkout as your working directory has uncommitted changes.</value>
-  </data>
 </root>

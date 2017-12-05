@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
-using GitHub.App;
+﻿using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -18,6 +9,15 @@ using GitHub.UI;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace GitHub.ViewModels
 {
@@ -127,7 +127,15 @@ namespace GitHub.ViewModels
                 DoPush);
             SubscribeOperationError(Push);
 
+            SyncSubmodules = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.SyncSubmodulesEnabled),
+                DoSyncSubmodules);
+            SubscribeOperationError(SyncSubmodules);
+
             OpenOnGitHub = ReactiveCommand.Create();
+            NavigateToGitChanges = ReactiveCommand.Create();
             DiffFile = ReactiveCommand.Create();
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
@@ -306,9 +314,19 @@ namespace GitHub.ViewModels
         public ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        public ReactiveCommand<Unit> SyncSubmodules { get; }
+
+        /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to the Changes page on Team Explorer.
+        /// </summary>
+        public ReactiveCommand<object> NavigateToGitChanges { get; }
 
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
@@ -411,6 +429,7 @@ namespace GitHub.ViewModels
                     var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
                     var pullEnabled = divergence.BehindBy > 0;
                     var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+
                     string pullToolTip;
                     string pushToolTip;
 
@@ -442,7 +461,10 @@ namespace GitHub.ViewModels
                         pushToolTip = Resources.MustPullBeforePush;
                     }
 
-                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    var syncSubmodulesEnabled = await pullRequestsService.IsSyncSubmodulesRequired(LocalRepository);
+                    var changesEnabled = !await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
+
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesEnabled, changesEnabled);
                     CheckoutState = null;
                 }
                 else
@@ -450,16 +472,11 @@ namespace GitHub.ViewModels
                     var caption = localBranches.Count > 0 ?
                         string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
                         string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
-                    var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
                     if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
                     {
                         disabled = Resources.SourceRepositoryNoLongerAvailable;
-                    }
-                    else if (!clean)
-                    {
-                        disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
                     }
 
                     CheckoutState = new CheckoutCommandState(caption, disabled);
@@ -663,6 +680,14 @@ namespace GitHub.ViewModels
                 });
         }
 
+
+        IObservable<Unit> DoSyncSubmodules(object unused)
+        {
+            return pullRequestsService.SyncSubmodules(LocalRepository);
+            // TODO: UsageTracker
+            // .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+        }
+
         class CheckoutCommandState : IPullRequestCheckoutState
         {
             public CheckoutCommandState(string caption, string disabledMessage)
@@ -684,7 +709,9 @@ namespace GitHub.ViewModels
                 bool pullEnabled,
                 bool pushEnabled,
                 string pullToolTip,
-                string pushToolTip)
+                string pushToolTip,
+                bool syncSubmodulesEnabled,
+                bool changesEnabled)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
@@ -692,13 +719,17 @@ namespace GitHub.ViewModels
                 PullEnabled = pullEnabled;
                 PullToolTip = pullToolTip;
                 PushToolTip = pushToolTip;
+                SyncSubmodulesEnabled = syncSubmodulesEnabled;
+                ChangesEnabled = changesEnabled;
             }
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
-            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0 && !SyncSubmodulesEnabled;
             public bool PullEnabled { get; }
             public bool PushEnabled { get; }
+            public bool SyncSubmodulesEnabled { get; }
+            public bool ChangesEnabled { get; }
             public string PullToolTip { get; }
             public string PushToolTip { get; }
         }

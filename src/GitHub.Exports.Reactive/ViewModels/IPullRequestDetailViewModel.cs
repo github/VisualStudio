@@ -157,9 +157,19 @@ namespace GitHub.ViewModels
         ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        ReactiveCommand<Unit> SyncSubmodules { get; }
+
+        /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to the Changes page on Team Explorer.
+        /// </summary>
+        ReactiveCommand<object> NavigateToGitChanges { get; }
 
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.

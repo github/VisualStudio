@@ -155,15 +155,18 @@
 
                     <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
 
-                    <!-- Checkout pull request button -->
-                    <ui:GitHubActionLink Command="{Binding Checkout}"
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                                Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}">
+
+                        <!-- Checkout pull request button -->
+                        <ui:GitHubActionLink Command="{Binding Checkout}"
                                          Content="{Binding CheckoutState.Caption}"
-                                         Grid.Column="2"
-                                         VerticalAlignment="Center"
+                                         
                                          TextTrimming="CharacterEllipsis"
-                                         Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
                                          ToolTip="{Binding CheckoutState.ToolTip}"
-                                         ToolTipService.ShowOnDisabled="True"/>
+                                         ToolTipService.ShowOnDisabled="True"
+                                         Margin="4 0" />
+                    </StackPanel>
 
                     <!-- Pull/push buttons -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
@@ -184,6 +187,18 @@
                                              ToolTip="{Binding UpdateState.PushToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
+
+                        <!-- Navigate to Git changes -->
+                        <ui:GitHubActionLink
+                            Command="{Binding NavigateToGitChanges}"
+                            Content="[GitChanges]" Margin="4 0"
+                            Visibility="{Binding UpdateState.ChangesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
+
+                        <!-- Sync submodules -->
+                        <ui:GitHubActionLink Command="{Binding SyncSubmodules}"
+                            Content="[SyncSubmodules]" Margin="4 0"
+                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
+
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->

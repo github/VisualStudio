@@ -46,6 +46,12 @@ namespace GitHub.Services
         IObservable<Unit> Push(ILocalRepositoryModel repository);
 
         /// <summary>
+        /// Sync submodules on the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        IObservable<Unit> SyncSubmodules(ILocalRepositoryModel repository);
+
+        /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -175,5 +181,12 @@ namespace GitHub.Services
             string baseBranch,
             string compareBranch,
             int maxCommits);
+
+        /// <summary>
+        /// Check if user needs to sync submodules on current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns>True if submodules need to be synced.</returns>
+        IObservable<bool> IsSyncSubmodulesRequired(ILocalRepositoryModel repository);
     }
 }

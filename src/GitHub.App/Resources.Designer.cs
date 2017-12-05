@@ -554,14 +554,5 @@ namespace GitHub.App {
                 return ResourceManager.GetString("UsernameOrEmailValidatorSpaces", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot checkout as your working directory has uncommitted changes..
-        /// </summary>
-        internal static string WorkingDirectoryHasUncommittedCHanges {
-            get {
-                return ResourceManager.GetString("WorkingDirectoryHasUncommittedCHanges", resourceCulture);
-            }
-        }
     }
 }

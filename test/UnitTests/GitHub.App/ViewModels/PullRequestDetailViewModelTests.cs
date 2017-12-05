@@ -176,20 +176,6 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             [Fact]
-            public async Task NotCheckedOutWithWorkingDirectoryDirty()
-            {
-                var target = CreateTarget(
-                    currentBranch: "master",
-                    existingPrBranch: "pr/123",
-                    dirty: true);
-
-                await target.Load("remoteRepositoryOwner", CreatePullRequest());
-
-                Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.ToolTip);
-            }
-
-            [Fact]
             public async Task CheckoutExistingLocalBranch()
             {
                 var target = CreateTarget(
@@ -489,7 +475,6 @@ namespace UnitTests.GitHub.App.ViewModels
             string currentBranch = "master",
             string existingPrBranch = null,
             bool prFromFork = false,
-            bool dirty = false,
             int aheadBy = 0,
             int behindBy = 0,
             IPullRequestSessionManager sessionManager = null)
@@ -498,7 +483,6 @@ namespace UnitTests.GitHub.App.ViewModels
                 currentBranch: currentBranch,
                 existingPrBranch: existingPrBranch,
                 prFromFork: prFromFork,
-                dirty: dirty,
                 aheadBy: aheadBy,
                 behindBy: behindBy,
                 sessionManager: sessionManager).Item1;
@@ -536,7 +520,6 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.Checkout(repository, Arg.Any<IPullRequestModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
             pullRequestService.GetDefaultLocalBranchName(repository, Arg.Any<int>(), Arg.Any<string>()).Returns(x => Observable.Return($"pr/{x[1]}"));
             pullRequestService.IsPullRequestFromRepository(repository, Arg.Any<IPullRequestModel>()).Returns(!prFromFork);
-            pullRequestService.IsWorkingDirectoryClean(repository).Returns(Observable.Return(!dirty));
             pullRequestService.Pull(repository).Returns(x => Throws("Pull threw"));
             pullRequestService.Push(repository).Returns(x => Throws("Push threw"));
             pullRequestService.SwitchToBranch(repository, Arg.Any<IPullRequestModel>())

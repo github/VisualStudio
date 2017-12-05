@@ -104,13 +104,46 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<bool> IsSyncSubmodulesRequired(ILocalRepositoryModel repository)
+        {
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                foreach (var submodule in repo.Submodules)
+                {
+                    var status = submodule.RetrieveStatus();
+
+                    if ((status & SubmoduleStatus.WorkDirAdded) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirDeleted) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirModified) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirUninitialized) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+                }
+
+                return Observable.Return(false);
+            }
+        }
+
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
             // The `using` appears to resolve this issue:
             // https://github.com/github/VisualStudio/issues/1306
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
-                var isClean = !IsFilthy(repo.RetrieveStatus());
+                var isClean = !IsFilthy(repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true }));
                 return Observable.Return(isClean);
             }
         }
@@ -150,6 +183,18 @@ namespace GitHub.Services
                     var remoteName = repo.Head.RemoteName;
                     var remote = await gitClient.GetHttpRemote(repo, remoteName);
                     await gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name);
+                    return Observable.Return(Unit.Default);
+                }
+            });
+        }
+
+        public IObservable<Unit> SyncSubmodules(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(async () =>
+            {
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    await gitClient.SyncSubmodules(repo);
                     return Observable.Return(Unit.Default);
                 }
             });
