@@ -193,12 +193,15 @@ namespace GitHub.ViewModels.GitHubPane
                 filterTextIsString = hasText && !filterTextIsNumber;
             }
 
-            pullRequests.Filter = (pullRequest, index, list) =>
-                (!state.IsOpen.HasValue || state.IsOpen == pullRequest.IsOpen) &&
-                (ass == null || ass.Equals(pullRequest.Assignee)) &&
-                (aut == null || aut.Equals(pullRequest.Author)) &&
-                (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) && 
-                (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
+            if (!pullRequests.Disposed)
+            {
+                pullRequests.Filter = (pullRequest, index, list) =>
+                    (!state.IsOpen.HasValue || state.IsOpen == pullRequest.IsOpen) &&
+                    (ass == null || ass.Equals(pullRequest.Assignee)) &&
+                    (aut == null || aut.Equals(pullRequest.Author)) &&
+                    (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) &&
+                    (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
+            }
         }
 
         string searchQuery;
