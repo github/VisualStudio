@@ -20,11 +20,9 @@ namespace GitHub.Factories
 
         [ImportingConstructor]
         public ViewViewModelFactory(
-            IGitHubServiceProvider serviceProvider,
-            ICompositionService cc)
+            IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            cc.SatisfyImportsOnce(this);
         }
 
         [ImportMany(AllowRecomposition = true)]
