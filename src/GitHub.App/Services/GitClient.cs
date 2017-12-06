@@ -67,6 +67,7 @@ namespace GitHub.Services
             });
         }
 
+        // HACK: This is just a prototype!
         public Task SyncSubmodules(IRepository repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -77,8 +78,7 @@ namespace GitHub.Services
                 var script =
 @"git submodule init
 git submodule sync --recursive
-git submodule update --recursive
-pause";
+git submodule update --recursive";
                 var scriptFile = Path.Combine(Path.GetTempPath(), "SyncSubmodules.cmd");
                 File.WriteAllText(scriptFile, script);
                 using (var process = Process.Start(new ProcessStartInfo { FileName = scriptFile, WorkingDirectory = workingDir }))
