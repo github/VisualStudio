@@ -110,7 +110,8 @@ namespace GitHub.Services
             // https://github.com/github/VisualStudio/issues/1306
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
-                var isClean = !IsFilthy(repo.RetrieveStatus());
+                var statusOptions = new StatusOptions { ExcludeSubmodules = true };
+                var isClean = !IsFilthy(repo.RetrieveStatus(statusOptions));
                 return Observable.Return(isClean);
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -227,13 +228,80 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
+        [Fact] // WorkDirModified
+        public async Task ChangedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                CommitFile(subRepo, "readme.txt", "content");
+                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Add submodule", Author, Author);
+                UpdateSubmodules(repo);
+                CommitFile(subRepo, "readme.txt", "content2");
+                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Update submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.True(isClean);
+            }
+        }
+
+        static void UpdateSubmodules(Repository repo)
+        {
+            foreach (var submodule in repo.Submodules)
+            {
+                var subDir = Path.Combine(repo.Info.WorkingDirectory, submodule.Path);
+                Directory.CreateDirectory(subDir); // Required to avoid NotFoundException
+                repo.Submodules.Update(submodule.Name, new SubmoduleUpdateOptions { Init = true });
+            }
+        }
+
+        static void CommitFile(Repository repo, string path, string content)
+        {
+            var contentFile = Path.Combine(repo.Info.WorkingDirectory, path);
+            File.WriteAllText(contentFile, content);
+            Commands.Stage(repo, path);
+            repo.Commit("message", Author, Author);
+        }
+
+        static void AddSubmodule(Repository repo, string name, string path, Repository subRepo)
+        {
+            var modulesPath = ".gitmodules";
+            var modulesFile = Path.Combine(repo.Info.WorkingDirectory, modulesPath);
+            if (!File.Exists(modulesFile))
+            {
+                File.WriteAllText(modulesFile, "");
+            }
+
+            var modulesConfig = Configuration.BuildFrom(modulesFile);
+            modulesConfig.Set($"submodule.{name}.path", path, ConfigurationLevel.Local);
+            modulesConfig.Set($"submodule.{name}.url", subRepo.Info.WorkingDirectory, ConfigurationLevel.Local);
+            Commands.Stage(repo, modulesPath);
+
+            AddGitLinkToTheIndex(repo.Index, path, subRepo.Head.Tip.Sha);
+        }
+
+        static void AddGitLinkToTheIndex(Index index, string path, string sha)
+        {
+            var id = new ObjectId(sha);
+            var mode = Mode.GitLink;
+            index.GetType().InvokeMember("AddEntryToTheIndex", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null,
+                index, new object[] { path, id, mode });
+        }
+
         static Repository CreateRepository(TempDirectory tempDirectory)
         {
             var repoDir = tempDirectory.Directory.FullName;
             return new Repository(Repository.Init(repoDir));
         }
 
-        static IPullRequestService CreatePullRequestService(Repository repo)
+        static PullRequestService CreatePullRequestService(Repository repo)
         {
             var repoDir = repo.Info.WorkingDirectory;
             var serviceProvider = Substitutes.ServiceProvider;
