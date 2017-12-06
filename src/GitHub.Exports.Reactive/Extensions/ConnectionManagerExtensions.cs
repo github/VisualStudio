@@ -14,7 +14,7 @@ namespace GitHub.Extensions
             IModelServiceFactory factory)
         {
             var connection = await cm.GetConnection(repository);
-            return connection != null ? await factory.CreateAsync(connection) : null;
+            return connection?.IsLoggedIn == true ? await factory.CreateAsync(connection) : null;
         }
     }
 }
