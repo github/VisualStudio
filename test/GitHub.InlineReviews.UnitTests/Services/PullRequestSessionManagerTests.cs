@@ -951,9 +951,10 @@ Line 4";
         {
             var connection = Substitute.For<IConnection>();
             connection.HostAddress.Returns(HostAddress.Create("https://github.com"));
+            connection.IsLoggedIn.Returns(true);
 
             var result = Substitute.For<IConnectionManager>();
-            result.Connections.Returns(new ObservableCollectionEx<IConnection>(new[] { connection }));
+            result.GetConnection(connection.HostAddress).Returns(connection);
             return result;
         }
 
