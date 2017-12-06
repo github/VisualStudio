@@ -25,7 +25,7 @@ namespace GitHub.Factories
             this.serviceProvider = serviceProvider;
         }
 
-        [ImportMany(AllowRecomposition = true)]
+        [ImportMany]
         IEnumerable<ExportFactory<FrameworkElement, IViewModelMetadata>> Views { get; set; }
 
         /// <inheritdoc/>
