@@ -99,11 +99,18 @@ namespace GitHub.ViewModels.GitHubPane
                 DoPush);
             SubscribeOperationError(Push);
 
+            SyncSubmodules = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.SyncSubmodulesEnabled),
+                DoSyncSubmodules);
+            SubscribeOperationError(SyncSubmodules);
+
             OpenOnGitHub = ReactiveCommand.Create();
             DiffFile = ReactiveCommand.Create();
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
-            ViewFile = ReactiveCommand.Create();            
+            ViewFile = ReactiveCommand.Create();
         }
 
         /// <summary>
@@ -265,6 +272,11 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        public ReactiveCommand<Unit> SyncSubmodules { get; }
+
+        /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
@@ -337,7 +349,7 @@ namespace GitHub.ViewModels.GitHubPane
             try
             {
                 var firstLoad = (Model == null);
-                Model = pullRequest;                
+                Model = pullRequest;
                 Session = await sessionManager.GetSession(pullRequest);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
@@ -391,7 +403,9 @@ namespace GitHub.ViewModels.GitHubPane
                         pushToolTip = Resources.MustPullBeforePush;
                     }
 
-                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    var syncSubmodulesEnabled = await pullRequestsService.IsSyncSubmodulesRequired(LocalRepository);
+
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesEnabled);
                     CheckoutState = null;
                 }
                 else
@@ -639,6 +653,13 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
+        IObservable<Unit> DoSyncSubmodules(object unused)
+        {
+            return pullRequestsService.SyncSubmodules(LocalRepository);
+            // TODO: UsageTracker
+            // .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+        }
+
         class CheckoutCommandState : IPullRequestCheckoutState
         {
             public CheckoutCommandState(string caption, string disabledMessage)
@@ -660,7 +681,8 @@ namespace GitHub.ViewModels.GitHubPane
                 bool pullEnabled,
                 bool pushEnabled,
                 string pullToolTip,
-                string pushToolTip)
+                string pushToolTip,
+                bool syncSubmodulesEnabled)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
@@ -668,15 +690,17 @@ namespace GitHub.ViewModels.GitHubPane
                 PullEnabled = pullEnabled;
                 PullToolTip = pullToolTip;
                 PushToolTip = pushToolTip;
+                SyncSubmodulesEnabled = syncSubmodulesEnabled;
             }
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
-            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0 && !SyncSubmodulesEnabled;
             public bool PullEnabled { get; }
             public bool PushEnabled { get; }
             public string PullToolTip { get; }
             public string PushToolTip { get; }
+            public bool SyncSubmodulesEnabled { get; }
         }
     }
 }

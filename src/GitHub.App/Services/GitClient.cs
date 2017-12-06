@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -62,6 +63,27 @@ namespace GitHub.Services
                     var remote = repository.Network.Remotes[remoteName];
                     var remoteRef = IsCanonical(branchName) ? branchName : @"refs/heads/" + branchName;
                     repository.Network.Push(remote, "HEAD", remoteRef, pushOptions);
+                }
+            });
+        }
+
+        public Task SyncSubmodules(IRepository repository)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var workingDir = repository.Info.WorkingDirectory;
+                var script =
+@"git submodule init
+git submodule sync --recursive
+git submodule update --recursive
+pause";
+                var scriptFile = Path.Combine(Path.GetTempPath(), "SyncSubmodules.cmd");
+                File.WriteAllText(scriptFile, script);
+                using (var process = Process.Start(new ProcessStartInfo { FileName = scriptFile, WorkingDirectory = workingDir }))
+                {
+                    process.WaitForExit();
                 }
             });
         }

@@ -189,6 +189,18 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<Unit> SyncSubmodules(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(async () =>
+            {
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    await gitClient.SyncSubmodules(repo);
+                    return Observable.Return(Unit.Default);
+                }
+            });
+        }
+
         public IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName)
         {
             return Observable.Defer(async () =>
