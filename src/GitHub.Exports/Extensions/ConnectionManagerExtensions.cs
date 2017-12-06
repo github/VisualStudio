@@ -26,7 +26,7 @@ namespace GitHub.Extensions
             return connections.Any(x => x.HostAddress == address && x.ConnectionError == null);
         }
 
-        public static async Task<IConnection> GetLoggedInConnections(this IConnectionManager cm)
+        public static async Task<IConnection> GetFirstLoggedInConnection(this IConnectionManager cm)
         {
             Guard.ArgumentNotNull(cm, nameof(cm));
 
@@ -34,7 +34,7 @@ namespace GitHub.Extensions
             return connections.FirstOrDefault(x => x.IsLoggedIn);
         }
 
-        public static Task<IConnection> LookupConnection(this IConnectionManager cm, ILocalRepositoryModel repository)
+        public static Task<IConnection> GetConnection(this IConnectionManager cm, ILocalRepositoryModel repository)
         {
             if (repository?.CloneUrl != null)
             {

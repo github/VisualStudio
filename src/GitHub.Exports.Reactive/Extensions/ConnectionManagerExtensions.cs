@@ -13,7 +13,7 @@ namespace GitHub.Extensions
             ILocalRepositoryModel repository,
             IModelServiceFactory factory)
         {
-            var connection = await cm.LookupConnection(repository);
+            var connection = await cm.GetConnection(repository);
             return connection != null ? await factory.CreateAsync(connection) : null;
         }
     }
