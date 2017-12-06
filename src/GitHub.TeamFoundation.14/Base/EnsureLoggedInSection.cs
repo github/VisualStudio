@@ -6,7 +6,6 @@ using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
-using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.UI;
 
@@ -15,14 +14,17 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
     public class EnsureLoggedInSection : TeamExplorerSectionBase
     {
         readonly ITeamExplorerServices teServices;
+        readonly IDialogService dialogService;
 
         public EnsureLoggedInSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, ITeamExplorerServices teServices)
+            IConnectionManager cm, ITeamExplorerServices teServices,
+            IDialogService dialogService)
             : base(serviceProvider, apiFactory, holder, cm)
         {
             IsVisible = false;
             this.teServices = teServices;
+            this.dialogService = dialogService;
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -55,17 +57,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);
                 teServices.ShowMessage(
                     msg,
-                    new Primitives.RelayCommand(_ => StartFlow(UIControllerFlow.Authentication))
+                    new Primitives.RelayCommand(_ => dialogService.ShowLoginDialog())
                 );
             }
-        }
-
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.GetService<IUIProvider>();
-            var controller = uiProvider.Configure(controllerFlow);
-            controller.TransitionSignal.Subscribe(c => { }, () => CheckLogin().Forget());
-            uiProvider.RunInDialog(controller);
         }
     }
 }

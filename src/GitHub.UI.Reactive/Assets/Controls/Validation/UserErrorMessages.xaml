@@ -18,7 +18,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-
+ 
                         <Viewbox
                             Grid.Column="0"
                             VerticalAlignment="Center"
@@ -29,20 +29,14 @@
                             <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="16" Fill="{TemplateBinding Fill}" />
                         </Viewbox>
 
-                        <ContentControl Grid.Column="1" Content="{Binding}">
-                            <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type rxui:UserError}">
-                                    <TextBlock
-                                        Text="{Binding Path=ErrorMessage}"
-                                        ToolTip="{Binding Path=ErrorCauseOrResolution}"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Center"
-                                        TextWrapping="Wrap"
-                                        FontWeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=ErrorMessageFontWeight}"
-                                        Margin="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=MessageMargin}"/>
-                                </DataTemplate>
-                            </ContentControl.Resources>
-                        </ContentControl>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Path=ErrorMessage}"
+                                   ToolTip="{Binding Path=ErrorCauseOrResolution}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   FontWeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=ErrorMessageFontWeight}"
+                                   Margin="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=MessageMargin}"/>
 
                         <ItemsControl Grid.Column="2" 
                                       ItemsSource="{Binding RecoveryOptions}"

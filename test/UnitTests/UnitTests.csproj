@@ -224,11 +224,9 @@
     <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
-    <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
     <Compile Include="GitHub.App\Factories\ModelServiceFactoryTests.cs" />
     <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
-    <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\PullRequestModelTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
@@ -236,16 +234,19 @@
     <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GistCreationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\LoginControlViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\PullRequestCreationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\PullRequestDetailViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\PullRequestListViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\TwoFactorDialogViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\GitHubDialogWindowViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\GistCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\GitHubPaneViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\NavigationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\LoginCredentialsViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\LoginToGitHubViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\PullRequestCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestDetailViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestListViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\RepositoryCloneViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\RepositoryCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\TeamExplorer\RepositoryPublishViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\Login2FaViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
     <Compile Include="GitHub.Exports\GitServiceTests.cs" />
     <Compile Include="GitHub.Exports\VSServicesTests.cs" />
@@ -262,7 +263,6 @@
     <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\UsageTrackerTests.cs" />
     <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
-    <Compile Include="GitHub.VisualStudio\UI\Views\GitHubPaneViewModelTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
@@ -309,10 +309,6 @@
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\DesignTimeStyleHelper\DesignTimeStyleHelper.csproj">
-      <Project>{b1f5c227-456f-437d-bd5f-4c11b7a8d1a0}</Project>
-      <Name>DesignTimeStyleHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>

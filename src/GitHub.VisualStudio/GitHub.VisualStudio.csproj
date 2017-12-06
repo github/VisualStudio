@@ -323,7 +323,7 @@
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
     <Compile Include="Services\LocalRepositories.cs" />
-    <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="Services\ShowDialogService.cs" />
     <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="Services\LoginManagerDispatcher.cs" />
@@ -345,55 +345,56 @@
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
-      <DependentUpon>GistCreationControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\StartPageCloneView.xaml.cs">
-      <DependentUpon>StartPageCloneView.xaml</DependentUpon>
+    <Compile Include="Views\ContentView.cs" />
+    <Compile Include="Views\Dialog\GistCreationView.xaml.cs">
+      <DependentUpon>GistCreationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
-      <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\GitHubDialogWindow.xaml.cs">
+      <DependentUpon>GitHubDialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryCreationControl.xaml.cs">
-      <DependentUpon>RepositoryCreationControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\LoginCredentialsView.xaml.cs">
+      <DependentUpon>LoginCredentialsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
-      <DependentUpon>LoginControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\Login2FaView.xaml.cs">
+      <DependentUpon>Login2FaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryPublishControl.xaml.cs">
-      <DependentUpon>RepositoryPublishControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryCloneView.xaml.cs">
+      <DependentUpon>RepositoryCloneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\TwoFactorControl.xaml.cs">
-      <DependentUpon>TwoFactorControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryCreationView.xaml.cs">
+      <DependentUpon>RepositoryCreationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
-      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
+      <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
-    <Compile Include="UI\Views\NotAGitRepositoryView.xaml.cs">
-      <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\NotAGitHubRepositoryView.xaml.cs">
-      <DependentUpon>NotAGitHubRepositoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\LoggedOutView.xaml.cs">
+    <Compile Include="Views\GitHubPane\LoggedOutView.xaml.cs">
       <DependentUpon>LoggedOutView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestCreationView.xaml.cs">
-      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
+      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestDetailView.xaml.cs">
-      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\PullRequestListView.xaml.cs">
+    <Compile Include="Views\GitHubPane\PullRequestListView.xaml.cs">
       <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\WindowController.xaml.cs">
-      <DependentUpon>WindowController.xaml</DependentUpon>
+    <Compile Include="Views\GitHubPane\PullRequestDetailView.xaml.cs">
+      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestCreationView.xaml.cs">
+      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\NotAGitHubRepositoryView.xaml.cs">
+      <DependentUpon>NotAGitHubRepositoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\NotAGitRepositoryView.xaml.cs">
+      <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
+      <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ViewLocator.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
@@ -486,74 +487,74 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\StartPageCloneView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\Settings\OptionsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
-    <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCreationControl.xaml">
+    <Page Include="Views\Dialog\GistCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\Controls\LoginControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryPublishControl.xaml">
+    <Page Include="Views\Dialog\GitHubDialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\Controls\TwoFactorControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>
-      </SubType>
-    </Page>
-    <Page Include="UI\Views\GitHubPaneView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\NotAGitRepositoryView.xaml">
+    <Page Include="Views\Dialog\LoginCredentialsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\NotAGitHubRepositoryView.xaml">
+    <Page Include="Views\Dialog\Login2FaView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\LoggedOutView.xaml">
+    <Page Include="Views\Dialog\RepositoryCloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\RepositoryCreationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\RepositoryRecloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\LoggedOutView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestCreationView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestDetailView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestDetailView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestListView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestCreationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\WindowController.xaml">
+    <Page Include="Views\GitHubPane\NotAGitHubRepositoryView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\NotAGitRepositoryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestListItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TeamExplorer\RepositoryPublishView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
