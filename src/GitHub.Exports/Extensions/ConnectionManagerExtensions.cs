@@ -34,7 +34,7 @@ namespace GitHub.Extensions
             return connections.FirstOrDefault(x => x.IsLoggedIn);
         }
 
-        public static Task<IConnection> GetConnection(this IConnectionManager cm, ILocalRepositoryModel repository)
+        public static Task<IConnection> GetConnection(this IConnectionManager cm, IRepositoryModel repository)
         {
             if (repository?.CloneUrl != null)
             {
