@@ -345,7 +345,10 @@ namespace GitHub.Api
                 request.Scopes.Add(scope);
             }
 
-            return client.GetGitHubLoginUrl(request);
+            var uri = client.GetGitHubLoginUrl(request);
+            
+            // OauthClient.GetGitHubLoginUrl seems to give the wrong URL. Fix this.
+            return new Uri(uri.ToString().Replace("/api/v3", ""));
         }
     }
 }

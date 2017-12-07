@@ -1,4 +1,5 @@
 using System.Reactive;
+using GitHub.Services;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -47,10 +48,10 @@ namespace GitHub.ViewModels.Dialog
         EnterpriseProbeStatus ProbeStatus { get; }
 
         /// <summary>
-        /// Gets a value indcating whether the GitHub Enterprise instance at <see cref="EnterpriseUrl"/>
-        /// supports logging in with a username and password.
+        /// Gets the supported login methods for the GitHub Enterprise instance at
+        /// <see cref="EnterpriseUrl"/>.
         /// </summary>
-        bool? SupportsUserNameAndPassword { get; }
+        EnterpriseLoginMethods? SupportedLoginMethods { get; }
 
         /// <summary>
         /// Gets the validator instance used for validating the 

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using GitHub.Controls;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels.Dialog;
 using ReactiveUI;
@@ -90,9 +91,10 @@ namespace GitHub.VisualStudio.Views.Dialog
         {
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, x => x.enterpriseloginControlsPanel.IsEnabled, x => x == false));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ProbeStatus, x => x.enterpriseUrl.IconContent));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ProbeStatus, x => x.enterpriseValidUrlPanel.Visibility, x => x == EnterpriseProbeStatus.Valid ? Visibility.Visible : Visibility.Collapsed));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportsUserNameAndPassword, x => x.enterpriseUsernamePasswordPanel.Visibility, x => x == true ? Visibility.Visible : Visibility.Collapsed));
-            
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseUsernamePasswordPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.UsernameAndPassword) != 0) ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseTokenPanel.Visibility, x => x == EnterpriseLoginMethods.TokenOnly ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseSsoPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.OAuth) != 0) ? Visibility.Visible : Visibility.Collapsed));
+
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmail, x => x.enterpriseUserNameOrEmail.Text));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmailValidator, v => v.enterpriseUserNameOrEmailValidationMessage.ReactiveValidator));
 

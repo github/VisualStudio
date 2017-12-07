@@ -21,23 +21,23 @@ namespace GitHub.ViewModels.Dialog
     public class LoginToGitHubForEnterpriseViewModel : LoginTabViewModel, ILoginToGitHubForEnterpriseViewModel
     {
         readonly ISimpleApiClientFactory apiClientFactory;
-        readonly IEnterpriseProbe enterpriseProbe;
+        readonly IEnterpriseCapabilitiesService enterpriseCapabilities;
 
         [ImportingConstructor]
         public LoginToGitHubForEnterpriseViewModel(
             IConnectionManager connectionManager,
             ISimpleApiClientFactory apiClientFactory,
-            IEnterpriseProbe enterpriseProbe,
+            IEnterpriseCapabilitiesService enterpriseCapabilities,
             IVisualStudioBrowser browser)
             : base(connectionManager, browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
-            Guard.ArgumentNotNull(enterpriseProbe, nameof(enterpriseProbe));
+            Guard.ArgumentNotNull(enterpriseCapabilities, nameof(enterpriseCapabilities));
             Guard.ArgumentNotNull(browser, nameof(browser));
 
             this.apiClientFactory = apiClientFactory;
-            this.enterpriseProbe = enterpriseProbe;
+            this.enterpriseCapabilities = enterpriseCapabilities;
 
             EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
                 .IfNullOrEmpty(Resources.EnterpriseUrlValidatorEmpty)
@@ -91,11 +91,11 @@ namespace GitHub.ViewModels.Dialog
             private set { this.RaiseAndSetIfChanged(ref probeStatus, value); }
         }
 
-        bool? supportsUserNameAndPassword;
-        public bool? SupportsUserNameAndPassword
+        EnterpriseLoginMethods? supportedLoginMethods;
+        public EnterpriseLoginMethods? SupportedLoginMethods
         {
-            get { return supportsUserNameAndPassword; }
-            private set { this.RaiseAndSetIfChanged(ref supportsUserNameAndPassword, value); }
+            get { return supportedLoginMethods; }
+            private set { this.RaiseAndSetIfChanged(ref supportedLoginMethods, value); }
         }
 
         public ReactivePropertyValidator EnterpriseUrlValidator { get; }
@@ -119,35 +119,34 @@ namespace GitHub.ViewModels.Dialog
             {
                 // The EnterpriseUrlValidator will display an adorner in this case so don't show anything.
                 ProbeStatus = EnterpriseProbeStatus.None;
+                SupportedLoginMethods = null;
                 return;
             }
 
             var enterpriseInstance = false;
-            var passwordAuth = (bool?)null;
+            var loginMethods = (EnterpriseLoginMethods?)null;
 
             try
             {
+                var uri = new Uri(url);
                 ProbeStatus = EnterpriseProbeStatus.Checking;
-                SupportsUserNameAndPassword = null;
 
-                if (await enterpriseProbe.Probe(new Uri(url)) == EnterpriseProbeResult.Ok)
+                if (await enterpriseCapabilities.Probe(uri) == EnterpriseProbeResult.Ok)
                 {
-                    var client = await apiClientFactory.Create(new UriString(url));
-                    var meta = await client.GetMetadata();
-
+                    loginMethods = await enterpriseCapabilities.ProbeLoginMethods(uri);
                     enterpriseInstance = true;
-                    passwordAuth = meta.VerifiablePasswordAuthentication;
                 }
             }
             catch
             {
                 ProbeStatus = EnterpriseProbeStatus.Invalid;
+                loginMethods = null;
             }
 
             if (url == EnterpriseUrl)
             {
                 ProbeStatus = enterpriseInstance ? EnterpriseProbeStatus.Valid : EnterpriseProbeStatus.Invalid;
-                SupportsUserNameAndPassword = passwordAuth;
+                SupportedLoginMethods = loginMethods;
             }
         }
     }

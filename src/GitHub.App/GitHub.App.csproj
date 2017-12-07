@@ -133,6 +133,7 @@
     <Compile Include="Models\IssueCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
+    <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\OAuthCallbackListener.cs" />
     <Compile Include="ViewModels\Dialog\GistCreationViewModel.cs" />
