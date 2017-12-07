@@ -30,7 +30,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository to sync</param>
         /// <returns></returns>
-        Task SyncSubmodules(IRepository repository);
+        Task SyncSubmodules(IRepository repository, Action<string> progress = null);
 
         /// <summary>
         /// Fetches the remote.
