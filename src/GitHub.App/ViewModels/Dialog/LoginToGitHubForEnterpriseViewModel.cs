@@ -84,11 +84,11 @@ namespace GitHub.ViewModels.Dialog
             set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
         }
 
-        bool? isEnterpriseInstance;
-        public bool? IsEnterpriseInstance
+        EnterpriseProbeStatus probeStatus;
+        public EnterpriseProbeStatus ProbeStatus
         {
-            get { return isEnterpriseInstance; }
-            private set { this.RaiseAndSetIfChanged(ref isEnterpriseInstance, value); }
+            get { return probeStatus; }
+            private set { this.RaiseAndSetIfChanged(ref probeStatus, value); }
         }
 
         bool? supportsUserNameAndPassword;
@@ -115,33 +115,38 @@ namespace GitHub.ViewModels.Dialog
 
         async void EnterpriseUrlChanged(string url, bool valid)
         {
+            if (!valid)
+            {
+                // The EnterpriseUrlValidator will display an adorner in this case so don't show anything.
+                ProbeStatus = EnterpriseProbeStatus.None;
+                return;
+            }
+
             var enterpriseInstance = false;
             var passwordAuth = (bool?)null;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(url) && valid)
+                ProbeStatus = EnterpriseProbeStatus.Checking;
+                SupportsUserNameAndPassword = null;
+
+                if (await enterpriseProbe.Probe(new Uri(url)) == EnterpriseProbeResult.Ok)
                 {
-                    IsEnterpriseInstance = SupportsUserNameAndPassword = null;
+                    var client = await apiClientFactory.Create(new UriString(url));
+                    var meta = await client.GetMetadata();
 
-                    if (await enterpriseProbe.Probe(new Uri(url)) == EnterpriseProbeResult.Ok)
-                    {
-                        var client = await apiClientFactory.Create(new UriString(url));
-                        var meta = await client.GetMetadata();
-
-                        enterpriseInstance = true;
-                        passwordAuth = meta.VerifiablePasswordAuthentication;
-                    }
+                    enterpriseInstance = true;
+                    passwordAuth = meta.VerifiablePasswordAuthentication;
                 }
             }
             catch
             {
-                enterpriseInstance = false;
+                ProbeStatus = EnterpriseProbeStatus.Invalid;
             }
 
             if (url == EnterpriseUrl)
             {
-                IsEnterpriseInstance = enterpriseInstance;
+                ProbeStatus = enterpriseInstance ? EnterpriseProbeStatus.Valid : EnterpriseProbeStatus.Invalid;
                 SupportsUserNameAndPassword = passwordAuth;
             }
         }
