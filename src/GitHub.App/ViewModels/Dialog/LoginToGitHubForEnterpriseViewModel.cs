@@ -58,7 +58,7 @@ namespace GitHub.ViewModels.Dialog
             this.WhenAnyValue(x => x.EnterpriseUrl, x => x.EnterpriseUrlValidator.ValidationResult)
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => EnterpriseUrlChanged(x.Item1, x.Item2.IsValid));
+                .Subscribe(x => EnterpriseUrlChanged(x.Item1, x.Item2?.IsValid ?? false));
 
             NavigateLearnMore = ReactiveCommand.CreateAsyncObservable(_ =>
             {
@@ -120,7 +120,7 @@ namespace GitHub.ViewModels.Dialog
 
             try
             {
-                if (valid)
+                if (!string.IsNullOrWhiteSpace(url) && valid)
                 {
                     IsEnterpriseInstance = SupportsUserNameAndPassword = null;
 
