@@ -17,6 +17,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -104,6 +105,7 @@ namespace GitHub.ViewModels.GitHubPane
                     .Cast<UpdateCommandState>()
                     .Select(x => x != null && x.SyncSubmodulesEnabled),
                 DoSyncSubmodules);
+            SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create();
