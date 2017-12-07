@@ -58,8 +58,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Api", "src\GitHub.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Exports.Reactive", "src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj", "{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignTimeStyleHelper", "src\DesignTimeStyleHelper\DesignTimeStyleHelper.csproj", "{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Octokit", "Octokit", "{1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octokit", "submodules\octokit.net\Octokit\Octokit.csproj", "{08DD4305-7787-4823-A53F-4D0F725A07F3}"
@@ -219,16 +217,6 @@ Global
 		{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{B1F5C227-456F-437D-BD5F-4C11B7A8D1A0}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 		{08DD4305-7787-4823-A53F-4D0F725A07F3}.Debug|Any CPU.ActiveCfg = Release|Any CPU
 		{08DD4305-7787-4823-A53F-4D0F725A07F3}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{08DD4305-7787-4823-A53F-4D0F725A07F3}.DebugCodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU

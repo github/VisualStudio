@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
+using GitHub.UI;
 using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Views
 {
-    public class GenericCommentView : GitHub.UI.ViewBase<ICommentViewModel, GenericCommentView> { }
+    public class GenericCommentView : ViewBase<ICommentViewModel, GenericCommentView> { }
 
     public partial class CommentView : GenericCommentView
     {

@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Helpers;
+using GitHub.Info;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.ViewModels;
+using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.Menus;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
@@ -19,8 +21,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
-using EnvDTE;
-using GitHub.Info;
 
 namespace GitHub.VisualStudio
 {
@@ -111,7 +111,6 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
@@ -152,12 +151,11 @@ namespace GitHub.VisualStudio
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
-            AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             return Task.CompletedTask;
         }
 
-        public IViewHost ShowHomePane()
+        public IGitHubPaneViewModel ShowHomePane()
         {
             var pane = ShowToolWindow(new Guid(GitHubPane.GitHubPaneGuid));
             if (pane == null)
@@ -167,7 +165,7 @@ namespace GitHub.VisualStudio
             {
                 ErrorHandler.Failed(frame.Show());
             }
-            return pane as IViewHost;
+            return (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
@@ -237,11 +235,6 @@ namespace GitHub.VisualStudio
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var usageService = serviceProvider.GetService<IUsageService>();
                 return new UsageTracker(serviceProvider, usageService);
-            }
-            else if (serviceType == typeof(IUIProvider))
-            {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UIProvider(sp);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {

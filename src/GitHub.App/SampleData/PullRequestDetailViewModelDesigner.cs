@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
+using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
 namespace GitHub.SampleData
@@ -76,11 +77,10 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestSession Session { get; }
         public ILocalRepositoryModel LocalRepository { get; }
         public string RemoteRepositoryOwner { get; }
+        public int Number { get; set; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public int CommentCount { get; set; }
-        public bool IsLoading { get; }
-        public bool IsBusy { get; }
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
@@ -89,6 +89,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
         public string ErrorMessage { get; set; }
+        public Uri WebUrl { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
@@ -98,6 +99,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
         public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
         public ReactiveCommand<object> ViewFile { get; }
+
+        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
         public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {

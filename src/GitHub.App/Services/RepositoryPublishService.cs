@@ -26,10 +26,12 @@ namespace GitHub.Services
         {
             get
             {
-                var activeRepo = vsGitServices.GetActiveRepo();
-                if (!string.IsNullOrEmpty(activeRepo?.Info?.WorkingDirectory))
-                    return new DirectoryInfo(activeRepo.Info.WorkingDirectory).Name ?? "";
-                return string.Empty;
+                using (var activeRepo = vsGitServices.GetActiveRepo())
+                {
+                    if (!string.IsNullOrEmpty(activeRepo?.Info?.WorkingDirectory))
+                        return new DirectoryInfo(activeRepo.Info.WorkingDirectory).Name ?? "";
+                    return string.Empty;
+                }
             }
         }
 
@@ -43,11 +45,14 @@ namespace GitHub.Services
                                      .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = vsGitServices.GetActiveRepo() }))
                              .SelectMany(async repo =>
                              {
-                                 await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl));
-                                 await gitClient.Push(repo.LocalRepo, "master", "origin");
-                                 await gitClient.Fetch(repo.LocalRepo, "origin");
-                                 await gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin");
-                                 return repo.RemoteRepo;
+                                 using (repo.LocalRepo)
+                                 {
+                                     await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl));
+                                     await gitClient.Push(repo.LocalRepo, "master", "origin");
+                                     await gitClient.Fetch(repo.LocalRepo, "origin");
+                                     await gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin");
+                                     return repo.RemoteRepo;
+                                 }
                              });
         }
     }
