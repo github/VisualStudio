@@ -236,12 +236,12 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
-                CommitFile(subRepo, "readme.txt", "content");
-                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
                 repo.Commit("Add submodule", Author, Author);
-                UpdateSubmodules(repo);
-                CommitFile(subRepo, "readme.txt", "content2");
-                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
                 repo.Commit("Update submodule", Author, Author);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
@@ -263,8 +263,8 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
-                CommitFile(subRepo, "readme.txt", "content");
-                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
                 repo.Commit($"Add submodule", Author, Author);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
@@ -283,9 +283,9 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
-                CommitFile(subRepo, "readme.txt", "content");
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
                 var subPath = "sub/path";
-                AddSubmodule(repo, "sub_name", subPath, subRepo);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", subPath, subRepo);
                 repo.Commit($"Add submodule", Author, Author);
                 var subDir = Path.Combine(repo.Info.WorkingDirectory, subPath);
                 Directory.CreateDirectory(subDir);
@@ -306,12 +306,12 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
-                CommitFile(subRepo, "readme.txt", "content");
-                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
                 repo.Commit("Add submodule", Author, Author);
-                UpdateSubmodules(repo);
-                CommitFile(subRepo, "readme.txt", "content2");
-                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
                 repo.Commit("Update submodule", Author, Author);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
@@ -332,10 +332,10 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
-                CommitFile(subRepo, "readme.txt", "content");
-                AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
                 repo.Commit($"Add submodule", Author, Author);
-                UpdateSubmodules(repo);
+                RepositoryHelpers.UpdateSubmodules(repo);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
@@ -553,50 +553,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
     }
 
-    static void UpdateSubmodules(Repository repo)
-    {
-        foreach (var submodule in repo.Submodules)
-        {
-            var subDir = Path.Combine(repo.Info.WorkingDirectory, submodule.Path);
-            Directory.CreateDirectory(subDir); // Required to avoid NotFoundException
-            repo.Submodules.Update(submodule.Name, new SubmoduleUpdateOptions { Init = true });
-        }
-    }
-
-    static void CommitFile(Repository repo, string path, string content)
-    {
-        var contentFile = Path.Combine(repo.Info.WorkingDirectory, path);
-        File.WriteAllText(contentFile, content);
-        Commands.Stage(repo, path);
-        repo.Commit("message", Author, Author);
-    }
-
-    static void AddSubmodule(Repository repo, string name, string path, Repository subRepo)
-    {
-        var modulesPath = ".gitmodules";
-        var modulesFile = Path.Combine(repo.Info.WorkingDirectory, modulesPath);
-        if (!File.Exists(modulesFile))
-        {
-            File.WriteAllText(modulesFile, "");
-        }
-
-        var modulesConfig = Configuration.BuildFrom(modulesFile);
-        modulesConfig.Set($"submodule.{name}.path", path, ConfigurationLevel.Local);
-        modulesConfig.Set($"submodule.{name}.url", subRepo.Info.WorkingDirectory, ConfigurationLevel.Local);
-        Commands.Stage(repo, modulesPath);
-
-        AddGitLinkToTheIndex(repo.Index, path, subRepo.Head.Tip.Sha);
-    }
-
-    static void AddGitLinkToTheIndex(Index index, string path, string sha)
-    {
-        var id = new ObjectId(sha);
-        var mode = Mode.GitLink;
-        index.GetType().InvokeMember("AddEntryToTheIndex", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null,
-            index, new object[] { path, id, mode });
-    }
-
-    static Repository CreateRepository(TempDirectory tempDirectory)
+    protected static Repository CreateRepository(TempDirectory tempDirectory)
     {
         var repoDir = tempDirectory.Directory.FullName;
         return new Repository(Repository.Init(repoDir));
