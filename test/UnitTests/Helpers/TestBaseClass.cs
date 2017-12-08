@@ -87,22 +87,32 @@ public class TestBaseClass : IEntryExitDecorator
 
         public void Dispose()
         {
+            DeleteDirectory(Directory);
             // Remove any read-only attributes
-            SetFileAttributes(Directory, FileAttributes.Normal);
-            Directory.Delete(true);
+        }
+    }
+
+    protected static void DeleteDirectory(string dir)
+    {
+        DeleteDirectory(new DirectoryInfo(dir));
+    }
+
+    protected static void DeleteDirectory(DirectoryInfo dir)
+    {
+        SetFileAttributes(dir, FileAttributes.Normal);
+        dir.Delete(true);
+    }
+
+    static void SetFileAttributes(DirectoryInfo dir, FileAttributes attributes)
+    {
+        foreach (DirectoryInfo subdir in dir.GetDirectories())
+        {
+            SetFileAttributes(subdir, attributes);
         }
 
-        static void SetFileAttributes(DirectoryInfo dir, FileAttributes attributes)
+        foreach (var file in dir.GetFiles())
         {
-            foreach (DirectoryInfo subdir in dir.GetDirectories())
-            {
-                SetFileAttributes(subdir, attributes);
-            }
-
-            foreach (var file in dir.GetFiles())
-            {
-                File.SetAttributes(file.FullName, attributes);
-            }
+            File.SetAttributes(file.FullName, attributes);
         }
     }
 

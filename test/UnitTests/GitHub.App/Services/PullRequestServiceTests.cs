@@ -236,12 +236,13 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
+                var relativePath = "../" + Path.GetFileName(Path.GetDirectoryName(subRepo.Info.WorkingDirectory));
                 RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", relativePath);
                 repo.Commit("Add submodule", Author, Author);
                 RepositoryHelpers.UpdateSubmodules(repo);
                 RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", relativePath);
                 repo.Commit("Update submodule", Author, Author);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
@@ -256,16 +257,20 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheIsSyncSubmodulesRequiredMethod
     {
         [Fact] // WorkDirDeleted
-        public async Task CommittedSubmodule_True()
+        public async Task DeletedSubmodule_True()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
+                var subRepoDirName = Path.GetFileName(Path.GetDirectoryName(subRepo.Info.WorkingDirectory));
+                var relativePath = "../" + subRepoDirName;
+                var subRepoPath = "sub/path";
                 RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", subRepoPath, relativePath);
                 repo.Commit($"Add submodule", Author, Author);
+                DeleteDirectory(Path.Combine(repoDir.Directory.FullName, subRepoPath));
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
@@ -275,28 +280,30 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact] // WorkDirUninitialized
-        public async Task UninitializedSubmodule_True()
-        {
-            using (var subRepoDir = new TempDirectory())
-            using (var subRepo = CreateRepository(subRepoDir))
-            using (var repoDir = new TempDirectory())
-            using (var repo = CreateRepository(repoDir))
-            {
-                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
-                var subPath = "sub/path";
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", subPath, subRepo);
-                repo.Commit($"Add submodule", Author, Author);
-                var subDir = Path.Combine(repo.Info.WorkingDirectory, subPath);
-                Directory.CreateDirectory(subDir);
-                var service = CreatePullRequestService(repo);
-                var repositoryModel = CreateLocalRepositoryModel(repo);
+        //[Fact] // WorkDirUninitialized
+        //public async Task UninitializedSubmodule_True()
+        //{
+        //    using (var subRepoDir = new TempDirectory())
+        //    using (var subRepo = CreateRepository(subRepoDir))
+        //    using (var repoDir = new TempDirectory())
+        //    using (var repo = CreateRepository(repoDir))
+        //    {
+        //        var subRepoDirName = Path.GetFileName(Path.GetDirectoryName(subRepo.Info.WorkingDirectory));
+        //        var relativePath = "../" + subRepoDirName;
+        //        RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+        //        var subPath = "sub/path";
+        //        RepositoryHelpers.AddSubmodule(repo, "sub_name", subPath, relativePath);
+        //        repo.Commit($"Add submodule", Author, Author);
+        //        var subDir = Path.Combine(repo.Info.WorkingDirectory, subPath);
+        //        Directory.CreateDirectory(subDir);
+        //        var service = CreatePullRequestService(repo);
+        //        var repositoryModel = CreateLocalRepositoryModel(repo);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+        //        var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
 
-                Assert.True(isRequired);
-            }
-        }
+        //        Assert.True(isRequired);
+        //    }
+        //}
 
         [Fact] // WorkDirModified
         public async Task ChangedSubmodule_True()
@@ -306,12 +313,14 @@ public class PullRequestServiceTests : TestBaseClass
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
+                var relativePath = "../" + Path.GetFileName(Path.GetDirectoryName(subRepo.Info.WorkingDirectory));
+                var subRepoPath = "sub/path";
                 RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", subRepoPath, relativePath);
                 repo.Commit("Add submodule", Author, Author);
                 RepositoryHelpers.UpdateSubmodules(repo);
                 RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.AddGitLinkToTheIndex(repo.Index, subRepoPath, subRepo.Head.Tip.Sha);
                 repo.Commit("Update submodule", Author, Author);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
@@ -325,17 +334,18 @@ public class PullRequestServiceTests : TestBaseClass
         // TODO: Find out when `SubmoduleStatus.WorkDirAdded` is used.
 
         [Fact]
-        public async Task UpdatedSubmodule_False()
+        public async Task CommittedSubmodule_False()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
             using (var repoDir = new TempDirectory())
             using (var repo = CreateRepository(repoDir))
             {
+                var relativePath = "../" + Path.GetFileName(Path.GetDirectoryName(subRepo.Info.WorkingDirectory));
+                var subRepoPath = "sub/path";
                 RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
-                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", subRepoPath, relativePath);
                 repo.Commit($"Add submodule", Author, Author);
-                RepositoryHelpers.UpdateSubmodules(repo);
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
@@ -564,6 +574,7 @@ public class PullRequestServiceTests : TestBaseClass
         var repoDir = repo.Info.WorkingDirectory;
         var serviceProvider = Substitutes.ServiceProvider;
         var gitService = serviceProvider.GetGitService();
+        // gitService.GetRepository(repoDir).Returns(_ => new Repository(repoDir));
         gitService.GetRepository(repoDir).Returns(repo);
         var service = new PullRequestService(Substitute.For<IGitClient>(), gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         return service;
