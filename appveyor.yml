@@ -21,7 +21,7 @@ install:
 build_script:
 - ps: |
     scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
-    Vsix-UpdateBuildVersion $env:APPVEYOR_BUILD_NUMBER
+    Vsix-UpdateBuildVersion '{version}'
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
 after_test:
