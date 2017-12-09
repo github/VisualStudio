@@ -19,9 +19,7 @@ install:
     nuget restore GitHubVS.sln
     (new-object Net.WebClient).DownloadString("https://raw.github.com/madskristensen/ExtensionScripts/master/AppVeyor/vsix.ps1") | iex
 build_script:
-- ps: |
-    scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
-    Vsix-UpdateBuildVersion '{version}'
+- ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
 after_test:
