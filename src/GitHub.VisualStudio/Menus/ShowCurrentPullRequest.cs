@@ -29,12 +29,9 @@ namespace GitHub.VisualStudio.Menus
             }
 
             var pullRequest = session.PullRequest;
-            var arg = new PullRequestDetailArgument { RepositoryOwner = session.RepositoryOwner, Number = pullRequest.Number };
-            var viewWithData = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = arg };
-
             var manager = ServiceProvider.TryGetService<IGitHubToolWindowManager>();
             var host = manager.ShowHomePane();
-            host?.ShowView(viewWithData);
+            host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number);
         }
     }
 }

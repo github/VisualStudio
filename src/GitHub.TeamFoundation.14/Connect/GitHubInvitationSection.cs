@@ -11,6 +11,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Media;
 using GitHub.VisualStudio.UI;
+using System.Linq;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -20,12 +21,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
     {
         public const string GitHubInvitationSectionId = "C2443FCC-6D62-4D31-B08A-C4DE70109C7F";
         public const int GitHubInvitationSectionPriority = 100;
+        readonly IDialogService dialogService;
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
 
         [ImportingConstructor]
-        public GitHubInvitationSection(IGitHubServiceProvider serviceProvider, IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
+        public GitHubInvitationSection(
+            IGitHubServiceProvider serviceProvider,
+            IDialogService dialogService,
+            IConnectionManager cm,
+            Lazy<IVisualStudioBrowser> browser)
             : base(serviceProvider)
         {
+            this.dialogService = dialogService;
             lazyBrowser = browser;
             CanConnect = true;
             CanSignUp = true;
@@ -40,26 +47,19 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 OnThemeChanged();
             };
 
-            IsVisible = cm.Connections.Count == 0;
+            IsVisible = !cm.Connections.Where(x => x.IsLoggedIn).Any();
 
-            cm.Connections.CollectionChanged += (s, e) => IsVisible = cm.Connections.Count == 0;
+            cm.Connections.CollectionChanged += (s, e) => IsVisible = !cm.Connections.Where(x => x.IsLoggedIn).Any();
         }
 
         public override void Connect()
         {
-            StartFlow(UIControllerFlow.Authentication);
-            base.Connect();
+            dialogService.ShowLoginDialog();
         }
 
         public override void SignUp()
         {
             OpenInBrowser(lazyBrowser, GitHubUrls.Plans);
-        }
-
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
-            uiProvider.RunInDialog(controllerFlow);
         }
 
         void OnThemeChanged()

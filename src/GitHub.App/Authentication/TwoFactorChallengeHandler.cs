@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Helpers;
 using GitHub.Extensions;
+using GitHub.ViewModels.Dialog;
 
 namespace GitHub.Authentication
 {
@@ -16,11 +17,11 @@ namespace GitHub.Authentication
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TwoFactorChallengeHandler : ReactiveObject, IDelegatingTwoFactorChallengeHandler
     {
-        ITwoFactorDialogViewModel twoFactorDialog;
+        ILogin2FaViewModel twoFactorDialog;
         public IViewModel CurrentViewModel
         {
             get { return twoFactorDialog; }
-            private set { this.RaiseAndSetIfChanged(ref twoFactorDialog, (ITwoFactorDialogViewModel)value); }
+            private set { this.RaiseAndSetIfChanged(ref twoFactorDialog, (ILogin2FaViewModel)value); }
         }
 
         public void SetViewModel(IViewModel vm)
@@ -50,7 +51,7 @@ namespace GitHub.Authentication
         public async Task ChallengeFailed(Exception exception)
         {
             await ThreadingHelper.SwitchToMainThreadAsync();
-            await twoFactorDialog.Cancel.ExecuteAsync(null);
+            twoFactorDialog.Cancel();
         }
     }
 }
