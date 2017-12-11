@@ -152,6 +152,31 @@ namespace GitHub.Api
         }
 
         /// <inheritdoc/>
+        public async Task<User> LoginWithToken(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            string token)
+        {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+            Guard.ArgumentNotNull(client, nameof(client));
+            Guard.ArgumentNotEmptyString(token, nameof(token));
+
+            await keychain.Save("[token]", token, hostAddress).ConfigureAwait(false);
+
+            try
+            {
+                var user = await ReadUserWithRetry(client);
+                await keychain.Save(user.Login, token, hostAddress).ConfigureAwait(false);
+                return user;
+            }
+            catch
+            {
+                await keychain.Delete(hostAddress);
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
         public Task<User> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));

@@ -92,13 +92,14 @@ namespace GitHub.VisualStudio.Views.Dialog
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, x => x.enterpriseloginControlsPanel.IsEnabled, x => x == false));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ProbeStatus, x => x.enterpriseUrl.IconContent));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseUsernamePasswordPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.UsernameAndPassword) != 0) ? Visibility.Visible : Visibility.Collapsed));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseTokenPanel.Visibility, x => x == EnterpriseLoginMethods.TokenOnly ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseTokenPanel.Visibility, x => x == EnterpriseLoginMethods.Token ? Visibility.Visible : Visibility.Collapsed));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseSsoPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.OAuth) != 0) ? Visibility.Visible : Visibility.Collapsed));
 
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmail, x => x.enterpriseUserNameOrEmail.Text));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmailValidator, v => v.enterpriseUserNameOrEmailValidationMessage.ReactiveValidator));
 
             d(this.BindPassword(ViewModel, vm => vm.EnterpriseLogin.Password, v => v.enterprisePassword.Text, enterprisePassword));
+            d(this.BindPassword(ViewModel, vm => vm.EnterpriseLogin.Password, v => v.enterpriseToken.Text, enterpriseToken));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.PasswordValidator, v => v.enterprisePasswordValidationMessage.ReactiveValidator));
 
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.EnterpriseUrl, v => v.enterpriseUrl.Text));

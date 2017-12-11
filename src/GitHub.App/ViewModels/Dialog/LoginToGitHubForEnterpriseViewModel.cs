@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -29,6 +30,16 @@ namespace GitHub.ViewModels.Dialog
             ISimpleApiClientFactory apiClientFactory,
             IEnterpriseCapabilitiesService enterpriseCapabilities,
             IVisualStudioBrowser browser)
+            : this(connectionManager, apiClientFactory, enterpriseCapabilities, browser, Scheduler.Default)
+        {
+        }
+
+        public LoginToGitHubForEnterpriseViewModel(
+            IConnectionManager connectionManager,
+            ISimpleApiClientFactory apiClientFactory,
+            IEnterpriseCapabilitiesService enterpriseCapabilities,
+            IVisualStudioBrowser browser,
+            IScheduler scheduler)
             : base(connectionManager, browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
@@ -44,11 +55,11 @@ namespace GitHub.ViewModels.Dialog
                 .IfNotUri(Resources.EnterpriseUrlValidatorInvalid)
                 .IfGitHubDotComHost(Resources.EnterpriseUrlValidatorNotAGitHubHost);
 
-            canLogin = this.WhenAny(
+            canLogin = this.WhenAnyValue(
                 x => x.UsernameOrEmailValidator.ValidationResult.IsValid,
                 x => x.PasswordValidator.ValidationResult.IsValid,
-                x => x.EnterpriseUrlValidator.ValidationResult.IsValid,
-                (x, y, z) => x.Value && y.Value && z.Value)
+                x => x.SupportedLoginMethods,
+                (x, y, z) => (x || (z & EnterpriseLoginMethods.Token) != 0) && y)
                 .ToProperty(this, x => x.CanLogin);
 
             canSsoLogin = this.WhenAnyValue(
@@ -56,7 +67,7 @@ namespace GitHub.ViewModels.Dialog
                 .ToProperty(this, x => x.CanLogin);
 
             this.WhenAnyValue(x => x.EnterpriseUrl, x => x.EnterpriseUrlValidator.ValidationResult)
-                .Throttle(TimeSpan.FromMilliseconds(500))
+                .Throttle(TimeSpan.FromMilliseconds(500), scheduler)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => EnterpriseUrlChanged(x.Item1, x.Item2?.IsValid ?? false));
 
@@ -69,7 +80,14 @@ namespace GitHub.ViewModels.Dialog
 
         protected override Task<IConnection> LogIn(object args)
         {
-            return LogInToHost(HostAddress.Create(EnterpriseUrl));
+            if (string.IsNullOrWhiteSpace(UsernameOrEmail))
+            {
+                return LogInWithToken(HostAddress.Create(EnterpriseUrl), Password);
+            }
+            else
+            {
+                return LogInToHost(HostAddress.Create(EnterpriseUrl));
+            }
         }
 
         protected override Task<IConnection> LogInViaOAuth(object args)
@@ -145,9 +163,27 @@ namespace GitHub.ViewModels.Dialog
 
             if (url == EnterpriseUrl)
             {
+                if ((loginMethods & EnterpriseLoginMethods.Token) != 0 &&
+                    (loginMethods & EnterpriseLoginMethods.UsernameAndPassword) != 0)
+                {
+                    loginMethods &= ~EnterpriseLoginMethods.Token;
+                }
+
                 ProbeStatus = enterpriseInstance ? EnterpriseProbeStatus.Valid : EnterpriseProbeStatus.Invalid;
                 SupportedLoginMethods = loginMethods;
             }
+        }
+
+        async Task<IConnection> LogInWithToken(HostAddress hostAddress, string token)
+        {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+
+            if (await ConnectionManager.GetConnection(hostAddress) != null)
+            {
+                await ConnectionManager.LogOut(hostAddress);
+            }
+
+            return await ConnectionManager.LogInWithToken(hostAddress, token);
         }
     }
 }

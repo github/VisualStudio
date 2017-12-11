@@ -237,6 +237,7 @@
     <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\GitHubDialogWindowViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\GistCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\LoginToGitHubForEnterpriseViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\GitHubPaneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\NavigationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\LoginCredentialsViewModelTests.cs" />

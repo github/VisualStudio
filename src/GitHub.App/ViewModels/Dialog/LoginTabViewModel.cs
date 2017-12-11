@@ -49,13 +49,12 @@ namespace GitHub.ViewModels.Dialog
 
             Login = ReactiveCommand.CreateAsyncTask(this.WhenAny(x => x.CanLogin, x => x.Value), LogIn);
             Login.ThrownExceptions.Subscribe(HandleError);
+            isLoggingIn = Login.IsExecuting.ToProperty(this, x => x.IsLoggingIn);
 
             LoginViaOAuth = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.IsLoggingIn, x => !x),
                 LogInViaOAuth);
             LoginViaOAuth.ThrownExceptions.Subscribe(HandleError);
-
-            isLoggingIn = Login.IsExecuting.ToProperty(this, x => x.IsLoggingIn);
 
             Reset = ReactiveCommand.CreateAsyncTask(_ => Clear());
 
@@ -83,8 +82,7 @@ namespace GitHub.ViewModels.Dialog
         string usernameOrEmail;
         public string UsernameOrEmail
         {
-            get
-            { return usernameOrEmail; }
+            get { return usernameOrEmail; }
             set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
         }
 
@@ -98,8 +96,7 @@ namespace GitHub.ViewModels.Dialog
         string password;
         public string Password
         {
-            get
-            { return password; }
+            get { return password; }
             set { this.RaiseAndSetIfChanged(ref password, value); }
         }
 

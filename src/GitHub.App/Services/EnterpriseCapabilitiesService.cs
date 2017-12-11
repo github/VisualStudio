@@ -3,7 +3,6 @@ using System.ComponentModel.Composition;
 using System.Net.Http;
 using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Factories;
 using GitHub.Primitives;
 using Octokit;
 
@@ -29,19 +28,11 @@ namespace GitHub.Services
 
         public async Task<EnterpriseLoginMethods> ProbeLoginMethods(Uri enterpriseBaseUrl)
         {
+            var result = EnterpriseLoginMethods.Token;
             var client = await apiClientFactory.Create(UriString.ToUriString(enterpriseBaseUrl));
             var meta = await client.GetMetadata();
-            var result = meta.VerifiablePasswordAuthentication ?
-                EnterpriseLoginMethods.UsernameAndPassword :
-                EnterpriseLoginMethods.TokenOnly;
-            var httpClient = new HttpClient();
-            var loginUrl = GetLoginUrl(client.Client.Connection);
-            var response = await httpClient.GetAsync(loginUrl);
 
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    result |= EnterpriseLoginMethods.OAuth;
-            //}
+            if (meta.VerifiablePasswordAuthentication) result |= EnterpriseLoginMethods.UsernameAndPassword;
 
             return result;
         }

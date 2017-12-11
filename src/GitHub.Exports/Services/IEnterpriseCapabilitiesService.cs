@@ -10,10 +10,9 @@ namespace GitHub.Services
     [Flags]
     public enum EnterpriseLoginMethods
     {
-        TokenOnly = 0x00,
-        UsernameAndPassword = 0x01,
-        OAuth = 0x02,
-        All = 0x03,
+        Token = 0x01,
+        UsernameAndPassword = 0x02,
+        OAuth = 0x04,
     }
 
     /// <summary>
