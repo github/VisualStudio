@@ -21,33 +21,28 @@ namespace GitHub.ViewModels.Dialog
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginToGitHubForEnterpriseViewModel : LoginTabViewModel, ILoginToGitHubForEnterpriseViewModel
     {
-        readonly ISimpleApiClientFactory apiClientFactory;
         readonly IEnterpriseCapabilitiesService enterpriseCapabilities;
 
         [ImportingConstructor]
         public LoginToGitHubForEnterpriseViewModel(
             IConnectionManager connectionManager,
-            ISimpleApiClientFactory apiClientFactory,
             IEnterpriseCapabilitiesService enterpriseCapabilities,
             IVisualStudioBrowser browser)
-            : this(connectionManager, apiClientFactory, enterpriseCapabilities, browser, Scheduler.Default)
+            : this(connectionManager, enterpriseCapabilities, browser, Scheduler.Default)
         {
         }
 
         public LoginToGitHubForEnterpriseViewModel(
             IConnectionManager connectionManager,
-            ISimpleApiClientFactory apiClientFactory,
             IEnterpriseCapabilitiesService enterpriseCapabilities,
             IVisualStudioBrowser browser,
             IScheduler scheduler)
             : base(connectionManager, browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
-            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(enterpriseCapabilities, nameof(enterpriseCapabilities));
             Guard.ArgumentNotNull(browser, nameof(browser));
 
-            this.apiClientFactory = apiClientFactory;
             this.enterpriseCapabilities = enterpriseCapabilities;
 
             EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)

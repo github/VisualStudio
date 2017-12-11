@@ -220,7 +220,6 @@ public class LoginToGitHubForEnterpriseViewModelTests
     {
         return new LoginToGitHubForEnterpriseViewModel(
             Substitute.For<IConnectionManager>(),
-            Substitute.For<ISimpleApiClientFactory>(),
             capabilitiesService ?? Substitute.For<IEnterpriseCapabilitiesService>(),
             Substitute.For<IVisualStudioBrowser>(),
             scheduler ?? Scheduler.Immediate);
