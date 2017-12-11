@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -64,6 +65,7 @@ namespace GitHub.Services
             return response.Body;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Created via Octokit reflection")]
         class EnterpriseMeta : Meta
         {
             public string InstalledVersion { get; private set; }
