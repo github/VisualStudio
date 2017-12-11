@@ -200,7 +200,7 @@ namespace GitHub.ViewModels.GitHubPane
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
             await UpdateContent(teServiceHolder.ActiveRepo);
-            teServiceHolder.Subscribe(this, x => UpdateContent(x).Forget());
+            teServiceHolder.Subscribe(this, x => UpdateContentIfRepositoryChanged(x).Forget());
             connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
 
             BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
@@ -344,8 +344,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task UpdateContent(ILocalRepositoryModel repository)
         {
-            if (initialized && Equals(repository, LocalRepository)) return;
-
             initialized = true;
             LocalRepository = repository;
             Connection = null;
@@ -387,6 +385,14 @@ namespace GitHub.ViewModels.GitHubPane
             else
             {
                 Content = notAGitHubRepository;
+            }
+        }
+
+        async Task UpdateContentIfRepositoryChanged(ILocalRepositoryModel repository)
+        {
+            if (!initialized || !Equals(repository, LocalRepository))
+            {
+                await UpdateContent(repository);
             }
         }
 
