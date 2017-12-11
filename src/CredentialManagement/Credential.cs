@@ -60,6 +60,28 @@ namespace GitHub.Authentication.CredentialManagement
             _lastWriteTime = DateTime.MinValue;
         }
 
+        public static Credential Load(string key)
+        {
+            var result = new Credential();
+            result.Target = key;
+            result.Type = CredentialType.Generic;
+            return result.Load() ? result : null;
+        }
+
+        public static void Save(string key, string username, string password)
+        {
+            var result = new Credential(username, password, key);
+            result.Save();
+        }
+
+        public static void Delete(string key)
+        {
+            var result = new Credential();
+            result.Target = key;
+            result.Type = CredentialType.Generic;
+            result.Delete();
+        }
+
         bool disposed;
         void Dispose(bool disposing)
         {

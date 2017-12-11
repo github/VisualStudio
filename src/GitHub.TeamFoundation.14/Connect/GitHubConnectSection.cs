@@ -34,6 +34,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly int sectionIndex;
         readonly IDialogService dialogService;
         readonly IRepositoryCloneService cloneService;
+        readonly ILocalRepositories localRepositories;
 
         bool isCloning;
         bool isCreating;
@@ -101,6 +102,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IVSServices vsServices,
             IRepositoryCloneService cloneService,
             IDialogService dialogService,
+            ILocalRepositories localRepositories,
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
@@ -111,6 +113,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(vsServices, nameof(vsServices));
             Guard.ArgumentNotNull(cloneService, nameof(cloneService));
             Guard.ArgumentNotNull(dialogService, nameof(dialogService));
+            Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
 
             Title = "GitHub";
             IsEnabled = true;
@@ -122,6 +125,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             this.vsServices = vsServices;
             this.cloneService = cloneService;
             this.dialogService = dialogService;
+            this.localRepositories = localRepositories;
 
             Clone = CreateAsyncCommandHack(DoClone);
 
@@ -170,7 +174,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         protected void Refresh(IConnection connection)
         {
-            if (connection == null)
+            if (connection == null || !connection.IsLoggedIn)
             {
                 LoggedIn = false;
                 IsVisible = false;
@@ -197,8 +201,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (connection != SectionConnection)
                 {
                     SectionConnection = connection;
-                    Repositories = SectionConnection.Repositories.CreateDerivedCollection(x => x,
-                                        orderer: OrderedComparer<ILocalRepositoryModel>.OrderBy(x => x.Name).Compare);
+                    Repositories?.Dispose();
+                    Repositories = localRepositories.GetRepositoriesForAddress(connection.HostAddress);
                     Repositories.CollectionChanged += UpdateRepositoryList;
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
@@ -371,23 +375,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             // TODO: This is wasteful as we can be calling it multiple times for a single changed
             // signal, once from each section. Needs refactoring.
-            await connectionManager.RefreshRepositories();
+            await localRepositories.Refresh();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
         public void DoCreate()
         {
-            StartFlow(UIControllerFlow.Create);
+            dialogService.ShowCreateRepositoryDialog(SectionConnection);
         }
 
         public void SignOut()
         {
-            SectionConnection.Logout();
+            connectionManager.LogOut(SectionConnection.HostAddress);
         }
 
         public void Login()
         {
-            StartFlow(UIControllerFlow.Authentication);
+            dialogService.ShowLoginDialog();
         }
 
         public bool OpenRepository()
@@ -410,31 +414,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // Navigate away when we're on the correct source control contexts.
             ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             return true;
-        }
-
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var notifications = ServiceProvider.TryGetService<INotificationDispatcher>();
-            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-            notifications.AddListener(teServices);
-
-            ServiceProvider.GitServiceProvider = TEServiceProvider;
-            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
-            var controller = uiProvider.Configure(controllerFlow, SectionConnection);
-            controller.ListenToCompletionState()
-                .Subscribe(success =>
-                {
-                    if (success)
-                    {
-                        if (controllerFlow == UIControllerFlow.Clone)
-                            isCloning = true;
-                        else if (controllerFlow == UIControllerFlow.Create)
-                            isCreating = true;
-                    }
-                });
-            uiProvider.RunInDialog(controller);
-
-            notifications.RemoveListener();
         }
 
         bool disposed;

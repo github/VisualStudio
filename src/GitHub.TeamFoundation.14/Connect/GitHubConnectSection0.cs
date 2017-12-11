@@ -21,8 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IPackageSettings settings,
             IVSServices vsServices,
             IRepositoryCloneService cloneService,
-            IDialogService dialogService)
-            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, cloneService, dialogService, 0)
+            IDialogService dialogService,
+            ILocalRepositories localRepositories)
+            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, cloneService, dialogService, localRepositories, 0)
         {
         }
     }
