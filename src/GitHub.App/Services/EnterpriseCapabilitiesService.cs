@@ -12,6 +12,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class EnterpriseCapabilitiesService : IEnterpriseCapabilitiesService
     {
+        static readonly Version MinimumOAuthVersion = new Version("2.12.1");
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IEnterpriseProbe probe;
 
@@ -29,10 +30,16 @@ namespace GitHub.Services
         public async Task<EnterpriseLoginMethods> ProbeLoginMethods(Uri enterpriseBaseUrl)
         {
             var result = EnterpriseLoginMethods.Token;
-            var client = await apiClientFactory.Create(UriString.ToUriString(enterpriseBaseUrl));
-            var meta = await client.GetMetadata();
+            var client = await apiClientFactory.Create(UriString.ToUriString(enterpriseBaseUrl)).ConfigureAwait(false);
+            var meta = await GetMetadata(client.Client).ConfigureAwait(false);
 
             if (meta.VerifiablePasswordAuthentication) result |= EnterpriseLoginMethods.UsernameAndPassword;
+
+            if (meta.InstalledVersion != null)
+            {
+                var version = new Version(meta.InstalledVersion);
+                if (version >= MinimumOAuthVersion) result |= EnterpriseLoginMethods.OAuth;
+            }
 
             return result;
         }
@@ -48,6 +55,18 @@ namespace GitHub.Services
 
             // OauthClient.GetGitHubLoginUrl seems to give the wrong URL. Fix this.
             return new Uri(uri.ToString().Replace("/api/v3", ""));
+        }
+
+        private async Task<EnterpriseMeta> GetMetadata(IGitHubClient client)
+        {
+            var endpoint = new Uri("meta", UriKind.Relative);
+            var response = await client.Connection.Get<EnterpriseMeta>(endpoint, null, null).ConfigureAwait(false);
+            return response.Body;
+        }
+
+        class EnterpriseMeta : Meta
+        {
+            public string InstalledVersion { get; private set; }
         }
     }
 }
