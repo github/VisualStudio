@@ -137,7 +137,12 @@
     <Compile Include="Models\IssueCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
+    <Compile Include="SampleData\ForkRepositoryExecuteViewModelDesigner.cs" />
+    <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
+    <Compile Include="ViewModels\Dialog\ForkRepositoryExecuteViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ForkRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ForkRepositorySelectViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GitHubDialogWindowViewModel.cs" />
     <Compile Include="ViewModels\Dialog\LoginCredentialsViewModel.cs" />

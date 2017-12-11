@@ -33,6 +33,7 @@ namespace GitHub.Api
             bool useOldScopes = false,
             bool useFingerprint = true);
 
+        IObservable<Repository> GetForks(string owner, string name);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);

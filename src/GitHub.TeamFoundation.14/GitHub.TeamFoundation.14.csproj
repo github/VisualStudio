@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\VSGitExt.cs" />
+    <Compile Include="Home\ForkNavigationItem.cs" />
     <Compile Include="RegistryHelper.cs" />
     <Compile Include="Services\VSGitServices.cs" />
     <Compile Include="Settings.cs" />

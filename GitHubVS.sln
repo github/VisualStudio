@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{11569514-5AE5-4B5B-92A2-F10B0967DE5F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -213,8 +213,8 @@ Global
 		{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{08DD4305-7787-4823-A53F-4D0F725A07F3}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{08DD4305-7787-4823-A53F-4D0F725A07F3}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{08DD4305-7787-4823-A53F-4D0F725A07F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08DD4305-7787-4823-A53F-4D0F725A07F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08DD4305-7787-4823-A53F-4D0F725A07F3}.DebugCodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
 		{08DD4305-7787-4823-A53F-4D0F725A07F3}.DebugCodeAnalysis|Any CPU.Build.0 = Release|Any CPU
 		{08DD4305-7787-4823-A53F-4D0F725A07F3}.DebugWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
@@ -426,5 +426,8 @@ Global
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{110B206F-8554-4B51-BF86-94DAA32F5E26} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{17EB676B-BB91-48B5-AA59-C67695C647C2} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {556014CF-5B35-4CE5-B3EF-6AB0007001AC}
 	EndGlobalSection
 EndGlobal

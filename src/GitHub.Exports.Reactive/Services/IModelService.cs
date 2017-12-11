@@ -21,6 +21,7 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
         IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo);
         ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);
+        IObservable<IRemoteRepositoryModel> GetForks(IRepositoryModel repository);
         IObservable<LicenseItem> GetLicenses();
         IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
         IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number);

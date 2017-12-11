@@ -398,4 +398,7 @@
   <data name="OpenFileInSolution" xml:space="preserve">
     <value>Open File in Solution</value>
   </data>
+  <data name="ForkNavigationItemText" xml:space="preserve">
+    <value>Fork</value>
+  </data>
 </root>

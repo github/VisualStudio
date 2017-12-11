@@ -295,6 +295,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fork.
+        /// </summary>
+        public static string ForkNavigationItemText {
+            get {
+                return ResourceManager.GetString("ForkNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Get Started.
         /// </summary>
         public static string GetStartedText {

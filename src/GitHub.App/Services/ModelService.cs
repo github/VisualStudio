@@ -94,6 +94,12 @@ namespace GitHub.Services
             .ToReadOnlyList(Create);
         }
 
+        public IObservable<IRemoteRepositoryModel> GetForks(IRepositoryModel repository)
+        {
+            return ApiClient.GetForks(repository.Owner, repository.Name)
+                .Select(x => new RemoteRepositoryModel(x));
+        }
+
         IObservable<LicenseCacheItem> GetLicensesFromApi()
         {
             return ApiClient.GetLicenses()

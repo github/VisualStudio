@@ -71,5 +71,15 @@ namespace GitHub.Services
             var viewModel = factory.CreateViewModel<ILoginViewModel>();
             return (IConnection)await showDialog.Show(viewModel);
         }
+
+        public async Task ShowForkDialog(ILocalRepositoryModel repository, IConnection connection)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotNull(connection, nameof(connection));
+
+            var viewModel = factory.CreateViewModel<IForkRepositoryViewModel>();
+            await viewModel.InitializeAsync(repository, connection);
+            await showDialog.Show(viewModel);
+        }
     }
 }
