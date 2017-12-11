@@ -2,7 +2,7 @@
 
 GitHub for Visual Studio exposes the pull requests for the current repository and lets you create new pull requests and review pull requests from other contributors.
 
-1. [Sign in](authenticating-to-github) to GitHub.
+1. [Sign in](../getting-started/authenticating-to-github.md) to GitHub.
 2. Open a solution in a GitHub repository.
 3. Open **Team Explorer** and click the **Pull Requests** button to open the **GitHub** pane.
 ![Pull Requests button in the Team Explorer pane](images/pull-requests-button2.png)
