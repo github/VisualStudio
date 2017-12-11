@@ -43,7 +43,7 @@ namespace GitHub.Factories
         /// <inheritdoc/>
         public FrameworkElement CreateView(Type viewModel)
         {
-            var f = Views.FirstOrDefault(x => x.Metadata.ViewModelType.Contains(viewModel));
+            var f = Views.FirstOrDefault(x => x.Metadata.ViewModelType.Contains(viewModel.FullName));
             return f?.CreateExport().Value;
         }
     }

@@ -37,10 +37,10 @@ namespace GitHub.Exports
         public ExportViewForAttribute(Type viewModelType)
             : base(typeof(FrameworkElement))
         {
-            ViewModelType = viewModelType;
+            ViewModelType = viewModelType.FullName;
         }
 
-        public Type ViewModelType { get; }
+        public string ViewModelType { get; }
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ namespace GitHub.Exports
     public interface IViewModelMetadata
     {
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
-        Type[] ViewModelType { get; }
+        string[] ViewModelType { get; }
     }
 
     /// <summary>
