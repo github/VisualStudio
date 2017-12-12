@@ -10,9 +10,9 @@ namespace GitHub.ViewModels.GitHubPane
         string FileName { get; }
 
         /// <summary>
-        /// Gets the path to display in the "Path" column of the changed files list.
+        /// Gets the old path of a moved/renamed file, relative to the root of the repository.
         /// </summary>
-        string DisplayPath { get; }
+        string OldPath { get; }
 
         /// <summary>
         /// Gets the SHA of the file.
