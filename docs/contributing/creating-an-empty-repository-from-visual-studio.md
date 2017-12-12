@@ -1,6 +1,6 @@
 # Creating an empty repository from Visual Studio
 
-1. [Sign in](authenticating-to-github) to GitHub.
+1. [Sign in](../getting-started/authenticating-to-github.md) to GitHub.
 
 2. Open **Team Explorer** by clicking on its tab next to *Solution Explorer*, or via the *View* menu.
 
