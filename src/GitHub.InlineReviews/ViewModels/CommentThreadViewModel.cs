@@ -9,17 +9,16 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// Base view model for a thread of comments.
     /// </summary>
-    public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel, IDisposable
+    public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
         ReactiveCommand<ICommentModel> postComment;
-        IDisposable placeholderSubscription;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentModels">The thread comments.</param>
-        public CommentThreadViewModel(IAccount currentUser)
+        protected CommentThreadViewModel(IAccount currentUser)
         {
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
@@ -48,21 +47,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <inheritdoc/>
         public IAccount CurrentUser { get; }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         /// <inheritdoc/>
         public abstract Uri GetCommentUrl(int id);
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                placeholderSubscription?.Dispose();
-            }
-        }
     }
 }

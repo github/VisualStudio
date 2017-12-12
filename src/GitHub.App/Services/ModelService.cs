@@ -13,10 +13,11 @@ using GitHub.Caches;
 using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
-using NLog;
 using Octokit;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -24,21 +25,26 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
+        static readonly ILogger log = LogManager.ForContext<ModelService>();
+
         public const string PRPrefix = "pr";
         const string TempFilesDirectory = Info.ApplicationInfo.ApplicationName;
         const string CachedFilesDirectory = "CachedFiles";
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly IApiClient apiClient;
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
 
-        public ModelService(IApiClient apiClient, IBlobCache hostCache, IAvatarProvider avatarProvider)
+        public ModelService(
+            IApiClient apiClient,
+            IBlobCache hostCache,
+            IAvatarProvider avatarProvider)
         {
-            this.apiClient = apiClient;
+            this.ApiClient = apiClient;
             this.hostCache = hostCache;
             this.avatarProvider = avatarProvider;
         }
+
+        public IApiClient ApiClient { get; }
 
         public IObservable<IAccount> GetCurrentUser()
         {
@@ -57,7 +63,7 @@ namespace GitHub.Services
                 .Select(Create)
                 .Catch<GitIgnoreItem, Exception>(e =>
                 {
-                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
+                    log.Error(e, "Failed to retrieve GitIgnoreTemplates");
                     return Observable.Empty<GitIgnoreItem>();
                 });
         }
@@ -74,7 +80,7 @@ namespace GitHub.Services
                 .Select(Create)
                 .Catch<LicenseItem, Exception>(e =>
                 {
-                    log.Info("Failed to retrieve licenses", e);
+                    log.Error(e, "Failed to retrieve licenses");
                     return Observable.Empty<LicenseItem>();
                 });
         }
@@ -90,14 +96,14 @@ namespace GitHub.Services
 
         IObservable<LicenseCacheItem> GetLicensesFromApi()
         {
-            return apiClient.GetLicenses()
+            return ApiClient.GetLicenses()
                 .WhereNotNull()
                 .Select(LicenseCacheItem.Create);
         }
 
         IObservable<GitIgnoreCacheItem> GetGitIgnoreTemplatesFromApi()
         {
-            return apiClient.GetGitIgnoreTemplates()
+            return ApiClient.GetGitIgnoreTemplates()
                 .WhereNotNull()
                 .Select(GitIgnoreCacheItem.Create);
         }
@@ -105,7 +111,7 @@ namespace GitHub.Services
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
         {
             return hostCache.GetAndRefreshObject("user",
-                () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
+                () => ApiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
                 .TakeLast(1)
                 .ToList();
         }
@@ -114,7 +120,7 @@ namespace GitHub.Services
         {
             return GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
-                    () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
+                    () => ApiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
                     TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
                 // TODO: Akavache returns the cached version followed by the fresh version if > 2
                 // minutes have expired from the last request. Here we make sure the latest value is
@@ -124,12 +130,12 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
+                        log.Error(e, "Retrieve user organizations failed because user is not stored in the cache");
                         return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                     })
                  .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
                  {
-                     log.Error("Retrieve user organizations failed.", e);
+                     log.Error(e, "Retrieve user organizations failed");
                      return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                  });
         }
@@ -168,7 +174,7 @@ namespace GitHub.Services
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.GetAndFetchLatestFromIndex(key, () =>
-                        apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                        ApiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
                                  .Select(PullRequestCacheItem.Create),
                         item =>
                         {
@@ -194,10 +200,10 @@ namespace GitHub.Services
             {
                 return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
                         Observable.CombineLatest(
-                            apiClient.GetPullRequest(owner, name, number),
-                            apiClient.GetPullRequestFiles(owner, name, number).ToList(),
-                            apiClient.GetIssueComments(owner, name, number).ToList(),
-                            apiClient.GetPullRequestReviewComments(owner, name, number).ToList(),
+                            ApiClient.GetPullRequest(owner, name, number),
+                            ApiClient.GetPullRequestFiles(owner, name, number).ToList(),
+                            ApiClient.GetIssueComments(owner, name, number).ToList(),
+                            ApiClient.GetPullRequestReviewComments(owner, name, number).ToList(),
                             (pr, files, comments, reviewComments) => new
                             {
                                 PullRequest = pr,
@@ -225,7 +231,7 @@ namespace GitHub.Services
                 .SelectMany(key =>
                     hostCache.GetAndFetchLatest(
                         key,
-                        () => apiClient.GetRepository(owner, repo).Select(RepositoryCacheItem.Create))
+                        () => ApiClient.GetRepository(owner, repo).Select(RepositoryCacheItem.Create))
                     .Select(Create)));
         }
 
@@ -237,7 +243,7 @@ namespace GitHub.Services
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.GetAndFetchLatestFromIndex(key, () =>
-                        apiClient.GetRepositories()
+                        ApiClient.GetRepositories()
                                  .Select(RepositoryCacheItem.Create),
                         item =>
                         {
@@ -267,7 +273,7 @@ namespace GitHub.Services
             return Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.PutAndUpdateIndex(key, () =>
-                        apiClient.CreatePullRequest(
+                        ApiClient.CreatePullRequest(
                                 new NewPullRequest(title,
                                                    string.Format(CultureInfo.InvariantCulture, "{0}:{1}", sourceRepository.Owner, sourceBranch.Name),
                                                    targetBranch.Name)
@@ -297,7 +303,7 @@ namespace GitHub.Services
 
                 if (!File.Exists(tempFile))
                 {
-                    var contents = await apiClient.GetFileContents(repo.Owner, repo.Name, commitSha, path);
+                    var contents = await ApiClient.GetFileContents(repo.Owner, repo.Name, commitSha, path);
                     Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFile, Convert.FromBase64String(contents.EncodedContent));
                 }
@@ -318,17 +324,16 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        string message = string.Format(CultureInfo.InvariantCulture,
-                            "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
+                        log.Error(e,
+                            "Retrieving {RepositoryType} user repositories failed because user is not stored in the cache",
                             repositoryType);
-                        log.Error(message, e);
                         return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
 
         IObservable<IEnumerable<RepositoryCacheItem>> GetUserRepositoriesFromApi(RepositoryType repositoryType)
         {
-            return apiClient.GetUserRepositories(repositoryType)
+            return ApiClient.GetUserRepositories(repositoryType)
                 .WhereNotNull()
                 .Select(RepositoryCacheItem.Create)
                 .ToList()
@@ -346,7 +351,7 @@ namespace GitHub.Services
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
-                    () => apiClient.GetRepositoriesForOrganization(organization).Select(
+                    () => ApiClient.GetRepositoriesForOrganization(organization).Select(
                         RepositoryCacheItem.Create).ToList(),
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
@@ -355,11 +360,8 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        string message = string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
+                        log.Error(e, "Retrieveing {Organization} org repositories failed because user is not stored in the cache",
                             organization);
-                        log.Error(message, e);
                         return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
@@ -370,7 +372,7 @@ namespace GitHub.Services
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));
 
             return Observable.Defer(() => keyobs
-                    .SelectMany(key => apiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
+                    .SelectMany(key => ApiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
                 .Select(x => new BranchModel(x, repo));
         }
 

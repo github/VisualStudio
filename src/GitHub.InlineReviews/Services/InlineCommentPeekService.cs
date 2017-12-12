@@ -26,19 +26,16 @@ namespace GitHub.InlineReviews.Services
     [Export(typeof(IInlineCommentPeekService))]
     class InlineCommentPeekService : IInlineCommentPeekService
     {
-        readonly IApiClientFactory apiClientFactory;
         readonly IOutliningManagerService outliningService;
         readonly IPeekBroker peekBroker;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public InlineCommentPeekService(
-            IApiClientFactory apiClientFactory,
             IOutliningManagerService outliningManager,
             IPeekBroker peekBroker,
             IUsageTracker usageTracker)
         {
-            this.apiClientFactory = apiClientFactory;
             this.outliningService = outliningManager;
             this.peekBroker = peekBroker;
             this.usageTracker = usageTracker;
@@ -160,7 +157,7 @@ namespace GitHub.InlineReviews.Services
             ExpandCollapsedRegions(textView, line.Extent);
             peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
 
-            usageTracker.IncrementPRReviewDiffViewInlineCommentOpen().Forget();
+            usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentOpen).Forget();
 
             return Tuple.Create(line, trackingPoint);
         }

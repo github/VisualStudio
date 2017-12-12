@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,10 +12,11 @@
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,10 +25,18 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,14 +45,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
-    <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+    <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -100,50 +107,52 @@
     <Compile Include="Collections\ITrackingCollection.cs" />
     <Compile Include="Collections\TrackingCollection.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
+    <Compile Include="Factories\IModelServiceFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
-    <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
-    <Compile Include="Models\IPullRequestSessionLiveFile.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
-    <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Models\PullRequestTextBufferInfo.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />
     <Compile Include="Services\IPullRequestSession.cs" />
     <Compile Include="Services\IPullRequestService.cs" />
     <Compile Include="Services\IPullRequestSessionManager.cs" />
+    <Compile Include="Services\IShowDialogService.cs" />
+    <Compile Include="Services\LocalRepositoriesExtensions.cs" />
     <Compile Include="Services\ModelServiceExtensions.cs" />
-    <Compile Include="ViewModels\IGistCreationViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IDialogContentViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IGitHubDialogWindowViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IGistCreationViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ILogin2FaViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ILoginCredentialsViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ILoginViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IRepositoryCloneViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IRepositoryCreationViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IRepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\ISearchablePageViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestCreationViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\INotAGitHubRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\INotAGitRepositoryViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
-    <Compile Include="ViewModels\IHasCancel.cs" />
-    <Compile Include="ViewModels\IHasDone.cs" />
-    <Compile Include="ViewModels\ILoginViewModel.cs" />
-    <Compile Include="ViewModels\INotAGitRepositoryViewModel.cs" />
-    <Compile Include="ViewModels\INotAGitHubRepositoryViewModel.cs" />
-    <Compile Include="ViewModels\ILoggedOutViewModel.cs" />
-    <Compile Include="ViewModels\ILoginControlViewModel.cs" />
-    <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
-    <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
     <Compile Include="Caches\IImageCache.cs" />
-    <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
     <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestChangeNode.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestDirectoryNode.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestFileNode.cs" />
+    <Compile Include="ViewModels\Dialog\IRepositoryCreationTarget.cs" />
+    <Compile Include="ViewModels\Dialog\ILoginToGitHubForEnterpriseViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ILoginToGitHubViewModel.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
-    <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
-    <Compile Include="ViewModels\IPullRequestDetailViewModel.cs" />
-    <Compile Include="ViewModels\IPullRequestChangeNode.cs" />
-    <Compile Include="ViewModels\IPullRequestDirectoryNode.cs" />
-    <Compile Include="ViewModels\IPullRequestFileNode.cs" />
-    <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
-    <Compile Include="ViewModels\IDialogViewModel.cs" />
-    <Compile Include="ViewModels\IBaseCloneViewModel.cs" />
-    <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
-    <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
-    <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Models\GitIgnoreItem.cs" />
     <Compile Include="Models\LicenseItem.cs" />
@@ -151,23 +160,22 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="ViewModels\TeamExplorer\IRepositoryPublishViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
     <Compile Include="Authentication\IDelegatingTwoFactorChallengeHandler.cs" />
-    <Compile Include="Factories\IRepositoryHostFactory.cs" />
-    <Compile Include="Models\IRepositoryHost.cs" />
-    <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
     <Compile Include="Services\IRepositoryCloneService.cs" />
     <Compile Include="Services\IRepositoryCreationService.cs" />
-    <Compile Include="ViewModels\IRepositoryCloneViewModel.cs" />
-    <Compile Include="ViewModels\IRepositoryCreationViewModel.cs" />
     <Compile Include="Validation\ReactivePropertyValidator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
@@ -199,6 +207,10 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -206,7 +218,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

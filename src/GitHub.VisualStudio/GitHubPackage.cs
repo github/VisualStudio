@@ -1,23 +1,26 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Helpers;
+using GitHub.Info;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels.GitHubPane;
+using GitHub.VisualStudio.Menus;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
-using GitHub.Helpers;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
-using GitHub.VisualStudio.Menus;
-using System.ComponentModel.Design;
-using GitHub.ViewModels;
-using GitHub.Api;
 
 namespace GitHub.VisualStudio
 {
@@ -31,6 +34,7 @@ namespace GitHub.VisualStudio
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
@@ -47,11 +51,20 @@ namespace GitHub.VisualStudio
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
 
             await GetServiceAsync(typeof(IUsageTracker));
 
             InitializeMenus().Forget();
+        }
+
+        void LogVersionInformation()
+        {
+            var packageVersion = ApplicationInfo.GetPackageVersion(this);
+            var hostVersionInfo = ApplicationInfo.GetHostVersionInfo();
+            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
+                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
         }
 
         async Task InitializeMenus()
@@ -98,7 +111,6 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
@@ -106,6 +118,7 @@ namespace GitHub.VisualStudio
         public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
         const string StartPagePreview5PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
+        static readonly ILogger log = LogManager.ForContext<ServiceProviderPackage>();
 
         Version vsversion;
         Version VSVersion
@@ -138,12 +151,11 @@ namespace GitHub.VisualStudio
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
-            AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             return Task.CompletedTask;
         }
 
-        public IViewHost ShowHomePane()
+        public IGitHubPaneViewModel ShowHomePane()
         {
             var pane = ShowToolWindow(new Guid(GitHubPane.GitHubPaneGuid));
             if (pane == null)
@@ -153,7 +165,7 @@ namespace GitHub.VisualStudio
             {
                 ErrorHandler.Failed(frame.Show());
             }
-            return pane as IViewHost;
+            return (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
@@ -162,19 +174,19 @@ namespace GitHub.VisualStudio
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
             {
-                VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                log.Error("Unable to find or create GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
             if (ErrorHandler.Failed(frame.Show()))
             {
-                VsOutputLogger.WriteLine("Unable to show GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                log.Error("Unable to show GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
 
             object docView = null;
             if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
             {
-                VsOutputLogger.WriteLine("Unable to grab instance of GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                log.Error("Unable to grab instance of GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
             return docView as GitHubPane;
@@ -198,11 +210,11 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(ILoginManager))
             {
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                var loginCache = serviceProvider.GetService<ILoginCache>();
+                var keychain = serviceProvider.GetService<IKeychain>();
                 var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
 
                 return new LoginManager(
-                    loginCache,
+                    keychain,
                     twoFaHandler,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
@@ -216,13 +228,10 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IUsageTracker))
             {
-                var uiProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UsageTracker(uiProvider);
-            }
-            else if (serviceType == typeof(IUIProvider))
-            {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UIProvider(sp);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var usageService = serviceProvider.GetService<IUsageService>();
+                return new UsageTracker(serviceProvider, usageService);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {

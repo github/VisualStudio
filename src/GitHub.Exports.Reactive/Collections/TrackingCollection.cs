@@ -164,7 +164,7 @@ namespace GitHub.Collections
     /// for T
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IDisposable
+    public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IReadOnlyObservableCollection<T>, IDisposable
         where T : class, ICopyable<T>
     {
         enum TheAction

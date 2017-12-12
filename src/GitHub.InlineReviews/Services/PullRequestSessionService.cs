@@ -15,7 +15,6 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
-using NLog;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
@@ -54,15 +53,19 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
         {
-            var repo = await GetRepository(repository);
-            return await diffService.Diff(repo, baseSha, headSha, relativePath);
+            using (var repo = await GetRepository(repository))
+            {
+                return await diffService.Diff(repo, baseSha, headSha, relativePath);
+            }
         }
 
         /// <inheritdoc/>
         public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
-            var repo = await GetRepository(repository);
-            return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
+            using (var repo = await GetRepository(repository))
+            {
+                return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
+            }
         }
 
         /// <inheritdoc/>
@@ -99,18 +102,14 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<int> UpdateCommentThreads(
+        public IReadOnlyList<Tuple<int, DiffSide>> UpdateCommentThreads(
             IReadOnlyList<IInlineCommentThreadModel> threads,
             IReadOnlyList<DiffChunk> diff)
         {
-            var changedLines = new List<int>();
+            var changedLines = new List<Tuple<int, DiffSide>>();
 
             foreach (var thread in threads)
             {
-                var hunk = thread.Comments.First().DiffHunk;
-                var chunks = DiffUtilities.ParseFragment(hunk);
-                var chunk = chunks.Last();
-                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var oldLineNumber = thread.LineNumber;
                 var newLineNumber = GetUpdatedLineNumber(thread, diff);
                 var changed = false;
@@ -130,8 +129,9 @@ namespace GitHub.InlineReviews.Services
 
                 if (changed)
                 {
-                    if (oldLineNumber != -1) changedLines.Add(oldLineNumber);
-                    if (newLineNumber != -1 && newLineNumber != oldLineNumber) changedLines.Add(newLineNumber);
+                    var side = thread.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                    if (oldLineNumber != -1) changedLines.Add(Tuple.Create(oldLineNumber, side));
+                    if (newLineNumber != -1 && newLineNumber != oldLineNumber) changedLines.Add(Tuple.Create(newLineNumber, side));
                 }
             }
 
@@ -179,18 +179,22 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public virtual async Task<string> GetTipSha(ILocalRepositoryModel repository)
         {
-            var repo = await GetRepository(repository);
-            return repo.Head.Tip.Sha;
+            using (var repo = await GetRepository(repository))
+            {
+                return repo.Head.Tip.Sha;
+            }
         }
 
         /// <inheritdoc/>
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
-            var repo = await GetRepository(repository);
-            var modified = await gitClient.IsModified(repo, relativePath, contents);
-            var pushed = await gitClient.IsHeadPushed(repo);
+            using (var repo = await GetRepository(repository))
+            {
+                var modified = await gitClient.IsModified(repo, relativePath, contents);
+                var pushed = await gitClient.IsHeadPushed(repo);
 
-            return !modified && pushed;
+                return !modified && pushed;
+            }
         }
 
         public async Task<byte[]> ExtractFileFromGit(
@@ -199,17 +203,18 @@ namespace GitHub.InlineReviews.Services
             string sha,
             string relativePath)
         {
-            var repo = await GetRepository(repository);
-
-            try
+            using (var repo = await GetRepository(repository))
             {
-                return await gitClient.ExtractFileBinary(repo, sha, relativePath);
-            }
-            catch (FileNotFoundException)
-            {
-                var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
-                await gitClient.Fetch(repo, "origin", sha, pullHeadRef);
-                return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                try
+                {
+                    return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                }
+                catch (FileNotFoundException)
+                {
+                    var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
+                    await gitClient.Fetch(repo, "origin", sha, pullHeadRef);
+                    return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                }
             }
         }
 
@@ -246,21 +251,23 @@ namespace GitHub.InlineReviews.Services
                 return mergeBase;
             }
 
-            var repo = await GetRepository(repository);
-            var targetUrl = pullRequest.Base.RepositoryCloneUrl;
-            var headUrl = pullRequest.Head.RepositoryCloneUrl;
-            var baseRef = pullRequest.Base.Ref;
-            var pullNumber = pullRequest.Number;
-            try
+            using (var repo = await GetRepository(repository))
             {
-                mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
-            }
+                var targetUrl = pullRequest.Base.RepositoryCloneUrl;
+                var headUrl = pullRequest.Head.RepositoryCloneUrl;
+                var baseRef = pullRequest.Base.Ref;
+                var pullNumber = pullRequest.Number;
+                try
+                {
+                    mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
+                }
+                catch (NotFoundException ex)
+                {
+                    throw new NotFoundException("The Pull Request failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
+                }
 
-            return mergeBaseCache[key] = mergeBase;
+                return mergeBaseCache[key] = mergeBase;
+            }
         }
 
         /// <inheritdoc/>
@@ -297,7 +304,7 @@ namespace GitHub.InlineReviews.Services
                 path,
                 position);
 
-            await usageTracker.IncrementPRReviewDiffViewInlineCommentPost();
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
 
             return new PullRequestReviewCommentModel
             {
@@ -333,7 +340,7 @@ namespace GitHub.InlineReviews.Services
                 body,
                 inReplyTo);
 
-            await usageTracker.IncrementPRReviewDiffViewInlineCommentPost();
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
 
             return new PullRequestReviewCommentModel
             {
@@ -367,6 +374,6 @@ namespace GitHub.InlineReviews.Services
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
-        }       
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
@@ -12,12 +13,12 @@ using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
-using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Xunit;
+using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -41,15 +42,17 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
                     Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
 
-                var repositoryHosts = CreateRepositoryHosts();
+                var connectionManager = CreateConnectionManager();
+                var modelFactory = CreateModelServiceFactory();
                 var repositoryModel = CreateRepositoryModel();
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
-                    repositoryHosts,
+                    connectionManager,
+                    modelFactory,
                     new FakeTeamExplorerServiceHolder(repositoryModel));
 
-                var modelService = repositoryHosts.LookupHost(HostAddress.Create(repositoryModel.CloneUrl)).ModelService;
+                var modelService = modelFactory.CreateBlocking(connectionManager.Connections[0]);
                 modelService.Received(1).GetPullRequest("fork", "repo", 15);
             }
         }
@@ -62,7 +65,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 Assert.NotNull(target.CurrentSession);
@@ -78,7 +82,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 Assert.Null(target.CurrentSession);
@@ -92,7 +97,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     teService);
 
                 var session = target.CurrentSession;
@@ -110,7 +116,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     teService);
 
                 var session = target.CurrentSession;
@@ -127,7 +134,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     teService);
 
                 var session = target.CurrentSession;
@@ -144,7 +152,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     teService);
 
                 teService.ActiveRepo = null;
@@ -158,7 +167,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService("this-owner"),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 Assert.Equal("this-owner", target.CurrentSession.RepositoryOwner);
@@ -177,7 +187,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -192,7 +203,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -207,7 +219,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(true),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -234,7 +247,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     sessionService,
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -251,7 +265,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     sessionService,
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 sessionService.BuildCommentThreads(
@@ -279,7 +294,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     sessionService,
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 sessionService.BuildCommentThreads(
@@ -304,7 +320,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     teHolder);
 
                 sessionService.BuildCommentThreads(
@@ -347,7 +364,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     sessionService,
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 sessionService.BuildCommentThreads(
@@ -389,7 +407,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     sessionService,
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -409,15 +428,18 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.NotNull(file.ToDispose);
+                var compositeDisposable = file.ToDispose as CompositeDisposable;
+                Assert.NotNull(compositeDisposable);
+                Assert.False(compositeDisposable.IsDisposed);
 
                 textView.Closed += Raise.Event();
 
-                Assert.Null(file.ToDispose);
+                Assert.True(compositeDisposable.IsDisposed);
             }
 
             [Fact]
@@ -450,7 +472,8 @@ Line 4";
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
                         CreateRealSessionService(diff: diffService),
-                        CreateRepositoryHosts(pullRequest),
+                        CreateConnectionManager(),
+                        CreateModelServiceFactory(pullRequest),
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -495,7 +518,8 @@ Line 4";
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
                         CreateRealSessionService(diff: diffService),
-                        CreateRepositoryHosts(pullRequest),
+                        CreateConnectionManager(),
+                        CreateModelServiceFactory(pullRequest),
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -509,7 +533,13 @@ Line 4";
 
                     Assert.Equal(1, file.InlineCommentThreads.Count);
                     Assert.Equal(4, file.InlineCommentThreads[0].LineNumber);
-                    Assert.Equal(new[] { 2, 4 }, linesChanged.ToArray());
+                    Assert.Equal(
+                        new[]
+                        {
+                            Tuple.Create(2, DiffSide.Right),
+                            Tuple.Create(4, DiffSide.Right),
+                        },
+                        linesChanged.ToArray());
                 }
             }
 
@@ -548,7 +578,8 @@ Line 4";
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
                         CreateRealSessionService(diff: diffService),
-                        CreateRepositoryHosts(pullRequest),
+                        CreateConnectionManager(),
+                        CreateModelServiceFactory(pullRequest),
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -602,7 +633,8 @@ Line 4";
                     var target = new PullRequestSessionManager(
                         CreatePullRequestService(),
                         CreateRealSessionService(diff: diffService),
-                        CreateRepositoryHosts(pullRequest),
+                        CreateConnectionManager(),
+                        CreateModelServiceFactory(pullRequest),
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -632,7 +664,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     sessionService,
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
@@ -642,6 +675,37 @@ Line 4";
                 SignalTextChanged(textView.TextBuffer);
 
                 Assert.Null(file.CommitSha);
+            }
+
+            [Fact]
+            public async Task UpdatingCurrentSessionPullRequestTriggersLinesChanged()
+            {
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var expectedLineNumber = 2;
+                var threads = new[]
+                {
+                    CreateInlineCommentThreadModel(expectedLineNumber),
+                };
+
+                sessionService.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(threads);
+
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    sessionService,
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
+                    new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var raised = false;
+                var pullRequest = target.CurrentSession.PullRequest;
+
+                file.LinesChanged.Subscribe(x => raised = x.Count == 1 && x[0].Item1 == expectedLineNumber);
+
+                // LinesChanged should be raised even if the IPullRequestModel is the same.
+                await target.CurrentSession.Update(target.CurrentSession.PullRequest);
+
+                Assert.True(raised);
             }
 
             static IPullRequestReviewCommentModel CreateComment(
@@ -741,7 +805,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber);
@@ -757,7 +822,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
@@ -774,7 +840,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber, "https://github.com/fork/repo");
@@ -791,7 +858,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
@@ -809,7 +877,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 Func<Task> run = async () =>
@@ -841,7 +910,8 @@ Line 4";
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
-                    CreateRepositoryHosts(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
                 Assert.Null(target.CurrentSession);
@@ -877,7 +947,18 @@ Line 4";
             return result;
         }
 
-        IRepositoryHosts CreateRepositoryHosts(IPullRequestModel pullRequest = null)
+        IConnectionManager CreateConnectionManager()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.HostAddress.Returns(HostAddress.Create("https://github.com"));
+            connection.IsLoggedIn.Returns(true);
+
+            var result = Substitute.For<IConnectionManager>();
+            result.GetConnection(connection.HostAddress).Returns(connection);
+            return result;
+        }
+
+        IModelServiceFactory CreateModelServiceFactory(IPullRequestModel pullRequest = null)
         {
             var modelService = Substitute.For<IModelService>();
             modelService.GetPullRequest(null, null, 0).ReturnsForAnyArgs(x =>
@@ -887,12 +968,10 @@ Line 4";
                 return Observable.Return(pr);
             });
 
-            var repositoryHost = Substitute.For<IRepositoryHost>();
-            repositoryHost.ModelService.Returns(modelService);
-
-            var result = Substitute.For<IRepositoryHosts>();
-            result.LookupHost(null).ReturnsForAnyArgs(repositoryHost);
-            return result;
+            var factory = Substitute.For<IModelServiceFactory>();
+            factory.CreateAsync(null).ReturnsForAnyArgs(modelService);
+            factory.CreateBlocking(null).ReturnsForAnyArgs(modelService);
+            return factory;
         }
 
         ILocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)

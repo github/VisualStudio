@@ -4,7 +4,8 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
-using NLog;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Caches
 {
@@ -16,7 +17,7 @@ namespace GitHub.Caches
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<SharedCache>();
 
         static SharedCache()
         {
@@ -26,37 +27,22 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                log.Error("Error while running the static inializer for SharedCache", e);
+                log.Error(e, "Error while running the static inializer for SharedCache");
             }
         }
 
-        public SharedCache() : this(null, null, null)
+        public SharedCache() : this(null, null)
         {
         }
 
-        protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache, ISecureBlobCache secureCache)
+        protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache)
         {
-            if (secureCache == null)
-            {
-                try
-                {
-                    BlobCache.Secure = new CredentialCache();
-                    secureCache = BlobCache.Secure;
-                }
-                catch (Exception e)
-                {
-                    log.Error("Failed to set up secure cache.", e);
-                    secureCache = new InMemoryBlobCache();
-                }
-            }
             UserAccount = userAccountCache ?? GetBlobCacheWithFallback(() => BlobCache.UserAccount, "UserAccount");
             LocalMachine = localMachineCache ?? GetBlobCacheWithFallback(() => BlobCache.LocalMachine, "LocalMachine");
-            Secure = secureCache;
         }
 
         public IBlobCache UserAccount { get; private set; }
         public IBlobCache LocalMachine { get; private set; }
-        public ISecureBlobCache Secure { get; private set; }
 
         public IObservable<Uri> GetEnterpriseHostUri()
         {
@@ -84,8 +70,6 @@ namespace GitHub.Caches
                 UserAccount.Shutdown.Wait();
                 LocalMachine.Dispose();
                 LocalMachine.Shutdown.Wait();
-                Secure.Dispose();
-                Secure.Shutdown.Wait();
                 disposed = true;
             }
         }
@@ -104,7 +88,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                log.Error(string.Format(CultureInfo.InvariantCulture, "Failed to set the {0} cache.", cacheName), e);
+                log.Error(e, "Failed to set the {CacheName} cache", cacheName);
                 return new InMemoryBlobCache();
             }
         }
