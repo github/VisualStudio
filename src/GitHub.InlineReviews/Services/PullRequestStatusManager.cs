@@ -11,12 +11,15 @@ using GitHub.Services;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using GitHub.Models;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.InlineReviews.Services
 {
     [Export(typeof(IPullRequestStatusManager))]
     public class PullRequestStatusManager : IPullRequestStatusManager
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestStatusManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
         readonly SVsServiceProvider serviceProvider;
@@ -131,12 +134,16 @@ namespace GitHub.InlineReviews.Services
                 }
                 catch (Exception e)
                 {
-                    VsOutputLogger.WriteLine("Couldn't raise {0}: {1}", nameof(PkgCmdIDList.openPullRequestsCommand), e);
+                    log.Error(e, "Couldn't raise {Guid}:{ID}", guid, id);
                     System.Diagnostics.Trace.WriteLine(e);
                 }
             }
 
-            public event EventHandler CanExecuteChanged;
+            public event EventHandler CanExecuteChanged
+            {
+                add { }
+                remove { }
+            }
         }
     }
 }
