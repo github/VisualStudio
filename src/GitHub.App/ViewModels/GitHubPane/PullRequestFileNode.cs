@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Models;
 using ReactiveUI;
@@ -21,12 +22,16 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
+        /// <param name="oldPath">
+        /// The old path of a moved/renamed file, relative to the repository. Should be null if the
+        /// file was not moved/renamed.
+        /// </param>
         public PullRequestFileNode(
             string repositoryPath,
             string path,
             string sha,
             PullRequestFileStatus status,
-            string statusDisplay)
+            string oldPath)
         {
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
             Guard.ArgumentNotEmptyString(path, nameof(path));
@@ -34,10 +39,26 @@ namespace GitHub.ViewModels.GitHubPane
 
             FileName = Path.GetFileName(path);
             DirectoryPath = Path.GetDirectoryName(path);
-            DisplayPath = Path.Combine(Path.GetFileName(repositoryPath), DirectoryPath);
             Sha = sha;
             Status = status;
-            StatusDisplay = statusDisplay;
+            OldPath = oldPath;
+
+            if (status == PullRequestFileStatus.Added)
+            {
+                StatusDisplay = Resources.AddedFileStatus;
+            }
+            else if (status == PullRequestFileStatus.Renamed)
+            {
+                if (oldPath != null)
+                {
+                    StatusDisplay = Path.GetDirectoryName(oldPath) == Path.GetDirectoryName(path) ?
+                            Path.GetFileName(oldPath) : oldPath;
+                }
+                else
+                {
+                    StatusDisplay = Resources.RenamedFileStatus;
+                }
+            }
         }
 
         /// <summary>
@@ -51,9 +72,9 @@ namespace GitHub.ViewModels.GitHubPane
         public string DirectoryPath { get; }
 
         /// <summary>
-        /// Gets the path to display in the "Path" column of the changed files list.
+        /// Gets the old path of a moved/renamed file, relative to the root of the repository.
         /// </summary>
-        public string DisplayPath { get; }
+        public string OldPath { get; }
 
         /// <summary>
         /// Gets the SHA of the file.
