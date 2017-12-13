@@ -1,22 +1,19 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Windows.Input;
+using GitHub.Api;
+using GitHub.Extensions;
+using GitHub.Info;
+using GitHub.Primitives;
+using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
+using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using GitHub.Services;
-using GitHub.Api;
-using GitHub.Primitives;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using GitHub.Extensions;
-using System.Windows.Input;
-using ReactiveUI;
-using GitHub.VisualStudio.UI;
-using GitHub.Settings;
-using System.Windows.Threading;
-using GitHub.Info;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -51,8 +48,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             this.settings = settings;
             this.usageTracker = usageTracker;
 
-            var openOnGitHub = ReactiveCommand.Create();
-            openOnGitHub.Subscribe(_ => DoOpenOnGitHub());
+            var openOnGitHub = new RelayCommand(_ => DoOpenOnGitHub());
             OpenOnGitHub = openOnGitHub;
         }
 
