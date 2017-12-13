@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Disposables;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Exports;
@@ -89,11 +88,11 @@ namespace GitHub.VisualStudio
         }
 
         static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
-        CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProviderPackage asyncServiceProvider;
         readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         readonly Version currentVersion;
+        List<IDisposable> disposables = new List<IDisposable>();
         bool initialized = false;
 
         public ExportProvider ExportProvider { get; private set; }
@@ -290,7 +289,13 @@ namespace GitHub.VisualStudio
                 if (disposed) return;
 
                 if (disposables != null)
-                    disposables.Dispose();
+                {
+                    foreach (var disposable in disposables)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+
                 disposables = null;
                 if (tempContainer != null)
                     tempContainer.Dispose();
