@@ -32,7 +32,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         readonly ITeamExplorerServices teamExplorerServices;
         readonly IPackageSettings settings;
         readonly IUsageTracker usageTracker;
-        readonly IDialogService dialogService;
 
         [ImportingConstructor]
         public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
@@ -41,8 +40,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             IVisualStudioBrowser visualStudioBrowser,
             ITeamExplorerServices teamExplorerServices,
             IPackageSettings settings,
-            IUsageTracker usageTracker,
-            IDialogService dialogService)
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
@@ -52,7 +50,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             this.teamExplorerServices = teamExplorerServices;
             this.settings = settings;
             this.usageTracker = usageTracker;
-            this.dialogService = dialogService;
 
             var openOnGitHub = ReactiveCommand.Create();
             openOnGitHub.Subscribe(_ => DoOpenOnGitHub());
@@ -118,6 +115,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         public void Login()
         {
+            var dialogService = ServiceProvider.GetService<IDialogService>();
             dialogService.ShowLoginDialog();
         }
 
