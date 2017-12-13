@@ -370,7 +370,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 Connection = await connectionManager.GetConnection(hostAddress);
 
-                if (Connection != null)
+                if (Connection?.IsLoggedIn == true)
                 {
                     navigator.Clear();
                     Content = navigator;
