@@ -123,12 +123,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             try
             {
-                var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var rightPath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var leftPath = file.OldPath ?? rightPath;
                 var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true);
                 var leftFile = await ViewModel.ExtractFile(file, false);
-                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
-                var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
-                var rightLabel = workingDirectory ? relativePath : $"{relativePath};PR {ViewModel.Model.Number}";
+                var leftLabel = $"{leftPath};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
@@ -161,11 +161,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
                 var session = ViewModel.Session;
-                AddBufferTag(diffViewer.LeftView.TextBuffer, session, relativePath, DiffSide.Left);
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, DiffSide.Left);
 
                 if (!workingDirectory)
                 {
-                    AddBufferTag(diffViewer.RightView.TextBuffer, session, relativePath, DiffSide.Right);
+                    AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
                 }
 
                 if (workingDirectory)
