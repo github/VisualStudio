@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -211,11 +212,10 @@ namespace GitHub.VisualStudio
             {
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var keychain = serviceProvider.GetService<IKeychain>();
-                var twoFaHandler = serviceProvider.GetService<ITwoFactorChallengeHandler>();
 
                 return new LoginManager(
                     keychain,
-                    twoFaHandler,
+                    new Lazy<ITwoFactorChallengeHandler>(() => serviceProvider.GetService<ITwoFactorChallengeHandler>()),
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
                     ApiClientConfiguration.AuthorizationNote,
