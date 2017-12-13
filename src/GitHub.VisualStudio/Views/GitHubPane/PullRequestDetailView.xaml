@@ -317,9 +317,13 @@
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding Status}" Value="Removed"/>
+                                                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Path=IsSelected}" Value="False"/>
+                                                                </MultiDataTrigger.Conditions>
                                                                 <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
-                                                            </DataTrigger>
+                                                            </MultiDataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </ui:OcticonImage.Style>
@@ -329,9 +333,15 @@
                                                     <Style TargetType="TextBlock">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}" Value="Removed">
-                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
                                                                 <Setter Property="TextDecorations" Value="Strikethrough"/>
                                                             </DataTrigger>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding Status}" Value="Removed"/>
+                                                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Path=IsSelected}" Value="False"/>
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
+                                                            </MultiDataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </TextBlock.Style>
