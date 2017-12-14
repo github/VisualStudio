@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -227,32 +228,356 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        static Repository CreateRepository(TempDirectory tempDirectory)
+        [Fact] // WorkDirModified
+        public async Task ChangedSubmodule_True()
         {
-            var repoDir = tempDirectory.Directory.FullName;
-            return new Repository(Repository.Init(repoDir));
-        }
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Add submodule", Author, Author);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Update submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
 
-        static IPullRequestService CreatePullRequestService(Repository repo)
-        {
-            var repoDir = repo.Info.WorkingDirectory;
-            var serviceProvider = Substitutes.ServiceProvider;
-            var gitService = serviceProvider.GetGitService();
-            gitService.GetRepository(repoDir).Returns(repo);
-            var service = new PullRequestService(Substitute.For<IGitClient>(), gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
-            return service;
-        }
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-        static ILocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
-        {
-            var repoDir = repo.Info.WorkingDirectory;
-            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
-            repositoryModel.LocalPath.Returns(repoDir);
-            return repositoryModel;
+                Assert.True(isClean);
+            }
         }
-
-        static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
     }
+
+    public class TheIsSyncSubmodulesRequiredMethod
+    {
+        [Fact] // WorkDirDeleted
+        public async Task CommittedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit($"Add submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.True(isRequired);
+            }
+        }
+
+        [Fact] // WorkDirUninitialized
+        public async Task UninitializedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                var subPath = "sub/path";
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", subPath, subRepo);
+                repo.Commit($"Add submodule", Author, Author);
+                var subDir = Path.Combine(repo.Info.WorkingDirectory, subPath);
+                Directory.CreateDirectory(subDir);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.True(isRequired);
+            }
+        }
+
+        [Fact] // WorkDirModified
+        public async Task ChangedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Add submodule", Author, Author);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Update submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.True(isRequired);
+            }
+        }
+
+        // TODO: Find out when `SubmoduleStatus.WorkDirAdded` is used.
+
+        [Fact]
+        public async Task UpdatedSubmodule_False()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit($"Add submodule", Author, Author);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task NewRepo_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task UntrackedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
+                File.WriteAllText(file, "contents");
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task CommitFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, file);
+                repo.Commit("foo", Author, Author);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task AddedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task ModifiedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task StagedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
+                Commands.Stage(repo, path);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task MissingFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Delete(file);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task RemovedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Delete(file);
+                Commands.Stage(repo, path);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task RenamedInIndexFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var renamedPath = "renamed.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                var renamedFile = Path.Combine(repo.Info.WorkingDirectory, renamedPath);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Move(file, renamedFile);
+                Commands.Stage(repo, path);
+                Commands.Stage(repo, renamedPath);
+
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+
+        [Fact]
+        public async Task RenamedInWorkingDirFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var renamedPath = "renamed.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                var renamedFile = Path.Combine(repo.Info.WorkingDirectory, renamedPath);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Move(file, renamedFile);
+
+                // NOTE: `RetrieveStatus(new StatusOptions { DetectRenamesInWorkDir = true })` would need to be used
+                // for renamed files to appear as `RenamedInWorkingDir` rather than `Missing` and `Untracked`.
+                // This isn't required in the current implementation.
+                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+
+                Assert.False(isRequired);
+            }
+        }
+    }
+
+    protected static Repository CreateRepository(TempDirectory tempDirectory)
+    {
+        var repoDir = tempDirectory.Directory.FullName;
+        return new Repository(Repository.Init(repoDir));
+    }
+
+    static PullRequestService CreatePullRequestService(Repository repo)
+    {
+        var repoDir = repo.Info.WorkingDirectory;
+        var serviceProvider = Substitutes.ServiceProvider;
+        var gitService = serviceProvider.GetGitService();
+        gitService.GetRepository(repoDir).Returns(repo);
+        var service = new PullRequestService(Substitute.For<IGitClient>(), gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        return service;
+    }
+
+    static ILocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
+    {
+        var repoDir = repo.Info.WorkingDirectory;
+        var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+        repositoryModel.LocalPath.Returns(repoDir);
+        return repositoryModel;
+    }
+
+    static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
 
     public class TheExtractFileMethod
     {

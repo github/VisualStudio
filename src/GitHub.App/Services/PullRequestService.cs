@@ -104,13 +104,47 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<bool> IsSyncSubmodulesRequired(ILocalRepositoryModel repository)
+        {
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                foreach (var submodule in repo.Submodules)
+                {
+                    var status = submodule.RetrieveStatus();
+
+                    if ((status & SubmoduleStatus.WorkDirAdded) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirDeleted) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirModified) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+
+                    if ((status & SubmoduleStatus.WorkDirUninitialized) != 0)
+                    {
+                        return Observable.Return(true);
+                    }
+                }
+
+                return Observable.Return(false);
+            }
+        }
+
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
             // The `using` appears to resolve this issue:
             // https://github.com/github/VisualStudio/issues/1306
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
-                var isClean = !IsFilthy(repo.RetrieveStatus());
+                var statusOptions = new StatusOptions { ExcludeSubmodules = true };
+                var isClean = !IsFilthy(repo.RetrieveStatus(statusOptions));
                 return Observable.Return(isClean);
             }
         }
@@ -153,6 +187,55 @@ namespace GitHub.Services
                     return Observable.Return(Unit.Default);
                 }
             });
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201", Justification = "Prototype")]
+        public IObservable<Unit> SyncSubmodules(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(async () =>
+            {
+                var output = new StringWriter(CultureInfo.InvariantCulture);
+                var exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
+                if (exitCode != 0)
+                {
+                    var ex = new ApplicationException(output.ToString());
+                    return Observable.Throw<Unit>(ex);
+                }
+
+                return Observable.Return(Unit.Default);
+            });
+        }
+
+        // HACK: This is just a prototype!
+        async Task<int> SyncSubmodules(string workingDir, Action<string> progress = null)
+        {
+            var cmdArguments = "/C git submodule init && git submodule sync --recursive && git submodule update --recursive";
+            var startInfo = new ProcessStartInfo("cmd", cmdArguments)
+            {
+                WorkingDirectory = workingDir,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            using (var process = Process.Start(startInfo))
+            {
+                await Task.WhenAll(
+                    ReadLinesAsync(process.StandardOutput, progress),
+                    ReadLinesAsync(process.StandardError, progress));
+                process.WaitForExit();
+                return process.ExitCode;
+            }
+        }
+
+        static async Task ReadLinesAsync(TextReader reader, Action<string> progress)
+        {
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                progress?.Invoke(line);
+            }
         }
 
         public IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName)
