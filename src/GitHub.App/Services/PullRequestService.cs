@@ -189,17 +189,25 @@ namespace GitHub.Services
             });
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201", Justification = "Prototype")]
         public IObservable<Unit> SyncSubmodules(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
-                await SyncSubmodules(repository.LocalPath);
+                var output = new StringWriter(CultureInfo.InvariantCulture);
+                var exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
+                if (exitCode != 0)
+                {
+                    var ex = new ApplicationException(output.ToString());
+                    return Observable.Throw<Unit>(ex);
+                }
+
                 return Observable.Return(Unit.Default);
             });
         }
 
         // HACK: This is just a prototype!
-        async Task SyncSubmodules(string workingDir, Action<string> progress = null)
+        async Task<int> SyncSubmodules(string workingDir, Action<string> progress = null)
         {
             var cmdArguments = "/C git submodule init && git submodule sync --recursive && git submodule update --recursive";
             var startInfo = new ProcessStartInfo("cmd", cmdArguments)
@@ -207,18 +215,26 @@ namespace GitHub.Services
                 WorkingDirectory = workingDir,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
 
             using (var process = Process.Start(startInfo))
             {
-                var outputReader = process.StandardOutput;
+                await Task.WhenAll(
+                    ReadLinesAsync(process.StandardOutput, progress),
+                    ReadLinesAsync(process.StandardError, progress));
+                process.WaitForExit();
+                return process.ExitCode;
+            }
+        }
 
-                string line;
-                while ((line = await outputReader.ReadLineAsync()) != null)
-                {
-                    progress?.Invoke(line);
-                }
+        static async Task ReadLinesAsync(TextReader reader, Action<string> progress)
+        {
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                progress?.Invoke(line);
             }
         }
 
