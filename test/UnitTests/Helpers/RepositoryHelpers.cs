@@ -1,7 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -28,32 +27,21 @@ public static class RepositoryHelpers
         repo.Commit("message", author, author);
     }
 
-    public static void AddSubmodule(Repository repo, string name, string path, string urlOrRelativePath)
+    public static void AddSubmodule(Repository repo, string name, string path, Repository subRepo)
     {
-        var arguments = $"submodule add --name {name} {urlOrRelativePath} {path}";
-        Execute("git", arguments, repo.Info.WorkingDirectory, Console.WriteLine);
-    }
-
-    static void Execute(string command, string arguments, string workingDir, Action<string> progress = null)
-    {
-        var startInfo = new ProcessStartInfo(command, arguments)
+        var modulesPath = ".gitmodules";
+        var modulesFile = Path.Combine(repo.Info.WorkingDirectory, modulesPath);
+        if (!File.Exists(modulesFile))
         {
-            WorkingDirectory = workingDir,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-
-        using (var process = Process.Start(startInfo))
-        {
-            var outputReader = process.StandardOutput;
-
-            string line;
-            while ((line = outputReader.ReadLine()) != null)
-            {
-                progress?.Invoke(line);
-            }
+            File.WriteAllText(modulesFile, "");
         }
+
+        var modulesConfig = Configuration.BuildFrom(modulesFile);
+        modulesConfig.Set($"submodule.{name}.path", path, ConfigurationLevel.Local);
+        modulesConfig.Set($"submodule.{name}.url", subRepo.Info.WorkingDirectory, ConfigurationLevel.Local);
+        Commands.Stage(repo, modulesPath);
+
+        AddGitLinkToTheIndex(repo.Index, path, subRepo.Head.Tip.Sha);
     }
 
     public static void AddGitLinkToTheIndex(Index index, string path, string sha)
