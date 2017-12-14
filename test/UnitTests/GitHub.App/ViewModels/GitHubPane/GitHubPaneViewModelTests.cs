@@ -94,7 +94,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
         {
             var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
-            var target = CreateTarget(teServiceHolder: te);
+            var cm = CreateConnectionManager("https://github.com");
+            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -105,7 +106,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
         {
             var te = CreateTeamExplorerServiceHolder(ValidEnterpriseRepo);
-            var target = CreateTarget(teServiceHolder: te);
+            var cm = CreateConnectionManager("https://enterprise.com");
+            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -249,6 +251,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         var hostAddress = HostAddress.Create(address);
         var connections = (ObservableCollectionEx<IConnection>)connectionManager.Connections;
         connection.HostAddress.Returns(hostAddress);
+        connection.IsLoggedIn.Returns(true);
         connectionManager.GetConnection(hostAddress).Returns(connection);
         connections.Add(connection);
     }
