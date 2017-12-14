@@ -201,14 +201,8 @@ namespace GitHub.Services
         // HACK: This is just a prototype!
         async Task SyncSubmodules(string workingDir, Action<string> progress = null)
         {
-            var script =
-@"git submodule init
-git submodule sync --recursive
-git submodule update --recursive";
-            var scriptFile = Path.Combine(Path.GetTempPath(), "SyncSubmodules.cmd");
-            File.WriteAllText(scriptFile, script);
-
-            var startInfo = new ProcessStartInfo(scriptFile)
+            var cmdArguments = "/C git submodule init && git submodule sync --recursive && git submodule update --recursive";
+            var startInfo = new ProcessStartInfo("cmd", cmdArguments)
             {
                 WorkingDirectory = workingDir,
                 UseShellExecute = false,
