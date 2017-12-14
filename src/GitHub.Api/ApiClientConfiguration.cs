@@ -49,7 +49,10 @@ namespace GitHub.Api
         {
             get
             {
-                return GetSha256Hash(Info.ApplicationInfo.ApplicationDescription + ":" + GetMachineIdentifier());
+                return GetSha256Hash(
+                    Info.ApplicationInfo.ApplicationDescription + ":" +
+                    GetMachineIdentifier() + ":" +
+                    GetMachineNameSafe());
             }
         }
 
