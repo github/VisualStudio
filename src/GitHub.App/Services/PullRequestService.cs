@@ -193,12 +193,39 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                using (var repo = gitService.GetRepository(repository.LocalPath))
-                {
-                    await gitClient.SyncSubmodules(repo);
-                    return Observable.Return(Unit.Default);
-                }
+                await SyncSubmodules(repository.LocalPath);
+                return Observable.Return(Unit.Default);
             });
+        }
+
+        // HACK: This is just a prototype!
+        async Task SyncSubmodules(string workingDir, Action<string> progress = null)
+        {
+            var script =
+@"git submodule init
+git submodule sync --recursive
+git submodule update --recursive";
+            var scriptFile = Path.Combine(Path.GetTempPath(), "SyncSubmodules.cmd");
+            File.WriteAllText(scriptFile, script);
+
+            var startInfo = new ProcessStartInfo(scriptFile)
+            {
+                WorkingDirectory = workingDir,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
+            };
+
+            using (var process = Process.Start(startInfo))
+            {
+                var outputReader = process.StandardOutput;
+
+                string line;
+                while ((line = await outputReader.ReadLineAsync()) != null)
+                {
+                    progress?.Invoke(line);
+                }
+            }
         }
 
         public IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName)

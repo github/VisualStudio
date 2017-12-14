@@ -26,13 +26,6 @@ namespace GitHub.Services
         Task Push(IRepository repository, string branchName, string remoteName);
 
         /// <summary>
-        /// Sync submodules for the current branch.
-        /// </summary>
-        /// <param name="repository">The repository to sync</param>
-        /// <returns></returns>
-        Task SyncSubmodules(IRepository repository, Action<string> progress = null);
-
-        /// <summary>
         /// Fetches the remote.
         /// </summary>
         /// <param name="repository">The repository to pull</param>
