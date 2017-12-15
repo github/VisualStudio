@@ -21,28 +21,42 @@ namespace GitHub.TeamFoundation
 
         internal static IEnumerable<ILocalRepositoryModel> PokeTheRegistryForRepositoryList()
         {
-            using (var key = OpenGitKey("Repositories"))
+            var key = OpenGitKey("Repositories");
+
+            if (key != null)
             {
-                return key.GetSubKeyNames().Select(x =>
+                using (key)
                 {
-                    using (var subkey = key.OpenSubKey(x))
+                    return key.GetSubKeyNames().Select(x =>
                     {
-                        try
+                        var subkey = key.OpenSubKey(x);
+
+                        if (subkey != null)
                         {
-                            var path = subkey?.GetValue("Path") as string;
-                            if (path != null && Directory.Exists(path))
-                                return new LocalRepositoryModel(path);
+                            using (subkey)
+                            {
+                                try
+                                {
+                                    var path = subkey?.GetValue("Path") as string;
+                                    if (path != null && Directory.Exists(path))
+                                        return new LocalRepositoryModel(path);
+                                }
+                                catch (Exception)
+                                {
+                                    // no sense spamming the log, the registry might have ton of stale things we don't care about
+                                }
+
+                            }
                         }
-                        catch (Exception)
-                        {
-                            // no sense spamming the log, the registry might have ton of stale things we don't care about
-                        }
+
                         return null;
-                    }
-                })
-                .Where(x => x != null)
-                .ToList();
+                    })
+                    .Where(x => x != null)
+                    .ToList();
+                }
             }
+
+            return new ILocalRepositoryModel[0];
         }
 
         internal static string PokeTheRegistryForLocalClonePath()

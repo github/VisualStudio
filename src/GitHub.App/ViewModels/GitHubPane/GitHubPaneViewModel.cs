@@ -370,7 +370,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 Connection = await connectionManager.GetConnection(hostAddress);
 
-                if (Connection != null)
+                if (Connection?.IsLoggedIn == true)
                 {
                     navigator.Clear();
                     Content = navigator;
@@ -402,8 +402,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         static Regex CreateRoute(string route)
         {
-            // Build RegEx from route (:foo to named group (?<foo>[a-z0-9]+)).
-            var routeFormat = new Regex("(:([a-z]+))\\b").Replace(route, "(?<$2>[a-z0-9]+)");
+            // Build RegEx from route (:foo to named group (?<foo>[\w_.-]+)).
+            var routeFormat = new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)");
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
     }
