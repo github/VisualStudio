@@ -27,7 +27,7 @@ namespace GitHub.VisualStudio.UI
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            var browser = Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>();
+            var browser = VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>();
             browser?.OpenUrl(e.Uri);
         }
     }

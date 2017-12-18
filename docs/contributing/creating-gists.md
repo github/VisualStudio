@@ -2,7 +2,7 @@
 
 GitHub for Visual Studio enables easy creation of gists directly from the Visual Studio Editor.
 
-1. [Sign in](authenticating-to-github) to GitHub.
+1. [Sign in](../getting-started/authenticating-to-github.md) to GitHub.
 
 2. Open a file in the Visual Studio text editor.
 

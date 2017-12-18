@@ -47,5 +47,10 @@ namespace GitHub.Services
         {
             return inner.Logout(hostAddress, client);
         }
+
+        public Task<User> LoginWithToken(HostAddress hostAddress, IGitHubClient client, string token)
+        {
+            return inner.LoginWithToken(hostAddress, client, token);
+        }
     }
 }

@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Menus
                 Clipboard.SetText(link);
                 var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
-                await UsageTracker.IncrementLinkToGitHubCount();
+                await UsageTracker.IncrementCounter(x => x.NumberOfLinkToGitHub);
             }
             catch
             {

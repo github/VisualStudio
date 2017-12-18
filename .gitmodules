@@ -13,6 +13,3 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
-[submodule "submodules/Rothko"]
-	path = submodules/Rothko
-	url = https://github.com/editor-tools/Rothko.git

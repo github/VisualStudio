@@ -14,7 +14,7 @@ namespace GitHub.Api
         public HostAddress HostAddress { get; }
         public UriString OriginalUrl { get; }
 
-        readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
+        readonly Lazy<IEnterpriseProbe> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);
 
@@ -24,7 +24,7 @@ namespace GitHub.Api
         bool? hasWiki;
 
         public SimpleApiClient(UriString repoUrl, IGitHubClient githubClient,
-            Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
+            Lazy<IEnterpriseProbe> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
             Guard.ArgumentNotNull(repoUrl, nameof(repoUrl));
             Guard.ArgumentNotNull(githubClient, nameof(githubClient));
@@ -127,14 +127,17 @@ namespace GitHub.Api
 
         async Task<bool> IsEnterpriseInternal()
         {
+            if (HostAddress == HostAddress.GitHubDotComHostAddress)
+                return false;
+
             var probe = enterpriseProbe.Value;
             Debug.Assert(probe != null, "Lazy<Enterprise> probe is not set, something is wrong.");
 #if !DEBUG
             if (probe == null)
                 return false;
 #endif
-            var ret = await probe.ProbeAsync(HostAddress.WebUri);
-            return (ret == Services.EnterpriseProbeResult.Ok);
+            var ret = await probe.Probe(HostAddress.WebUri);
+            return (ret == EnterpriseProbeResult.Ok);
         }
     }
 }

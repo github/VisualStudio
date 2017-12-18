@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" />
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
   <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
   <PropertyGroup>
@@ -12,6 +12,8 @@
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -107,8 +109,8 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
-    <Reference Include="LibGit2Sharp, Version=0.24.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LibGit2Sharp.0.24.0\lib\net40\LibGit2Sharp.dll</HintPath>
+    <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Markdig, Version=0.13.0.0, Culture=neutral, PublicKeyToken=870da25a133885f8, processorArchitecture=MSIL">
@@ -237,6 +239,10 @@
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
@@ -317,7 +323,8 @@
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
     <Compile Include="Services\LocalRepositories.cs" />
-    <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="Services\ShowDialogService.cs" />
+    <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="Services\LoginManagerDispatcher.cs" />
     <Compile Include="Services\UsageTrackerDispatcher.cs" />
@@ -338,55 +345,56 @@
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
-      <DependentUpon>GistCreationControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\StartPageCloneView.xaml.cs">
-      <DependentUpon>StartPageCloneView.xaml</DependentUpon>
+    <Compile Include="Views\ContentView.cs" />
+    <Compile Include="Views\Dialog\GistCreationView.xaml.cs">
+      <DependentUpon>GistCreationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
-      <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\GitHubDialogWindow.xaml.cs">
+      <DependentUpon>GitHubDialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryCreationControl.xaml.cs">
-      <DependentUpon>RepositoryCreationControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\LoginCredentialsView.xaml.cs">
+      <DependentUpon>LoginCredentialsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
-      <DependentUpon>LoginControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\Login2FaView.xaml.cs">
+      <DependentUpon>Login2FaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryPublishControl.xaml.cs">
-      <DependentUpon>RepositoryPublishControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryCloneView.xaml.cs">
+      <DependentUpon>RepositoryCloneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\TwoFactorControl.xaml.cs">
-      <DependentUpon>TwoFactorControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryCreationView.xaml.cs">
+      <DependentUpon>RepositoryCreationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
-      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
+      <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
-    <Compile Include="UI\Views\NotAGitRepositoryView.xaml.cs">
-      <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\NotAGitHubRepositoryView.xaml.cs">
-      <DependentUpon>NotAGitHubRepositoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\LoggedOutView.xaml.cs">
+    <Compile Include="Views\GitHubPane\LoggedOutView.xaml.cs">
       <DependentUpon>LoggedOutView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestCreationView.xaml.cs">
-      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
+      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestDetailView.xaml.cs">
-      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\PullRequestListView.xaml.cs">
+    <Compile Include="Views\GitHubPane\PullRequestListView.xaml.cs">
       <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\WindowController.xaml.cs">
-      <DependentUpon>WindowController.xaml</DependentUpon>
+    <Compile Include="Views\GitHubPane\PullRequestDetailView.xaml.cs">
+      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestCreationView.xaml.cs">
+      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\NotAGitHubRepositoryView.xaml.cs">
+      <DependentUpon>NotAGitHubRepositoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\NotAGitRepositoryView.xaml.cs">
+      <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
+      <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ViewLocator.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
@@ -414,9 +422,6 @@
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
       <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
     </Content>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -482,74 +487,74 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\StartPageCloneView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\Settings\OptionsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
-    <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCreationControl.xaml">
+    <Page Include="Views\Dialog\GistCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\Controls\LoginControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryPublishControl.xaml">
+    <Page Include="Views\Dialog\GitHubDialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\Controls\TwoFactorControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>
-      </SubType>
-    </Page>
-    <Page Include="UI\Views\GitHubPaneView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\NotAGitRepositoryView.xaml">
+    <Page Include="Views\Dialog\LoginCredentialsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\NotAGitHubRepositoryView.xaml">
+    <Page Include="Views\Dialog\Login2FaView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\LoggedOutView.xaml">
+    <Page Include="Views\Dialog\RepositoryCloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\RepositoryCreationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\RepositoryRecloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\LoggedOutView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestCreationView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestDetailView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestDetailView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestListView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestCreationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\WindowController.xaml">
+    <Page Include="Views\GitHubPane\NotAGitHubRepositoryView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\NotAGitRepositoryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestListItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TeamExplorer\RepositoryPublishView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -594,10 +599,6 @@
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
-      <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
-      <Name>Rothko</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
@@ -731,7 +732,7 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
   </Target>
   <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" />

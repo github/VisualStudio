@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Primitives;
 using Octokit;
+using Serilog;
 
 namespace GitHub.Api
 {
@@ -13,10 +17,14 @@ namespace GitHub.Api
     /// </summary>
     public class LoginManager : ILoginManager
     {
+        const string ScopesHeader = "X-OAuth-Scopes";
+        static readonly ILogger log = LogManager.ForContext<LoginManager>();
+        static readonly Uri UserEndpoint = new Uri("user", UriKind.Relative);
         readonly IKeychain keychain;
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
+        readonly IReadOnlyList<string> scopes;
         readonly string authorizationNote;
         readonly string fingerprint;
         IOAuthCallbackListener oauthListener;
@@ -36,6 +44,7 @@ namespace GitHub.Api
             IOAuthCallbackListener oauthListener,
             string clientId,
             string clientSecret,
+            IReadOnlyList<string> scopes,
             string authorizationNote = null,
             string fingerprint = null)
         {
@@ -49,6 +58,7 @@ namespace GitHub.Api
             this.oauthListener = oauthListener;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
+            this.scopes = scopes;
             this.authorizationNote = authorizationNote;
             this.fingerprint = fingerprint;
         }
@@ -71,7 +81,7 @@ namespace GitHub.Api
 
             var newAuth = new NewAuthorization
             {
-                Scopes = ApiClientConfiguration.Scopes,
+                Scopes = scopes,
                 Note = authorizationNote,
                 Fingerprint = fingerprint,
             };
@@ -142,12 +152,37 @@ namespace GitHub.Api
         }
 
         /// <inheritdoc/>
+        public async Task<User> LoginWithToken(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            string token)
+        {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+            Guard.ArgumentNotNull(client, nameof(client));
+            Guard.ArgumentNotEmptyString(token, nameof(token));
+
+            await keychain.Save("[token]", token, hostAddress).ConfigureAwait(false);
+
+            try
+            {
+                var user = await ReadUserWithRetry(client);
+                await keychain.Save(user.Login, token, hostAddress).ConfigureAwait(false);
+                return user;
+            }
+            catch
+            {
+                await keychain.Delete(hostAddress);
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
         public Task<User> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            return client.User.Current();
+            return ReadUserWithRetry(client);
         }
 
         /// <inheritdoc/>
@@ -282,7 +317,7 @@ namespace GitHub.Api
             {
                 try
                 {
-                    return await client.User.Current().ConfigureAwait(false);
+                    return await GetUserAndCheckScopes(client).ConfigureAwait(false);
                 }
                 catch (AuthorizationException)
                 {
@@ -295,18 +330,50 @@ namespace GitHub.Api
             }
         }
 
-        static Uri GetLoginUrl(IOauthClient client, string state)
+        async Task<User> GetUserAndCheckScopes(IGitHubClient client)
+        {
+            var response = await client.Connection.Get<User>(
+                UserEndpoint, null, null).ConfigureAwait(false);
+
+            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
+            {
+                var returnedScopes = response.HttpResponse.Headers[ScopesHeader]
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .ToArray();
+
+                if (scopes.Except(returnedScopes).Count() == 0)
+                {
+                    return response.Body;
+                }
+                else
+                {
+                    log.Error("Incorrect API scopes: require {RequiredScopes} but got {Scopes}", scopes, returnedScopes);
+                }
+            }
+            else
+            {
+                log.Error("Error reading scopes: /user succeeded but scopes header was not present");
+            }
+
+            throw new IncorrectScopesException();
+        }
+
+        Uri GetLoginUrl(IOauthClient client, string state)
         {
             var request = new OauthLoginRequest(ApiClientConfiguration.ClientId);
 
             request.State = state;
 
-            foreach (var scope in ApiClientConfiguration.Scopes)
+            foreach (var scope in scopes)
             {
                 request.Scopes.Add(scope);
             }
 
-            return client.GetGitHubLoginUrl(request);
+            var uri = client.GetGitHubLoginUrl(request);
+            
+            // OauthClient.GetGitHubLoginUrl seems to give the wrong URL. Fix this.
+            return new Uri(uri.ToString().Replace("/api/v3", ""));
         }
     }
 }

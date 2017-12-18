@@ -15,8 +15,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         [ImportingConstructor]
         public EnsureLoggedInSectionSync(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, ITeamExplorerServices teServices)
-            : base(serviceProvider, apiFactory, holder, cm, teServices)
+            IConnectionManager cm, ITeamExplorerServices teServices,
+            IDialogService dialogService)
+            : base(serviceProvider, apiFactory, holder, cm, teServices, dialogService)
         {}
     }
 }

@@ -27,7 +27,6 @@ namespace GitHub.Services
     public class OAuthCallbackListener : IOAuthCallbackListener
     {
         const int CallbackPort = 42549;
-        readonly static string CallbackUrl = Invariant($"http://localhost:{CallbackPort}/");
         readonly IHttpListener httpListener;
 
         [ImportingConstructor]
@@ -38,6 +37,8 @@ namespace GitHub.Services
             this.httpListener = httpListener;
             httpListener.Prefixes.Add(CallbackUrl);
         }
+
+        public readonly static string CallbackUrl = Invariant($"http://localhost:{CallbackPort}/");
 
         public async Task<string> Listen(string id, CancellationToken cancel)
         {

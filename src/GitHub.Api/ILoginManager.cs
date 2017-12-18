@@ -47,6 +47,17 @@ namespace GitHub.Api
             CancellationToken cancel);
 
         /// <summary>
+        /// Attempts to log into a GitHub server with a token.
+        /// </summary>
+        /// <param name="hostAddress">The address of the server.</param>
+        /// <param name="client">An octokit client configured to access the server.</param>
+        /// <param name="token">The token.</param>
+        Task<User> LoginWithToken(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            string token);
+
+        /// <summary>
         /// Attempts to log into a GitHub server using existing credentials.
         /// </summary>
         /// <param name="hostAddress">The address of the server.</param>

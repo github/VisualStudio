@@ -75,7 +75,7 @@ namespace GitHub.VisualStudio
 
             if (conns.Any(x => x.HostAddress == address))
             {
-                throw new InvalidOperationException($"A connection to {address} already exists.");
+                throw new InvalidOperationException($"A connection to {address.Title} already exists.");
             }
 
             var client = CreateClient(address);
@@ -84,7 +84,7 @@ namespace GitHub.VisualStudio
 
             conns.Add(connection);
             await SaveConnections();
-            await usageTracker.IncrementLoginCount();
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
             return connection;
         }
 
@@ -105,7 +105,27 @@ namespace GitHub.VisualStudio
 
             conns.Add(connection);
             await SaveConnections();
-            await usageTracker.IncrementLoginCount();
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            return connection;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IConnection> LogInWithToken(HostAddress address, string token)
+        {
+            var conns = await GetLoadedConnectionsInternal();
+
+            if (conns.Any(x => x.HostAddress == address))
+            {
+                throw new InvalidOperationException($"A connection to {address.Title} already exists.");
+            }
+
+            var client = CreateClient(address);
+            var user = await loginManager.LoginWithToken(address, client, token);
+            var connection = new Connection(address, user.Login, user, null);
+
+            conns.Add(connection);
+            await SaveConnections();
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
             return connection;
         }
 
@@ -116,7 +136,7 @@ namespace GitHub.VisualStudio
 
             if (connection == null)
             {
-                throw new KeyNotFoundException($"Could not find a connection to {address}.");
+                throw new KeyNotFoundException($"Could not find a connection to {address.Title}.");
             }
 
             var client = CreateClient(address);
@@ -169,7 +189,7 @@ namespace GitHub.VisualStudio
                     var connection = new Connection(c.HostAddress, c.UserName, user, error);
 
                     result.Add(connection);
-                    await usageTracker.IncrementLoginCount();
+                    await usageTracker.IncrementCounter(x => x.NumberOfLogins);
                 }
             }
             finally

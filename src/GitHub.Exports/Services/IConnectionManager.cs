@@ -72,6 +72,21 @@ namespace GitHub.Services
         Task<IConnection> LogInViaOAuth(HostAddress address, CancellationToken cancel);
 
         /// <summary>
+        /// Attempts to login to a GitHub instance with a token.
+        /// </summary>
+        /// <param name="address">The instance address.</param>
+        /// <param name="token">The token.</param>
+        /// <returns>
+        /// A connection if the login succeded. If the login fails, throws an exception. An
+        /// exception is also thrown if an existing connection with the same host address already
+        /// exists.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// A connection to the host already exists.
+        /// </exception>
+        Task<IConnection> LogInWithToken(HostAddress address, string token);
+
+        /// <summary>
         /// Logs out of a GitHub instance.
         /// </summary>
         /// <param name="address"></param>
