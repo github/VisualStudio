@@ -9,9 +9,10 @@ using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using GitHub.Models;
 using GitHub.Logging;
+using GitHub.Extensions;
+using Microsoft.VisualStudio.Shell;
 using Serilog;
 
 namespace GitHub.InlineReviews.Services
@@ -25,13 +26,15 @@ namespace GitHub.InlineReviews.Services
         readonly SVsServiceProvider serviceProvider;
         readonly Window mainWindow;
         readonly IPullRequestSessionManager pullRequestSessionManager;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestStatusManager(SVsServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager)
+        public PullRequestStatusManager(SVsServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager, IUsageTracker usageTracker)
             : this()
         {
             this.serviceProvider = serviceProvider;
             this.pullRequestSessionManager = pullRequestSessionManager;
+            this.usageTracker = usageTracker;
         }
 
         public PullRequestStatusManager()
@@ -56,13 +59,13 @@ namespace GitHub.InlineReviews.Services
         void RefreshCurrentSession()
         {
             var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
-            var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(serviceProvider, pullRequest) : null;
+            var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(pullRequest) : null;
             ShowStatus(viewModel);
         }
 
-        static PullRequestStatusViewModel CreatePullRequestStatusViewModel(IServiceProvider serviceProvider, IPullRequestModel pullRequest)
+        PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestModel pullRequest)
         {
-            var command = new RaiseVsCommand(serviceProvider, Guids.guidGitHubCmdSetString, PkgCmdIDList.showCurrentPullRequestCommand);
+            var command = new RaisePullRequestCommand(serviceProvider, usageTracker);
             var pullRequestStatusViewModel = new PullRequestStatusViewModel(command);
             pullRequestStatusViewModel.Number = pullRequest.Number;
             pullRequestStatusViewModel.Title = pullRequest.Title;
@@ -108,17 +111,18 @@ namespace GitHub.InlineReviews.Services
             return contentControl?.Content as StatusBar;
         }
 
-        class RaiseVsCommand : ICommand
+        class RaisePullRequestCommand : ICommand
         {
-            readonly IServiceProvider serviceProvider;
-            readonly string guid;
-            readonly int id;
+            readonly string guid = Guids.guidGitHubCmdSetString;
+            readonly int id = PkgCmdIDList.showCurrentPullRequestCommand;
 
-            internal RaiseVsCommand(IServiceProvider serviceProvider, string guid, int id)
+            readonly IServiceProvider serviceProvider;
+            readonly IUsageTracker usageTracker;
+
+            internal RaisePullRequestCommand(IServiceProvider serviceProvider, IUsageTracker usageTracker)
             {
                 this.serviceProvider = serviceProvider;
-                this.guid = guid;
-                this.id = id;
+                this.usageTracker = usageTracker;
             }
 
             public bool CanExecute(object parameter) => true;
@@ -135,8 +139,9 @@ namespace GitHub.InlineReviews.Services
                 catch (Exception e)
                 {
                     log.Error(e, "Couldn't raise {Guid}:{ID}", guid, id);
-                    System.Diagnostics.Trace.WriteLine(e);
                 }
+
+                usageTracker.IncrementCounter(x => x.NumberOfShowCurrentPullRequest).Forget();
             }
 
             public event EventHandler CanExecuteChanged
