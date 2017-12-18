@@ -473,6 +473,12 @@ namespace GitHub.ViewModels.GitHubPane
         {
             var relativePath = Path.Combine(file.DirectoryPath, file.FileName);
             var encoding = pullRequestsService.GetEncoding(LocalRepository, relativePath);
+
+            if (!head && file.OldPath != null)
+            {
+                relativePath = file.OldPath;
+            }
+
             return pullRequestsService.ExtractFile(LocalRepository, model, relativePath, head, encoding).ToTask();
         }
 
@@ -552,7 +558,7 @@ namespace GitHub.ViewModels.GitHubPane
                     changedFile.FileName,
                     changedFile.Sha,
                     changedFile.Status,
-                    GetStatusDisplay(changedFile, changes));
+                    GetOldFileName(changedFile, changes));
 
                 var file = await Session.GetFile(changedFile.FileName);
                 var fileCommentCount = file?.WhenAnyValue(x => x.InlineCommentThreads)
@@ -598,28 +604,15 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        string GetStatusDisplay(IPullRequestFileModel file, TreeChanges changes)
+        string GetOldFileName(IPullRequestFileModel file, TreeChanges changes)
         {
-            switch (file.Status)
+            if (file.Status == PullRequestFileStatus.Renamed)
             {
-                case PullRequestFileStatus.Added:
-                    return Resources.AddedFileStatus;
-                case PullRequestFileStatus.Renamed:
-                    var fileName = file.FileName.Replace("/", "\\");
-                    var change = changes?.Renamed.FirstOrDefault(x => x.Path == fileName);
-
-                    if (change != null)
-                    {
-                        return Path.GetDirectoryName(change.OldPath) == Path.GetDirectoryName(change.Path) ?
-                            Path.GetFileName(change.OldPath) : change.OldPath;
-                    }
-                    else
-                    {
-                        return Resources.RenamedFileStatus;
-                    }
-                default:
-                    return null;
+                var fileName = file.FileName.Replace("/", "\\");
+                return changes?.Renamed.FirstOrDefault(x => x.Path == fileName)?.OldPath;
             }
+
+            return null;
         }
 
         IObservable<Unit> DoCheckout(object unused)

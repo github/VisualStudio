@@ -88,6 +88,10 @@ namespace GitHub.ViewModels.GitHubPane
                 .Where(x => PullRequests != null)
                 .Subscribe(f => UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, f));
 
+            this.WhenAnyValue(x => x.SelectedRepository)
+                .Skip(1)
+                .Subscribe(_ => ResetAndLoad());
+
             OpenPullRequest = ReactiveCommand.Create();
             OpenPullRequest.Subscribe(DoOpenPullRequest);
             CreatePullRequest = ReactiveCommand.Create();
@@ -117,9 +121,9 @@ namespace GitHub.ViewModels.GitHubPane
                     new[] { remoteRepository.Parent, remoteRepository } :
                     new[] { remoteRepository };
                 SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
+
+                // Setting SelectedRepository will cause a Load().
                 SelectedRepository = Repositories[0];
-                WebUrl = repository.CloneUrl?.ToRepositoryUrl().Append("pulls");
-                await Load();
             }
             finally
             {
@@ -324,6 +328,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         void ResetAndLoad()
         {
+            WebUrl = SelectedRepository.CloneUrl?.ToRepositoryUrl().Append("pulls");
             CreatePullRequests();
             UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, SearchQuery);
             Load().Forget();
