@@ -49,7 +49,10 @@ namespace GitHub.Api
         {
             get
             {
-                return GetSha256Hash(Info.ApplicationInfo.ApplicationDescription + ":" + GetMachineIdentifier());
+                return GetSha256Hash(
+                    Info.ApplicationInfo.ApplicationDescription + ":" +
+                    GetMachineIdentifier() + ":" +
+                    GetMachineNameSafe());
             }
         }
 
@@ -60,13 +63,13 @@ namespace GitHub.Api
             try
             {
                 // adapted from http://stackoverflow.com/a/1561067
-                var fastedValidNetworkInterface = NetworkInterface.GetAllNetworkInterfaces()
-                    .OrderBy(nic => nic.Speed)
+                var fastestValidNetworkInterface = NetworkInterface.GetAllNetworkInterfaces()
+                    .OrderByDescending(nic => nic.Speed)
                     .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
                     .Select(nic => nic.GetPhysicalAddress().ToString())
-                    .FirstOrDefault(address => address.Length > 12);
+                    .FirstOrDefault(address => address.Length >= 12);
 
-                return fastedValidNetworkInterface ?? GetMachineNameSafe();
+                return fastestValidNetworkInterface ?? GetMachineNameSafe();
             }
             catch (Exception)
             {
