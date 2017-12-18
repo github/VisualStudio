@@ -12,7 +12,8 @@ namespace GitHub.ViewModels.GitHubPane
     public abstract class PanePageViewModelBase : ViewModelBase, IPanePageViewModel, IDisposable
     {
         static readonly Uri paneUri = new Uri("github://pane");
-        Subject<Uri> navigate = new Subject<Uri>();
+        readonly Subject<Uri> navigate = new Subject<Uri>();
+        readonly Subject<Unit> close = new Subject<Unit>();
         Exception error;
         bool isBusy;
         bool isLoading;
@@ -59,10 +60,20 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public virtual IObservable<Unit> CloseRequested { get; }
+        public IObservable<Unit> CloseRequested => close;
 
         /// <inheritdoc/>
         public IObservable<Uri> NavigationRequested => navigate;
+
+        /// <inheritdoc/>
+        public virtual void Activated()
+        {
+        }
+
+        /// <inheritdoc/>
+        public virtual void Deactivated()
+        {
+        }
 
         /// <inheritdoc/>
         public void Dispose()
@@ -73,6 +84,11 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public virtual Task Refresh() => Task.CompletedTask;
+
+        /// <summary>
+        /// Sends a request to close the page.
+        /// </summary>
+        protected void Close() => close.OnNext(Unit.Default);
 
         /// <summary>
         /// Sends a request to navigate to a new page.
@@ -86,8 +102,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             if (disposing)
             {
-                navigate?.Dispose();
-                navigate = null;
+                close.Dispose();
+                navigate.Dispose();
             }
         }
     }
