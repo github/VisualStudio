@@ -58,14 +58,6 @@ namespace GitHub.ViewModels
         void NavigateTo(IPanePageViewModel page);
 
         /// <summary>
-        /// Registers a resource for disposal when all instances of a page are removed from the
-        /// history.
-        /// </summary>
-        /// <param name="page">The page.</param>
-        /// <param name="dispose">The resource to dispose.</param>
-        void RegisterDispose(IPanePageViewModel page, IDisposable dispose);
-
-        /// <summary>
         /// Removes all instances of a page from the history.
         /// </summary>
         /// <param name="page">The page to remove.</param>
