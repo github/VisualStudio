@@ -657,9 +657,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         IObservable<Unit> DoSyncSubmodules(object unused)
         {
-            return pullRequestsService.SyncSubmodules(LocalRepository);
-            // TODO: UsageTracker
-            // .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+            return pullRequestsService.SyncSubmodules(LocalRepository).Do(_ => usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget());
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
