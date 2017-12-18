@@ -32,15 +32,17 @@ namespace GitHub.Exports
     /// </summary>
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [SuppressMessage("Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments",
+        Justification = "Store string rather than Type as metadata")]
     public sealed class ExportViewForAttribute : ExportAttribute
     {
         public ExportViewForAttribute(Type viewModelType)
             : base(typeof(FrameworkElement))
         {
-            ViewModelType = viewModelType;
+            ViewModelType = viewModelType.FullName;
         }
 
-        public Type ViewModelType { get; }
+        public string ViewModelType { get; }
     }
 
     /// <summary>
@@ -69,7 +71,7 @@ namespace GitHub.Exports
     public interface IViewModelMetadata
     {
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
-        Type[] ViewModelType { get; }
+        string[] ViewModelType { get; }
     }
 
     /// <summary>
