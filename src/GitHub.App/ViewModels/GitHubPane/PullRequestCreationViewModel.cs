@@ -95,6 +95,7 @@ namespace GitHub.ViewModels.GitHubPane
             });
 
             Cancel = ReactiveCommand.Create();
+            Cancel.Subscribe(_ => Close());
 
             isExecuting = CreatePullRequest.IsExecuting.ToProperty(this, x => x.IsExecuting);
 
@@ -298,7 +299,5 @@ namespace GitHub.ViewModels.GitHubPane
             get { return branchValidator; }
             set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
         }
-
-        public override IObservable<Unit> CloseRequested => Cancel.SelectUnit();
     }
 }

@@ -10,6 +10,7 @@
              xmlns:uc="clr-namespace:GitHub.UI.Controls;assembly=GitHub.UI"
              xmlns:vuc="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+             Foreground="{DynamicResource GitHubVsWindowText}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
@@ -82,8 +83,7 @@
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter Spinner}, FallbackValue=Collapsed}"/>
-      <Border Background="White"
-              HorizontalAlignment="Stretch"
+      <Border HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter Error}, FallbackValue=Collapsed}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

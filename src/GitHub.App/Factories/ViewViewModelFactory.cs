@@ -20,14 +20,12 @@ namespace GitHub.Factories
 
         [ImportingConstructor]
         public ViewViewModelFactory(
-            IGitHubServiceProvider serviceProvider,
-            ICompositionService cc)
+            IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            cc.SatisfyImportsOnce(this);
         }
 
-        [ImportMany(AllowRecomposition = true)]
+        [ImportMany]
         IEnumerable<ExportFactory<FrameworkElement, IViewModelMetadata>> Views { get; set; }
 
         /// <inheritdoc/>
@@ -45,7 +43,7 @@ namespace GitHub.Factories
         /// <inheritdoc/>
         public FrameworkElement CreateView(Type viewModel)
         {
-            var f = Views.FirstOrDefault(x => x.Metadata.ViewModelType.Contains(viewModel));
+            var f = Views.FirstOrDefault(x => x.Metadata.ViewModelType.Contains(viewModel.FullName));
             return f?.CreateExport().Value;
         }
     }
