@@ -4,7 +4,7 @@
 
 ### If you are having issues with the installer, please read
 
-If you need to upgrade, downgrade, or uninstall the extension, refer to this issue: https://github.com/github/VisualStudio/issues/1394 which details common problems and solutions when using the installer.
+If you need to upgrade, downgrade, or uninstall the extension, and are having problems doing so, refer to this issue: https://github.com/github/VisualStudio/issues/1394 which details common problems and solutions when using the installer.
 
 ### The location of the submodules has changed as of 31-01-2017
 
