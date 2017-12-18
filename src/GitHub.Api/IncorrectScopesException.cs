@@ -4,13 +4,13 @@ using System.Runtime.Serialization;
 namespace GitHub.Api
 {
     /// <summary>
-    /// Thrown when the login for a user does not have the required scopes.
+    /// Thrown when the login for a user does not have the required API scopes.
     /// </summary>
     [Serializable]
     public class IncorrectScopesException : Exception
     {
         public IncorrectScopesException()
-            : this("You need to sign out and back in.")
+            : this("Incorrect API scopes.")
         {
         }
 

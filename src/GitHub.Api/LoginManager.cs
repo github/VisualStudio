@@ -356,7 +356,8 @@ namespace GitHub.Api
                 log.Error("Error reading scopes: /user succeeded but scopes header was not present");
             }
 
-            throw new IncorrectScopesException();
+            throw new IncorrectScopesException(
+                "Incorrect API scopes. Required: " + string.Join(",", scopes));
         }
 
         Uri GetLoginUrl(IOauthClient client, string state)
