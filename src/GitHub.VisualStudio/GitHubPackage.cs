@@ -213,9 +213,19 @@ namespace GitHub.VisualStudio
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var keychain = serviceProvider.GetService<IKeychain>();
 
+                // HACK: We need to make sure this is run on the main thread. We really
+                // shouldn't be injecting a view model concern into LoginManager - this
+                // needs to be refactored. See #1398.
+                var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() =>
+                    ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    {
+                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        return serviceProvider.GetService<ITwoFactorChallengeHandler>();
+                    }));
+
                 return new LoginManager(
                     keychain,
-                    new Lazy<ITwoFactorChallengeHandler>(() => serviceProvider.GetService<ITwoFactorChallengeHandler>()),
+                    lazy2Fa,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
                     ApiClientConfiguration.AuthorizationNote,
