@@ -106,6 +106,7 @@ namespace GitHub.VisualStudio
             conns.Add(connection);
             await SaveConnections();
             await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            await usageTracker.IncrementCounter(x => x.NumberOfOAuthLogins);
             return connection;
         }
 
@@ -126,6 +127,7 @@ namespace GitHub.VisualStudio
             conns.Add(connection);
             await SaveConnections();
             await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            await usageTracker.IncrementCounter(x => x.NumberOfTokenLogins);
             return connection;
         }
 
