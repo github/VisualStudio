@@ -32,7 +32,15 @@ namespace GitHub.InlineReviews.Services
             string path)
         {
             var patch = await gitClient.Compare(repo, baseSha, headSha, path);
-            return DiffUtilities.ParseFragment(patch).ToList();
+
+            if (patch != null)
+            {
+                return DiffUtilities.ParseFragment(patch).ToList();
+            }
+            else
+            {
+                return new DiffChunk[0];
+            }
         }
 
         /// <inheritdoc/>
@@ -44,7 +52,15 @@ namespace GitHub.InlineReviews.Services
             byte[] contents)
         {
             var changes = await gitClient.CompareWith(repo, baseSha, headSha, path, contents);
-            return DiffUtilities.ParseFragment(changes.Patch).ToList();
+
+            if (changes?.Patch != null)
+            {
+                return DiffUtilities.ParseFragment(changes.Patch).ToList();
+            }
+            else
+            {
+                return new DiffChunk[0];
+            }
         }
     }
 }
