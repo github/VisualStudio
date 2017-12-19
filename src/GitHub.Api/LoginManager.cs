@@ -194,6 +194,38 @@ namespace GitHub.Api
             await keychain.Delete(hostAddress);
         }
 
+        /// <summary>
+        /// Tests if received API scopes match the required API scopes.
+        /// </summary>
+        /// <param name="required">The required API scopes.</param>
+        /// <param name="received">The received API scopes.</param>
+        /// <returns>True if all required scopes are present, otherwise false.</returns>
+        public static bool ScopesMatch(IReadOnlyList<string> required, IReadOnlyList<string> received)
+        {
+            foreach (var scope in required)
+            {
+                var found = received.Contains(scope);
+
+                if (!found && (scope.StartsWith("read:") || scope.StartsWith("write:")))
+                {
+                    // NOTE: Scopes are actually more complex than this, for example
+                    // `user` encompasses `read:user` and `user:email` but just use
+                    // this simple rule for now as it works for the scopes we require.
+                    var adminScope = scope
+                        .Replace("read:", "admin:")
+                        .Replace("write:", "admin:");
+                    found = received.Contains(adminScope);
+                }
+
+                if (!found)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
             IGitHubClient client,
             NewAuthorization newAuth,
@@ -342,7 +374,7 @@ namespace GitHub.Api
                     .Select(x => x.Trim())
                     .ToArray();
 
-                if (scopes.Except(returnedScopes).Count() == 0)
+                if (ScopesMatch(scopes, returnedScopes))
                 {
                     return response.Body;
                 }

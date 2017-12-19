@@ -310,4 +310,39 @@ public class LoginManagerTests
             return result;
         }
     }
+
+    public class TheScopesMatchMethod
+    {
+        [Fact]
+        public void ReturnsFalseWhenMissingScopes()
+        {
+            var received = new[] { "user", "repo", "write:public_key" };
+
+            Assert.False(LoginManager.ScopesMatch(scopes, received));
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenScopesEqual()
+        {
+            var received = new[] { "user", "repo", "gist", "write:public_key" };
+
+            Assert.True(LoginManager.ScopesMatch(scopes, received));
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenExtraScopesReturned()
+        {
+            var received = new[] { "user", "repo", "gist", "foo", "write:public_key" };
+
+            Assert.True(LoginManager.ScopesMatch(scopes, received));
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenAdminScopeReturnedInsteadOfWrite()
+        {
+            var received = new[] { "user", "repo", "gist", "foo", "admin:public_key" };
+
+            Assert.True(LoginManager.ScopesMatch(scopes, received));
+        }
+    }
 }
