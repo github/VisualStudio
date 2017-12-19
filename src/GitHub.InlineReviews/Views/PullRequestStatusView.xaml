@@ -4,26 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="60">
 
     <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
         <Button Background="Transparent"
-            Foreground="{DynamicResource GitHubVsWindowText}"
+            Foreground="{DynamicResource VsBrush.StatusBarText}"
             BorderThickness="0"
-            Padding="0"
+            Padding="4 0"
             Command="{Binding ShowCurrentPullRequestCommand}">
-
-            <TextBlock>
+            <StackPanel Orientation="Horizontal">
                 <ui:OcticonPath
-                    Fill="{DynamicResource GitHubVsWindowText}"
-                    Width="16"
-                    Height="16"
-                    VerticalAlignment="Center"
+                    Fill="White"
+                    VerticalAlignment="Bottom"
+                    Margin="0 0 4 0 "
                     Icon="git_pull_request" />
-                #<Run Text="{Binding Number}" />
-            </TextBlock>
+                <TextBlock
+                    VerticalAlignment="Center">
+                    #<Run Text="{Binding Number}" />
+                </TextBlock>
+            </StackPanel>
         </Button>
         <Grid.ToolTip>
             <TextBlock Text="{Binding Title}" />
