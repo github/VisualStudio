@@ -7,7 +7,7 @@ namespace GitHub.ViewModels.GitHubPane
     /// <summary>
     /// A view model that represents a page in the GitHub pane.
     /// </summary>
-    public interface IPanePageViewModel : IViewModel
+    public interface IPanePageViewModel : IViewModel, IDisposable
     {
         /// <summary>
         /// Gets an exception representing an error state to display.
@@ -47,6 +47,16 @@ namespace GitHub.ViewModels.GitHubPane
         /// pane.
         /// </summary>
         IObservable<Uri> NavigationRequested { get; }
+
+        /// <summary>
+        /// Called when the page becomes the current page in the GitHub pane.
+        /// </summary>
+        void Activated();
+
+        /// <summary>
+        /// Called when the page stops being the current page in the GitHub pane.
+        /// </summary>
+        void Deactivated();
 
         /// <summary>
         /// Refreshes the view model.
