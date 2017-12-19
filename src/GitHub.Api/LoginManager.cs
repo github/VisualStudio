@@ -206,7 +206,9 @@ namespace GitHub.Api
             {
                 var found = received.Contains(scope);
 
-                if (!found && (scope.StartsWith("read:") || scope.StartsWith("write:")))
+                if (!found && 
+                    (scope.StartsWith("read:", StringComparison.Ordinal) ||
+                     scope.StartsWith("write:", StringComparison.Ordinal)))
                 {
                     // NOTE: Scopes are actually more complex than this, for example
                     // `user` encompasses `read:user` and `user:email` but just use
