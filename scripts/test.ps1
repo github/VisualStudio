@@ -30,7 +30,7 @@ if ($Trace) {
     Set-PSDebug -Trace 1
 }
 
-$env:PATH = "$$PSScriptRoot;$env:PATH"
+$env:PATH = "$PSScriptRoot;$env:PATH"
 
 $exitcode = 0
 
