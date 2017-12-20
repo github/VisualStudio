@@ -40,7 +40,14 @@ $xml = Join-Path $rootDirectory "nunit-$Project.xml"
         exit -1
     }
 
-    Run-Process -Fatal $TimeoutDuration $consoleRunner $dll,"--where ""cat != Timings""","--result=$xml;format=AppVeyor"
+    $args = @()
+    if ($AppVeyor) {
+        $args = $dll, "--where", "cat!=Timings", "--result=$xml;format=AppVeyor"
+    } else {
+        $args = $dll, "--where", "cat!=Timings", "--result=$xml"
+    }
+
+    Run-Process -Fatal $TimeoutDuration $consoleRunner $args
     if (!$?) {
         Die 1 "$Project tests failed"
     }
