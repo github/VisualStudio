@@ -21,7 +21,7 @@ namespace GitHub.Api
         static readonly ILogger log = LogManager.ForContext<LoginManager>();
         static readonly Uri UserEndpoint = new Uri("user", UriKind.Relative);
         readonly IKeychain keychain;
-        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
+        readonly Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
         readonly IReadOnlyList<string> scopes;
@@ -40,7 +40,7 @@ namespace GitHub.Api
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
             IKeychain keychain,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler,
             IOAuthCallbackListener oauthListener,
             string clientId,
             string clientSecret,
@@ -278,7 +278,7 @@ namespace GitHub.Api
         {
             for (;;)
             {
-                var challengeResult = await twoFactorChallengeHandler.HandleTwoFactorException(exception);
+                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception);
 
                 if (challengeResult == null)
                 {
@@ -302,7 +302,7 @@ namespace GitHub.Api
                     }
                     catch (Exception e)
                     {
-                        await twoFactorChallengeHandler.ChallengeFailed(e);
+                        await twoFactorChallengeHandler.Value.ChallengeFailed(e);
                         await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }

@@ -32,8 +32,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly IPackageSettings packageSettings;
         readonly IVSServices vsServices;
         readonly int sectionIndex;
-        readonly IDialogService dialogService;
-        readonly IRepositoryCloneService cloneService;
         readonly ILocalRepositories localRepositories;
 
         bool isCloning;
@@ -100,8 +98,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IConnectionManager manager,
             IPackageSettings packageSettings,
             IVSServices vsServices,
-            IRepositoryCloneService cloneService,
-            IDialogService dialogService,
             ILocalRepositories localRepositories,
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
@@ -111,8 +107,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(manager, nameof(manager));
             Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
             Guard.ArgumentNotNull(vsServices, nameof(vsServices));
-            Guard.ArgumentNotNull(cloneService, nameof(cloneService));
-            Guard.ArgumentNotNull(dialogService, nameof(dialogService));
             Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
 
             Title = "GitHub";
@@ -123,8 +117,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
             this.packageSettings = packageSettings;
             this.vsServices = vsServices;
-            this.cloneService = cloneService;
-            this.dialogService = dialogService;
             this.localRepositories = localRepositories;
 
             Clone = CreateAsyncCommandHack(DoClone);
@@ -136,6 +128,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         async Task DoClone()
         {
+            var dialogService = ServiceProvider.GetService<IDialogService>();
             var result = await dialogService.ShowCloneDialog(SectionConnection);
 
             if (result != null)
@@ -143,6 +136,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 try
                 {
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
+                    var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
                     await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
                         result.Repository.Name,
@@ -381,6 +375,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void DoCreate()
         {
+            var dialogService = ServiceProvider.GetService<IDialogService>();
             dialogService.ShowCreateRepositoryDialog(SectionConnection);
         }
 
@@ -391,6 +386,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void Login()
         {
+            var dialogService = ServiceProvider.GetService<IDialogService>();
             dialogService.ShowLoginDialog();
         }
 
