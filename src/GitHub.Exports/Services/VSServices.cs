@@ -4,12 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using GitHub.Logging;
-using GitHub.VisualStudio;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
 using Serilog;
-using DTE = EnvDTE.DTE;
+using EnvDTE;
 
 namespace GitHub.Services
 {
@@ -43,40 +40,6 @@ namespace GitHub.Services
                 if (vsVersion == null)
                     vsVersion = GetVSVersion();
                 return vsVersion;
-            }
-        }
-
-        public void ActivityLogMessage(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log message to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogError(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log error to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogWarning(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
             }
         }
 
