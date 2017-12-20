@@ -17,17 +17,22 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
-        static readonly ILogger log = LogManager.ForContext<VSServices>();
+        readonly ILogger log;
         readonly IGitHubServiceProvider serviceProvider;
 
         // Use a prefix (~$) that is defined in the default VS gitignore.
         public const string TempSolutionName = "~$GitHubVSTemp$~";
 
-
         [ImportingConstructor]
-        public VSServices(IGitHubServiceProvider serviceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider) :
+            this(serviceProvider, LogManager.ForContext<VSServices>())
+        {
+        }
+
+        public VSServices(IGitHubServiceProvider serviceProvider, ILogger log)
         {
             this.serviceProvider = serviceProvider;
+            this.log = log;
         }
 
         string vsVersion;
@@ -40,7 +45,6 @@ namespace GitHub.Services
                 return vsVersion;
             }
         }
-
 
         public void ActivityLogMessage(string message)
         {
@@ -84,19 +88,19 @@ namespace GitHub.Services
         /// </remarks>
         /// <param name="repoPath">The path to the repository to open</param>
         /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
-        public bool TryOpenRepository(string repoPath, bool logErrors = true)
+        public bool TryOpenRepository(string repoPath)
         {
             var os = serviceProvider.TryGetService<IOperatingSystem>();
             if (os == null)
             {
-                if (logErrors) log.Error("TryOpenRepository couldn't find IOperatingSystem service");
+                log.Error("TryOpenRepository couldn't find IOperatingSystem service");
                 return false;
             }
 
             var dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
-                if (logErrors) log.Error("TryOpenRepository couldn't find DTE service");
+                log.Error("TryOpenRepository couldn't find DTE service");
                 return false;
             }
 
@@ -116,16 +120,16 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                if (logErrors) log.Error(e, "Error opening repository");
+                log.Error(e, "Error opening repository");
             }
             finally
             {
-                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName, logErrors);
+                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName);
             }
             return solutionCreated;
         }
 
-        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName, bool logErrors)
+        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName)
         {
             var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
             try
@@ -139,7 +143,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                if (logErrors) log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
+                log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
             }
         }
 
