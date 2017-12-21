@@ -27,5 +27,4 @@ on_success:
     if ($full_build) {
       script\Sign-Package -AppVeyor
     }
-    Vsix-PublishToGallery C:\projects\visualstudio\release\**\*.vsix 
-    C:\projects\visualstudio\release\2.3.7.792\GitHub.VisualStudio.vsix
+    Vsix-PublishToGallery C:\projects\visualstudio\release\**\*.vsix
