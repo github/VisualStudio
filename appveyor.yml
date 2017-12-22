@@ -23,7 +23,7 @@ build_script:
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
 after_test:
-- ps: Vsix-PublishToGallery
+- ps: Vsix-PushArtifacts | Vsix-PublishToGallery
 on_success:
 - ps: |
     if ($full_build) {
