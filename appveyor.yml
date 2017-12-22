@@ -22,9 +22,10 @@ build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
+after_test:
+- ps: Vsix-PublishToGallery
 on_success:
 - ps: |
     if ($full_build) {
       script\Sign-Package -AppVeyor
     }
-    Vsix-PublishToGallery C:\projects\visualstudio\release\**\*.vsix
