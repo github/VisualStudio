@@ -1,9 +1,9 @@
 ## Contributing to the _GitHub Extension for Visual Studio_
 
-[fork]: https://github.com/github/VisualStudio/fork
-[pr]: https://github.com/github/VisualStudio/compare
+[fork]: https://github.com/xaxadmin/VisualStudio/fork
+[pr]: https://github.com/xaxadmin/VisualStudio/compare
 [code-of-conduct]: http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com
-[readme]: https://github.com/github/VisualStudio#build
+[readme]: https://github.com/xaxadmin/VisualStudio#build
 
 Hi there! We're thrilled that you'd like to contribute to the __GitHub Extension for Visual Studio__. Your help is essential for keeping it great.
 
@@ -57,7 +57,7 @@ If you have a feature that you think would be a great addition to the extension,
 
 ## Things to improve in the current version
 
-- [Localization](https://github.com/github/VisualStudio/issues/18)
+- [Localization](https://github.com/xaxdmin/VisualStudio/issues/18)
 
 ## Roadmap and future feature ideas
 
@@ -66,6 +66,6 @@ If you have a feature that you think would be a great addition to the extension,
 
 ## Resources
 
-- [Contributing to Open Source on GitHub](https://guides.github.com/activities/contributing-to-open-source/)
-- [Using Pull Requests](https://help.github.com/articles/using-pull-requests/)
-- [GitHub Help](https://help.github.com)
+- [Contributing to Open Source on GitHub](https://hg.github.com/activities/contributing-to-open-source/)
+- [Using Pull Requests](https://hg.github.com/articles/using-pull-requests/)
+- [GitHub Help](https://hg.github.com)
