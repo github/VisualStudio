@@ -166,6 +166,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.RightView, file);
                 }
 
                 if (workingDirectory)
@@ -194,6 +195,15 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     AddBufferTag(source, session, path, side);
                 }
             }
+        }
+
+        void EnableNavigateToEditor(IWpfTextView textView, IPullRequestFileNode file)
+        {
+            textView.VisualElement.PreviewKeyDown += async (s, e) =>
+            {
+                await DoOpenFile(file, true);
+                e.Handled = true;
+            };
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
