@@ -215,7 +215,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, file);
                     EnableNavigateToEditor(diffViewer.RightView, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, file);
                 }
 
                 if (workingDirectory)
