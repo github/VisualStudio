@@ -138,6 +138,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 IVsTextView view = OpenDocument(fullPath);
 
                 view.SetCaretPos(line, column);
+                view.CenterLines(line, 1);
 
                 // TODO: Add metrics for NumberOfPRDetailsOpenLiveFile
                 await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
