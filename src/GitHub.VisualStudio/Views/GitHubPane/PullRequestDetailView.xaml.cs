@@ -119,6 +119,54 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
+        async Task DoOpenLiveFile(IPullRequestFileNode file)
+        {
+            try
+            {
+                var activeView = FindActiveView();
+                if (activeView == null)
+                {
+                    ShowErrorInStatusBar("Couldn't find active view");
+                    return;
+                }
+
+                int line;
+                int column;
+                activeView.GetCaretPos(out line, out column);
+
+                var fullPath = ViewModel.GetLocalFilePath(file);
+                IVsTextView view = OpenDocument(fullPath);
+
+                view.SetCaretPos(line, column);
+
+                // TODO: Add metrics for NumberOfPRDetailsOpenLiveFile
+                await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error opening live file", e);
+            }
+        }
+
+        static IVsTextView OpenDocument(string fullPath)
+        {
+            var logicalView = VSConstants.LOGVIEWID.TextView_guid;
+            IVsUIHierarchy hierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+            IVsTextView view;
+            VsShellUtilities.OpenDocument(Services.GitHubServiceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
+            return view;
+        }
+
+        static IVsTextView FindActiveView()
+        {
+            var textManager = Services.GitHubServiceProvider.GetService<SVsTextManager, IVsTextManager2>();
+            IVsTextView view;
+            var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
+            return hresult == VSConstants.S_OK ? view : null;
+        }
+
         async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
         {
             try
@@ -201,15 +249,19 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             textView.VisualElement.PreviewKeyDown += async (s, e) =>
             {
-                await DoOpenFile(file, true);
+                await DoOpenLiveFile(file);
                 e.Handled = true;
             };
         }
 
-        void ShowErrorInStatusBar(string message, Exception e)
+        void ShowErrorInStatusBar(string message, Exception e = null)
         {
             var ns = GitHub.VisualStudio.Services.DefaultExportProvider.GetExportedValue<IStatusBarNotificationService>();
-            ns?.ShowMessage(message + ": " + e.Message);
+            if (e != null)
+            {
+                message += ": " + e.Message;
+            }
+            ns?.ShowMessage(message);
         }
 
         void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
