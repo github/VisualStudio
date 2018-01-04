@@ -252,7 +252,15 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             textView.VisualElement.PreviewKeyDown += async (s, e) =>
             {
-                await DoOpenLiveFile(file);
+                if (e.Key == Key.Space)
+                {
+                    await DoOpenLiveFile(file);
+                }
+                else
+                {
+                    Services.Dte.StatusBar.Text = "Press space bar to open file in solution";
+                }
+
                 e.Handled = true;
             };
         }
