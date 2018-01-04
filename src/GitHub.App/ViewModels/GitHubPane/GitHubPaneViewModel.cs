@@ -46,6 +46,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        bool initialized;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -199,7 +200,7 @@ namespace GitHub.ViewModels.GitHubPane
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
             await UpdateContent(teServiceHolder.ActiveRepo);
-            teServiceHolder.Subscribe(this, x => UpdateContent(x).Forget());
+            teServiceHolder.Subscribe(this, x => UpdateContentIfRepositoryChanged(x).Forget());
             connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
 
             BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
@@ -343,10 +344,11 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task UpdateContent(ILocalRepositoryModel repository)
         {
+            initialized = true;
             LocalRepository = repository;
             Connection = null;
-
             Content = null;
+            navigator.Clear();
 
             if (repository == null)
             {
@@ -372,7 +374,6 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (Connection?.IsLoggedIn == true)
                 {
-                    navigator.Clear();
                     Content = navigator;
                     await ShowDefaultPage();
                 }
@@ -384,6 +385,14 @@ namespace GitHub.ViewModels.GitHubPane
             else
             {
                 Content = notAGitHubRepository;
+            }
+        }
+
+        async Task UpdateContentIfRepositoryChanged(ILocalRepositoryModel repository)
+        {
+            if (!initialized || !Equals(repository, LocalRepository))
+            {
+                await UpdateContent(repository);
             }
         }
 

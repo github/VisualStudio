@@ -168,10 +168,11 @@
                 DockPanel.Dock="Top">
       <uirx:ErrorMessageDisplay x:Name="loadingFailedMessage"
                                 Margin="8,0"
-                                Content="{x:Static prop:Resources.loadingFailedMessageContent}"
                                 Icon="stop"
                                 Message="{x:Static prop:Resources.loadingFailedMessageMessage}"
-                                Visibility="{Binding LoadingFailed, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}" />
+                                Visibility="{Binding LoadingFailed, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}">
+        <TextBlock Text="{x:Static prop:Resources.loadingFailedMessageContent}" TextWrapping="Wrap" />
+      </uirx:ErrorMessageDisplay>  
     </StackPanel>
 
     <ui:OcticonCircleButton x:Name="cloneButton"

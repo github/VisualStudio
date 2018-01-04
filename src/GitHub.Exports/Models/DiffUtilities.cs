@@ -13,6 +13,8 @@ namespace GitHub.Models
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
+            Guard.ArgumentNotNull(diff, nameof(diff));
+
             var reader = new LineReader(diff);
             string line;
             DiffChunk chunk = null;
