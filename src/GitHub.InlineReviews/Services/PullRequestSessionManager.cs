@@ -66,10 +66,10 @@ namespace GitHub.InlineReviews.Services
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
 
-            RepoChanged(teamExplorerContext.GetActiveRepository()).Forget();
+            RepoChanged(teamExplorerContext.ActiveRepository).Forget();
             teamExplorerContext.StatusChanged += (s, e) =>
             {
-                RepoChanged(teamExplorerContext.GetActiveRepository()).Forget();
+                RepoChanged(teamExplorerContext.ActiveRepository).Forget();
             };
         }
 

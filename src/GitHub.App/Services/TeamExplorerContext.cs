@@ -10,33 +10,33 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerContext : ITeamExplorerContext
     {
-        readonly IVSGitExt vsGitExt;
         readonly ITeamExplorerServiceHolder teamExplorerServiceHolder;
+
+        ILocalRepositoryModel activeRepository;
 
         [ImportingConstructor]
         public TeamExplorerContext(IVSGitExt vsGitExt, ITeamExplorerServiceHolder teamExplorerServiceHolder)
         {
-            this.vsGitExt = vsGitExt;
             this.teamExplorerServiceHolder = teamExplorerServiceHolder;
 
             vsGitExt.ActiveRepositoriesChanged += () =>
             {
                 StatusChanged?.Invoke(this, EventArgs.Empty);
             };
-        }
 
-        public ILocalRepositoryModel GetActiveRepository()
-        {
-            var activeRepository = vsGitExt.ActiveRepositories.FirstOrDefault();
-            if (activeRepository == null)
+            teamExplorerServiceHolder.Subscribe(this, repo =>
             {
-                // HACK: TeamExplorerServiceHolder does some magic to ensure that ActiveRepositories is aviablable.
-                activeRepository = teamExplorerServiceHolder.ActiveRepo;
-            }
-
-            return activeRepository;
+                if (!Equals(repo, activeRepository))
+                {
+                    activeRepository = repo;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                }
+            });
         }
+
+        public ILocalRepositoryModel ActiveRepository => teamExplorerServiceHolder.ActiveRepo;
 
         public event EventHandler StatusChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

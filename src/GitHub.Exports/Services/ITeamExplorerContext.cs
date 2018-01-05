@@ -1,11 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using GitHub.Models;
 
 namespace GitHub.Services
 {
-    public interface ITeamExplorerContext
+    public interface ITeamExplorerContext : INotifyPropertyChanged
     {
-        ILocalRepositoryModel GetActiveRepository();
+        ILocalRepositoryModel ActiveRepository { get; }
         event EventHandler StatusChanged;
     }
 }

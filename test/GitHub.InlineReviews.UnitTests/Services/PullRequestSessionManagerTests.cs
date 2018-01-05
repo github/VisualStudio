@@ -1005,13 +1005,13 @@ Line 4";
         static ITeamExplorerContext CreateTeamExplorerContext(ILocalRepositoryModel repo)
         {
             var teamExplorerContext = Substitute.For<ITeamExplorerContext>();
-            teamExplorerContext.GetActiveRepository().Returns(repo);
+            teamExplorerContext.ActiveRepository.Returns(repo);
             return teamExplorerContext;
         }
 
         static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, ILocalRepositoryModel localRepositoryModel)
         {
-            teamExplorerContext.GetActiveRepository().Returns(localRepositoryModel);
+            teamExplorerContext.ActiveRepository.Returns(localRepositoryModel);
             teamExplorerContext.StatusChanged += Raise.Event();
         }
     }
