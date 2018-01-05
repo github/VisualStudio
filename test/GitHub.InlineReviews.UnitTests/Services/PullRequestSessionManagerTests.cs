@@ -49,7 +49,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Substitute.For<IPullRequestSessionService>(),
                     connectionManager,
                     modelFactory,
-                    CreateVSGitExt(repositoryModel));
+                    CreateTeamExplorerContext(repositoryModel));
 
                 var modelService = modelFactory.CreateBlocking(connectionManager.Connections[0]);
                 modelService.Received(1).GetPullRequest("fork", "repo", 15);
@@ -62,14 +62,14 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var service = CreatePullRequestService();
                 var connectionManager = CreateConnectionManager();
                 var modelFactory = CreateModelServiceFactory();
-                var vsGitExt = CreateVSGitExt(repositoryModel);
+                var teamExplorerContext = CreateTeamExplorerContext(repositoryModel);
 
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
                     connectionManager,
                     modelFactory,
-                    vsGitExt);
+                    teamExplorerContext);
 
                 Assert.Null(target.CurrentSession);
             }
@@ -85,7 +85,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 Assert.NotNull(target.CurrentSession);
                 Assert.True(target.CurrentSession.IsCheckedOut);
@@ -102,7 +102,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 Assert.Null(target.CurrentSession);
             }
@@ -111,18 +111,18 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public void CurrentSessionChangesWhenBranchChanges()
             {
                 var service = CreatePullRequestService();
-                var vsGitExt = CreateVSGitExt(CreateRepositoryModel());
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
                 var target = new PullRequestSessionManager(
                     service,
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    vsGitExt);
+                    teamExplorerContext);
 
                 var session = target.CurrentSession;
 
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
-                vsGitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
+                teamExplorerContext.StatusChanged += Raise.Event();
 
                 Assert.NotSame(session, target.CurrentSession);
             }
@@ -130,17 +130,17 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Fact]
             public void CurrentSessionChangesWhenRepoChanged()
             {
-                var vsGitExt = CreateVSGitExt(CreateRepositoryModel());
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    vsGitExt);
+                    teamExplorerContext);
 
                 var session = target.CurrentSession;
 
-                SetActiveRepository(vsGitExt, CreateRepositoryModel("https://github.com/owner/other"));
+                SetActiveRepository(teamExplorerContext, CreateRepositoryModel("https://github.com/owner/other"));
 
                 Assert.NotSame(session, target.CurrentSession);
             }
@@ -148,17 +148,17 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Fact]
             public void RepoChangedDoesntCreateNewSessionIfNotNecessary()
             {
-                var vsGitExt = CreateVSGitExt(CreateRepositoryModel());
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    vsGitExt);
+                    teamExplorerContext);
 
                 var session = target.CurrentSession;
 
-                vsGitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
+                teamExplorerContext.StatusChanged += Raise.Event();
 
                 Assert.Same(session, target.CurrentSession);
             }
@@ -166,15 +166,15 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Fact]
             public void RepoChangedHandlesNullRepository()
             {
-                var vsGitExt = CreateVSGitExt(CreateRepositoryModel());
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    vsGitExt);
+                    teamExplorerContext);
 
-                SetActiveRepository(vsGitExt, null);
+                SetActiveRepository(teamExplorerContext, null);
 
                 Assert.Null(target.CurrentSession);
             }
@@ -187,7 +187,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 Assert.Equal("this-owner", target.CurrentSession.RepositoryOwner);
             }
@@ -207,7 +207,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same("BASESHA", file.BaseSha);
@@ -223,7 +223,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same("TIPSHA", file.CommitSha);
@@ -239,7 +239,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(true),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Null(file.CommitSha);
@@ -267,7 +267,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same(diff, file.Diff);
@@ -285,7 +285,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
@@ -314,7 +314,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
@@ -333,14 +333,14 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 var threads = new List<IInlineCommentThreadModel>();
-                var vsGitExt = CreateVSGitExt(CreateRepositoryModel());
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
 
                 var target = new PullRequestSessionManager(
                     CreatePullRequestService(),
                     CreateSessionService(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    vsGitExt);
+                    teamExplorerContext);
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
@@ -356,7 +356,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.NotNull(file.InlineCommentThreads);
                 Assert.NotNull(file.TrackingPoints);
 
-                SetActiveRepository(vsGitExt, null);
+                SetActiveRepository(teamExplorerContext, null);
 
                 Assert.Null(file.BaseSha);
                 Assert.Null(file.CommitSha);
@@ -384,7 +384,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
@@ -427,7 +427,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Same("TIPSHA", file.CommitSha);
@@ -448,7 +448,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateSessionService(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 var compositeDisposable = file.ToDispose as CompositeDisposable;
@@ -492,7 +492,7 @@ Line 4";
                         CreateRealSessionService(diff: diffService),
                         CreateConnectionManager(),
                         CreateModelServiceFactory(pullRequest),
-                        CreateVSGitExt(CreateRepositoryModel()));
+                        CreateTeamExplorerContext(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                     Assert.Equal(1, file.InlineCommentThreads.Count);
@@ -538,7 +538,7 @@ Line 4";
                         CreateRealSessionService(diff: diffService),
                         CreateConnectionManager(),
                         CreateModelServiceFactory(pullRequest),
-                        CreateVSGitExt(CreateRepositoryModel()));
+                        CreateTeamExplorerContext(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                     Assert.Equal(1, file.InlineCommentThreads.Count);
@@ -598,7 +598,7 @@ Line 4";
                         CreateRealSessionService(diff: diffService),
                         CreateConnectionManager(),
                         CreateModelServiceFactory(pullRequest),
-                        CreateVSGitExt(CreateRepositoryModel()));
+                        CreateTeamExplorerContext(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                     Assert.Equal("Original Comment", file.InlineCommentThreads[0].Comments[0].Body);
@@ -653,7 +653,7 @@ Line 4";
                         CreateRealSessionService(diff: diffService),
                         CreateConnectionManager(),
                         CreateModelServiceFactory(pullRequest),
-                        CreateVSGitExt(CreateRepositoryModel()));
+                        CreateTeamExplorerContext(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                     Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
@@ -684,7 +684,7 @@ Line 4";
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.Equal("TIPSHA", file.CommitSha);
@@ -713,7 +713,7 @@ Line 4";
                     sessionService,
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
                 var raised = false;
                 var pullRequest = target.CurrentSession.PullRequest;
@@ -825,7 +825,7 @@ Line 4";
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber);
                 var result = await target.GetSession(newModel);
@@ -842,7 +842,7 @@ Line 4";
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
                 var result = await target.GetSession(newModel);
@@ -860,7 +860,7 @@ Line 4";
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber, "https://github.com/fork/repo");
                 var result = await target.GetSession(newModel);
@@ -878,7 +878,7 @@ Line 4";
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
                 var result1 = await target.GetSession(newModel);
@@ -897,7 +897,7 @@ Line 4";
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 Func<Task> run = async () =>
                 {
@@ -930,7 +930,7 @@ Line 4";
                     Substitute.For<IPullRequestSessionService>(),
                     CreateConnectionManager(),
                     CreateModelServiceFactory(),
-                    CreateVSGitExt(CreateRepositoryModel()));
+                    CreateTeamExplorerContext(CreateRepositoryModel()));
 
                 Assert.Null(target.CurrentSession);
 
@@ -943,13 +943,6 @@ Line 4";
 
                 Assert.Same(session, target.CurrentSession);
             }
-        }
-
-        static void SetActiveRepository(IVSGitExt vsGitExt, ILocalRepositoryModel localRepositoryModel)
-        {
-            var repos = localRepositoryModel != null ? new[] { localRepositoryModel } : new ILocalRepositoryModel[0];
-            vsGitExt.ActiveRepositories.Returns(repos);
-            vsGitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
         }
 
         IPullRequestModel CreatePullRequestModel(
@@ -1009,12 +1002,17 @@ Line 4";
             return result;
         }
 
-        static IVSGitExt CreateVSGitExt(ILocalRepositoryModel repo)
+        static ITeamExplorerContext CreateTeamExplorerContext(ILocalRepositoryModel repo)
         {
-            var vsGitExt = Substitute.For<IVSGitExt>();
-            var repos = repo != null ? new[] { repo } : new ILocalRepositoryModel[0];
-            vsGitExt.ActiveRepositories.Returns(repos);
-            return vsGitExt;
+            var teamExplorerContext = Substitute.For<ITeamExplorerContext>();
+            teamExplorerContext.GetActiveRepository().Returns(repo);
+            return teamExplorerContext;
+        }
+
+        static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, ILocalRepositoryModel localRepositoryModel)
+        {
+            teamExplorerContext.GetActiveRepository().Returns(localRepositoryModel);
+            teamExplorerContext.StatusChanged += Raise.Event();
         }
     }
 }
