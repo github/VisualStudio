@@ -101,7 +101,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
         }
 
         [Test]
@@ -118,7 +118,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
             Assert.AreEqual(2, target.Thread.Comments.Count);
 
             var file = await sessionManager.GetLiveFile(

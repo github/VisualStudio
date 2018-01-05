@@ -813,7 +813,7 @@ Line 4";
                 var result = await target.GetSession(newModel);
 
                 Assert.That(target.CurrentSession, Is.SameAs(result));
-                ///Assert.That(target.CurrentSession, Is.SameAs(newModel));
+                Assert.That(result.PullRequest, Is.SameAs(newModel));
             }
 
             [Test]

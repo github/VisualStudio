@@ -44,7 +44,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                /**Assert.Single(result);**/
+                //Assert.Single(result);
                 Assert.That(result[0].Tag, Is.InstanceOf(typeof(ShowInlineCommentTag)));
             }
 
@@ -61,7 +61,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                /**Assert.Single(result);**/
+                //Assert.Single(result);
                 Assert.That(result[0].Tag, Is.InstanceOf(typeof(AddInlineCommentTag)));
             }
 
@@ -111,7 +111,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                /**Assert.Single(result);**/
+                //Assert.Single(result);
                 Assert.That(result[0].Tag, Is.InstanceOf(typeof(AddInlineCommentTag)));
             }
 
@@ -221,7 +221,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                /**Assert.Single(result);**/
+                //Assert.Single(result);
                 Assert.That(result[0].Tag, Is.InstanceOf(typeof(ShowInlineCommentTag)));
             }
 
@@ -238,7 +238,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                /**Assert.Single(result);**/
+                //Assert.Single(result);
                 Assert.That(result[0].Tag, Is.InstanceOf(typeof(AddInlineCommentTag)));
             }
 
