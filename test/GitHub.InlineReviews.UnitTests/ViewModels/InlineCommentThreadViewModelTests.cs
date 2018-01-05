@@ -8,21 +8,21 @@ using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
     public class InlineCommentThreadViewModelTests
     {
-        [Fact]
+        [Test]
         public void CreatesComments()
         {
             var target = new InlineCommentThreadViewModel(
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1", "Comment 2"));
 
-            Assert.Equal(3, target.Comments.Count);
-            Assert.Equal(
+            Assert.AreEqual(3, target.Comments.Count);
+            Assert.AreEqual(
                 new[] 
                 {
                     "Comment 1",
@@ -31,7 +31,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }, 
                 target.Comments.Select(x => x.Body));
 
-            Assert.Equal(
+            Assert.AreEqual(
                 new[]
                 {
                     CommentEditState.None,
@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 target.Comments.Select(x => x.EditState));
         }
 
-        [Fact]
+        [Test]
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
             var target = new InlineCommentThreadViewModel(
@@ -54,7 +54,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.True(target.Comments[1].CommitEdit.CanExecute(null));
         }
 
-        [Fact]
+        [Test]
         public void PostsCommentInReplyToCorrectComment()
         {
             var session = CreateSession();

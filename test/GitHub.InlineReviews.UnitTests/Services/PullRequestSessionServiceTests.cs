@@ -7,7 +7,7 @@ using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheBuildCommentThreadsMethod
         {
-            [Fact]
+            [Test]
             public async Task MatchesReviewCommentOnOriginalLine()
             {
                 var baseContents = @"Line 1
@@ -49,11 +49,11 @@ Line 4";
                         diff);
 
                     var thread = result.Single();
-                    Assert.Equal(2, thread.LineNumber);
+                    Assert.AreEqual(2, thread.LineNumber);
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task MatchesReviewCommentOnDifferentLine()
             {
                 var baseContents = @"Line 1
@@ -85,11 +85,11 @@ Line 4";
                         diff);
 
                     var thread = result.Single();
-                    Assert.Equal(4, thread.LineNumber);
+                    Assert.AreEqual(4, thread.LineNumber);
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task ReturnsLineNumberMinus1ForNonMatchingComment()
             {
                 var baseContents = @"Line 1
@@ -124,12 +124,12 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.Equal(2, result.Count);
-                    Assert.Equal(-1, result[1].LineNumber);
+                    Assert.AreEqual(2, result.Count);
+                    Assert.AreEqual(-1, result[1].LineNumber);
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task HandlesDifferingPathSeparators()
             {
                 var winFilePath = @"foo\test.cs";
@@ -164,14 +164,14 @@ Line 4";
                         diff);
 
                     var thread = result.First();
-                    Assert.Equal(4, thread.LineNumber);
+                    Assert.AreEqual(4, thread.LineNumber);
                 }
             }
         }
 
         public class TheUpdateCommentThreadsMethod
         {
-            [Fact]
+            [Test]
             public async Task UpdatesWithNewLineNumber()
             {
                 var baseContents = @"Line 1
@@ -205,13 +205,13 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.Equal(2, threads[0].LineNumber);
+                    Assert.AreEqual(2, threads[0].LineNumber);
 
                     diff = await diffService.Diff(FilePath, newHeadContents);
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
-                    Assert.Equal(3, threads[0].LineNumber);
-                    Assert.Equal(
+                    Assert.AreEqual(3, threads[0].LineNumber);
+                    Assert.AreEqual(
                         new[] 
                         {
                             Tuple.Create(2, DiffSide.Right),
@@ -221,7 +221,7 @@ Line 4";
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task UnmarksStaleThreads()
             {
                 var baseContents = @"Line 1
@@ -254,7 +254,7 @@ Line 4";
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
                     Assert.False(threads[0].IsStale);
-                    Assert.Equal(new[] { Tuple.Create(2, DiffSide.Right) }, changedLines.ToArray());
+                    Assert.AreEqual(new[] { Tuple.Create(2, DiffSide.Right) }, changedLines.ToArray());
                 }
             }
         }

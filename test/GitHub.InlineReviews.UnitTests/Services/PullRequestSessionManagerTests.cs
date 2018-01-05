@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.UnitTests.Services
@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheConstructor : PullRequestSessionManagerTests
         {
-            [Fact]
+            [Test]
             public void ReadsPullRequestFromCorrectFork()
             {
                 var service = CreatePullRequestService();
@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheCurrentSessionProperty : PullRequestSessionManagerTests
         {
-            [Fact]
+            [Test]
             public void CreatesSessionForCurrentBranch()
             {
                 var target = new PullRequestSessionManager(
@@ -73,7 +73,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.True(target.CurrentSession.IsCheckedOut);
             }
 
-            [Fact]
+            [Test]
             public void CurrentSessionIsNullIfNoPullRequestForCurrentBranch()
             {
                 var service = CreatePullRequestService();
@@ -89,7 +89,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.Null(target.CurrentSession);
             }
 
-            [Fact]
+            [Test]
             public void CurrentSessionChangesWhenBranchChanges()
             {
                 var service = CreatePullRequestService();
@@ -106,10 +106,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
                 teService.NotifyActiveRepoChanged();
 
-                Assert.NotSame(session, target.CurrentSession);
+                Assert.That(session, Is.Not.SameAs(target.CurrentSession));
             }
 
-            [Fact]
+            [Test]
             public void CurrentSessionChangesWhenRepoChanged()
             {
                 var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
@@ -124,10 +124,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 teService.ActiveRepo = CreateRepositoryModel("https://github.com/owner/other");
 
-                Assert.NotSame(session, target.CurrentSession);
+                Assert.That(session, Is.Not.SameAs(target.CurrentSession));
             }
 
-            [Fact]
+            [Test]
             public void RepoChangedDoesntCreateNewSessionIfNotNecessary()
             {
                 var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
@@ -142,10 +142,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 teService.NotifyActiveRepoChanged();
 
-                Assert.Same(session, target.CurrentSession);
+                Assert.That(session, Is.SameAs(target.CurrentSession));
             }
 
-            [Fact]
+            [Test]
             public void RepoChangedHandlesNullRepository()
             {
                 var teService = new FakeTeamExplorerServiceHolder(CreateRepositoryModel());
@@ -161,7 +161,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.Null(target.CurrentSession);
             }
 
-            [Fact]
+            [Test]
             public void CreatesSessionWithCorrectRepositoryOwner()
             {
                 var target = new PullRequestSessionManager(
@@ -171,7 +171,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
-                Assert.Equal("this-owner", target.CurrentSession.RepositoryOwner);
+                Assert.AreEqual("this-owner", target.CurrentSession.RepositoryOwner);
             }
         }
 
@@ -179,7 +179,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
         {
             const string FilePath = "test.cs";
 
-            [Fact]
+            [Test]
             public async Task BaseShaIsSet()
             {
                 var textView = CreateTextView();
@@ -192,10 +192,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Same("BASESHA", file.BaseSha);
+                Assert.That("BASESHA", Is.SameAs(file.BaseSha));
             }
 
-            [Fact]
+            [Test]
             public async Task CommitShaIsSet()
             {
                 var textView = CreateTextView();
@@ -208,10 +208,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Same("TIPSHA", file.CommitSha);
+                Assert.That("TIPSHA", Is.SameAs(file.CommitSha));
             }
 
-            [Fact]
+            [Test]
             public async Task CommitShaIsNullIfModified()
             {
                 var textView = CreateTextView();
@@ -227,7 +227,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.Null(file.CommitSha);
             }
 
-            [Fact]
+            [Test]
             public async Task DiffIsSet()
             {
                 var textView = CreateTextView();
@@ -252,10 +252,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Same(diff, file.Diff);
+                Assert.That(diff, Is.SameAs(file.Diff));
             }
 
-            [Fact]
+            [Test]
             public async Task InlineCommentThreadsIsSet()
             {
                 var textView = CreateTextView();
@@ -277,10 +277,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Same(threads, file.InlineCommentThreads);
+                Assert.That(threads, Is.SameAs(file.InlineCommentThreads));
             }
 
-            [Fact]
+            [Test]
             public async Task CreatesTrackingPointsForThreads()
             {
                 var textView = CreateTextView();
@@ -306,10 +306,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Equal(2, file.TrackingPoints.Count);
+                Assert.AreEqual(2, file.TrackingPoints.Count);
             }
 
-            [Fact]
+            [Test]
             public async Task MovingToNoRepositoryShouldNullOutProperties()
             {
                 var textView = CreateTextView();
@@ -347,7 +347,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.Null(file.TrackingPoints);
             }
 
-            [Fact]
+            [Test]
             public async Task ModifyingBufferMarksThreadsAsStaleAndSignalsRebuild()
             {
                 var textView = CreateTextView();
@@ -391,7 +391,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
             }
 
-            [Fact]
+            [Test]
             public async Task RebuildSignalUpdatesCommitSha()
             {
                 var textView = CreateTextView();
@@ -412,7 +412,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Same("TIPSHA", file.CommitSha);
+                Assert.That("TIPSHA", Is.SameAs(file.CommitSha));
 
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
                 file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
@@ -420,7 +420,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.Null(file.CommitSha);
             }
 
-            [Fact]
+            [Test]
             public async Task ClosingTextViewDisposesFile()
             {
                 var textView = CreateTextView();
@@ -442,7 +442,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 Assert.True(compositeDisposable.IsDisposed);
             }
 
-            [Fact]
+            [Test]
             public async Task InlineCommentThreadsAreLoadedFromCurrentSession()
             {
                 var baseContents = @"Line 1
@@ -477,12 +477,12 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.Equal(1, file.InlineCommentThreads.Count);
-                    Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
+                    Assert.AreEqual(1, file.InlineCommentThreads.Count);
+                    Assert.AreEqual(2, file.InlineCommentThreads[0].LineNumber);
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task UpdatesInlineCommentThreadsFromEditorContent()
             {
                 var baseContents = @"Line 1
@@ -523,17 +523,17 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.Equal(1, file.InlineCommentThreads.Count);
-                    Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
+                    Assert.AreEqual(1, file.InlineCommentThreads.Count);
+                    Assert.AreEqual(2, file.InlineCommentThreads[0].LineNumber);
 
                     textView.TextSnapshot.GetText().Returns(editorContents);
                     SignalTextChanged(textView.TextBuffer);
 
                     var linesChanged = await file.LinesChanged.Take(1);
 
-                    Assert.Equal(1, file.InlineCommentThreads.Count);
-                    Assert.Equal(4, file.InlineCommentThreads[0].LineNumber);
-                    Assert.Equal(
+                    Assert.AreEqual(1, file.InlineCommentThreads.Count);
+                    Assert.AreEqual(4, file.InlineCommentThreads[0].LineNumber);
+                    Assert.AreEqual(
                         new[]
                         {
                             Tuple.Create(2, DiffSide.Right),
@@ -543,7 +543,7 @@ Line 4";
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task UpdatesReviewCommentWithNewBody()
             {
                 var baseContents = @"Line 1
@@ -583,7 +583,7 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.Equal("Original Comment", file.InlineCommentThreads[0].Comments[0].Body);
+                    Assert.AreEqual("Original Comment", file.InlineCommentThreads[0].Comments[0].Body);
 
                     pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
@@ -593,11 +593,11 @@ Line 4";
 
                     await file.LinesChanged.Take(1);
 
-                    Assert.Equal("Updated Comment", file.InlineCommentThreads[0].Comments[0].Body);
+                    Assert.AreEqual("Updated Comment", file.InlineCommentThreads[0].Comments[0].Body);
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
@@ -638,7 +638,7 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.AreEqual(1, file.InlineCommentThreads[0].Comments.Count);
 
                     pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
@@ -649,13 +649,13 @@ Line 4";
 
                     var linesChanged = await file.LinesChanged.Take(1);
 
-                    Assert.Equal(2, file.InlineCommentThreads[0].Comments.Count);
-                    Assert.Equal("Comment1", file.InlineCommentThreads[0].Comments[0].Body);
-                    Assert.Equal("Comment2", file.InlineCommentThreads[0].Comments[1].Body);
+                    Assert.AreEqual(2, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.AreEqual("Comment1", file.InlineCommentThreads[0].Comments[0].Body);
+                    Assert.AreEqual("Comment2", file.InlineCommentThreads[0].Comments[1].Body);
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task CommitShaIsUpdatedOnTextChange()
             {
                 var textView = CreateTextView();
@@ -669,7 +669,7 @@ Line 4";
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Equal("TIPSHA", file.CommitSha);
+                Assert.AreEqual("TIPSHA", file.CommitSha);
 
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
                 SignalTextChanged(textView.TextBuffer);
@@ -677,7 +677,7 @@ Line 4";
                 Assert.Null(file.CommitSha);
             }
 
-            [Fact]
+            [Test]
             public async Task UpdatingCurrentSessionPullRequestTriggersLinesChanged()
             {
                 var textView = CreateTextView();
@@ -799,7 +799,7 @@ Line 4";
 
         public class TheGetSessionMethod : PullRequestSessionManagerTests
         {
-            [Fact]
+            [Test]
             public async Task GetSessionReturnsAndUpdatesCurrentSessionIfNumbersMatch()
             {
                 var target = new PullRequestSessionManager(
@@ -812,11 +812,11 @@ Line 4";
                 var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber);
                 var result = await target.GetSession(newModel);
 
-                Assert.Same(target.CurrentSession, result);
-                Assert.Same(target.CurrentSession.PullRequest, newModel);
+                Assert.That(target.CurrentSession, Is.SameAs(result));
+                ///Assert.That(target.CurrentSession, Is.SameAs(newModel));
             }
 
-            [Fact]
+            [Test]
             public async Task GetSessionReturnsNewSessionForPullRequestWithDifferentNumber()
             {
                 var target = new PullRequestSessionManager(
@@ -829,12 +829,12 @@ Line 4";
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
                 var result = await target.GetSession(newModel);
 
-                Assert.NotSame(target.CurrentSession, result);
-                Assert.Same(result.PullRequest, newModel);
+                Assert.That(target.CurrentSession, Is.Not.SameAs(result));
+                Assert.That(result.PullRequest, Is.SameAs(newModel));
                 Assert.False(result.IsCheckedOut);
             }
 
-            [Fact]
+            [Test]
             public async Task GetSessionReturnsNewSessionForPullRequestWithDifferentBaseOwner()
             {
                 var target = new PullRequestSessionManager(
@@ -847,12 +847,12 @@ Line 4";
                 var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber, "https://github.com/fork/repo");
                 var result = await target.GetSession(newModel);
 
-                Assert.NotSame(target.CurrentSession, result);
-                Assert.Same(result.PullRequest, newModel);
+                Assert.That(target.CurrentSession, Is.Not.SameAs(result));
+                Assert.That(result.PullRequest, Is.SameAs(newModel));
                 Assert.False(result.IsCheckedOut);
             }
 
-            [Fact]
+            [Test]
             public async Task GetSessionReturnsSameSessionEachTime()
             {
                 var target = new PullRequestSessionManager(
@@ -866,10 +866,10 @@ Line 4";
                 var result1 = await target.GetSession(newModel);
                 var result2 = await target.GetSession(newModel);
 
-                Assert.Same(result1, result2);
+                Assert.That(result1, Is.SameAs(result2));
             }
 
-            [Fact]
+            [Test]
             public async Task SessionCanBeCollected()
             {
                 WeakReference<IPullRequestSession> weakSession = null;
@@ -900,7 +900,7 @@ Line 4";
                 Assert.Null(result);
             }
 
-            [Fact]
+            [Test]
             public async Task GetSessionUpdatesCurrentSessionIfCurrentBranchIsPullRequestButWasNotMarked()
             {
                 var service = CreatePullRequestService();
@@ -923,7 +923,7 @@ Line 4";
 
                 var session = await target.GetSession(model);
 
-                Assert.Same(session, target.CurrentSession);
+                Assert.That(session, Is.SameAs(target.CurrentSession));
             }
         }
 
