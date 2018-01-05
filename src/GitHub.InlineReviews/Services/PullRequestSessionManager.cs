@@ -53,19 +53,21 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService sessionService,
             IConnectionManager connectionManager,
             IModelServiceFactory modelServiceFactory,
-            ITeamExplorerServiceHolder teamExplorerService)
+            IVSGitExt vsGitExt)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
-            Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
+            Guard.ArgumentNotNull(vsGitExt, nameof(vsGitExt));
 
             this.service = service;
             this.sessionService = sessionService;
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
-            teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
+
+            RepoChanged(vsGitExt);
+            vsGitExt.ActiveRepositoriesChanged += () => RepoChanged(vsGitExt);
         }
 
         /// <inheritdoc/>
@@ -176,6 +178,12 @@ namespace GitHub.InlineReviews.Services
             }
 
             return null;
+        }
+
+        void RepoChanged(IVSGitExt vsGitExt)
+        {
+            var repo = vsGitExt.ActiveRepositories.FirstOrDefault();
+            RepoChanged(repo).Forget();
         }
 
         async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
