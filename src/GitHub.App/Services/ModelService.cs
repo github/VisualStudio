@@ -580,7 +580,7 @@ namespace GitHub.Services
                     Sha = pr.Head.Sha,
                     RepositoryCloneUrl = pr.Head.Repository?.CloneUrl
                 };
-                CommentCount = pr.Comments + pr.ReviewComments;
+                CommentCount = pr.Comments;
                 CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
                 Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;

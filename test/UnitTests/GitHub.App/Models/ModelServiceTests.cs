@@ -89,8 +89,8 @@ public class ModelServiceTests
         {
             var data = new[]
             {
-                new LicenseMetadata("mit", "MIT", new Uri("https://github.com/")),
-                new LicenseMetadata("apache", "Apache", new Uri("https://github.com/"))
+                new LicenseMetadata("mit", "MIT", "https://github.com/"),
+                new LicenseMetadata("apache", "Apache", "https://github.com/")
             };
 
             var apiClient = Substitute.For<IApiClient>();

@@ -52,7 +52,7 @@ public class TestBaseClass : IEntryExitDecorator
     protected static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
         DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount = 0, int reviewCommentCount = 0)
     {
-        var uri = new Uri("https://url");
+        var uri = "https://url";
         var uris = uri.ToString();
         var repo = new Repository(uris, uris, uris, uris, uris, uris, uris,
             1, user, "Repo", "Repo", string.Empty, string.Empty, string.Empty,
@@ -68,8 +68,8 @@ public class TestBaseClass : IEntryExitDecorator
             new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
             new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
             user, null, null, false, null,
-            commentCount, reviewCommentCount, 0, 0, 0, 0,
-            null, false);
+            "123", reviewCommentCount, 0, 0, 0, 0,
+            null, false, null);
     }
 
     protected class TempDirectory : IDisposable
