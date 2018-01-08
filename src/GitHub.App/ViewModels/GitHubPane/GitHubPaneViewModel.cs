@@ -28,6 +28,7 @@ namespace GitHub.ViewModels.GitHubPane
     public sealed class GitHubPaneViewModel : ViewModelBase, IGitHubPaneViewModel, IDisposable
     {
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
+        static readonly Regex pullReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/:id");
 
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
@@ -249,6 +250,14 @@ namespace GitHub.ViewModels.GitHubPane
                 var number = int.Parse(match.Groups["number"].Value);
                 await ShowPullRequest(owner, repo, number);
             }
+            else if ((match = pullReviewUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                var id = long.Parse(match.Groups["id"].Value);
+                await ShowPullRequestReview(owner, repo, number, id);
+            }
             else
             {
                 throw new NotSupportedException("Unrecognised GitHub pane URL: " + uri.AbsolutePath);
@@ -286,6 +295,20 @@ namespace GitHub.ViewModels.GitHubPane
             return NavigateTo<IPullRequestDetailViewModel>(
                 x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number),
                 x => x.RemoteRepositoryOwner == owner && x.LocalRepository.Name == repo && x.Number == number);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowPullRequestReview(string owner, string repo, int number, long id)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            return NavigateTo<IPullRequestReviewViewModel>(
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, id),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestNumber == number &&
+                     x.PullRequestReviewId == id);
         }
 
         OleMenuCommand BindNavigatorCommand<T>(IServiceProvider paneServiceProvider, int commandId, ReactiveCommand<T> command)

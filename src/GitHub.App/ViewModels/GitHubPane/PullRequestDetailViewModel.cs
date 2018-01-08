@@ -18,6 +18,7 @@ using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
 using PullRequestReviewState = Octokit.PullRequestReviewState;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -107,7 +108,8 @@ namespace GitHub.ViewModels.GitHubPane
             DiffFile = ReactiveCommand.Create();
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
-            ViewFile = ReactiveCommand.Create();            
+            ViewFile = ReactiveCommand.Create();
+            ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
         }
 
         /// <summary>
@@ -302,6 +304,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
         /// </summary>
         public ReactiveCommand<object> ViewFile { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to a pull request review.
+        /// </summary>
+        public ReactiveCommand<object> ShowReview { get; }
 
         /// <summary>
         /// Initializes the view model.
@@ -697,6 +704,12 @@ namespace GitHub.ViewModels.GitHubPane
                     else
                         usageTracker.IncrementCounter(x => x.NumberOfLocalPullRequestPushes).Forget();
                 });
+        }
+
+        void DoShowReview(object item)
+        {
+            var review = (PullRequestDetailReviewItem)item;
+            NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/{review.Id}"));
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
