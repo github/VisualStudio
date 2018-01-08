@@ -197,9 +197,14 @@ namespace GitHub.VisualStudio.Base
         void UpdateActiveRepo()
         {
             var repo = gitService.ActiveRepositories.FirstOrDefault();
+
             if (!Equals(repo, ActiveRepo))
+            {
                 // so annoying that this is on the wrong thread
                 syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
+            }
+
+            StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -269,6 +274,8 @@ namespace GitHub.VisualStudio.Base
                 return uiContextFactory;
             }
         }
+
+        public event EventHandler StatusChanged;
     }
 
     [Export(typeof(IVSUIContextFactory))]

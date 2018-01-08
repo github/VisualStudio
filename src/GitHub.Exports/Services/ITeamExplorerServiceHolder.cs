@@ -47,6 +47,11 @@ namespace GitHub.Services
         /// Refresh the information on the active repo (in case of remote url changes or other such things)
         /// </summary>
         void Refresh();
+
+        /// <summary>
+        /// Fired when the repo or its status changes.
+        /// </summary>
+        event EventHandler StatusChanged;
     }
 
     public interface IGitAwareItem

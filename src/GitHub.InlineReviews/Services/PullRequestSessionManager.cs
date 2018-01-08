@@ -53,19 +53,24 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService sessionService,
             IConnectionManager connectionManager,
             IModelServiceFactory modelServiceFactory,
-            ITeamExplorerServiceHolder teamExplorerService)
+            ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
-            Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.service = service;
             this.sessionService = sessionService;
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
-            teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
+
+            RepoChanged(teamExplorerContext.ActiveRepository).Forget();
+            teamExplorerContext.StatusChanged += (s, e) =>
+            {
+                RepoChanged(teamExplorerContext.ActiveRepository).Forget();
+            };
         }
 
         /// <inheritdoc/>
