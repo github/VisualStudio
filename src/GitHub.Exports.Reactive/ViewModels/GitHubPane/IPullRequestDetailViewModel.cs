@@ -126,6 +126,11 @@ namespace GitHub.ViewModels.GitHubPane
         string Body { get; }
 
         /// <summary>
+        /// Gets the latest pull request review for each user.
+        /// </summary>
+        IReadOnlyList<PullRequestDetailReviewItem> Reviews { get; }
+
+        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
         IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }

@@ -203,18 +203,21 @@ namespace GitHub.Services
                             ApiClient.GetPullRequest(owner, name, number),
                             ApiClient.GetPullRequestFiles(owner, name, number).ToList(),
                             ApiClient.GetIssueComments(owner, name, number).ToList(),
+                            ApiClient.GetPullRequestReviews(owner, name, number).ToList(),
                             ApiClient.GetPullRequestReviewComments(owner, name, number).ToList(),
-                            (pr, files, comments, reviewComments) => new
+                            (pr, files, comments, reviews, reviewComments) => new
                             {
                                 PullRequest = pr,
                                 Files = files,
                                 Comments = comments,
+                                Reviews = reviews,
                                 ReviewComments = reviewComments
                             })
                             .Select(x => PullRequestCacheItem.Create(
                                 x.PullRequest, 
                                 (IReadOnlyList<PullRequestFile>)x.Files,
                                 (IReadOnlyList<IssueComment>)x.Comments,
+                                (IReadOnlyList<PullRequestReview>)x.Reviews,
                                 (IReadOnlyList<PullRequestReviewComment>)x.ReviewComments)),
                         TimeSpan.Zero,
                         TimeSpan.FromDays(7))
@@ -440,10 +443,20 @@ namespace GitHub.Services
                         User = Create(x.User),
                         CreatedAt = x.CreatedAt ?? DateTimeOffset.MinValue,
                     }).ToList(),
+                Reviews = prCacheItem.Reviews.Select(x =>
+                    (IPullRequestReviewModel)new PullRequestReviewModel
+                    {
+                        Id = x.Id,
+                        User = Create(x.User),
+                        Body = x.Body,
+                        State = x.State,
+                        CommitId = x.CommitId,
+                    }).ToList(),
                 ReviewComments = prCacheItem.ReviewComments.Select(x =>
                     (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
                     {
                         Id = x.Id,
+                        PullRequestReviewId = x.PullRequestReviewId,
                         Path = x.Path,
                         Position = x.Position,
                         OriginalPosition = x.OriginalPosition,
@@ -539,22 +552,28 @@ namespace GitHub.Services
         {
             public static PullRequestCacheItem Create(PullRequest pr)
             {
-                return new PullRequestCacheItem(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReviewComment[0]);
+                return new PullRequestCacheItem(
+                    pr,
+                    new PullRequestFile[0],
+                    new IssueComment[0],
+                    new PullRequestReview[0],
+                    new PullRequestReviewComment[0]);
             }
 
             public static PullRequestCacheItem Create(
                 PullRequest pr,
                 IReadOnlyList<PullRequestFile> files,
                 IReadOnlyList<IssueComment> comments,
+                IReadOnlyList<PullRequestReview> reviews,
                 IReadOnlyList<PullRequestReviewComment> reviewComments)
             {
-                return new PullRequestCacheItem(pr, files, comments, reviewComments);
+                return new PullRequestCacheItem(pr, files, comments, reviews, reviewComments);
             }
 
             public PullRequestCacheItem() {}
 
             public PullRequestCacheItem(PullRequest pr)
-                : this(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReviewComment[0])
+                : this(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReview[0], new PullRequestReviewComment[0])
             {
             }
 
@@ -562,6 +581,7 @@ namespace GitHub.Services
                 PullRequest pr,
                 IReadOnlyList<PullRequestFile> files,
                 IReadOnlyList<IssueComment> comments,
+                IReadOnlyList<PullRequestReview> reviews,
                 IReadOnlyList<PullRequestReviewComment> reviewComments)
             {
                 Title = pr.Title;
@@ -589,6 +609,7 @@ namespace GitHub.Services
                 Body = pr.Body;
                 ChangedFiles = files.Select(x => new PullRequestFileCacheItem(x)).ToList();
                 Comments = comments.Select(x => new IssueCommentCacheItem(x)).ToList();
+                Reviews = reviews.Select(x => new PullRequestReviewCacheItem(x)).ToList();
                 ReviewComments = reviewComments.Select(x => new PullRequestReviewCommentCacheItem(x)).ToList();
                 State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
@@ -610,6 +631,7 @@ namespace GitHub.Services
             public string Body { get; set; }
             public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
             public IList<IssueCommentCacheItem> Comments { get; set; } = new IssueCommentCacheItem[0];
+            public IList<PullRequestReviewCacheItem> Reviews { get; set; } = new PullRequestReviewCacheItem[0];
             public IList<PullRequestReviewCommentCacheItem> ReviewComments { get; set; } = new PullRequestReviewCommentCacheItem[0];
 
             // Nullable for compatibility with old caches.
@@ -674,6 +696,27 @@ namespace GitHub.Services
             public DateTimeOffset? CreatedAt { get; set; }
         }
 
+        public class PullRequestReviewCacheItem
+        {
+            public PullRequestReviewCacheItem()
+            {
+            }
+
+            public PullRequestReviewCacheItem(PullRequestReview review)
+            {
+                Id = review.Id;
+                User = new AccountCacheItem(review.User);
+                Body = review.Body;
+                State = review.State.Value;
+            }
+
+            public long Id { get; set; }
+            public AccountCacheItem User { get; set; }
+            public string Body { get; set; }
+            public PullRequestReviewState State { get; set; }
+            public string CommitId { get; set; }
+        }
+
         public class PullRequestReviewCommentCacheItem
         {
             public PullRequestReviewCommentCacheItem()
@@ -683,6 +726,7 @@ namespace GitHub.Services
             public PullRequestReviewCommentCacheItem(PullRequestReviewComment comment)
             {
                 Id = comment.Id;
+                PullRequestReviewId = comment.PullRequestReviewId;
                 Path = comment.Path;
                 Position = comment.Position;
                 OriginalPosition = comment.OriginalPosition;
@@ -695,6 +739,7 @@ namespace GitHub.Services
             }
 
             public int Id { get; }
+            public long PullRequestReviewId { get; set; }
             public string Path { get; set; }
             public int? Position { get; set; }
             public int? OriginalPosition { get; set; }

@@ -133,6 +133,7 @@
     <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestDetailReviewItem.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\ISearchablePageViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestCreationViewModel.cs" />

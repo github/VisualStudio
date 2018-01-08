@@ -85,7 +85,7 @@
     <FrameworkElement.CommandBindings>
         <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </FrameworkElement.CommandBindings>
-    
+
     <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -232,22 +232,24 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <!-- Author and open time -->
                     <RowDefinition Height="Auto"/>
                     <!-- PR body -->
                     <RowDefinition Height="Auto"/>
                     <!-- View on github link -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Reviewers -->
+                    <RowDefinition Height="Auto"/>
                     <!-- Files changed -->
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Author and open time -->
                 <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
                     <controls:AccountAvatar Account="{Binding Model.Author}"
-                                            VerticalAlignment="Top"
+                                            VerticalAlignment="Bottom"
                                             Width="16"
-                                            Height="16"/>
+                                            Height="16" Margin="0,0,0,1"/>
 
                     <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
                         <Run FontWeight="Bold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
@@ -266,9 +268,34 @@
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
+                <ui:SectionControl Name="reviewsSection"
+                                   HeaderText="Reviewers"
+                                   IsExpanded="True"
+                                   Grid.Row="3">
+                    <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0 2">
+                                    <ui:OcticonImage VerticalAlignment="Top" Margin="0 2" Icon="{Binding Icon}"/>
+                                    <controls:AccountAvatar VerticalAlignment="Top" Margin="2" Account="{Binding User}"/>
+                                    <StackPanel Orientation="Vertical" Margin="2 0">
+                                        <TextBlock>
+                                            <Hyperlink>
+                                                <Run FontWeight="Bold" Text="{Binding User.Login, Mode=OneWay}"/>
+                                                <Run Text="{Binding State, Mode=OneWay}"/>
+                                            </Hyperlink>
+                                        </TextBlock>
+                                        <TextBlock Opacity="0.5" Text="{Binding FileCommentCount, StringFormat={}{0} file comments }"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ui:SectionControl>
+
                 <!-- Files changed -->
                 <ui:SectionControl Name="changesSection" 
-                                   Grid.Row="3"
+                                   Grid.Row="4"
                                    IsExpanded="True"
                                    HeaderText="{Binding Model.ChangedFiles.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0">

@@ -31,7 +31,7 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public class PullRequestDetailViewModelDesigner : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        private List<IPullRequestChangeNode> changedFilesTree;
+        List<IPullRequestChangeNode> changedFilesTree;
 
         public PullRequestDetailViewModelDesigner()
         {
@@ -69,6 +69,20 @@ This requires that errors be propagated from the viewmodel to the view and from 
             modelsDir.Files.Add(oldBranchModel);
             gitHubDir.Directories.Add(modelsDir);
 
+            Reviews = new[]
+            {
+                new PullRequestDetailReviewItem(
+                    1,
+                    new AccountDesigner { Login = "grokys", IsUser = true },
+                    Octokit.PullRequestReviewState.Approved,
+                    5),
+                new PullRequestDetailReviewItem(
+                    2,
+                    new AccountDesigner { Login = "shana", IsUser = true },
+                    Octokit.PullRequestReviewState.ChangesRequested,
+                    5),
+            };
+
             changedFilesTree = new List<IPullRequestChangeNode>();
             changedFilesTree.Add(gitHubDir);
         }
@@ -84,6 +98,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
+        public IReadOnlyList<PullRequestDetailReviewItem> Reviews { get; }
         public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }

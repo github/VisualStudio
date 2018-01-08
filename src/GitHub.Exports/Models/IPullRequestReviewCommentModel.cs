@@ -8,6 +8,11 @@ namespace GitHub.Models
     public interface IPullRequestReviewCommentModel : ICommentModel
     {
         /// <summary>
+        /// Gets the ID of the related pull request review.
+        /// </summary>
+        long PullRequestReviewId { get; }
+
+        /// <summary>
         /// The relative path to the file that the comment was made on.
         /// </summary>
         string Path { get; }

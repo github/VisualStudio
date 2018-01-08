@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -18,6 +17,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
+using PullRequestReviewState = Octokit.PullRequestReviewState;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -41,6 +41,7 @@ namespace GitHub.ViewModels.GitHubPane
         string targetBranchDisplayName;
         int commentCount;
         string body;
+        IReadOnlyList<PullRequestDetailReviewItem> reviews;
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
@@ -235,6 +236,15 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
+        /// Gets the latest pull request review for each user.
+        /// </summary>
+        public IReadOnlyList<PullRequestDetailReviewItem> Reviews
+        {
+            get { return reviews; }
+            private set { this.RaiseAndSetIfChanged(ref reviews, value); }
+        }
+
+        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
         public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree
@@ -350,6 +360,7 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
+                Reviews = BuildReviews(pullRequest).ToList();
 
                 var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
                 ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
@@ -432,6 +443,30 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 IsBusy = false;
             }
+        }
+
+        IEnumerable<PullRequestDetailReviewItem> BuildReviews(IPullRequestModel pullRequest)
+        {
+            var result = new Dictionary<string, PullRequestDetailReviewItem>();
+
+            for (var i = pullRequest.Reviews.Count - 1; i >= 0; --i)
+            {
+                var review = pullRequest.Reviews[i];
+
+                if (!result.ContainsKey(review.User.Login) &&
+                    review.State != PullRequestReviewState.Dismissed &&
+                    review.State != PullRequestReviewState.Pending)
+                {
+                    var commentCount = pullRequest.ReviewComments
+                        .Where(x => x.PullRequestReviewId == review.Id)
+                        .Count();
+                    result.Add(
+                        review.User.Login,
+                        new PullRequestDetailReviewItem(review.Id, review.User, review.State, commentCount));
+                }
+            }
+
+            return result.Values.OrderBy(x => x.User);
         }
 
         /// <summary>
