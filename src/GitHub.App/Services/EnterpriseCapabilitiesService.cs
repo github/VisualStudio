@@ -13,7 +13,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class EnterpriseCapabilitiesService : IEnterpriseCapabilitiesService
     {
-        static readonly Version MinimumOAuthVersion = new Version("2.12.1");
+        static readonly Version MinimumOAuthVersion = new Version("2.12.2");
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IEnterpriseProbe probe;
 
