@@ -240,7 +240,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 Assert.True(target.Checkout.CanExecute(null));
 
-                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.Throws<FileNotFoundException>(async () => target.Checkout.ExecuteAsyncTask());
 
                 Assert.That("Switch threw", Is.EqualTo(target.OperationError));
             }
@@ -255,7 +255,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
-                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.Throws<FileNotFoundException>(async () => target.Checkout.ExecuteAsyncTask());
                 Assert.That("Switch threw", Is.EqualTo(target.OperationError));
 
                 await target.Checkout.ExecuteAsync();
@@ -272,7 +272,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
-                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.Throws<FileNotFoundException>(async () => target.Checkout.ExecuteAsyncTask());
                 Assert.That("Switch threw", Is.EqualTo(target.OperationError));
 
                 await target.Refresh();
@@ -369,7 +369,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
+                Assert.Throws<FileNotFoundException>(async () => target.Pull.ExecuteAsyncTask(null));
                 Assert.That("Pull threw", Is.EqualTo(target.OperationError));
             }
         }
@@ -479,7 +479,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
+                Assert.Throws<FileNotFoundException>(async () => target.Push.ExecuteAsyncTask(null));
                 Assert.That("Push threw", Is.EqualTo(target.OperationError));
             }
         }
@@ -553,7 +553,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var vm = new PullRequestDetailViewModel(
                 pullRequestService,
                 sessionManager ?? Substitute.For<IPullRequestSessionManager>(),
-                Substitute.For<IModelServiceTestory>(),
+                Substitute.For<IModelServiceFactory>(),
                 Substitute.For<IUsageTracker>(),
                 Substitute.For<IVSGitExt>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();

@@ -124,8 +124,8 @@ public class ConnectionManagerTests
                 CreateLoginManager(),
                 Substitute.For<IUsageTracker>());
 
-            await Assert.ThrowsAsync<AuthorizationException>(async () =>
-                await target.LogIn(HostAddress.Create("invalid.com"), "user", "pass"));
+            Assert.Throws<AuthorizationException>(async () =>
+                target.LogIn(HostAddress.Create("invalid.com"), "user", "pass"));
         }
 
         [Test]

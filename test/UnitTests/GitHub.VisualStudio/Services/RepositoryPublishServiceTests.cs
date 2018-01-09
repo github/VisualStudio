@@ -17,7 +17,8 @@ public class RepositoryPublishServiceTests
         {
             var solution = Substitute.For<IVsSolution>();
             var gitClient = Substitute.For<IGitClient>();
-            var service = new RepositoryPublishService(gitClient, Substitute.IVSGitServices);
+            //var service = new RepositoryPublishService(gitClient, Substitutes.IVSGitServices);
+            var service = new RepositoryPublishService(gitClient, Substitute.For<IVSGitServices>());
             var newRepository = new Octokit.NewRepository("test");
             var account = Substitute.For<IAccount>();
             account.Login.Returns("monalisa");

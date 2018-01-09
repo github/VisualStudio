@@ -53,7 +53,7 @@ public class ImageCacheTests
                 .FirstAsync();
 
             Assert.That(retrieved, Is.Null);
-            Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
+            Assert.Throws<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
         }
         
         [Test]
