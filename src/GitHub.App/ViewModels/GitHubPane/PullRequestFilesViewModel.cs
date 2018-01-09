@@ -19,10 +19,15 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public sealed class PullRequestFilesViewModel : ViewModelBase, IPullRequestFilesViewModel
     {
+        IReadOnlyList<IPullRequestChangeNode> items;
         CompositeDisposable subscriptions;
 
         /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestChangeNode> Items { get; private set; }
+        public IReadOnlyList<IPullRequestChangeNode> Items
+        {
+            get { return items; }
+            private set { this.RaiseAndSetIfChanged(ref items, value); }
+        }
 
         /// <inheritdoc/>
         public void Dispose()

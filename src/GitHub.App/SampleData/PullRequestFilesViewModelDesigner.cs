@@ -7,7 +7,7 @@ using GitHub.ViewModels.GitHubPane;
 using LibGit2Sharp;
 using ReactiveUI;
 
-namespace GitHub.App.SampleData
+namespace GitHub.SampleData
 {
     public class PullRequestFilesViewModelDesigner : PanePageViewModelBase, IPullRequestFilesViewModel
     {

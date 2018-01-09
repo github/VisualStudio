@@ -19,6 +19,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             InitializeComponent();
         }
 
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+        }
+
         void changesTree_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             ApplyContextMenuBinding<TreeViewItem>(sender, e);

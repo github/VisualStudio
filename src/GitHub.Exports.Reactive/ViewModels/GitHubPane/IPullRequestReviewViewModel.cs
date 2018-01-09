@@ -39,6 +39,11 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestReviewModel Model { get; }
 
         /// <summary>
+        /// Gets the state of the pull request review as a string.
+        /// </summary>
+        string State { get; }
+
+        /// <summary>
         /// Gets the body of the pull request review.
         /// </summary>
         string Body { get; }

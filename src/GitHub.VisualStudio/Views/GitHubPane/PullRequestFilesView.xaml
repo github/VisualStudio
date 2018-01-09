@@ -7,8 +7,7 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vm="clr-namespace:GitHub.ViewModels.GitHubPane;assembly=GitHub.App"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
-             xmlns:sample="clr-namespace:GitHub.App.SampleData;assembly=GitHub.App"
-             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:sample="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              Name="root">
 

@@ -27,6 +27,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IModelServiceFactory modelServiceFactory;
         IModelService modelService;
         IPullRequestReviewModel model;
+        string state;
         string body;
         IPullRequestFilesViewModel files;
 
@@ -71,6 +72,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return model; }
             private set { this.RaiseAndSetIfChanged(ref model, value); }
+        }
+
+        /// <inheritdoc/>
+        public string State
+        {
+            get { return state; }
+            private set { this.RaiseAndSetIfChanged(ref state, value); }
         }
 
         /// <inheritdoc/>
@@ -142,6 +150,7 @@ namespace GitHub.ViewModels.GitHubPane
             try
             {
                 Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
+                State = PullRequestDetailReviewItem.ToString(Model.State);
                 Body = !string.IsNullOrWhiteSpace(Model.Body) ? Model.Body : Resources.NoDescriptionProvidedMarkdown;
 
                 var session = await sessionManager.GetSession(pullRequest);

@@ -7,9 +7,12 @@
                                     xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                                    xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+                                    xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
-                                    mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800">
+                                    mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800"
+                                    d:DataContext="{d:DesignInstance Type={x:Type sampleData:PullRequestReviewViewModelDesigner}, IsDesignTimeCreatable=True}">
     
     <Control.Resources>
         <ResourceDictionary>
@@ -23,11 +26,23 @@
     </Control.Resources>
 
     <StackPanel Margin="8,0">
-        <TextBlock DockPanel.Dock="Top" FontSize="18" Margin="0 4">Pull Request Review</TextBlock>
+        <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
+            <c:AccountAvatar Account="{Binding Model.User}" Margin="4" Width="24" Height="24"/>
+            <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
+                <Run FontWeight="Bold" Text="{Binding Model.User.Login, Mode=OneWay}"/>
+                <Run Text="{Binding State, Mode=OneWay}"/>
+                <Hyperlink Command="{Binding NavigateToPullRequest}">
+                    <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+        
         <ui:SectionControl HeaderText="Summary" Margin="0 4">
             <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
         </ui:SectionControl>
-        <ui:SectionControl HeaderText="Files" Margin="0 4" Content="{Binding Files}"/>
+        <ui:SectionControl HeaderText="Files" Margin="0 4">
+            <local:PullRequestFilesView DataContext="{Binding Files}"/>
+        </ui:SectionControl>
     </StackPanel>
     
 </local:GenericPullRequestReviewView>
