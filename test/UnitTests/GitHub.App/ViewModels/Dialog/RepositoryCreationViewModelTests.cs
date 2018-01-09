@@ -15,7 +15,7 @@ using NSubstitute;
 using Octokit;
 using Rothko;
 using UnitTests;
-using Xunit;
+using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
 
 public class RepositoryCreationViewModelTests
@@ -53,7 +53,7 @@ public class RepositoryCreationViewModelTests
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTheSameAsTheRepositoryNameWhenTheInputIsSafe()
         {
             var vm = GetMeAViewModel();
@@ -61,20 +61,20 @@ public class RepositoryCreationViewModelTests
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "this-is-bad";
 
-            Assert.Equal(vm.RepositoryName, vm.SafeRepositoryName);
+            Assert.That(vm.RepositoryName, Is.EqualTo(vm.SafeRepositoryName));
         }
 
-        [Fact]
+        [Test]
         public void IsConvertedWhenTheRepositoryNameIsNotSafe()
         {
             var vm = GetMeAViewModel();
 
             vm.RepositoryName = "this is bad";
 
-            Assert.Equal("this-is-bad", vm.SafeRepositoryName);
+            Assert.That("this-is-bad", Is.EqualTo(vm.SafeRepositoryName));
         }
 
-        [Fact]
+        [Test]
         public void IsNullWhenRepositoryNameIsNull()
         {
             var vm = GetMeAViewModel();
@@ -82,13 +82,13 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "not-null";
             vm.RepositoryName = null;
 
-            Assert.Null(vm.SafeRepositoryName);
+            Assert.That(vm.SafeRepositoryName, Is.Null);
         }
     }
 
     public class TheBrowseForDirectoryCommand : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task SetsTheBaseRepositoryPathWhenUserChoosesADirectory()
         {
             var provider = Substitutes.ServiceProvider;
@@ -101,10 +101,10 @@ public class RepositoryCreationViewModelTests
 
             await vm.BrowseForDirectory.ExecuteAsync();
 
-            Assert.Equal(@"c:\fake\foo", vm.BaseRepositoryPath);
+            Assert.That(@"c:\fake\foo", Is.EqualTo(vm.BaseRepositoryPath));
         }
 
-        [Fact]
+        [Test]
         public async Task DoesNotChangeTheBaseRepositoryPathWhenUserDoesNotChooseResult()
         {
             var provider = Substitutes.ServiceProvider;
@@ -116,13 +116,13 @@ public class RepositoryCreationViewModelTests
 
             await vm.BrowseForDirectory.ExecuteAsync();
 
-            Assert.Equal(@"c:\fake\dev", vm.BaseRepositoryPath);
+            Assert.That(@"c:\fake\dev", Is.EqualTo(vm.BaseRepositoryPath));
         }
     }
 
     public class TheBaseRepositoryPathProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsSetFromTheRepositoryCreationService()
         {
             var repositoryCreationService = Substitute.For<IRepositoryCreationService>();
@@ -130,13 +130,13 @@ public class RepositoryCreationViewModelTests
 
             var vm = GetMeAViewModel(creationService: repositoryCreationService);
 
-            Assert.Equal(@"c:\fake\default", vm.BaseRepositoryPath);
+            Assert.That(@"c:\fake\default", Is.EqualTo(vm.BaseRepositoryPath));
         }
     }
 
     public class TheBaseRepositoryPathValidatorProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsFalseWhenPathEmpty()
         {
             var vm = GetMeAViewModel();
@@ -145,10 +145,10 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "foo";
 
             Assert.False(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a repository path", vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That("Please enter a repository path", Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenPathHasInvalidCharacters()
         {
             var vm = GetMeAViewModel();
@@ -157,11 +157,11 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "foo";
 
             Assert.False(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal("Path contains invalid characters",
-                vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That("Path contains invalid characters",
+                Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenLotsofInvalidCharactersInPath()
         {
             var vm = GetMeAViewModel();
@@ -170,11 +170,11 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "foo";
 
             Assert.False(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal("Path contains invalid characters",
-                vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That("Path contains invalid characters",
+                Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsValidWhenUserAccidentallyUsesForwardSlashes()
         {
             var vm = GetMeAViewModel();
@@ -185,7 +185,7 @@ public class RepositoryCreationViewModelTests
             Assert.True(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenPathIsNotRooted()
         {
             var vm = GetMeAViewModel();
@@ -194,10 +194,10 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "foo";
 
             Assert.False(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a valid path", vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That("Please enter a valid path", Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenAfterBeingTrue()
         {
             var vm = GetMeAViewModel();
@@ -205,15 +205,15 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "repo";
 
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
 
             vm.BaseRepositoryPath = "";
 
             Assert.False(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a repository path", vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That("Please enter a repository path", Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsTrueWhenRepositoryNameAndPathIsValid()
         {
             var vm = GetMeAViewModel();
@@ -222,10 +222,10 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "thisisfine";
 
             Assert.True(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Empty(vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That(vm.BaseRepositoryPathValidator.ValidationResult.Message, Is.Empty);
         }
 
-        [Fact]
+        [Test]
         public void IsTrueWhenSetToValidQuotedPath()
         {
             var vm = GetMeAViewModel();
@@ -234,10 +234,10 @@ public class RepositoryCreationViewModelTests
             vm.BaseRepositoryPath = @"""c:\fake""";
 
             Assert.True(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal(@"c:\fake", vm.BaseRepositoryPath);
+            Assert.That(@"c:\fake", Is.EqualTo(vm.BaseRepositoryPath));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsCorrectMessageWhenPathTooLong()
         {
             var vm = GetMeAViewModel();
@@ -245,13 +245,13 @@ public class RepositoryCreationViewModelTests
             vm.BaseRepositoryPath = @"C:\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\";
 
             Assert.False(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
-            Assert.Equal("Path too long", vm.BaseRepositoryPathValidator.ValidationResult.Message);
+            Assert.That("Path too long", Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Message));
         }
     }
 
     public class TheRepositoryNameValidatorProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsFalseWhenRepoNameEmpty()
         {
             var vm = GetMeAViewModel();
@@ -260,10 +260,10 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "";
 
             Assert.False(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a repository name", vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That("Please enter a repository name", Is.EqualTo(vm.RepositoryNameValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenAfterBeingTrue()
         {
             var vm = GetMeAViewModel();
@@ -272,15 +272,15 @@ public class RepositoryCreationViewModelTests
 
             Assert.True(vm.CreateRepository.CanExecute(null));
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
 
             vm.RepositoryName = "";
 
             Assert.False(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a repository name", vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That("Please enter a repository name", Is.EqualTo(vm.RepositoryNameValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsTrueWhenRepositoryNameAndPathIsValid()
         {
             var vm = GetMeAViewModel();
@@ -288,12 +288,11 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "thisisfine";
 
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
         }
 
-        [Theory]
-        [InlineData(true, false)]
-        [InlineData(false, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
         public void IsFalseWhenRepositoryAlreadyExists(bool exists, bool expected)
         {
             var provider = Substitutes.ServiceProvider;
@@ -304,16 +303,16 @@ public class RepositoryCreationViewModelTests
 
             vm.RepositoryName = "foo";
 
-            Assert.Equal(expected, vm.RepositoryNameValidator.ValidationResult.IsValid);
+            Assert.That(expected, Is.EqualTo(vm.RepositoryNameValidator.ValidationResult.IsValid));
             if (!expected)
-                Assert.Equal("Repository with same name already exists at this location",
-                    vm.RepositoryNameValidator.ValidationResult.Message);
+                Assert.That("Repository with same name already exists at this location",
+                    Is.EqualTo(vm.RepositoryNameValidator.ValidationResult.Message));
         }
     }
 
     public class TheSafeRepositoryNameWarningValidatorProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTrueWhenRepoNameIsSafe()
         {
             var vm = GetMeAViewModel();
@@ -324,7 +323,7 @@ public class RepositoryCreationViewModelTests
             Assert.True(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenRepoNameIsNotSafe()
         {
             var vm = GetMeAViewModel();
@@ -333,13 +332,13 @@ public class RepositoryCreationViewModelTests
             vm.RepositoryName = "this is bad";
 
             Assert.False(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
-            Assert.Equal("Will be created as this-is-bad", vm.SafeRepositoryNameWarningValidator.ValidationResult.Message);
+            Assert.That("Will be created as this-is-bad", Is.EqualTo(vm.SafeRepositoryNameWarningValidator.ValidationResult.Message));
         }
     }
 
     public class TheAccountsProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsPopulatedByTheRepositoryHost()
         {
             var accounts = new List<IAccount> { new AccountDesigner(), new AccountDesigner() };
@@ -354,14 +353,14 @@ public class RepositoryCreationViewModelTests
                 Substitute.For<IUsageTracker>());
             vm.InitializeAsync(connection).Wait();
 
-            Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
-            Assert.Equal(2, vm.Accounts.Count);
+            Assert.That(vm.Accounts[0], Is.EqualTo(vm.SelectedAccount));
+            Assert.That(2, Is.EqualTo(vm.Accounts.Count));
         }
     }
 
     public class TheGitIgnoreTemplatesProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
         {
             var gitIgnoreTemplates = new[]
@@ -383,23 +382,23 @@ public class RepositoryCreationViewModelTests
 
             var result = vm.GitIgnoreTemplates;
 
-            Assert.Equal(5, result.Count);
-            Assert.Equal("None", result[0].Name);
+            Assert.That(5, Is.EqualTo(result.Count));
+            Assert.That("None", Is.EqualTo(result[0].Name));
             Assert.True(result[0].Recommended);
-            Assert.Equal("VisualStudio", result[1].Name);
+            Assert.That("VisualStudio", Is.EqualTo(result[1].Name));
             Assert.True(result[1].Recommended);
-            Assert.Equal("Node", result[2].Name);
+            Assert.That("Node", Is.EqualTo(result[2].Name));
             Assert.True(result[2].Recommended);
-            Assert.Equal("Waf", result[3].Name);
+            Assert.That("Waf", Is.EqualTo(result[3].Name));
             Assert.False(result[3].Recommended);
-            Assert.Equal("WordPress", result[4].Name);
+            Assert.That("WordPress", Is.EqualTo(result[4].Name));
             Assert.False(result[4].Recommended);
         }
     }
 
     public class TheLicensesProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async void IsPopulatedByTheModelService()
         {
             var licenses = new[]
@@ -421,25 +420,25 @@ public class RepositoryCreationViewModelTests
 
             var result = vm.Licenses;
 
-            Assert.Equal(5, result.Count);
-            Assert.Equal("", result[0].Key);
-            Assert.Equal("None", result[0].Name);
+            Assert.That(5, Is.EqualTo(result.Count));
+            Assert.That("", Is.EqualTo(result[0].Key));
+            Assert.That("None", Is.EqualTo(result[0].Name));
             Assert.True(result[0].Recommended);
-            Assert.Equal("apache-2.0", result[1].Key);
+            Assert.That("apache-2.0", Is.EqualTo(result[1].Key));
             Assert.True(result[1].Recommended);
-            Assert.Equal("mit", result[2].Key);
+            Assert.That("mit", Is.EqualTo(result[2].Key));
             Assert.True(result[2].Recommended);
-            Assert.Equal("agpl-3.0", result[3].Key);
+            Assert.That("agpl-3.0", Is.EqualTo(result[3].Key));
             Assert.False(result[3].Recommended);
-            Assert.Equal("artistic-2.0", result[4].Key);
+            Assert.That("artistic-2.0", Is.EqualTo(result[4].Key));
             Assert.False(result[4].Recommended);
-            Assert.Equal(result[0], vm.SelectedLicense);
+            Assert.That(result[0], Is.EqualTo(vm.SelectedLicense));
         }
     }
 
     public class TheSelectedGitIgnoreProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async void DefaultsToVisualStudio()
         {
             var gitignores = new[]
@@ -458,10 +457,10 @@ public class RepositoryCreationViewModelTests
             // this is how long the default collection waits to process about 5 things with the default UI settings
             await Task.Delay(100);
 
-            Assert.Equal("VisualStudio", vm.SelectedGitIgnoreTemplate.Name);
+            Assert.That("VisualStudio", Is.EqualTo(vm.SelectedGitIgnoreTemplate.Name));
         }
 
-        [Fact]
+        [Test]
         public void DefaultsToNoneIfVisualStudioIsMissingSomehow()
         {
             var gitignores = new[]
@@ -477,13 +476,13 @@ public class RepositoryCreationViewModelTests
                 .Returns(gitignores.ToObservable());
             var vm = GetMeAViewModel(provider, modelService: modelService);
 
-            Assert.Equal("None", vm.SelectedGitIgnoreTemplate.Name);
+            Assert.That("None", Is.EqualTo(vm.SelectedGitIgnoreTemplate.Name));
         }
     }
 
     public class TheCreateRepositoryCommand : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task DisplaysUserErrorWhenCreationFails()
         {
             var creationService = Substitutes.RepositoryCreationService;
@@ -499,11 +498,11 @@ public class RepositoryCreationViewModelTests
             {
                 await vm.CreateRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
 
-                Assert.Equal("Could not create a repository on GitHub", handlers.LastError.ErrorMessage);
+                Assert.That("Could not create a repository on GitHub", Is.EqualTo(handlers.LastError.ErrorMessage));
             }
         }
 
-        [Fact]
+        [Test]
         public void CreatesARepositoryUsingTheCreationService()
         {
             var creationService = Substitutes.RepositoryCreationService;
@@ -533,7 +532,7 @@ public class RepositoryCreationViewModelTests
                     Args.ApiClient);
         }
 
-        [Fact]
+        [Test]
         public void SetsAutoInitToTrueWhenLicenseSelected()
         {
             var creationService = Substitutes.RepositoryCreationService;
@@ -563,7 +562,7 @@ public class RepositoryCreationViewModelTests
                     Args.ApiClient);
         }
 
-        [Fact]
+        [Test]
         public void SetsAutoInitToTrueWhenGitIgnore()
         {
             var creationService = Substitutes.RepositoryCreationService;
@@ -593,11 +592,10 @@ public class RepositoryCreationViewModelTests
                     Args.ApiClient);
         }
 
-        [Theory]
-        [InlineData("", "", false)]
-        [InlineData("", @"c:\dev", false)]
-        [InlineData("blah", @"c:\|dev", false)]
-        [InlineData("blah", @"c:\dev", true)]
+        [TestCase("", "", false)]
+        [TestCase("", @"c:\dev", false)]
+        [TestCase("blah", @"c:\|dev", false)]
+        [TestCase("blah", @"c:\dev", true)]
         public void CannotCreateWhenRepositoryNameOrBasePathIsInvalid(
             string repositoryName,
             string baseRepositoryPath,
@@ -610,18 +608,17 @@ public class RepositoryCreationViewModelTests
 
             bool result = reactiveCommand.CanExecute(null);
 
-            Assert.Equal(expected, result);
+            Assert.That(expected, Is.EqualTo(result));
         }
     }
 
     public class TheCanKeepPrivateProperty : TestBaseClass
     {
-        [Theory]
-        [InlineData(true, false, false, false)]
-        [InlineData(true, false, true, false)]
-        [InlineData(false, false, true, false)]
-        [InlineData(true, true, true, true)]
-        [InlineData(false, false, false, true)]
+        [TestCase(true, false, false, false)]
+        [TestCase(true, false, true, false)]
+        [TestCase(false, false, true, false)]
+        [TestCase(true, true, true, true)]
+        [TestCase(false, false, false, true)]
         public void IsOnlyTrueWhenUserIsEntepriseOrNotOnFreeAccountThatIsNotMaxedOut(
             bool isFreeAccount,
             bool isEnterprise,
@@ -635,7 +632,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel();
             vm.SelectedAccount = selectedAccount;
 
-            Assert.Equal(expected, vm.CanKeepPrivate);
+            Assert.That(expected, Is.EqualTo(vm.CanKeepPrivate));
         }
     }
 }

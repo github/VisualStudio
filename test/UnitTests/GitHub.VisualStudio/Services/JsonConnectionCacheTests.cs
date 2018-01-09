@@ -7,13 +7,13 @@ using GitHub.Primitives;
 using GitHub.VisualStudio;
 using NSubstitute;
 using Rothko;
-using Xunit;
+using NUnit.Framework;
 
 public class JsonConnectionCacheTests
 {
     public class TheLoadMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task IsLoadedFromCache()
         {
             const string cacheData = @"{""connections"":[{""HostUrl"":""https://github.com"", ""UserName"":""shana""},{""HostUrl"":""https://github.enterprise"", ""UserName"":""haacked""}]}";
@@ -27,18 +27,17 @@ public class JsonConnectionCacheTests
             var cache = new JsonConnectionCache(program, operatingSystem);
 
             var connections = (await cache.Load()).ToList();
-            Assert.Equal(2, connections.Count);
-            Assert.Equal(new Uri("https://api.github.com"), connections[0].HostAddress.ApiUri);
-            Assert.Equal(new Uri("https://github.enterprise/api/v3/"), connections[1].HostAddress.ApiUri);
+            Assert.That(2, Is.EqualTo(connections.Count));
+            Assert.That(new Uri("https://api.github.com"), Is.EqualTo(connections[0].HostAddress.ApiUri));
+            Assert.That(new Uri("https://github.enterprise/api/v3/"), Is.EqualTo(connections[1].HostAddress.ApiUri));
         }
 
-        [Theory]
-        [InlineData("|!This ain't no JSON what even is this?")]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("{}")]
-        [InlineData(@"{""connections"":null}")]
-        [InlineData(@"{""connections"":{}}")]
+        [TestCase("|!This ain't no JSON what even is this?")]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("{}")]
+        [TestCase(@"{""connections"":null}")]
+        [TestCase(@"{""connections"":{}}")]
         public async Task IsEmptyWhenCacheCorrupt(string cacheJson)
         {
             var program = Substitute.For<IProgram>();
@@ -52,11 +51,11 @@ public class JsonConnectionCacheTests
 
             var connections = (await cache.Load()).ToList();
 
-            Assert.Empty(connections);
+            Assert.That(connections, Is.Empty);
             operatingSystem.File.Received().Delete(@"c:\fake\GHfVS\ghfvs.connections");
         }
 
-        [Fact]
+        [Test]
         public async Task IsSavedToDisk()
         {
             var program = Substitute.For<IProgram>();

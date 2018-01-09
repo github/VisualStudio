@@ -9,14 +9,14 @@ using GitHub.Settings;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.Primitives;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using GitHub.Factories;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
     public class PullRequestListViewModelTests : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void SelectingAssigneeShouldTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
@@ -33,7 +33,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Fact]
+        [Test]
         public void ResettingAssigneeToNoneShouldNotTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
@@ -56,7 +56,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Fact]
+        [Test]
         public void SelectingAuthorShouldTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
@@ -73,7 +73,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Fact]
+        [Test]
         public void ResettingAuthorToNoneShouldNotTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
@@ -96,8 +96,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Theory]
-        [InlineData("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
+        [TestCase("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
         public void OpenPullRequestOnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
         {
             var connection = Substitute.For<IConnection>();

@@ -7,7 +7,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.Factories
 {
@@ -15,27 +15,27 @@ namespace UnitTests.GitHub.App.Factories
     {
         public class TheCreateAsyncMethod
         {
-            [Fact]
+            [Test]
             public async Task ShouldCreateDifferentModelServiceForDifferentHost()
             {
                 var target = CreateTarget();
                 var instance1 = await target.CreateAsync(CreateConnection("https://github.com"));
                 var instance2 = await target.CreateAsync(CreateConnection("https://another.com"));
 
-                Assert.NotSame(instance1, instance2);
+                Assert.That(instance1, Is.Not.SameAs(instance2));
             }
 
-            [Fact]
+            [Test]
             public async Task ShouldCreateDifferentModelServiceForDifferentConnectionsWithSameAddress()
             {
                 var target = CreateTarget();
                 var instance1 = await target.CreateAsync(CreateConnection("https://github.com"));
                 var instance2 = await target.CreateAsync(CreateConnection("https://github.com"));
 
-                Assert.NotSame(instance1, instance2);
+                Assert.That(instance1, Is.Not.SameAs(instance2));
             }
 
-            [Fact]
+            [Test]
             public async Task ShouldCacheModelServiceForHost()
             {
                 var target = CreateTarget();
@@ -43,10 +43,10 @@ namespace UnitTests.GitHub.App.Factories
                 var instance1 = await target.CreateAsync(connection);
                 var instance2 = await target.CreateAsync(connection);
 
-                Assert.Same(instance1, instance2);
+                Assert.That(instance1, Is.SameAs(instance2));
             }
 
-            [Fact]
+            [Test]
             public async Task ShouldInsertUser()
             {
                 var hostCacheFactory = Substitute.For<IHostCacheFactory>();

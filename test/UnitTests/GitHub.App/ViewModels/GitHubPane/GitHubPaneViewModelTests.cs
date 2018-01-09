@@ -11,7 +11,7 @@ using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
 using ReactiveUI;
-using Xunit;
+using NUnit.Framework;
 
 public class GitHubPaneViewModelTests : TestBaseClass
 {
@@ -20,7 +20,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     public class TheInitializeMethod
     {
-        [Fact]
+        [Test]
         public async Task NotAGitRepositoryShownWhenNoRepository()
         {
             var te = Substitute.For<ITeamExplorerServiceHolder>();
@@ -32,7 +32,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<INotAGitRepositoryViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
         {
             var repo = Substitute.For<ILocalRepositoryModel>();
@@ -44,7 +44,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstance()
         {
             var te = CreateTeamExplorerServiceHolder("https://some.site/foo/bar");
@@ -55,7 +55,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepo()
         {
             var te = CreateTeamExplorerServiceHolder("https://github.com/invalid/repo");
@@ -66,7 +66,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task LoggedOutShownWhenNotLoggedInToGitHub()
         {
             var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
@@ -78,7 +78,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task LoggedOutShownWhenNotLoggedInToEnterprise()
         {
             var te = CreateTeamExplorerServiceHolder(ValidEnterpriseRepo);
@@ -90,7 +90,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
         {
             var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
@@ -102,7 +102,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
         {
             var te = CreateTeamExplorerServiceHolder(ValidEnterpriseRepo);
@@ -114,7 +114,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
         }
 
-        [Fact]
+        [Test]
         public async Task NavigatorShownWhenUserLogsIn()
         {
             var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
@@ -133,7 +133,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     public class TheShowPullRequestsMethod
     {
-        [Fact]
+        [Test]
         public async Task HasNoEffectWhenUserLoggedOut()
         {
             var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
@@ -151,7 +151,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             viewModelFactory.DidNotReceive().CreateViewModel<IPullRequestListViewModel>();
         }
 
-        [Fact]
+        [Test]
         public async Task HasNoEffectWhenAlreadyCurrentPage()
         {
             var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
@@ -163,12 +163,12 @@ public class GitHubPaneViewModelTests : TestBaseClass
                 navigator: nav);
 
             await Initialize(target);
-            Assert.Same(nav, target.Content);
+            Assert.That(nav, Is.SameAs(target.Content));
             Assert.IsAssignableFrom<IPullRequestListViewModel>(nav.Content);
 
             await target.ShowPullRequests();
 
-            Assert.Equal(1, nav.History.Count);
+            Assert.That(1, Is.EqualTo(nav.History.Count));
         }
     }
 

@@ -8,13 +8,13 @@ using GitHub.Services;
 using GitHub.ViewModels.Dialog;
 using NSubstitute;
 using ReactiveUI;
-using Xunit;
+using NUnit.Framework;
 
 public class LoginCredentialsViewModelTests
 {
     public class TheDoneSignal : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task SucessfulGitHubLoginSignalsDone()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
@@ -35,7 +35,7 @@ public class LoginCredentialsViewModelTests
             Assert.True(signalled);
         }
 
-        [Fact]
+        [Test]
         public async Task FailedGitHubLoginDoesNotSignalDone()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
@@ -55,7 +55,7 @@ public class LoginCredentialsViewModelTests
             Assert.False(signalled);
         }
 
-        [Fact]
+        [Test]
         public async Task AllowsLoginFromEnterpriseAfterGitHubLoginHasFailed()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
@@ -88,7 +88,7 @@ public class LoginCredentialsViewModelTests
 
     public class TheLoginModeProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void LoginModeTracksAvailableConnections()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
@@ -106,16 +106,16 @@ public class LoginCredentialsViewModelTests
 
             var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
 
-            Assert.Equal(LoginMode.DotComOrEnterprise, loginViewModel.LoginMode);
+            Assert.That(LoginMode.DotComOrEnterprise, Is.EqualTo(loginViewModel.LoginMode));
 
             connections.Add(enterpriseConnection);
-            Assert.Equal(LoginMode.DotComOnly, loginViewModel.LoginMode);
+            Assert.That(LoginMode.DotComOnly, Is.EqualTo(loginViewModel.LoginMode));
 
             connections.Add(gitHubConnection);
-            Assert.Equal(LoginMode.None, loginViewModel.LoginMode);
+            Assert.That(LoginMode.None, Is.EqualTo(loginViewModel.LoginMode));
 
             connections.RemoveAt(0);
-            Assert.Equal(LoginMode.EnterpriseOnly, loginViewModel.LoginMode);
+            Assert.That(LoginMode.EnterpriseOnly, Is.EqualTo(loginViewModel.LoginMode));
         }
     }
 }

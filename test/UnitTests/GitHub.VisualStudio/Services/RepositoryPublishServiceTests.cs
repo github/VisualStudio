@@ -6,19 +6,18 @@ using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell.Interop;
 using NSubstitute;
-using Xunit;
-using UnitTests;
+using NUnit.Framework;
 
 public class RepositoryPublishServiceTests
 {
     public class ThePublishMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task CreatesRepositoryAndPushesLocalToIt()
         {
             var solution = Substitute.For<IVsSolution>();
             var gitClient = Substitute.For<IGitClient>();
-            var service = new RepositoryPublishService(gitClient, Substitutes.IVSGitServices);
+            var service = new RepositoryPublishService(gitClient, Substitute.IVSGitServices);
             var newRepository = new Octokit.NewRepository("test");
             var account = Substitute.For<IAccount>();
             account.Login.Returns("monalisa");
@@ -29,7 +28,7 @@ public class RepositoryPublishServiceTests
 
             var repository = await service.PublishRepository(newRepository, account, apiClient);
 
-            Assert.Equal("https://github.com/monalisa/test", repository.CloneUrl);
+            Assert.That("https://github.com/monalisa/test", Is.EqualTo(repository.CloneUrl));
         }
     }
 }

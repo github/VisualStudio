@@ -11,13 +11,13 @@ using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
 using UnitTests.Helpers;
-using Xunit;
+using NUnit.Framework;
 
 public class AvatarProviderTests
 {
     public class TheDefaultOrgBitmapImageProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task CanBeAccessedFromMultipleThreads()
         {
             var blobCache = new InMemoryBlobCache();
@@ -35,14 +35,14 @@ public class AvatarProviderTests
                 return avatarProvider.DefaultOrgBitmapImage.ToString();
             });
 
-            Assert.Equal(expected, actual);
-            Assert.NotEqual(mainThreadId, otherThreadId);
+            Assert.That(expected, Is.EqualTo(actual));
+            Assert.That(mainThreadId, Is.Not.EqualTo(otherThreadId));
         }
     }
 
     public class TheDefaultUserBitmapImageProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task CanBeAccessedFromMultipleThreads()
         {
             var blobCache = new InMemoryBlobCache();
@@ -60,14 +60,14 @@ public class AvatarProviderTests
                 return avatarProvider.DefaultUserBitmapImage.ToString();
             });
 
-            Assert.Equal(expected, actual);
-            Assert.NotEqual(mainThreadId, otherThreadId);
+            Assert.That(expected, Is.EqualTo(actual));
+            Assert.That(mainThreadId, Is.Not.EqualTo(otherThreadId));
         }
     }
 
     public class TheGetAvatarMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task GetsAvatarFromCache()
         {
             var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
@@ -86,7 +86,7 @@ public class AvatarProviderTests
             AssertSameImage(expectedImage, retrieved);
         }
 
-        [Fact]
+        [Test]
         public async Task RetrievesGitHubAvatar()
         {
             var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
@@ -108,7 +108,7 @@ public class AvatarProviderTests
         static void AssertSameImage(byte[] expected, BitmapSource imageSource)
         {
             var actualBytes = ImageCache.GetBytesFromBitmapImage(imageSource);
-            Assert.Equal(expected, actualBytes);
+            Assert.That(expected, Is.EqualTo(actualBytes));
         }
 
         static void AssertSameImage(BitmapSource expected, BitmapSource actual)
@@ -120,13 +120,13 @@ public class AvatarProviderTests
             // TODO: This is probably not correct, but we've manually verified the code we're testing.
             // We need a way to test similarity of images.
             const int bytesToCompare = 19;
-            Assert.Equal(expectedBytes.Take(bytesToCompare), actualBytes.Take(bytesToCompare));
+            Assert.That(expectedBytes.Take(bytesToCompare), Is.EqualTo(actualBytes.Take(bytesToCompare)));
         }
     }
 
     public class TheInvalidateAvatarMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void DoesNotThrowOnNullUserOrAvatarUrl()
         {
             var blobStore = Substitute.For<IBlobCache>();
@@ -143,7 +143,7 @@ public class AvatarProviderTests
 
     public class TheGetBytesFromBitmapImageMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void GetsBytesFromImage()
         {
             var image = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
@@ -157,7 +157,7 @@ public class AvatarProviderTests
                 bytes = ms.ToArray();
             }
 
-            Assert.NotNull(bytes);
+            Assert.That(bytes, Is.Not.Null);
             Assert.True(bytes.Length > 256);
         }
     }
