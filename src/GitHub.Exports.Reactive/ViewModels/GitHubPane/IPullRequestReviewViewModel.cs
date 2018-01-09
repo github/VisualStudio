@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -52,6 +53,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the pull request's changed files.
         /// </summary>
         IPullRequestFilesViewModel Files { get; }
+
+        /// <summary>
+        /// Gets a command which when executed navigates to the parent pull request.
+        /// </summary>
+        ReactiveCommand<object> NavigateToPullRequest { get; }
 
         /// <summary>
         /// Initializes the view model.

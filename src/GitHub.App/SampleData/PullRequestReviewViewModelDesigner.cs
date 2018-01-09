@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
+using ReactiveUI;
 
 namespace GitHub.SampleData
 {
@@ -30,6 +31,7 @@ Otherwise, very nice work here! ✨";
         public string State { get; set; }
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }
+        public ReactiveCommand<object> NavigateToPullRequest { get; }
 
         public Task InitializeAsync(
             ILocalRepositoryModel localRepository,

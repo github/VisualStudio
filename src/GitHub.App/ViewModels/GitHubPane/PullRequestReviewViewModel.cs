@@ -11,6 +11,7 @@ using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
 using Serilog;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -53,7 +54,10 @@ namespace GitHub.ViewModels.GitHubPane
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
+
             Files = files;
+            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => 
+                NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
         }
 
         /// <inheritdoc/>
@@ -91,6 +95,9 @@ namespace GitHub.ViewModels.GitHubPane
             get { return body; }
             private set { this.RaiseAndSetIfChanged(ref body, value); }
         }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> NavigateToPullRequest { get; }
 
         /// <inheritdoc/>
         public async Task InitializeAsync(

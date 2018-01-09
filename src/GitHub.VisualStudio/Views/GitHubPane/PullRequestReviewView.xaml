@@ -36,10 +36,9 @@
                 </Hyperlink>
             </TextBlock>
         </StackPanel>
+
+        <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
         
-        <ui:SectionControl HeaderText="Summary" Margin="0 4">
-            <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
-        </ui:SectionControl>
         <ui:SectionControl HeaderText="Files" Margin="0 4">
             <local:PullRequestFilesView DataContext="{Binding Files}"/>
         </ui:SectionControl>
