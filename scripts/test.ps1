@@ -47,13 +47,13 @@ if (!$?) {
 }
 
 Write-Output "Running UnitTests..."
-Run-XUnit test UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-NUnit test UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 3
 }
 
 Write-Output "Running GitHub.InlineReviews.UnitTests..."
-Run-NUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-XUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 4
 }
