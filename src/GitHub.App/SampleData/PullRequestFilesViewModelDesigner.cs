@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
@@ -28,15 +29,14 @@ namespace GitHub.SampleData
             };
         }
 
-        public ReactiveCommand<object> DiffFile { get; }
-        public ReactiveCommand<object> ViewFile { get; }
-        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
-        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
-
+        public bool IsBranchCheckedOut { get; set; }
         public IReadOnlyList<IPullRequestChangeNode> Items { get; }
+        public ReactiveCommand<Unit> DiffFile { get; }
+        public ReactiveCommand<Unit> ViewFile { get; }
+        public ReactiveCommand<Unit> DiffFileWithWorkingDirectory { get; }
+        public ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
 
         public Task InitializeAsync(
-            string repositoryPath,
             IPullRequestSession session,
             TreeChanges changes,
             Func<IInlineCommentThreadModel, bool> commentFilter = null)

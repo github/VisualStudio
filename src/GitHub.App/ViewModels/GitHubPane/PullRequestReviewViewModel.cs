@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.App;
+using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
@@ -29,7 +30,6 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestReviewModel model;
         string state;
         string body;
-        IPullRequestFilesViewModel files;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
@@ -37,15 +37,23 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The session manager.</param>
         /// <param name="modelServiceFactory">The model service factory.</param>
+        /// <param name="files">The pull request files view model.</param>
         [ImportingConstructor]
         public PullRequestReviewViewModel(
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
-            IModelServiceFactory modelServiceFactory)
+            IModelServiceFactory modelServiceFactory,
+            IPullRequestFilesViewModel files)
         {
+            Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
+            Guard.ArgumentNotNull(files, nameof(files));
+
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
+            Files = files;
         }
 
         /// <inheritdoc/>
@@ -61,11 +69,7 @@ namespace GitHub.ViewModels.GitHubPane
         public long PullRequestReviewId { get; private set; }
 
         /// <inheritdoc/>
-        public IPullRequestFilesViewModel Files
-        {
-            get { return files; }
-            private set { this.RaiseAndSetIfChanged(ref files, value); }
-        }
+        public IPullRequestFilesViewModel Files { get; }
 
         /// <inheritdoc/>
         public IPullRequestReviewModel Model
@@ -155,8 +159,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var session = await sessionManager.GetSession(pullRequest);
                 var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-                Files = new PullRequestFilesViewModel();
-                await Files.InitializeAsync(LocalRepository.LocalPath, session, changes, FilterComments);
+                await Files.InitializeAsync(session, changes, FilterComments);
             }
             finally
             {
@@ -170,8 +173,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                Files?.Dispose();
-                Files = null;
+                Files.Dispose();
             }
         }
 

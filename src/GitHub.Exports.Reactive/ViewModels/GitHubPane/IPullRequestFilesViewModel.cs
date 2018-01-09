@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
@@ -21,33 +22,31 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
-        ReactiveCommand<object> DiffFile { get; }
+        ReactiveCommand<Unit> DiffFile { get; }
 
         /// <summary>
         /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
         /// </summary>
-        ReactiveCommand<object> ViewFile { get; }
+        ReactiveCommand<Unit> ViewFile { get; }
 
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
         /// the working directory and HEAD.
         /// </summary>
-        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
+        ReactiveCommand<Unit> DiffFileWithWorkingDirectory { get; }
 
         /// <summary>
         /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
         /// </summary>
-        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
+        ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
 
         /// <summary>
         /// Initializes the view model.
         /// </summary>
-        /// <param name="repositoryPath">The absolute path to the repository.</param>
         /// <param name="session">The pull request session.</param>
         /// <param name="changes">The libgit2sharp representation of the changes.</param>
         /// <param name="commentFilter">An optional review comment filter.</param>
         Task InitializeAsync(
-            string repositoryPath,
             IPullRequestSession session,
             TreeChanges changes,
             Func<IInlineCommentThreadModel, bool> commentFilter = null);
