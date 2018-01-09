@@ -10,9 +10,11 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using EnvDTE;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.VisualStudio;
 using LibGit2Sharp;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
@@ -40,6 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IUsageTracker usageTracker;
         readonly BehaviorSubject<bool> isBranchCheckedOut = new BehaviorSubject<bool>(false);
         IPullRequestSession session;
+        Func<IInlineCommentThreadModel, bool> commentFilter;
         IReadOnlyList<IPullRequestChangeNode> items;
         CompositeDisposable subscriptions;
 
@@ -65,6 +68,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             DiffFile = ReactiveCommand.CreateAsyncTask(x => DoDiffFile((IPullRequestFileNode)x, false));
             ViewFile = ReactiveCommand.CreateAsyncTask(x => DoOpenFile((IPullRequestFileNode)x, false));
+            OpenFirstComment = ReactiveCommand.CreateAsyncTask(x => DoOpenFirstComment((IPullRequestFileNode)x));
 
             DiffFileWithWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
@@ -103,6 +107,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             this.session = session;
+            this.commentFilter = commentFilter;
             subscriptions = new CompositeDisposable();
             subscriptions.Add(session.WhenAnyValue(x => x.IsCheckedOut).Subscribe(isBranchCheckedOut));
 
@@ -145,6 +150,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> OpenFirstComment { get; }
 
         async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
         {
@@ -233,6 +241,45 @@ namespace GitHub.ViewModels.GitHubPane
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
+            }
+        }
+
+        async Task DoOpenFirstComment(IPullRequestFileNode file)
+        {
+            try
+            {
+                var path = Path.Combine(file.DirectoryPath, file.FileName);
+                var sessionFile = await session.GetFile(path);
+                var threads = sessionFile.InlineCommentThreads.AsEnumerable();
+
+                if (commentFilter != null)
+                {
+                    threads = threads.Where(commentFilter);
+                }
+
+                var thread = threads.FirstOrDefault();
+                if (thread == null) return;
+
+                var param = (object)new InlineCommentNavigationParams
+                {
+                    FromLine = thread.LineNumber - 1,
+                };
+
+                await DoDiffFile(file, false);
+
+                // HACK: We need to wait here for the diff view to set itself up and move its cursor
+                // to the first changed line. There must be a better way of doing this.
+                await Task.Delay(1500);
+
+                VisualStudio.Services.Dte.Commands.Raise(
+                    Guids.CommandSetString,
+                    PkgCmdIDList.NextInlineCommentId,
+                    ref param,
+                    null);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error showing comment", e);
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using GitHub.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
 using GitHub.Logging;

@@ -41,6 +41,12 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
 
         /// <summary>
+        /// Gets a command that opens the first comment for a <see cref="IPullRequestFileNode"/> in
+        /// the diff viewer.
+        /// </summary>
+        ReactiveCommand<Unit> OpenFirstComment { get; }
+
+        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="session">The pull request session.</param>

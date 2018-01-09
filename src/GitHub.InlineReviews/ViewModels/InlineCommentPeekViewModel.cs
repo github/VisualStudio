@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;

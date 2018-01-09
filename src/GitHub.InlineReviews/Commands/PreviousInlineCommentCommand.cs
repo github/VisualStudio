@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text.Tagging;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
+using GitHub.Commands;
 
 namespace GitHub.InlineReviews.Commands
 {

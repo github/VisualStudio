@@ -123,7 +123,8 @@
                             </Style>
                         </TextBlock.Style>
                         <ui:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0"/>
-                        <Hyperlink>
+                        <Hyperlink Command="{Binding DataContext.OpenFirstComment, ElementName=root}"
+                                   CommandParameter="{Binding}">
                             <Run Text="{Binding CommentCount, Mode=OneWay}"/>
                         </Hyperlink>
                     </TextBlock>
