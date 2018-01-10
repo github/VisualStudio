@@ -69,6 +69,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         [Import]
         IUsageTracker UsageTracker { get; set; }
 
+        [Import]
+        INavigationService NavigationService { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -123,26 +126,16 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             try
             {
-                var activeView = Utilities.FindActiveView();
+                var fullPath = ViewModel.GetLocalFilePath(file);
+
+                var activeView = NavigationService.FindActiveView();
                 if (activeView == null)
                 {
                     ShowErrorInStatusBar("Couldn't find active view");
                     return;
                 }
 
-                int line;
-                int column;
-                activeView.GetCaretPos(out line, out column);
-                var text1 = Utilities.GetText(activeView);
-
-                var fullPath = ViewModel.GetLocalFilePath(file);
-                IVsTextView view = Utilities.OpenDocument(fullPath);
-                var text2 = VsShellUtilities.GetRunningDocumentContents(Services.GitHubServiceProvider, fullPath);
-
-                var equivalentLine = Utilities.FindEquivalentLine(text1, text2, line);
-
-                view.SetCaretPos(line, column);
-                view.CenterLines(line, 1);
+                NavigationService.NavigateToEquivalentPosition(activeView, fullPath);
 
                 // TODO: Add metrics for NumberOfPRDetailsOpenLiveFile
                 await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
@@ -150,47 +143,6 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening live file", e);
-            }
-        }
-
-        public static class Utilities
-        {
-            public static object FindEquivalentLine(string text1, string text2, int line)
-            {
-                return line;
-            }
-
-            internal static string GetText(IVsTextView textView)
-            {
-                IVsTextLines buffer;
-                ErrorHandler.ThrowOnFailure(textView.GetBuffer(out buffer));
-
-                int line;
-                int index;
-                ErrorHandler.ThrowOnFailure(buffer.GetLastLineIndex(out line, out index));
-
-                string text;
-                ErrorHandler.ThrowOnFailure(buffer.GetLineText(0, 0, line, index, out text));
-                return text;
-            }
-
-            internal static IVsTextView OpenDocument(string fullPath)
-            {
-                var logicalView = VSConstants.LOGVIEWID.TextView_guid;
-                IVsUIHierarchy hierarchy;
-                uint itemID;
-                IVsWindowFrame windowFrame;
-                IVsTextView view;
-                VsShellUtilities.OpenDocument(Services.GitHubServiceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
-                return view;
-            }
-
-            internal static IVsTextView FindActiveView()
-            {
-                var textManager = Services.GitHubServiceProvider.GetService<SVsTextManager, IVsTextManager2>();
-                IVsTextView view;
-                var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
-                return hresult == VSConstants.S_OK ? view : null;
             }
         }
 

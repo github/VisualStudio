@@ -154,6 +154,7 @@
     <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
+    <Compile Include="Services\INavigationService.cs" />
     <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Models\UsageData.cs" />
     <Compile Include="Services\IUsageService.cs" />
