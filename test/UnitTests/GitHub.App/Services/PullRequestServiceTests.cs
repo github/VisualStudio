@@ -291,7 +291,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async void MergeBaseNotAvailable_ThrowsNotFoundException()
+        public async Task MergeBaseNotAvailable_ThrowsNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
@@ -497,7 +497,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheCheckoutMethod
     {
         [Test]
-        public async void ShouldCheckoutExistingBranch()
+        public async Task ShouldCheckoutExistingBranch()
         {
             var gitClient = MockGitClient();
             var service = new PullRequestService(
@@ -520,7 +520,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async void ShouldCheckoutLocalBranch()
+        public async Task ShouldCheckoutLocalBranch()
         {
             var gitClient = MockGitClient();
             var service = new PullRequestService(
@@ -547,7 +547,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async void ShouldCheckoutBranchFromFork()
+        public async Task ShouldCheckoutBranchFromFork()
         {
             var gitClient = MockGitClient();
             var service = new PullRequestService(
@@ -577,7 +577,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async void ShouldUseUniquelyNamedRemoteForFork()
+        public async Task ShouldUseUniquelyNamedRemoteForFork()
         {
             var gitClient = MockGitClient();
             var gitService = MockGitService();

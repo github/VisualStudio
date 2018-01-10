@@ -361,7 +361,7 @@ public class RepositoryCreationViewModelTests
     public class TheGitIgnoreTemplatesProperty : TestBaseClass
     {
         [Test]
-        public async void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        public async Task IsPopulatedByTheApiAndSortedWithRecommendedFirst()
         {
             var gitIgnoreTemplates = new[]
             {
@@ -399,7 +399,7 @@ public class RepositoryCreationViewModelTests
     public class TheLicensesProperty : TestBaseClass
     {
         [Test]
-        public async void IsPopulatedByTheModelService()
+        public async Task IsPopulatedByTheModelService()
         {
             var licenses = new[]
             {
@@ -439,7 +439,7 @@ public class RepositoryCreationViewModelTests
     public class TheSelectedGitIgnoreProperty : TestBaseClass
     {
         [Test]
-        public async void DefaultsToVisualStudio()
+        public async Task DefaultsToVisualStudio()
         {
             var gitignores = new[]
             {
