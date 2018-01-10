@@ -123,7 +123,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             try
             {
-                var activeView = FindActiveView();
+                var activeView = Utilities.FindActiveView();
                 if (activeView == null)
                 {
                     ShowErrorInStatusBar("Couldn't find active view");
@@ -133,9 +133,13 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 int line;
                 int column;
                 activeView.GetCaretPos(out line, out column);
+                var text1 = Utilities.GetText(activeView);
 
                 var fullPath = ViewModel.GetLocalFilePath(file);
-                IVsTextView view = OpenDocument(fullPath);
+                IVsTextView view = Utilities.OpenDocument(fullPath);
+                var text2 = VsShellUtilities.GetRunningDocumentContents(Services.GitHubServiceProvider, fullPath);
+
+                var equivalentLine = Utilities.FindEquivalentLine(text1, text2, line);
 
                 view.SetCaretPos(line, column);
                 view.CenterLines(line, 1);
@@ -149,23 +153,45 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        static IVsTextView OpenDocument(string fullPath)
+        public static class Utilities
         {
-            var logicalView = VSConstants.LOGVIEWID.TextView_guid;
-            IVsUIHierarchy hierarchy;
-            uint itemID;
-            IVsWindowFrame windowFrame;
-            IVsTextView view;
-            VsShellUtilities.OpenDocument(Services.GitHubServiceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
-            return view;
-        }
+            public static object FindEquivalentLine(string text1, string text2, int line)
+            {
+                return line;
+            }
 
-        static IVsTextView FindActiveView()
-        {
-            var textManager = Services.GitHubServiceProvider.GetService<SVsTextManager, IVsTextManager2>();
-            IVsTextView view;
-            var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
-            return hresult == VSConstants.S_OK ? view : null;
+            internal static string GetText(IVsTextView textView)
+            {
+                IVsTextLines buffer;
+                ErrorHandler.ThrowOnFailure(textView.GetBuffer(out buffer));
+
+                int line;
+                int index;
+                ErrorHandler.ThrowOnFailure(buffer.GetLastLineIndex(out line, out index));
+
+                string text;
+                ErrorHandler.ThrowOnFailure(buffer.GetLineText(0, 0, line, index, out text));
+                return text;
+            }
+
+            internal static IVsTextView OpenDocument(string fullPath)
+            {
+                var logicalView = VSConstants.LOGVIEWID.TextView_guid;
+                IVsUIHierarchy hierarchy;
+                uint itemID;
+                IVsWindowFrame windowFrame;
+                IVsTextView view;
+                VsShellUtilities.OpenDocument(Services.GitHubServiceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
+                return view;
+            }
+
+            internal static IVsTextView FindActiveView()
+            {
+                var textManager = Services.GitHubServiceProvider.GetService<SVsTextManager, IVsTextManager2>();
+                IVsTextView view;
+                var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
+                return hresult == VSConstants.S_OK ? view : null;
+            }
         }
 
         async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
