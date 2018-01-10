@@ -153,7 +153,7 @@ public class LoginManagerTests
                 new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            Assert.Throws<LoginAttemptsExceededException>(() => target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
                 "id",
@@ -223,7 +223,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            Assert.Throws<AuthorizationException>(async () => target.Login(enterprise, client, "foo", "bar"));
+            Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
 
             await keychain.Received().Delete(enterprise);
         }
@@ -241,7 +241,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            Assert.Throws<InvalidOperationException>(async () => target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
         }
@@ -264,7 +264,7 @@ public class LoginManagerTests
             tfa.Value.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            Assert.Throws<InvalidOperationException>(async() => target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<InvalidOperationException>(async() => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
         }

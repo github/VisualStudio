@@ -124,8 +124,8 @@ public class ConnectionManagerTests
                 CreateLoginManager(),
                 Substitute.For<IUsageTracker>());
 
-            Assert.Throws<AuthorizationException>(async () =>
-                target.LogIn(HostAddress.Create("invalid.com"), "user", "pass"));
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+                await target.LogIn(HostAddress.Create("invalid.com"), "user", "pass"));
         }
 
         [Test]
@@ -138,8 +138,8 @@ public class ConnectionManagerTests
                 CreateLoginManager(),
                 Substitute.For<IUsageTracker>());
 
-            Assert.Throws<InvalidOperationException>(async () =>
-                target.LogIn(HostAddress.GitHubDotComHostAddress, "user", "pass"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await target.LogIn(HostAddress.GitHubDotComHostAddress, "user", "pass"));
         }
 
         [Test]
@@ -207,8 +207,8 @@ public class ConnectionManagerTests
                 loginManager,
                 Substitute.For<IUsageTracker>());
 
-            Assert.Throws<KeyNotFoundException>(async () =>
-                target.LogOut(HostAddress.GitHubDotComHostAddress));
+            Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+                await target.LogOut(HostAddress.GitHubDotComHostAddress));
         }
 
         [Test]

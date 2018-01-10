@@ -303,9 +303,7 @@ public class PullRequestServiceTests : TestBaseClass
             var head = false;
             var mergeBaseException = new NotFoundException();
 
-            //var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-            //                    fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
-            var ex = Assert.Throws<NotFoundException>(async () => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+            var ex = Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
                                 fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
         }
 

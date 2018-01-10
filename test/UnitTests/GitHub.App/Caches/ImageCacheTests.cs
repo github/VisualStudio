@@ -53,7 +53,7 @@ public class ImageCacheTests
                 .FirstAsync();
 
             Assert.That(retrieved, Is.Null);
-            Assert.Throws<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
         }
         
         [Test]
@@ -86,7 +86,7 @@ public class ImageCacheTests
 
             var imageCache = new ImageCache(cacheFactory, Substitute.For<IEnvironment>(), new Lazy<IImageDownloader>(() => imageDownloader));
 
-            Assert.Throws<KeyNotFoundException>(async () =>
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await
                 imageCache.GetImage(imageUri).FirstAsync());
         }
 
@@ -102,8 +102,8 @@ public class ImageCacheTests
 
             var imageCache = new ImageCache(cacheFactory, Substitute.For<IEnvironment>(), new Lazy<IImageDownloader>(() => imageDownloader));
 
-            Assert.Throws<KeyNotFoundException>(async () =>
-                imageCache.GetImage(imageUri).FirstAsync());
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await
+                     imageCache.GetImage(imageUri).FirstAsync());
         }
 
         [Test]
@@ -151,7 +151,7 @@ public class ImageCacheTests
 
             await imageCache.Invalidate(new Uri("https://fake/"));
 
-            Assert.Throws<KeyNotFoundException>(async () => cache.Get("https://fake/"));
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
         }
     }
 
