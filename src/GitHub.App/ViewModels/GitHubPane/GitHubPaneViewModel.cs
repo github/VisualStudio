@@ -330,7 +330,7 @@ namespace GitHub.ViewModels.GitHubPane
                 x => x.RemoteRepositoryOwner == owner &&
                      x.LocalRepository.Name == repo &&
                      x.PullRequestNumber == number &&
-                     x.PullRequestReviewId == 0);
+                     x.IsPending);
         }
 
         OleMenuCommand BindNavigatorCommand<T>(IServiceProvider paneServiceProvider, int commandId, ReactiveCommand<T> command)

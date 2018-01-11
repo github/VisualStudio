@@ -155,6 +155,17 @@ namespace GitHub.InlineReviews.Services
         ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal();
 
         /// <summary>
+        /// Creates a pending PR review comment.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
+        /// <param name="number">The pull request number.</param>
+        Task<IPullRequestReviewModel> CreateReview(
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            int number);
+
+        /// <summary>
         /// Posts a new PR review comment.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>

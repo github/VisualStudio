@@ -69,7 +69,9 @@ namespace GitHub.InlineReviews.Models
                     .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();
+                this.RaisePropertyChanging();
                 inlineCommentThreads = value;
+                this.RaisePropertyChanged();
                 NotifyLinesChanged(lines);
             }
         }

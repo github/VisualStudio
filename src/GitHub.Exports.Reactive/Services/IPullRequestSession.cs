@@ -51,6 +51,12 @@ namespace GitHub.Services
         string RepositoryOwner { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request has a pending review for the current
+        /// user.
+        /// </summary>
+        bool HasPendingReview { get; }
+
+        /// <summary>
         /// Gets all files touched by the pull request.
         /// </summary>
         /// <returns>
@@ -80,9 +86,15 @@ namespace GitHub.Services
         /// <param name="body">The comment body.</param>
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
+        /// <param name="fileDiff">The diff between the PR head and base.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
         /// <returns>A comment model.</returns>
-        Task<IPullRequestReviewCommentModel> PostReviewComment(string body, string commitId, string path, int position);
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            string body,
+            string commitId,
+            string path,
+            IReadOnlyList<DiffChunk> fileDiff,
+            int position);
 
         /// <summary>
         /// Posts a PR review comment reply.
@@ -91,6 +103,11 @@ namespace GitHub.Services
         /// <param name="inReplyTo">The comment ID to reply to.</param>
         /// <returns></returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo);
+
+        /// <summary>
+        /// Starts a new pull request review.
+        /// </summary>
+        void StartReview();
 
         /// <summary>
         /// Updates the pull request session with a new pull request model in response to a refresh

@@ -53,6 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool active;
         bool refreshOnActivate;
         Uri webUrl;
+        IDisposable sessionSubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -339,7 +340,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Number = number;
                 WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
-                vsGitExt.ActiveRepositoriesChanged += ActiveRepositoriesChanged;
+                vsGitExt.ActiveRepositoriesChanged += StateChanged;
                 await Refresh();
             }
             finally
@@ -367,7 +368,7 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
-                Reviews = await BuildReviews(pullRequest);
+                Reviews = BuildReviews(pullRequest);
 
                 var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
                 ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
@@ -436,6 +437,11 @@ namespace GitHub.ViewModels.GitHubPane
                     UpdateState = null;
                 }
 
+                sessionSubscription?.Dispose();
+                sessionSubscription = Session.WhenAnyValue(x => x.HasPendingReview)
+                    .Skip(1)
+                    .Subscribe(_ => Reviews = BuildReviews(Session.PullRequest));
+
                 if (firstLoad)
                 {
                     usageTracker.IncrementCounter(x => x.NumberOfPullRequestsOpened).Forget();
@@ -452,9 +458,10 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        async Task<IReadOnlyList<PullRequestDetailReviewItem>> BuildReviews(IPullRequestModel pullRequest)
+        IReadOnlyList<PullRequestDetailReviewItem> BuildReviews(IPullRequestModel pullRequest)
         {
             var existing = new Dictionary<string, PullRequestDetailReviewItem>();
+            var currentUser = Session.User;
 
             for (var i = pullRequest.Reviews.Count - 1; i >= 0; --i)
             {
@@ -462,7 +469,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (!existing.ContainsKey(review.User.Login) &&
                     review.State != PullRequestReviewState.Dismissed &&
-                    review.State != PullRequestReviewState.Pending)
+                    (review.State != PullRequestReviewState.Pending || review.User.Equals(currentUser)))
                 {
                     var commentCount = pullRequest.ReviewComments
                         .Where(x => x.PullRequestReviewId == review.Id)
@@ -473,13 +480,19 @@ namespace GitHub.ViewModels.GitHubPane
                 }
             }
 
-            var newReview = new PullRequestDetailReviewItem(
-                0,
-                await modelService.GetCurrentUser(),
-                PullRequestReviewState.Pending,
-                0);
+            var result = existing.Values.OrderBy(x => x.User).AsEnumerable();
 
-            return existing.Values.OrderBy(x => x.User).Concat(new[] { newReview }).ToList();
+            if (!result.Any(x => x.State == PullRequestReviewState.Pending))
+            {
+                var newReview = new PullRequestDetailReviewItem(
+                    0,
+                    currentUser,
+                    PullRequestReviewState.Pending,
+                    0);
+                result = result.Concat(new[] { newReview });
+            }
+
+            return result.ToList();
         }
 
         /// <summary>
@@ -562,11 +575,12 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                vsGitExt.ActiveRepositoriesChanged -= ActiveRepositoriesChanged;
+                vsGitExt.ActiveRepositoriesChanged -= StateChanged;
+                sessionSubscription?.Dispose();
             }
         }
 
-        async void ActiveRepositoriesChanged()
+        async void StateChanged()
         {
             try
             {
@@ -582,7 +596,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Error refreshing in ActiveRepositoriesChanged.");
+                log.Error(ex, "Error refreshing in StateChanged.");
             }
         }
 

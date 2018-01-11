@@ -9,8 +9,6 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestDetailReviewItem
     {
-        readonly PullRequestReviewState state;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailReviewItem"/> class.
         /// </summary>
@@ -26,7 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             Id = id;
             User = user;
-            this.state = state;
+            State = state;
             FileCommentCount = fileCommentCount;
         }
 
@@ -41,14 +39,19 @@ namespace GitHub.ViewModels.GitHubPane
         public IAccount User { get; }
 
         /// <summary>
+        /// Gets the state of the review.
+        /// </summary>
+        public PullRequestReviewState State { get; }
+
+        /// <summary>
         /// Gets a string representing the state of the review.
         /// </summary>
-        public string State => ToString(state);
+        public string StateDisplay => ToString(State);
 
         /// <summary>
         /// Gets the name of the icon representation of the state.
         /// </summary>
-        public string Icon => ToIcon(state);
+        public string Icon => ToIcon(State);
 
         /// <summary>
         /// Gets the number of file comments in the review.

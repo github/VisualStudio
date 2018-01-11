@@ -61,6 +61,18 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<PullRequestReview> CreatePullRequestReview(
+            string owner,
+            string name,
+            int number)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
+            var review = new PullRequestReviewCreate();
+            return gitHubClient.PullRequest.Review.Create(owner, name, number, review);
+        }
+
         public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
             string owner,
             string name,

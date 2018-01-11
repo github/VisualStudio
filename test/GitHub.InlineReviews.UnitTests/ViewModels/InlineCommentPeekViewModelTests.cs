@@ -86,7 +86,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             target.Thread.Comments[0].Body = "New Comment";
 
             sessionManager.CurrentSession
-                .When(x => x.PostReviewComment(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>()))
+                .When(x => x.PostReviewComment(
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<int>()))
                 .Do(async x =>
                 {
                     // Simulate the thread being added to the session.

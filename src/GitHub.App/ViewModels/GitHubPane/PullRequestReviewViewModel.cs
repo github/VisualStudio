@@ -179,12 +179,16 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
+                var session = await sessionManager.GetSession(pullRequest);
+
                 if (PullRequestReviewId > 0)
                 {
                     Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
                     State = PullRequestDetailReviewItem.ToString(Model.State);
                     IsPending = Model.State == Octokit.PullRequestReviewState.Pending;
-                    Body = !string.IsNullOrWhiteSpace(Model.Body) ? Model.Body : Resources.NoDescriptionProvidedMarkdown;
+                    Body = IsPending || !string.IsNullOrWhiteSpace(Model.Body) ? 
+                        Model.Body :
+                        Resources.NoDescriptionProvidedMarkdown;
                 }
                 else
                 {
@@ -192,9 +196,9 @@ namespace GitHub.ViewModels.GitHubPane
                     State = null;
                     IsPending = true;
                     Body = string.Empty;
+                    session.StartReview();
                 }
 
-                var session = await sessionManager.GetSession(pullRequest);
                 var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
                 await Files.InitializeAsync(session, changes, FilterComments);
             }

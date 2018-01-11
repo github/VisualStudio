@@ -16,7 +16,7 @@
                 <Hyperlink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                            CommandParameter="{Binding}">
                     <Run FontWeight="Bold" Text="{Binding User.Login, Mode=OneWay}"/>
-                    <Run Text="{Binding State, Mode=OneWay}"/>
+                    <Run Text="{Binding StateDisplay, Mode=OneWay}"/>
                 </Hyperlink>
                 </TextBlock>
                 <TextBlock Opacity="0.5" Text="{Binding FileCommentCount, StringFormat={}{0} file comments }"/>

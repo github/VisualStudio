@@ -282,6 +282,24 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IPullRequestReviewModel> CreateReview(
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            int number)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var apiClient = await apiClientFactory.Create(address);
+
+            var result = await apiClient.CreatePullRequestReview(remoteRepositoryOwner, localRepository.Name, number);
+
+            return new PullRequestReviewModel
+            {
+                Id = result.Id,
+                State = Octokit.PullRequestReviewState.Pending,
+            };
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,

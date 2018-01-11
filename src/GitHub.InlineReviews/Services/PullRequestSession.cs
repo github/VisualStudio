@@ -10,6 +10,7 @@ using GitHub.Services;
 using ReactiveUI;
 using System.Threading;
 using System.Reactive.Subjects;
+using static System.FormattableString;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -33,6 +34,8 @@ namespace GitHub.InlineReviews.Services
         IReadOnlyList<IPullRequestSessionFile> files;
         IPullRequestModel pullRequest;
         Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
+        bool hasPendingReview;
+        List<PullRequestReviewCommentModel> pendingReviewComments;
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -120,19 +123,46 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, string commitId, string path, int position)
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+            string body,
+            string commitId,
+            string path,
+            IReadOnlyList<DiffChunk> diff,
+            int position)
         {
-            var model = await service.PostReviewComment(
-                LocalRepository,
-                RepositoryOwner,
-                User,
-                PullRequest.Number,
-                body,
-                commitId,
-                path,
-                position);
-            await AddComment(model);
-            return model;
+            if (!HasPendingReview)
+            {
+                var model = await service.PostReviewComment(
+                    LocalRepository,
+                    RepositoryOwner,
+                    User,
+                    PullRequest.Number,
+                    body,
+                    commitId,
+                    path,
+                    position);
+                await AddComment(model);
+                return model;
+            }
+            else
+            {
+                var model = new PullRequestReviewCommentModel
+                {
+                    Body = body,
+                    CommitId = commitId,
+                    Path = path,
+                    Position = position,
+                    CreatedAt = DateTimeOffset.Now,
+                    DiffHunk = BuildDiffHunk(diff, position),
+                    OriginalPosition = position,
+                    OriginalCommitId = commitId,
+                    User = User,
+                };
+
+                pendingReviewComments.Add(model);
+                await AddComment(model);
+                return model;
+            }
         }
 
         /// <inheritdoc/>
@@ -149,6 +179,25 @@ namespace GitHub.InlineReviews.Services
             return model;
         }
 
+        /// <inheritdoc/>
+        public void StartReview()
+        {
+            if (!HasPendingReview)
+            {
+                var newReview = new PullRequestReviewModel
+                {
+                    Id = -1,
+                    State = Octokit.PullRequestReviewState.Pending,
+                    User = User,
+                };
+
+                PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { newReview }).ToList();
+                HasPendingReview = true;
+                pendingReviewComments = new List<PullRequestReviewCommentModel>();
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task Update(IPullRequestModel pullRequestModel)
         {
             PullRequest = pullRequestModel;
@@ -192,22 +241,19 @@ namespace GitHub.InlineReviews.Services
             return result;
         }
 
-        async Task<string> CalculateContentCommitSha(IPullRequestSessionFile file, byte[] content)
-        {
-            if (IsCheckedOut)
-            {
-                return await service.IsUnmodifiedAndPushed(LocalRepository, file.RelativePath, content) ?
-                       await service.GetTipSha(LocalRepository) : null;
-            }
-            else
-            {
-                return PullRequest.Head.Sha;
-            }
-        }
-
         string GetFullPath(string relativePath)
         {
             return Path.Combine(LocalRepository.LocalPath, relativePath);
+        }
+
+        static string BuildDiffHunk(IReadOnlyList<DiffChunk> diff, int position)
+        {
+            var lines = diff.SelectMany(x => x.Lines).Reverse();
+            var context = lines.SkipWhile(x => x.DiffLineNumber != position).Take(5).Reverse().ToList();
+            var oldLineNumber = context.Select(x => x.OldLineNumber).Where(x => x != -1).FirstOrDefault();
+            var newLineNumber = context.Select(x => x.NewLineNumber).Where(x => x != -1).FirstOrDefault();
+            var header = Invariant($"@@ -{oldLineNumber},5 +{newLineNumber},5 @@");
+            return header + '\n' + string.Join("\n", context);
         }
 
         /// <inheritdoc/>
@@ -246,6 +292,16 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public string RepositoryOwner { get; }
+
+        /// <inheritdoc/>
+        public bool HasPendingReview
+        {
+            get { return hasPendingReview; }
+            private set { this.RaiseAndSetIfChanged(ref hasPendingReview, value); }
+        }
+
+        /// <inheritdoc/>
+        public long PendingReviewId { get; private set; }
 
         IEnumerable<string> FilePaths
         {

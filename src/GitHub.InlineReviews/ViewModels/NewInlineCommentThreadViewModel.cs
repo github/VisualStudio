@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -110,6 +111,7 @@ namespace GitHub.InlineReviews.ViewModels
                 body,
                 File.CommitSha,
                 File.RelativePath.Replace("\\", "/"),
+                File.Diff,
                 diffPosition.DiffLineNumber);
 
             return model;

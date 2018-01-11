@@ -45,6 +45,15 @@ namespace GitHub.Api
         IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo);
 
         /// <summary>
+        /// Creates a new pending PR review.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <returns></returns>
+        IObservable<PullRequestReview> CreatePullRequestReview(string owner, string name, int number);
+
+        /// <summary>
         /// Creates a new PR review comment.
         /// </summary>
         /// <param name="owner">The repository owner.</param>
