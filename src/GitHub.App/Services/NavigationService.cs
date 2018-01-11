@@ -30,11 +30,13 @@ namespace GitHub.Services
             var view = OpenDocument(targetFile);
             var text2 = VsShellUtilities.GetRunningDocumentContents(serviceProvider, targetFile);
 
-            var matchingLine = FindNearestMatchingLine(text1, text2, line);
+            var fromLines = ReadLines(text1);
+            var toLines = ReadLines(text2);
+            var matchingLine = FindNearestMatchingLine(fromLines, toLines, line);
             if (matchingLine == -1)
             {
                 // If we can't match line use orignal as best guess.
-                matchingLine = line;
+                matchingLine = line < toLines.Count ? line : toLines.Count - 1;
                 column = 0;
             }
 
@@ -77,10 +79,9 @@ namespace GitHub.Services
             return view;
         }
 
-        static int FindNearestMatchingLine(string text1, string text2, int line)
+        static int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
         {
-            var fromLines = ReadLines(text1);
-            var toLines = ReadLines(text2);
+            line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
             var fromLine = fromLines[line];
 
             for (var offset = 0; true; offset++)
@@ -94,7 +95,7 @@ namespace GitHub.Services
 
                 var lineBelow = line - offset;
                 var checkBelow = lineBelow >= 0;
-                if (checkBelow && toLines[lineBelow] == fromLine)
+                if (checkBelow && lineBelow < toLines.Count && toLines[lineBelow] == fromLine)
                 {
                     return lineBelow;
                 }
