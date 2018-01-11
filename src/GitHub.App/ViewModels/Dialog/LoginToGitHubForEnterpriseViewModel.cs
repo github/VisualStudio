@@ -141,7 +141,7 @@ namespace GitHub.ViewModels.Dialog
 
             try
             {
-                var uri = new Uri(url);
+                var uri = new UriBuilder(url).Uri;
                 ProbeStatus = EnterpriseProbeStatus.Checking;
 
                 if (await enterpriseCapabilities.Probe(uri) == EnterpriseProbeResult.Ok)

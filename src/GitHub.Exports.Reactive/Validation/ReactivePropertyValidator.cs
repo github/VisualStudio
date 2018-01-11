@@ -280,8 +280,15 @@ namespace GitHub.Validation
         {
             return This.IfFalse(s =>
             {
-                Uri uri;
-                return Uri.TryCreate(s, UriKind.Absolute, out uri);
+                try
+                {
+                    new UriBuilder(s);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }, errorMessage);
         }
 
