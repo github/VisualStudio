@@ -27,7 +27,7 @@ namespace GitHub.InlineReviews.UnitTests.Models
             {
                 var chunks = DiffUtilities.ParseFragment(header);
 
-				//Assert.Single(chunks);
+                Assert.That(chunks, Has.One.Items);
 				var chunk = chunks.First();
 				Assert.That(chunk.Lines, Is.Empty);
             }
