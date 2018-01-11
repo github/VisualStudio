@@ -17,7 +17,7 @@
                         </Grid.ColumnDefinitions>
                         <Viewbox
                             Grid.Column="0"
-                            VerticalAlignment="Center" 
+                            VerticalAlignment="Top" 
                             HorizontalAlignment="Right"
                             Margin="{TemplateBinding IconMargin}"
                             Width="16"
