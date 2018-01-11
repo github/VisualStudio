@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Primitives;
 using Octokit;
+using IProgram = GitHub.Models.IProgram;
 
 namespace GitHub.Services
 {
@@ -16,23 +16,29 @@ namespace GitHub.Services
         static readonly Version MinimumOAuthVersion = new Version("2.12.2");
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IEnterpriseProbe probe;
+        readonly IProgram program;
 
         [ImportingConstructor]
         public EnterpriseCapabilitiesService(
             ISimpleApiClientFactory apiClientFactory,
-            IEnterpriseProbe probe)
+            IEnterpriseProbe probe,
+            IProgram program)
         {
             this.apiClientFactory = apiClientFactory;
             this.probe = probe;
+            this.program = program;
         }
 
         public Task<EnterpriseProbeResult> Probe(Uri enterpriseBaseUrl) => probe.Probe(enterpriseBaseUrl);
 
         public async Task<EnterpriseLoginMethods> ProbeLoginMethods(Uri enterpriseBaseUrl)
         {
+            // It's important that we don't use our cached credentials on this connection, as they
+            // may be wrong - we're trying to log in after all.
+            var hostAddress = HostAddress.Create(enterpriseBaseUrl);
+            var connection = new Octokit.Connection(program.ProductHeader, hostAddress.ApiUri);
+            var meta = await GetMetadata(connection).ConfigureAwait(false);
             var result = EnterpriseLoginMethods.Token;
-            var client = await apiClientFactory.Create(UriString.ToUriString(enterpriseBaseUrl)).ConfigureAwait(false);
-            var meta = await GetMetadata(client.Client).ConfigureAwait(false);
 
             if (meta.VerifiablePasswordAuthentication) result |= EnterpriseLoginMethods.UsernameAndPassword;
 
@@ -45,23 +51,10 @@ namespace GitHub.Services
             return result;
         }
 
-        private Uri GetLoginUrl(IConnection connection)
-        {
-            var oauthClient = new OauthClient(connection);
-            var oauthLoginRequest = new OauthLoginRequest(ApiClientConfiguration.ClientId)
-            {
-                RedirectUri = new Uri(OAuthCallbackListener.CallbackUrl),
-            };
-            var uri = oauthClient.GetGitHubLoginUrl(oauthLoginRequest);
-
-            // OauthClient.GetGitHubLoginUrl seems to give the wrong URL. Fix this.
-            return new Uri(uri.ToString().Replace("/api/v3", ""));
-        }
-
-        private async Task<EnterpriseMeta> GetMetadata(IGitHubClient client)
+        private async Task<EnterpriseMeta> GetMetadata(IConnection connection)
         {
             var endpoint = new Uri("meta", UriKind.Relative);
-            var response = await client.Connection.Get<EnterpriseMeta>(endpoint, null, null).ConfigureAwait(false);
+            var response = await connection.Get<EnterpriseMeta>(endpoint, null, null).ConfigureAwait(false);
             return response.Body;
         }
 
