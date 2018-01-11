@@ -294,6 +294,7 @@
                                       Background="Transparent"
                                       BorderThickness="0"
                                       Margin="0 6 0 0"
+                                      KeyUp="FileListKeyUp"
                                       MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <TreeView.ItemContainerStyle>
