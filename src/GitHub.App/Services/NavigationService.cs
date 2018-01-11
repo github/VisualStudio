@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
+using IServiceProvider = System.IServiceProvider;
 
 namespace GitHub.Services
 {
@@ -22,7 +22,7 @@ namespace GitHub.Services
         {
             int line;
             int column;
-            sourceView.GetCaretPos(out line, out column);
+            ErrorHandler.ThrowOnFailure(sourceView.GetCaretPos(out line, out column));
             var text1 = GetText(sourceView);
 
             var view = OpenDocument(targetFile);
@@ -30,8 +30,8 @@ namespace GitHub.Services
 
             var equivalentLine = FindEquivalentLine(text1, text2, line);
 
-            view.SetCaretPos(equivalentLine, column);
-            view.CenterLines(equivalentLine, 1);
+            ErrorHandler.ThrowOnFailure(view.SetCaretPos(equivalentLine, column));
+            ErrorHandler.ThrowOnFailure(view.CenterLines(equivalentLine, 1));
 
             return view;
         }
@@ -46,6 +46,12 @@ namespace GitHub.Services
 
         int FindEquivalentLine(string text1, string text2, int line)
         {
+            if (text1 == text2)
+            {
+                return line;
+            }
+
+            // TODO: Add best guess line matching when target file has been modified.
             return line;
         }
 
