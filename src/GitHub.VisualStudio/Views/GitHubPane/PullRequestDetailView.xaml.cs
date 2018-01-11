@@ -72,6 +72,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         [Import]
         INavigationService NavigationService { get; set; }
 
+        [Import]
+        IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -228,19 +231,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
         void EnableNavigateToEditor(IWpfTextView textView, IPullRequestFileNode file)
         {
-            textView.VisualElement.PreviewKeyDown += async (s, e) =>
-            {
-                if (e.Key == Key.Space)
-                {
-                    await DoOpenLiveFile(file);
-                }
-                else
-                {
-                    Services.Dte.StatusBar.Text = "Press space bar to open file in solution";
-                }
-
-                e.Handled = true;
-            };
+            var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
+            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
+            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
+            var dispatcher = new TextViewCommandDispatcher(view, commandGroup, commandId);
+            dispatcher.Exec += async (s, e) => await DoOpenLiveFile(file);
         }
 
         void ShowErrorInStatusBar(string message, Exception e = null)
