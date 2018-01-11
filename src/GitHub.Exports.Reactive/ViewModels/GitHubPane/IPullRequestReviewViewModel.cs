@@ -45,6 +45,11 @@ namespace GitHub.ViewModels.GitHubPane
         string State { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the review is in the pending state.
+        /// </summary>
+        bool IsPending { get; }
+
+        /// <summary>
         /// Gets the body of the pull request review.
         /// </summary>
         string Body { get; }
@@ -60,7 +65,7 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<object> NavigateToPullRequest { get; }
 
         /// <summary>
-        /// Initializes the view model.
+        /// Initializes the view model with an existing review.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
         /// <param name="connection">The connection to the repository host.</param>
@@ -75,6 +80,21 @@ namespace GitHub.ViewModels.GitHubPane
             string repo,
             int pullRequestNumber,
             long pullRequestReviewId);
+
+        /// <summary>
+        /// Initializes the view model for creating a new review.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="connection">The connection to the repository host.</param>
+        /// <param name="owner">The pull request's repository owner.</param>
+        /// <param name="repo">The pull request's repository name.</param>
+        /// <param name="pullRequestNumber">The pull request number.</param>
+        Task InitializeNewAsync(
+            ILocalRepositoryModel localRepository,
+            IConnection connection,
+            string owner,
+            string repo,
+            int pullRequestNumber);
 
         /// <summary>
         /// Updates the data from a pull request model.

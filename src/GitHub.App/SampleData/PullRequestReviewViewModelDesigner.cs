@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -29,6 +30,7 @@ Otherwise, very nice work here! ✨";
         public long PullRequestReviewId { get; set; }
         public IPullRequestReviewModel Model { get; set; }
         public string State { get; set; }
+        public bool IsPending { get; set; }
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
@@ -40,6 +42,11 @@ Otherwise, very nice work here! ✨";
             string repo,
             int pullRequestNumber,
             long pullRequestReviewId)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task InitializeNewAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber)
         {
             return Task.CompletedTask;
         }

@@ -11,8 +11,10 @@
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
-                                    mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800"
-                                    d:DataContext="{d:DesignInstance Type={x:Type sampleData:PullRequestReviewViewModelDesigner}, IsDesignTimeCreatable=True}">
+                                    mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800">
+    <d:DesignProperties.DataContext>
+        <sampleData:PullRequestReviewViewModelDesigner IsPending="True"/>
+    </d:DesignProperties.DataContext>
     
     <Control.Resources>
         <ResourceDictionary>
@@ -26,19 +28,44 @@
     </Control.Resources>
 
     <StackPanel Margin="8,0">
-        <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
-            <c:AccountAvatar Account="{Binding Model.User}" Margin="4" Width="24" Height="24"/>
-            <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
+
+        <!-- Existing review -->
+        <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToInverseVisibilityConverter}}">
+            <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
+                <c:AccountAvatar Account="{Binding Model.User}" Margin="4" Width="24" Height="24"/>
+                <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
                 <Run FontWeight="Bold" Text="{Binding Model.User.Login, Mode=OneWay}"/>
                 <Run Text="{Binding State, Mode=OneWay}"/>
                 <Hyperlink Command="{Binding NavigateToPullRequest}">
                     <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
                 </Hyperlink>
-            </TextBlock>
+                </TextBlock>
+            </StackPanel>
+
+            <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
         </StackPanel>
 
-        <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
-        
+        <!-- Pending review -->
+        <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}}">
+            <TextBlock FontSize="16" Margin="0 4">Submit your review</TextBlock>
+            <TextBlock Margin="0 4">Review summary</TextBlock>
+            <TextBox AcceptsReturn="True"
+                     Margin="0 4"
+                     MinHeight="120"
+                     Padding="0 4"
+                     TextWrapping="Wrap"
+                     Text="{Binding Body}"/>
+            <StackPanel Margin="0 4" Orientation="Horizontal">
+                <ui:LinkDropDown Header="Submit review">
+                    <ui:GitHubActionLink>Comment only</ui:GitHubActionLink>
+                    <ui:GitHubActionLink>Approve</ui:GitHubActionLink>
+                    <ui:GitHubActionLink>Request changes</ui:GitHubActionLink>
+                </ui:LinkDropDown>
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Width="1" Height="16" Margin="4 0"/>
+                <ui:GitHubActionLink VerticalAlignment="Center">Cancel</ui:GitHubActionLink>
+            </StackPanel>
+        </StackPanel>
+
         <ui:SectionControl HeaderText="Files" Margin="0 4">
             <local:PullRequestFilesView DataContext="{Binding Files}"/>
         </ui:SectionControl>

@@ -29,6 +29,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
         static readonly Regex pullReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/:id");
+        static readonly Regex pullNewReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/new");
 
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
@@ -250,6 +251,13 @@ namespace GitHub.ViewModels.GitHubPane
                 var number = int.Parse(match.Groups["number"].Value);
                 await ShowPullRequest(owner, repo, number);
             }
+            else if ((match = pullNewReviewUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                await ShowCreatePullRequestReview(owner, repo, number);
+            }
             else if ((match = pullReviewUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
@@ -309,6 +317,20 @@ namespace GitHub.ViewModels.GitHubPane
                      x.LocalRepository.Name == repo &&
                      x.PullRequestNumber == number &&
                      x.PullRequestReviewId == id);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowCreatePullRequestReview(string owner, string repo, int number)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            return NavigateTo<IPullRequestReviewViewModel>(
+                x => x.InitializeNewAsync(LocalRepository, Connection, owner, repo, number),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestNumber == number &&
+                     x.PullRequestReviewId == 0);
         }
 
         OleMenuCommand BindNavigatorCommand<T>(IServiceProvider paneServiceProvider, int commandId, ReactiveCommand<T> command)

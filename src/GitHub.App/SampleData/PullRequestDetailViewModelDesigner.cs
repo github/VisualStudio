@@ -81,6 +81,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
                     new AccountDesigner { Login = "shana", IsUser = true },
                     Octokit.PullRequestReviewState.ChangesRequested,
                     5),
+                new PullRequestDetailReviewItem(
+                    2,
+                    new AccountDesigner { Login = "grokys", IsUser = true },
+                    Octokit.PullRequestReviewState.Pending,
+                    0),
             };
 
             changedFilesTree = new List<IPullRequestChangeNode>();

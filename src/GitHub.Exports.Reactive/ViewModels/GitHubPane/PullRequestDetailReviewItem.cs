@@ -70,6 +70,8 @@ namespace GitHub.ViewModels.GitHubPane
                     return "requested changes";
                 case PullRequestReviewState.Commented:
                     return "commented";
+                case PullRequestReviewState.Pending:
+                    return "pending review";
                 default:
                     throw new NotSupportedException();
             }
@@ -90,6 +92,8 @@ namespace GitHub.ViewModels.GitHubPane
                     return "x";
                 case PullRequestReviewState.Commented:
                     return "comment";
+                case PullRequestReviewState.Pending:
+                    return "file_text";
                 default:
                     throw new NotSupportedException();
             }

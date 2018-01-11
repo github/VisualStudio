@@ -30,6 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
         IModelService modelService;
         IPullRequestReviewModel model;
         string state;
+        bool isPending;
         string body;
 
         /// <summary>
@@ -90,6 +91,13 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public bool IsPending
+        {
+            get { return isPending; }
+            private set { this.RaiseAndSetIfChanged(ref isPending, value); }
+        }
+
+        /// <inheritdoc/>
         public string Body
         {
             get { return body; }
@@ -131,6 +139,17 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public Task InitializeNewAsync(
+            ILocalRepositoryModel localRepository,
+            IConnection connection,
+            string owner,
+            string repo,
+            int pullRequestNumber)
+        {
+            return InitializeAsync(localRepository, connection, owner, repo, pullRequestNumber, 0);
+        }
+
+        /// <inheritdoc/>
         public override async Task Refresh()
         {
             try
@@ -160,9 +179,20 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
-                Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
-                State = PullRequestDetailReviewItem.ToString(Model.State);
-                Body = !string.IsNullOrWhiteSpace(Model.Body) ? Model.Body : Resources.NoDescriptionProvidedMarkdown;
+                if (PullRequestReviewId > 0)
+                {
+                    Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
+                    State = PullRequestDetailReviewItem.ToString(Model.State);
+                    IsPending = Model.State == Octokit.PullRequestReviewState.Pending;
+                    Body = !string.IsNullOrWhiteSpace(Model.Body) ? Model.Body : Resources.NoDescriptionProvidedMarkdown;
+                }
+                else
+                {
+                    Model = null;
+                    State = null;
+                    IsPending = true;
+                    Body = string.Empty;
+                }
 
                 var session = await sessionManager.GetSession(pullRequest);
                 var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);

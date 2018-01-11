@@ -275,20 +275,7 @@
                     <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel Margin="0 2">
-                                    <ui:OcticonImage VerticalAlignment="Top" Margin="0 2" Icon="{Binding Icon}"/>
-                                    <controls:AccountAvatar VerticalAlignment="Top" Margin="2" Account="{Binding User}"/>
-                                    <StackPanel Orientation="Vertical" Margin="2 0">
-                                        <TextBlock>
-                                            <Hyperlink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ui:SectionControl}}}"
-                                                       CommandParameter="{Binding}">
-                                                <Run FontWeight="Bold" Text="{Binding User.Login, Mode=OneWay}"/>
-                                                <Run Text="{Binding State, Mode=OneWay}"/>
-                                            </Hyperlink>
-                                        </TextBlock>
-                                        <TextBlock Opacity="0.5" Text="{Binding FileCommentCount, StringFormat={}{0} file comments }"/>
-                                    </StackPanel>
-                                </DockPanel>
+                                <local:PullRequestDetailReviewItemView/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

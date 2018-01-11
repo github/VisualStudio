@@ -367,7 +367,7 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
-                Reviews = BuildReviews(pullRequest).ToList();
+                Reviews = await BuildReviews(pullRequest);
 
                 var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
                 ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
@@ -452,28 +452,34 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        IEnumerable<PullRequestDetailReviewItem> BuildReviews(IPullRequestModel pullRequest)
+        async Task<IReadOnlyList<PullRequestDetailReviewItem>> BuildReviews(IPullRequestModel pullRequest)
         {
-            var result = new Dictionary<string, PullRequestDetailReviewItem>();
+            var existing = new Dictionary<string, PullRequestDetailReviewItem>();
 
             for (var i = pullRequest.Reviews.Count - 1; i >= 0; --i)
             {
                 var review = pullRequest.Reviews[i];
 
-                if (!result.ContainsKey(review.User.Login) &&
+                if (!existing.ContainsKey(review.User.Login) &&
                     review.State != PullRequestReviewState.Dismissed &&
                     review.State != PullRequestReviewState.Pending)
                 {
                     var commentCount = pullRequest.ReviewComments
                         .Where(x => x.PullRequestReviewId == review.Id)
                         .Count();
-                    result.Add(
+                    existing.Add(
                         review.User.Login,
                         new PullRequestDetailReviewItem(review.Id, review.User, review.State, commentCount));
                 }
             }
 
-            return result.Values.OrderBy(x => x.User);
+            var newReview = new PullRequestDetailReviewItem(
+                0,
+                await modelService.GetCurrentUser(),
+                PullRequestReviewState.Pending,
+                0);
+
+            return existing.Values.OrderBy(x => x.User).Concat(new[] { newReview }).ToList();
         }
 
         /// <summary>
@@ -709,7 +715,8 @@ namespace GitHub.ViewModels.GitHubPane
         void DoShowReview(object item)
         {
             var review = (PullRequestDetailReviewItem)item;
-            NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/{review.Id}"));
+            var id = review.Id > 0 ? review.Id.ToString() : "new";
+            NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/{id}"));
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
