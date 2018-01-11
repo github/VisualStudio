@@ -111,6 +111,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     if (!workingDirectory)
                     {
                         AddBufferTag(buffer, ViewModel.Session, fullPath, null);
+
+                        var textView = NavigationService.FindActiveView();
+                        EnableNavigateToEditor(textView, file);
                     }
                 }
 
@@ -232,9 +235,14 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         void EnableNavigateToEditor(IWpfTextView textView, IPullRequestFileNode file)
         {
             var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
+            EnableNavigateToEditor(view, file);
+        }
+
+        void EnableNavigateToEditor(IVsTextView textView, IPullRequestFileNode file)
+        {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            var dispatcher = new TextViewCommandDispatcher(view, commandGroup, commandId);
+            var dispatcher = new TextViewCommandDispatcher(textView, commandGroup, commandId);
             dispatcher.Exec += async (s, e) => await DoOpenLiveFile(file);
         }
 
