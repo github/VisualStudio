@@ -202,6 +202,18 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             ns?.ShowMessage(message + ": " + e.Message);
         }
 
+        private void FileListKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
+                if (file != null)
+                {
+                    DoDiffFile(file, false).Forget();
+                }
+            }
+        }
+
         void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
