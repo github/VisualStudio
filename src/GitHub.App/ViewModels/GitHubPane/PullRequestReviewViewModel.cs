@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.App;
@@ -28,6 +29,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IModelServiceFactory modelServiceFactory;
         IModelService modelService;
+        IPullRequestSession session;
         IPullRequestReviewModel model;
         string state;
         bool isPending;
@@ -59,6 +61,7 @@ namespace GitHub.ViewModels.GitHubPane
             Files = files;
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => 
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
+            Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
         }
 
         /// <inheritdoc/>
@@ -106,6 +109,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<object> NavigateToPullRequest { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> Submit { get; }
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
@@ -179,7 +185,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
-                var session = await sessionManager.GetSession(pullRequest);
+                session = await sessionManager.GetSession(pullRequest);
 
                 if (PullRequestReviewId > 0)
                 {
@@ -215,6 +221,24 @@ namespace GitHub.ViewModels.GitHubPane
             if (disposing)
             {
                 Files.Dispose();
+            }
+        }
+
+        async Task DoSubmit(object arg)
+        {
+            try
+            {
+                Octokit.PullRequestReviewEvent e;
+
+                if (Enum.TryParse(arg.ToString(), out e))
+                {
+                    await session.PostPendingReview(Body, e);
+                    Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Error = ex;
             }
         }
 

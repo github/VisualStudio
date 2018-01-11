@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Models;
 using Microsoft.VisualStudio.Text;
+using Octokit;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -155,15 +156,26 @@ namespace GitHub.InlineReviews.Services
         ISubject<ITextSnapshot, ITextSnapshot> CreateRebuildSignal();
 
         /// <summary>
-        /// Creates a pending PR review comment.
+        /// Posts PR review.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
         /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
+        /// <param name="user">The user posting the review.</param>
         /// <param name="number">The pull request number.</param>
-        Task<IPullRequestReviewModel> CreateReview(
+        /// <param name="commitId">The SHA of the commit being reviewed.</param>
+        /// <param name="body">The review body.</param>
+        /// <param name="e">The review event.</param>
+        /// <param name="comments">The review comments.</param>
+        /// <
+        Task<IPullRequestReviewModel> PostReview(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
-            int number);
+            IAccount user,
+            int number,
+            string commitId,
+            string body,
+            PullRequestReviewEvent e,
+            IEnumerable<IPullRequestReviewCommentModel> comments);
 
         /// <summary>
         /// Posts a new PR review comment.

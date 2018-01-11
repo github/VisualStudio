@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Octokit;
 
 namespace GitHub.Services
 {
@@ -105,9 +106,17 @@ namespace GitHub.Services
         Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo);
 
         /// <summary>
-        /// Starts a new pull request review.
+        /// Starts a new pending pull request review.
         /// </summary>
         void StartReview();
+
+        /// <summary>
+        /// Posts the currently pending review.
+        /// </summary>
+        /// <param name="body">The review body.</param>
+        /// <param name="state">The review event.</param>
+        /// <returns>The review model.</returns>
+        Task<IPullRequestReviewModel> PostPendingReview(string body, PullRequestReviewEvent e);
 
         /// <summary>
         /// Updates the pull request session with a new pull request model in response to a refresh

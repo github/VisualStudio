@@ -101,11 +101,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotNull(changes, nameof(changes));
 
-            if (this.session != null)
-            {
-                throw new NotSupportedException("PullRequestFilesViewModel is already initialized.");
-            }
-
+            subscriptions?.Dispose();
             this.session = session;
             this.commentFilter = commentFilter;
             subscriptions = new CompositeDisposable();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -45,13 +46,24 @@ namespace GitHub.Api
         IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo);
 
         /// <summary>
-        /// Creates a new pending PR review.
+        /// Posts a new PR review.
         /// </summary>
         /// <param name="owner">The repository owner.</param>
         /// <param name="name">The repository name.</param>
         /// <param name="number">The pull request number.</param>
+        /// <param name="commitId">The SHA of the commit being reviewed.</param>
+        /// <param name="body">The review body.</param>
+        /// <param name="e">The review event.</param>
+        /// <param name="comments">The review comments.</param>
         /// <returns></returns>
-        IObservable<PullRequestReview> CreatePullRequestReview(string owner, string name, int number);
+        IObservable<PullRequestReview> PostPullRequestReview(
+            string owner,
+            string name,
+            int number,
+            string commitId,
+            string body,
+            PullRequestReviewEvent e,
+            IEnumerable<IPullRequestReviewCommentModel> comments);
 
         /// <summary>
         /// Creates a new PR review comment.

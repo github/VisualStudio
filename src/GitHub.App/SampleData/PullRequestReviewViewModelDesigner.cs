@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
@@ -34,6 +35,7 @@ Otherwise, very nice work here! ✨";
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit> Submit { get; }
 
         public Task InitializeAsync(
             ILocalRepositoryModel localRepository,

@@ -57,9 +57,9 @@
                      Text="{Binding Body}"/>
             <StackPanel Margin="0 4" Orientation="Horizontal">
                 <ui:LinkDropDown Header="Submit review">
-                    <ui:GitHubActionLink>Comment only</ui:GitHubActionLink>
-                    <ui:GitHubActionLink>Approve</ui:GitHubActionLink>
-                    <ui:GitHubActionLink>Request changes</ui:GitHubActionLink>
+                    <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Comment">Comment only</ui:GitHubActionLink>
+                    <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Approve">Approve</ui:GitHubActionLink>
+                    <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="RequestChanges">Request changes</ui:GitHubActionLink>
                 </ui:LinkDropDown>
                 <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Width="1" Height="16" Margin="4 0"/>
                 <ui:GitHubActionLink VerticalAlignment="Center">Cancel</ui:GitHubActionLink>

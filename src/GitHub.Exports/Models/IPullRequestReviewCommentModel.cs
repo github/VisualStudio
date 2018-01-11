@@ -10,7 +10,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the ID of the related pull request review.
         /// </summary>
-        long PullRequestReviewId { get; }
+        long PullRequestReviewId { get; set; }
 
         /// <summary>
         /// The relative path to the file that the comment was made on.

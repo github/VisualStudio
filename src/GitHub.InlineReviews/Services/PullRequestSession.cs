@@ -11,6 +11,7 @@ using ReactiveUI;
 using System.Threading;
 using System.Reactive.Subjects;
 using static System.FormattableString;
+using Octokit;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -195,6 +196,33 @@ namespace GitHub.InlineReviews.Services
                 HasPendingReview = true;
                 pendingReviewComments = new List<PullRequestReviewCommentModel>();
             }
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewModel> PostPendingReview(string body, PullRequestReviewEvent e)
+        {
+            var model = await service.PostReview(
+                LocalRepository,
+                RepositoryOwner,
+                User,
+                PullRequest.Number,
+                PullRequest.Head.Sha,
+                body,
+                e,
+                pendingReviewComments);
+
+            foreach (var comment in PullRequest.ReviewComments)
+            {
+                if (comment.PullRequestReviewId == 0)
+                {
+                    comment.PullRequestReviewId = model.Id;
+                }
+            }
+
+            PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
+            pendingReviewComments = null;
+            HasPendingReview = false;
+            return model;
         }
 
         /// <inheritdoc/>

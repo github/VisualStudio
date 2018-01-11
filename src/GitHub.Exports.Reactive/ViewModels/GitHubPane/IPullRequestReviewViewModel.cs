@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -60,9 +61,14 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
-        /// Gets a command which when executed navigates to the parent pull request.
+        /// Gets a command which navigates to the parent pull request.
         /// </summary>
         ReactiveCommand<object> NavigateToPullRequest { get; }
+
+        /// <summary>
+        /// Gets a command which submits the review.
+        /// </summary>
+        ReactiveCommand<Unit> Submit { get; }
 
         /// <summary>
         /// Initializes the view model with an existing review.
