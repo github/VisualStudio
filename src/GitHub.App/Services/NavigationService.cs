@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using IServiceProvider = System.IServiceProvider;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -28,10 +30,16 @@ namespace GitHub.Services
             var view = OpenDocument(targetFile);
             var text2 = VsShellUtilities.GetRunningDocumentContents(serviceProvider, targetFile);
 
-            var equivalentLine = FindEquivalentLine(text1, text2, line);
+            var matchingLine = FindNearestMatchingLine(text1, text2, line);
+            if (matchingLine == -1)
+            {
+                // If we can't match line use orignal as best guess.
+                matchingLine = line;
+                column = 0;
+            }
 
-            ErrorHandler.ThrowOnFailure(view.SetCaretPos(equivalentLine, column));
-            ErrorHandler.ThrowOnFailure(view.CenterLines(equivalentLine, 1));
+            ErrorHandler.ThrowOnFailure(view.SetCaretPos(matchingLine, column));
+            ErrorHandler.ThrowOnFailure(view.CenterLines(matchingLine, 1));
 
             return view;
         }
@@ -42,17 +50,6 @@ namespace GitHub.Services
             IVsTextView view;
             var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
             return hresult == VSConstants.S_OK ? view : null;
-        }
-
-        int FindEquivalentLine(string text1, string text2, int line)
-        {
-            if (text1 == text2)
-            {
-                return line;
-            }
-
-            // TODO: Add best guess line matching when target file has been modified.
-            return line;
         }
 
         string GetText(IVsTextView textView)
@@ -78,6 +75,48 @@ namespace GitHub.Services
             IVsTextView view;
             VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
             return view;
+        }
+
+        static int FindNearestMatchingLine(string text1, string text2, int line)
+        {
+            var fromLines = ReadLines(text1);
+            var toLines = ReadLines(text2);
+            var fromLine = fromLines[line];
+
+            for (var offset = 0; true; offset++)
+            {
+                var lineAbove = line + offset;
+                var checkAbove = lineAbove < toLines.Count;
+                if (checkAbove && toLines[lineAbove] == fromLine)
+                {
+                    return lineAbove;
+                }
+
+                var lineBelow = line - offset;
+                var checkBelow = lineBelow >= 0;
+                if (checkBelow && toLines[lineBelow] == fromLine)
+                {
+                    return lineBelow;
+                }
+
+                if (!checkAbove && !checkBelow)
+                {
+                    return -1;
+                }
+            }
+        }
+
+        static IList<string> ReadLines(string text)
+        {
+            var lines = new List<string>();
+            var reader = new DiffUtilities.LineReader(text);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                lines.Add(line);
+            }
+
+            return lines;
         }
     }
 }
