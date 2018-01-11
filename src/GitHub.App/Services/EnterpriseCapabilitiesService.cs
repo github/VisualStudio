@@ -14,17 +14,14 @@ namespace GitHub.Services
     public class EnterpriseCapabilitiesService : IEnterpriseCapabilitiesService
     {
         static readonly Version MinimumOAuthVersion = new Version("2.12.2");
-        readonly ISimpleApiClientFactory apiClientFactory;
         readonly IEnterpriseProbe probe;
         readonly IProgram program;
 
         [ImportingConstructor]
         public EnterpriseCapabilitiesService(
-            ISimpleApiClientFactory apiClientFactory,
             IEnterpriseProbe probe,
             IProgram program)
         {
-            this.apiClientFactory = apiClientFactory;
             this.probe = probe;
             this.program = program;
         }

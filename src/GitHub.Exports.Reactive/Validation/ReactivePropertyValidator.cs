@@ -276,6 +276,8 @@ namespace GitHub.Validation
             return This.IfTrue(String.IsNullOrEmpty, errorMessage);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "System.UriBuilder",
+            Justification = "We're using UriBuilder to validate the URL because Uri.TryCreate fails if no scheme specified.")]
         public static ReactivePropertyValidator<string> IfNotUri(this ReactivePropertyValidator<string> This, string errorMessage)
         {
             return This.IfFalse(s =>
