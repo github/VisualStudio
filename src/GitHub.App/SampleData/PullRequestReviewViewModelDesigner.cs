@@ -24,6 +24,7 @@ namespace GitHub.SampleData
 
 Otherwise, very nice work here! ✨";
             Files = new PullRequestFilesViewModelDesigner();
+            CommentCount = 3;
 
             FileComments = new[]
             {
@@ -65,6 +66,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public IPullRequestFilesViewModel Files { get; set; }
         public IReadOnlyList<IPullRequestReviewCommentModel> FileComments { get; set; }
         public IReadOnlyList<IPullRequestReviewCommentModel> OutdatedFileComments { get; set; }
+        public int CommentCount { get; set; }
         public ReactiveCommand<Unit> OpenComment { get; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public ReactiveCommand<Unit> Submit { get; }

@@ -112,12 +112,15 @@
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <local:PullRequestFilesView DataContext="{Binding Files}"/>
             </TabItem>
-            <TabItem Header="{Binding FileComments.Count}"
+            <TabItem Header="{Binding CommentCount}"
                      HeaderStringFormat="File comments ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <StackPanel>
                     <ItemsControl ItemsSource="{Binding FileComments}"/>
-                    <ui:SectionControl HeaderText="Outdated" Margin="0 8 0 0" IsExpanded="False">
+                    <ui:SectionControl HeaderText="{Binding OutdatedFileComments.Count, StringFormat=Outdated ({0})}"
+                                       IsExpanded="False"
+                                       Margin="0 8 0 0"
+                                       Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
                         <ItemsControl ItemsSource="{Binding OutdatedFileComments}"/>
                     </ui:SectionControl>
                 </StackPanel>

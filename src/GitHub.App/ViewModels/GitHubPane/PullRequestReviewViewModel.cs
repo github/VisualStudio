@@ -38,6 +38,7 @@ namespace GitHub.ViewModels.GitHubPane
         string body;
         IReadOnlyList<IPullRequestReviewCommentModel> fileComments;
         IReadOnlyList<IPullRequestReviewCommentModel> outdatedFileComments;
+        int commentCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
@@ -109,6 +110,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return outdatedFileComments; }
             private set { this.RaiseAndSetIfChanged(ref outdatedFileComments, value); }
+        }
+
+        /// <inheritdoc/>
+        public int CommentCount
+        {
+            get { return commentCount; }
+            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
         }
 
         /// <inheritdoc/>
@@ -308,6 +316,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             FileComments = current;
             OutdatedFileComments = outdated;
+            CommentCount = current.Count + outdated.Count;
         }
     }
 }
