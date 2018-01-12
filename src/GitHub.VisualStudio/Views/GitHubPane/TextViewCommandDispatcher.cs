@@ -39,6 +39,18 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
         int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
+            if (pguidCmdGroup == commandGroup)
+            {
+                if (prgCmds != null && cCmds == 1)
+                {
+                    if (prgCmds[0].cmdID == commandId)
+                    {
+                        prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
+                        return VSConstants.S_OK;
+                    }
+                }
+            }
+
             return next?.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText) ?? 0;
         }
 

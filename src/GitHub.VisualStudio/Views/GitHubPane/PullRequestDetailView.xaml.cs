@@ -242,8 +242,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            var dispatcher = new TextViewCommandDispatcher(textView, commandGroup, commandId);
-            dispatcher.Exec += async (s, e) => await DoOpenLiveFile(file);
+            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec += async (s, e) => await DoOpenLiveFile(file);
+
+            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
+            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
+            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec += async (s, e) => await DoOpenLiveFile(file);
         }
 
         void ShowErrorInStatusBar(string message, Exception e = null)
