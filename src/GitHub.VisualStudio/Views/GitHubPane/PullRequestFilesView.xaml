@@ -40,6 +40,7 @@
               BorderThickness="0"
               Margin="0 6 0 0"
               ContextMenuOpening="changesTree_ContextMenuOpening"
+              KeyUp="changesTree_KeyUp"
               MouseDoubleClick="changesTree_MouseDoubleClick"
               MouseRightButtonDown="changesTree_MouseRightButtonDown">
         <TreeView.ItemContainerStyle>
@@ -57,7 +58,9 @@
             </HierarchicalDataTemplate>
             
             <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
-                <StackPanel Orientation="Horizontal" Tag="{Binding DataContext, ElementName=root}">
+                <StackPanel Orientation="Horizontal"
+                            Tag="{Binding DataContext, ElementName=root}"
+                            KeyboardNavigation.DirectionalNavigation="None">
                     
                     <!-- 
                       We need to change the color of the file icon when the file is deleted, but applying the style

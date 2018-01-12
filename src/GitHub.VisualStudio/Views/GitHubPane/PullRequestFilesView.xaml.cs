@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         void changesTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
-            (DataContext as IPullRequestFilesViewModel)?.DiffFile.Execute(file);            
+            (DataContext as IPullRequestFilesViewModel)?.DiffFile.Execute(file);
         }
 
         void changesTree_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -67,6 +67,19 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     }
 
                     e.Handled = false;
+                }
+            }
+        }
+
+        private void changesTree_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
+
+                if (file != null)
+                {
+                    (DataContext as IPullRequestFilesViewModel)?.DiffFile.Execute(file);
                 }
             }
         }
