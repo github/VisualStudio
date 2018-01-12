@@ -40,7 +40,6 @@ namespace GitHub.SampleData
 
         public Task InitializeAsync(
             IPullRequestSession session,
-            TreeChanges changes,
             Func<IInlineCommentThreadModel, bool> commentFilter = null)
         {
             return Task.CompletedTask;

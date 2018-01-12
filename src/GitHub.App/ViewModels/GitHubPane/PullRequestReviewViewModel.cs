@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
@@ -31,9 +32,11 @@ namespace GitHub.ViewModels.GitHubPane
         IModelService modelService;
         IPullRequestSession session;
         IPullRequestReviewModel model;
+        IDisposable sessionSubscription;
         string state;
         bool isPending;
         string body;
+        IReadOnlyList<IPullRequestReviewCommentModel> fileComments;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
@@ -45,11 +48,13 @@ namespace GitHub.ViewModels.GitHubPane
         [ImportingConstructor]
         public PullRequestReviewViewModel(
             IPullRequestService pullRequestsService,
+            IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
             IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
+            Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(files, nameof(files));
@@ -62,6 +67,18 @@ namespace GitHub.ViewModels.GitHubPane
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => 
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
             Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
+
+            OpenComment = ReactiveCommand.CreateAsyncTask(async x =>
+            {
+                var comment = (IPullRequestReviewCommentModel)x;
+                var file = await session.GetFile(comment.Path);
+                var thread = file.InlineCommentThreads.FirstOrDefault(y => y.Comments.Any(z => z.Id == comment.Id));
+
+                if (thread != null)
+                {
+                    await editorService.OpenDiff(session, file.RelativePath, thread);
+                }
+            });
         }
 
         /// <inheritdoc/>
@@ -78,6 +95,13 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public IPullRequestFilesViewModel Files { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IPullRequestReviewCommentModel> FileComments
+        {
+            get { return fileComments; }
+            private set { this.RaiseAndSetIfChanged(ref fileComments, value); }
+        }
 
         /// <inheritdoc/>
         public IPullRequestReviewModel Model
@@ -106,6 +130,9 @@ namespace GitHub.ViewModels.GitHubPane
             get { return body; }
             set { this.RaiseAndSetIfChanged(ref body, value); }
         }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> OpenComment { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> NavigateToPullRequest { get; }
@@ -205,8 +232,12 @@ namespace GitHub.ViewModels.GitHubPane
                     session.StartReview();
                 }
 
-                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-                await Files.InitializeAsync(session, changes, FilterComments);
+                await Files.InitializeAsync(session, FilterComments);
+
+                sessionSubscription?.Dispose();
+                sessionSubscription = session.WhenAnyValue(x => x.PullRequest.ReviewComments)
+                    .Select(x => x.Where(y => y.PullRequestReviewId == PullRequestReviewId).ToList())
+                    .Subscribe(x => FileComments = x);
             }
             finally
             {
@@ -221,6 +252,7 @@ namespace GitHub.ViewModels.GitHubPane
             if (disposing)
             {
                 Files.Dispose();
+                sessionSubscription?.Dispose();
             }
         }
 

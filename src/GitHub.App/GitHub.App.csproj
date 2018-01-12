@@ -227,6 +227,7 @@
     <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
+    <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="ViewModels\Dialog\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GitHubDialogWindowViewModel.cs" />
     <Compile Include="ViewModels\Dialog\LoginCredentialsViewModel.cs" />

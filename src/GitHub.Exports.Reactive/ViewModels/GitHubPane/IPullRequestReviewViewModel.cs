@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
@@ -59,6 +60,16 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the pull request's changed files.
         /// </summary>
         IPullRequestFilesViewModel Files { get; }
+
+        /// <summary>
+        /// Gets a list of the file comments in the review.
+        /// </summary>
+        IReadOnlyList<IPullRequestReviewCommentModel> FileComments { get; }
+
+        /// <summary>
+        /// Gets a command which opens an inline comment in a diff view.
+        /// </summary>
+        ReactiveCommand<Unit> OpenComment { get; }
 
         /// <summary>
         /// Gets a command which navigates to the parent pull request.

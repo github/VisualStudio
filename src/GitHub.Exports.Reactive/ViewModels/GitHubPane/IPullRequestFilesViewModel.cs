@@ -55,11 +55,9 @@ namespace GitHub.ViewModels.GitHubPane
         /// Initializes the view model.
         /// </summary>
         /// <param name="session">The pull request session.</param>
-        /// <param name="changes">The libgit2sharp representation of the changes.</param>
         /// <param name="commentFilter">An optional review comment filter.</param>
         Task InitializeAsync(
             IPullRequestSession session,
-            TreeChanges changes,
             Func<IInlineCommentThreadModel, bool> commentFilter = null);
     }
 }

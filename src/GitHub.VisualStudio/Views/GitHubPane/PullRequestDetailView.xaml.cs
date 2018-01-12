@@ -124,7 +124,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             try
             {
-                var rightPath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var rightPath = file.RelativePath;
                 var leftPath = file.OldPath ?? rightPath;
                 var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true);
                 var leftFile = await ViewModel.ExtractFile(file, false);

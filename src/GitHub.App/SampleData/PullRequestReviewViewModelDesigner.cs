@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
@@ -23,6 +24,21 @@ namespace GitHub.SampleData
 
 Otherwise, very nice work here! ✨";
             Files = new PullRequestFilesViewModelDesigner();
+            FileComments = new[]
+            {
+                new PullRequestReviewCommentModel
+                {
+                    Body = @"These should probably be properties. Most likely they should be readonly properties. I know that makes creating instances of these not look as nice as using property initializers when constructing an instance, but if these properties should never be mutated after construction, then it guides future consumers to the right behavior.
+
+However, if you're two-way binding these properties to a UI, then ignore the readonly part and make them properties. But in that case they should probably be reactive properties (or implement INPC).",
+                    Path = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
+                },
+                new PullRequestReviewCommentModel
+                {
+                    Body = "While I have no problems with naming a variable ass I think we should probably avoid swear words in case Microsoft runs their Policheck tool against this code.",
+                    Path = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
+                },
+            };
         }
 
         public ILocalRepositoryModel LocalRepository { get; set; }
@@ -34,6 +50,8 @@ Otherwise, very nice work here! ✨";
         public bool IsPending { get; set; }
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }
+        public IReadOnlyList<IPullRequestReviewCommentModel> FileComments { get; set; }
+        public ReactiveCommand<Unit> OpenComment { get; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public ReactiveCommand<Unit> Submit { get; }
 

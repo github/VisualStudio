@@ -532,15 +532,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// <returns>The path to a temporary file.</returns>
         public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {
-            var relativePath = Path.Combine(file.DirectoryPath, file.FileName);
-            var encoding = pullRequestsService.GetEncoding(LocalRepository, relativePath);
+            var path = file.RelativePath;
+            var encoding = pullRequestsService.GetEncoding(LocalRepository, path);
 
             if (!head && file.OldPath != null)
             {
-                relativePath = file.OldPath;
+                path = file.OldPath;
             }
 
-            return pullRequestsService.ExtractFile(LocalRepository, model, relativePath, head, encoding).ToTask();
+            return pullRequestsService.ExtractFile(LocalRepository, model, path, head, encoding).ToTask();
         }
 
         /// <summary>
@@ -550,7 +550,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <returns>The full path to the file in the working directory.</returns>
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
-            return Path.Combine(LocalRepository.LocalPath, file.DirectoryPath, file.FileName);
+            return Path.Combine(LocalRepository.LocalPath, file.RelativePath);
         }
 
         /// <inheritdoc/>
@@ -626,7 +626,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var fileCommentCount = file?.WhenAnyValue(x => x.InlineCommentThreads)
                     .Subscribe(x => node.CommentCount = x.Count(y => y.LineNumber != -1));
 
-                var dir = GetDirectory(node.DirectoryPath, dirs);
+                var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
                 dir.Files.Add(node);
             }
 
