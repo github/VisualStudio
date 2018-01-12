@@ -43,6 +43,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly BehaviorSubject<bool> isBranchCheckedOut = new BehaviorSubject<bool>(false);
         IPullRequestSession session;
         Func<IInlineCommentThreadModel, bool> commentFilter;
+        int changedFilesCount;
         IReadOnlyList<IPullRequestChangeNode> items;
         CompositeDisposable subscriptions;
 
@@ -76,6 +77,13 @@ namespace GitHub.ViewModels.GitHubPane
             OpenFileInWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
                 x => DoOpenFile((IPullRequestFileNode)x, true));
+        }
+
+        /// <inheritdoc/>
+        public int ChangedFilesCount
+        {
+            get { return changedFilesCount; }
+            private set { this.RaiseAndSetIfChanged(ref changedFilesCount, value); }
         }
 
         /// <inheritdoc/>
@@ -132,6 +140,7 @@ namespace GitHub.ViewModels.GitHubPane
                 dir.Files.Add(node);
             }
 
+            ChangedFilesCount = session.PullRequest.ChangedFiles.Count;
             Items = dirs[string.Empty].Children.ToList();
         }
 

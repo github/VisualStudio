@@ -8,6 +8,7 @@
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+                                    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
@@ -15,7 +16,7 @@
     <d:DesignProperties.DataContext>
         <sampleData:PullRequestReviewViewModelDesigner IsPending="True"/>
     </d:DesignProperties.DataContext>
-    
+
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -66,9 +67,13 @@
             </StackPanel>
         </StackPanel>
 
-        <ui:SectionControl HeaderText="Files" Margin="0 4">
-            <local:PullRequestFilesView DataContext="{Binding Files}"/>
-        </ui:SectionControl>
+        <TabControl Margin="0 16 0 0" Style="{DynamicResource GitHubPRDetailsTabControl}">
+            <TabItem Header="{Binding Files.ChangedFilesCount}"
+                     HeaderStringFormat="Files changed ({0})"
+                     Style="{DynamicResource GitHubPRDetailsTabItem}">
+                <local:PullRequestFilesView DataContext="{Binding Files}"/>
+            </TabItem>
+        </TabControl>
     </StackPanel>
-    
+
 </local:GenericPullRequestReviewView>

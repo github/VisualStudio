@@ -27,9 +27,10 @@ namespace GitHub.SampleData
                     }
                 }
             };
+            ChangedFilesCount = 4;
         }
 
-        public bool IsBranchCheckedOut { get; set; }
+        public int ChangedFilesCount { get; set; }
         public IReadOnlyList<IPullRequestChangeNode> Items { get; }
         public ReactiveCommand<Unit> DiffFile { get; }
         public ReactiveCommand<Unit> ViewFile { get; }

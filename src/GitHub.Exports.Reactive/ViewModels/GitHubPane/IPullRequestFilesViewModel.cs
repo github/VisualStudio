@@ -15,6 +15,11 @@ namespace GitHub.ViewModels.GitHubPane
     public interface IPullRequestFilesViewModel : IViewModel, IDisposable
     {
         /// <summary>
+        /// Gets the number of changed files in the pull request.
+        /// </summary>
+        int ChangedFilesCount { get; }
+
+        /// <summary>
         /// Gets the root nodes of the tree.
         /// </summary>
         IReadOnlyList<IPullRequestChangeNode> Items { get; }
