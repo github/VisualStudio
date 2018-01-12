@@ -132,6 +132,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             try
             {
+                if (!ViewModel.IsCheckedOut)
+                {
+                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    return;
+                }
+
                 var fullPath = ViewModel.GetLocalFilePath(file);
 
                 var activeView = NavigationService.FindActiveView();
@@ -150,6 +156,13 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             {
                 ShowErrorInStatusBar("Error opening live file", e);
             }
+        }
+
+        static void ShowInfoMessage(string message)
+        {
+            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
+                Services.GitHubServiceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
         }
 
         async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
