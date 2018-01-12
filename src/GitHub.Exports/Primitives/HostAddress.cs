@@ -44,6 +44,7 @@ namespace GitHub.Primitives
         {
             WebUri = new Uri(enterpriseUri, new Uri("/", UriKind.Relative));
             ApiUri = new Uri(enterpriseUri, new Uri("/api/v3/", UriKind.Relative));
+            GraphQLApiUri = new Uri(enterpriseUri, new Uri("/api/graphql", UriKind.Relative));
             //CredentialCacheKeyHost = ApiUri.Host;
             CredentialCacheKeyHost = WebUri.ToString();
         }
@@ -52,6 +53,7 @@ namespace GitHub.Primitives
         {
             WebUri = new Uri("https://github.com");
             ApiUri = new Uri("https://api.github.com");
+            GraphQLApiUri = new Uri("https://api.github.com/graphql");
             //CredentialCacheKeyHost = "github.com";
             CredentialCacheKeyHost = WebUri.ToString();
         }
@@ -66,6 +68,12 @@ namespace GitHub.Primitives
         ///  "https://github-enterprise.com/api/v3"
         /// </summary>
         public Uri ApiUri { get; set; }
+
+        /// <summary>
+        /// The Url to the host's GraphQL API endpoint. For example, "https://api.github.com/graphql" or
+        ///  "https://github-enterprise.com/api/graphql"
+        /// </summary>
+        public Uri GraphQLApiUri { get; set; }
 
         // If the host name is "api.github.com" or "gist.github.com", we really only want "github.com",
         // since that's the same cache key for all the other github.com operations.

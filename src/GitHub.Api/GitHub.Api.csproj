@@ -62,9 +62,12 @@
       <Link>ApiClientConfiguration_User.cs</Link>
     </Compile>
     <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
+    <Compile Include="GraphQLClientFactory.cs" />
+    <Compile Include="IGraphQLClientFactory.cs" />
     <Compile Include="IKeychain.cs" />
     <Compile Include="ILoginManager.cs" />
     <Compile Include="ITwoFactorChallengeHandler.cs" />
+    <Compile Include="GraphQLKeychainCredentialStore.cs" />
     <Compile Include="LoginManager.cs" />
     <Compile Include="KeychainCredentialStore.cs" />
     <Compile Include="WindowsKeychain.cs" />
@@ -78,6 +81,14 @@
     <Compile Include="SimpleApiClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\Octokit.GraphQL\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
+      <Project>{8334b9f4-4468-4800-88da-572031b23308}</Project>
+      <Name>Octokit.GraphQL.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\Octokit.GraphQL\Octokit.GraphQL\Octokit.GraphQL.csproj">
+      <Project>{a2adf518-2909-4556-b63d-12a02f16036d}</Project>
+      <Name>Octokit.GraphQL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>

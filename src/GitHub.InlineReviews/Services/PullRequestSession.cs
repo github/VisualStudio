@@ -12,6 +12,9 @@ using System.Threading;
 using System.Reactive.Subjects;
 using static System.FormattableString;
 using Octokit;
+using GitHub.Api;
+using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -28,18 +31,21 @@ namespace GitHub.InlineReviews.Services
     public class PullRequestSession : ReactiveObject, IPullRequestSession
     {
         readonly IPullRequestSessionService service;
+        readonly Octokit.GraphQL.Connection graphql;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         bool isCheckedOut;
         string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
         IPullRequestModel pullRequest;
+        string pullRequestId;
         Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
         bool hasPendingReview;
-        List<PullRequestReviewCommentModel> pendingReviewComments;
+        string pendingReviewId;
 
         public PullRequestSession(
             IPullRequestSessionService service,
+            Octokit.GraphQL.Connection graphql,
             IAccount user,
             IPullRequestModel pullRequest,
             ILocalRepositoryModel localRepository,
@@ -47,11 +53,13 @@ namespace GitHub.InlineReviews.Services
             bool isCheckedOut)
         {
             Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(graphql, nameof(graphql));
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
             Guard.ArgumentNotNull(localRepository, nameof(localRepository));
 
             this.service = service;
+            this.graphql = graphql;
             this.isCheckedOut = isCheckedOut;
             this.pullRequest = pullRequest;
             User = user;
@@ -147,8 +155,45 @@ namespace GitHub.InlineReviews.Services
             }
             else
             {
+                if (pullRequestId == null)
+                {
+                    var query = new Query()
+                        .Repository(RepositoryOwner, LocalRepository.Name)
+                        .PullRequest(PullRequest.Number)
+                        .Select(x => x.Id);
+                    pullRequestId = (await graphql.Run(query)).Single();
+                }
+
+                if (pendingReviewId == null)
+                {
+                    var review = new AddPullRequestReviewInput
+                    {
+                        PullRequestId = pullRequestId,
+                    };
+
+                    var addReview = new Mutation()
+                        .AddPullRequestReview(review)
+                        .Select(x => x.PullRequestReview.Id);
+                    pendingReviewId = (await graphql.Run(addReview)).Single();
+                }
+
+                var comment = new AddPullRequestReviewCommentInput
+                {
+                    Body = body,
+                    CommitOID = commitId,
+                    Path = path,
+                    Position = position,
+                    PullRequestReviewId = pendingReviewId,
+                };
+
+                var addComment = new Mutation()
+                    .AddPullRequestReviewComment(comment)
+                    .Select(x => x.Comment.DatabaseId);
+                var commentId = (await graphql.Run(addComment)).Single();
+
                 var model = new PullRequestReviewCommentModel
                 {
+                    Id = commentId.Value,
                     Body = body,
                     CommitId = commitId,
                     Path = path,
@@ -160,7 +205,6 @@ namespace GitHub.InlineReviews.Services
                     User = User,
                 };
 
-                pendingReviewComments.Add(model);
                 await AddComment(model);
                 return model;
             }
@@ -194,35 +238,35 @@ namespace GitHub.InlineReviews.Services
 
                 PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { newReview }).ToList();
                 HasPendingReview = true;
-                pendingReviewComments = new List<PullRequestReviewCommentModel>();
             }
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewModel> PostPendingReview(string body, PullRequestReviewEvent e)
+        public Task<IPullRequestReviewModel> PostPendingReview(string body, Octokit.PullRequestReviewEvent e)
         {
-            var model = await service.PostReview(
-                LocalRepository,
-                RepositoryOwner,
-                User,
-                PullRequest.Number,
-                PullRequest.Head.Sha,
-                body,
-                e,
-                pendingReviewComments);
+            throw new NotImplementedException();
+            //var model = await service.PostReview(
+            //    LocalRepository,
+            //    RepositoryOwner,
+            //    User,
+            //    PullRequest.Number,
+            //    PullRequest.Head.Sha,
+            //    body,
+            //    e,
+            //    pendingReviewComments);
 
-            foreach (var comment in PullRequest.ReviewComments)
-            {
-                if (comment.PullRequestReviewId == 0)
-                {
-                    comment.PullRequestReviewId = model.Id;
-                }
-            }
+            //foreach (var comment in PullRequest.ReviewComments)
+            //{
+            //    if (comment.PullRequestReviewId == 0)
+            //    {
+            //        comment.PullRequestReviewId = model.Id;
+            //    }
+            //}
 
-            PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
-            pendingReviewComments = null;
-            HasPendingReview = false;
-            return model;
+            //PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
+            //pendingReviewComments = null;
+            //HasPendingReview = false;
+            //return model;
         }
 
         /// <inheritdoc/>
