@@ -104,7 +104,7 @@ namespace GitHub.ViewModels.GitHubPane
         public string Body
         {
             get { return body; }
-            private set { this.RaiseAndSetIfChanged(ref body, value); }
+            set { this.RaiseAndSetIfChanged(ref body, value); }
         }
 
         /// <inheritdoc/>
