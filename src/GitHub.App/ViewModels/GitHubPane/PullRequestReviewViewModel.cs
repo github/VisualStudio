@@ -74,7 +74,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var file = await session.GetFile(comment.Path);
                 var thread = file.InlineCommentThreads.FirstOrDefault(y => y.Comments.Any(z => z.Id == comment.Id));
 
-                if (thread != null)
+                if (thread != null && thread.LineNumber != -1)
                 {
                     await editorService.OpenDiff(session, file.RelativePath, thread);
                 }
