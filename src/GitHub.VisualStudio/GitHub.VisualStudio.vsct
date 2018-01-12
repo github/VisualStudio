@@ -242,8 +242,8 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="openFileInSolutionCommand" priority="0x104">
-      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    <CommandPlacement guid="guidContextMenuSet" id="openFileInSolutionCommand" priority="0x1000">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
     </CommandPlacement>
 
     <!-- Standard toolbar commands -->
