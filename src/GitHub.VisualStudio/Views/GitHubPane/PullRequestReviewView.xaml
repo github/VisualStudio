@@ -8,7 +8,7 @@
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
-                                    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                                    xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.App"
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
@@ -69,6 +69,44 @@
         </StackPanel>
 
         <TabControl Margin="0 16 0 0" Style="{DynamicResource GitHubPRDetailsTabControl}">
+            <TabControl.Resources>
+                <DataTemplate DataType="{x:Type models:PullRequestReviewCommentModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <ui:OcticonImage Grid.Column="0" 
+                                         Icon="comment"
+                                         Margin="0 2 2 0"/>
+                        <TextBlock Grid.Column="1"
+                                   Margin="0 2"              
+                                   TextTrimming="CharacterEllipsis">
+                            <Hyperlink Command="{Binding DataContext.OpenComment, ElementName=root}"
+                                       CommandParameter="{Binding}">
+                                <Hyperlink.Style>
+                                    <Style TargetType="Hyperlink">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Position}" Value="{x:Null}">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Hyperlink.Style>
+                                <Run Text="{Binding Body, Converter={ui:TrimNewlinesConverter}, Mode=OneWay}"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Grid.Column="1" Grid.Row="1"
+                                   Opacity="0.5"
+                                   Text="{Binding Path}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.Resources>
             <TabItem Header="{Binding Files.ChangedFilesCount}"
                      HeaderStringFormat="Files changed ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
@@ -77,37 +115,12 @@
             <TabItem Header="{Binding FileComments.Count}"
                      HeaderStringFormat="File comments ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
-                <ItemsControl ItemsSource="{Binding FileComments}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <ui:OcticonImage Grid.Column="0" 
-                                                 Icon="comment"
-                                                 Margin="0 2 2 0"/>
-                                <TextBlock Grid.Column="1"
-                                           Margin="0 2"              
-                                           TextTrimming="CharacterEllipsis">
-                                    <Hyperlink Command="{Binding DataContext.OpenComment, ElementName=root}"
-                                               CommandParameter="{Binding}">
-                                        <Run Text="{Binding Body, Converter={ui:TrimNewlinesConverter}, Mode=OneWay}"/>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock Grid.Column="1" Grid.Row="1"
-                                           Opacity="0.5"
-                                           Text="{Binding Path}"
-                                           TextTrimming="CharacterEllipsis"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding FileComments}"/>
+                    <ui:SectionControl HeaderText="Outdated" Margin="0 8 0 0" IsExpanded="False">
+                        <ItemsControl ItemsSource="{Binding OutdatedFileComments}"/>
+                    </ui:SectionControl>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </StackPanel>

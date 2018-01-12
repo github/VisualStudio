@@ -37,6 +37,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool isPending;
         string body;
         IReadOnlyList<IPullRequestReviewCommentModel> fileComments;
+        IReadOnlyList<IPullRequestReviewCommentModel> outdatedFileComments;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
@@ -101,6 +102,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return fileComments; }
             private set { this.RaiseAndSetIfChanged(ref fileComments, value); }
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IPullRequestReviewCommentModel> OutdatedFileComments
+        {
+            get { return outdatedFileComments; }
+            private set { this.RaiseAndSetIfChanged(ref outdatedFileComments, value); }
         }
 
         /// <inheritdoc/>
@@ -236,8 +244,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 sessionSubscription?.Dispose();
                 sessionSubscription = session.WhenAnyValue(x => x.PullRequest.ReviewComments)
-                    .Select(x => x.Where(y => y.PullRequestReviewId == PullRequestReviewId).ToList())
-                    .Subscribe(x => FileComments = x);
+                    .Subscribe(UpdateFileComments);
             }
             finally
             {
@@ -277,6 +284,30 @@ namespace GitHub.ViewModels.GitHubPane
         bool FilterComments(IInlineCommentThreadModel thread)
         {
             return thread.Comments.Any(x => x.PullRequestReviewId == PullRequestReviewId);
+        }
+
+        void UpdateFileComments(IReadOnlyList<IPullRequestReviewCommentModel> comments)
+        {
+            var current = new List<IPullRequestReviewCommentModel>();
+            var outdated = new List<IPullRequestReviewCommentModel>();
+
+            foreach (var comment in comments)
+            {
+                if (comment.PullRequestReviewId == PullRequestReviewId)
+                {
+                    if (comment.Position.HasValue)
+                    {
+                        current.Add(comment);
+                    }
+                    else
+                    {
+                        outdated.Add(comment);
+                    }
+                }
+            }
+
+            FileComments = current;
+            OutdatedFileComments = outdated;
         }
     }
 }

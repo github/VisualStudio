@@ -24,6 +24,7 @@ namespace GitHub.SampleData
 
 Otherwise, very nice work here! ✨";
             Files = new PullRequestFilesViewModelDesigner();
+
             FileComments = new[]
             {
                 new PullRequestReviewCommentModel
@@ -32,12 +33,24 @@ Otherwise, very nice work here! ✨";
 
 However, if you're two-way binding these properties to a UI, then ignore the readonly part and make them properties. But in that case they should probably be reactive properties (or implement INPC).",
                     Path = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
+                    Position = 1,
                 },
                 new PullRequestReviewCommentModel
                 {
                     Body = "While I have no problems with naming a variable ass I think we should probably avoid swear words in case Microsoft runs their Policheck tool against this code.",
                     Path = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
+                    Position = 1,
                 },
+            };
+
+            OutdatedFileComments = new[]
+            {
+                new PullRequestReviewCommentModel
+                {
+                    Body = @"So this is just casting a mutable list to an IReadOnlyList which can be cast back to List.",
+                    Path = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
+                    Position = null,
+                }
             };
         }
 
@@ -51,6 +64,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }
         public IReadOnlyList<IPullRequestReviewCommentModel> FileComments { get; set; }
+        public IReadOnlyList<IPullRequestReviewCommentModel> OutdatedFileComments { get; set; }
         public ReactiveCommand<Unit> OpenComment { get; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public ReactiveCommand<Unit> Submit { get; }
