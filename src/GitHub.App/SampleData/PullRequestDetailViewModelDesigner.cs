@@ -31,8 +31,6 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public class PullRequestDetailViewModelDesigner : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        List<IPullRequestChangeNode> changedFilesTree;
-
         public PullRequestDetailViewModelDesigner()
         {
             var repoPath = @"C:\Repo";
@@ -88,8 +86,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                     0),
             };
 
-            changedFilesTree = new List<IPullRequestChangeNode>();
-            changedFilesTree.Add(gitHubDir);
+            Files = new PullRequestFilesViewModelDesigner();
         }
 
         public IPullRequestModel Model { get; }
@@ -104,7 +101,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsFromFork { get; }
         public string Body { get; }
         public IReadOnlyList<PullRequestDetailReviewItem> Reviews { get; }
-        public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;
+        public IPullRequestFilesViewModel Files { get; set; }
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }

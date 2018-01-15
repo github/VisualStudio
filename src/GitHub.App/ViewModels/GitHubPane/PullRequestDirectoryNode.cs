@@ -16,7 +16,7 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestDirectoryNode(string relativePath)
         {
             DirectoryName = System.IO.Path.GetFileName(relativePath);
-            RelativePath = relativePath;
+            RelativePath = relativePath.Replace("/", "\\");
             Directories = new List<IPullRequestDirectoryNode>();
             Files = new List<IPullRequestFileNode>();
         }

@@ -49,102 +49,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
         }
 
-        public class TheChangedFilesTreeProperty
-        {
-            [Fact]
-            public async Task ShouldCreateChangesTree()
-            {
-                var target = CreateTarget();
-                var pr = CreatePullRequest();
-
-                pr.ChangedFiles = new[]
-                {
-                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
-                };
-
-                await target.Load(pr);
-
-                Assert.Equal(3, target.ChangedFilesTree.Count);
-
-                var dir1 = (PullRequestDirectoryNode)target.ChangedFilesTree[0];
-                Assert.Equal("dir1", dir1.DirectoryName);
-                Assert.Equal(2, dir1.Files.Count);
-                Assert.Equal(1, dir1.Directories.Count);
-                Assert.Equal("f1.cs", dir1.Files[0].FileName);
-                Assert.Equal("f2.cs", dir1.Files[1].FileName);
-                Assert.Equal("dir1\\f1.cs", dir1.Files[0].RelativePath);
-                Assert.Equal("dir1\\f2.cs", dir1.Files[1].RelativePath);
-
-                var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
-                Assert.Equal("dir1a", dir1a.DirectoryName);
-                Assert.Equal(1, dir1a.Files.Count);
-                Assert.Equal(0, dir1a.Directories.Count);
-
-                var dir2 = (PullRequestDirectoryNode)target.ChangedFilesTree[1];
-                Assert.Equal("dir2", dir2.DirectoryName);
-                Assert.Equal(1, dir2.Files.Count);
-                Assert.Equal(0, dir2.Directories.Count);
-
-                var readme = (PullRequestFileNode)target.ChangedFilesTree[2];
-                Assert.Equal("readme.md", readme.FileName);
-            }
-
-            [Fact]
-            public async Task FileCommentCountShouldTrackSessionInlineComments()
-            {
-                var pr = CreatePullRequest();
-                var file = Substitute.For<IPullRequestSessionFile>();
-                var thread1 = CreateThread(5);
-                var thread2 = CreateThread(6);
-                var outdatedThread = CreateThread(-1);
-                var session = Substitute.For<IPullRequestSession>();
-                var sessionManager = Substitute.For<IPullRequestSessionManager>();
-
-                file.InlineCommentThreads.Returns(new[] { thread1 });
-                session.GetFile("readme.md").Returns(Task.FromResult(file));
-                sessionManager.GetSession(pr).Returns(Task.FromResult(session));
-
-                var target = CreateTarget(sessionManager: sessionManager);
-
-                pr.ChangedFiles = new[]
-                {
-                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
-                };
-
-                await target.Load(pr);
-                Assert.Equal(1, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
-
-                file.InlineCommentThreads.Returns(new[] { thread1, thread2 });
-                RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-                Assert.Equal(2, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
-
-                // Outdated comment is not included in the count.
-                file.InlineCommentThreads.Returns(new[] { thread1, thread2, outdatedThread });
-                RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-                Assert.Equal(2, ((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount);
-
-                file.Received(1).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
-            }
-
-            IInlineCommentThreadModel CreateThread(int lineNumber)
-            {
-                var result = Substitute.For<IInlineCommentThreadModel>();
-                result.LineNumber.Returns(lineNumber);
-                return result;
-            }
-
-            void RaisePropertyChanged<T>(T o, string propertyName)
-                where T : INotifyPropertyChanged
-            {
-                o.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(new PropertyChangedEventArgs(propertyName));
-            }
-
-        }
-
         public class TheCheckoutCommand
         {
             [Fact]
@@ -555,7 +459,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 sessionManager ?? Substitute.For<IPullRequestSessionManager>(),
                 Substitute.For<IModelServiceFactory>(),
                 Substitute.For<IUsageTracker>(),
-                Substitute.For<IVSGitExt>());
+                Substitute.For<IVSGitExt>(),
+                Substitute.For<IPullRequestFilesViewModel>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
