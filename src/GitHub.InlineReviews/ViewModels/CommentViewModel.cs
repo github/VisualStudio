@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.UI;
 using Octokit;
 using ReactiveUI;
@@ -20,16 +21,20 @@ namespace GitHub.InlineReviews.ViewModels
     public class CommentViewModel : ReactiveObject, ICommentViewModel
     {
         static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
+        readonly IPullRequestSession session;
         string body;
         string errorMessage;
         bool isReadOnly;
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
+        ObservableAsPropertyHelper<bool> canStartReview;
+        ObservableAsPropertyHelper<string> commitCaption;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
+        /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentId">The ID of the comment.</param>
@@ -38,6 +43,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="user">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
         public CommentViewModel(
+            IPullRequestSession session,
             ICommentThreadViewModel thread,
             IAccount currentUser,
             int commentId,
@@ -46,11 +52,13 @@ namespace GitHub.InlineReviews.ViewModels
             IAccount user,
             DateTimeOffset updatedAt)
         {
+            Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotNull(thread, nameof(thread));
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
             Guard.ArgumentNotNull(body, nameof(body));
             Guard.ArgumentNotNull(user, nameof(user));
 
+            this.session = session;
             Thread = thread;
             CurrentUser = currentUser;
             Id = commentId;
@@ -62,6 +70,13 @@ namespace GitHub.InlineReviews.ViewModels
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
                 x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Equals(currentUser)));
+
+            canStartReview = session.WhenAnyValue(x => x.HasPendingReview)
+                .Select(x => !x)
+                .ToProperty(this, x => x.CanStartReview);
+            commitCaption = session.WhenAnyValue(x => x.HasPendingReview)
+                .Select(x => x ? "Add review comment" : "Add a single comment")
+                .ToProperty(this, x => x.CommitCaption);
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
@@ -76,6 +91,11 @@ namespace GitHub.InlineReviews.ViewModels
                 DoCommitEdit);
             AddErrorHandler(CommitEdit);
 
+            StartReview = ReactiveCommand.CreateAsyncTask(
+                CommitEdit.CanExecuteObservable,
+                DoStartReview);
+            AddErrorHandler(StartReview);
+
             CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
             CancelEdit.Subscribe(DoCancelEdit);
             AddErrorHandler(CancelEdit);
@@ -86,14 +106,16 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
+        /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="model">The comment model.</param>
         public CommentViewModel(
+            IPullRequestSession session,
             ICommentThreadViewModel thread,
             IAccount currentUser,
             ICommentModel model)
-            : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
+            : this(session, thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
         }
 
@@ -104,10 +126,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="currentUser">The current user.</param>
         /// <returns>THe placeholder comment.</returns>
         public static CommentViewModel CreatePlaceholder(
+            IPullRequestSession session,
             ICommentThreadViewModel thread,
             IAccount currentUser)
         {
             return new CommentViewModel(
+                session,
                 thread,
                 currentUser,
                 0,
@@ -169,6 +193,12 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
+        async Task DoStartReview(object unused)
+        {
+            session.StartReview();
+            await CommitEdit.ExecuteAsync(null);
+        }
+
         /// <inheritdoc/>
         public int Id { get; private set; }
 
@@ -207,15 +237,17 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref updatedAt, value); }
         }
 
-        /// <summary>
-        /// Gets the current user.
-        /// </summary>
+        /// <inheritdoc/>
         public IAccount CurrentUser { get; }
 
-        /// <summary>
-        /// Gets the thread that the comment is a part of.
-        /// </summary>
+        /// <inheritdoc/>
         public ICommentThreadViewModel Thread { get; }
+
+        /// <inheritdoc/>
+        public bool CanStartReview => canStartReview.Value;
+
+        /// <inheritdoc/>
+        public string CommitCaption => commitCaption.Value;
 
         /// <inheritdoc/>
         public IAccount User { get; }
@@ -228,6 +260,9 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> CommitEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> StartReview { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> OpenOnGitHub { get; }

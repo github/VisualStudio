@@ -26,7 +26,7 @@
         <TextBlock Visibility="{Binding Id, Converter={ui:EqualsToVisibilityConverter 0}}">
             <Hyperlink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                        CommandParameter="{Binding}">
-                Start a review
+                Add your review
             </Hyperlink>
         </TextBlock>
     </Grid>

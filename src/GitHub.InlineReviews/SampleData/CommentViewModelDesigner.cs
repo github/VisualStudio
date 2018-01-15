@@ -25,10 +25,13 @@ namespace GitHub.InlineReviews.SampleData
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }
+        public bool CanStartReview { get; set; } = true;
+        public string CommitCaption { get; set; } = "Add a single comment";
 
         public ReactiveCommand<object> BeginEdit { get; }
         public ReactiveCommand<object> CancelEdit { get; }
         public ReactiveCommand<Unit> CommitEdit { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit> StartReview { get; }
     }
 }

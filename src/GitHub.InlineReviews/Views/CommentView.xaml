@@ -168,7 +168,12 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}">Comment</Button>
+                <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
+                <Button Margin="4 0 0 0"
+                        Command="{Binding StartReview}"
+                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}">
+                    Start a review
+                </Button>
                 <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
             </StackPanel>
         </Grid>

@@ -37,10 +37,10 @@ namespace GitHub.InlineReviews.ViewModels
 
             foreach (var comment in comments)
             {
-                Comments.Add(new CommentViewModel(this, CurrentUser, comment));
+                Comments.Add(new CommentViewModel(session, this, CurrentUser, comment));
             }
 
-            Comments.Add(CommentViewModel.CreatePlaceholder(this, CurrentUser));
+            Comments.Add(CommentViewModel.CreatePlaceholder(session, this, CurrentUser));
         }
 
         /// <summary>

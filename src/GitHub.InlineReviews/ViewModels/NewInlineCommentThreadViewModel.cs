@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.ViewModels
                 this.WhenAnyValue(x => x.NeedsPush, x => !x),
                 DoPostComment);
 
-            var placeholder = CommentViewModel.CreatePlaceholder(this, CurrentUser);
+            var placeholder = CommentViewModel.CreatePlaceholder(session, this, CurrentUser);
             placeholder.BeginEdit.Execute(null);
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
