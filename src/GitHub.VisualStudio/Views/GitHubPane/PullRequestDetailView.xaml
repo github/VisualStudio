@@ -299,6 +299,7 @@
                                       Background="Transparent"
                                       BorderThickness="0"
                                       Margin="0 6 0 0"
+                                      KeyUp="FileListKeyUp"
                                       MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <TreeView.ItemContainerStyle>
@@ -317,7 +318,8 @@
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
-                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ui:SectionControl}}}">
+                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ui:SectionControl}}}"
+                                                    KeyboardNavigation.DirectionalNavigation="None">
                                             <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
