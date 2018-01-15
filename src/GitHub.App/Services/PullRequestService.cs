@@ -198,7 +198,20 @@ namespace GitHub.Services
                 var exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
                 if (exitCode != 0)
                 {
-                    var ex = new ApplicationException(output.ToString());
+                    // Replace with friendly message if Git.exe isn't on path.
+                    // If culture isn't English, user will see the local equivalent of:
+                    // "'git' is not recognized as an internal or external command"                    
+                    var message = output.ToString();
+                    if (exitCode == 1 && message.StartsWith("'git' is not recognized as an internal or external command,", StringComparison.Ordinal))
+                    {
+                        message =
+@"Couldn't find Git.exe on PATH.
+
+Please install Git for Windows from:
+https://git-scm.com/download/win";
+                    }
+
+                    var ex = new ApplicationException(message);
                     return Observable.Throw<Unit>(ex);
                 }
 
@@ -206,7 +219,7 @@ namespace GitHub.Services
             });
         }
 
-        // HACK: This is just a prototype!
+        // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
         async Task<int> SyncSubmodules(string workingDir, Action<string> progress = null)
         {
             var cmdArguments = "/C git submodule init && git submodule sync --recursive && git submodule update --recursive";
