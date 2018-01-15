@@ -116,7 +116,7 @@ namespace GitHub.Services
         /// <param name="body">The review body.</param>
         /// <param name="state">The review event.</param>
         /// <returns>The review model.</returns>
-        Task<IPullRequestReviewModel> PostPendingReview(string body, PullRequestReviewEvent e);
+        Task<IPullRequestReviewModel> PostReview(string body, PullRequestReviewEvent e);
 
         /// <summary>
         /// Updates the pull request session with a new pull request model in response to a refresh

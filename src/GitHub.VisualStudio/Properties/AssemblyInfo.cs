@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.Shell;
     OldVersionLowerBound = "0.0.0.0", OldVersionUpperBound = AssemblyVersionInformation.Version)]
 
 [assembly: ProvideCodeBase(AssemblyName = "Octokit", CodeBase = @"$PackageFolder$\Octokit.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Octokit.GraphQL", CodeBase = @"$PackageFolder$\Octokit.GraphQL.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Octokit.GraphQL.Core", CodeBase = @"$PackageFolder$\Octokit.GraphQL.Core.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "LibGit2Sharp", CodeBase = @"$PackageFolder$\LibGit2Sharp.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Splat", CodeBase = @"$PackageFolder$\Splat.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Rothko", CodeBase = @"$PackageFolder$\Rothko.dll")]

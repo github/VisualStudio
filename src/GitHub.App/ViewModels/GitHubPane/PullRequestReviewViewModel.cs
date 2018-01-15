@@ -279,7 +279,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (Enum.TryParse(arg.ToString(), out e))
                 {
-                    await session.PostPendingReview(Body, e);
+                    await session.PostReview(Body, e);
                     Close();
                 }
             }

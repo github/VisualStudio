@@ -38,10 +38,10 @@ namespace GitHub.InlineReviews.Services
         string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
         IPullRequestModel pullRequest;
-        string pullRequestId;
+        string pullRequestNodeId;
         Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
         bool hasPendingReview;
-        string pendingReviewId;
+        string pendingReviewId { get; set; }
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -155,20 +155,13 @@ namespace GitHub.InlineReviews.Services
             }
             else
             {
-                if (pullRequestId == null)
-                {
-                    var query = new Query()
-                        .Repository(RepositoryOwner, LocalRepository.Name)
-                        .PullRequest(PullRequest.Number)
-                        .Select(x => x.Id);
-                    pullRequestId = (await graphql.Run(query)).Single();
-                }
+                await LoadPullRequestNodeId();
 
                 if (pendingReviewId == null)
                 {
                     var review = new AddPullRequestReviewInput
                     {
-                        PullRequestId = pullRequestId,
+                        PullRequestId = pullRequestNodeId,
                     };
 
                     var addReview = new Mutation()
@@ -238,35 +231,68 @@ namespace GitHub.InlineReviews.Services
 
                 PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { newReview }).ToList();
                 HasPendingReview = true;
+                pendingReviewId = null;
             }
         }
 
         /// <inheritdoc/>
-        public Task<IPullRequestReviewModel> PostPendingReview(string body, Octokit.PullRequestReviewEvent e)
+        public async Task<IPullRequestReviewModel> PostReview(string body, Octokit.PullRequestReviewEvent e)
         {
-            throw new NotImplementedException();
-            //var model = await service.PostReview(
-            //    LocalRepository,
-            //    RepositoryOwner,
-            //    User,
-            //    PullRequest.Number,
-            //    PullRequest.Head.Sha,
-            //    body,
-            //    e,
-            //    pendingReviewComments);
+            if (pendingReviewId == null)
+            {
+                await LoadPullRequestNodeId();
 
-            //foreach (var comment in PullRequest.ReviewComments)
-            //{
-            //    if (comment.PullRequestReviewId == 0)
-            //    {
-            //        comment.PullRequestReviewId = model.Id;
-            //    }
-            //}
+                var review = new AddPullRequestReviewInput
+                {
+                    Body = body,
+                    Event = ToGraphQl(e),
+                    PullRequestId = pullRequestNodeId,
+                };
 
-            //PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
-            //pendingReviewComments = null;
-            //HasPendingReview = false;
-            //return model;
+                var mutation = new Mutation()
+                    .AddPullRequestReview(review)
+                    .Select(x => new PullRequestReviewModel
+                    {
+                        Body = body,
+                        CommitId = x.PullRequestReview.Commit.Oid,
+                        Id = x.PullRequestReview.DatabaseId.Value,
+                        NodeId = x.PullRequestReview.Id,
+                        State = ToRest(x.PullRequestReview.State),
+                        User = User,
+                    });
+
+                var model = (await graphql.Run(mutation)).Single();
+                PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
+                HasPendingReview = false;
+                return model;
+            }
+            else
+            {
+                var submit = new SubmitPullRequestReviewInput
+                {
+                    Body = body,
+                    Event = ToGraphQl(e),
+                    PullRequestReviewId = pendingReviewId,
+                };
+
+                var mutation = new Mutation()
+                    .SubmitPullRequestReview(submit)
+                    .Select(x => new PullRequestReviewModel
+                    {
+                        Body = body,
+                        CommitId = x.PullRequestReview.Commit.Oid,
+                        Id = x.PullRequestReview.DatabaseId.Value,
+                        NodeId = x.PullRequestReview.Id,
+                        State = ToRest(x.PullRequestReview.State),
+                        User = User,
+                    });
+
+                var model = (await graphql.Run(mutation)).Single();
+                PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
+                HasPendingReview = false;
+                pendingReviewId = null;
+                return model;
+            }
         }
 
         /// <inheritdoc/>
@@ -278,6 +304,24 @@ namespace GitHub.InlineReviews.Services
             foreach (var file in this.fileIndex.Values.ToList())
             {
                 await UpdateFile(file);
+            }
+
+            var pendingReview = pullRequestModel.Reviews
+                .FirstOrDefault(x => x.State == Octokit.PullRequestReviewState.Pending && x.User.Equals(User));
+
+            if (pendingReview != null)
+            {
+                HasPendingReview = true;
+
+                if (pendingReview.NodeId != null)
+                {
+                    pendingReviewId = pendingReview.NodeId;
+                }
+                else
+                {
+                    // TODO: REST->GraphQL mapping not yet implemented on this instance. Display a
+                    // warning telling the user to finish their review online or something.
+                }
             }
 
             pullRequestChanged.OnNext(pullRequestModel);
@@ -318,6 +362,18 @@ namespace GitHub.InlineReviews.Services
             return Path.Combine(LocalRepository.LocalPath, relativePath);
         }
 
+        async Task LoadPullRequestNodeId()
+        {
+            if (pullRequestNodeId == null)
+            {
+                var query = new Query()
+                    .Repository(RepositoryOwner, LocalRepository.Name)
+                    .PullRequest(PullRequest.Number)
+                    .Select(x => x.Id);
+                pullRequestNodeId = (await graphql.Run(query)).Single();
+            }
+        }
+
         static string BuildDiffHunk(IReadOnlyList<DiffChunk> diff, int position)
         {
             var lines = diff.SelectMany(x => x.Lines).Reverse();
@@ -326,6 +382,40 @@ namespace GitHub.InlineReviews.Services
             var newLineNumber = context.Select(x => x.NewLineNumber).Where(x => x != -1).FirstOrDefault();
             var header = Invariant($"@@ -{oldLineNumber},5 +{newLineNumber},5 @@");
             return header + '\n' + string.Join("\n", context);
+        }
+
+        static Octokit.PullRequestReviewState ToRest(Octokit.GraphQL.Model.PullRequestReviewState state)
+        {
+            switch (state)
+            {
+                case Octokit.GraphQL.Model.PullRequestReviewState.Approved:
+                    return Octokit.PullRequestReviewState.Approved;
+                case Octokit.GraphQL.Model.PullRequestReviewState.ChangesRequested:
+                    return Octokit.PullRequestReviewState.ChangesRequested;
+                case Octokit.GraphQL.Model.PullRequestReviewState.Commented:
+                    return Octokit.PullRequestReviewState.Commented;
+                case Octokit.GraphQL.Model.PullRequestReviewState.Dismissed:
+                    return Octokit.PullRequestReviewState.Dismissed;
+                case Octokit.GraphQL.Model.PullRequestReviewState.Pending:
+                    return Octokit.PullRequestReviewState.Pending;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)
+        {
+            switch (e)
+            {
+                case Octokit.PullRequestReviewEvent.Approve:
+                    return Octokit.GraphQL.Model.PullRequestReviewEvent.Approve;
+                case Octokit.PullRequestReviewEvent.Comment:
+                    return Octokit.GraphQL.Model.PullRequestReviewEvent.Comment;
+                case Octokit.PullRequestReviewEvent.RequestChanges:
+                    return Octokit.GraphQL.Model.PullRequestReviewEvent.RequestChanges;
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         /// <inheritdoc/>

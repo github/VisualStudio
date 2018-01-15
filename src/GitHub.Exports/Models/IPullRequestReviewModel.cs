@@ -9,9 +9,14 @@ namespace GitHub.Models
     public interface IPullRequestReviewModel
     {
         /// <summary>
-        /// Gets the ID of the comment.
+        /// Gets the ID of the review.
         /// </summary>
         long Id { get; }
+
+        /// <summary>
+        /// Gets the GraphQL ID for the review.
+        /// </summary>
+        string NodeId { get; set; }
 
         /// <summary>
         /// Gets the author of the review.

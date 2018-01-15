@@ -447,6 +447,7 @@ namespace GitHub.Services
                     (IPullRequestReviewModel)new PullRequestReviewModel
                     {
                         Id = x.Id,
+                        NodeId = x.NodeId,
                         User = Create(x.User),
                         Body = x.Body,
                         State = x.State,
@@ -705,12 +706,14 @@ namespace GitHub.Services
             public PullRequestReviewCacheItem(PullRequestReview review)
             {
                 Id = review.Id;
+                NodeId = review.NodeId;
                 User = new AccountCacheItem(review.User);
                 Body = review.Body;
                 State = review.State.Value;
             }
 
             public long Id { get; set; }
+            public string NodeId { get; set; }
             public AccountCacheItem User { get; set; }
             public string Body { get; set; }
             public PullRequestReviewState State { get; set; }
