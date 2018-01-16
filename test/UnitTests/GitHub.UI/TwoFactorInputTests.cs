@@ -9,9 +9,7 @@ public class TwoFactorInputTests
 {
     public class TheTextProperty : TestBaseClass
     {
-#if !NCRUNCH
         [Test]
-#endif
         public void SetsTextBoxesToIndividualCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -28,9 +26,7 @@ public class TwoFactorInputTests
             Assert.That("5", Is.EqualTo(textBoxes[5].Text));
         }
 
-#if !NCRUNCH
         [Test]
-#endif
         public void IgnoresNonDigitCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -47,9 +43,7 @@ public class TwoFactorInputTests
             Assert.That("5", Is.EqualTo(textBoxes[5].Text));
         }
 
-#if !NCRUNCH
         [Test]
-#endif
         public void HandlesNotEnoughCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -66,8 +60,6 @@ public class TwoFactorInputTests
             Assert.That("", Is.EqualTo(textBoxes[5].Text));
         }
 
-#if !NCRUNCH
-#endif
         [TestCase(null, null)]
         [TestCase("", "")]
         [TestCase("xxxx", "")]
