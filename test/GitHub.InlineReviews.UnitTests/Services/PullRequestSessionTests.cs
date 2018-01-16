@@ -114,7 +114,7 @@ Line 4";
 
                     var file = await target.GetFile(FilePath);
                     var thread = file.InlineCommentThreads.First();
-                    Assert.AreEqual(2, thread.LineNumber);
+                    Assert.That(2, Is.EqualTo(thread.LineNumber));
                 }
             }
         }
@@ -241,12 +241,12 @@ Line 4";
 
                     var file = await target.GetFile(FilePath);
 
-                    Assert.AreEqual(1, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
 
                     pullRequest = CreatePullRequest(comment1, comment2);
                     await target.Update(pullRequest);
 
-                    Assert.AreEqual(2, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
                 }
             }
 

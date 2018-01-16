@@ -49,7 +49,7 @@ Line 4";
                         diff);
 
                     var thread = result.Single();
-                    Assert.AreEqual(2, thread.LineNumber);
+                    Assert.That(2, Is.EqualTo(thread.LineNumber));
                 }
             }
 
@@ -85,7 +85,7 @@ Line 4";
                         diff);
 
                     var thread = result.Single();
-                    Assert.AreEqual(4, thread.LineNumber);
+                    Assert.That(4, Is.EqualTo(thread.LineNumber));
                 }
             }
 
@@ -124,8 +124,8 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.AreEqual(2, result.Count);
-                    Assert.AreEqual(-1, result[1].LineNumber);
+                    Assert.That(2, Is.EqualTo(result.Count));
+                    Assert.That(-1, Is.EqualTo(result[1].LineNumber));
                 }
             }
 
@@ -164,7 +164,7 @@ Line 4";
                         diff);
 
                     var thread = result.First();
-                    Assert.AreEqual(4, thread.LineNumber);
+                    Assert.That(4, Is.EqualTo(thread.LineNumber));
                 }
             }
         }
@@ -205,19 +205,19 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.AreEqual(2, threads[0].LineNumber);
+                    Assert.That(2, Is.EqualTo(threads[0].LineNumber));
 
                     diff = await diffService.Diff(FilePath, newHeadContents);
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
-                    Assert.AreEqual(3, threads[0].LineNumber);
-                    Assert.AreEqual(
+                    Assert.That(3, Is.EqualTo(threads[0].LineNumber));
+                    Assert.That(
                         new[] 
                         {
                             Tuple.Create(2, DiffSide.Right),
                             Tuple.Create(3, DiffSide.Right)
-                        }, 
-                        changedLines.ToArray());
+                        },
+                        Is.EqualTo(changedLines.ToArray()));
                 }
             }
 
@@ -253,8 +253,8 @@ Line 4";
                     threads[0].IsStale = true;
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
-                    Assert.False(threads[0].IsStale);
-                    Assert.AreEqual(new[] { Tuple.Create(2, DiffSide.Right) }, changedLines.ToArray());
+                    Assert.That(threads[0].IsStale, Is.False);
+                    Assert.That(new[] { Tuple.Create(2, DiffSide.Right) }, Is.EqualTo(changedLines.ToArray()));
                 }
             }
         }

@@ -44,10 +44,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             // There should be an existing comment and a reply placeholder.
             Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
-            Assert.AreEqual(2, target.Thread.Comments.Count);
-            Assert.AreEqual("Existing comment", target.Thread.Comments[0].Body);
-            Assert.AreEqual(string.Empty, target.Thread.Comments[1].Body);
-            Assert.AreEqual(CommentEditState.Placeholder, target.Thread.Comments[1].EditState);
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
+            Assert.That("Existing comment", Is.EqualTo(target.Thread.Comments[0].Body));
+            Assert.That(string.Empty, Is.EqualTo(target.Thread.Comments[1].Body));
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(target.Thread.Comments[1].EditState));
         }
 
         [Test]
@@ -64,8 +64,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             await target.Initialize();
 
             Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
-            Assert.AreEqual(string.Empty, target.Thread.Comments[0].Body);
-            Assert.AreEqual(CommentEditState.Editing, target.Thread.Comments[0].EditState);
+            Assert.That(string.Empty, Is.EqualTo(target.Thread.Comments[0].Body));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Thread.Comments[0].EditState));
         }
 
         [Test]
@@ -119,7 +119,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             await target.Initialize();
 
             Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
-            Assert.AreEqual(2, target.Thread.Comments.Count);
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             var file = await sessionManager.GetLiveFile(
                 RelativePath,
@@ -127,7 +127,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 peekSession.TextView.TextBuffer);
             AddCommentToExistingThread(file);
 
-            Assert.AreEqual(3, target.Thread.Comments.Count);
+            Assert.That(3, Is.EqualTo(target.Thread.Comments.Count));
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.AreEqual(2, target.Thread.Comments.Count);
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             var placeholder = target.Thread.Comments.Last();
             placeholder.BeginEdit.Execute(null);
@@ -157,9 +157,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             AddCommentToExistingThread(file);
 
             placeholder = target.Thread.Comments.Last();
-            Assert.AreEqual(3, target.Thread.Comments.Count);
-            Assert.AreEqual(CommentEditState.Editing, placeholder.EditState);
-            Assert.AreEqual("Comment being edited", placeholder.Body);
+            Assert.That(3, Is.EqualTo(target.Thread.Comments.Count));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(placeholder.EditState));
+            Assert.That("Comment being edited", Is.EqualTo(placeholder.Body));
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.AreEqual(2, target.Thread.Comments.Count);
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             sessionManager.CurrentSession.PostReviewComment(null, 0)
                 .ReturnsForAnyArgs(async x =>
@@ -195,8 +195,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             placeholder.CommitEdit.Execute(null);
 
             placeholder = target.Thread.Comments.Last();
-            Assert.AreEqual(CommentEditState.Placeholder, placeholder.EditState);
-            Assert.AreEqual(string.Empty, placeholder.Body);
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(placeholder.EditState));
+            Assert.That(string.Empty, Is.EqualTo(placeholder.Body));
         }
 
         void AddCommentToExistingThread(IPullRequestSessionFile file)

@@ -49,8 +49,8 @@ index b02decb..f7dadae 100644
                 var chunks = DiffUtilities.ParseFragment(header);
                 var chunk = chunks.First();
 
-                Assert.AreEqual(expectOldLineNumber, chunk.OldLineNumber);
-                Assert.AreEqual(expectNewLineNumber, chunk.NewLineNumber);
+                Assert.That(expectOldLineNumber, Is.EqualTo(chunk.OldLineNumber));
+                Assert.That(expectNewLineNumber, Is.EqualTo(chunk.NewLineNumber));
             }
 
             [Test]
@@ -77,7 +77,7 @@ index b02decb..f7dadae 100644
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
-                Assert.AreEqual(2, chunk.Lines.Count());
+                Assert.That(2, Is.EqualTo(chunk.Lines.Count()));
             }
 
             [Test]
@@ -92,7 +92,7 @@ index b02decb..f7dadae 100644
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
                 var line = chunk.Lines.Last();
-                Assert.AreEqual(3, line.DiffLineNumber);
+                Assert.That(3, Is.EqualTo(line.DiffLineNumber));
             }
 
 			[TestCase("+foo\n+bar\n", "+foo", "+bar")]
@@ -106,8 +106,8 @@ index b02decb..f7dadae 100644
 
                 var chunk = DiffUtilities.ParseFragment(diff).First();
 
-                Assert.AreEqual(contentLine0, chunk.Lines[0].Content);
-                Assert.AreEqual(contentLine1, chunk.Lines[1].Content);
+                Assert.That(contentLine0, Is.EqualTo(chunk.Lines[0].Content));
+                Assert.That(contentLine1, Is.EqualTo(chunk.Lines[1].Content));
             }
 
 			[TestCase("+foo\n+bar\n", 1, 2)]
@@ -120,8 +120,8 @@ index b02decb..f7dadae 100644
 
                 var chunk = DiffUtilities.ParseFragment(diff).First();
 
-                Assert.AreEqual(lineNumber0, chunk.Lines[0].NewLineNumber);
-                Assert.AreEqual(lineNumber1, chunk.Lines[1].NewLineNumber);
+                Assert.That(lineNumber0, Is.EqualTo(chunk.Lines[0].NewLineNumber));
+                Assert.That(lineNumber1, Is.EqualTo(chunk.Lines[1].NewLineNumber));
             }
 
 			[TestCase("-foo\n-bar\n", 1, 2)]
@@ -134,8 +134,8 @@ index b02decb..f7dadae 100644
 
                 var chunk = DiffUtilities.ParseFragment(diff).First();
 
-                Assert.AreEqual(lineNumber0, chunk.Lines[0].OldLineNumber);
-                Assert.AreEqual(lineNumber1, chunk.Lines[1].OldLineNumber);
+                Assert.That(lineNumber0, Is.EqualTo(chunk.Lines[0].OldLineNumber));
+                Assert.That(lineNumber1, Is.EqualTo(chunk.Lines[1].OldLineNumber));
             }
 
             [Test]
@@ -146,7 +146,7 @@ index b02decb..f7dadae 100644
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
-                Assert.AreEqual(expectDiffLine, chunk.DiffLine);
+                Assert.That(expectDiffLine, Is.EqualTo(chunk.DiffLine));
             }
 
 			[TestCase(1, 2)]
@@ -156,8 +156,8 @@ index b02decb..f7dadae 100644
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
-                Assert.AreEqual(oldLineNumber, chunk.OldLineNumber);
-                Assert.AreEqual(newLineNumber, chunk.NewLineNumber);
+                Assert.That(oldLineNumber, Is.EqualTo(chunk.OldLineNumber));
+                Assert.That(newLineNumber, Is.EqualTo(chunk.NewLineNumber));
             }
 
 			[TestCase(1, 2, " 1", 1, 2)]
@@ -170,8 +170,8 @@ index b02decb..f7dadae 100644
                 var chunk = DiffUtilities.ParseFragment(header).First();
                 var diffLine = chunk.Lines.First();
 
-                Assert.AreEqual(expectOldLineNumber, diffLine.OldLineNumber);
-                Assert.AreEqual(expectNewLineNumber, diffLine.NewLineNumber);
+                Assert.That(expectOldLineNumber, Is.EqualTo(diffLine.OldLineNumber));
+                Assert.That(expectNewLineNumber, Is.EqualTo(diffLine.NewLineNumber));
             }
 
 			[TestCase(" 1", 0, 1)]
@@ -184,7 +184,7 @@ index b02decb..f7dadae 100644
                 var result = DiffUtilities.ParseFragment(fragment);
 
                 var firstLine = result.First().Lines.Skip(skip).First();
-                Assert.AreEqual(expectDiffLineNumber, firstLine.DiffLineNumber);
+                Assert.That(expectDiffLineNumber, Is.EqualTo(firstLine.DiffLineNumber));
             }
 
 			[TestCase(" FIRST")]
@@ -198,7 +198,7 @@ index b02decb..f7dadae 100644
 
                 var str = firstLine.ToString();
 
-                Assert.AreEqual(line, str);
+                Assert.That(line, Is.EqualTo(str));
             }
 
 			[TestCase(" FIRST")]
@@ -211,7 +211,7 @@ index b02decb..f7dadae 100644
                 var result = DiffUtilities.ParseFragment(fragment);
                 var firstLine = result.First().Lines.First();
 
-                Assert.AreEqual(line, firstLine.Content);
+                Assert.That(line, Is.EqualTo(firstLine.Content));
             }
 
 			[TestCase(" FIRST", DiffChangeType.None)]
@@ -224,7 +224,7 @@ index b02decb..f7dadae 100644
                 var result = DiffUtilities.ParseFragment(fragment);
 
                 var firstLine = result.First().Lines.First();
-                Assert.AreEqual(expectType, firstLine.Type);
+                Assert.That(expectType, Is.EqualTo(firstLine.Type));
             }
 
 			[TestCase("?FIRST", "Invalid diff line change char: '?'.")]
@@ -235,7 +235,7 @@ index b02decb..f7dadae 100644
                 var result = DiffUtilities.ParseFragment(fragment);
                 var e = Assert.Throws<InvalidDataException>(() => result.First());
 
-                Assert.AreEqual(expectMessage, e.Message);
+                Assert.That(expectMessage, Is.EqualTo(e.Message));
             }
         }
 
@@ -274,7 +274,7 @@ index b02decb..f7dadae 100644
                 var line = DiffUtilities.Match(chunks1, targetLines);
 
                 var diffLineNumber = (line != null) ? line.DiffLineNumber : -1;
-                Assert.AreEqual(expectedDiffLineNumber, diffLineNumber);
+                Assert.That(expectedDiffLineNumber, Is.EqualTo(diffLineNumber));
             }
 
             [Test]
@@ -289,7 +289,7 @@ index b02decb..f7dadae 100644
 
                 var line = DiffUtilities.Match(chunks1, targetLines);
 
-                Assert.AreEqual(expectLine, line);
+                Assert.That(expectLine, Is.EqualTo(line));
             }
 
             [Test]
@@ -300,7 +300,7 @@ index b02decb..f7dadae 100644
 
                 var line = DiffUtilities.Match(chunks, lines);
 
-                Assert.Null(line);
+                Assert.That(line, Is.Null);
             }
         }
 
@@ -325,7 +325,7 @@ index b02decb..f7dadae 100644
                 foreach (var expectLine in expectLines)
                 {
                     var line = lineReader.ReadLine();
-                    Assert.AreEqual(expectLine, line);
+                    Assert.That(expectLine, Is.EqualTo(line));
                 }
             }
 
@@ -344,7 +344,7 @@ index b02decb..f7dadae 100644
             {
                 var count = DiffUtilities.LineReader.CountCarriageReturns(text);
 
-                Assert.AreEqual(expectCount, count);
+                Assert.That(expectCount, Is.EqualTo(count));
             }
 
             [Test]

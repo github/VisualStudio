@@ -23,8 +23,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 false);
 
             Assert.That(target.Comments, Has.One.Items);
-            Assert.AreEqual(string.Empty, target.Comments[0].Body);
-            Assert.AreEqual(CommentEditState.Editing, target.Comments[0].EditState);
+            Assert.That(string.Empty, Is.EqualTo(target.Comments[0].Body));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Comments[0].EditState));
         }
 
         [Test]
@@ -37,18 +37,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 10,
                 false);
 
-            Assert.False(target.NeedsPush);
-            Assert.True(target.PostComment.CanExecute(false));
+            Assert.That(target.NeedsPush, Is.False);
+            Assert.That(target.PostComment.CanExecute(false), Is.True);
 
             file.CommitSha.Returns((string)null);
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.True(target.NeedsPush);
-            Assert.False(target.PostComment.CanExecute(false));
+            Assert.That(target.NeedsPush, Is.True);
+            Assert.That(target.PostComment.CanExecute(false), Is.False);
 
             file.CommitSha.Returns("COMMIT_SHA");
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.False(target.NeedsPush);
-            Assert.True(target.PostComment.CanExecute(false));
+            Assert.That(target.NeedsPush, Is.False);
+            Assert.That(target.PostComment.CanExecute(false), Is.True);
         }
 
         [Test]
@@ -63,14 +63,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             file.CommitSha.Returns((string)null);
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.False(target.Comments[0].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.False);
 
             target.Comments[0].Body = "Foo";
-            Assert.False(target.Comments[0].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.False);
 
             file.CommitSha.Returns("COMMIT_SHA");
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.True(target.Comments[0].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.True);
         }
 
         [Test]

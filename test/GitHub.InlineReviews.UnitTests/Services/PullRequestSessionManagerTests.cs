@@ -69,8 +69,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
-                Assert.NotNull(target.CurrentSession);
-                Assert.True(target.CurrentSession.IsCheckedOut);
+                Assert.That(target.CurrentSession, Is.Not.Null);
+                Assert.That(target.CurrentSession.IsCheckedOut, Is.True);
             }
 
             [Test]
@@ -86,7 +86,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
-                Assert.Null(target.CurrentSession);
+                Assert.That(target.CurrentSession, Is.Null);
             }
 
             [Test]
@@ -158,7 +158,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 teService.ActiveRepo = null;
 
-                Assert.Null(target.CurrentSession);
+                Assert.That(target.CurrentSession, Is.Null);
             }
 
             [Test]
@@ -171,7 +171,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
-                Assert.AreEqual("this-owner", target.CurrentSession.RepositoryOwner);
+                Assert.That("this-owner", Is.EqualTo(target.CurrentSession.RepositoryOwner));
             }
         }
 
@@ -224,7 +224,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.Null(file.CommitSha);
+                Assert.That(file.CommitSha, Is.Null);
             }
 
             [Test]
@@ -306,7 +306,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.AreEqual(2, file.TrackingPoints.Count);
+                Assert.That(2, Is.EqualTo(file.TrackingPoints.Count));
             }
 
             [Test]
@@ -332,19 +332,19 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.NotNull(file.BaseSha);
-                Assert.NotNull(file.CommitSha);
-                Assert.NotNull(file.Diff);
-                Assert.NotNull(file.InlineCommentThreads);
-                Assert.NotNull(file.TrackingPoints);
+                Assert.That(file.BaseSha, Is.Not.Null);
+                Assert.That(file.CommitSha, Is.Not.Null);
+                Assert.That(file.Diff, Is.Not.Null);
+                Assert.That(file.InlineCommentThreads, Is.Not.Null);
+                Assert.That(file.TrackingPoints, Is.Not.Null);
 
                 teHolder.ActiveRepo = null;
 
-                Assert.Null(file.BaseSha);
-                Assert.Null(file.CommitSha);
-                Assert.Null(file.Diff);
-                Assert.Null(file.InlineCommentThreads);
-                Assert.Null(file.TrackingPoints);
+                Assert.That(file.BaseSha, Is.Null);
+                Assert.That(file.CommitSha, Is.Null);
+                Assert.That(file.Diff, Is.Null);
+                Assert.That(file.InlineCommentThreads, Is.Null);
+                Assert.That(file.TrackingPoints, Is.Null);
             }
 
             [Test]
@@ -387,7 +387,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 threads[0].Received().IsStale = true;
                 threads[1].DidNotReceive().IsStale = true;
 
-                Assert.True(linesChangedReceived);
+                Assert.That(linesChangedReceived, Is.True);
                 file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
             }
 
@@ -417,7 +417,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
                 file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
 
-                Assert.Null(file.CommitSha);
+                Assert.That(file.CommitSha, Is.Null);
             }
 
             [Test]
@@ -434,12 +434,12 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 var compositeDisposable = file.ToDispose as CompositeDisposable;
-                Assert.NotNull(compositeDisposable);
-                Assert.False(compositeDisposable.IsDisposed);
+                Assert.That(compositeDisposable, Is.Not.Null);
+                Assert.That(compositeDisposable.IsDisposed, Is.False);
 
                 textView.Closed += Raise.Event();
 
-                Assert.True(compositeDisposable.IsDisposed);
+                Assert.That(compositeDisposable.IsDisposed, Is.True);
             }
 
             [Test]
@@ -477,8 +477,8 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.AreEqual(1, file.InlineCommentThreads.Count);
-                    Assert.AreEqual(2, file.InlineCommentThreads[0].LineNumber);
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
+                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
                 }
             }
 
@@ -523,23 +523,23 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.AreEqual(1, file.InlineCommentThreads.Count);
-                    Assert.AreEqual(2, file.InlineCommentThreads[0].LineNumber);
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
+                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
 
                     textView.TextSnapshot.GetText().Returns(editorContents);
                     SignalTextChanged(textView.TextBuffer);
 
                     var linesChanged = await file.LinesChanged.Take(1);
 
-                    Assert.AreEqual(1, file.InlineCommentThreads.Count);
-                    Assert.AreEqual(4, file.InlineCommentThreads[0].LineNumber);
-                    Assert.AreEqual(
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
+                    Assert.That(4, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
+                    Assert.That(
                         new[]
                         {
                             Tuple.Create(2, DiffSide.Right),
                             Tuple.Create(4, DiffSide.Right),
                         },
-                        linesChanged.ToArray());
+                        Is.EqualTo(linesChanged.ToArray()));
                 }
             }
 
@@ -583,7 +583,7 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.AreEqual("Original Comment", file.InlineCommentThreads[0].Comments[0].Body);
+                    Assert.That("Original Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Body));
 
                     pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
@@ -593,7 +593,7 @@ Line 4";
 
                     await file.LinesChanged.Take(1);
 
-                    Assert.AreEqual("Updated Comment", file.InlineCommentThreads[0].Comments[0].Body);
+                    Assert.That("Updated Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Body));
                 }
             }
 
@@ -638,7 +638,7 @@ Line 4";
                         new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.AreEqual(1, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
 
                     pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
@@ -649,9 +649,9 @@ Line 4";
 
                     var linesChanged = await file.LinesChanged.Take(1);
 
-                    Assert.AreEqual(2, file.InlineCommentThreads[0].Comments.Count);
-                    Assert.AreEqual("Comment1", file.InlineCommentThreads[0].Comments[0].Body);
-                    Assert.AreEqual("Comment2", file.InlineCommentThreads[0].Comments[1].Body);
+                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
+                    Assert.That("Comment1", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Body));
+                    Assert.That("Comment2", Is.EqualTo(file.InlineCommentThreads[0].Comments[1].Body));
                 }
             }
 
@@ -669,12 +669,12 @@ Line 4";
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                Assert.AreEqual("TIPSHA", file.CommitSha);
+                Assert.That("TIPSHA", Is.EqualTo(file.CommitSha));
 
                 sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
                 SignalTextChanged(textView.TextBuffer);
 
-                Assert.Null(file.CommitSha);
+                Assert.That(file.CommitSha, Is.Null);
             }
 
             [Test]
@@ -705,7 +705,7 @@ Line 4";
                 // LinesChanged should be raised even if the IPullRequestModel is the same.
                 await target.CurrentSession.Update(target.CurrentSession.PullRequest);
 
-                Assert.True(raised);
+                Assert.That(raised, Is.True);
             }
 
             static IPullRequestReviewCommentModel CreateComment(
@@ -831,7 +831,7 @@ Line 4";
 
                 Assert.That(target.CurrentSession, Is.Not.SameAs(result));
                 Assert.That(result.PullRequest, Is.SameAs(newModel));
-                Assert.False(result.IsCheckedOut);
+                Assert.That(result.IsCheckedOut, Is.False);
             }
 
             [Test]
@@ -849,7 +849,7 @@ Line 4";
 
                 Assert.That(target.CurrentSession, Is.Not.SameAs(result));
                 Assert.That(result.PullRequest, Is.SameAs(newModel));
-                Assert.False(result.IsCheckedOut);
+                Assert.That(result.IsCheckedOut, Is.False);
             }
 
             [Test]
@@ -886,7 +886,7 @@ Line 4";
                     var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
                     var session = await target.GetSession(newModel);
 
-                    Assert.NotNull(session);
+                    Assert.That(session, Is.Not.Null);
 
                     weakSession = new WeakReference<IPullRequestSession>(session);
                 };
@@ -897,7 +897,7 @@ Line 4";
                 IPullRequestSession result;
                 weakSession.TryGetTarget(out result);
 
-                Assert.Null(result);
+                Assert.That(result, Is.Null);
             }
 
             [Test]
@@ -914,7 +914,7 @@ Line 4";
                     CreateModelServiceFactory(),
                     new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
 
-                Assert.Null(target.CurrentSession);
+                Assert.That(target.CurrentSession, Is.Null);
 
                 var model = CreatePullRequestModel(CurrentBranchPullRequestNumber);
 

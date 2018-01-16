@@ -21,24 +21,24 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1", "Comment 2"));
 
-            Assert.AreEqual(3, target.Comments.Count);
-            Assert.AreEqual(
+            Assert.That(3, Is.EqualTo(target.Comments.Count));
+            Assert.That(
                 new[] 
                 {
                     "Comment 1",
                     "Comment 2",
                     string.Empty
-                }, 
-                target.Comments.Select(x => x.Body));
+                },
+                Is.EqualTo(target.Comments.Select(x => x.Body)));
 
-            Assert.AreEqual(
+            Assert.That(
                 new[]
                 {
                     CommentEditState.None,
                     CommentEditState.None,
                     CommentEditState.Placeholder,
                 },
-                target.Comments.Select(x => x.EditState));
+                Is.EqualTo(target.Comments.Select(x => x.EditState)));
         }
 
         [Test]
@@ -48,10 +48,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1"));
 
-            Assert.False(target.Comments[1].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.False);
 
             target.Comments[1].Body = "Foo";
-            Assert.True(target.Comments[1].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.True);
         }
 
         [Test]
