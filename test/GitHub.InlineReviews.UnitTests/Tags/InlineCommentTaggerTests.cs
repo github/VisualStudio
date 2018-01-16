@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf(typeof(ShowInlineCommentTag)));
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
             [Test]
@@ -62,7 +62,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf(typeof(AddInlineCommentTag)));
+                Assert.That(result[0].Tag, Is.InstanceOf<AddInlineCommentTag>());
             }
 
             [Test]
@@ -95,7 +95,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf(typeof(ShowInlineCommentTag)));
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
             [Test]
@@ -112,7 +112,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf(typeof(AddInlineCommentTag)));
+                Assert.That(result[0].Tag, Is.InstanceOf<AddInlineCommentTag>());
             }
 
             [Test]
@@ -222,7 +222,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf(typeof(ShowInlineCommentTag)));
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
             [Test]
@@ -239,7 +239,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf(typeof(AddInlineCommentTag)));
+                Assert.That(result[0].Tag, Is.InstanceOf<AddInlineCommentTag>());
             }
 
             [Test]
