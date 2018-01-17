@@ -2,9 +2,11 @@
 using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using GitHub.Models;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Models;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -15,18 +17,36 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerContext : ITeamExplorerContext
     {
+        const string GitExtTypeName = "Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider";
+        static readonly ILogger log = LogManager.ForContext<TeamExplorerContext>();
+
         [ImportingConstructor]
         public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
-            var gitExtType = Type.GetType("Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider", false);
-            if (gitExtType != null)
+            var gitExtType = Type.GetType(GitExtTypeName, false);
+            if (gitExtType == null)
             {
-                var gitExt = serviceProvider.GetService(gitExtType);
-                Refresh(gitExt);
-
-                var notifyPropertyChanged = (INotifyPropertyChanged)gitExt;
-                notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
+                log.Error("Couldn't find type {GitExtTypeName}", GitExtTypeName);
+                return;
             }
+
+            var gitExt = serviceProvider.GetService(gitExtType);
+            if (gitExt == null)
+            {
+                log.Error("Couldn't find service for type {GitExtType}", gitExtType);
+                return;
+            }
+
+            Refresh(gitExt);
+
+            var notifyPropertyChanged = gitExt as INotifyPropertyChanged;
+            if (notifyPropertyChanged == null)
+            {
+                log.Error("The service {ServiceObject} doesn't implement {Interface}", gitExt, typeof(INotifyPropertyChanged));
+                return;
+            }
+
+            notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
         }
 
         void Refresh(object gitExt)
@@ -47,7 +67,7 @@ namespace GitHub.Services
         static string FindActiveRepositoryPath(object gitExt)
         {
             var activeRepositoriesProperty = gitExt.GetType().GetProperty("ActiveRepositories");
-            var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty.GetValue(gitExt);
+            var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty?.GetValue(gitExt);
             if (activeRepositories == null)
             {
                 return null;
@@ -60,7 +80,7 @@ namespace GitHub.Services
             }
 
             var repositoryPathProperty = repo.GetType().GetProperty("RepositoryPath");
-            var repositoryPath = (string)repositoryPathProperty.GetValue(repo);
+            var repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
             return repositoryPath;
         }
 
