@@ -53,7 +53,8 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService sessionService,
             IConnectionManager connectionManager,
             IModelServiceFactory modelServiceFactory,
-            ITeamExplorerServiceHolder teamExplorerService)
+            ITeamExplorerServiceHolder teamExplorerService,
+            ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));

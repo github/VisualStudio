@@ -20,6 +20,10 @@ namespace GitHub.Services
         const string GitExtTypeName = "Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider";
         static readonly ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
+        string repositoryPath;
+        string branchName;
+        string headSha;
+
         [ImportingConstructor]
         public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
@@ -51,37 +55,62 @@ namespace GitHub.Services
 
         void Refresh(object gitExt)
         {
-            var newPath = FindActiveRepositoryPath(gitExt);
-            var oldPath = ActiveRepository?.LocalPath;
-            if (newPath != oldPath)
+            string newRepositoryPath;
+            string newBranchName;
+            string newHeadSha;
+            FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
+
+            log.Information("Refresh ActiveRepository: RepositoryPath={RepositoryPath}, BranchName={BranchName}, HeadSha={HeadSha}",
+                newRepositoryPath, newBranchName, newHeadSha);
+
+            if (newRepositoryPath != repositoryPath)
             {
-                ActiveRepository = new LocalRepositoryModel(newPath);
+                log.Information("Fire PropertyChanged event for ActiveRepository");
+
+                repositoryPath = newRepositoryPath;
+                branchName = newBranchName;
+                headSha = newHeadSha;
+
+                ActiveRepository = repositoryPath != null ? new LocalRepositoryModel(repositoryPath) : null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
             }
-            else
+            else if (newBranchName != branchName || newHeadSha != headSha)
             {
+                log.Information("Fire StatusChanged event for ActiveRepository");
+
+                branchName = newBranchName;
+                headSha = newHeadSha;
+
                 StatusChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
-        static string FindActiveRepositoryPath(object gitExt)
+        static bool FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
         {
             var activeRepositoriesProperty = gitExt.GetType().GetProperty("ActiveRepositories");
             var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty?.GetValue(gitExt);
-            if (activeRepositories == null)
-            {
-                return null;
-            }
-
-            var repo = activeRepositories.FirstOrDefault();
+            var repo = activeRepositories?.FirstOrDefault();
             if (repo == null)
             {
-                return null;
+                repositoryPath = null;
+                branchName = null;
+                headSha = null;
+                return false;
             }
 
             var repositoryPathProperty = repo.GetType().GetProperty("RepositoryPath");
-            var repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
-            return repositoryPath;
+            repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
+
+            var currentBranchProperty = repo.GetType().GetProperty("CurrentBranch");
+            var currentBranch = currentBranchProperty?.GetValue(repo);
+
+            var headShaProperty = currentBranch?.GetType().GetProperty("HeadSha");
+            headSha = (string)headShaProperty?.GetValue(currentBranch);
+
+            var nameProperty = currentBranch?.GetType().GetProperty("Name");
+            branchName = (string)nameProperty?.GetValue(currentBranch);
+
+            return true;
         }
 
         public ILocalRepositoryModel ActiveRepository
