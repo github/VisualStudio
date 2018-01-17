@@ -212,7 +212,7 @@ namespace GitHub.InlineReviews.Services
                 {
                     var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
 
-                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) &&
+                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
                         pr?.Item2 != (CurrentSession?.PullRequest.Number))
                     {
                         var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);
