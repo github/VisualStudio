@@ -177,6 +177,23 @@ public class UriStringTests
         }
 
         [Theory]
+        [InlineData("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
+        [InlineData("http://example.com/", "http://example.com/")]
+        [InlineData("http://haacked@example.com/foo/bar", "http://example.com/baz/bar")]
+        [InlineData("https://github.com/github/Windows", "https://github.com/baz/Windows")]
+        [InlineData("https://github.com/github/Windows.git", "https://github.com/baz/Windows")]
+        [InlineData("https://haacked@github.com/github/Windows.git", "https://github.com/baz/Windows")]
+        [InlineData("http://example.com:4000/github/Windows", "http://example.com:4000/baz/Windows")]
+        [InlineData("git@192.168.1.2:github/Windows.git", "https://192.168.1.2/baz/Windows")]
+        [InlineData("git@example.com:org/repo.git", "https://example.com/baz/repo")]
+        [InlineData("ssh://git@github.com:443/shana/cef", "https://github.com/baz/cef")]
+        [InlineData("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/baz/encourage")]
+        public void ConvertsWithNewOwner(string uriString, string expected)
+        {
+            Assert.Equal(new Uri(expected), new UriString(uriString).ToRepositoryUrl("baz"));
+        }
+
+        [Theory]
         [InlineData("asdf", null)]
         [InlineData("", null)]
         [InlineData("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
