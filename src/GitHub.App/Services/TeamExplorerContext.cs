@@ -63,7 +63,14 @@ namespace GitHub.Services
             log.Information("Refresh ActiveRepository: RepositoryPath={RepositoryPath}, BranchName={BranchName}, HeadSha={HeadSha}",
                 newRepositoryPath, newBranchName, newHeadSha);
 
-            if (newRepositoryPath != repositoryPath)
+            if (newRepositoryPath == null)
+            {
+                // Ignore when ActiveRepositories is empty.
+                // The ActiveRepository can be changed but not unloaded.
+                // https://github.com/github/VisualStudio/issues/1421
+                log.Information("Ignoring null ActiveRepository");
+            }
+            else if (newRepositoryPath != repositoryPath)
             {
                 log.Information("Fire PropertyChanged event for ActiveRepository");
 
@@ -85,7 +92,7 @@ namespace GitHub.Services
             }
         }
 
-        static bool FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
+        static void FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
         {
             var activeRepositoriesProperty = gitExt.GetType().GetProperty("ActiveRepositories");
             var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty?.GetValue(gitExt);
@@ -95,7 +102,7 @@ namespace GitHub.Services
                 repositoryPath = null;
                 branchName = null;
                 headSha = null;
-                return false;
+                return;
             }
 
             var repositoryPathProperty = repo.GetType().GetProperty("RepositoryPath");
@@ -109,8 +116,6 @@ namespace GitHub.Services
 
             var nameProperty = currentBranch?.GetType().GetProperty("Name");
             branchName = (string)nameProperty?.GetValue(currentBranch);
-
-            return true;
         }
 
         public ILocalRepositoryModel ActiveRepository
