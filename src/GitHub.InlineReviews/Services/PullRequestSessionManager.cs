@@ -156,6 +156,8 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
+            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+
             if (await service.EnsureLocalBranchesAreMarkedAsPullRequests(repository, pullRequest))
             {
                 // The branch for the PR was not previously marked with the PR number in the git
