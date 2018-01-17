@@ -287,7 +287,7 @@ namespace GitHub.Services
         {
             if (pullRequest.Head?.RepositoryCloneUrl != null)
             {
-                return repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
+                return repository.CloneUrl?.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
             }
 
             return false;
