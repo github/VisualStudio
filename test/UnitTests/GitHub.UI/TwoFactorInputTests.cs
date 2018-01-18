@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using GitHub.UI;
@@ -9,7 +10,8 @@ public class TwoFactorInputTests
 {
     public class TheTextProperty : TestBaseClass
     {
-        [Test]
+
+        [Test, Apartment(ApartmentState.STA)]
         public void SetsTextBoxesToIndividualCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -26,7 +28,7 @@ public class TwoFactorInputTests
             Assert.That("5", Is.EqualTo(textBoxes[5].Text));
         }
 
-        [Test]
+        [Test, Apartment(ApartmentState.STA)]
         public void IgnoresNonDigitCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -43,7 +45,7 @@ public class TwoFactorInputTests
             Assert.That("5", Is.EqualTo(textBoxes[5].Text));
         }
 
-        [Test]
+        [Test, Apartment(ApartmentState.STA)]
         public void HandlesNotEnoughCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -60,7 +62,7 @@ public class TwoFactorInputTests
             Assert.That("", Is.EqualTo(textBoxes[5].Text));
         }
 
-        [TestCase(null, null)]
+        [TestCase(null, null), Apartment(ApartmentState.STA)]
         [TestCase("", "")]
         [TestCase("xxxx", "")]
         public void HandlesNullAndStringsWithNoDigits(string input, string expected)
