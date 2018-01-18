@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Shell;
 using GitHub.Models;
 using GitHub.Logging;
 using Serilog;
+using EnvDTE;
 
 namespace GitHub.Services
 {
@@ -20,6 +21,9 @@ namespace GitHub.Services
         const string GitExtTypeName = "Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider";
         static readonly ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
+        readonly DTE dte;
+
+        string solutionPath;
         string repositoryPath;
         string branchName;
         string headSha;
@@ -41,6 +45,12 @@ namespace GitHub.Services
                 return;
             }
 
+            dte = (DTE)serviceProvider.GetService(typeof(DTE));
+            if (dte == null)
+            {
+                log.Error("Couldn't find service for type {DteType}", typeof(DTE));
+            }
+
             Refresh(gitExt);
 
             var notifyPropertyChanged = gitExt as INotifyPropertyChanged;
@@ -59,14 +69,14 @@ namespace GitHub.Services
             string newBranchName;
             string newHeadSha;
             FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
+            var newSolutionPath = dte?.Solution?.FullName;
 
-            log.Information("Refresh ActiveRepository: RepositoryPath={RepositoryPath}, BranchName={BranchName}, HeadSha={HeadSha}",
-                newRepositoryPath, newBranchName, newHeadSha);
+            log.Information("Refresh ActiveRepository: RepositoryPath={RepositoryPath}, BranchName={BranchName}, HeadSha={HeadSha}, SolutionPath={SolutionPath}",
+                newRepositoryPath, newBranchName, newHeadSha, newSolutionPath);
 
-            if (newRepositoryPath == null)
+            if (newRepositoryPath == null && newSolutionPath == solutionPath)
             {
-                // Ignore when ActiveRepositories is empty.
-                // The ActiveRepository can be changed but not unloaded.
+                // Ignore when ActiveRepositories is empty and solution hasn't changed.
                 // https://github.com/github/VisualStudio/issues/1421
                 log.Information("Ignoring null ActiveRepository");
             }
@@ -74,6 +84,7 @@ namespace GitHub.Services
             {
                 log.Information("Fire PropertyChanged event for ActiveRepository");
 
+                solutionPath = newSolutionPath;
                 repositoryPath = newRepositoryPath;
                 branchName = newBranchName;
                 headSha = newHeadSha;
