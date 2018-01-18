@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -34,7 +35,6 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
-        readonly IVSGitExt vsGitExt;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -78,7 +78,6 @@ namespace GitHub.ViewModels.GitHubPane
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
-            this.vsGitExt = vsGitExt;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -106,7 +105,7 @@ namespace GitHub.ViewModels.GitHubPane
             DiffFile = ReactiveCommand.Create();
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
-            ViewFile = ReactiveCommand.Create();            
+            ViewFile = ReactiveCommand.Create();
         }
 
         /// <summary>
@@ -322,7 +321,8 @@ namespace GitHub.ViewModels.GitHubPane
                 Number = number;
                 WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
-                vsGitExt.ActiveRepositoriesChanged += ActiveRepositoriesChanged;
+                sessionManager.PropertyChanged += ActiveRepositoriesChanged;
+
                 await Refresh();
             }
             finally
@@ -340,7 +340,7 @@ namespace GitHub.ViewModels.GitHubPane
             try
             {
                 var firstLoad = (Model == null);
-                Model = pullRequest;                
+                Model = pullRequest;
                 Session = await sessionManager.GetSession(pullRequest);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
@@ -514,22 +514,24 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                vsGitExt.ActiveRepositoriesChanged -= ActiveRepositoriesChanged;
+                sessionManager.PropertyChanged -= ActiveRepositoriesChanged;
             }
         }
 
-        async void ActiveRepositoriesChanged()
+        void ActiveRepositoriesChanged(object sender, PropertyChangedEventArgs e)
         {
             try
             {
-                if (active)
+                if (e.PropertyName == nameof(sessionManager.CurrentSession))
                 {
-                    await ThreadingHelper.SwitchToMainThreadAsync();
-                    await Refresh();
-                }
-                else
-                {
-                    refreshOnActivate = true;
+                    if (active)
+                    {
+                        Refresh().Forget();
+                    }
+                    else
+                    {
+                        refreshOnActivate = true;
+                    }
                 }
             }
             catch (Exception ex)
