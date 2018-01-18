@@ -29,8 +29,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitRepositoryViewModel>());
+		}
 
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
@@ -41,8 +41,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+		}
 
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstance()
@@ -52,8 +52,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+		}
 
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepo()
@@ -63,8 +63,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+		}
 
         [Test]
         public async Task LoggedOutShownWhenNotLoggedInToGitHub()
@@ -75,8 +75,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+		}
 
         [Test]
         public async Task LoggedOutShownWhenNotLoggedInToEnterprise()
@@ -87,8 +87,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+		}
 
         [Test]
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
@@ -99,8 +99,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+		}
 
         [Test]
         public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
@@ -111,8 +111,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+		}
 
         [Test]
         public async Task NavigatorShownWhenUserLogsIn()
@@ -123,12 +123,12 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
-            AddConnection(cm, "https://github.com");
+			AddConnection(cm, "https://github.com");
 
-            Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+		}
     }
 
     public class TheShowPullRequestsMethod
@@ -144,9 +144,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
                 teServiceHolder: te);
 
             await Initialize(target);
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
-            await target.ShowPullRequests();
+			await target.ShowPullRequests();
 
             viewModelFactory.DidNotReceive().CreateViewModel<IPullRequestListViewModel>();
         }
@@ -164,9 +164,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
             Assert.That(nav, Is.SameAs(target.Content));
-            Assert.IsAssignableFrom<IPullRequestListViewModel>(nav.Content);
+			Assert.That(nav.Content, Is.InstanceOf<IPullRequestListViewModel>());
 
-            await target.ShowPullRequests();
+			await target.ShowPullRequests();
 
             Assert.That(1, Is.EqualTo(nav.History.Count));
         }
