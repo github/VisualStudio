@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
 using GitHub.Models;
 using GitHub.Logging;
+using GitHub.Primitives;
 using Serilog;
 using EnvDTE;
 
@@ -27,16 +28,17 @@ namespace GitHub.Services
         string repositoryPath;
         string branchName;
         string headSha;
+        bool testing;
 
         [ImportingConstructor]
         public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+            : this(serviceProvider, FindGitExtType(), false)
         {
-            var gitExtType = Type.GetType(GitExtTypeName, false);
-            if (gitExtType == null)
-            {
-                log.Error("Couldn't find type {GitExtTypeName}", GitExtTypeName);
-                return;
-            }
+        }
+
+        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, Type gitExtType, bool testing)
+        {
+            this.testing = testing;
 
             var gitExt = serviceProvider.GetService(gitExtType);
             if (gitExt == null)
@@ -61,6 +63,17 @@ namespace GitHub.Services
             }
 
             notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
+        }
+
+        static Type FindGitExtType()
+        {
+            var gitExtType = Type.GetType(GitExtTypeName, false);
+            if (gitExtType == null)
+            {
+                log.Error("Couldn't find type {GitExtTypeName}", GitExtTypeName);
+            }
+
+            return gitExtType;
         }
 
         void Refresh(object gitExt)
@@ -89,7 +102,7 @@ namespace GitHub.Services
                 branchName = newBranchName;
                 headSha = newHeadSha;
 
-                ActiveRepository = repositoryPath != null ? new LocalRepositoryModel(repositoryPath) : null;
+                ActiveRepository = CreateRepository(repositoryPath);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
             }
             else if (newBranchName != branchName || newHeadSha != headSha)
@@ -101,6 +114,22 @@ namespace GitHub.Services
 
                 StatusChanged?.Invoke(this, EventArgs.Empty);
             }
+        }
+
+        ILocalRepositoryModel CreateRepository(string repositoryPath)
+        {
+            if (repositoryPath == null)
+            {
+                return null;
+            }
+
+            if (testing)
+            {
+                // HACK: This avoids calling GitService.GitServiceHelper.
+                return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), repositoryPath);
+            }
+
+            return new LocalRepositoryModel(repositoryPath);
         }
 
         static void FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
