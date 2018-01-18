@@ -23,9 +23,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task NotAGitRepositoryShownWhenNoRepository()
         {
-            var te = Substitute.For<ITeamExplorerServiceHolder>();
-            te.ActiveRepo.Returns(default(ILocalRepositoryModel));
-            var target = CreateTarget(teServiceHolder: te);
+            var te = Substitute.For<ITeamExplorerContext>();
+            te.ActiveRepository.Returns(default(ILocalRepositoryModel));
+            var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
 
@@ -36,8 +36,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
         {
             var repo = Substitute.For<ILocalRepositoryModel>();
-            var te = CreateTeamExplorerServiceHolder(null);
-            var target = CreateTarget(teServiceHolder: te);
+            var te = CreateTeamExplorerContext(null);
+            var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
 
@@ -47,8 +47,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstance()
         {
-            var te = CreateTeamExplorerServiceHolder("https://some.site/foo/bar");
-            var target = CreateTarget(teServiceHolder: te);
+            var te = CreateTeamExplorerContext("https://some.site/foo/bar");
+            var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
 
@@ -58,8 +58,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepo()
         {
-            var te = CreateTeamExplorerServiceHolder("https://github.com/invalid/repo");
-            var target = CreateTarget(teServiceHolder: te);
+            var te = CreateTeamExplorerContext("https://github.com/invalid/repo");
+            var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
 
@@ -69,9 +69,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task LoggedOutShownWhenNotLoggedInToGitHub()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
+            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager("https://enterprise.com");
-            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -81,9 +81,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task LoggedOutShownWhenNotLoggedInToEnterprise()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidEnterpriseRepo);
+            var te = CreateTeamExplorerContext(ValidEnterpriseRepo);
             var cm = CreateConnectionManager("https://github.com");
-            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -93,9 +93,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
+            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager("https://github.com");
-            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -105,9 +105,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidEnterpriseRepo);
+            var te = CreateTeamExplorerContext(ValidEnterpriseRepo);
             var cm = CreateConnectionManager("https://enterprise.com");
-            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -117,9 +117,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task NavigatorShownWhenUserLogsIn()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
+            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager();
-            var target = CreateTarget(teServiceHolder: te, connectionManager: cm);
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
             await Initialize(target);
 
@@ -136,12 +136,12 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task HasNoEffectWhenUserLoggedOut()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
+            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var viewModelFactory = Substitute.For<IViewViewModelFactory>();
             var target = CreateTarget(
                 viewModelFactory: viewModelFactory,
                 connectionManager: CreateConnectionManager(),
-                teServiceHolder: te);
+                teamExplorerContext: te);
 
             await Initialize(target);
             Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
@@ -154,11 +154,11 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Fact]
         public async Task HasNoEffectWhenAlreadyCurrentPage()
         {
-            var te = CreateTeamExplorerServiceHolder(ValidGitHubRepo);
+            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager(ValidGitHubRepo);
             var nav = new NavigationViewModel();
             var target = CreateTarget(
-                teServiceHolder: te,
+                teamExplorerContext: te,
                 connectionManager: cm,
                 navigator: nav);
 
@@ -176,7 +176,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         IViewViewModelFactory viewModelFactory = null,
         ISimpleApiClientFactory apiClientFactory = null,
         IConnectionManager connectionManager = null,
-        ITeamExplorerServiceHolder teServiceHolder = null,
+        ITeamExplorerContext teamExplorerContext = null,
         IVisualStudioBrowser browser = null,
         IUsageTracker usageTracker = null,
         INavigationViewModel navigator = null,
@@ -186,7 +186,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
     {
         viewModelFactory = viewModelFactory ?? Substitute.For<IViewViewModelFactory>();
         connectionManager = connectionManager ?? Substitute.For<IConnectionManager>();
-        teServiceHolder = teServiceHolder ?? Substitute.For<ITeamExplorerServiceHolder>();
+        teamExplorerContext = teamExplorerContext ?? Substitute.For<ITeamExplorerContext>();
         browser = browser ?? Substitute.For<IVisualStudioBrowser>();
         usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
         loggedOut = loggedOut ?? Substitute.For<ILoggedOutViewModel>();
@@ -219,7 +219,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             viewModelFactory,
             apiClientFactory,
             connectionManager,
-            teServiceHolder,
+            teamExplorerContext,
             browser,
             usageTracker,
             navigator,
@@ -264,13 +264,13 @@ public class GitHubPaneViewModelTests : TestBaseClass
         return result;
     }
 
-    static ITeamExplorerServiceHolder CreateTeamExplorerServiceHolder(string repositoryCloneUrl)
+    static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl)
     {
         var repository = Substitute.For<ILocalRepositoryModel>();
         repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
 
-        var result = Substitute.For<ITeamExplorerServiceHolder>();
-        result.ActiveRepo.Returns(repository);
+        var result = Substitute.For<ITeamExplorerContext>();
+        result.ActiveRepository.Returns(repository);
         return result;
     }
 
