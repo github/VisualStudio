@@ -128,6 +128,33 @@ namespace GitHub.App.UnitTests.Services
             }
         }
 
+        public class TheStatusChangedEvent
+        {
+            [TestCase(false, "name1", "sha1", "name1", "sha1", false)]
+            [TestCase(false, "name1", "sha1", "name2", "sha1", true)]
+            [TestCase(false, "name1", "sha1", "name1", "sha2", true)]
+            [TestCase(false, "name1", "sha1", "name2", "sha2", true)]
+            [TestCase(true, "name1", "sha1", "name1", "sha1", false)]
+            [TestCase(true, "name1", "sha1", "name2", "sha2", false)]
+            public void SameActiveRepository_ExpectWasRaised(bool changePath, string name1, string sha1, string name2, string sha2, bool expectWasRaised)
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPaths = new[] { Directory.GetCurrentDirectory(), Path.GetTempPath() };
+                var path1 = Directory.GetCurrentDirectory();
+                var path2 = changePath ? Path.GetTempPath() : path1;
+                var repoInfo1 = new GitRepositoryInfo(path1, new GitBranchInfo(name1, sha1));
+                var repoInfo2 = new GitRepositoryInfo(path2, new GitBranchInfo(name2, sha2));
+                var target = CreateTeamExplorerContext(gitExt);
+                var eventWasRaised = false;
+                target.StatusChanged += (s, e) => eventWasRaised = true;
+
+                gitExt.SetActiveRepository(repoInfo1);
+                gitExt.SetActiveRepository(repoInfo2);
+
+                Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
+            }
+        }
+
         static TeamExplorerContext CreateTeamExplorerContext(FakeGitExt gitExt, DTE dte = null)
         {
             var gitExtType = typeof(FakeGitExt);
