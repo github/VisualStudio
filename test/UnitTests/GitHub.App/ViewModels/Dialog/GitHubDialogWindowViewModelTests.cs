@@ -54,8 +54,8 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
 
                 await target.StartWithConnection(content);
 
-                Assert.IsAssignableFrom<ILoginViewModel>(target.Content);
-            }
+				Assert.That(target.Content, Is.InstanceOf<ILoginViewModel>());
+			}
 
             [Test]
             public async Task ShowsContentWhenConnectionAvailable()
