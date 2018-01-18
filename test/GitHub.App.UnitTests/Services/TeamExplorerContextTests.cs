@@ -1,10 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.ComponentModel;
 using System.Collections.Generic;
 using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
-using System.ComponentModel;
-using System.IO;
+using EnvDTE;
 
 namespace GitHub.App.UnitTests.Services
 {
@@ -38,11 +39,102 @@ namespace GitHub.App.UnitTests.Services
             }
         }
 
-        static TeamExplorerContext CreateTeamExplorerContext(FakeGitExt gitExt)
+        public class ThePropertyChangedEvent
+        {
+            [Test]
+            public void SetActiveRepository()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var target = CreateTeamExplorerContext(gitExt);
+                var eventWasRaised = false;
+                target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
+
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(eventWasRaised, Is.True);
+            }
+
+            [Test]
+            public void SetTwicePropertyChangedFiresOnce()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var target = CreateTeamExplorerContext(gitExt);
+                var eventWasRaisedCount = 0;
+                target.PropertyChanged += (s, e) => eventWasRaisedCount++;
+
+                gitExt.SetActiveRepository(repoInfo);
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(1, Is.EqualTo(1));
+            }
+
+            [Test]
+            public void ChangeActiveRepository()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var repositoryPath2 = Path.GetTempPath();
+                var repoInfo2 = new GitRepositoryInfo(repositoryPath2, null);
+                var target = CreateTeamExplorerContext(gitExt);
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
+
+                gitExt.SetActiveRepository(repoInfo2);
+
+                Assert.That(eventWasRaised, Is.True);
+            }
+
+            [Test]
+            public void ClearActiveRepository_NoEventWhenNoSolutionChange()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var target = CreateTeamExplorerContext(gitExt);
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
+
+                gitExt.SetActiveRepository(null);
+
+                Assert.That(eventWasRaised, Is.False);
+                Assert.That(target.ActiveRepository.LocalPath, Is.EqualTo(repositoryPath));
+            }
+
+            [Test]
+            public void ClearActiveRepository_FireWhenSolutionChanged()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var dte = Substitute.For<DTE>();
+                var target = CreateTeamExplorerContext(gitExt, dte);
+                dte.Solution.FullName.Returns("Solution1");
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
+
+                dte.Solution.FullName.Returns("Solution2");
+                gitExt.SetActiveRepository(null);
+
+                Assert.That(eventWasRaised, Is.True);
+                Assert.That(target.ActiveRepository, Is.Null);
+            }
+        }
+
+        static TeamExplorerContext CreateTeamExplorerContext(FakeGitExt gitExt, DTE dte = null)
         {
             var gitExtType = typeof(FakeGitExt);
+            dte = dte ?? Substitute.For<DTE>();
             var sp = Substitute.For<IServiceProvider>();
             sp.GetService(gitExtType).Returns(gitExt);
+            sp.GetService(typeof(DTE)).Returns(dte);
             return new TeamExplorerContext(sp, gitExtType, true);
         }
 
@@ -50,7 +142,7 @@ namespace GitHub.App.UnitTests.Services
         {
             public void SetActiveRepository(GitRepositoryInfo repo)
             {
-                ActiveRepositories = new[] { repo };
+                ActiveRepositories = repo != null ? new[] { repo } : new GitRepositoryInfo[0];
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepositories)));
             }
 
