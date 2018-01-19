@@ -66,8 +66,7 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
-            IUsageTracker usageTracker,
-            IVSGitExt vsGitExt)
+            IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
