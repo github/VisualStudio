@@ -10,7 +10,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.Tags
 {
@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
     {
         public class WithTextBufferInfo
         {
-            [Fact]
+            [Test]
             public void FirstPassShouldReturnEmptyTags()
             {
                 var target = new InlineCommentTagger(
@@ -28,10 +28,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
                 var result = target.GetTags(CreateSpan(10));
 
-                Assert.Empty(result);
+                Assert.That(result, Is.Empty);
             }
 
-            [Fact]
+            [Test]
             public void ShouldReturnShowCommentTagForRhs()
             {
                 var target = new InlineCommentTagger(
@@ -44,11 +44,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Single(result);
-                Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
+                Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
-            [Fact]
+            [Test]
             public void ShouldReturnAddNewCommentTagForAddedLineOnRhs()
             {
                 var target = new InlineCommentTagger(
@@ -61,11 +61,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Single(result);
-                Assert.IsType<AddInlineCommentTag>(result[0].Tag);
+                Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<AddInlineCommentTag>());
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
                 var target = new InlineCommentTagger(
@@ -78,10 +78,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Empty(result);
+                Assert.That(result, Is.Empty);
             }
 
-            [Fact]
+            [Test]
             public void ShouldReturnShowCommentTagForLhs()
             {
                 var target = new InlineCommentTagger(
@@ -94,11 +94,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Single(result);
-                Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
+                Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
-            [Fact]
+            [Test]
             public void ShouldReturnAddCommentTagForLhs()
             {
                 var target = new InlineCommentTagger(
@@ -111,11 +111,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Single(result);
-                Assert.IsType<AddInlineCommentTag>(result[0].Tag);
+                Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<AddInlineCommentTag>());
             }
 
-            [Fact]
+            [Test]
             public void ShouldRaiseTagsChangedOnFileLinesChanged()
             {
                 var file = CreateSessionFile();
@@ -196,7 +196,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
         public class WithoutTextBufferInfo
         {
-            [Fact]
+            [Test]
             public void FirstPassShouldReturnEmptyTags()
             {
                 var target = new InlineCommentTagger(
@@ -205,11 +205,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     CreateSessionManager());
 
                 var result = target.GetTags(CreateSpan(10));
-
-                Assert.Empty(result);
+                Assert.That(result, Is.Empty);
             }
 
-            [Fact]
+            [Test]
             public void ShouldReturnShowCommentTag()
             {
                 var target = new InlineCommentTagger(
@@ -222,11 +221,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Single(result);
-                Assert.IsType<ShowInlineCommentTag>(result[0].Tag);
+                Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
-            [Fact]
+            [Test]
             public void ShouldReturnAddNewCommentTagForAddedLine()
             {
                 var target = new InlineCommentTagger(
@@ -239,11 +238,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.Single(result);
-                Assert.IsType<AddInlineCommentTag>(result[0].Tag);
+                Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<AddInlineCommentTag>());
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
                 var target = new InlineCommentTagger(
@@ -255,11 +254,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var span = CreateSpan(13);
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
-
-                Assert.Empty(result);
+                 Assert.That(result, Is.Empty);
             }
 
-            [Fact]
+            [Test]
             public void ShouldRaiseTagsChangedOnFileLinesChanged()
             {
                 var file = CreateSessionFile();
@@ -283,7 +281,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 Assert.True(raised);
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotRaiseTagsChangedOnLeftHandSideLinesChanged()
             {
                 var file = CreateSessionFile();
