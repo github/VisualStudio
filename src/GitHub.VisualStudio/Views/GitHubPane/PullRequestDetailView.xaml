@@ -184,7 +184,8 @@
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
                         <!-- Sync submodules -->
-                        <ui:GitHubActionLink Content="[SyncSubmodules]"
+                        <TextBlock Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"/>
+                        <ui:GitHubActionLink Content="Sync"
                             Command="{Binding SyncSubmodules}"
                             Margin="4 0"
                             Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
