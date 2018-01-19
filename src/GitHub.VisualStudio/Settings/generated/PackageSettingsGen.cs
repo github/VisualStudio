@@ -43,6 +43,13 @@ namespace GitHub.VisualStudio.Settings {
             set { collectMetrics  = value; this.RaisePropertyChange(); }
         }
 
+        bool enableTraceLogging;
+        public bool EnableTraceLogging
+        {
+            get { return enableTraceLogging; }
+            set { enableTraceLogging = value; this.RaisePropertyChange(); }
+        }
+
         bool editorComments;
         public bool EditorComments
         {
@@ -69,6 +76,7 @@ namespace GitHub.VisualStudio.Settings {
         {
             CollectMetrics = (bool)settingsStore.Read("CollectMetrics", true);
             EditorComments = (bool)settingsStore.Read("EditorComments", false);
+            EnableTraceLogging = (bool)settingsStore.Read("EnableTraceLogging", false);
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
             HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
         }
@@ -77,6 +85,7 @@ namespace GitHub.VisualStudio.Settings {
         {
             settingsStore.Write("CollectMetrics", CollectMetrics);
             settingsStore.Write("EditorComments", EditorComments);
+            settingsStore.Write("EnableTraceLogging", EnableTraceLogging);
             settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
             settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
         }

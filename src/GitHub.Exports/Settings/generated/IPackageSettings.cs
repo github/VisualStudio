@@ -31,6 +31,7 @@ namespace GitHub.Settings
         void Save();
         bool CollectMetrics { get; set; }
         bool EditorComments { get; set; }
+        bool EnableTraceLogging { get; set; }
         UIState UIState { get; set; }
         bool HideTeamExplorerWelcomeMessage { get; set; }
     }
