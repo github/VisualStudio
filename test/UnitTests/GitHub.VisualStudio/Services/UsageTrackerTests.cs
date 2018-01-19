@@ -39,16 +39,19 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await service.Received(1).WriteLocalData(
                     Arg.Is<UsageData>(x =>
                         x.Reports.Count == 1 &&
-                        x.Reports[0].Guid == UserGuid &&
+                        x.Reports[0].Dimensions.Guid == UserGuid &&
                         x.Reports[0].Measures.NumberOfStartups == 1));
             }
 
             [Fact]
             public async Task FirstTickShouldIncrementLaunchCountInExistingReport()
             {
-                var model = new UsageModel
+                var model = new UsageModel()
                 {
-                    Date = DateTimeOffset.Now,
+                    Dimensions = new UsageModel.DimensionsModel()
+                    {
+                        Date = DateTimeOffset.Now,
+                    },
                     Measures = new UsageModel.MeasuresModel
                     {
                         NumberOfStartups = 4,
@@ -67,7 +70,10 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var model = new UsageModel
                 {
-                    Date = DateTimeOffset.Now - TimeSpan.FromDays(1),
+                    Dimensions = new UsageModel.DimensionsModel()
+                    {
+                        Date = DateTimeOffset.Now - TimeSpan.FromDays(1),
+                    },
                     Measures = new UsageModel.MeasuresModel
                     {
                         NumberOfStartups = 4,
@@ -128,7 +134,13 @@ namespace UnitTests.GitHub.VisualStudio.Services
             [Fact]
             public async Task TickShouldSendDataIfDifferentDay()
             {
-                var model = new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1) };
+                var model = new UsageModel
+                {
+                    Dimensions = new UsageModel.DimensionsModel()
+                    {
+                        Date = DateTimeOffset.Now - TimeSpan.FromDays(1)
+                    },
+                };
                 var serviceProvider = CreateServiceProvider();
                 var targetAndTick = CreateTargetAndGetTick(
                     serviceProvider,
@@ -145,9 +157,30 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var models = new[]
                 {
-                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid() },
-                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid() },
-                    new UsageModel { Date = DateTimeOffset.Now, Guid = Guid.NewGuid() },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {
+                            Date = DateTimeOffset.Now - TimeSpan.FromDays(2),
+                            Guid = Guid.NewGuid()
+                        }
+                    },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {
+                            Date = DateTimeOffset.Now - TimeSpan.FromDays(1),
+                            Guid = Guid.NewGuid()
+                        }
+                    },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {
+                            Date = DateTimeOffset.Now,
+                            Guid = Guid.NewGuid()
+                        }
+                    },
                 };
                 var service = CreateUsageService(models);
                 var serviceProvider = CreateServiceProvider();
@@ -157,9 +190,9 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 var metricsService = serviceProvider.TryGetService<IMetricsService>();
 
-                await metricsService.Received(1).PostUsage(Arg.Is<UsageModel>(x => x.Guid == models[0].Guid));
-                await metricsService.Received(1).PostUsage(Arg.Is<UsageModel>(x => x.Guid == models[1].Guid));
-                await metricsService.Received(0).PostUsage(Arg.Is<UsageModel>(x => x.Guid == models[2].Guid));
+                await metricsService.Received(1).PostUsage(Arg.Is<UsageModel>(x => x.Dimensions.Guid == models[0].Dimensions.Guid));
+                await metricsService.Received(1).PostUsage(Arg.Is<UsageModel>(x => x.Dimensions.Guid == models[1].Dimensions.Guid));
+                await metricsService.Received(0).PostUsage(Arg.Is<UsageModel>(x => x.Dimensions.Guid == models[2].Dimensions.Guid));
             }
 
             [Fact]
@@ -167,9 +200,21 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var models = new[]
                 {
-                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid() },
-                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid() },
-                    new UsageModel { Date = DateTimeOffset.Now, Guid = Guid.NewGuid() },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid()}
+                    },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid()}
+                    },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {Date = DateTimeOffset.Now, Guid = Guid.NewGuid()}
+                    },
                 };
                 var service = CreateUsageService(models);
                 var serviceProvider = CreateServiceProvider();
@@ -185,9 +230,21 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var models = new[]
                 {
-                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid() },
-                    new UsageModel { Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid() },
-                    new UsageModel { Date = DateTimeOffset.Now, Guid = Guid.NewGuid() },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {Date = DateTimeOffset.Now - TimeSpan.FromDays(2), Guid = Guid.NewGuid()}
+                    },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {Date = DateTimeOffset.Now - TimeSpan.FromDays(1), Guid = Guid.NewGuid()}
+                    },
+                    new UsageModel
+                    {
+                        Dimensions = new UsageModel.DimensionsModel()
+                        {Date = DateTimeOffset.Now, Guid = Guid.NewGuid()}
+                    },
                 };
                 var service = CreateUsageService(models);
                 var serviceProvider = CreateServiceProvider();
@@ -209,7 +266,10 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var model = new UsageModel
                 {
-                    Date = DateTimeOffset.Now,
+                    Dimensions = new UsageModel.DimensionsModel()
+                    {
+                        Date = DateTimeOffset.Now,
+                    },
                     Measures = new UsageModel.MeasuresModel
                     {
                         NumberOfClones = 4
@@ -229,7 +289,8 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var data = new UsageModel
                 {
-                    Date = DateTimeOffset.Now,
+                    Dimensions = new UsageModel.DimensionsModel()
+                    { Date = DateTimeOffset.Now, },
                 };
                 var service = CreateUsageService(data);
                 var target = new UsageTracker(
@@ -249,7 +310,8 @@ namespace UnitTests.GitHub.VisualStudio.Services
             {
                 var data = new UsageModel
                 {
-                    Date = DateTimeOffset.Now - TimeSpan.FromDays(1),
+                    Dimensions = new UsageModel.DimensionsModel()
+                    { Date = DateTimeOffset.Now - TimeSpan.FromDays(1),}
                 };
                 var service = CreateUsageService(data);
                 var target = new UsageTracker(
@@ -261,7 +323,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await service.Received(1).WriteLocalData(
                     Arg.Is<UsageData>(x => 
                         x.Reports.Count == 2 &&
-                        x.Reports[1].Guid == UserGuid &&
+                        x.Reports[1].Dimensions.Guid == UserGuid &&
                         x.Reports[1].Measures.NumberOfClones == 1));
             }
         }

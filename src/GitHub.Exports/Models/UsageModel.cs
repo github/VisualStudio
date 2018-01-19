@@ -16,11 +16,7 @@ namespace GitHub.Models
                     Guid = guid,
                     Date = DateTime.Now,
                 },
-                Measures = new MeasuresModel
-                {
-                    Guid = guid,
-                    Date = DateTime.Now,
-                },
+                Measures = new MeasuresModel(),
             };
         }
 
@@ -37,8 +33,6 @@ namespace GitHub.Models
 
         public class MeasuresModel
         {
-            public Guid Guid { get; set; }
-            public DateTimeOffset Date { get; set; }
             public int NumberOfStartups { get; set; }
             public int NumberOfUpstreamPullRequests { get; set; }
             public int NumberOfClones { get; set; }

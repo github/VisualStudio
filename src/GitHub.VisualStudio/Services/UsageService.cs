@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Models;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -17,7 +19,7 @@ namespace GitHub.Services
     {
         const string StoreFileName = "metrics.json";
         const string UserStoreFileName = "user.json";
-        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly ILogger log = LogManager.ForContext<UsageService>();
         readonly IGitHubServiceProvider serviceProvider;
         string storePath;
         string userStorePath;
@@ -46,7 +48,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed reading user metrics GUID", ex);
+                    log.Error(ex, "Failed reading user metrics GUID");
                 }
             }
 
@@ -62,7 +64,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed reading writing metrics GUID", ex);
+                    log.Error(ex, "Failed reading writing metrics GUID");
                 }
             }
 
@@ -80,7 +82,7 @@ namespace GitHub.Services
                 async _ =>
                 {
                     try { await callback(); }
-                    catch (Exception ex) { log.Warn("Failed submitting usage data", ex); }
+                    catch (Exception ex) { log.Warning(ex, "Failed submitting usage data"); }
                 },
                 null,
                 dueTime,
@@ -115,7 +117,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                log.Warn("Failed to write usage data", ex);
+                log.Warning(ex, "Failed to write usage data");
             }
         }
 
