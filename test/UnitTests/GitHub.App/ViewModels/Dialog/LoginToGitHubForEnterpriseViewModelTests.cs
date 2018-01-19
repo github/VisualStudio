@@ -7,13 +7,13 @@ using GitHub.ViewModels.Dialog;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 public class LoginToGitHubForEnterpriseViewModelTests
 {
     public class TheProbeStatusProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void InvalidUrlReturnsNone()
         {
             var scheduler = new TestScheduler();
@@ -21,10 +21,10 @@ public class LoginToGitHubForEnterpriseViewModelTests
 
             target.EnterpriseUrl = "badurl";
 
-            Assert.Equal(EnterpriseProbeStatus.None, target.ProbeStatus);
+            Assert.That(EnterpriseProbeStatus.None, Is.EqualTo(target.ProbeStatus));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsCheckingWhenProbeNotFinished()
         {
             var scheduler = new TestScheduler();
@@ -36,11 +36,11 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.Equal(EnterpriseProbeStatus.Checking, target.ProbeStatus);
+            Assert.That(EnterpriseProbeStatus.Checking, Is.EqualTo(target.ProbeStatus));
             task.SetCanceled();
         }
 
-        [Fact]
+        [Test]
         public void ReturnsValidWhenProbeReturnsOk()
         {
             var scheduler = new TestScheduler();
@@ -51,10 +51,10 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             scheduler.Stop();
 
-            Assert.Equal(EnterpriseProbeStatus.Valid, target.ProbeStatus);
+            Assert.That(EnterpriseProbeStatus.Valid, Is.EqualTo(target.ProbeStatus));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsInvalidWhenProbeReturnsFailed()
         {
             var scheduler = new TestScheduler();
@@ -65,10 +65,10 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             scheduler.Stop();
 
-            Assert.Equal(EnterpriseProbeStatus.Invalid, target.ProbeStatus);
+            Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsInvalidWhenProbeReturnsNotFound()
         {
             var scheduler = new TestScheduler();
@@ -79,13 +79,13 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             scheduler.Stop();
 
-            Assert.Equal(EnterpriseProbeStatus.Invalid, target.ProbeStatus);
+            Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
         }
     }
 
     public class TheSupportedLoginMethodsProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void InvalidUrlReturnsNull()
         {
             var scheduler = new TestScheduler();
@@ -93,10 +93,10 @@ public class LoginToGitHubForEnterpriseViewModelTests
 
             target.EnterpriseUrl = "badurl";
 
-            Assert.Null(target.SupportedLoginMethods);
+            Assert.That(target.SupportedLoginMethods, Is.Null);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsToken()
         {
             var scheduler = new TestScheduler();
@@ -106,10 +106,10 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.Equal(EnterpriseLoginMethods.Token, target.SupportedLoginMethods);
+            Assert.That(EnterpriseLoginMethods.Token, Is.EqualTo(target.SupportedLoginMethods));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsUsernameAndPassword()
         {
             var scheduler = new TestScheduler();
@@ -119,10 +119,10 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.Equal(EnterpriseLoginMethods.UsernameAndPassword, target.SupportedLoginMethods);
+            Assert.That(EnterpriseLoginMethods.UsernameAndPassword, Is.EqualTo(target.SupportedLoginMethods));
         }
 
-        [Fact]
+        [Test]
         public void GivesPrecedenceToUsernameAndPasswordOverToken()
         {
             var scheduler = new TestScheduler();
@@ -134,15 +134,15 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.Equal(
+            Assert.That(
                 EnterpriseLoginMethods.UsernameAndPassword | EnterpriseLoginMethods.OAuth,
-                target.SupportedLoginMethods);
+                Is.EqualTo(target.SupportedLoginMethods));
         }
     }
 
     public class TheLoginCommand : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void DisabledWhenUserNameEmpty()
         {
             var scheduler = new TestScheduler();
@@ -156,7 +156,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             Assert.False(target.Login.CanExecute(null));
         }
 
-        [Fact]
+        [Test]
         public void DisabledWhenPasswordEmpty()
         {
             var scheduler = new TestScheduler();
@@ -170,7 +170,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             Assert.False(target.Login.CanExecute(null));
         }
 
-        [Fact]
+        [Test]
         public void EnabledWhenUsernameAndPasswordSet()
         {
             var scheduler = new TestScheduler();
@@ -185,7 +185,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             Assert.True(target.Login.CanExecute(null));
         }
 
-        [Fact]
+        [Test]
         public void EnabledWhenOnlyPasswordSetWhenUsingTokenLogin()
         {
             var scheduler = new TestScheduler();

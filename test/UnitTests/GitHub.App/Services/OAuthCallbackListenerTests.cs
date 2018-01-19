@@ -6,13 +6,13 @@ using GitHub.Extensions;
 using GitHub.Services;
 using NSubstitute;
 using Rothko;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.Services
 {
     public class OAuthCallbackListenerTests
     {
-        [Fact]
+        [Test]
         public void ListenStartsHttpListener()
         {
             var httpListener = CreateHttpListener("id1");
@@ -24,7 +24,7 @@ namespace UnitTests.GitHub.App.Services
             httpListener.Received(1).Start();
         }
 
-        [Fact]
+        [Test]
         public async Task ListenStopsHttpListener()
         {
             var httpListener = CreateHttpListener("id1");
@@ -35,7 +35,7 @@ namespace UnitTests.GitHub.App.Services
             httpListener.Received(1).Stop();
         }
 
-        [Fact]
+        [Test]
         public void CancelStopsHttpListener()
         {
             var httpListener = CreateHttpListener(null);
@@ -49,7 +49,7 @@ namespace UnitTests.GitHub.App.Services
             httpListener.Received(1).Stop();
         }
 
-        [Fact]
+        [Test]
         public void CallingListenWhenAlreadyListeningCancelsFirstListen()
         {
             var httpListener = CreateHttpListener(null);
@@ -61,7 +61,7 @@ namespace UnitTests.GitHub.App.Services
             httpListener.Received(1).Stop();
         }
 
-        [Fact]
+        [Test]
         public async Task SuccessfulResponseClosesResponse()
         {
             var httpListener = CreateHttpListener("id1");
