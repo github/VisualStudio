@@ -20,8 +20,8 @@ namespace GitHub.Services
     public class TeamExplorerContext : ITeamExplorerContext
     {
         const string GitExtTypeName = "Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider";
-        static readonly ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
+        readonly ILogger log;
         readonly DTE dte;
 
         string solutionPath;
@@ -32,14 +32,17 @@ namespace GitHub.Services
 
         [ImportingConstructor]
         public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : this(serviceProvider, FindGitExtType(), false)
+            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), null, false)
         {
         }
 
-        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, Type gitExtType, bool testing)
+        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ILogger log,
+            Type gitExtType, bool testing)
         {
+            this.log = log;
             this.testing = testing;
 
+            gitExtType = gitExtType ?? FindGitExtType();
             var gitExt = serviceProvider.GetService(gitExtType);
             if (gitExt == null)
             {
@@ -65,7 +68,7 @@ namespace GitHub.Services
             notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
         }
 
-        static Type FindGitExtType()
+        Type FindGitExtType()
         {
             var gitExtType = Type.GetType(GitExtTypeName, false);
             if (gitExtType == null)
@@ -78,47 +81,51 @@ namespace GitHub.Services
 
         void Refresh(object gitExt)
         {
-            string newRepositoryPath;
-            string newBranchName;
-            string newHeadSha;
-            FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
-            var newSolutionPath = dte?.Solution?.FullName;
-
-            log.Information("Refresh ActiveRepository: RepositoryPath={RepositoryPath}, BranchName={BranchName}, HeadSha={HeadSha}, SolutionPath={SolutionPath}",
-                newRepositoryPath, newBranchName, newHeadSha, newSolutionPath);
-
-            if (newRepositoryPath == null && newSolutionPath == solutionPath)
+            try
             {
-                // Ignore when ActiveRepositories is empty and solution hasn't changed.
-                // https://github.com/github/VisualStudio/issues/1421
-                log.Information("Ignoring null ActiveRepository");
+                string newRepositoryPath;
+                string newBranchName;
+                string newHeadSha;
+                FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
+                var newSolutionPath = dte?.Solution?.FullName;
+
+                if (newRepositoryPath == null && newSolutionPath == solutionPath)
+                {
+                    // Ignore when ActiveRepositories is empty and solution hasn't changed.
+                    // https://github.com/github/VisualStudio/issues/1421
+                    log.Information("Ignoring no ActiveRepository when solution hasn't changed");
+                }
+                else if (newRepositoryPath != repositoryPath)
+                {
+                    log.Information("Fire PropertyChanged event for ActiveRepository");
+
+                    solutionPath = newSolutionPath;
+                    repositoryPath = newRepositoryPath;
+                    branchName = newBranchName;
+                    headSha = newHeadSha;
+
+                    ActiveRepository = CreateRepository(repositoryPath);
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                }
+                else if (newBranchName != branchName || newHeadSha != headSha)
+                {
+                    log.Information("Fire StatusChanged event for ActiveRepository");
+
+                    branchName = newBranchName;
+                    headSha = newHeadSha;
+
+                    StatusChanged?.Invoke(this, EventArgs.Empty);
+                }
             }
-            else if (newRepositoryPath != repositoryPath)
+            catch (Exception e)
             {
-                log.Information("Fire PropertyChanged event for ActiveRepository");
-
-                solutionPath = newSolutionPath;
-                repositoryPath = newRepositoryPath;
-                branchName = newBranchName;
-                headSha = newHeadSha;
-
-                ActiveRepository = CreateRepository(repositoryPath);
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
-            }
-            else if (newBranchName != branchName || newHeadSha != headSha)
-            {
-                log.Information("Fire StatusChanged event for ActiveRepository");
-
-                branchName = newBranchName;
-                headSha = newHeadSha;
-
-                StatusChanged?.Invoke(this, EventArgs.Empty);
+                log.Error(e, "Refreshing active repository");
             }
         }
 
-        ILocalRepositoryModel CreateRepository(string repositoryPath)
+        ILocalRepositoryModel CreateRepository(string path)
         {
-            if (repositoryPath == null)
+            if (path == null)
             {
                 return null;
             }
@@ -126,10 +133,10 @@ namespace GitHub.Services
             if (testing)
             {
                 // HACK: This avoids calling GitService.GitServiceHelper.
-                return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), repositoryPath);
+                return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), path);
             }
 
-            return new LocalRepositoryModel(repositoryPath);
+            return new LocalRepositoryModel(path);
         }
 
         static void FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
