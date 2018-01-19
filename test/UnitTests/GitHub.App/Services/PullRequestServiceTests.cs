@@ -253,7 +253,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
     }
 
-    public class TheIsSyncSubmodulesRequiredMethod
+    public class TheCountSubmodulesToSyncMethod
     {
         [Fact] // WorkDirDeleted
         public async Task CommittedSubmodule_True()
@@ -269,9 +269,9 @@ public class PullRequestServiceTests : TestBaseClass
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.True(isRequired);
+                Assert.Equal(1, count);
             }
         }
 
@@ -292,9 +292,9 @@ public class PullRequestServiceTests : TestBaseClass
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.True(isRequired);
+                Assert.Equal(1, count);
             }
         }
 
@@ -316,9 +316,9 @@ public class PullRequestServiceTests : TestBaseClass
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.True(isRequired);
+                Assert.Equal(1, count);
             }
         }
 
@@ -339,9 +339,9 @@ public class PullRequestServiceTests : TestBaseClass
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -354,9 +354,9 @@ public class PullRequestServiceTests : TestBaseClass
                 var service = CreatePullRequestService(repo);
                 var repositoryModel = CreateLocalRepositoryModel(repo);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -371,9 +371,9 @@ public class PullRequestServiceTests : TestBaseClass
                 var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
                 File.WriteAllText(file, "contents");
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -390,9 +390,9 @@ public class PullRequestServiceTests : TestBaseClass
                 Commands.Stage(repo, file);
                 repo.Commit("foo", Author, Author);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -409,9 +409,9 @@ public class PullRequestServiceTests : TestBaseClass
                 File.WriteAllText(file, "contents");
                 Commands.Stage(repo, path);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -430,9 +430,9 @@ public class PullRequestServiceTests : TestBaseClass
                 repo.Commit("foo", Author, Author);
                 File.WriteAllText(file, "contents2");
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -452,9 +452,9 @@ public class PullRequestServiceTests : TestBaseClass
                 File.WriteAllText(file, "contents2");
                 Commands.Stage(repo, path);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -473,9 +473,9 @@ public class PullRequestServiceTests : TestBaseClass
                 repo.Commit("foo", Author, Author);
                 File.Delete(file);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -495,9 +495,9 @@ public class PullRequestServiceTests : TestBaseClass
                 File.Delete(file);
                 Commands.Stage(repo, path);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -520,9 +520,9 @@ public class PullRequestServiceTests : TestBaseClass
                 Commands.Stage(repo, path);
                 Commands.Stage(repo, renamedPath);
 
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
 
@@ -546,9 +546,9 @@ public class PullRequestServiceTests : TestBaseClass
                 // NOTE: `RetrieveStatus(new StatusOptions { DetectRenamesInWorkDir = true })` would need to be used
                 // for renamed files to appear as `RenamedInWorkingDir` rather than `Missing` and `Untracked`.
                 // This isn't required in the current implementation.
-                var isRequired = await service.IsSyncSubmodulesRequired(repositoryModel).FirstAsync();
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.False(isRequired);
+                Assert.Equal(0, count);
             }
         }
     }

@@ -104,36 +104,33 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> IsSyncSubmodulesRequired(ILocalRepositoryModel repository)
+        public IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository)
         {
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
+                var count = 0;
                 foreach (var submodule in repo.Submodules)
                 {
                     var status = submodule.RetrieveStatus();
-
                     if ((status & SubmoduleStatus.WorkDirAdded) != 0)
                     {
-                        return Observable.Return(true);
+                        count++;
                     }
-
-                    if ((status & SubmoduleStatus.WorkDirDeleted) != 0)
+                    else if ((status & SubmoduleStatus.WorkDirDeleted) != 0)
                     {
-                        return Observable.Return(true);
+                        count++;
                     }
-
-                    if ((status & SubmoduleStatus.WorkDirModified) != 0)
+                    else if ((status & SubmoduleStatus.WorkDirModified) != 0)
                     {
-                        return Observable.Return(true);
+                        count++;
                     }
-
-                    if ((status & SubmoduleStatus.WorkDirUninitialized) != 0)
+                    else if ((status & SubmoduleStatus.WorkDirUninitialized) != 0)
                     {
-                        return Observable.Return(true);
+                        count++;
                     }
                 }
 
-                return Observable.Return(false);
+                return Observable.Return(count);
             }
         }
 
