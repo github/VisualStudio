@@ -160,9 +160,9 @@ namespace GitHub.App.UnitTests.Services
         {
             var gitExtType = typeof(FakeGitExt);
             dte = dte ?? Substitute.For<DTE>();
-            var sp = Substitute.For<IServiceProvider>();
+            var sp = Substitute.For<IGitHubServiceProvider>();
             sp.GetService(gitExtType).Returns(gitExt);
-            sp.GetService(typeof(DTE)).Returns(dte);
+            sp.TryGetService<DTE>().Returns(dte);
             var log = Substitute.For<ILogger>();
             return new TeamExplorerContext(sp, log, gitExtType, true);
         }

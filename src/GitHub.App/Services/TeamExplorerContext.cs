@@ -31,12 +31,12 @@ namespace GitHub.Services
         bool testing;
 
         [ImportingConstructor]
-        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
             : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), null, false)
         {
         }
 
-        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ILogger log,
+        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, ILogger log,
             Type gitExtType, bool testing)
         {
             this.log = log;
@@ -50,7 +50,7 @@ namespace GitHub.Services
                 return;
             }
 
-            dte = (DTE)serviceProvider.GetService(typeof(DTE));
+            dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
                 log.Error("Couldn't find service for type {DteType}", typeof(DTE));
