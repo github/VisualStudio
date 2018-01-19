@@ -20,8 +20,8 @@ namespace GitHub.Services
     public class TeamExplorerContext : ITeamExplorerContext
     {
         const string GitExtTypeName = "Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider";
-        static readonly ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
+        readonly ILogger log;
         readonly DTE dte;
 
         string solutionPath;
@@ -32,14 +32,17 @@ namespace GitHub.Services
 
         [ImportingConstructor]
         public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : this(serviceProvider, FindGitExtType(), false)
+            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), null, false)
         {
         }
 
-        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, Type gitExtType, bool testing)
+        public TeamExplorerContext([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ILogger log,
+            Type gitExtType, bool testing)
         {
+            this.log = log;
             this.testing = testing;
 
+            gitExtType = gitExtType ?? FindGitExtType();
             var gitExt = serviceProvider.GetService(gitExtType);
             if (gitExt == null)
             {
@@ -65,7 +68,7 @@ namespace GitHub.Services
             notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
         }
 
-        static Type FindGitExtType()
+        Type FindGitExtType()
         {
             var gitExtType = Type.GetType(GitExtTypeName, false);
             if (gitExtType == null)

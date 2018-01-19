@@ -6,6 +6,7 @@ using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
 using EnvDTE;
+using Serilog;
 
 namespace GitHub.App.UnitTests.Services
 {
@@ -162,7 +163,8 @@ namespace GitHub.App.UnitTests.Services
             var sp = Substitute.For<IServiceProvider>();
             sp.GetService(gitExtType).Returns(gitExt);
             sp.GetService(typeof(DTE)).Returns(dte);
-            return new TeamExplorerContext(sp, gitExtType, true);
+            var log = Substitute.For<ILogger>();
+            return new TeamExplorerContext(sp, log, gitExtType, true);
         }
 
         class FakeGitExt : INotifyPropertyChanged
