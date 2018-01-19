@@ -11,7 +11,7 @@ using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
 using ReactiveUI;
-using Xunit;
+using NUnit.Framework;
 
 public class GitHubPaneViewModelTests : TestBaseClass
 {
@@ -20,7 +20,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     public class TheInitializeMethod
     {
-        [Fact]
+        [Test]
         public async Task NotAGitRepositoryShownWhenNoRepository()
         {
             var te = Substitute.For<ITeamExplorerContext>();
@@ -29,10 +29,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitRepositoryViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
         {
             var repo = Substitute.For<ILocalRepositoryModel>();
@@ -41,10 +41,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstance()
         {
             var te = CreateTeamExplorerContext("https://some.site/foo/bar");
@@ -52,10 +52,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepo()
         {
             var te = CreateTeamExplorerContext("https://github.com/invalid/repo");
@@ -63,10 +63,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INotAGitHubRepositoryViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task LoggedOutShownWhenNotLoggedInToGitHub()
         {
             var te = CreateTeamExplorerContext(ValidGitHubRepo);
@@ -75,10 +75,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task LoggedOutShownWhenNotLoggedInToEnterprise()
         {
             var te = CreateTeamExplorerContext(ValidEnterpriseRepo);
@@ -87,10 +87,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
         {
             var te = CreateTeamExplorerContext(ValidGitHubRepo);
@@ -99,10 +99,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
         {
             var te = CreateTeamExplorerContext(ValidEnterpriseRepo);
@@ -111,10 +111,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+		}
 
-        [Fact]
+        [Test]
         public async Task NavigatorShownWhenUserLogsIn()
         {
             var te = CreateTeamExplorerContext(ValidGitHubRepo);
@@ -123,17 +123,17 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
-            AddConnection(cm, "https://github.com");
+			AddConnection(cm, "https://github.com");
 
-            Assert.IsAssignableFrom<INavigationViewModel>(target.Content);
-        }
+			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+		}
     }
 
     public class TheShowPullRequestsMethod
     {
-        [Fact]
+        [Test]
         public async Task HasNoEffectWhenUserLoggedOut()
         {
             var te = CreateTeamExplorerContext(ValidGitHubRepo);
@@ -144,14 +144,14 @@ public class GitHubPaneViewModelTests : TestBaseClass
                 teamExplorerContext: te);
 
             await Initialize(target);
-            Assert.IsAssignableFrom<ILoggedOutViewModel>(target.Content);
+			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
-            await target.ShowPullRequests();
+			await target.ShowPullRequests();
 
             viewModelFactory.DidNotReceive().CreateViewModel<IPullRequestListViewModel>();
         }
 
-        [Fact]
+        [Test]
         public async Task HasNoEffectWhenAlreadyCurrentPage()
         {
             var te = CreateTeamExplorerContext(ValidGitHubRepo);
@@ -163,12 +163,12 @@ public class GitHubPaneViewModelTests : TestBaseClass
                 navigator: nav);
 
             await Initialize(target);
-            Assert.Same(nav, target.Content);
-            Assert.IsAssignableFrom<IPullRequestListViewModel>(nav.Content);
+            Assert.That(nav, Is.SameAs(target.Content));
+			Assert.That(nav.Content, Is.InstanceOf<IPullRequestListViewModel>());
 
-            await target.ShowPullRequests();
+			await target.ShowPullRequests();
 
-            Assert.Equal(1, nav.History.Count);
+            Assert.That(1, Is.EqualTo(nav.History.Count));
         }
     }
 

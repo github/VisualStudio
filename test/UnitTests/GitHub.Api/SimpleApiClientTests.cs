@@ -5,7 +5,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 using EnterpriseProbeResult = GitHub.Services.EnterpriseProbeResult;
 
 public class SimpleApiClientTests
@@ -21,7 +21,7 @@ public class SimpleApiClientTests
 
     public class TheGetRepositoryMethod
     {
-        [Fact]
+        [Test]
         public async Task RetrievesRepositoryFromWeb()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -38,10 +38,10 @@ public class SimpleApiClientTests
 
             var result = await client.GetRepository();
 
-            Assert.Equal(42, result.Id);
+            Assert.That(42, Is.EqualTo(result.Id));
         }
 
-        [Fact]
+        [Test]
         public async Task RetrievesCachedRepositoryForSubsequentCalls()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -60,16 +60,15 @@ public class SimpleApiClientTests
 
             var result = await client.GetRepository();
 
-            Assert.Equal(42, result.Id);
+            Assert.That(42, Is.EqualTo(result.Id));
         }
     }
 
     public class TheHasWikiMethod
     {
-        [Theory]
-        [InlineData(WikiProbeResult.Ok, true)]
-        [InlineData(WikiProbeResult.Failed, false)]
-        [InlineData(WikiProbeResult.NotFound, false)]
+        [TestCase(WikiProbeResult.Ok, true)]
+        [TestCase(WikiProbeResult.Failed, false)]
+        [TestCase(WikiProbeResult.NotFound, false)]
         public async Task ReturnsTrueWhenWikiProbeReturnsOk(WikiProbeResult probeResult, bool expected)
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -89,11 +88,11 @@ public class SimpleApiClientTests
 
             var result = client.HasWiki();
 
-            Assert.Equal(expected, result);
-            Assert.Equal(expected, client.HasWiki());
+            Assert.That(expected, Is.EqualTo(result));
+            Assert.That(expected, Is.EqualTo(client.HasWiki()));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenWeHaveNotRequestedRepository()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -114,10 +113,9 @@ public class SimpleApiClientTests
 
     public class TheIsEnterpriseMethod
     {
-        [Theory]
-        [InlineData(EnterpriseProbeResult.Ok, true)]
-        [InlineData(EnterpriseProbeResult.Failed, false)]
-        [InlineData(EnterpriseProbeResult.NotFound, false)]
+        [TestCase(EnterpriseProbeResult.Ok, true)]
+        [TestCase(EnterpriseProbeResult.Failed, false)]
+        [TestCase(EnterpriseProbeResult.NotFound, false)]
         public async Task ReturnsTrueWhenEnterpriseProbeReturnsOk(EnterpriseProbeResult probeResult, bool expected)
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -137,11 +135,11 @@ public class SimpleApiClientTests
 
             var result = client.IsEnterprise();
 
-            Assert.Equal(expected, result);
-            Assert.Equal(expected, client.IsEnterprise());
+            Assert.That(expected, Is.EqualTo(result));
+            Assert.That(expected, Is.EqualTo(client.IsEnterprise()));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenWeHaveNotRequestedRepository()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -162,7 +160,7 @@ public class SimpleApiClientTests
 
     public class TheIsIsAuthenticatedMethod
     {
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenCredentialsNotSet()
         {
             var gitHubClient = Substitute.For<IGitHubClient>();
@@ -178,7 +176,7 @@ public class SimpleApiClientTests
             Assert.False(result);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenAuthenicationTypeIsAnonymous()
         {
             var connection = Substitute.For<IConnection>();
@@ -197,7 +195,7 @@ public class SimpleApiClientTests
             Assert.False(result);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenLoginIsSetToBasicAuth()
         {
             var connection = Substitute.For<IConnection>();
@@ -216,7 +214,7 @@ public class SimpleApiClientTests
             Assert.True(result);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenLoginIsSetToOAuth()
         {
             var connection = Substitute.For<IConnection>();
