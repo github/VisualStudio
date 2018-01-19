@@ -81,7 +81,6 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
-    <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
     <Compile Include="Commands\VsCommandBase.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
@@ -122,7 +121,6 @@
     <Compile Include="ViewModels\InlineCommentViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\PullRequestCommentsViewModel.cs" />
     <Compile Include="Views\DiffCommentThreadView.xaml.cs">
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
@@ -132,10 +130,6 @@
     </Compile>
     <Compile Include="Views\InlineCommentPeekView.xaml.cs">
       <DependentUpon>InlineCommentPeekView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\PullRequestCommentsPane.cs" />
-    <Compile Include="Views\PullRequestCommentsView.xaml.cs">
-      <DependentUpon>PullRequestCommentsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SampleData\CommentViewModelDesigner.cs" />
     <Compile Include="Services\DiffService.cs" />
@@ -435,10 +429,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\InlineCommentPeekView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\PullRequestCommentsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,6 +1,7 @@
 ﻿using System;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -12,6 +13,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
+        /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentId">The ID of the comment.</param>
@@ -20,6 +22,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="user">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
         public InlineCommentViewModel(
+            IPullRequestSession session,
             ICommentThreadViewModel thread,
             IAccount currentUser,
             int commentId,
@@ -29,7 +32,7 @@ namespace GitHub.InlineReviews.ViewModels
             DateTimeOffset updatedAt,
             string commitSha,
             int diffLine)
-            : base(thread, currentUser, commentId, body, state, user, updatedAt)
+            : base(session, thread, currentUser, commentId, body, state, user, updatedAt)
         {
             Guard.ArgumentNotNull(commitSha, nameof(commitSha));
 
@@ -40,14 +43,16 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
+        /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="model">The comment model.</param>
         public InlineCommentViewModel(
+            IPullRequestSession session,
             ICommentThreadViewModel thread,
             IAccount currentUser,
             IPullRequestReviewCommentModel model)
-            : base(thread, currentUser, model)
+            : base(session, thread, currentUser, model)
         {
             CommitSha = model.OriginalCommitId;
             DiffLine = model.OriginalPosition.Value;

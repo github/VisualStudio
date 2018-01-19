@@ -242,6 +242,7 @@
     <Compile Include="GitHub.App\ViewModels\Dialog\LoginToGitHubViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\PullRequestCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestDetailViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestFilesViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestListViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\RepositoryCloneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\RepositoryCreationViewModelTests.cs" />

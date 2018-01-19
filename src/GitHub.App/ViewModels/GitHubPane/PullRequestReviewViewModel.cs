@@ -245,7 +245,6 @@ namespace GitHub.ViewModels.GitHubPane
                     State = null;
                     IsPending = true;
                     Body = string.Empty;
-                    session.StartReview();
                 }
 
                 await Files.InitializeAsync(session, FilterComments);

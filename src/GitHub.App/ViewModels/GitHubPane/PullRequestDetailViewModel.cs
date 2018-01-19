@@ -43,7 +43,6 @@ namespace GitHub.ViewModels.GitHubPane
         int commentCount;
         string body;
         IReadOnlyList<PullRequestDetailReviewItem> reviews;
-        IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
@@ -64,13 +63,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="usageTracker">The usage tracker.</param>
         /// <param name="vsGitExt">The Visual Studio git service.</param>
+        /// <param name="files">The pull request files view model.</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
-            IVSGitExt vsGitExt)
+            IVSGitExt vsGitExt,
+            IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -82,6 +83,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
             this.vsGitExt = vsGitExt;
+            Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -248,13 +250,9 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
-        /// Gets the changed files as a tree.
+        /// Gets the pull request's changed files.
         /// </summary>
-        public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree
-        {
-            get { return changedFilesTree; }
-            private set { this.RaiseAndSetIfChanged(ref changedFilesTree, value); }
-        }
+        public IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
         /// Gets the web URL for the pull request.
@@ -370,8 +368,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = BuildReviews(pullRequest);
 
-                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+                await Files.InitializeAsync(Session);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
@@ -606,54 +603,6 @@ namespace GitHub.ViewModels.GitHubPane
             command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        async Task<IPullRequestDirectoryNode> CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
-        {
-            var dirs = new Dictionary<string, PullRequestDirectoryNode>
-            {
-                { string.Empty, new PullRequestDirectoryNode(string.Empty) }
-            };
-
-            foreach (var changedFile in pullRequest.ChangedFiles)
-            {
-                var node = new PullRequestFileNode(
-                    LocalRepository.LocalPath,
-                    changedFile.FileName,
-                    changedFile.Sha,
-                    changedFile.Status,
-                    GetOldFileName(changedFile, changes));
-
-                var file = await Session.GetFile(changedFile.FileName);
-                var fileCommentCount = file?.WhenAnyValue(x => x.InlineCommentThreads)
-                    .Subscribe(x => node.CommentCount = x.Count(y => y.LineNumber != -1));
-
-                var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
-                dir.Files.Add(node);
-            }
-
-            return dirs[string.Empty];
-        }
-
-        static PullRequestDirectoryNode GetDirectory(string path, Dictionary<string, PullRequestDirectoryNode> dirs)
-        {
-            PullRequestDirectoryNode dir;
-
-            if (!dirs.TryGetValue(path, out dir))
-            {
-                var parentPath = Path.GetDirectoryName(path);
-                var parentDir = GetDirectory(parentPath, dirs);
-
-                dir = new PullRequestDirectoryNode(path);
-
-                if (!parentDir.Directories.Any(x => x.DirectoryName == dir.DirectoryName))
-                {
-                    parentDir.Directories.Add(dir);
-                    dirs.Add(path, dir);
-                }
-            }
-
-            return dir;
-        }
-
         static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
         {
             if (targetBranchLabel != null)
@@ -664,17 +613,6 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 return Resources.InvalidBranchName;
             }
-        }
-
-        string GetOldFileName(IPullRequestFileModel file, TreeChanges changes)
-        {
-            if (file.Status == PullRequestFileStatus.Renamed)
-            {
-                var fileName = file.FileName.Replace("/", "\\");
-                return changes?.Renamed.FirstOrDefault(x => x.Path == fileName)?.OldPath;
-            }
-
-            return null;
         }
 
         IObservable<Unit> DoCheckout(object unused)

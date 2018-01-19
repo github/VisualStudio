@@ -131,9 +131,9 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<PullRequestDetailReviewItem> Reviews { get; }
 
         /// <summary>
-        /// Gets the changed files as a tree.
+        /// Gets the pull request's changed files.
         /// </summary>
-        IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }
+        IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
@@ -169,27 +169,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         ReactiveCommand<object> OpenOnGitHub { get; }
-
-        /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
-        /// </summary>
-        ReactiveCommand<object> DiffFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
-        /// the working directory and HEAD.
-        /// </summary>
-        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
-        /// </summary>
-        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
-        /// </summary>
-        ReactiveCommand<object> ViewFile { get; }
 
         /// <summary>
         /// Initializes the view model.
