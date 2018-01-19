@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using GitHub.UI;
-using Xunit;
+using NUnit.Framework;
 
 public class TwoFactorInputTests
 {
     public class TheTextProperty : TestBaseClass
     {
-#if !NCRUNCH
-        [STAFact]
-#endif
+
+        [Test, Apartment(ApartmentState.STA)]
         public void SetsTextBoxesToIndividualCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -19,18 +19,16 @@ public class TwoFactorInputTests
 
             twoFactorInput.Text = "012345";
 
-            Assert.Equal("012345", twoFactorInput.Text);
-            Assert.Equal("0", textBoxes[0].Text);
-            Assert.Equal("1", textBoxes[1].Text);
-            Assert.Equal("2", textBoxes[2].Text);
-            Assert.Equal("3", textBoxes[3].Text);
-            Assert.Equal("4", textBoxes[4].Text);
-            Assert.Equal("5", textBoxes[5].Text);
+            Assert.That("012345", Is.EqualTo(twoFactorInput.Text));
+            Assert.That("0", Is.EqualTo(textBoxes[0].Text));
+            Assert.That("1", Is.EqualTo(textBoxes[1].Text));
+            Assert.That("2", Is.EqualTo(textBoxes[2].Text));
+            Assert.That("3", Is.EqualTo(textBoxes[3].Text));
+            Assert.That("4", Is.EqualTo(textBoxes[4].Text));
+            Assert.That("5", Is.EqualTo(textBoxes[5].Text));
         }
 
-#if !NCRUNCH
-        [STAFact]
-#endif
+        [Test, Apartment(ApartmentState.STA)]
         public void IgnoresNonDigitCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -38,18 +36,16 @@ public class TwoFactorInputTests
 
             twoFactorInput.Text = "01xyz2345";
 
-            Assert.Equal("012345", twoFactorInput.Text);
-            Assert.Equal("0", textBoxes[0].Text);
-            Assert.Equal("1", textBoxes[1].Text);
-            Assert.Equal("2", textBoxes[2].Text);
-            Assert.Equal("3", textBoxes[3].Text);
-            Assert.Equal("4", textBoxes[4].Text);
-            Assert.Equal("5", textBoxes[5].Text);
+            Assert.That("012345", Is.EqualTo(twoFactorInput.Text));
+            Assert.That("0", Is.EqualTo(textBoxes[0].Text));
+            Assert.That("1", Is.EqualTo(textBoxes[1].Text));
+            Assert.That("2", Is.EqualTo(textBoxes[2].Text));
+            Assert.That("3", Is.EqualTo(textBoxes[3].Text));
+            Assert.That("4", Is.EqualTo(textBoxes[4].Text));
+            Assert.That("5", Is.EqualTo(textBoxes[5].Text));
         }
 
-#if !NCRUNCH
-        [STAFact]
-#endif
+        [Test, Apartment(ApartmentState.STA)]
         public void HandlesNotEnoughCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -57,21 +53,18 @@ public class TwoFactorInputTests
 
             twoFactorInput.Text = "012";
 
-            Assert.Equal("012", twoFactorInput.Text);
-            Assert.Equal("0", textBoxes[0].Text);
-            Assert.Equal("1", textBoxes[1].Text);
-            Assert.Equal("2", textBoxes[2].Text);
-            Assert.Equal("", textBoxes[3].Text);
-            Assert.Equal("", textBoxes[4].Text);
-            Assert.Equal("", textBoxes[5].Text);
+            Assert.That("012", Is.EqualTo(twoFactorInput.Text));
+            Assert.That("0", Is.EqualTo(textBoxes[0].Text));
+            Assert.That("1", Is.EqualTo(textBoxes[1].Text));
+            Assert.That("2", Is.EqualTo(textBoxes[2].Text));
+            Assert.That("", Is.EqualTo(textBoxes[3].Text));
+            Assert.That("", Is.EqualTo(textBoxes[4].Text));
+            Assert.That("", Is.EqualTo(textBoxes[5].Text));
         }
 
-#if !NCRUNCH
-        [STATheory]
-#endif
-        [InlineData(null, null)]
-        [InlineData("", "")]
-        [InlineData("xxxx", "")]
+        [TestCase(null, null), Apartment(ApartmentState.STA)]
+        [TestCase("", "")]
+        [TestCase("xxxx", "")]
         public void HandlesNullAndStringsWithNoDigits(string input, string expected)
         {
             var twoFactorInput = new TwoFactorInput();
@@ -79,13 +72,13 @@ public class TwoFactorInputTests
 
             twoFactorInput.Text = input;
 
-            Assert.Equal(expected, twoFactorInput.Text);
-            Assert.Equal("", textBoxes[0].Text);
-            Assert.Equal("", textBoxes[1].Text);
-            Assert.Equal("", textBoxes[2].Text);
-            Assert.Equal("", textBoxes[3].Text);
-            Assert.Equal("", textBoxes[4].Text);
-            Assert.Equal("", textBoxes[5].Text);
+            Assert.That(expected, Is.EqualTo(twoFactorInput.Text));
+            Assert.That("", Is.EqualTo(textBoxes[0].Text));
+            Assert.That("", Is.EqualTo(textBoxes[1].Text));
+            Assert.That("", Is.EqualTo(textBoxes[2].Text));
+            Assert.That("", Is.EqualTo(textBoxes[3].Text));
+            Assert.That("", Is.EqualTo(textBoxes[4].Text));
+            Assert.That("", Is.EqualTo(textBoxes[5].Text));
         }
 
         static IEnumerable<FrameworkElement> GetChildrenRecursive(FrameworkElement element)

@@ -47,7 +47,7 @@ if (!$?) {
 }
 
 Write-Output "Running UnitTests..."
-Run-XUnit test UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
+Run-NUnit test UnitTests $TimeoutDuration $config -AppVeyor:$AppVeyor
 if (!$?) {
     $exitcode = 3
 }

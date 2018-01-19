@@ -9,13 +9,13 @@ using GitHub.Collections;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.Models
 {
     public class AccountModelTests : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void CopyFromDoesNotLoseAvatar()
         {
             var userImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
@@ -47,11 +47,11 @@ namespace UnitTests.GitHub.App.Models
             collectionEvent.Reset();
 
             //Checking some initial properties
-            Assert.Equal(login, col[0].Login);
-            Assert.Equal(initialOwnedPrivateRepositoryCount, col[0].OwnedPrivateRepos);
+            Assert.That(login, Is.EqualTo(col[0].Login));
+            Assert.That(initialOwnedPrivateRepositoryCount, Is.EqualTo(col[0].OwnedPrivateRepos));
 
             //Demonstrating that the avatar is not yet present
-            Assert.Null(col[0].Avatar);
+            Assert.That(col[0].Avatar, Is.Null);
 
             //Adding a listener to check for the changing of the Avatar property
             initialAccount.Changed.Subscribe(args =>
@@ -71,7 +71,7 @@ namespace UnitTests.GitHub.App.Models
             avatarPropertyEvent.Reset();
 
             //Demonstrating that the avatar is present
-            Assert.NotNull(col[0].Avatar);
+            Assert.That(col[0].Avatar, Is.Not.Null);
             Assert.True(BitmapSourcesAreEqual(col[0].Avatar, userImage));
             Assert.False(BitmapSourcesAreEqual(col[0].Avatar, orgImage));
 
@@ -96,13 +96,13 @@ namespace UnitTests.GitHub.App.Models
             avatarPropertyEvent.Reset();
 
             //Login is the id, so that should be the same
-            Assert.Equal(login, col[0].Login);
+            Assert.That(login, Is.EqualTo(col[0].Login));
 
             //CopyFrom() should have updated this field
-            Assert.Equal(updatedOwnedPrivateRepositoryCount, col[0].OwnedPrivateRepos);
+            Assert.That(updatedOwnedPrivateRepositoryCount, Is.EqualTo(col[0].OwnedPrivateRepos));
 
             //CopyFrom() should not cause a race condition here
-            Assert.NotNull(col[0].Avatar);
+            Assert.That(col[0].Avatar, Is.Not.Null);
             Assert.True(BitmapSourcesAreEqual(col[0].Avatar, orgImage));
             Assert.False(BitmapSourcesAreEqual(col[0].Avatar, userImage));
         }
