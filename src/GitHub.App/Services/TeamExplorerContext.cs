@@ -81,41 +81,45 @@ namespace GitHub.Services
 
         void Refresh(object gitExt)
         {
-            string newRepositoryPath;
-            string newBranchName;
-            string newHeadSha;
-            FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
-            var newSolutionPath = dte?.Solution?.FullName;
-
-            log.Information("Refresh ActiveRepository: RepositoryPath={RepositoryPath}, BranchName={BranchName}, HeadSha={HeadSha}, SolutionPath={SolutionPath}",
-                newRepositoryPath, newBranchName, newHeadSha, newSolutionPath);
-
-            if (newRepositoryPath == null && newSolutionPath == solutionPath)
+            try
             {
-                // Ignore when ActiveRepositories is empty and solution hasn't changed.
-                // https://github.com/github/VisualStudio/issues/1421
-                log.Information("Ignoring null ActiveRepository");
+                string newRepositoryPath;
+                string newBranchName;
+                string newHeadSha;
+                FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
+                var newSolutionPath = dte?.Solution?.FullName;
+
+                if (newRepositoryPath == null && newSolutionPath == solutionPath)
+                {
+                    // Ignore when ActiveRepositories is empty and solution hasn't changed.
+                    // https://github.com/github/VisualStudio/issues/1421
+                    log.Information("Ignoring no ActiveRepository when solution hasn't changed");
+                }
+                else if (newRepositoryPath != repositoryPath)
+                {
+                    log.Information("Fire PropertyChanged event for ActiveRepository");
+
+                    solutionPath = newSolutionPath;
+                    repositoryPath = newRepositoryPath;
+                    branchName = newBranchName;
+                    headSha = newHeadSha;
+
+                    ActiveRepository = CreateRepository(repositoryPath);
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                }
+                else if (newBranchName != branchName || newHeadSha != headSha)
+                {
+                    log.Information("Fire StatusChanged event for ActiveRepository");
+
+                    branchName = newBranchName;
+                    headSha = newHeadSha;
+
+                    StatusChanged?.Invoke(this, EventArgs.Empty);
+                }
             }
-            else if (newRepositoryPath != repositoryPath)
+            catch (Exception e)
             {
-                log.Information("Fire PropertyChanged event for ActiveRepository");
-
-                solutionPath = newSolutionPath;
-                repositoryPath = newRepositoryPath;
-                branchName = newBranchName;
-                headSha = newHeadSha;
-
-                ActiveRepository = CreateRepository(repositoryPath);
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
-            }
-            else if (newBranchName != branchName || newHeadSha != headSha)
-            {
-                log.Information("Fire StatusChanged event for ActiveRepository");
-
-                branchName = newBranchName;
-                headSha = newHeadSha;
-
-                StatusChanged?.Invoke(this, EventArgs.Empty);
+                log.Error(e, "Refreshing active repository");
             }
         }
 
