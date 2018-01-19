@@ -55,7 +55,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 modelService.Received(1).GetPullRequest("fork", "repo", 15);
             }
 
-            [Fact]
+            [Test]
             public void LocalRepositoryModelNull()
             {
                 var repositoryModel = null as LocalRepositoryModel;
