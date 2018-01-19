@@ -116,9 +116,9 @@ namespace GitHub.Services
             }
         }
 
-        ILocalRepositoryModel CreateRepository(string repositoryPath)
+        ILocalRepositoryModel CreateRepository(string path)
         {
-            if (repositoryPath == null)
+            if (path == null)
             {
                 return null;
             }
@@ -126,10 +126,10 @@ namespace GitHub.Services
             if (testing)
             {
                 // HACK: This avoids calling GitService.GitServiceHelper.
-                return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), repositoryPath);
+                return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), path);
             }
 
-            return new LocalRepositoryModel(repositoryPath);
+            return new LocalRepositoryModel(path);
         }
 
         static void FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
