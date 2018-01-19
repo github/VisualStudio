@@ -38,7 +38,10 @@ namespace GitHub.Services
         /// <returns>Returns a <see cref="UriString"/> representing the uri of the remote normalized to a GitHub repository url or null if none found.</returns>
         public UriString GetUri(string path, string remote = "origin")
         {
-            return GetUri(GetRepository(path), remote);
+            using (var repo = GetRepository(path))
+            {
+                return GetUri(repo, remote);
+            }
         }
 
         /// <summary>
@@ -82,29 +85,31 @@ namespace GitHub.Services
         public Task<string> GetLatestPushedSha(string path)
         {
             Guard.ArgumentNotNull(path, nameof(path));
-            var repo = GetRepository(path);
-
-            if (repo == null)
-                return null;
-
-            if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
-            {
-                return Task.FromResult(repo.Head.Tip.Sha);
-            }
 
             return Task.Factory.StartNew(() =>
-             {
-                 var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
+            {
+                using (var repo = GetRepository(path))
+                {
+                    if (repo != null)
+                    {
+                        if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
+                        {
+                            return repo.Head.Tip.Sha;
+                        }
 
-                 foreach (var c in repo.Commits)
-                 {
-                     if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
-                     {
-                         return c.Sha;
-                     }
-                 }
-                 return null;
-             });
+                        var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
+                        foreach (var c in repo.Commits)
+                        {
+                            if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
+                            {
+                                return c.Sha;
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            });
         }
     }
 }

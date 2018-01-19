@@ -13,8 +13,8 @@ namespace GitHub.Api
     public class LoginManager : ILoginManager
     {
         readonly string[] scopes = { "user", "repo", "gist", "write:public_key" };
-        readonly ILoginCache loginCache;
-        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
+        readonly IKeychain keychain;
+        readonly Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
         readonly string authorizationNote;
@@ -23,26 +23,26 @@ namespace GitHub.Api
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginManager"/> class.
         /// </summary>
-        /// <param name="loginCache">The cache in which to store login details.</param>
+        /// <param name="keychain">The keychain in which to store credentials.</param>
         /// <param name="twoFactorChallengeHandler">The handler for 2FA challenges.</param>
         /// <param name="clientId">The application's client API ID.</param>
         /// <param name="clientSecret">The application's client API secret.</param>
         /// <param name="authorizationNote">An note to store with the authorization.</param>
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
-            ILoginCache loginCache,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            IKeychain keychain,
+            Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler,
             string clientId,
             string clientSecret,
             string authorizationNote = null,
             string fingerprint = null)
         {
-            Guard.ArgumentNotNull(loginCache, nameof(loginCache));
+            Guard.ArgumentNotNull(keychain, nameof(keychain));
             Guard.ArgumentNotNull(twoFactorChallengeHandler, nameof(twoFactorChallengeHandler));
             Guard.ArgumentNotEmptyString(clientId, nameof(clientId));
             Guard.ArgumentNotEmptyString(clientSecret, nameof(clientSecret));
 
-            this.loginCache = loginCache;
+            this.keychain = keychain;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
@@ -64,7 +64,7 @@ namespace GitHub.Api
 
             // Start by saving the username and password, these will be used by the `IGitHubClient`
             // until an authorization token has been created and acquired:
-            await loginCache.SaveLogin(userName, password, hostAddress).ConfigureAwait(false);
+            await keychain.Save(userName, password, hostAddress).ConfigureAwait(false);
 
             var newAuth = new NewAuthorization
             {
@@ -99,13 +99,13 @@ namespace GitHub.Api
                     }
                     else
                     {
-                        await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
+                        await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }
             } while (auth == null);
 
-            await loginCache.SaveLogin(userName, auth.Token, hostAddress).ConfigureAwait(false);
+            await keychain.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
 
             var retry = 0;
 
@@ -141,7 +141,7 @@ namespace GitHub.Api
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            await loginCache.EraseLogin(hostAddress);
+            await keychain.Delete(hostAddress);
         }
 
         async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
@@ -194,7 +194,7 @@ namespace GitHub.Api
         {
             for (;;)
             {
-                var challengeResult = await twoFactorChallengeHandler.HandleTwoFactorException(exception);
+                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception);
 
                 if (challengeResult == null)
                 {
@@ -218,8 +218,8 @@ namespace GitHub.Api
                     }
                     catch (Exception e)
                     {
-                        await twoFactorChallengeHandler.ChallengeFailed(e);
-                        await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
+                        await twoFactorChallengeHandler.Value.ChallengeFailed(e);
+                        await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }

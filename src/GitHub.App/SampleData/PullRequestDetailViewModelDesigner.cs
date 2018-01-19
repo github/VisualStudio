@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
+using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
 namespace GitHub.SampleData
@@ -36,7 +37,7 @@ namespace GitHub.SampleData
         {
             var repoPath = @"C:\Repo";
 
-            Model = new PullRequestModel(419, 
+            Model = new PullRequestModel(419,
                 "Error handling/bubbling from viewmodels to views to viewhosts",
                  new AccountDesigner { Login = "shana", IsUser = true },
                  DateTime.Now.Subtract(TimeSpan.FromDays(3)))
@@ -60,7 +61,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var repositoriesDir = new PullRequestDirectoryNode("Repositories");
             var itrackingBranch = new PullRequestFileNode(repoPath, @"GitHub\Models\ITrackingBranch.cs", "abc", PullRequestFileStatus.Modified, null);
             var oldBranchModel = new PullRequestFileNode(repoPath, @"GitHub\Models\OldBranchModel.cs", "abc", PullRequestFileStatus.Removed, null);
-            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", "abc", PullRequestFileStatus.Added, "add");
+            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", "abc", PullRequestFileStatus.Added, null);
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);
@@ -75,12 +76,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestModel Model { get; }
         public IPullRequestSession Session { get; }
         public ILocalRepositoryModel LocalRepository { get; }
-        public IRemoteRepositoryModel RemoteRepository { get; }
+        public string RemoteRepositoryOwner { get; }
+        public int Number { get; set; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public int CommentCount { get; set; }
-        public bool IsLoading { get; }
-        public bool IsBusy { get; }
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
@@ -89,6 +89,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
         public string ErrorMessage { get; set; }
+        public Uri WebUrl { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
@@ -98,6 +99,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
         public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
         public ReactiveCommand<object> ViewFile { get; }
+
+        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
         public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
         {

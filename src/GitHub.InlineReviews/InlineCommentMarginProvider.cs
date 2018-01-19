@@ -28,25 +28,41 @@ namespace GitHub.InlineReviews
         const string MarginName = "InlineComment";
         const string MarginPropertiesName = "Indicator Margin"; // Same background color as Glyph margin 
 
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
-        readonly IPullRequestSessionManager sessionManager;
         readonly IPackageSettings packageSettings;
+        IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
+            IGitHubServiceProvider serviceProvider,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
-            IPullRequestSessionManager sessionManager,
             IPackageSettings packageSettings)
         {
+            this.serviceProvider = serviceProvider;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            this.sessionManager = sessionManager;
             this.packageSettings = packageSettings;
+        }
+
+        IPullRequestSessionManager SessionManager
+        {
+            get
+            {
+                // Lazily load the pull request session manager to prevent all of our assemblies
+                // being loaded on VS startup.
+                if (sessionManager == null)
+                {
+                    sessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
+                }
+
+                return sessionManager;
+            }
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
@@ -61,17 +77,17 @@ namespace GitHub.InlineReviews
 
             Func<Grid> gridFactory = () => new GlyphMarginGrid();
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
-            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, parent, editorFormatMap);
+            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, editorFormatMap);
         }
 
         IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
-            IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
+            IWpfTextViewHost wpfTextViewHost, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
             var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
 
-            if(IsDiffView(wpfTextViewHost))
+            if (IsDiffView(wpfTextViewHost))
             {
                 TrackCommentGlyph(wpfTextViewHost, margin.VisualElement);
             }
@@ -95,7 +111,7 @@ namespace GitHub.InlineReviews
 
         bool IsMarginVisible(ITextBuffer buffer)
         {
-            if (sessionManager.GetTextBufferInfo(buffer) != null)
+            if (SessionManager.GetTextBufferInfo(buffer) != null)
             {
                 return true;
             }

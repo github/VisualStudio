@@ -10,9 +10,12 @@ namespace GitHub.Services
     public interface IDialogService
     {
         /// <summary>
-        /// Shows the clone dialog.
+        /// Shows the Clone dialog.
         /// </summary>
-        /// <param name="connection">The connection to use.</param>
+        /// <param name="connection">
+        /// The connection to use. If null, the first connection will be used, or the user promted
+        /// to log in if there are no connections.
+        /// </param>
         /// <returns>
         /// A task that returns an instance of <see cref="CloneDialogResult"/> on success,
         /// or null if the dialog was cancelled.
@@ -32,5 +35,27 @@ namespace GitHub.Services
         /// out a repository that was previously checked out on another machine.
         /// </remarks>
         Task<string> ShowReCloneDialog(IRepositoryModel repository);
+
+        /// <summary>
+        /// Shows the Create Gist dialog.
+        /// </summary>
+        Task ShowCreateGist();
+
+        /// <summary>
+        /// Shows the Create Repository dialog.
+        /// </summary>
+        /// <param name="connection">
+        /// The connection to use. May not be null.
+        /// </param>
+        Task ShowCreateRepositoryDialog(IConnection connection);
+
+        /// <summary>
+        /// Shows the Login dialog.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IConnection"/> created by the login, or null if the login was
+        /// unsuccessful.
+        /// </returns>
+        Task<IConnection> ShowLoginDialog();
     }
 }

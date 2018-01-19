@@ -3,12 +3,14 @@ using System.IO;
 using System.Windows;
 using System.Reflection;
 using System.Collections.Generic;
-using GitHub.VisualStudio;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub
 {
     public class LoadingResourceDictionary : ResourceDictionary
     {
+        static readonly ILogger log = LogManager.ForContext<LoadingResourceDictionary>();
         static Dictionary<string, Assembly> assemblyDicts = new Dictionary<string, Assembly>();
 
         public new Uri Source
@@ -21,6 +23,7 @@ namespace GitHub
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
         void EnsureAssemblyLoaded(Uri value)
         {
             try
@@ -28,7 +31,7 @@ namespace GitHub
                 var assemblyName = FindAssemblyNameFromPackUri(value);
                 if (assemblyName == null)
                 {
-                    VsOutputLogger.WriteLine($"Couldn't find assembly name in '{value}'.");
+                    log.Error("Couldn't find assembly name in '{Uri}'", value);
                     return;
                 }
 
@@ -41,7 +44,7 @@ namespace GitHub
 
                 if (!File.Exists(assemblyFile))
                 {
-                    VsOutputLogger.WriteLine($"Couldn't find assembly at '{assemblyFile}'.");
+                    log.Error("Couldn't find assembly at '{AssemblyFile}'", assemblyFile);
                     return;
                 }
 
@@ -50,20 +53,20 @@ namespace GitHub
             }
             catch(Exception e)
             {
-                VsOutputLogger.WriteLine($"Error loading assembly for '{value}': {e}");
+                log.Error(e, "Error loading assembly for '{Uri}'", value);
             }
         }
 
         static string FindAssemblyNameFromPackUri(Uri packUri)
         {
             var path = packUri.LocalPath;
-            if (!path.StartsWith("/"))
+            if (!path.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
             var component = ";component/";
-            int componentIndex = path.IndexOf(component, 1);
+            int componentIndex = path.IndexOf(component, 1, StringComparison.OrdinalIgnoreCase);
             if (componentIndex == -1)
             {
                 return null;

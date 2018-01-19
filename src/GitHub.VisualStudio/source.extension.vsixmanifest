@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="c3d3dc68-c977-411f-b3e8-03b0dccf7dfc" Version="2.3.2.32" Language="en-US" Publisher="GitHub, Inc" />
+    <Identity Id="c3d3dc68-c977-411f-b3e8-03b0dccf7dfc" Version="2.3.7.0" Language="en-US" Publisher="GitHub, Inc" />
     <DisplayName>GitHub Extension for Visual Studio</DisplayName>
     <Description xml:space="preserve">A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</Description>
     <PackageId>GitHub.VisualStudio</PackageId>
@@ -11,12 +11,14 @@
     <PreviewImage>Resources\preview_200x200.png</PreviewImage>
     <Tags>GitHub;git;open source;source control;branch;pull request;team explorer;commit;publish</Tags>
   </Metadata>
-  <Installation AllUsers="false" Experimental="true">
+  <Installation AllUsers="true" Experimental="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,15.0]" />
+    <InstallationTarget Version="[15.0,16.0)" Id="Microsoft.VisualStudio.IntegratedShell" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0,]" />
+    <Dependency Id="Microsoft.VisualStudio.TeamFoundation.TeamExplorer.Extensions" DisplayName="Team Explorer" d:Source="Installed" Version="[14.0,16.0)" />
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />

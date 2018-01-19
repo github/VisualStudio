@@ -3,6 +3,7 @@ using GitHub.UI;
 using System;
 using System.Diagnostics;
 using GitHub.Extensions;
+using GitHub.Logging;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -24,13 +25,13 @@ namespace GitHub.VisualStudio.Menus
 
         public bool CanShow()
         {
-            Debug.Assert(SelectedTextProvider != null, "Could not get an instance of ISelectedTextProvider");
+            Log.Assert(SelectedTextProvider != null, "Could not get an instance of ISelectedTextProvider");
             return !String.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText());
         }
 
         public void Activate(object data)
         {
-            StartFlow(UIControllerFlow.Gist);
+            DialogService?.ShowCreateGist();
         }
     }
 }

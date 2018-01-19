@@ -1,5 +1,4 @@
 ﻿using GitHub.Services;
-using GitHub.UI;
 using System;
 
 namespace GitHub.VisualStudio.Menus
@@ -16,7 +15,7 @@ namespace GitHub.VisualStudio.Menus
 
         public void Activate(object data = null)
         {
-            StartFlow(UIControllerFlow.Authentication);
+            DialogService?.ShowLoginDialog();
         }
     }
 }
