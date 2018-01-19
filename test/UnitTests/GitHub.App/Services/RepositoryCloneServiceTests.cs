@@ -1,7 +1,7 @@
 ﻿using System.Reactive.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using UnitTests;
 using GitHub.Services;
 using System.Linq.Expressions;
@@ -12,7 +12,7 @@ public class RepositoryCloneServiceTests
 {
     public class TheCloneRepositoryMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task ClonesToRepositoryPath()
         {
             var serviceProvider = Substitutes.ServiceProvider;
@@ -26,7 +26,7 @@ public class RepositoryCloneServiceTests
             await vsGitServices.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", true);
         }
 
-        [Fact]
+        [Test]
         public async Task UpdatesMetricsWhenRepositoryCloned()
         {
             var serviceProvider = Substitutes.ServiceProvider;

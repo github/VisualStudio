@@ -3,7 +3,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels.TeamExplorer;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using UnitTests;
 using System.Threading.Tasks;
 using System;
@@ -75,10 +75,9 @@ public class RepositoryPublishViewModelTests
 
     public class TheConnectionsProperty : TestBaseClass
     {
-        [Theory]
-        [InlineData(GitHubUrls.GitHub, "https://github.enterprise")]
-        [InlineData("https://github.enterprise", null)]
-        [InlineData(GitHubUrls.GitHub, null)]
+        [TestCase(GitHubUrls.GitHub, "https://github.enterprise")]
+        [TestCase("https://github.enterprise", null)]
+        [TestCase(GitHubUrls.GitHub, null)]
         public void ConnectionsMatchConnectionManager(string arg1, string arg2)
         {
             var args = Helpers.GetArgs(arg1, arg2);
@@ -93,15 +92,14 @@ public class RepositoryPublishViewModelTests
 
             var vm = Helpers.GetViewModel(connectionManager: cm);
 
-            Assert.Equal(conns, vm.Connections);
+            Assert.That(conns, Is.EqualTo(vm.Connections));
         }
     }
 
     public class TheSelectedConnectionProperty : TestBaseClass
     {
-        [Theory]
-        [InlineData(GitHubUrls.GitHub, "https://github.enterprise")]
-        [InlineData("https://github.enterprise", GitHubUrls.GitHub)]
+        [TestCase(GitHubUrls.GitHub, "https://github.enterprise")]
+        [TestCase("https://github.enterprise", GitHubUrls.GitHub)]
         public void DefaultsToGitHub(string arg1, string arg2)
         {
             var args = Helpers.GetArgs(arg1, arg2);
@@ -115,14 +113,14 @@ public class RepositoryPublishViewModelTests
             cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
             var vm = Helpers.GetViewModel(connectionManager: cm);
 
-            Assert.Same(adds.First(x => x.IsGitHubDotCom()), vm.SelectedConnection.HostAddress);
-            Assert.Same(conns.First(x => x.HostAddress.IsGitHubDotCom()), vm.SelectedConnection);
+            Assert.That(adds.First(x => x.IsGitHubDotCom()), Is.SameAs(vm.SelectedConnection.HostAddress));
+            Assert.That(conns.First(x => x.HostAddress.IsGitHubDotCom()), Is.SameAs(vm.SelectedConnection));
         }
     }
 
     public class TheAccountsProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsPopulatedByTheAccountsForTheSelectedHost()
         {
             var cm = Substitutes.ConnectionManager;
@@ -146,19 +144,19 @@ public class RepositoryPublishViewModelTests
             cm.Connections.Returns(new ObservableCollectionEx<IConnection>(conns));
             var vm = Helpers.GetViewModel(connectionManager: cm, factory: factory);
 
-            Assert.Equal(2, vm.Accounts.Count);
-            Assert.Same(gitHubAccounts[0], vm.SelectedAccount);
+            Assert.That(2, Is.EqualTo(vm.Accounts.Count));
+            Assert.That(gitHubAccounts[0], Is.SameAs(vm.SelectedAccount));
 
             vm.SelectedConnection = conns.First(x => !x.HostAddress.IsGitHubDotCom());
 
-            Assert.Equal(1, vm.Accounts.Count);
-            Assert.Same(enterpriseAccounts[0], vm.SelectedAccount);
+            Assert.AreEqual(1, vm.Accounts.Count);
+            Assert.That(enterpriseAccounts[0], Is.SameAs(vm.SelectedAccount));
         }
     }
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTheSameAsTheRepositoryNameWhenTheInputIsSafe()
         {
             var cm = Substitutes.ConnectionManager;
@@ -166,10 +164,10 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "this-is-bad";
 
-            Assert.Equal(vm.RepositoryName, vm.SafeRepositoryName);
+            Assert.That(vm.RepositoryName, Is.EqualTo(vm.SafeRepositoryName));
         }
 
-        [Fact]
+        [Test]
         public void IsConvertedWhenTheRepositoryNameIsNotSafe()
         {
             var cm = Substitutes.ConnectionManager;
@@ -177,10 +175,10 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "this is bad";
 
-            Assert.Equal("this-is-bad", vm.SafeRepositoryName);
+            Assert.That("this-is-bad", Is.EqualTo(vm.SafeRepositoryName));
         }
 
-        [Fact]
+        [Test]
         public void IsNullWhenRepositoryNameIsNull()
         {
             var cm = Substitutes.ConnectionManager;
@@ -190,13 +188,13 @@ public class RepositoryPublishViewModelTests
             vm.RepositoryName = "not-null";
             vm.RepositoryName = null;
 
-            Assert.Null(vm.SafeRepositoryName);
+            Assert.That(vm.SafeRepositoryName, Is.Null);
         }
     }
 
     public class TheRepositoryNameValidatorProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsFalseWhenRepoNameEmpty()
         {
             var cm = Substitutes.ConnectionManager;
@@ -205,10 +203,10 @@ public class RepositoryPublishViewModelTests
             vm.RepositoryName = "";
 
             Assert.False(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a repository name", vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That("Please enter a repository name", Is.EqualTo(vm.RepositoryNameValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenAfterBeingTrue()
         {
             var cm = Substitutes.ConnectionManager;
@@ -218,15 +216,15 @@ public class RepositoryPublishViewModelTests
 
             Assert.True(vm.PublishRepository.CanExecute(null));
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
 
             vm.RepositoryName = "";
 
             Assert.False(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Equal("Please enter a repository name", vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That("Please enter a repository name", Is.EqualTo(vm.RepositoryNameValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void IsTrueWhenRepositoryNameIsValid()
         {
             var cm = Substitutes.ConnectionManager;
@@ -235,13 +233,13 @@ public class RepositoryPublishViewModelTests
             vm.RepositoryName = "thisisfine";
 
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
-            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+            Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
         }
     }
 
     public class TheSafeRepositoryNameWarningValidatorProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTrueWhenRepoNameIsSafe()
         {
             var cm = Substitutes.ConnectionManager;
@@ -252,7 +250,7 @@ public class RepositoryPublishViewModelTests
             Assert.True(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenRepoNameIsNotSafe()
         {
             var cm = Substitutes.ConnectionManager;
@@ -261,10 +259,10 @@ public class RepositoryPublishViewModelTests
             vm.RepositoryName = "this is bad";
 
             Assert.False(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
-            Assert.Equal("Will be created as this-is-bad", vm.SafeRepositoryNameWarningValidator.ValidationResult.Message);
+            Assert.That("Will be created as this-is-bad", Is.EqualTo(vm.SafeRepositoryNameWarningValidator.ValidationResult.Message));
         }
 
-        [Fact]
+        [Test]
         public void ResetsSafeNameValidator()
         {
             var cm = Substitutes.ConnectionManager;
@@ -274,7 +272,7 @@ public class RepositoryPublishViewModelTests
             Assert.True(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
 
             vm.RepositoryName = "this is bad";
-            Assert.Equal("this-is-bad", vm.SafeRepositoryName);
+            Assert.That("this-is-bad", Is.EqualTo(vm.SafeRepositoryName));
             Assert.False(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
 
             vm.RepositoryName = "this";
@@ -285,7 +283,7 @@ public class RepositoryPublishViewModelTests
 
     public class ThePublishRepositoryCommand : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task RepositoryExistsCallsNotificationServiceWithError()
         {
             var cm = Substitutes.ConnectionManager;
@@ -299,12 +297,12 @@ public class RepositoryPublishViewModelTests
 
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
-            Assert.NotNull(vm.SafeRepositoryNameWarningValidator.ValidationResult.Message);
+            Assert.That(vm.SafeRepositoryNameWarningValidator.ValidationResult.Message, Is.Not.Null);
             notificationService.DidNotReceive().ShowMessage(Args.String);
             notificationService.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
         }
 
-        [Fact]
+        [Test]
         public async Task ResetsWhenSwitchingHosts()
         {
             var args = Helpers.GetArgs(GitHubUrls.GitHub, "https://github.enterprise");
@@ -328,7 +326,7 @@ public class RepositoryPublishViewModelTests
 
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
-            Assert.Equal("repo-name", vm.RepositoryName);
+            Assert.That("repo-name", Is.EqualTo(vm.RepositoryName));
             notificationService.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
 
             var wasCalled = false;
@@ -339,7 +337,7 @@ public class RepositoryPublishViewModelTests
             Assert.True(wasCalled);
         }
 
-        [Fact]
+        [Test]
         public async Task ResetsWhenSwitchingAccounts()
         {
             var cm = Substitutes.ConnectionManager;
@@ -362,7 +360,8 @@ public class RepositoryPublishViewModelTests
 
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
-            Assert.Equal("repo-name", vm.RepositoryName);
+            Assert.That("repo-name", Is.EqualTo(vm.RepositoryName))
+                ;
             notificationService.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
 
             var wasCalled = false;
