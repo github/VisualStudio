@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.Extensions
 {
@@ -12,13 +12,13 @@ namespace UnitTests.GitHub.Extensions
     {
         public class TheArgumentNotNullMethod : TestBaseClass
         {
-            [Fact]
+            [Test]
             public void ShouldNotThrow()
             {
                 Guard.ArgumentNotNull(new object(), "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrow()
             {
                 Assert.Throws<ArgumentNullException>(() => Guard.ArgumentNotNull(null, "name"));
@@ -27,19 +27,19 @@ namespace UnitTests.GitHub.Extensions
 
         public class TheArgumentNonNegativeMethod : TestBaseClass
         {
-            [Fact]
+            [Test]
             public void ShouldNotThrowFor0()
             {
                 Guard.ArgumentNonNegative(0, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotThrowFor1()
             {
                 Guard.ArgumentNonNegative(1, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrowForMinus1()
             {
                 Assert.Throws<ArgumentException>(() => Guard.ArgumentNonNegative(-1, "name"));
@@ -48,19 +48,19 @@ namespace UnitTests.GitHub.Extensions
 
         public class TheArgumentNotEmptyStringMethod : TestBaseClass
         {
-            [Fact]
+            [Test]
             public void ShouldNotThrowForString()
             {
                 Guard.ArgumentNotEmptyString("string", "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrowForEmptyString()
             {
                 Assert.Throws<ArgumentException>(() => Guard.ArgumentNotEmptyString("", "name"));
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrowForNull()
             {
                 Assert.Throws<ArgumentException>(() => Guard.ArgumentNotEmptyString(null, "name"));
@@ -69,49 +69,49 @@ namespace UnitTests.GitHub.Extensions
 
         public class TheArgumentInRangeMethod : TestBaseClass
         {
-            [Fact]
+            [Test]
             public void ShouldNotThrowForGreaterThanMinimum()
             {
                 Guard.ArgumentInRange(12, 10, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotThrowForEqualToMinimumNoMaximum()
             {
                 Guard.ArgumentInRange(10, 10, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotThrowForEqualToMinimumWithMaximum()
             {
                 Guard.ArgumentInRange(10, 10, 20, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotThrowForEqualToMaximum()
             {
                 Guard.ArgumentInRange(20, 10, 20, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldNotThrowForBetweenMinimumAndMaximum()
             {
                 Guard.ArgumentInRange(12, 10, 20, "name");
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrowForLessThanMinimumNoMaximum()
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => Guard.ArgumentInRange(2, 10, "name"));
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrowForLessThanMinimumWithMaximum()
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => Guard.ArgumentInRange(2, 10, 20, "name"));
             }
 
-            [Fact]
+            [Test]
             public void ShouldThrowForGreaterThanMaximum()
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => Guard.ArgumentInRange(22, 10, 20, "name"));

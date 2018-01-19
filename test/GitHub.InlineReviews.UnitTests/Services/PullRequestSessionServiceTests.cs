@@ -7,7 +7,7 @@ using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheBuildCommentThreadsMethod
         {
-            [Fact]
+            [Test]
             public async Task MatchesReviewCommentOnOriginalLine()
             {
                 var baseContents = @"Line 1
@@ -49,11 +49,11 @@ Line 4";
                         diff);
 
                     var thread = result.Single();
-                    Assert.Equal(2, thread.LineNumber);
+                    Assert.That(2, Is.EqualTo(thread.LineNumber));
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task MatchesReviewCommentOnDifferentLine()
             {
                 var baseContents = @"Line 1
@@ -85,11 +85,11 @@ Line 4";
                         diff);
 
                     var thread = result.Single();
-                    Assert.Equal(4, thread.LineNumber);
+                    Assert.That(4, Is.EqualTo(thread.LineNumber));
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task ReturnsLineNumberMinus1ForNonMatchingComment()
             {
                 var baseContents = @"Line 1
@@ -124,12 +124,12 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.Equal(2, result.Count);
-                    Assert.Equal(-1, result[1].LineNumber);
+                    Assert.That(2, Is.EqualTo(result.Count));
+                    Assert.That(-1, Is.EqualTo(result[1].LineNumber));
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task HandlesDifferingPathSeparators()
             {
                 var winFilePath = @"foo\test.cs";
@@ -164,14 +164,14 @@ Line 4";
                         diff);
 
                     var thread = result.First();
-                    Assert.Equal(4, thread.LineNumber);
+                    Assert.That(4, Is.EqualTo(thread.LineNumber));
                 }
             }
         }
 
         public class TheUpdateCommentThreadsMethod
         {
-            [Fact]
+            [Test]
             public async Task UpdatesWithNewLineNumber()
             {
                 var baseContents = @"Line 1
@@ -205,23 +205,23 @@ Line 4";
                         FilePath,
                         diff);
 
-                    Assert.Equal(2, threads[0].LineNumber);
+                    Assert.That(2, Is.EqualTo(threads[0].LineNumber));
 
                     diff = await diffService.Diff(FilePath, newHeadContents);
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
-                    Assert.Equal(3, threads[0].LineNumber);
-                    Assert.Equal(
+                    Assert.That(3, Is.EqualTo(threads[0].LineNumber));
+                    Assert.That(
                         new[] 
                         {
                             Tuple.Create(2, DiffSide.Right),
                             Tuple.Create(3, DiffSide.Right)
-                        }, 
-                        changedLines.ToArray());
+                        },
+                        Is.EqualTo(changedLines.ToArray()));
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task UnmarksStaleThreads()
             {
                 var baseContents = @"Line 1
@@ -253,8 +253,8 @@ Line 4";
                     threads[0].IsStale = true;
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
-                    Assert.False(threads[0].IsStale);
-                    Assert.Equal(new[] { Tuple.Create(2, DiffSide.Right) }, changedLines.ToArray());
+                    Assert.That(threads[0].IsStale, Is.False);
+                    Assert.That(new[] { Tuple.Create(2, DiffSide.Right) }, Is.EqualTo(changedLines.ToArray()));
                 }
             }
         }

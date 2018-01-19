@@ -11,13 +11,13 @@ using GitHub.Factories;
 using GitHub.Services;
 using NSubstitute;
 using Rothko;
-using Xunit;
+using NUnit.Framework;
 
 public class ImageCacheTests
 {
     public class TheGetImageBytesMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task RetrievesImageFromCacheAndDoesNotFetchIt()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
@@ -32,11 +32,11 @@ public class ImageCacheTests
             var retrieved = await imageCache.GetImage(new Uri("https://fake/")).FirstAsync();
 
             Assert.NotNull(retrieved);
-            Assert.Equal(32, retrieved.PixelWidth);
-            Assert.Equal(32, retrieved.PixelHeight);
+            Assert.That(32, Is.EqualTo(retrieved.PixelWidth));
+            Assert.That(32, Is.EqualTo(retrieved.PixelHeight));
         }
 
-        [Fact]
+        [Test]
         public async Task WhenLoadingFromCacheFailsInvalidatesCacheEntry()
         {
             var cache = new InMemoryBlobCache();
@@ -52,11 +52,11 @@ public class ImageCacheTests
                 .Catch(Observable.Return<BitmapSource>(null))
                 .FirstAsync();
 
-            Assert.Null(retrieved);
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
+            Assert.That(retrieved, Is.Null);
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
         }
         
-        [Fact]
+        [Test]
         public async Task DownloadsImageWhenMissingAndCachesIt()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
@@ -70,12 +70,12 @@ public class ImageCacheTests
 
             var retrieved = await imageCache.GetImage(imageUri).FirstAsync();
 
-            Assert.NotNull(retrieved);
-            Assert.Equal(32, retrieved.PixelWidth);
-            Assert.Equal(32, retrieved.PixelHeight);
+            Assert.That(retrieved, Is.Not.Null);
+            Assert.That(32, Is.EqualTo(retrieved.PixelWidth));
+            Assert.That(32, Is.EqualTo(retrieved.PixelHeight));
         }
 
-        [Fact]
+        [Test]
         public async Task ThrowsKeyNotFoundExceptionWhenItemNotInCacheAndImageFetchThrowsException()
         {
             var imageUri = new Uri("https://example.com/poop.gif");
@@ -86,11 +86,11 @@ public class ImageCacheTests
 
             var imageCache = new ImageCache(cacheFactory, Substitute.For<IEnvironment>(), new Lazy<IImageDownloader>(() => imageDownloader));
 
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await
                 imageCache.GetImage(imageUri).FirstAsync());
         }
 
-        [Fact]
+        [Test]
         public async Task ThrowsKeyNotFoundExceptionWhenItemNotInCacheAndImageFetchReturnsEmpty()
         {
             var imageUri = new Uri("https://example.com/poop.gif");
@@ -102,11 +102,11 @@ public class ImageCacheTests
 
             var imageCache = new ImageCache(cacheFactory, Substitute.For<IEnvironment>(), new Lazy<IImageDownloader>(() => imageDownloader));
 
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await
-                imageCache.GetImage(imageUri).FirstAsync());
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await
+                     imageCache.GetImage(imageUri).FirstAsync());
         }
 
-        [Fact]
+        [Test]
         public void OnlyDownloadsAndDecodesOnceForConcurrentOperations()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
@@ -126,20 +126,20 @@ public class ImageCacheTests
             var sub1 = imageCache.GetImage(uri).Subscribe(x => res1 = x);
             var sub2 = imageCache.GetImage(uri).Subscribe(x => res2 = x);
 
-            Assert.Null(res1);
-            Assert.Null(res2);
+            Assert.That(res1, Is.Null);
+            Assert.That(res2, Is.Null);
 
             subj.OnNext(singlePixel);
             subj.OnCompleted();
 
-            Assert.NotNull(res1);
-            Assert.Equal(res1, res2);
+            Assert.That(res1, Is.Not.Null);
+            Assert.That(res1, Is.EqualTo(res2));
         }
     }
 
     public class TheInvalidateMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task RemovesImageFromCache()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
@@ -151,13 +151,13 @@ public class ImageCacheTests
 
             await imageCache.Invalidate(new Uri("https://fake/"));
 
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
+            Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
         }
     }
 
     public class TheSeedImageMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task AddsImageDirectlyToCache()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
@@ -169,7 +169,7 @@ public class ImageCacheTests
             await imageCache.SeedImage(new Uri("https://fake/"), singlePixel, DateTimeOffset.MaxValue);
 
             var retrieved = await cache.Get("https://fake/");
-            Assert.Equal(singlePixel, retrieved);
+            Assert.That(singlePixel, Is.EqualTo(retrieved));
         }
     }
 }
