@@ -51,6 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool active;
         bool refreshOnActivate;
         Uri webUrl;
+        IDisposable subscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -320,9 +321,21 @@ namespace GitHub.ViewModels.GitHubPane
                 Number = number;
                 WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
-                sessionManager.PropertyChanged += ActiveRepositoriesChanged;
 
                 await Refresh();
+                subscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
+                    .Skip(1)
+                    .Subscribe(y =>
+                {
+                    if (active)
+                    {
+                        Refresh().Forget();
+                    }
+                    else
+                    {
+                        refreshOnActivate = true;
+                    }
+                });
             }
             finally
             {
@@ -513,29 +526,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                sessionManager.PropertyChanged -= ActiveRepositoriesChanged;
-            }
-        }
-
-        void ActiveRepositoriesChanged(object sender, PropertyChangedEventArgs e)
-        {
-            try
-            {
-                if (e.PropertyName == nameof(sessionManager.CurrentSession))
-                {
-                    if (active)
-                    {
-                        Refresh().Forget();
-                    }
-                    else
-                    {
-                        refreshOnActivate = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Error refreshing in ActiveRepositoriesChanged.");
+                subscription.Dispose();
             }
         }
 
