@@ -6,15 +6,17 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
-        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<UsageTracker>();
         readonly IGitHubServiceProvider gitHubServiceProvider;
 
         bool initialized;
@@ -108,7 +110,7 @@ namespace GitHub.Services
                     }
                     catch (Exception ex)
                     {
-                        log.Error("Failed to send metrics", ex);
+                        log.Error(ex, "Failed to send metrics");
                     }
                 }
             }
