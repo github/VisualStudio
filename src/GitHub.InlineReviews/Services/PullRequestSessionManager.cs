@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -66,18 +67,15 @@ namespace GitHub.InlineReviews.Services
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
 
-            RepoChanged(teamExplorerContext.ActiveRepository).Forget();
-            teamExplorerContext.StatusChanged += (s, e) =>
-            {
-                RepoChanged(teamExplorerContext.ActiveRepository).Forget();
-            };
-            teamExplorerContext.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(teamExplorerContext.ActiveRepository))
-                {
-                    RepoChanged(teamExplorerContext.ActiveRepository).Forget();
-                }
-            };
+            Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
+                .StartWith((EventPattern<object>)null)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => RepoChanged(teamExplorerContext.ActiveRepository).Forget());
+
+            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                .Skip(1)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => RepoChanged(x).Forget());
         }
 
         /// <inheritdoc/>
@@ -196,8 +194,6 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                await ThreadingHelper.SwitchToMainThreadAsync();
-
                 if (localRepositoryModel != repository)
                 {
                     repository = localRepositoryModel;
