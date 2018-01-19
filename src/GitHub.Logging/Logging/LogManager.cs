@@ -24,7 +24,7 @@ namespace GitHub.Logging
 #if DEBUG
                 .MinimumLevel.Debug()
 #else
-                .MinimumLevel.Information()
+                .MinimumLevel.Verbose()
 #endif
                 .WriteTo.File(logPath,
                     fileSizeLimitBytes: null,
