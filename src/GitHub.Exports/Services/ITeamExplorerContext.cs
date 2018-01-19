@@ -6,9 +6,11 @@ namespace GitHub.Services
 {
     /// <summary>
     /// Responsible for watching the active repository in Team Explorer.
-    /// A PropertyChanged event is fired when moving to a new repository.
-    /// A StatusChanged event is fired when the CurrentBranch or HeadSha changes.
     /// </summary>
+    /// <remarks>
+    /// A <see cref="PropertyChanged"/> event is fired when moving to a new repository.
+    /// A <see cref="StatusChanged"/> event is fired when the CurrentBranch or HeadSha changes.
+    /// </remarks>
     public interface ITeamExplorerContext : INotifyPropertyChanged
     {
         /// <summary>
