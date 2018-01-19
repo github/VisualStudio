@@ -17,11 +17,17 @@ namespace GitHub.Services
         /// The active Git repository in Team Explorer.
         /// This will be null if no repository is active.
         /// </summary>
+        /// <remarks>
+        /// This property might be changed by a non-UI thread.
+        /// </remarks>
         ILocalRepositoryModel ActiveRepository { get; }
 
         /// <summary>
         /// Fired when the CurrentBranch or HeadSha changes.
         /// </summary>
+        /// <remarks>
+        /// This event might fire on a non-UI thread.
+        /// </remarks>
         event EventHandler StatusChanged;
     }
 }
