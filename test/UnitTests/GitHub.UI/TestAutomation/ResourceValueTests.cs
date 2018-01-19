@@ -1,13 +1,13 @@
 ﻿using System.Resources;
 using System.Collections;
 using System.Globalization;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.UI.TestAutomation
 {
     public class ResourceValueTest
     {
-        [Fact]
+        [Test]
         public void ValueAndNameAreTheSame()
         {
             ResourceSet autoIDResourceSet = AutomationIDs.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
@@ -16,7 +16,7 @@ namespace GitHub.UI.TestAutomation
                 var key = entry.Key.ToString();
                 var value = entry.Value.ToString();
 
-                Assert.Equal(value, key);
+                Assert.That(value, Is.EqualTo(key));
             }
         }
     }

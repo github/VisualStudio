@@ -6,7 +6,7 @@ using GitHub.Api;
 using GitHub.Primitives;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 public class LoginManagerTests
 {
@@ -16,7 +16,7 @@ public class LoginManagerTests
 
     public class TheLoginMethod
     {
-        [Fact]
+        [Test]
         public async Task LoginTokenIsSavedToCache()
         {
             var client = CreateClient();
@@ -33,7 +33,7 @@ public class LoginManagerTests
             await keychain.Received().Save("foo", "123abc", host);
         }
 
-        [Fact]
+        [Test]
         public async Task LoggedInUserIsReturned()
         {
             var user = new User();
@@ -48,10 +48,10 @@ public class LoginManagerTests
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
             var result = await target.Login(host, client, "foo", "bar");
 
-            Assert.Same(user, result);
+            Assert.That(user, Is.SameAs(result));
         }
 
-        [Fact]
+        [Test]
         public async Task DeletesExistingAuthenticationIfNullTokenReturned()
         {
             // If GetOrCreateApplicationAuthentication is called and a matching token already exists,
@@ -77,7 +77,7 @@ public class LoginManagerTests
             await keychain.Received().Save("foo", "123abc", host);
         }
 
-        [Fact]
+        [Test]
         public async Task TwoFactorExceptionIsPassedToHandler()
         {
             var client = CreateClient();
@@ -103,7 +103,7 @@ public class LoginManagerTests
                 "123456");
         }
 
-        [Fact]
+        [Test]
         public async Task Failed2FACodeResultsInRetry()
         {
             var client = CreateClient();
@@ -138,7 +138,7 @@ public class LoginManagerTests
                 "123456");
         }
 
-        [Fact]
+        [Test]
         public async Task HandlerNotifiedOfExceptionIn2FAChallengeResponse()
         {
             var client = CreateClient();
@@ -160,7 +160,7 @@ public class LoginManagerTests
                 new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
-            await Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
                 "id",
@@ -170,7 +170,7 @@ public class LoginManagerTests
             await tfa.Value.Received(1).ChallengeFailed(loginAttemptsException);
         }
 
-        [Fact]
+        [Test]
         public async Task RequestResendCodeResultsInRetryingLogin()
         {
             var client = CreateClient();
@@ -196,7 +196,7 @@ public class LoginManagerTests
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
         }
 
-        [Fact]
+        [Test]
         public async Task UsesUsernameAndPasswordInsteadOfAuthorizationTokenWhenEnterpriseAndAPIReturns404()
         {
             var client = CreateClient();
@@ -219,7 +219,7 @@ public class LoginManagerTests
             await keychain.Received().Save("foo", "bar", enterprise);
         }
 
-        [Fact]
+        [Test]
         public async Task ErasesLoginWhenUnauthorized()
         {
             var client = CreateClient();
@@ -233,12 +233,12 @@ public class LoginManagerTests
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
-            await Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
+            Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
 
             await keychain.Received().Delete(enterprise);
         }
 
-        [Fact]
+        [Test]
         public async Task ErasesLoginWhenNonOctokitExceptionThrown()
         {
             var client = CreateClient();
@@ -250,14 +250,15 @@ public class LoginManagerTests
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
-
+          
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
+
 
             await keychain.Received().Delete(host);
         }
 
-        [Fact]
+        [Test]
         public async Task ErasesLoginWhenNonOctokitExceptionThrownIn2FA()
         {
             var client = CreateClient();
@@ -276,12 +277,12 @@ public class LoginManagerTests
             tfa.Value.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidResponseScopesCauseException()
         {
             var client = CreateClient(responseScopes: new[] { "user", "repo" });
@@ -294,7 +295,7 @@ public class LoginManagerTests
 
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
 
-            await Assert.ThrowsAsync<IncorrectScopesException>(() => target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<IncorrectScopesException>(() => target.Login(host, client, "foo", "bar"));
         }
 
         IGitHubClient CreateClient(User user = null, string[] responseScopes = null)
@@ -313,7 +314,7 @@ public class LoginManagerTests
 
     public class TheScopesMatchMethod
     {
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenMissingScopes()
         {
             var received = new[] { "user", "repo", "write:public_key" };
@@ -321,7 +322,7 @@ public class LoginManagerTests
             Assert.False(LoginManager.ScopesMatch(scopes, received));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenScopesEqual()
         {
             var received = new[] { "user", "repo", "gist", "write:public_key" };
@@ -329,7 +330,7 @@ public class LoginManagerTests
             Assert.True(LoginManager.ScopesMatch(scopes, received));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenExtraScopesReturned()
         {
             var received = new[] { "user", "repo", "gist", "foo", "write:public_key" };
@@ -337,7 +338,7 @@ public class LoginManagerTests
             Assert.True(LoginManager.ScopesMatch(scopes, received));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenAdminScopeReturnedInsteadOfWrite()
         {
             var received = new[] { "user", "repo", "gist", "foo", "admin:public_key" };
