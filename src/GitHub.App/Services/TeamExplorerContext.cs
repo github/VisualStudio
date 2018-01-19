@@ -3,7 +3,6 @@ using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.Shell;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Primitives;
@@ -28,19 +27,16 @@ namespace GitHub.Services
         string repositoryPath;
         string branchName;
         string headSha;
-        bool testing;
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
-            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), null, false)
+            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), null)
         {
         }
 
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, ILogger log,
-            Type gitExtType, bool testing)
+        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, ILogger log, Type gitExtType)
         {
             this.log = log;
-            this.testing = testing;
 
             gitExtType = gitExtType ?? FindGitExtType();
             var gitExt = serviceProvider.GetService(gitExtType);
@@ -130,7 +126,7 @@ namespace GitHub.Services
                 return null;
             }
 
-            if (testing)
+            if (Splat.ModeDetector.InUnitTestRunner())
             {
                 // HACK: This avoids calling GitService.GitServiceHelper.
                 return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), path);

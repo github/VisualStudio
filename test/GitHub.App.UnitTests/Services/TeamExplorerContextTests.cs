@@ -14,6 +14,12 @@ namespace GitHub.App.UnitTests.Services
     {
         public class TheActiveRepositoryProperty
         {
+            [SetUp]
+            public void SetUp()
+            {
+                Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+            }
+
             [Test]
             public void NoActiveRepository()
             {
@@ -164,7 +170,7 @@ namespace GitHub.App.UnitTests.Services
             sp.GetService(gitExtType).Returns(gitExt);
             sp.TryGetService<DTE>().Returns(dte);
             var log = Substitute.For<ILogger>();
-            return new TeamExplorerContext(sp, log, gitExtType, true);
+            return new TeamExplorerContext(sp, log, gitExtType);
         }
 
         class FakeGitExt : INotifyPropertyChanged

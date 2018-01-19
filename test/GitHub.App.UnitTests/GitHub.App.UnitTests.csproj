@@ -82,6 +82,10 @@
       <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
       <Name>GitHub.Exports</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
