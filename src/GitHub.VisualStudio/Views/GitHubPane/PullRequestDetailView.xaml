@@ -155,7 +155,6 @@
                     <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
 
                     <!-- Checkout pull request button -->
-                    <!--
                     <ui:GitHubActionLink Command="{Binding Checkout}"
                                          Content="{Binding CheckoutState.Caption}"
                                          Grid.Column="2"
@@ -164,14 +163,10 @@
                                          Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
                                          ToolTip="{Binding CheckoutState.ToolTip}"
                                          ToolTipService.ShowOnDisabled="True"/>
-                     -->
 
                     <!-- Pull/push buttons -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <!-- 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
                             Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
-                    -->
                         <ui:OcticonImage Icon="arrow_down"/>
                         <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
                         <ui:GitHubActionLink Content="Pull"
@@ -181,10 +176,7 @@
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
                         <ui:OcticonImage Icon="arrow_up"/>
-                        <TextBlock Text="5" VerticalAlignment="Center"/>
-                        <!--
                         <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
-                        -->
                         <ui:GitHubActionLink Content="Push"
                                              Command="{Binding Push}"
                                              Margin="4,0"
@@ -193,25 +185,11 @@
                                              VerticalAlignment="Center"/>
                         <!-- Sync submodules -->
                         <ui:OcticonImage Icon="package"/>
-                        <TextBlock Text="4" Margin="4 0 0 0" VerticalAlignment="Center"/>
-                        <!--
-                        <TextBlock Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"/>
-                        -->
-                        <ui:GitHubActionLink Content="Sync"
-                            Command="{Binding SyncSubmodules}"
-                            Margin="4 0" />
-                        <!--
+                        <TextBlock  Margin="4 0 0 0" Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"/>
                         <ui:GitHubActionLink Content="Sync"
                             Command="{Binding SyncSubmodules}"
                             Margin="4 0"
                             Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
-                        -->
-                        <!--
-                        <ui:GitHubActionLink Content="Sync"
-                            Command="{Binding SyncSubmodules}"
-                            Margin="4 0"
-                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
-                            -->
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->
