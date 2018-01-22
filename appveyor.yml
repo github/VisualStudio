@@ -21,8 +21,7 @@ build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test:
   assemblies:
-    only:
-      'test\**\**\**\*UnitTests.dll'
+    - 'test\**\**\**\*UnitTests.dll'
 on_success:
 - ps: |
     if ($full_build) {
