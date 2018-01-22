@@ -35,6 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
+        readonly ITeamExplorerContext teamExplorerContext;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -51,7 +52,6 @@ namespace GitHub.ViewModels.GitHubPane
         bool active;
         bool refreshOnActivate;
         Uri webUrl;
-        IDisposable subscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -61,23 +61,26 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="usageTracker">The usage tracker.</param>
-        /// <param name="vsGitExt">The Visual Studio git service.</param>
+        /// <param name="teamExplorerContext">The context for tracking repo changes</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
+            this.teamExplorerContext = teamExplorerContext;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -323,23 +326,23 @@ namespace GitHub.ViewModels.GitHubPane
                 modelService = await modelServiceFactory.CreateAsync(connection);
 
                 await Refresh();
-                subscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
-                    .Skip(1)
-                    .Subscribe(y =>
-                {
-                    if (active)
-                    {
-                        Refresh().Forget();
-                    }
-                    else
-                    {
-                        refreshOnActivate = true;
-                    }
-                });
+                teamExplorerContext.StatusChanged += RefreshLater;
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        void RefreshLater(object sender, EventArgs e)
+        {
+            if (active)
+            {
+                Refresh().Forget();
+            }
+            else
+            {
+                refreshOnActivate = true;
             }
         }
 
@@ -453,6 +456,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
+                await ThreadingHelper.SwitchToMainThreadAsync();
+
                 Error = null;
                 OperationError = null;
                 IsBusy = true;
@@ -526,7 +531,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                subscription.Dispose();
+                teamExplorerContext.StatusChanged -= RefreshLater;
             }
         }
 
