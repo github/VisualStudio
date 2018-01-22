@@ -228,7 +228,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact] // WorkDirModified
+        [Test] // WorkDirModified
         public async Task ChangedSubmodule_True()
         {
             using (var subRepoDir = new TempDirectory())
@@ -255,7 +255,7 @@ public class PullRequestServiceTests : TestBaseClass
 
     public class TheCountSubmodulesToSyncMethod
     {
-        [Fact] // WorkDirDeleted
+        [Test] // WorkDirDeleted
         public async Task CommittedSubmodule_True()
         {
             using (var subRepoDir = new TempDirectory())
@@ -271,11 +271,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(1, count);
+                Assert.That(1, Is.EqualTo(count));
             }
         }
 
-        [Fact] // WorkDirUninitialized
+        [Test] // WorkDirUninitialized
         public async Task UninitializedSubmodule_True()
         {
             using (var subRepoDir = new TempDirectory())
@@ -294,11 +294,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(1, count);
+                Assert.That(1, Is.EqualTo(count));
             }
         }
 
-        [Fact] // WorkDirModified
+        [Test] // WorkDirModified
         public async Task ChangedSubmodule_True()
         {
             using (var subRepoDir = new TempDirectory())
@@ -318,13 +318,13 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(1, count);
+                Assert.That(1, Is.EqualTo(count));
             }
         }
 
         // TODO: Find out when `SubmoduleStatus.WorkDirAdded` is used.
 
-        [Fact]
+        [Test]
         public async Task UpdatedSubmodule_False()
         {
             using (var subRepoDir = new TempDirectory())
@@ -341,11 +341,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task NewRepo_False()
         {
             using (var tempDir = new TempDirectory())
@@ -356,11 +356,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task UntrackedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -373,11 +373,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task CommitFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -392,11 +392,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task AddedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -411,11 +411,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task ModifiedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -432,11 +432,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task StagedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -454,11 +454,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task MissingFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -475,11 +475,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task RemovedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -497,11 +497,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task RenamedInIndexFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -522,11 +522,11 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task RenamedInWorkingDirFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -548,7 +548,7 @@ public class PullRequestServiceTests : TestBaseClass
                 // This isn't required in the current implementation.
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
 
-                Assert.Equal(0, count);
+                Assert.That(0, Is.EqualTo(count));
             }
         }
     }
