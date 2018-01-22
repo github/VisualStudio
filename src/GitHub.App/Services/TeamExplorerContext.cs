@@ -27,6 +27,7 @@ namespace GitHub.Services
         string repositoryPath;
         string branchName;
         string headSha;
+        bool ignoreUnload;
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
@@ -90,27 +91,39 @@ namespace GitHub.Services
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
                     // https://github.com/github/VisualStudio/issues/1421
                     log.Information("Ignoring no ActiveRepository when solution hasn't changed");
+                    ignoreUnload = true;
                 }
-                else if (newRepositoryPath != repositoryPath)
+                else
                 {
-                    log.Information("Fire PropertyChanged event for ActiveRepository");
+                    if (newRepositoryPath != repositoryPath)
+                    {
+                        log.Information("Fire PropertyChanged event for ActiveRepository");
+                        repositoryPath = newRepositoryPath;
+                        branchName = newBranchName;
+                        headSha = newHeadSha;
+                        ActiveRepository = CreateRepository(repositoryPath);
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                    }
+                    else if (newBranchName != branchName)
+                    {
+                        log.Information("Fire StatusChanged event when BranchName changes for ActiveRepository");
+                        branchName = newBranchName;
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                    else if (newHeadSha != headSha)
+                    {
+                        log.Information("Fire StatusChanged event when HeadSha changes for ActiveRepository");
+                        headSha = newHeadSha;
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                    else if (!ignoreUnload)
+                    {
+                        log.Information("Fire StatusChanged event for ActiveRepository");
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                    }
 
+                    ignoreUnload = false;
                     solutionPath = newSolutionPath;
-                    repositoryPath = newRepositoryPath;
-                    branchName = newBranchName;
-                    headSha = newHeadSha;
-
-                    ActiveRepository = CreateRepository(repositoryPath);
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
-                }
-                else if (newBranchName != branchName || newHeadSha != headSha)
-                {
-                    log.Information("Fire StatusChanged event for ActiveRepository");
-
-                    branchName = newBranchName;
-                    headSha = newHeadSha;
-
-                    StatusChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
             catch (Exception e)

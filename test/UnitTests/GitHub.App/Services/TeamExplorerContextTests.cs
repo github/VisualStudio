@@ -80,7 +80,7 @@ namespace GitHub.App.UnitTests.Services
             }
 
             [Test]
-            public void ChangeActiveRepository()
+            public void ChangeActiveRepository_NoSolutionChange()
             {
                 var gitExt = new FakeGitExt();
                 var repositoryPath = Directory.GetCurrentDirectory();
@@ -133,11 +133,30 @@ namespace GitHub.App.UnitTests.Services
                 Assert.That(eventWasRaised, Is.True);
                 Assert.That(target.ActiveRepository, Is.Null);
             }
+
+            [Test]
+            public void NoActiveRepositoryChange_SolutionChanges()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var dte = Substitute.For<DTE>();
+                var target = CreateTeamExplorerContext(gitExt, dte);
+                dte.Solution.FullName.Returns("");
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
+
+                dte.Solution.FullName.Returns("Solution");
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(eventWasRaised, Is.False);
+            }
         }
 
         public class TheStatusChangedEvent
         {
-            [TestCase(false, "name1", "sha1", "name1", "sha1", false)]
+            [TestCase(false, "name1", "sha1", "name1", "sha1", true)]
             [TestCase(false, "name1", "sha1", "name2", "sha1", true)]
             [TestCase(false, "name1", "sha1", "name1", "sha2", true)]
             [TestCase(false, "name1", "sha1", "name2", "sha2", true)]
@@ -159,6 +178,40 @@ namespace GitHub.App.UnitTests.Services
                 gitExt.SetActiveRepository(repoInfo2);
 
                 Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
+            }
+
+            [Test]
+            public void SolutionUnloadedAndReloaded_DontFireStatusChanged()
+            {
+                var gitExt = new FakeGitExt();
+                var path = Directory.GetCurrentDirectory();
+                var repoInfo1 = new GitRepositoryInfo(path, new GitBranchInfo("name", "sha"));
+                var repoInfo2 = new GitRepositoryInfo(null, new GitBranchInfo(null, null));
+                var target = CreateTeamExplorerContext(gitExt);
+                gitExt.SetActiveRepository(repoInfo1);
+                gitExt.SetActiveRepository(repoInfo2);
+
+                var eventWasRaised = false;
+                target.StatusChanged += (s, e) => eventWasRaised = true;
+                gitExt.SetActiveRepository(repoInfo1);
+
+                Assert.That(eventWasRaised, Is.False);
+            }
+
+            [Test]
+            public void NameAndShaSameAfterPush_FireStatusChanged()
+            {
+                var gitExt = new FakeGitExt();
+                var path = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(path, new GitBranchInfo("name", "sha"));
+                var target = CreateTeamExplorerContext(gitExt);
+                gitExt.SetActiveRepository(repoInfo);
+
+                var eventWasRaised = false;
+                target.StatusChanged += (s, e) => eventWasRaised = true;
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(eventWasRaised, Is.True);
             }
         }
 
