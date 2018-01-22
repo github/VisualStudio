@@ -5,7 +5,7 @@ using GitHub.Api;
 using GitHub.Primitives;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 public class LoginManagerTests
 {
@@ -14,7 +14,7 @@ public class LoginManagerTests
 
     public class TheLoginMethod
     {
-        [Fact]
+        [Test]
         public async Task LoginTokenIsSavedToCache()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -30,7 +30,7 @@ public class LoginManagerTests
             await keychain.Received().Save("foo", "123abc", host);
         }
 
-        [Fact]
+        [Test]
         public async Task LoggedInUserIsReturned()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -45,10 +45,10 @@ public class LoginManagerTests
             var target = new LoginManager(keychain, tfa, "id", "secret");
             var result = await target.Login(host, client, "foo", "bar");
 
-            Assert.Same(user, result);
+            Assert.That(user, Is.SameAs(result));
         }
 
-        [Fact]
+        [Test]
         public async Task DeletesExistingAuthenticationIfNullTokenReturned()
         {
             // If GetOrCreateApplicationAuthentication is called and a matching token already exists,
@@ -73,7 +73,7 @@ public class LoginManagerTests
             await keychain.Received().Save("foo", "123abc", host);
         }
 
-        [Fact]
+        [Test]
         public async Task TwoFactorExceptionIsPassedToHandler()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -98,7 +98,7 @@ public class LoginManagerTests
                 "123456");
         }
 
-        [Fact]
+        [Test]
         public async Task Failed2FACodeResultsInRetry()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -132,7 +132,7 @@ public class LoginManagerTests
                 "123456");
         }
 
-        [Fact]
+        [Test]
         public async Task HandlerNotifiedOfExceptionIn2FAChallengeResponse()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -163,7 +163,7 @@ public class LoginManagerTests
             tfa.Value.Received(1).ChallengeFailed(loginAttemptsException);
         }
 
-        [Fact]
+        [Test]
         public async Task RequestResendCodeResultsInRetryingLogin()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -188,7 +188,7 @@ public class LoginManagerTests
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
         }
 
-        [Fact]
+        [Test]
         public async Task UsesUsernameAndPasswordInsteadOfAuthorizationTokenWhenEnterpriseAndAPIReturns404()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -210,7 +210,7 @@ public class LoginManagerTests
             await keychain.Received().Save("foo", "bar", enterprise);
         }
 
-        [Fact]
+        [Test]
         public async Task ErasesLoginWhenUnauthorized()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -223,12 +223,12 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            await Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
+            Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
 
             await keychain.Received().Delete(enterprise);
         }
 
-        [Fact]
+        [Test]
         public async Task ErasesLoginWhenNonOctokitExceptionThrown()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -241,12 +241,12 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
         }
 
-        [Fact]
+        [Test]
         public async Task ErasesLoginWhenNonOctokitExceptionThrownIn2FA()
         {
             var client = Substitute.For<IGitHubClient>();
@@ -264,7 +264,7 @@ public class LoginManagerTests
             tfa.Value.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
             var target = new LoginManager(keychain, tfa, "id", "secret");
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
+            Assert.ThrowsAsync<InvalidOperationException>(async() => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
         }

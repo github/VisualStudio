@@ -13,14 +13,14 @@ using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using UnitTests.Helpers;
-using Xunit;
+using NUnit.Framework;
 using UnitTests;
 
 public class PullRequestModelTests : TestBaseClass
 {
     protected DateTimeOffset Now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
 
-    [Fact]
+    [Test]
     public void ComparisonNullEqualsNull()
     {
         PullRequestModel left = null;
@@ -31,7 +31,7 @@ public class PullRequestModelTests : TestBaseClass
         Assert.False(left < right);
     }
 
-    [Fact]
+    [Test]
     public void ComparisonBiggerThanNull()
     {
         PullRequestModel left = new PullRequestModel(0, "", Substitute.For<IAccount>(), Now, Now);
@@ -42,7 +42,7 @@ public class PullRequestModelTests : TestBaseClass
         Assert.False(left < right);
     }
 
-    [Fact]
+    [Test]
     public void ComparisonNullLowerThan()
     {
         PullRequestModel left = null;
@@ -53,7 +53,7 @@ public class PullRequestModelTests : TestBaseClass
         Assert.True(left < right);
     }
 
-    [Fact]
+    [Test]
     public void ComparisonLowerThan()
     {
         PullRequestModel left = new PullRequestModel(0, "", Substitute.For<IAccount>(), Now, Now + TimeSpan.FromMilliseconds(1));
@@ -64,7 +64,7 @@ public class PullRequestModelTests : TestBaseClass
         Assert.True(left < right);
     }
 
-    [Fact]
+    [Test]
     public void ComparisonGreaterThan()
     {
         PullRequestModel left = new PullRequestModel(0, "", Substitute.For<IAccount>(), Now, Now + TimeSpan.FromMilliseconds(3));
@@ -75,7 +75,7 @@ public class PullRequestModelTests : TestBaseClass
         Assert.False(left < right);
     }
 
-    [Fact]
+    [Test]
     public void ComparisonEquals()
     {
         PullRequestModel left = new PullRequestModel(1, "", Substitute.For<IAccount>(), Now, Now + TimeSpan.FromMilliseconds(1));
@@ -86,9 +86,8 @@ public class PullRequestModelTests : TestBaseClass
         Assert.False(left < right);
     }
 
-    [Theory]
-    [InlineData(1, 1, 1, 2)]
-    [InlineData(1, 1, 2, 1)]
+    [TestCase(1, 1, 1, 2)]
+    [TestCase(1, 1, 2, 1)]
     public void ComparisonNotEquals(int id1, int ms1, int id2, int ms2)
     {
         PullRequestModel left = new PullRequestModel(id1, "", Substitute.For<IAccount>(), Now, Now + TimeSpan.FromMilliseconds(ms1));
