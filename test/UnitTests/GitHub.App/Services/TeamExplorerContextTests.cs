@@ -187,6 +187,26 @@ namespace GitHub.App.UnitTests.Services
                 Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
             }
 
+            [TestCase("trackedSha", "trackedSha", false)]
+            [TestCase("trackedSha1", "trackedSha2", true)]
+            public void TrackedShaChanges_CheckWasRaised(string trackedSha1, string trackedSha2, bool expectWasRaised)
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPaths = new[] { Directory.GetCurrentDirectory(), Path.GetTempPath() };
+                var repoPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repoPath, new GitBranchInfo("name", "sha"));
+                var service = Substitute.For<TeamExplorerContext.IService>();
+                service.FindTrackedSha(Arg.Any<string>()).Returns(trackedSha1, trackedSha2);
+                var target = CreateTeamExplorerContext(gitExt, service: service);
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.StatusChanged += (s, e) => eventWasRaised = true;
+
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
+            }
+
             [Test]
             public void SolutionUnloadedAndReloaded_DontFireStatusChanged()
             {
