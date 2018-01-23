@@ -5,7 +5,6 @@ using System.ComponentModel.Composition;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Logging;
-using GitHub.Primitives;
 using Serilog;
 using EnvDTE;
 using LibGit2Sharp;
@@ -30,15 +29,18 @@ namespace GitHub.Services
         string headSha;
         string trackedSha;
 
+        readonly IService service = new Service();
+
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
-            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), GitExtTypeName)
+            : this(LogManager.ForContext<TeamExplorerContext>(), new Service(), GitExtTypeName, serviceProvider)
         {
         }
 
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, ILogger log, string gitExtTypeName)
+        public TeamExplorerContext(ILogger log, IService service, string gitExtTypeName, IGitHubServiceProvider serviceProvider)
         {
             this.log = log;
+            this.service = service;
 
             // Visual Studio 2015 and 2017 use different versions of the Microsoft.TeamFoundation.Git.Provider assembly.
             // There are no binding redirections between them, but the package that includes them defines a ProvideBindingPath
@@ -74,6 +76,25 @@ namespace GitHub.Services
             notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
         }
 
+        public interface IService
+        {
+            string FindTrackedSha(string repositoryPath);
+            ILocalRepositoryModel CreateRepository(string path);
+        }
+
+        class Service : IService
+        {
+            public string FindTrackedSha(string repositoryPath)
+            {
+                using (var repo = new Repository(repositoryPath))
+                {
+                    return repo.Head.TrackedBranch?.Tip.Sha;
+                }
+            }
+
+            public ILocalRepositoryModel CreateRepository(string path) => new LocalRepositoryModel(path);
+        }
+
         void Refresh(object gitExt)
         {
             try
@@ -83,7 +104,7 @@ namespace GitHub.Services
                 string newHeadSha;
                 FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
                 var newSolutionPath = dte?.Solution?.FullName;
-                var newTrackedSha = newRepositoryPath != null ? FindTrackedSha(newRepositoryPath) : null;
+                var newTrackedSha = newRepositoryPath != null ? service.FindTrackedSha(newRepositoryPath) : null;
 
                 if (newRepositoryPath == null && newSolutionPath == solutionPath)
                 {
@@ -96,7 +117,7 @@ namespace GitHub.Services
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Information("Fire PropertyChanged event for ActiveRepository");
-                        ActiveRepository = newRepositoryPath != null ? CreateRepository(newRepositoryPath) : null;
+                        ActiveRepository = newRepositoryPath != null ? service.CreateRepository(newRepositoryPath) : null;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
                     }
                     else if (newBranchName != branchName)
@@ -126,32 +147,6 @@ namespace GitHub.Services
             {
                 log.Error(e, "Refreshing active repository");
             }
-        }
-
-        static string FindTrackedSha(string repositoryPath)
-        {
-            try
-            {
-                using (var repo = new Repository(repositoryPath))
-                {
-                    return repo.Head.TrackedBranch?.Tip.Sha;
-                }
-            }
-            catch (RepositoryNotFoundException)
-            {
-                return null;
-            }
-        }
-
-        ILocalRepositoryModel CreateRepository(string path)
-        {
-            if (Splat.ModeDetector.InUnitTestRunner())
-            {
-                // HACK: This avoids calling GitService.GitServiceHelper.
-                return new LocalRepositoryModel("testing", new UriString("github.com/testing/testing"), path);
-            }
-
-            return new LocalRepositoryModel(path);
         }
 
         static void FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
