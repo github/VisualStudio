@@ -23,26 +23,26 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task NotAGitRepositoryShownWhenNoRepository()
         {
-            var te = Substitute.For<ITeamExplorerContext>();
+            var te = CreateTeamExplorerContext();
             te.ActiveRepository.Returns(default(ILocalRepositoryModel));
             var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<INotAGitRepositoryViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INotAGitRepositoryViewModel>());
+        }
 
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
         {
             var repo = Substitute.For<ILocalRepositoryModel>();
-            var te = CreateTeamExplorerContext(null);
+            var te = CreateTeamExplorerContext();
             var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+        }
 
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstance()
@@ -52,8 +52,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+        }
 
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepo()
@@ -63,8 +63,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
+        }
 
         [Test]
         public async Task LoggedOutShownWhenNotLoggedInToGitHub()
@@ -75,8 +75,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+        }
 
         [Test]
         public async Task LoggedOutShownWhenNotLoggedInToEnterprise()
@@ -87,8 +87,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+        }
 
         [Test]
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
@@ -99,8 +99,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+        }
 
         [Test]
         public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
@@ -111,8 +111,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+        }
 
         [Test]
         public async Task NavigatorShownWhenUserLogsIn()
@@ -123,12 +123,12 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
 
-			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+            Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
-			AddConnection(cm, "https://github.com");
+            AddConnection(cm, "https://github.com");
 
-			Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
-		}
+            Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
+        }
     }
 
     public class TheShowPullRequestsMethod
@@ -144,9 +144,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
                 teamExplorerContext: te);
 
             await Initialize(target);
-			Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+            Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
-			await target.ShowPullRequests();
+            await target.ShowPullRequests();
 
             viewModelFactory.DidNotReceive().CreateViewModel<IPullRequestListViewModel>();
         }
@@ -164,9 +164,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
             await Initialize(target);
             Assert.That(nav, Is.SameAs(target.Content));
-			Assert.That(nav.Content, Is.InstanceOf<IPullRequestListViewModel>());
+            Assert.That(nav.Content, Is.InstanceOf<IPullRequestListViewModel>());
 
-			await target.ShowPullRequests();
+            await target.ShowPullRequests();
 
             Assert.That(1, Is.EqualTo(nav.History.Count));
         }
@@ -264,10 +264,13 @@ public class GitHubPaneViewModelTests : TestBaseClass
         return result;
     }
 
-    static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl)
+    static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl = null)
     {
         var repository = Substitute.For<ILocalRepositoryModel>();
-        repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
+        if (repositoryCloneUrl != null)
+        {
+            repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
+        }
 
         var result = Substitute.For<ITeamExplorerContext>();
         result.ActiveRepository.Returns(repository);
