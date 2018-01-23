@@ -156,7 +156,7 @@ namespace GitHub.App.UnitTests.Services
 
         public class TheStatusChangedEvent
         {
-            [TestCase(false, "name1", "sha1", "name1", "sha1", true)]
+            [TestCase(false, "name1", "sha1", "name1", "sha1", false)]
             [TestCase(false, "name1", "sha1", "name2", "sha1", true)]
             [TestCase(false, "name1", "sha1", "name1", "sha2", true)]
             [TestCase(false, "name1", "sha1", "name2", "sha2", true)]
@@ -196,22 +196,6 @@ namespace GitHub.App.UnitTests.Services
                 gitExt.SetActiveRepository(repoInfo1);
 
                 Assert.That(eventWasRaised, Is.False);
-            }
-
-            [Test]
-            public void NameAndShaSameAfterPush_FireStatusChanged()
-            {
-                var gitExt = new FakeGitExt();
-                var path = Directory.GetCurrentDirectory();
-                var repoInfo = new GitRepositoryInfo(path, new GitBranchInfo("name", "sha"));
-                var target = CreateTeamExplorerContext(gitExt);
-                gitExt.SetActiveRepository(repoInfo);
-
-                var eventWasRaised = false;
-                target.StatusChanged += (s, e) => eventWasRaised = true;
-                gitExt.SetActiveRepository(repoInfo);
-
-                Assert.That(eventWasRaised, Is.True);
             }
         }
 

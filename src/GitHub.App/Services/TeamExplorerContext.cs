@@ -8,6 +8,7 @@ using GitHub.Logging;
 using GitHub.Primitives;
 using Serilog;
 using EnvDTE;
+using LibGit2Sharp;
 
 namespace GitHub.Services
 {
@@ -27,7 +28,7 @@ namespace GitHub.Services
         string repositoryPath;
         string branchName;
         string headSha;
-        bool ignoreUnload;
+        string trackedSha;
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
@@ -85,50 +86,63 @@ namespace GitHub.Services
                 string newHeadSha;
                 FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
                 var newSolutionPath = dte?.Solution?.FullName;
+                var newTrackedSha = newRepositoryPath != null ? FindTrackedSha(newRepositoryPath) : null;
 
                 if (newRepositoryPath == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
                     // https://github.com/github/VisualStudio/issues/1421
                     log.Information("Ignoring no ActiveRepository when solution hasn't changed");
-                    ignoreUnload = true;
                 }
                 else
                 {
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Information("Fire PropertyChanged event for ActiveRepository");
-                        repositoryPath = newRepositoryPath;
-                        branchName = newBranchName;
-                        headSha = newHeadSha;
-                        ActiveRepository = CreateRepository(repositoryPath);
+                        ActiveRepository = CreateRepository(newRepositoryPath);
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
                     }
                     else if (newBranchName != branchName)
                     {
                         log.Information("Fire StatusChanged event when BranchName changes for ActiveRepository");
-                        branchName = newBranchName;
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
                     else if (newHeadSha != headSha)
                     {
                         log.Information("Fire StatusChanged event when HeadSha changes for ActiveRepository");
-                        headSha = newHeadSha;
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
-                    else if (!ignoreUnload)
+                    else if (newTrackedSha != trackedSha)
                     {
-                        log.Information("Fire StatusChanged event for ActiveRepository");
+                        log.Information("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
 
-                    ignoreUnload = false;
+                    repositoryPath = newRepositoryPath;
+                    branchName = newBranchName;
+                    headSha = newHeadSha;
                     solutionPath = newSolutionPath;
+                    trackedSha = newTrackedSha;
                 }
             }
             catch (Exception e)
             {
                 log.Error(e, "Refreshing active repository");
+            }
+        }
+
+        static string FindTrackedSha(string repositoryPath)
+        {
+            try
+            {
+                using (var repo = new Repository(repositoryPath))
+                {
+                    return repo.Head.TrackedBranch?.Tip.Sha;
+                }
+            }
+            catch (RepositoryNotFoundException)
+            {
+                return null;
             }
         }
 
