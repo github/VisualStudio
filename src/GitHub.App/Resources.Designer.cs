@@ -502,6 +502,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sync {0} submodules.
+        /// </summary>
+        internal static string SyncSubmodules {
+            get {
+                return ResourceManager.GetString("SyncSubmodules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         internal static string TwoFactorApp {

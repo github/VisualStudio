@@ -285,4 +285,7 @@
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
     <value>Cannot checkout as your working directory has uncommitted changes.</value>
   </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>Sync {0} submodules</value>
+  </data>
 </root>
