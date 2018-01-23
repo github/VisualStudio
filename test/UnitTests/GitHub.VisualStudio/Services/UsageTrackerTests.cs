@@ -44,7 +44,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                         x.Reports[0].Measures.NumberOfStartups == 1));
             }
 
-            [Fact]
+            [Test]
             public async Task FirstTickShouldIncrementLaunchCountInExistingReport()
             {
                 var model = new UsageModel()
@@ -63,10 +63,10 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await targetAndTick.Item2();
 
-                Assert.Equal(5, model.Measures.NumberOfStartups);
+                Assert.AreEqual(5, model.Measures.NumberOfStartups);
             }
 
-            [Fact]
+            [Test]
             public async Task FirstTickNotShouldIncrementLaunchCountInOldReport()
             {
                 var model = new UsageModel
@@ -85,7 +85,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await targetAndTick.Item2();
 
-                Assert.Equal(4, model.Measures.NumberOfStartups);
+                Assert.AreEqual(4, model.Measures.NumberOfStartups);
             }
 
             [Test]
@@ -282,7 +282,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await target.IncrementCounter(x => x.NumberOfClones);
 
-                Assert.Equal(5, model.NumberOfClones);
+                Assert.AreEqual(5, model.Measures.NumberOfClones);
             }
 
             [Test]
@@ -306,7 +306,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                         x.Reports[0].Measures.NumberOfClones == 1));
             }
 
-            [Fact]
+            [Test]
             public async Task ShouldCreateNewRecordIfNewDay()
             {
                 var data = new UsageModel
