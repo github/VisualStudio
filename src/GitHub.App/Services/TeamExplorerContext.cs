@@ -37,6 +37,8 @@ namespace GitHub.Services
         string headSha;
         string trackedSha;
 
+        ILocalRepositoryModel repositoryModel;
+
         readonly IService service = new Service();
 
         [ImportingConstructor]
@@ -130,7 +132,6 @@ namespace GitHub.Services
                     {
                         log.Information("Fire PropertyChanged event for ActiveRepository");
                         ActiveRepository = repo != null ? service.CreateRepository(repo.RepositoryPath) : null;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
                     }
                     else if (newBranchName != branchName)
                     {
@@ -205,7 +206,19 @@ namespace GitHub.Services
         /// </summary>
         public ILocalRepositoryModel ActiveRepository
         {
-            get; private set;
+            get
+            {
+                return repositoryModel;
+            }
+
+            private set
+            {
+                if (value != repositoryModel)
+                {
+                    repositoryModel = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                }
+            }
         }
 
         /// <summary>
