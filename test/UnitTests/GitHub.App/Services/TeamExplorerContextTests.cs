@@ -207,7 +207,7 @@ namespace GitHub.App.UnitTests.Services
             sp.GetService(gitExtType).Returns(gitExt);
             sp.TryGetService<DTE>().Returns(dte);
             var log = Substitute.For<ILogger>();
-            return new TeamExplorerContext(sp, log, gitExtType);
+            return new TeamExplorerContext(sp, log, gitExtType.AssemblyQualifiedName);
         }
 
         class FakeGitExt : INotifyPropertyChanged

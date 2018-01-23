@@ -32,15 +32,23 @@ namespace GitHub.Services
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
-            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), null)
+            : this(serviceProvider, LogManager.ForContext<TeamExplorerContext>(), GitExtTypeName)
         {
         }
 
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, ILogger log, Type gitExtType)
+        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, ILogger log, string gitExtTypeName)
         {
             this.log = log;
 
-            gitExtType = gitExtType ?? FindGitExtType();
+            // Visual Studio 2015 and 2017 use different versions of the Microsoft.TeamFoundation.Git.Provider assembly.
+            // There are no binding redirections between them, but the package that includes them defines a ProvideBindingPath
+            // attrubute. This means the required IGitExt type can be found using an unqualified assembly name (GitExtTypeName).
+            var gitExtType = Type.GetType(gitExtTypeName, false);
+            if (gitExtType == null)
+            {
+                log.Error("Couldn't find type {GitExtTypeName}", gitExtTypeName);
+            }
+
             var gitExt = serviceProvider.GetService(gitExtType);
             if (gitExt == null)
             {
@@ -66,17 +74,6 @@ namespace GitHub.Services
             notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
         }
 
-        Type FindGitExtType()
-        {
-            var gitExtType = Type.GetType(GitExtTypeName, false);
-            if (gitExtType == null)
-            {
-                log.Error("Couldn't find type {GitExtTypeName}", GitExtTypeName);
-            }
-
-            return gitExtType;
-        }
-
         void Refresh(object gitExt)
         {
             try
@@ -99,7 +96,7 @@ namespace GitHub.Services
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Information("Fire PropertyChanged event for ActiveRepository");
-                        ActiveRepository = CreateRepository(newRepositoryPath);
+                        ActiveRepository = newRepositoryPath != null ? CreateRepository(newRepositoryPath) : null;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
                     }
                     else if (newBranchName != branchName)
@@ -148,11 +145,6 @@ namespace GitHub.Services
 
         ILocalRepositoryModel CreateRepository(string path)
         {
-            if (path == null)
-            {
-                return null;
-            }
-
             if (Splat.ModeDetector.InUnitTestRunner())
             {
                 // HACK: This avoids calling GitService.GitServiceHelper.
