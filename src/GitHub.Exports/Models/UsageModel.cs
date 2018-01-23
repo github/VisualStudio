@@ -27,6 +27,7 @@ namespace GitHub.Models
             public string AppVersion { get; set; }
             public string VSVersion { get; set; }
             public string Lang { get; set; }
+            public string CurrentLang { get; set; }
             public bool IsGitHubUser { get; set; }
             public bool IsEnterpriseUser { get; set; }
         }
