@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -113,6 +114,7 @@ namespace GitHub.ViewModels.Dialog
 
         public ReactivePropertyValidator EnterpriseUrlValidator { get; }
 
+        [SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings")]
         protected override Uri BaseUri => new UriBuilder(EnterpriseUrl).Uri;
 
         public IReactiveCommand<Unit> NavigateLearnMore
