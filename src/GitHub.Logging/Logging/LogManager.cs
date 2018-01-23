@@ -32,6 +32,18 @@ namespace GitHub.Logging
                 .CreateLogger();
         }
 
+        public static void EnableTraceLogging(bool enable)
+        {
+            Logger.Value.ForContext(typeof(LogManager)).Information("EnableTraceLogging: {Enable}", enable);
+
+            var logEventLevel = enable ? LogEventLevel.Verbose : DefaultLoggingLevel;
+            if(LoggingLevelSwitch.MinimumLevel != logEventLevel)
+            { 
+                Logger.Value.ForContext(typeof(LogManager)).Information("Logging Level: {LogEventLevel}", logEventLevel);
+                LoggingLevelSwitch.MinimumLevel = logEventLevel;
+            }
+        }
+
         static Lazy<Logger> Logger { get; } = new Lazy<Logger>(CreateLogger);
 
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]

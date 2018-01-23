@@ -52,6 +52,7 @@ namespace GitHub.VisualStudio
             await base.InitializeAsync(cancellationToken, progress);
             
             var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+            LogManager.EnableTraceLogging(packageSettings?.EnableTraceLogging ?? false);
 
             await GetServiceAsync(typeof(IUsageTracker));
 
@@ -210,8 +211,8 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IMenuProvider))
             {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new MenuProvider(sp);
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                return new MenuProvider(serviceProvider);
             }
             else if (serviceType == typeof(IUsageService))
             {
@@ -237,8 +238,8 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IPackageSettings))
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var sp = GetService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return sp.TryGetService(serviceType);
+                var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
+                return new PackageSettings(sp);
             }
             // go the mef route
             else

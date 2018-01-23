@@ -156,9 +156,16 @@ namespace GitHub.VisualStudio
 
             var sp = initialized ? syncServiceProvider : asyncServiceProvider;
 
-            instance = sp.GetService(serviceType);
-            if (instance != null)
-                return instance;
+            try
+            {
+                instance = sp.GetService(serviceType);
+                if (instance != null)
+                    return instance;
+            }
+            catch (Exception ex)
+            {
+                //Debugger.Break();
+            }
 
             instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
 
