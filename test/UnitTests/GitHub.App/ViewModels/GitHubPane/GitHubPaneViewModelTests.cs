@@ -23,8 +23,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task NotAGitRepositoryShownWhenNoRepository()
         {
-            var te = CreateTeamExplorerContext();
-            te.ActiveRepository.Returns(default(ILocalRepositoryModel));
+            var te = Substitute.For<ITeamExplorerContext>();
+            te.ActiveRepository.Returns(null as ILocalRepositoryModel);
             var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
@@ -35,8 +35,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
         {
-            var repo = Substitute.For<ILocalRepositoryModel>();
-            var te = CreateTeamExplorerContext();
+            var te = CreateTeamExplorerContext(null);
             var target = CreateTarget(teamExplorerContext: te);
 
             await Initialize(target);
@@ -93,9 +92,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
         {
-            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager("https://github.com");
-            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
+            var target = CreateTarget(connectionManager: cm);
 
             await Initialize(target);
 
@@ -117,9 +115,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task NavigatorShownWhenUserLogsIn()
         {
-            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager();
-            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
+            var target = CreateTarget(connectionManager: cm);
 
             await Initialize(target);
 
@@ -136,12 +133,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task HasNoEffectWhenUserLoggedOut()
         {
-            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var viewModelFactory = Substitute.For<IViewViewModelFactory>();
             var target = CreateTarget(
                 viewModelFactory: viewModelFactory,
-                connectionManager: CreateConnectionManager(),
-                teamExplorerContext: te);
+                connectionManager: CreateConnectionManager());
 
             await Initialize(target);
             Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
@@ -154,11 +149,9 @@ public class GitHubPaneViewModelTests : TestBaseClass
         [Test]
         public async Task HasNoEffectWhenAlreadyCurrentPage()
         {
-            var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager(ValidGitHubRepo);
             var nav = new NavigationViewModel();
             var target = CreateTarget(
-                teamExplorerContext: te,
                 connectionManager: cm,
                 navigator: nav);
 
@@ -186,7 +179,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
     {
         viewModelFactory = viewModelFactory ?? Substitute.For<IViewViewModelFactory>();
         connectionManager = connectionManager ?? Substitute.For<IConnectionManager>();
-        teamExplorerContext = teamExplorerContext ?? Substitute.For<ITeamExplorerContext>();
+        teamExplorerContext = teamExplorerContext ?? CreateTeamExplorerContext(ValidGitHubRepo);
         browser = browser ?? Substitute.For<IVisualStudioBrowser>();
         usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
         loggedOut = loggedOut ?? Substitute.For<ILoggedOutViewModel>();
@@ -264,14 +257,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
         return result;
     }
 
-    static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl = null)
+    static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl)
     {
         var repository = Substitute.For<ILocalRepositoryModel>();
-        if (repositoryCloneUrl != null)
-        {
-            repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
-        }
-
+        repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
         var result = Substitute.For<ITeamExplorerContext>();
         result.ActiveRepository.Returns(repository);
         return result;
