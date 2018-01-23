@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using GitHub.Services;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using DTE = EnvDTE.DTE;
 using Rothko;
 
@@ -11,7 +11,7 @@ public class VSServicesTests
 {
     public class TheTryOpenRepositoryMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void NoExceptions_ReturnsTrue()
         {
             var repoDir = @"x:\repo";
@@ -22,7 +22,7 @@ public class VSServicesTests
             Assert.True(success);
         }
 
-        [Fact]
+        [Test]
         public void SolutionCreateThrows_ReturnsFalse()
         {
             var repoDir = @"x:\repo";
@@ -36,7 +36,7 @@ public class VSServicesTests
             Assert.False(success);
         }
 
-        [Fact]
+        [Test]
         public void RepoDirExistsFalse_ReturnFalse()
         {
             var repoDir = @"x:\repo";
@@ -51,7 +51,7 @@ public class VSServicesTests
             Assert.False(success);
         }
 
-        [Fact]
+        [Test]
         public void DeleteThrowsIOException_ReturnTrue()
         {
             var repoDir = @"x:\repo";
@@ -69,7 +69,7 @@ public class VSServicesTests
             Assert.True(success);
         }
 
-        [Fact]
+        [Test]
         public void SolutionCreate_DeleteVsSolutionSubdir()
         {
             var repoDir = @"x:\repo";

@@ -104,8 +104,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews.UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Logging", "src\GitHub.Logging\GitHub.Logging.csproj", "{8D73575A-A89F-47CC-B153-B47DD06837F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.App.UnitTests", "test\GitHub.App.UnitTests\GitHub.App.UnitTests.csproj", "{134DC1D8-6D5E-4780-895D-ECCE729DE05B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -405,16 +403,6 @@ Global
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -438,6 +426,5 @@ Global
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{110B206F-8554-4B51-BF86-94DAA32F5E26} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{17EB676B-BB91-48B5-AA59-C67695C647C2} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
-		{134DC1D8-6D5E-4780-895D-ECCE729DE05B} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 	EndGlobalSection
 EndGlobal

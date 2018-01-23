@@ -7,6 +7,7 @@ using NUnit.Framework;
 using NSubstitute;
 using EnvDTE;
 using Serilog;
+using GitHub.Models;
 
 namespace GitHub.App.UnitTests.Services
 {
@@ -14,6 +15,12 @@ namespace GitHub.App.UnitTests.Services
     {
         public class TheActiveRepositoryProperty
         {
+            [SetUp]
+            public void SetUp()
+            {
+                Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+            }
+
             [Test]
             public void NoActiveRepository()
             {
@@ -32,11 +39,14 @@ namespace GitHub.App.UnitTests.Services
                 var repositoryPath = Directory.GetCurrentDirectory();
                 var repoInfo = new GitRepositoryInfo(repositoryPath, null);
                 gitExt.SetActiveRepository(repoInfo);
-                var target = CreateTeamExplorerContext(gitExt);
+                var service = Substitute.For<TeamExplorerContext.IService>();
+                var expectRepo = Substitute.For<ILocalRepositoryModel>();
+                service.CreateRepository(repositoryPath).Returns(expectRepo);
+                var target = CreateTeamExplorerContext(gitExt, service: service);
 
                 var repo = target.ActiveRepository;
 
-                Assert.That(repo.LocalPath, Is.EqualTo(repositoryPath));
+                Assert.That(repo, Is.EqualTo(expectRepo));
             }
         }
 
@@ -74,7 +84,7 @@ namespace GitHub.App.UnitTests.Services
             }
 
             [Test]
-            public void ChangeActiveRepository()
+            public void ChangeActiveRepository_NoSolutionChange()
             {
                 var gitExt = new FakeGitExt();
                 var repositoryPath = Directory.GetCurrentDirectory();
@@ -97,7 +107,10 @@ namespace GitHub.App.UnitTests.Services
                 var gitExt = new FakeGitExt();
                 var repositoryPath = Directory.GetCurrentDirectory();
                 var repoInfo = new GitRepositoryInfo(repositoryPath, null);
-                var target = CreateTeamExplorerContext(gitExt);
+                var service = Substitute.For<TeamExplorerContext.IService>();
+                var expectRepo = Substitute.For<ILocalRepositoryModel>();
+                service.CreateRepository(repositoryPath).Returns(expectRepo);
+                var target = CreateTeamExplorerContext(gitExt, service: service);
                 gitExt.SetActiveRepository(repoInfo);
                 var eventWasRaised = false;
                 target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
@@ -105,7 +118,7 @@ namespace GitHub.App.UnitTests.Services
                 gitExt.SetActiveRepository(null);
 
                 Assert.That(eventWasRaised, Is.False);
-                Assert.That(target.ActiveRepository.LocalPath, Is.EqualTo(repositoryPath));
+                Assert.That(target.ActiveRepository, Is.EqualTo(expectRepo));
             }
 
             [Test]
@@ -126,6 +139,25 @@ namespace GitHub.App.UnitTests.Services
 
                 Assert.That(eventWasRaised, Is.True);
                 Assert.That(target.ActiveRepository, Is.Null);
+            }
+
+            [Test]
+            public void NoActiveRepositoryChange_SolutionChanges()
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repositoryPath, null);
+                var dte = Substitute.For<DTE>();
+                var target = CreateTeamExplorerContext(gitExt, dte);
+                dte.Solution.FullName.Returns("");
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.PropertyChanged += (s, e) => eventWasRaised = e.PropertyName == nameof(target.ActiveRepository);
+
+                dte.Solution.FullName.Returns("Solution");
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(eventWasRaised, Is.False);
             }
         }
 
@@ -154,17 +186,56 @@ namespace GitHub.App.UnitTests.Services
 
                 Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
             }
+
+            [TestCase("trackedSha", "trackedSha", false)]
+            [TestCase("trackedSha1", "trackedSha2", true)]
+            public void TrackedShaChanges_CheckWasRaised(string trackedSha1, string trackedSha2, bool expectWasRaised)
+            {
+                var gitExt = new FakeGitExt();
+                var repositoryPaths = new[] { Directory.GetCurrentDirectory(), Path.GetTempPath() };
+                var repoPath = Directory.GetCurrentDirectory();
+                var repoInfo = new GitRepositoryInfo(repoPath, new GitBranchInfo("name", "sha"));
+                var service = Substitute.For<TeamExplorerContext.IService>();
+                service.FindTrackedSha(Arg.Any<string>()).Returns(trackedSha1, trackedSha2);
+                var target = CreateTeamExplorerContext(gitExt, service: service);
+                gitExt.SetActiveRepository(repoInfo);
+                var eventWasRaised = false;
+                target.StatusChanged += (s, e) => eventWasRaised = true;
+
+                gitExt.SetActiveRepository(repoInfo);
+
+                Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
+            }
+
+            [Test]
+            public void SolutionUnloadedAndReloaded_DontFireStatusChanged()
+            {
+                var gitExt = new FakeGitExt();
+                var path = Directory.GetCurrentDirectory();
+                var repoInfo1 = new GitRepositoryInfo(path, new GitBranchInfo("name", "sha"));
+                var repoInfo2 = new GitRepositoryInfo(null, new GitBranchInfo(null, null));
+                var target = CreateTeamExplorerContext(gitExt);
+                gitExt.SetActiveRepository(repoInfo1);
+                gitExt.SetActiveRepository(repoInfo2);
+
+                var eventWasRaised = false;
+                target.StatusChanged += (s, e) => eventWasRaised = true;
+                gitExt.SetActiveRepository(repoInfo1);
+
+                Assert.That(eventWasRaised, Is.False);
+            }
         }
 
-        static TeamExplorerContext CreateTeamExplorerContext(FakeGitExt gitExt, DTE dte = null)
+        static TeamExplorerContext CreateTeamExplorerContext(FakeGitExt gitExt, DTE dte = null, TeamExplorerContext.IService service = null)
         {
             var gitExtType = typeof(FakeGitExt);
             dte = dte ?? Substitute.For<DTE>();
-            var sp = Substitute.For<IServiceProvider>();
+            service = service ?? Substitute.For<TeamExplorerContext.IService>();
+            var sp = Substitute.For<IGitHubServiceProvider>();
             sp.GetService(gitExtType).Returns(gitExt);
-            sp.GetService(typeof(DTE)).Returns(dte);
+            sp.TryGetService<DTE>().Returns(dte);
             var log = Substitute.For<ILogger>();
-            return new TeamExplorerContext(sp, log, gitExtType, true);
+            return new TeamExplorerContext(log, service, gitExtType.AssemblyQualifiedName, sp);
         }
 
         class FakeGitExt : INotifyPropertyChanged

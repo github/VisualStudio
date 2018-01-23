@@ -200,14 +200,11 @@ namespace GitHub.ViewModels.GitHubPane
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
             await UpdateContent(teamExplorerContext.ActiveRepository);
-            teamExplorerContext.PropertyChanged += async (s, e) =>
-            {
-                if (e.PropertyName == nameof(teamExplorerContext.ActiveRepository))
-                {
-                    await ThreadingHelper.SwitchToMainThreadAsync();
-                    await UpdateContent(teamExplorerContext.ActiveRepository);
-                }
-            };
+            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+               .Skip(1)
+               .ObserveOn(RxApp.MainThreadScheduler)
+               .Subscribe(x => UpdateContent(x).Forget());
+
             connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
 
             BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);

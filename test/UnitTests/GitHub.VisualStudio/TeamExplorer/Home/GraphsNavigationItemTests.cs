@@ -3,18 +3,18 @@ using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio.TeamExplorer.Home;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using UnitTests;
 
 public class GraphsNavigationItemTests
 {
     public class TheExecuteMethod : TestBaseClass
     {
-        [Theory(Skip = "Needs fixing with new TeamFoundation split assemblies")]
-        [InlineData("https://github.com/foo/bar.git", "https://github.com/foo/bar/graphs")]
-        [InlineData("https://haacked@github.com/foo/bar.git", "https://github.com/foo/bar/graphs")]
-        [InlineData("https://github.com/foo/bar", "https://github.com/foo/bar/graphs")]
-        [InlineData("https://github.com/foo/bar/", "https://github.com/foo/bar/graphs")]
+        [TestCase("https://github.com/foo/bar.git", "https://github.com/foo/bar/graphs")]
+        [TestCase("https://haacked@github.com/foo/bar.git", "https://github.com/foo/bar/graphs")]
+        [TestCase("https://github.com/foo/bar", "https://github.com/foo/bar/graphs")]
+        [TestCase("https://github.com/foo/bar/", "https://github.com/foo/bar/graphs")]
+        [Ignore("Needs fixing with new TeamFoundation split assemblies")]
         public void BrowsesToTheCorrectURL(string origin, string expectedUrl)
         {
             var apiFactory = Substitute.For<ISimpleApiClientFactory>();
