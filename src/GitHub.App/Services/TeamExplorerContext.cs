@@ -99,14 +99,10 @@ namespace GitHub.Services
         {
             try
             {
-                string newRepositoryPath;
-                string newBranchName;
-                string newHeadSha;
-                FindActiveRepository(gitExt, out newRepositoryPath, out newBranchName, out newHeadSha);
+                var repo = FindActiveRepository(gitExt);
                 var newSolutionPath = dte?.Solution?.FullName;
-                var newTrackedSha = newRepositoryPath != null ? service.FindTrackedSha(newRepositoryPath) : null;
 
-                if (newRepositoryPath == null && newSolutionPath == solutionPath)
+                if (repo == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
                     // https://github.com/github/VisualStudio/issues/1421
@@ -114,10 +110,15 @@ namespace GitHub.Services
                 }
                 else
                 {
+                    var newRepositoryPath = repo?.RepositoryPath;
+                    var newBranchName = repo?.BranchName;
+                    var newHeadSha = repo?.HeadSha;
+                    var newTrackedSha = newRepositoryPath != null ? service.FindTrackedSha(newRepositoryPath) : null;
+
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Information("Fire PropertyChanged event for ActiveRepository");
-                        ActiveRepository = newRepositoryPath != null ? service.CreateRepository(newRepositoryPath) : null;
+                        ActiveRepository = repo != null ? service.CreateRepository(repo.RepositoryPath) : null;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
                     }
                     else if (newBranchName != branchName)
@@ -149,30 +150,43 @@ namespace GitHub.Services
             }
         }
 
-        static void FindActiveRepository(object gitExt, out string repositoryPath, out string branchName, out string headSha)
+        static RepositoryInfo FindActiveRepository(object gitExt)
         {
             var activeRepositoriesProperty = gitExt.GetType().GetProperty("ActiveRepositories");
             var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty?.GetValue(gitExt);
             var repo = activeRepositories?.FirstOrDefault();
             if (repo == null)
             {
-                repositoryPath = null;
-                branchName = null;
-                headSha = null;
-                return;
+                return null;
             }
 
             var repositoryPathProperty = repo.GetType().GetProperty("RepositoryPath");
-            repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
+            var repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
 
             var currentBranchProperty = repo.GetType().GetProperty("CurrentBranch");
             var currentBranch = currentBranchProperty?.GetValue(repo);
 
             var headShaProperty = currentBranch?.GetType().GetProperty("HeadSha");
-            headSha = (string)headShaProperty?.GetValue(currentBranch);
+            var headSha = (string)headShaProperty?.GetValue(currentBranch);
 
             var nameProperty = currentBranch?.GetType().GetProperty("Name");
-            branchName = (string)nameProperty?.GetValue(currentBranch);
+            var branchName = (string)nameProperty?.GetValue(currentBranch);
+
+            return new RepositoryInfo(repositoryPath, branchName, headSha);
+        }
+
+        class RepositoryInfo
+        {
+            public RepositoryInfo(string repositoryPath, string branchName, string headSha)
+            {
+                RepositoryPath = repositoryPath;
+                BranchName = branchName;
+                HeadSha = headSha;
+            }
+
+            public string RepositoryPath { get; }
+            public string BranchName { get; }
+            public string HeadSha { get; }
         }
 
         public ILocalRepositoryModel ActiveRepository
