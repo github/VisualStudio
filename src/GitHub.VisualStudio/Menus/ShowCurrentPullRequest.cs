@@ -1,15 +1,17 @@
 ﻿using System;
 using GitHub.Exports;
-using GitHub.UI;
-using GitHub.Services;
 using GitHub.Extensions;
-using GitHub.Models;
+using GitHub.Logging;
+using GitHub.Services;
+using Serilog;
 
 namespace GitHub.VisualStudio.Menus
 {
     [ExportMenu(MenuType = MenuType.OpenPullRequests)]
     public class ShowCurrentPullRequest : MenuBase, IMenuHandler
     {
+        static readonly ILogger log = LogManager.ForContext<ShowCurrentPullRequest>();
+
         public ShowCurrentPullRequest(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
@@ -19,19 +21,26 @@ namespace GitHub.VisualStudio.Menus
         public Guid Guid => Guids.guidGitHubCmdSet;
         public int CmdId => PkgCmdIDList.showCurrentPullRequestCommand;
 
-        public void Activate(object data = null)
+        public async void Activate(object data = null)
         {
-            var pullRequestSessionManager = ServiceProvider.ExportProvider.GetExportedValueOrDefault<IPullRequestSessionManager>();
-            var session = pullRequestSessionManager?.CurrentSession;
-            if (session == null)
+            try
             {
-                return; // No active PR session.
-            }
+                var pullRequestSessionManager = ServiceProvider.ExportProvider.GetExportedValueOrDefault<IPullRequestSessionManager>();
+                var session = pullRequestSessionManager?.CurrentSession;
+                if (session == null)
+                {
+                    return; // No active PR session.
+                }
 
-            var pullRequest = session.PullRequest;
-            var manager = ServiceProvider.TryGetService<IGitHubToolWindowManager>();
-            var host = manager.ShowHomePane();
-            host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number);
+                var pullRequest = session.PullRequest;
+                var manager = ServiceProvider.TryGetService<IGitHubToolWindowManager>();
+                var host = await manager.ShowGitHubPane();
+                await host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error showing current pull request");
+            }
         }
     }
 }
