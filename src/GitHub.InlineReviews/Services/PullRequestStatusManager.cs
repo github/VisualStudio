@@ -12,7 +12,6 @@ using GitHub.VisualStudio;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Extensions;
-using Microsoft.VisualStudio.Shell;
 using Serilog;
 
 namespace GitHub.InlineReviews.Services
@@ -23,13 +22,13 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
-        readonly SVsServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
         readonly Window mainWindow;
         readonly IPullRequestSessionManager pullRequestSessionManager;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestStatusManager(SVsServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager, IUsageTracker usageTracker)
+        public PullRequestStatusManager(IGitHubServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager, IUsageTracker usageTracker)
             : this()
         {
             this.serviceProvider = serviceProvider;
@@ -65,7 +64,8 @@ namespace GitHub.InlineReviews.Services
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestModel pullRequest)
         {
-            var command = new RaisePullRequestCommand(serviceProvider, usageTracker);
+            var dte = serviceProvider.TryGetService<EnvDTE.DTE>();
+            var command = new RaisePullRequestCommand(dte, usageTracker);
             var pullRequestStatusViewModel = new PullRequestStatusViewModel(command);
             pullRequestStatusViewModel.Number = pullRequest.Number;
             pullRequestStatusViewModel.Title = pullRequest.Title;
@@ -116,12 +116,12 @@ namespace GitHub.InlineReviews.Services
             readonly string guid = Guids.guidGitHubCmdSetString;
             readonly int id = PkgCmdIDList.showCurrentPullRequestCommand;
 
-            readonly IServiceProvider serviceProvider;
+            readonly EnvDTE.DTE dte;
             readonly IUsageTracker usageTracker;
 
-            internal RaisePullRequestCommand(IServiceProvider serviceProvider, IUsageTracker usageTracker)
+            internal RaisePullRequestCommand(EnvDTE.DTE dte, IUsageTracker usageTracker)
             {
-                this.serviceProvider = serviceProvider;
+                this.dte = dte;
                 this.usageTracker = usageTracker;
             }
 
@@ -131,10 +131,9 @@ namespace GitHub.InlineReviews.Services
             {
                 try
                 {
-                    var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
                     object customIn = null;
                     object customOut = null;
-                    dte.Commands.Raise(guid, id, ref customIn, ref customOut);
+                    dte?.Commands.Raise(guid, id, ref customIn, ref customOut);
                 }
                 catch (Exception e)
                 {
