@@ -113,7 +113,7 @@ namespace GitHub.ViewModels.Dialog
 
         public ReactivePropertyValidator EnterpriseUrlValidator { get; }
 
-        protected override Uri BaseUri => new Uri(EnterpriseUrl);
+        protected override Uri BaseUri => new UriBuilder(EnterpriseUrl).Uri;
 
         public IReactiveCommand<Unit> NavigateLearnMore
         {
