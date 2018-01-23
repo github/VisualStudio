@@ -12,8 +12,16 @@ using LibGit2Sharp;
 namespace GitHub.Services
 {
     /// <summary>
-    /// This service uses reflection to access the IGitExt from Visual Studio 2015 and 2017.
+    /// This implementation listenes to IGitExt for ActiveRepositories property change events and fires
+    /// <see cref="PropertyChanged"/> and <see cref="StatusChanged"/> events when appropriate.
     /// </summary>
+    /// <remarks>
+    /// A <see cref="PropertyChanged"/> is fired when a solution is opened in a new repository (or not in a repository).
+    /// A <see cref="StatusChanged"/> event is only fired when the current branch, head SHA or tracked SHA changes (not
+    /// on every IGitExt property change event). <see cref="ActiveRepository"/> contains the active repository or null
+    /// if a solution is opened that isn't in a repository. No events are fired when the same solution is unloaded then
+    /// reloaded (e.g. when a .sln file is touched).
+    /// </remarks>
     [Export(typeof(ITeamExplorerContext))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerContext : ITeamExplorerContext
@@ -76,6 +84,9 @@ namespace GitHub.Services
             notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
         }
 
+        /// <summary>
+        /// Used for unit testing.
+        /// </summary>
         public interface IService
         {
             string FindTrackedSha(string repositoryPath);
@@ -189,12 +200,22 @@ namespace GitHub.Services
             public string HeadSha { get; }
         }
 
+        /// <summary>
+        /// The active repository or null if not in a repository.
+        /// </summary>
         public ILocalRepositoryModel ActiveRepository
         {
             get; private set;
         }
 
+        /// <summary>
+        /// Fired when a solution is opened in a new repository (or that isn't in a repository).
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Fired when the current branch, head SHA or tracked SHA changes.
+        /// </summary>
         public event EventHandler StatusChanged;
     }
 }
