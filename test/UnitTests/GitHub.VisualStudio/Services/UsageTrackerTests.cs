@@ -9,7 +9,8 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
+
 
 namespace UnitTests.GitHub.VisualStudio.Services
 {
@@ -19,7 +20,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
         public class TheTimer : TestBaseClass
         {
-            [Fact]
+            [Test]
             public void ShouldStartTimer()
             {
                 var service = Substitute.For<IUsageService>();
@@ -28,7 +29,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
             }
 
-            [Fact]
+            [Test]
             public async Task FirstTickShouldIncrementLaunchCount()
             {
                 var service = CreateUsageService();
@@ -87,7 +88,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 Assert.Equal(4, model.Measures.NumberOfStartups);
             }
 
-            [Fact]
+            [Test]
             public async Task SubsequentTickShouldNotIncrementLaunchCount()
             {
                 var service = CreateUsageService();
@@ -100,7 +101,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await service.DidNotReceiveWithAnyArgs().WriteLocalData(null);
             }
 
-            [Fact]
+            [Test]
             public async Task ShouldDisposeTimerIfMetricsServiceNotFound()
             {
                 var service = CreateUsageService();
@@ -117,7 +118,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 Assert.True(disposed);
             }
 
-            [Fact]
+            [Test]
             public async Task TickShouldNotSendDataIfSameDay()
             {
                 var serviceProvider = CreateServiceProvider();
@@ -131,7 +132,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await metricsService.DidNotReceive().PostUsage(Arg.Any<UsageModel>());
             }
 
-            [Fact]
+            [Test]
             public async Task TickShouldSendDataIfDifferentDay()
             {
                 var model = new UsageModel
@@ -152,7 +153,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await metricsService.Received(1).PostUsage(Arg.Any<UsageModel>());
             }
 
-            [Fact]
+            [Test]
             public async Task TickShouldSendBacklogData()
             {
                 var models = new[]
@@ -195,7 +196,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await metricsService.Received(0).PostUsage(Arg.Is<UsageModel>(x => x.Dimensions.Guid == models[2].Dimensions.Guid));
             }
 
-            [Fact]
+            [Test]
             public async Task SentReportsShouldBeRemovedFromDisk()
             {
                 var models = new[]
@@ -225,7 +226,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
                 await service.Received(1).WriteLocalData(Arg.Is<UsageData>(x => x.Reports.Count == 1));
             }
 
-            [Fact]
+            [Test]
             public async Task ReportsShouldNotBeRemovedIfNotSent()
             {
                 var models = new[]
@@ -261,7 +262,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
         public class TheIncrementCounterMethod : TestBaseClass
         {
-            [Fact]
+            [Test]
             public async Task ShouldIncrementCounter()
             {
                 var model = new UsageModel
@@ -281,10 +282,10 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await target.IncrementCounter(x => x.NumberOfClones);
 
-                Assert.Equal(5, model.Measures.NumberOfClones);
+                Assert.Equal(5, model.NumberOfClones);
             }
 
-            [Fact]
+            [Test]
             public async Task ShouldWriteUpdatedData()
             {
                 var data = new UsageModel

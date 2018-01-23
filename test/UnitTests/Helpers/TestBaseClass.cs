@@ -4,7 +4,7 @@ using Octokit;
 using System;
 using System.IO;
 using System.IO.Compression;
-using Xunit.Abstractions;
+using NUnit.Framework;
 
 /// <summary>
 /// This base class will get its methods called by the most-derived

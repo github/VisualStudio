@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Octokit;
 using ReactiveUI;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         const string FullPath = "c:\\repo\\test.cs";
         const string RelativePath = "test.cs";
 
-        [Fact]
+        [Test]
         public async Task ThreadIsCreatedForExistingComments()
         {
             // There is an existing comment thread at line 10.
@@ -43,14 +43,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             await target.Initialize();
 
             // There should be an existing comment and a reply placeholder.
-            Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
-            Assert.Equal(2, target.Thread.Comments.Count);
-            Assert.Equal("Existing comment", target.Thread.Comments[0].Body);
-            Assert.Equal(string.Empty, target.Thread.Comments[1].Body);
-            Assert.Equal(CommentEditState.Placeholder, target.Thread.Comments[1].EditState);
+            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
+            Assert.That("Existing comment", Is.EqualTo(target.Thread.Comments[0].Body));
+            Assert.That(string.Empty, Is.EqualTo(target.Thread.Comments[1].Body));
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(target.Thread.Comments[1].EditState));
         }
 
-        [Fact]
+        [Test]
         public async Task ThreadIsCreatedForNewComment()
         {
             // There is no existing comment thread at line 9, but there is a + diff entry.
@@ -63,12 +63,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.IsType<NewInlineCommentThreadViewModel>(target.Thread);
-            Assert.Equal(string.Empty, target.Thread.Comments[0].Body);
-            Assert.Equal(CommentEditState.Editing, target.Thread.Comments[0].EditState);
+            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
+            Assert.That(string.Empty, Is.EqualTo(target.Thread.Comments[0].Body));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Thread.Comments[0].EditState));
         }
 
-        [Fact]
+        [Test]
         public async Task SwitchesFromNewThreadToExistingThreadWhenCommentPosted()
         {
             var sessionManager = CreateSessionManager();
@@ -81,7 +81,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IPreviousInlineCommentCommand>());
 
             await target.Initialize();
-            Assert.IsType<NewInlineCommentThreadViewModel>(target.Thread);
+            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
 
             target.Thread.Comments[0].Body = "New Comment";
 
@@ -101,10 +101,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
 
-            Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
+            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
         }
 
-        [Fact]
+        [Test]
         public async Task RefreshesWhenSessionInlineCommentThreadsChanges()
         {
             var sessionManager = CreateSessionManager();
@@ -118,8 +118,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
-            Assert.Equal(2, target.Thread.Comments.Count);
+            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             var file = await sessionManager.GetLiveFile(
                 RelativePath,
@@ -127,10 +127,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 peekSession.TextView.TextBuffer);
             AddCommentToExistingThread(file);
 
-            Assert.Equal(3, target.Thread.Comments.Count);
+            Assert.That(3, Is.EqualTo(target.Thread.Comments.Count));
         }
 
-        [Fact]
+        [Test]
         public async Task RetainsCommentBeingEditedWhenSessionRefreshed()
         {
             var sessionManager = CreateSessionManager();
@@ -144,7 +144,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.Equal(2, target.Thread.Comments.Count);
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             var placeholder = target.Thread.Comments.Last();
             placeholder.BeginEdit.Execute(null);
@@ -157,12 +157,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             AddCommentToExistingThread(file);
 
             placeholder = target.Thread.Comments.Last();
-            Assert.Equal(3, target.Thread.Comments.Count);
-            Assert.Equal(CommentEditState.Editing, placeholder.EditState);
-            Assert.Equal("Comment being edited", placeholder.Body);
+            Assert.That(3, Is.EqualTo(target.Thread.Comments.Count));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(placeholder.EditState));
+            Assert.That("Comment being edited", Is.EqualTo(placeholder.Body));
         }
 
-        [Fact]
+        [Test]
         public async Task DoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
             var sessionManager = CreateSessionManager();
@@ -176,7 +176,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.Equal(2, target.Thread.Comments.Count);
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             sessionManager.CurrentSession.PostReviewComment(null, 0)
                 .ReturnsForAnyArgs(async x =>
@@ -195,8 +195,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             placeholder.CommitEdit.Execute(null);
 
             placeholder = target.Thread.Comments.Last();
-            Assert.Equal(CommentEditState.Placeholder, placeholder.EditState);
-            Assert.Equal(string.Empty, placeholder.Body);
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(placeholder.EditState));
+            Assert.That(string.Empty, Is.EqualTo(placeholder.Body));
         }
 
         void AddCommentToExistingThread(IPullRequestSessionFile file)
