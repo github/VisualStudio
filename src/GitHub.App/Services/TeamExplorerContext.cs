@@ -30,6 +30,8 @@ namespace GitHub.Services
 
         readonly ILogger log;
         readonly DTE dte;
+        readonly IService service;
+        readonly GitExt gitExt;
 
         string solutionPath;
         string repositoryPath;
@@ -39,7 +41,6 @@ namespace GitHub.Services
 
         ILocalRepositoryModel repositoryModel;
 
-        readonly IService service = new Service();
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
@@ -68,13 +69,15 @@ namespace GitHub.Services
                 return;
             }
 
+            this.gitExt = new GitExt(gitExt);
+
             dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
                 log.Error("Couldn't find service for type {DteType}", typeof(DTE));
             }
 
-            Refresh(gitExt);
+            Refresh();
 
             var notifyPropertyChanged = gitExt as INotifyPropertyChanged;
             if (notifyPropertyChanged == null)
@@ -83,7 +86,7 @@ namespace GitHub.Services
                 return;
             }
 
-            notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
+            notifyPropertyChanged.PropertyChanged += (s, e) => Refresh();
         }
 
         /// <summary>
@@ -108,11 +111,11 @@ namespace GitHub.Services
             public ILocalRepositoryModel CreateRepository(string path) => new LocalRepositoryModel(path);
         }
 
-        void Refresh(object gitExt)
+        void Refresh()
         {
             try
             {
-                var repo = FindActiveRepository(gitExt);
+                var repo = gitExt.ActiveRepository;
                 var newSolutionPath = dte?.Solution?.FullName;
 
                 if (repo == null && newSolutionPath == solutionPath)
@@ -162,38 +165,35 @@ namespace GitHub.Services
             }
         }
 
-        static RepositoryInfo FindActiveRepository(object gitExt)
+        class GitExt
         {
-            var activeRepositoriesProperty = gitExt.GetType().GetProperty("ActiveRepositories");
-            var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty?.GetValue(gitExt);
-            var repo = activeRepositories?.FirstOrDefault();
-            if (repo == null)
+            readonly object gitExt;
+
+            internal GitExt(object gitExt)
             {
-                return null;
+                this.gitExt = gitExt;
             }
 
-            var repositoryPathProperty = repo.GetType().GetProperty("RepositoryPath");
-            var repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
-
-            var currentBranchProperty = repo.GetType().GetProperty("CurrentBranch");
-            var currentBranch = currentBranchProperty?.GetValue(repo);
-
-            var headShaProperty = currentBranch?.GetType().GetProperty("HeadSha");
-            var headSha = (string)headShaProperty?.GetValue(currentBranch);
-
-            var nameProperty = currentBranch?.GetType().GetProperty("Name");
-            var branchName = (string)nameProperty?.GetValue(currentBranch);
-
-            return new RepositoryInfo(repositoryPath, branchName, headSha);
+            internal RepositoryInfo ActiveRepository
+            {
+                get
+                {
+                    var activeRepositories = (IEnumerable<object>)gitExt.GetType().GetProperty("ActiveRepositories")?.GetValue(gitExt);
+                    var repo = activeRepositories?.FirstOrDefault();
+                    return repo != null ? new RepositoryInfo(repo) : null;
+                }
+            }
         }
 
         class RepositoryInfo
         {
-            public RepositoryInfo(string repositoryPath, string branchName, string headSha)
+            internal RepositoryInfo(object repo)
             {
-                RepositoryPath = repositoryPath;
-                BranchName = branchName;
-                HeadSha = headSha;
+                // Only called a handful times per session so not caching reflection calls.
+                var currentBranch = repo.GetType().GetProperty("CurrentBranch")?.GetValue(repo);
+                RepositoryPath = (string)repo.GetType().GetProperty("RepositoryPath")?.GetValue(repo);
+                BranchName = (string)currentBranch?.GetType().GetProperty("Name")?.GetValue(currentBranch);
+                HeadSha = (string)currentBranch?.GetType().GetProperty("HeadSha")?.GetValue(currentBranch);
             }
 
             public string RepositoryPath { get; }
