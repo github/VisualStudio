@@ -54,6 +54,11 @@ namespace GitHub.VisualStudio
             var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
             LogManager.EnableTraceLogging(packageSettings?.EnableTraceLogging ?? false);
 
+            packageSettings.PropertyChanged += (sender, args) =>
+            {
+                log.Information("Packaged Settings PropertyChanged: {PropertyName}", args.PropertyName);
+            };
+
             await GetServiceAsync(typeof(IUsageTracker));
 
             // This package might be loaded on demand so we must await initialization of menus.
