@@ -112,6 +112,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
@@ -150,6 +151,7 @@ namespace GitHub.VisualStudio
         {
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
+            AddService(typeof(IUsageService), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
@@ -236,11 +238,16 @@ namespace GitHub.VisualStudio
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return new MenuProvider(sp);
             }
+            else if (serviceType == typeof(IUsageService))
+            {
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                return new UsageService(sp);
+            }
             else if (serviceType == typeof(IUsageTracker))
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                var usageService = serviceProvider.GetService<IUsageService>();
                 return new UsageTracker(serviceProvider, usageService);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
