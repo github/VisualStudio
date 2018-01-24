@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GitHub.Logging;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
@@ -151,16 +153,42 @@ namespace GitHub.Services
             var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}.{2}_Config\\SplashInfo", RegistryRootKey, version.Major, version.Minor);
             try
             {
-                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                if (version.Major == 14)
                 {
-                    var value = (string)key.GetValue(EnvVersionKey, String.Empty);
-                    if (!String.IsNullOrEmpty(value))
-                        return value;
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                    {
+                        var value = (string)key.GetValue(EnvVersionKey, String.Empty);
+                        if (!String.IsNullOrEmpty(value))
+                            return value;
+                    }
                 }
-                // fallback to poking the CommonIDE assembly, which most closely follows the advertised version.
-                var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.StartsWith("Microsoft.VisualStudio.CommonIDE", StringComparison.OrdinalIgnoreCase));
-                if (asm != null)
-                    return asm.GetName().Version.ToString();
+                else
+                {
+                    var os = serviceProvider.TryGetService<IOperatingSystem>();
+                    var devenv = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+
+                    // C:\ProgramData\Microsoft\VisualStudio\Packages\_Instances
+                    var pathToInstallationData = Path.Combine(os.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData),
+                        "Microsoft", "VisualStudio", "Packages", "_Instances");
+
+                    var regexVersion = new Regex(@"""productDisplayVersion"":""([^""]+)""");
+                    var regexPath = new Regex(@"""installationPath"":""([^""]+)""");
+
+                    foreach (var dir in os.Directory.EnumerateDirectories(pathToInstallationData))
+                    {
+                        var data = os.File.ReadAllText(Path.Combine(dir, "state.json"), System.Text.Encoding.UTF8);
+                        if (regexPath.IsMatch(data) && regexVersion.IsMatch(data))
+                        {
+                            var path = regexPath.Match(data).Groups[1].Value;
+                            path = path.Replace("\\\\", "\\");
+                            if (devenv.StartsWith(path, StringComparison.OrdinalIgnoreCase))
+                            {
+                                var value = regexVersion.Match(data).Groups[1].Value;
+                                return value;
+                            }
+                        }
+                    }
+                }
             }
             catch(Exception ex)
             {
