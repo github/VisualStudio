@@ -2,12 +2,10 @@
 using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Logging;
 using Serilog;
 using EnvDTE;
-using LibGit2Sharp;
 
 namespace GitHub.Services
 {
@@ -26,10 +24,9 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerContext : ITeamExplorerContext
     {
-        const string GitExtTypeName = "Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider";
-
         readonly ILogger log;
         readonly DTE dte;
+        readonly IVSGitExt gitExt;
 
         string solutionPath;
         string repositoryPath;
@@ -37,34 +34,18 @@ namespace GitHub.Services
         string headSha;
         string trackedSha;
 
-        readonly IService service = new Service();
+        ILocalRepositoryModel repositoryModel;
 
         [ImportingConstructor]
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider)
-            : this(LogManager.ForContext<TeamExplorerContext>(), new Service(), GitExtTypeName, serviceProvider)
+        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
+            : this(LogManager.ForContext<TeamExplorerContext>(), gitExt, serviceProvider)
         {
         }
 
-        public TeamExplorerContext(ILogger log, IService service, string gitExtTypeName, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(ILogger log, IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
         {
             this.log = log;
-            this.service = service;
-
-            // Visual Studio 2015 and 2017 use different versions of the Microsoft.TeamFoundation.Git.Provider assembly.
-            // There are no binding redirections between them, but the package that includes them defines a ProvideBindingPath
-            // attrubute. This means the required IGitExt type can be found using an unqualified assembly name (GitExtTypeName).
-            var gitExtType = Type.GetType(gitExtTypeName, false);
-            if (gitExtType == null)
-            {
-                log.Error("Couldn't find type {GitExtTypeName}", gitExtTypeName);
-            }
-
-            var gitExt = serviceProvider.GetService(gitExtType);
-            if (gitExt == null)
-            {
-                log.Error("Couldn't find service for type {GitExtType}", gitExtType);
-                return;
-            }
+            this.gitExt = gitExt;
 
             dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
@@ -72,45 +53,17 @@ namespace GitHub.Services
                 log.Error("Couldn't find service for type {DteType}", typeof(DTE));
             }
 
-            Refresh(gitExt);
+            gitExt.Refresh(serviceProvider);
 
-            var notifyPropertyChanged = gitExt as INotifyPropertyChanged;
-            if (notifyPropertyChanged == null)
-            {
-                log.Error("The service {ServiceObject} doesn't implement {Interface}", gitExt, typeof(INotifyPropertyChanged));
-                return;
-            }
-
-            notifyPropertyChanged.PropertyChanged += (s, e) => Refresh(gitExt);
+            Refresh();
+            gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        /// <summary>
-        /// Used for unit testing.
-        /// </summary>
-        public interface IService
-        {
-            string FindTrackedSha(string repositoryPath);
-            ILocalRepositoryModel CreateRepository(string path);
-        }
-
-        class Service : IService
-        {
-            public string FindTrackedSha(string repositoryPath)
-            {
-                using (var repo = new Repository(repositoryPath))
-                {
-                    return repo.Head.TrackedBranch?.Tip.Sha;
-                }
-            }
-
-            public ILocalRepositoryModel CreateRepository(string path) => new LocalRepositoryModel(path);
-        }
-
-        void Refresh(object gitExt)
+        void Refresh()
         {
             try
             {
-                var repo = FindActiveRepository(gitExt);
+                var repo = gitExt.ActiveRepositories?.FirstOrDefault();
                 var newSolutionPath = dte?.Solution?.FullName;
 
                 if (repo == null && newSolutionPath == solutionPath)
@@ -121,16 +74,15 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    var newRepositoryPath = repo?.RepositoryPath;
-                    var newBranchName = repo?.BranchName;
-                    var newHeadSha = repo?.HeadSha;
-                    var newTrackedSha = newRepositoryPath != null ? service.FindTrackedSha(newRepositoryPath) : null;
+                    var newRepositoryPath = repo?.LocalPath;
+                    var newBranchName = repo?.CurrentBranch?.Name;
+                    var newHeadSha = repo?.CurrentBranch?.Sha;
+                    var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
 
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Information("Fire PropertyChanged event for ActiveRepository");
-                        ActiveRepository = repo != null ? service.CreateRepository(repo.RepositoryPath) : null;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                        ActiveRepository = repo;
                     }
                     else if (newBranchName != branchName)
                     {
@@ -161,51 +113,24 @@ namespace GitHub.Services
             }
         }
 
-        static RepositoryInfo FindActiveRepository(object gitExt)
-        {
-            var activeRepositoriesProperty = gitExt.GetType().GetProperty("ActiveRepositories");
-            var activeRepositories = (IEnumerable<object>)activeRepositoriesProperty?.GetValue(gitExt);
-            var repo = activeRepositories?.FirstOrDefault();
-            if (repo == null)
-            {
-                return null;
-            }
-
-            var repositoryPathProperty = repo.GetType().GetProperty("RepositoryPath");
-            var repositoryPath = (string)repositoryPathProperty?.GetValue(repo);
-
-            var currentBranchProperty = repo.GetType().GetProperty("CurrentBranch");
-            var currentBranch = currentBranchProperty?.GetValue(repo);
-
-            var headShaProperty = currentBranch?.GetType().GetProperty("HeadSha");
-            var headSha = (string)headShaProperty?.GetValue(currentBranch);
-
-            var nameProperty = currentBranch?.GetType().GetProperty("Name");
-            var branchName = (string)nameProperty?.GetValue(currentBranch);
-
-            return new RepositoryInfo(repositoryPath, branchName, headSha);
-        }
-
-        class RepositoryInfo
-        {
-            public RepositoryInfo(string repositoryPath, string branchName, string headSha)
-            {
-                RepositoryPath = repositoryPath;
-                BranchName = branchName;
-                HeadSha = headSha;
-            }
-
-            public string RepositoryPath { get; }
-            public string BranchName { get; }
-            public string HeadSha { get; }
-        }
-
         /// <summary>
         /// The active repository or null if not in a repository.
         /// </summary>
         public ILocalRepositoryModel ActiveRepository
         {
-            get; private set;
+            get
+            {
+                return repositoryModel;
+            }
+
+            private set
+            {
+                if (value != repositoryModel)
+                {
+                    repositoryModel = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepository)));
+                }
+            }
         }
 
         /// <summary>

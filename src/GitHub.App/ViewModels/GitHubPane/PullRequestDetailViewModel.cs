@@ -326,7 +326,7 @@ namespace GitHub.ViewModels.GitHubPane
                 modelService = await modelServiceFactory.CreateAsync(connection);
 
                 await Refresh();
-                teamExplorerContext.StatusChanged += RefreshLater;
+                teamExplorerContext.StatusChanged += RefreshIfActive;
             }
             finally
             {
@@ -334,7 +334,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void RefreshLater(object sender, EventArgs e)
+        void RefreshIfActive(object sender, EventArgs e)
         {
             if (active)
             {
@@ -531,7 +531,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                teamExplorerContext.StatusChanged -= RefreshLater;
+                teamExplorerContext.StatusChanged -= RefreshIfActive;
             }
         }
 
