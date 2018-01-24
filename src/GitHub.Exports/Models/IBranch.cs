@@ -11,5 +11,7 @@ namespace GitHub.Models
         IRepositoryModel Repository { get; }
         bool IsTracking { get; }
         string DisplayName { get; set; }
+        string Sha { get; }
+        string TrackedSha { get; }
     }
 }
