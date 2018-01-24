@@ -75,14 +75,6 @@ namespace GitHub.InlineReviews.ViewModels
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
-
-            NavigateToEditor = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(true),
-                async _ =>
-                {
-                    // TODO: Execute the `openFileInSolutionCommand`.
-                    await Task.Delay(1000);
-                });
         }
 
         /// <summary>
@@ -103,11 +95,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets a command which moves to the previous inline comment in the file.
         /// </summary>
         public ReactiveCommand<Unit> PreviousComment { get; }
-
-        /// <summary>
-        /// Gets a command which navigates to the position of this comment in the live editor.
-        /// </summary>
-        public ReactiveCommand<Unit> NavigateToEditor { get; }
 
         public void Dispose()
         {
