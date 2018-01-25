@@ -24,7 +24,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerContext : ITeamExplorerContext
     {
-        readonly ILogger log;
+        static ILogger log = LogManager.ForContext<TeamExplorerContext>();
+
         readonly DTE dte;
         readonly IVSGitExt gitExt;
 
@@ -38,13 +39,12 @@ namespace GitHub.Services
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(LogManager.ForContext<TeamExplorerContext>(), gitExt, serviceProvider)
+            : this(gitExt, serviceProvider)
         {
         }
 
-        public TeamExplorerContext(ILogger log, IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
         {
-            this.log = log;
             this.gitExt = gitExt;
 
             dte = serviceProvider.TryGetService<DTE>();

@@ -4,7 +4,6 @@ using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
 using EnvDTE;
-using Serilog;
 using GitHub.Models;
 
 namespace GitHub.App.UnitTests.Services
@@ -13,12 +12,6 @@ namespace GitHub.App.UnitTests.Services
     {
         public class TheActiveRepositoryProperty
         {
-            [SetUp]
-            public void SetUp()
-            {
-                Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-            }
-
             [Test]
             public void NoActiveRepository()
             {
@@ -223,8 +216,7 @@ namespace GitHub.App.UnitTests.Services
             dte = dte ?? Substitute.For<DTE>();
             var sp = Substitute.For<IGitHubServiceProvider>();
             sp.TryGetService<DTE>().Returns(dte);
-            var log = Substitute.For<ILogger>();
-            return new TeamExplorerContext(log, gitExt, sp);
+            return new TeamExplorerContext(gitExt, sp);
         }
 
         static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)
