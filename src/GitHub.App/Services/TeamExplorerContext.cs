@@ -24,7 +24,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerContext : ITeamExplorerContext
     {
-        readonly ILogger log;
+        static ILogger log = LogManager.ForContext<TeamExplorerContext>();
+
         readonly DTE dte;
         readonly IVSGitExt gitExt;
 
@@ -38,21 +39,18 @@ namespace GitHub.Services
 
         [ImportingConstructor]
         public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(LogManager.ForContext<TeamExplorerContext>(), gitExt, serviceProvider)
+            : this(gitExt, serviceProvider)
         {
         }
 
-        public TeamExplorerContext(ILogger log, IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
         {
-            this.log = log;
             this.gitExt = gitExt;
 
-            dte = serviceProvider.TryGetService<DTE>();
-            if (dte == null)
-            {
-                log.Error("Couldn't find service for type {DteType}", typeof(DTE));
-            }
+            // This is a standard service which should always be available.
+            dte = serviceProvider.GetService<DTE>();
 
+            // HACK: In a future version of VSGitExt this hopefully won't be necessary.
             gitExt.Refresh(serviceProvider);
 
             Refresh();
@@ -64,7 +62,7 @@ namespace GitHub.Services
             try
             {
                 var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-                var newSolutionPath = dte?.Solution?.FullName;
+                var newSolutionPath = dte.Solution?.FullName;
 
                 if (repo == null && newSolutionPath == solutionPath)
                 {
