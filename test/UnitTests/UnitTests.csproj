@@ -260,6 +260,7 @@
     <Compile Include="GitHub.Extensions\GuardTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
+    <Compile Include="GitHub.TeamFoundation\VSGitExtTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
     <Compile Include="GitHub.UI\TestAutomation\ResourceValueTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
@@ -371,6 +372,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
