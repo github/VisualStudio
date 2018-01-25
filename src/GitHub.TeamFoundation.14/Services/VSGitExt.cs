@@ -14,8 +14,6 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExt : IVSGitExt
     {
-        static readonly ILogger log = LogManager.ForContext<VSGitExt>();
-
         IGitHubServiceProvider serviceProvider;
         IVSUIContext context;
         IGitExt gitService;
