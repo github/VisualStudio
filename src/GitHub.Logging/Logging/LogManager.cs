@@ -9,6 +9,14 @@ namespace GitHub.Logging
 {
     public static class LogManager
     {
+#if DEBUG
+        private static LogEventLevel DefaultLoggingLevel = LogEventLevel.Debug;
+#else
+        private static LogEventLevel DefaultLoggingLevel = LogEventLevel.Information;
+#endif
+
+        private static LoggingLevelSwitch LoggingLevelSwitch = new LoggingLevelSwitch(DefaultLoggingLevel);
+
         static Logger CreateLogger()
         {
             var logPath = Path.Combine(
@@ -21,11 +29,7 @@ namespace GitHub.Logging
 
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()
-#if DEBUG
-                .MinimumLevel.Debug()
-#else
-                .MinimumLevel.Verbose()
-#endif
+                .MinimumLevel.ControlledBy(LoggingLevelSwitch)
                 .WriteTo.File(logPath,
                     fileSizeLimitBytes: null,
                     outputTemplate: outputTemplate)

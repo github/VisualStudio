@@ -149,7 +149,9 @@ namespace GitHub.VisualStudio
 
         public object TryGetService(Type serviceType)
         {
-            string contract = AttributedModelServices.GetContractName(serviceType);
+            log.Debug("TryGetService {ServiceType}", serviceType);
+
+            var contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
@@ -162,7 +164,7 @@ namespace GitHub.VisualStudio
                 if (instance != null)
                     return instance;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Debugger.Break();
             }
