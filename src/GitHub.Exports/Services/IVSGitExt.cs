@@ -8,7 +8,6 @@ namespace GitHub.Services
 {
     public interface IVSGitExt
     {
-        void Refresh(IServiceProvider serviceProvider);
         IEnumerable<ILocalRepositoryModel> ActiveRepositories { get; }
         event Action ActiveRepositoriesChanged;
     }

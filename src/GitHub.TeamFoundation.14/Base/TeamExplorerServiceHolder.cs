@@ -181,7 +181,10 @@ namespace GitHub.VisualStudio.Base
                         if (repos == null)
                         {
                             log.Error("Error 2001: ActiveRepositories is null. GitService: '{GitService}'", GitService);
-                            GitService.Refresh(ServiceProvider);
+
+                            // NOTE: VSGitExt is now self-refreshing
+                            //GitService.Refresh(ServiceProvider);
+
                             repos = GitService.ActiveRepositories;
                             if (repos == null)
                                 log.Error("Error 2002: ActiveRepositories is null. GitService: '{GitService}'", GitService);
