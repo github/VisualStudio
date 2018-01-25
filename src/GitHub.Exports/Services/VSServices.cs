@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 using GitHub.Logging;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Setup.Configuration;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
 using Serilog;
@@ -147,6 +149,7 @@ namespace GitHub.Services
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
         const string EnvVersionKey = "EnvVersion";
+        const string InstallationNamePrefix = "VisualStudio/";
         string GetVSVersion()
         {
             var version = typeof(Microsoft.VisualStudio.Shell.ActivityLog).Assembly.GetName().Version;
@@ -164,30 +167,9 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    var os = serviceProvider.TryGetService<IOperatingSystem>();
-                    var devenv = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-                    // C:\ProgramData\Microsoft\VisualStudio\Packages\_Instances
-                    var pathToInstallationData = Path.Combine(os.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData),
-                        "Microsoft", "VisualStudio", "Packages", "_Instances");
-
-                    var regexVersion = new Regex(@"""productDisplayVersion"":""([^""]+)""");
-                    var regexPath = new Regex(@"""installationPath"":""([^""]+)""");
-
-                    foreach (var dir in os.Directory.EnumerateDirectories(pathToInstallationData))
-                    {
-                        var data = os.File.ReadAllText(Path.Combine(dir, "state.json"), System.Text.Encoding.UTF8);
-                        if (regexPath.IsMatch(data) && regexVersion.IsMatch(data))
-                        {
-                            var path = regexPath.Match(data).Groups[1].Value;
-                            path = path.Replace("\\\\", "\\");
-                            if (devenv.StartsWith(path, StringComparison.OrdinalIgnoreCase))
-                            {
-                                var value = regexVersion.Match(data).Groups[1].Value;
-                                return value;
-                            }
-                        }
-                    }
+                    var setupConfiguration = new SetupConfiguration();
+                    var setupInstance = setupConfiguration.GetInstanceForCurrentProcess();
+                    return setupInstance.GetInstallationName().TrimPrefix(InstallationNamePrefix);
                 }
             }
             catch(Exception ex)
