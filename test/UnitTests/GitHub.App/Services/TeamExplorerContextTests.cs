@@ -215,7 +215,7 @@ namespace GitHub.App.UnitTests.Services
         {
             dte = dte ?? Substitute.For<DTE>();
             var sp = Substitute.For<IGitHubServiceProvider>();
-            sp.TryGetService<DTE>().Returns(dte);
+            sp.GetService<DTE>().Returns(dte);
             return new TeamExplorerContext(gitExt, sp);
         }
 
