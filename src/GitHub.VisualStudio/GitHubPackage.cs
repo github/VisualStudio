@@ -210,6 +210,8 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(ILoginManager))
             {
+                // These services are got through MEF and we will take a performance hit if ILoginManager is requested during 
+                // InitializeAsync. TODO: We can probably make LoginManager a normal MEF component rather than a service.
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var keychain = serviceProvider.GetService<IKeychain>();
                 var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
