@@ -1,10 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
 using GitHub.Controls;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels.Dialog;
 using ReactiveUI;
@@ -30,6 +33,7 @@ namespace GitHub.VisualStudio.Views.Dialog
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
+                d(Disposable.Create(Deactivate));
             });
 
             IsVisibleChanged += (s, e) =>
@@ -37,6 +41,33 @@ namespace GitHub.VisualStudio.Views.Dialog
                 if (IsVisible)
                     dotComUserNameOrEmail.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
             };
+
+            // Refocus VS after a SSO login attempt.
+            this.WhenAnyObservable(
+                x => x.ViewModel.GitHubLogin.LoginViaOAuth,
+                x => x.ViewModel.EnterpriseLogin.LoginViaOAuth)
+                .Subscribe(_ => Application.Current.MainWindow?.Activate());
+
+            hostTabControl.SelectionChanged += (s, e) =>
+            {
+                foreach (var i in e.RemovedItems)
+                {
+                    if (i == dotComTab)
+                    {
+                        ViewModel?.GitHubLogin.Deactivated();
+                    }
+                    else if (i == enterpriseTab)
+                    {
+                        ViewModel?.EnterpriseLogin.Deactivated();
+                    }
+                }
+            };
+        }
+
+        void Deactivate()
+        {
+            ViewModel?.GitHubLogin.Deactivated();
+            ViewModel?.EnterpriseLogin.Deactivated();
         }
 
         void SetupDotComBindings(Action<IDisposable> d)
@@ -50,6 +81,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.PasswordValidator, v => v.dotComPasswordValidationMessage.ReactiveValidator));
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.Login, v => v.dotComLogInButton.Command));
+            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.LoginViaOAuth, v => v.dotComSsaLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.IsLoggingIn, v => v.dotComLogInButton.ShowSpinner));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigatePricing, v => v.pricingLink.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.Error, v => v.dotComErrorMessage.UserError));
@@ -58,17 +90,23 @@ namespace GitHub.VisualStudio.Views.Dialog
         void SetupEnterpriseBindings(Action<IDisposable> d)
         {
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, x => x.enterpriseloginControlsPanel.IsEnabled, x => x == false));
-            
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ProbeStatus, x => x.enterpriseUrl.IconContent));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseUsernamePasswordPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.UsernameAndPassword) != 0) ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseTokenPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.Token) != 0) ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseSsoPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.OAuth) != 0) ? Visibility.Visible : Visibility.Collapsed));
+
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmail, x => x.enterpriseUserNameOrEmail.Text));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmailValidator, v => v.enterpriseUserNameOrEmailValidationMessage.ReactiveValidator));
 
             d(this.BindPassword(ViewModel, vm => vm.EnterpriseLogin.Password, v => v.enterprisePassword.Text, enterprisePassword));
+            d(this.BindPassword(ViewModel, vm => vm.EnterpriseLogin.Password, v => v.enterpriseToken.Text, enterpriseToken));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.PasswordValidator, v => v.enterprisePasswordValidationMessage.ReactiveValidator));
 
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.EnterpriseUrl, v => v.enterpriseUrl.Text));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.EnterpriseUrlValidator, v => v.enterpriseUrlValidationMessage.ReactiveValidator));
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Login, v => v.enterpriseLogInButton.Command));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.LoginViaOAuth, v => v.enterpriseSsaLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, v => v.enterpriseLogInButton.ShowSpinner));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateLearnMore, v => v.learnMoreLink.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Error, v => v.enterpriseErrorMessage.UserError));

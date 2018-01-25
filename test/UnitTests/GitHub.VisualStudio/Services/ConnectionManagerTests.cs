@@ -23,7 +23,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github", "valid"),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
             var result = await target.GetLoadedConnections();
 
             Assert.That(2, Is.EqualTo(result.Count));
@@ -41,7 +42,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github", "invalid"),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
             var result = await target.GetLoadedConnections();
 
             Assert.That(2, Is.EqualTo(result.Count));
@@ -62,7 +64,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github", "valid"),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
             var result = await target.GetConnection(HostAddress.Create("valid.com"));
 
             Assert.That("https://valid.com/", Is.EqualTo(result.HostAddress.WebUri.ToString()));
@@ -76,7 +79,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github", "valid"),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
             var result = await target.GetConnection(HostAddress.Create("another.com"));
 
             Assert.That(result, Is.Null);
@@ -93,7 +97,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache(),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
             var result = await target.LogIn(HostAddress.GitHubDotComHostAddress, "user", "pass");
 
             Assert.That(result, Is.Not.Null);
@@ -107,7 +112,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache(),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             await target.LogIn(HostAddress.GitHubDotComHostAddress, "user", "pass");
 
@@ -122,7 +128,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache(),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             Assert.ThrowsAsync<AuthorizationException>(async () =>
                 await target.LogIn(HostAddress.Create("invalid.com"), "user", "pass"));
@@ -136,7 +143,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github"),
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await target.LogIn(HostAddress.GitHubDotComHostAddress, "user", "pass"));
@@ -151,7 +159,8 @@ public class ConnectionManagerTests
                 cache,
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             await target.LogIn(HostAddress.GitHubDotComHostAddress, "user", "pass");
 
@@ -171,7 +180,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github"),
                 Substitute.For<IKeychain>(),
                 loginManager,
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             await target.LogOut(HostAddress.GitHubDotComHostAddress);
 
@@ -189,7 +199,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("github"),
                 Substitute.For<IKeychain>(),
                 loginManager,
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             await target.LogOut(HostAddress.GitHubDotComHostAddress);
 
@@ -205,7 +216,8 @@ public class ConnectionManagerTests
                 CreateConnectionCache("valid"),
                 Substitute.For<IKeychain>(),
                 loginManager,
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             Assert.ThrowsAsync<KeyNotFoundException>(async () =>
                 await target.LogOut(HostAddress.GitHubDotComHostAddress));
@@ -220,7 +232,8 @@ public class ConnectionManagerTests
                 cache,
                 Substitute.For<IKeychain>(),
                 CreateLoginManager(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IVisualStudioBrowser>());
 
             await target.LogOut(HostAddress.GitHubDotComHostAddress);
 
