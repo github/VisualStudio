@@ -53,11 +53,16 @@ namespace GitHub.VisualStudio
             
             var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
             LogManager.EnableTraceLogging(packageSettings?.EnableTraceLogging ?? false);
-
-            packageSettings.PropertyChanged += (sender, args) =>
+            if (packageSettings != null)
             {
-                log.Information("Packaged Settings PropertyChanged: {PropertyName}", args.PropertyName);
-            };
+                packageSettings.PropertyChanged += (sender, args) =>
+                {
+                    if (args.PropertyName == "EnableTraceLogging")
+                    {
+                        LogManager.EnableTraceLogging(packageSettings.EnableTraceLogging);
+                    }
+                };
+            }
 
             await GetServiceAsync(typeof(IUsageTracker));
 
