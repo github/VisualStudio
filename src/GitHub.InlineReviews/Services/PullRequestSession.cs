@@ -11,10 +11,11 @@ using ReactiveUI;
 using System.Threading;
 using System.Reactive.Subjects;
 using static System.FormattableString;
-using Octokit;
-using GitHub.Api;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
+
+// GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
+#pragma warning disable CS0618 
 
 namespace GitHub.InlineReviews.Services
 {
@@ -167,7 +168,7 @@ namespace GitHub.InlineReviews.Services
                     var addReview = new Mutation()
                         .AddPullRequestReview(review)
                         .Select(x => x.PullRequestReview.Id);
-                    pendingReviewId = (await graphql.Run(addReview)).Single();
+                    pendingReviewId = await graphql.Run(addReview);
                 }
 
                 var comment = new AddPullRequestReviewCommentInput
@@ -182,7 +183,7 @@ namespace GitHub.InlineReviews.Services
                 var addComment = new Mutation()
                     .AddPullRequestReviewComment(comment)
                     .Select(x => x.Comment.DatabaseId);
-                var commentId = (await graphql.Run(addComment)).Single();
+                var commentId = await graphql.Run(addComment);
 
                 var model = new PullRequestReviewCommentModel
                 {
@@ -261,7 +262,7 @@ namespace GitHub.InlineReviews.Services
                         User = User,
                     });
 
-                var model = (await graphql.Run(mutation)).Single();
+                var model = await graphql.Run(mutation);
                 PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
                 HasPendingReview = false;
                 return model;
@@ -287,7 +288,7 @@ namespace GitHub.InlineReviews.Services
                         User = User,
                     });
 
-                var model = (await graphql.Run(mutation)).Single();
+                var model = await graphql.Run(mutation);
                 PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
                 HasPendingReview = false;
                 pendingReviewId = null;
@@ -370,7 +371,7 @@ namespace GitHub.InlineReviews.Services
                     .Repository(RepositoryOwner, LocalRepository.Name)
                     .PullRequest(PullRequest.Number)
                     .Select(x => x.Id);
-                pullRequestNodeId = (await graphql.Run(query)).Single();
+                pullRequestNodeId = await graphql.Run(query);
             }
         }
 
