@@ -18,9 +18,9 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenSccProviderContextIsActive(bool isActive, int expectCalls)
         {
             var context = CreateVSUIContext(isActive);
-            var sp = CreateGitHubServiceProvider(context);
+            var sp = Substitute.For<IGitHubServiceProvider>();
 
-            var target = new VSGitExt(sp);
+            var target = CreateVSGitExt(context, sp: sp);
 
             sp.Received(expectCalls).GetService<IGitExt>();
         }
@@ -30,9 +30,9 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenUIContextChanged(bool activated, int expectCalls)
         {
             var context = CreateVSUIContext(false);
-            var sp = CreateGitHubServiceProvider(context);
+            var sp = Substitute.For<IGitHubServiceProvider>();
+            var target = CreateVSGitExt(context, sp: sp);
 
-            var target = new VSGitExt(sp);
             var eventArgs = Substitute.For<IVSUIContextChangedEventArgs>();
             eventArgs.Activated.Returns(activated);
             context.UIContextChanged += Raise.Event<EventHandler<IVSUIContextChangedEventArgs>>(context, eventArgs);
@@ -48,8 +48,8 @@ public class VSGitExtTests
         {
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt();
-            var sp = CreateGitHubServiceProvider(context, gitExt);
-            var target = new VSGitExt(sp);
+
+            var target = CreateVSGitExt(context, gitExt);
 
             bool wasFired = false;
             target.ActiveRepositoriesChanged += () => wasFired = true;
@@ -64,8 +64,7 @@ public class VSGitExtTests
         {
             var context = CreateVSUIContext(false);
             var gitExt = CreateGitExt();
-            var sp = CreateGitHubServiceProvider(context, gitExt);
-            var target = new VSGitExt(sp);
+            var target = CreateVSGitExt(context, gitExt);
 
             bool wasFired = false;
             target.ActiveRepositoriesChanged += () => wasFired = true;
@@ -84,9 +83,7 @@ public class VSGitExtTests
         public void SccProviderContextNotActive_IsNull()
         {
             var context = CreateVSUIContext(false);
-            var sp = CreateGitHubServiceProvider(context);
-
-            var target = new VSGitExt(sp);
+            var target = CreateVSGitExt(context);
 
             Assert.That(target.ActiveRepositories, Is.Null);
         }
@@ -96,8 +93,7 @@ public class VSGitExtTests
         {
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new string[0]);
-            var sp = CreateGitHubServiceProvider(context, gitExt);
-            var target = new VSGitExt(sp);
+            var target = CreateVSGitExt(context, gitExt);
 
             var activeRepositories = target.ActiveRepositories;
 
@@ -105,7 +101,7 @@ public class VSGitExtTests
         }
 
         // TODO: We can't currently test returning a non-empty list because it constructs a live LocalRepositoryModel object.
-        // Move could move the responsibility for constructing a LocalRepositoryModel object outside of VSGitExt.
+        // We could move the responsibility for constructing a LocalRepositoryModel object outside of VSGitExt.
     }
 
     static IVSUIContext CreateVSUIContext(bool isActive)
@@ -137,15 +133,15 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static IGitHubServiceProvider CreateGitHubServiceProvider(IVSUIContext context, IGitExt gitExt = null)
+    static IVSGitExt CreateVSGitExt(IVSUIContext context, IGitExt gitExt = null, IGitHubServiceProvider sp = null)
     {
-        var contextFactory = Substitute.For<IVSUIContextFactory>();
+        sp = sp ?? Substitute.For<IGitHubServiceProvider>();
+        var factory = Substitute.For<IVSUIContextFactory>();
         gitExt = gitExt ?? Substitute.For<IGitExt>();
         var contextGuid = new Guid(Guids.GitSccProviderId);
-        contextFactory.GetUIContext(contextGuid).Returns(context);
-        var sp = Substitute.For<IGitHubServiceProvider>();
-        sp.GetService<IVSUIContextFactory>().Returns(contextFactory);
+        factory.GetUIContext(contextGuid).Returns(context);
+        sp.GetService<IVSUIContextFactory>().Returns(factory);
         sp.GetService<IGitExt>().Returns(gitExt);
-        return sp;
+        return new VSGitExt(sp, factory);
     }
 }
