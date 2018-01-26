@@ -25,12 +25,9 @@ namespace GitHub.VisualStudio.Base
         readonly SynchronizationContext syncContext;
 
         /// <summary>
-        /// This class relies on IVSUIContextFactory to get the UIContext object that provides information
-        /// when VS switches repositories. Unfortunately, for some reason MEF fails to create the instance
-        /// when imported from the constructor, so it's imported manually when first accessed via the
-        /// ServiceProvider instance (when mocking, make sure that the ServiceProvider includes this factory)
+        /// This class relies on IVSGitExt that provides information when VS switches repositories.
         /// </summary>
-        /// <param name="gitService"></param>
+        /// <param name="gitService">Used for monitoring the active repository.</param>
         [ImportingConstructor]
         public TeamExplorerServiceHolder(IVSGitExt gitService)
         {

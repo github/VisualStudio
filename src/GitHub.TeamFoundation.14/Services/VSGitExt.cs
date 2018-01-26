@@ -10,6 +10,9 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.VisualStudio.Base
 {
+    /// <summary>
+    /// This service acts as an always available version of <see cref="IGitExt"/>.
+    /// </summary>
     [Export(typeof(IVSGitExt))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExt : IVSGitExt
