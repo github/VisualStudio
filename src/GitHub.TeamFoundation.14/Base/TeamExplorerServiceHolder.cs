@@ -4,11 +4,9 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using GitHub.Extensions;
-using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.TeamFoundation.Controls;
-using Serilog;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -16,7 +14,6 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        static readonly ILogger log = LogManager.ForContext<TeamExplorerServiceHolder>();
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
