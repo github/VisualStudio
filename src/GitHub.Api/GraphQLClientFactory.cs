@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Primitives;
 using Octokit.GraphQL;
 
 namespace GitHub.Api
@@ -20,9 +21,9 @@ namespace GitHub.Api
             this.program = program;
         }
 
-        public Task<Octokit.GraphQL.Connection> CreateConnection(IConnection connection)
+        public Task<Octokit.GraphQL.Connection> CreateConnection(HostAddress address)
         {
-            var credentials = new GraphQLKeychainCredentialStore(keychain, connection.HostAddress);
+            var credentials = new GraphQLKeychainCredentialStore(keychain, address);
             var header = new ProductHeaderValue(program.ProductHeader.Name, program.ProductHeader.Version);
             return Task.FromResult(new Connection(header, credentials));
         }

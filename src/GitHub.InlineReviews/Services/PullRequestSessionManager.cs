@@ -258,13 +258,11 @@ namespace GitHub.InlineReviews.Services
             {
                 var connection = await connectionManager.GetConnection(repository);
                 var modelService = await modelServiceFactory.CreateAsync(connection);
-                var graphql = await graphqlFactory.CreateConnection(connection);
 
                 if (modelService != null)
                 {
                     session = new PullRequestSession(
                         sessionService,
-                        graphql,
                         await modelService.GetCurrentUser(),
                         pullRequest,
                         repository,

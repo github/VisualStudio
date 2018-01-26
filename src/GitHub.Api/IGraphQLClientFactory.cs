@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using GitHub.Models;
+using GitHub.Primitives;
 
 namespace GitHub.Api
 {
     public interface IGraphQLClientFactory
     {
-        Task<Octokit.GraphQL.Connection> CreateConnection(IConnection connection);
+        Task<Octokit.GraphQL.Connection> CreateConnection(HostAddress address);
     }
 }

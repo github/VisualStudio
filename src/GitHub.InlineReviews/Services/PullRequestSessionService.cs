@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -15,8 +16,13 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
+using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
 using ReactiveUI;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
+
+// GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
+#pragma warning disable CS0618 
 
 namespace GitHub.InlineReviews.Services
 {
@@ -30,6 +36,7 @@ namespace GitHub.InlineReviews.Services
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
         readonly IApiClientFactory apiClientFactory;
+        readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
 
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
@@ -40,12 +47,14 @@ namespace GitHub.InlineReviews.Services
             IGitClient gitClient,
             IDiffService diffService,
             IApiClientFactory apiClientFactory,
+            IGraphQLClientFactory graphqlFactory,
             IUsageTracker usageTracker)
         {
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
             this.apiClientFactory = apiClientFactory;
+            this.graphqlFactory = graphqlFactory;
             this.usageTracker = usageTracker;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
@@ -239,6 +248,22 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
+        public async Task<string> GetGraphQLPullRequestId(
+            ILocalRepositoryModel localRepository,
+            string repositoryOwner,
+            int number)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var query = new Query()
+                .Repository(repositoryOwner, localRepository.Name)
+                .PullRequest(number)
+                .Select(x => x.Id);
+
+            return await graphql.Run(query);
+        }
+
         /// <inheritdoc/>
         public virtual async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
@@ -283,6 +308,35 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IPullRequestReviewModel> CreatePendingReview(
+            ILocalRepositoryModel localRepository,
+            IAccount user,
+            string pullRequestId)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var review = new AddPullRequestReviewInput
+            {
+                PullRequestId = pullRequestId,
+            };
+
+            var addReview = new Mutation()
+                .AddPullRequestReview(review)
+                .Select(x => new PullRequestReviewModel
+                {
+                    Id = x.PullRequestReview.DatabaseId.Value,
+                    Body = x.PullRequestReview.Body,
+                    CommitId = x.PullRequestReview.Commit.Oid,
+                    NodeId = x.PullRequestReview.Id,
+                    State = ToRest(x.PullRequestReview.State),
+                    User = user,
+                });
+
+            return await graphql.Run(addReview);
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewModel> PostReview(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
@@ -290,8 +344,7 @@ namespace GitHub.InlineReviews.Services
             int number,
             string commitId,
             string body,
-            PullRequestReviewEvent e,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            PullRequestReviewEvent e)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
@@ -302,8 +355,7 @@ namespace GitHub.InlineReviews.Services
                 number,
                 commitId,
                 body,
-                e,
-                comments);
+                e);
 
             return new PullRequestReviewModel
             {
@@ -315,8 +367,81 @@ namespace GitHub.InlineReviews.Services
             };
         }
 
+        public async Task<IPullRequestReviewModel> SubmitPendingReview(
+            ILocalRepositoryModel localRepository,
+            IAccount user,
+            string pendingReviewId,
+            string body,
+            PullRequestReviewEvent e)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var submit = new SubmitPullRequestReviewInput
+            {
+                Body = body,
+                Event = ToGraphQl(e),
+                PullRequestReviewId = pendingReviewId,
+            };
+
+            var mutation = new Mutation()
+                .SubmitPullRequestReview(submit)
+                .Select(x => new PullRequestReviewModel
+                {
+                    Body = body,
+                    CommitId = x.PullRequestReview.Commit.Oid,
+                    Id = x.PullRequestReview.DatabaseId.Value,
+                    NodeId = x.PullRequestReview.Id,
+                    State = ToRest(x.PullRequestReview.State),
+                    User = user,
+                });
+
+            return await graphql.Run(mutation);
+        }
+
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+        public async Task<IPullRequestReviewCommentModel> PostPendingReviewComment(
+            ILocalRepositoryModel localRepository,
+            IAccount user,
+            string pendingReviewId,
+            string body,
+            string commitId,
+            string path,
+            int position)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var comment = new AddPullRequestReviewCommentInput
+            {
+                Body = body,
+                CommitOID = commitId,
+                Path = path,
+                Position = position,
+                PullRequestReviewId = pendingReviewId,
+            };
+
+            var addComment = new Mutation()
+                .AddPullRequestReviewComment(comment)
+                .Select(x => new PullRequestReviewCommentModel
+                {
+                    Id = x.Comment.DatabaseId.Value,
+                    Body = x.Comment.Body,
+                    CommitId = x.Comment.Commit.Oid,
+                    Path = x.Comment.Path,
+                    Position = x.Comment.Position,
+                    CreatedAt = x.Comment.CreatedAt.Value,
+                    DiffHunk = x.Comment.DiffHunk,
+                    OriginalPosition = x.Comment.OriginalPosition,
+                    OriginalCommitId = x.Comment.OriginalCommit.Oid,
+                    User = user,
+                });
+
+            return await graphql.Run(addComment);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
@@ -356,7 +481,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+        public async Task<IPullRequestReviewCommentModel> PostReviewCommentRepy(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
@@ -408,6 +533,40 @@ namespace GitHub.InlineReviews.Services
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
+        }
+
+        static Octokit.PullRequestReviewState ToRest(Octokit.GraphQL.Model.PullRequestReviewState state)
+        {
+            switch (state)
+            {
+                case Octokit.GraphQL.Model.PullRequestReviewState.Approved:
+                    return Octokit.PullRequestReviewState.Approved;
+                case Octokit.GraphQL.Model.PullRequestReviewState.ChangesRequested:
+                    return Octokit.PullRequestReviewState.ChangesRequested;
+                case Octokit.GraphQL.Model.PullRequestReviewState.Commented:
+                    return Octokit.PullRequestReviewState.Commented;
+                case Octokit.GraphQL.Model.PullRequestReviewState.Dismissed:
+                    return Octokit.PullRequestReviewState.Dismissed;
+                case Octokit.GraphQL.Model.PullRequestReviewState.Pending:
+                    return Octokit.PullRequestReviewState.Pending;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)
+        {
+            switch (e)
+            {
+                case Octokit.PullRequestReviewEvent.Approve:
+                    return Octokit.GraphQL.Model.PullRequestReviewEvent.Approve;
+                case Octokit.PullRequestReviewEvent.Comment:
+                    return Octokit.GraphQL.Model.PullRequestReviewEvent.Comment;
+                case Octokit.PullRequestReviewEvent.RequestChanges:
+                    return Octokit.GraphQL.Model.PullRequestReviewEvent.RequestChanges;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

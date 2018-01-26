@@ -178,16 +178,6 @@ namespace GitHub.InlineReviews.ViewModels
             catch (Exception e)
             {
                 var message = e.Message;
-
-                if (e is ApiValidationException)
-                {
-                    // HACK: If the user has pending review comments on the server then we can't
-                    // post new comments. The correct way to test for this would be to make a
-                    // request to /repos/:owner/:repo/pulls/:number/reviews and check for comments
-                    // with a PENDING state. For the moment however we'll just display a message.
-                    message += ". Do you have pending review comments?";
-                }
-
                 ErrorMessage = message;
                 log.Error(e, "Error posting inline comment");
             }
@@ -195,7 +185,7 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task DoStartReview(object unused)
         {
-            session.StartReview();
+            await session.StartReview();
             await CommitEdit.ExecuteAsync(null);
         }
 

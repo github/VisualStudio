@@ -54,7 +54,6 @@ namespace GitHub.Api
         /// <param name="commitId">The SHA of the commit being reviewed.</param>
         /// <param name="body">The review body.</param>
         /// <param name="e">The review event.</param>
-        /// <param name="comments">The review comments.</param>
         /// <returns></returns>
         IObservable<PullRequestReview> PostPullRequestReview(
             string owner,
@@ -62,8 +61,7 @@ namespace GitHub.Api
             int number,
             string commitId,
             string body,
-            PullRequestReviewEvent e,
-            IEnumerable<IPullRequestReviewCommentModel> comments);
+            PullRequestReviewEvent e);
 
         /// <summary>
         /// Creates a new PR review comment.

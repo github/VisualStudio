@@ -67,8 +67,7 @@ namespace GitHub.Api
             int number,
             string commitId,
             string body,
-            PullRequestReviewEvent e,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            PullRequestReviewEvent e)
         {
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
             Guard.ArgumentNotEmptyString(name, nameof(name));
@@ -78,10 +77,6 @@ namespace GitHub.Api
                 Body = body,
                 CommitId = commitId,
                 Event = e,
-                Comments = comments.Select(x => new DraftPullRequestReviewComment(
-                    x.Body,
-                    x.Path,
-                    x.Position.Value)).ToList(),
             };
 
             return gitHubClient.PullRequest.Review.Create(owner, name, number, review);

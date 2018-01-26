@@ -14,9 +14,6 @@ using static System.FormattableString;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 
-// GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
-#pragma warning disable CS0618 
-
 namespace GitHub.InlineReviews.Services
 {
     /// <summary>
@@ -32,7 +29,6 @@ namespace GitHub.InlineReviews.Services
     public class PullRequestSession : ReactiveObject, IPullRequestSession
     {
         readonly IPullRequestSessionService service;
-        readonly Octokit.GraphQL.Connection graphql;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         bool isCheckedOut;
@@ -46,7 +42,6 @@ namespace GitHub.InlineReviews.Services
 
         public PullRequestSession(
             IPullRequestSessionService service,
-            Octokit.GraphQL.Connection graphql,
             IAccount user,
             IPullRequestModel pullRequest,
             ILocalRepositoryModel localRepository,
@@ -54,13 +49,11 @@ namespace GitHub.InlineReviews.Services
             bool isCheckedOut)
         {
             Guard.ArgumentNotNull(service, nameof(service));
-            Guard.ArgumentNotNull(graphql, nameof(graphql));
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
             Guard.ArgumentNotNull(localRepository, nameof(localRepository));
 
             this.service = service;
-            this.graphql = graphql;
             this.isCheckedOut = isCheckedOut;
             this.pullRequest = pullRequest;
             User = user;
@@ -140,9 +133,11 @@ namespace GitHub.InlineReviews.Services
             IReadOnlyList<DiffChunk> diff,
             int position)
         {
+            IPullRequestReviewCommentModel model;
+
             if (!HasPendingReview)
             {
-                var model = await service.PostReviewComment(
+                model = await service.PostStandaloneReviewComment(
                     LocalRepository,
                     RepositoryOwner,
                     User,
@@ -151,63 +146,27 @@ namespace GitHub.InlineReviews.Services
                     commitId,
                     path,
                     position);
-                await AddComment(model);
-                return model;
             }
             else
             {
-                await LoadPullRequestNodeId();
-
-                if (pendingReviewId == null)
-                {
-                    var review = new AddPullRequestReviewInput
-                    {
-                        PullRequestId = pullRequestNodeId,
-                    };
-
-                    var addReview = new Mutation()
-                        .AddPullRequestReview(review)
-                        .Select(x => x.PullRequestReview.Id);
-                    pendingReviewId = await graphql.Run(addReview);
-                }
-
-                var comment = new AddPullRequestReviewCommentInput
-                {
-                    Body = body,
-                    CommitOID = commitId,
-                    Path = path,
-                    Position = position,
-                    PullRequestReviewId = pendingReviewId,
-                };
-
-                var addComment = new Mutation()
-                    .AddPullRequestReviewComment(comment)
-                    .Select(x => x.Comment.DatabaseId);
-                var commentId = await graphql.Run(addComment);
-
-                var model = new PullRequestReviewCommentModel
-                {
-                    Id = commentId.Value,
-                    Body = body,
-                    CommitId = commitId,
-                    Path = path,
-                    Position = position,
-                    CreatedAt = DateTimeOffset.Now,
-                    DiffHunk = BuildDiffHunk(diff, position),
-                    OriginalPosition = position,
-                    OriginalCommitId = commitId,
-                    User = User,
-                };
-
-                await AddComment(model);
-                return model;
+                model = await service.PostPendingReviewComment(
+                    LocalRepository,
+                    User,
+                    pendingReviewId,
+                    body,
+                    commitId,
+                    path,
+                    position);
             }
+
+            await AddComment(model);
+            return model;
         }
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo)
         {
-            var model = await service.PostReviewComment(
+            var model = await service.PostReviewCommentRepy(
                 LocalRepository,
                 RepositoryOwner,
                 User,
@@ -219,81 +178,50 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public void StartReview()
+        public async Task<IPullRequestReviewModel> StartReview()
         {
-            if (!HasPendingReview)
+            if (HasPendingReview)
             {
-                var newReview = new PullRequestReviewModel
-                {
-                    Id = -1,
-                    State = Octokit.PullRequestReviewState.Pending,
-                    User = User,
-                };
-
-                PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { newReview }).ToList();
-                HasPendingReview = true;
-                pendingReviewId = null;
+                throw new InvalidOperationException("A pending review is already underway.");
             }
+
+            var model = await service.CreatePendingReview(
+                LocalRepository,
+                User,
+                await GetPullRequestNodeId());
+            HasPendingReview = true;
+            pendingReviewId = model.NodeId;
+            return model;
         }
 
         /// <inheritdoc/>
         public async Task<IPullRequestReviewModel> PostReview(string body, Octokit.PullRequestReviewEvent e)
         {
+            IPullRequestReviewModel model;
+
             if (pendingReviewId == null)
             {
-                await LoadPullRequestNodeId();
-
-                var review = new AddPullRequestReviewInput
-                {
-                    Body = body,
-                    Event = ToGraphQl(e),
-                    PullRequestId = pullRequestNodeId,
-                };
-
-                var mutation = new Mutation()
-                    .AddPullRequestReview(review)
-                    .Select(x => new PullRequestReviewModel
-                    {
-                        Body = body,
-                        CommitId = x.PullRequestReview.Commit.Oid,
-                        Id = x.PullRequestReview.DatabaseId.Value,
-                        NodeId = x.PullRequestReview.Id,
-                        State = ToRest(x.PullRequestReview.State),
-                        User = User,
-                    });
-
-                var model = await graphql.Run(mutation);
-                PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
-                HasPendingReview = false;
-                return model;
+                model = await service.PostReview(
+                    LocalRepository,
+                    RepositoryOwner,
+                    User,
+                    PullRequest.Number,
+                    PullRequest.Head.Sha,
+                    body,
+                    e);
             }
             else
             {
-                var submit = new SubmitPullRequestReviewInput
-                {
-                    Body = body,
-                    Event = ToGraphQl(e),
-                    PullRequestReviewId = pendingReviewId,
-                };
-
-                var mutation = new Mutation()
-                    .SubmitPullRequestReview(submit)
-                    .Select(x => new PullRequestReviewModel
-                    {
-                        Body = body,
-                        CommitId = x.PullRequestReview.Commit.Oid,
-                        Id = x.PullRequestReview.DatabaseId.Value,
-                        NodeId = x.PullRequestReview.Id,
-                        State = ToRest(x.PullRequestReview.State),
-                        User = User,
-                    });
-
-                var model = await graphql.Run(mutation);
-                PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
-                HasPendingReview = false;
-                pendingReviewId = null;
-                return model;
+                model = await service.SubmitPendingReview(
+                    LocalRepository,
+                    User,
+                    pendingReviewId,
+                    body,
+                    e);
             }
+
+            PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
+            return model;
         }
 
         /// <inheritdoc/>
@@ -363,16 +291,17 @@ namespace GitHub.InlineReviews.Services
             return Path.Combine(LocalRepository.LocalPath, relativePath);
         }
 
-        async Task LoadPullRequestNodeId()
+        async Task<string> GetPullRequestNodeId()
         {
             if (pullRequestNodeId == null)
             {
-                var query = new Query()
-                    .Repository(RepositoryOwner, LocalRepository.Name)
-                    .PullRequest(PullRequest.Number)
-                    .Select(x => x.Id);
-                pullRequestNodeId = await graphql.Run(query);
+                pullRequestNodeId = await service.GetGraphQLPullRequestId(
+                    LocalRepository,
+                    RepositoryOwner,
+                    PullRequest.Number);
             }
+
+            return pullRequestNodeId;
         }
 
         static string BuildDiffHunk(IReadOnlyList<DiffChunk> diff, int position)
@@ -383,40 +312,6 @@ namespace GitHub.InlineReviews.Services
             var newLineNumber = context.Select(x => x.NewLineNumber).Where(x => x != -1).FirstOrDefault();
             var header = Invariant($"@@ -{oldLineNumber},5 +{newLineNumber},5 @@");
             return header + '\n' + string.Join("\n", context);
-        }
-
-        static Octokit.PullRequestReviewState ToRest(Octokit.GraphQL.Model.PullRequestReviewState state)
-        {
-            switch (state)
-            {
-                case Octokit.GraphQL.Model.PullRequestReviewState.Approved:
-                    return Octokit.PullRequestReviewState.Approved;
-                case Octokit.GraphQL.Model.PullRequestReviewState.ChangesRequested:
-                    return Octokit.PullRequestReviewState.ChangesRequested;
-                case Octokit.GraphQL.Model.PullRequestReviewState.Commented:
-                    return Octokit.PullRequestReviewState.Commented;
-                case Octokit.GraphQL.Model.PullRequestReviewState.Dismissed:
-                    return Octokit.PullRequestReviewState.Dismissed;
-                case Octokit.GraphQL.Model.PullRequestReviewState.Pending:
-                    return Octokit.PullRequestReviewState.Pending;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)
-        {
-            switch (e)
-            {
-                case Octokit.PullRequestReviewEvent.Approve:
-                    return Octokit.GraphQL.Model.PullRequestReviewEvent.Approve;
-                case Octokit.PullRequestReviewEvent.Comment:
-                    return Octokit.GraphQL.Model.PullRequestReviewEvent.Comment;
-                case Octokit.PullRequestReviewEvent.RequestChanges:
-                    return Octokit.GraphQL.Model.PullRequestReviewEvent.RequestChanges;
-                default:
-                    throw new NotSupportedException();
-            }
         }
 
         /// <inheritdoc/>

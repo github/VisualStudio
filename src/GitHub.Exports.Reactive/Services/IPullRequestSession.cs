@@ -108,7 +108,7 @@ namespace GitHub.Services
         /// <summary>
         /// Starts a new pending pull request review.
         /// </summary>
-        void StartReview();
+        Task<IPullRequestReviewModel> StartReview();
 
         /// <summary>
         /// Posts the currently pending review.
