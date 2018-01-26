@@ -162,9 +162,9 @@ namespace GitHub.VisualStudio
                 if (instance != null)
                     return instance;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Debugger.Break();
+                log.Error(ex, "Error loading {ServiceType}", serviceType);
             }
 
             instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
