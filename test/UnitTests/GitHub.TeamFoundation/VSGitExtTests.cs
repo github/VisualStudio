@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.ComponentModel;
 using System.Collections.Generic;
 using GitHub.Services;
@@ -37,6 +38,22 @@ public class VSGitExtTests
             context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
 
             sp.Received(expectCalls).GetService<IGitExt>();
+        }
+
+        [Test]
+        public void ActiveRepositories_ReadUsingThreadPoolThread()
+        {
+            var gitExt = Substitute.For<IGitExt>();
+            bool threadPool = false;
+            gitExt.ActiveRepositories.Returns(x =>
+            {
+                threadPool = Thread.CurrentThread.IsThreadPoolThread;
+                return new IGitRepositoryInfo[0];
+            });
+
+            var target = CreateVSGitExt(gitExt: gitExt);
+
+            Assert.That(threadPool, Is.True);
         }
     }
 
@@ -78,12 +95,12 @@ public class VSGitExtTests
     public class TheActiveRepositoriesProperty
     {
         [Test]
-        public void SccProviderContextNotActive_IsNull()
+        public void SccProviderContextNotActive_IsEmpty()
         {
             var context = CreateVSUIContext(false);
             var target = CreateVSGitExt(context);
 
-            Assert.That(target.ActiveRepositories, Is.Null);
+            Assert.That(target.ActiveRepositories, Is.Empty);
         }
 
         [Test]
@@ -102,22 +119,6 @@ public class VSGitExtTests
         // We could move the responsibility for constructing a LocalRepositoryModel object outside of VSGitExt.
     }
 
-    static IVSUIContext CreateVSUIContext(bool isActive)
-    {
-        var context = Substitute.For<IVSUIContext>();
-        context.IsActive.Returns(isActive);
-        return context;
-    }
-
-    static IGitExt CreateGitExt(IList<string> repositoryPaths = null)
-    {
-        repositoryPaths = repositoryPaths ?? new string[0];
-        var gitExt = Substitute.For<IGitExt>();
-        var repoList = CreateActiveRepositories(new string[0]);
-        gitExt.ActiveRepositories.Returns(repoList);
-        return gitExt;
-    }
-
     static IReadOnlyList<IGitRepositoryInfo> CreateActiveRepositories(IList<string> repositoryPaths)
     {
         var repositories = new List<IGitRepositoryInfo>();
@@ -131,15 +132,34 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static IVSGitExt CreateVSGitExt(IVSUIContext context, IGitExt gitExt = null, IGitHubServiceProvider sp = null)
+    static IVSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IGitHubServiceProvider sp = null)
     {
+        context = context ?? CreateVSUIContext(true);
+        gitExt = gitExt ?? CreateGitExt();
         sp = sp ?? Substitute.For<IGitHubServiceProvider>();
         var factory = Substitute.For<IVSUIContextFactory>();
-        gitExt = gitExt ?? Substitute.For<IGitExt>();
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetService<IVSUIContextFactory>().Returns(factory);
         sp.GetService<IGitExt>().Returns(gitExt);
-        return new VSGitExt(sp, factory);
+        var vsGitExt = new VSGitExt(sp, factory);
+        vsGitExt.InitializeTask.Wait();
+        return vsGitExt;
+    }
+
+    static IGitExt CreateGitExt(IList<string> repositoryPaths = null)
+    {
+        repositoryPaths = repositoryPaths ?? new string[0];
+        var gitExt = Substitute.For<IGitExt>();
+        var repoList = CreateActiveRepositories(new string[0]);
+        gitExt.ActiveRepositories.Returns(repoList);
+        return gitExt;
+    }
+
+    static IVSUIContext CreateVSUIContext(bool isActive)
+    {
+        var context = Substitute.For<IVSUIContext>();
+        context.IsActive.Returns(isActive);
+        return context;
     }
 }

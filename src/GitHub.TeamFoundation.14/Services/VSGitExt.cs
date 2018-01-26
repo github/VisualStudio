@@ -7,6 +7,7 @@ using GitHub.Services;
 using GitHub.Logging;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -32,11 +33,20 @@ namespace GitHub.VisualStudio.Base
             // This could be changed to VSConstants.UICONTEXT.SolutionExists_guid when testing.
             context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
 
+            // Start with empty array until we have a change to initialize.
+            ActiveRepositories = new ILocalRepositoryModel[0];
+
             // If we're not in the GitSccProvider context or TryInitialize fails, have another go when the context changes.
-            if (!context.IsActive || !TryInitialize())
+            if (context.IsActive && TryInitialize())
+            {
+                //// RefreshActiveRepositories on background thread so we don't impact startup.
+                InitializeTask = Task.Run(() => RefreshActiveRepositories());
+            }
+            else
             {
                 context.UIContextChanged += ContextChanged;
                 log.Information("VSGitExt will be initialized later");
+                InitializeTask = Task.CompletedTask;
             }
         }
 
@@ -45,6 +55,7 @@ namespace GitHub.VisualStudio.Base
             // If we're in the GitSccProvider context and TryInitialize succeeds, we can stop listening for events.
             if (e.Activated && TryInitialize())
             {
+                RefreshActiveRepositories();
                 context.UIContextChanged -= ContextChanged;
                 log.Information("Initialized VSGitExt on UIContextChanged");
             }
@@ -55,13 +66,11 @@ namespace GitHub.VisualStudio.Base
             gitService = serviceProvider.GetService<IGitExt>();
             if (gitService != null)
             {
-                // The IGitExt service is now available so let consumers know to read ActiveRepositories.
-                ActiveRepositoriesChanged?.Invoke();
                 gitService.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == nameof(gitService.ActiveRepositories))
                     {
-                        ActiveRepositoriesChanged?.Invoke();
+                        RefreshActiveRepositories();
                     }
                 };
 
@@ -73,8 +82,23 @@ namespace GitHub.VisualStudio.Base
             return false;
         }
 
-        public IEnumerable<ILocalRepositoryModel> ActiveRepositories => gitService?.ActiveRepositories.Select(x => x.ToModel());
+        void RefreshActiveRepositories()
+        {
+            try
+            {
+                ActiveRepositories = gitService?.ActiveRepositories.Select(x => x.ToModel());
+                ActiveRepositoriesChanged?.Invoke();
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error refreshing repositories");
+            }
+        }
+
+        public IEnumerable<ILocalRepositoryModel> ActiveRepositories { get; private set; }
         public event Action ActiveRepositoriesChanged;
+
+        public Task InitializeTask { get; }
     }
 
     static class IGitRepositoryInfoExtensions
