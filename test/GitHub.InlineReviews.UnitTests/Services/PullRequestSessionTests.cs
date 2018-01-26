@@ -12,7 +12,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
         public class TheGetFileMethod
         {
-            [Fact]
+            [Test]
             public async Task BaseShaIsSet()
             {
                 var target = new PullRequestSession(
@@ -36,10 +36,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     true);
                 var file = await target.GetFile(FilePath);
 
-                Assert.Same("BASE_SHA", file.BaseSha);
+                Assert.That("BASE_SHA", Is.SameAs(file.BaseSha));
             }
 
-            [Fact]
+            [Test]
             public async Task CommitShaIsSet()
             {
                 var target = new PullRequestSession(
@@ -51,10 +51,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     true);
                 var file = await target.GetFile(FilePath);
 
-                Assert.Same("HEAD_SHA", file.CommitSha);
+                Assert.That("HEAD_SHA", Is.SameAs(file.CommitSha));
             }
 
-            [Fact]
+            [Test]
             public async Task DiffShaIsSet()
             {
                 var diff = new List<DiffChunk>();
@@ -75,10 +75,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     true);
                 var file = await target.GetFile(FilePath);
 
-                Assert.Same(diff, file.Diff);
+                Assert.That(diff, Is.SameAs(file.Diff));
             }
 
-            [Fact]
+            [Test]
             public async Task InlineCommentThreadsIsSet()
             {
                 var baseContents = @"Line 1
@@ -114,14 +114,14 @@ Line 4";
 
                     var file = await target.GetFile(FilePath);
                     var thread = file.InlineCommentThreads.First();
-                    Assert.Equal(2, thread.LineNumber);
+                    Assert.That(2, Is.EqualTo(thread.LineNumber));
                 }
             }
         }
 
         public class ThePostReviewCommentMethod
         {
-            [Fact]
+            [Test]
             public async Task PostsToCorrectFork()
             {
                 var service = Substitute.For<IPullRequestSessionService>();
@@ -140,7 +140,7 @@ Line 4";
                     1);
             }
 
-            [Fact]
+            [Test]
             public async Task PostsReplyToCorrectFork()
             {
                 var service = Substitute.For<IPullRequestSessionService>();
@@ -180,7 +180,7 @@ Line 4";
 
         public class TheUpdateMethod
         {
-            [Fact]
+            [Test]
             public async Task UpdatesThePullRequestModel()
             {
                 var target = new PullRequestSession(
@@ -197,10 +197,10 @@ Line 4";
                 // PullRequestModel overrides Equals such that two PRs with the same number are
                 // considered equal. This was causing the PullRequest not to be updated on refresh.
                 // Test that this works correctly!
-                Assert.Same(newPullRequest, target.PullRequest);
+                Assert.That(newPullRequest, Is.SameAs(target.PullRequest));
             }
 
-            [Fact]
+            [Test]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
@@ -241,16 +241,16 @@ Line 4";
 
                     var file = await target.GetFile(FilePath);
 
-                    Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
 
                     pullRequest = CreatePullRequest(comment1, comment2);
                     await target.Update(pullRequest);
 
-                    Assert.Equal(2, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
                 }
             }
 
-            [Fact]
+            [Test]
             public async Task DoesntThrowIfGetFileCalledDuringUpdate()
             {
                 var comment = CreateComment(@"@@ -1,4 +1,4 @@

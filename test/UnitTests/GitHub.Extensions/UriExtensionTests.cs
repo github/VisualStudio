@@ -1,17 +1,16 @@
 ﻿using System;
 using GitHub.Extensions;
-using Xunit;
+using NUnit.Framework;
 
 public class UriExtensionTests
 {
     public class TheAppendMethod : TestBaseClass
     {
-        [Theory]
-        [InlineData("https://github.com/foo/bar", "graphs", "https://github.com/foo/bar/graphs")]
-        [InlineData("https://github.com/foo/bar/", "graphs", "https://github.com/foo/bar/graphs")]
-        [InlineData("https://github.com", "bippety/boppety", "https://github.com/bippety/boppety")]
-        [InlineData("https://github.com/", "bippety/boppety", "https://github.com/bippety/boppety")]
-        [InlineData("https://github.com/foo/bar", "bippety/boppety", "https://github.com/foo/bar/bippety/boppety")]
+        [TestCase("https://github.com/foo/bar", "graphs", "https://github.com/foo/bar/graphs")]
+        [TestCase("https://github.com/foo/bar/", "graphs", "https://github.com/foo/bar/graphs")]
+        [TestCase("https://github.com", "bippety/boppety", "https://github.com/bippety/boppety")]
+        [TestCase("https://github.com/", "bippety/boppety", "https://github.com/bippety/boppety")]
+        [TestCase("https://github.com/foo/bar", "bippety/boppety", "https://github.com/foo/bar/bippety/boppety")]
         public void AppendsRelativePath(string url, string relativePath, string expected)
         {
             var uri = new Uri(url, UriKind.Absolute);
@@ -19,7 +18,7 @@ public class UriExtensionTests
 
             var result = uri.Append(relativePath);
 
-            Assert.Equal(expectedUri, result);
+            Assert.That(expectedUri, Is.EqualTo(result));
         }
     }
 }

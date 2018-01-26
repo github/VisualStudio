@@ -11,7 +11,7 @@ using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using LibGit2Sharp;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
@@ -21,20 +21,20 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         public class TheBodyProperty
         {
-            [Fact]
+            [Test]
             public async Task ShouldUsePlaceholderBodyIfNoneExists()
             {
                 var target = CreateTarget();
 
                 await target.Load(CreatePullRequest(body: string.Empty));
 
-                Assert.Equal("*No description provided.*", target.Body);
+                Assert.That("*No description provided.*", Is.EqualTo(target.Body));
             }
         }
 
         public class TheHeadProperty
         {
-            [Fact]
+            [Test]
             public async Task ShouldAcceptNullHead()
             {
                 var target = CreateTarget();
@@ -45,13 +45,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(model);
 
-                Assert.Equal("[invalid]", target.SourceBranchDisplayName);
+                Assert.That("[invalid]", Is.EqualTo(target.SourceBranchDisplayName));
             }
         }
 
         public class TheCheckoutCommand
         {
-            [Fact]
+            [Test]
             public async Task CheckedOutAndUpToDate()
             {
                 var target = CreateTarget(
@@ -61,10 +61,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Null(target.CheckoutState);
+                Assert.That(target.CheckoutState, Is.Null);
             }
 
-            [Fact]
+            [Test]
             public async Task NotCheckedOut()
             {
                 var target = CreateTarget(
@@ -75,10 +75,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.True(target.CheckoutState.IsEnabled);
-                Assert.Equal("Checkout pr/123", target.CheckoutState.ToolTip);
+                Assert.That("Checkout pr/123", Is.EqualTo(target.CheckoutState.ToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task NotCheckedOutWithWorkingDirectoryDirty()
             {
                 var target = CreateTarget(
@@ -89,10 +89,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.ToolTip);
+                Assert.That("Cannot checkout as your working directory has uncommitted changes.", Is.EqualTo(target.CheckoutState.ToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckoutExistingLocalBranch()
             {
                 var target = CreateTarget(
@@ -102,10 +102,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest(number: 123));
 
                 Assert.True(target.Checkout.CanExecute(null));
-                Assert.Equal("Checkout pr/123", target.CheckoutState.Caption);
+                Assert.That("Checkout pr/123", Is.EqualTo(target.CheckoutState.Caption));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckoutNonExistingLocalBranch()
             {
                 var target = CreateTarget(
@@ -114,10 +114,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest(number: 123));
 
                 Assert.True(target.Checkout.CanExecute(null));
-                Assert.Equal("Checkout to pr/123", target.CheckoutState.Caption);
+                Assert.That("Checkout to pr/123", Is.EqualTo(target.CheckoutState.Caption));
             }
 
-            [Fact]
+            [Test]
             public async Task UpdatesOperationErrorWithExceptionMessage()
             {
                 var target = CreateTarget(
@@ -130,10 +130,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(pr);
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("The source repository is no longer available.", target.CheckoutState.ToolTip);
+                Assert.That("The source repository is no longer available.", Is.EqualTo(target.CheckoutState.ToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task SetsOperationErrorOnCheckoutFailure()
             {
                 var target = CreateTarget(
@@ -144,12 +144,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 Assert.True(target.Checkout.CanExecute(null));
 
-                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
 
-                Assert.Equal("Switch threw", target.OperationError);
+                Assert.That("Switch threw", Is.EqualTo(target.OperationError));
             }
 
-            [Fact]
+            [Test]
             public async Task ClearsOperationErrorOnCheckoutSuccess()
             {
                 var target = CreateTarget(
@@ -159,14 +159,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
-                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
-                Assert.Equal("Switch threw", target.OperationError);
+                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.That("Switch threw", Is.EqualTo(target.OperationError));
 
                 await target.Checkout.ExecuteAsync();
-                Assert.Null(target.OperationError);
+                Assert.That(target.OperationError, Is.Null);
             }
 
-            [Fact]
+            [Test]
             public async Task ClearsOperationErrorOnCheckoutRefresh()
             {
                 var target = CreateTarget(
@@ -176,17 +176,17 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
-                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
-                Assert.Equal("Switch threw", target.OperationError);
+                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.That("Switch threw", Is.EqualTo(target.OperationError));
 
                 await target.Refresh();
-                Assert.Null(target.OperationError);
+                Assert.That(target.OperationError, Is.Null);
             }
         }
 
         public class ThePullCommand
         {
-            [Fact]
+            [Test]
             public async Task NotCheckedOut()
             {
                 var target = CreateTarget(
@@ -196,10 +196,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Pull.CanExecute(null));
-                Assert.Null(target.UpdateState);
+                Assert.That(target.UpdateState, Is.Null);
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndUpToDate()
             {
                 var target = CreateTarget(
@@ -209,12 +209,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Pull.CanExecute(null));
-                Assert.Equal(0, target.UpdateState.CommitsAhead);
-                Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("No commits to pull", target.UpdateState.PullToolTip);
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("No commits to pull", Is.EqualTo(target.UpdateState.PullToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndBehind()
             {
                 var target = CreateTarget(
@@ -225,12 +225,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Pull.CanExecute(null));
-                Assert.Equal(0, target.UpdateState.CommitsAhead);
-                Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("Pull from remote branch baz", target.UpdateState.PullToolTip);
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("Pull from remote branch baz", Is.EqualTo(target.UpdateState.PullToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndAheadAndBehind()
             {
                 var target = CreateTarget(
@@ -242,12 +242,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Pull.CanExecute(null));
-                Assert.Equal(3, target.UpdateState.CommitsAhead);
-                Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("Pull from remote branch baz", target.UpdateState.PullToolTip);
+                Assert.That(3, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("Pull from remote branch baz", Is.EqualTo(target.UpdateState.PullToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndBehindFork()
             {
                 var target = CreateTarget(
@@ -259,12 +259,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Pull.CanExecute(null));
-                Assert.Equal(0, target.UpdateState.CommitsAhead);
-                Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("Pull from fork branch foo:baz", target.UpdateState.PullToolTip);
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("Pull from fork branch foo:baz", Is.EqualTo(target.UpdateState.PullToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task UpdatesOperationErrorWithExceptionMessage()
             {
                 var target = CreateTarget(
@@ -273,14 +273,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
-                Assert.Equal("Pull threw", target.OperationError);
+                Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
+                Assert.That("Pull threw", Is.EqualTo(target.OperationError));
             }
         }
 
         public class ThePushCommand
         {
-            [Fact]
+            [Test]
             public async Task NotCheckedOut()
             {
                 var target = CreateTarget(
@@ -290,10 +290,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
-                Assert.Null(target.UpdateState);
+                Assert.That(target.UpdateState, Is.Null);
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndUpToDate()
             {
                 var target = CreateTarget(
@@ -303,12 +303,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
-                Assert.Equal(0, target.UpdateState.CommitsAhead);
-                Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("No commits to push", target.UpdateState.PushToolTip);
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("No commits to push", Is.EqualTo(target.UpdateState.PushToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndAhead()
             {
                 var target = CreateTarget(
@@ -319,12 +319,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Push.CanExecute(null));
-                Assert.Equal(2, target.UpdateState.CommitsAhead);
-                Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("Push to remote branch baz", target.UpdateState.PushToolTip);
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("Push to remote branch baz", Is.EqualTo(target.UpdateState.PushToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndBehind()
             {
                 var target = CreateTarget(
@@ -335,12 +335,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
-                Assert.Equal(0, target.UpdateState.CommitsAhead);
-                Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("No commits to push", target.UpdateState.PushToolTip);
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("No commits to push", Is.EqualTo(target.UpdateState.PushToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndAheadAndBehind()
             {
                 var target = CreateTarget(
@@ -352,12 +352,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Push.CanExecute(null));
-                Assert.Equal(3, target.UpdateState.CommitsAhead);
-                Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("You must pull before you can push", target.UpdateState.PushToolTip);
+                Assert.That(3, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("You must pull before you can push", Is.EqualTo(target.UpdateState.PushToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task CheckedOutAndAheadOfFork()
             {
                 var target = CreateTarget(
@@ -369,12 +369,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Push.CanExecute(null));
-                Assert.Equal(2, target.UpdateState.CommitsAhead);
-                Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("Push to fork branch foo:baz", target.UpdateState.PushToolTip);
+                Assert.That(2, Is.EqualTo(target.UpdateState.CommitsAhead));
+                Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
+                Assert.That("Push to fork branch foo:baz", Is.EqualTo(target.UpdateState.PushToolTip));
             }
 
-            [Fact]
+            [Test]
             public async Task UpdatesOperationErrorWithExceptionMessage()
             {
                 var target = CreateTarget(
@@ -383,8 +383,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
-                Assert.Equal("Push threw", target.OperationError);
+                Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
+                Assert.That("Push threw", Is.EqualTo(target.OperationError));
             }
         }
 

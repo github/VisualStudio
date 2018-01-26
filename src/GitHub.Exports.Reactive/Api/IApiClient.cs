@@ -28,11 +28,6 @@ namespace GitHub.Api
         /// </summary>
         /// <returns></returns>
         IObservable<Repository> GetRepositoriesForOrganization(string organization);
-        IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
-            string authenticationCode = null,
-            bool useOldScopes = false,
-            bool useFingerprint = true);
 
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();

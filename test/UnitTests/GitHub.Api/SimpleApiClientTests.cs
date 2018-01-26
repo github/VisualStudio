@@ -5,8 +5,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using Xunit;
-using EnterpriseProbeResult = GitHub.Services.EnterpriseProbeResult;
+using NUnit.Framework;
 
 public class SimpleApiClientTests
 {
@@ -21,27 +20,27 @@ public class SimpleApiClientTests
 
     public class TheGetRepositoryMethod
     {
-        [Fact]
+        [Test]
         public async Task RetrievesRepositoryFromWeb()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
             var repository = new Repository(42);
             gitHubClient.Repository.Get("github", "visualstudio").Returns(Task.FromResult(repository));
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var result = await client.GetRepository();
 
-            Assert.Equal(42, result.Id);
+            Assert.That(42, Is.EqualTo(result.Id));
         }
 
-        [Fact]
+        [Test]
         public async Task RetrievesCachedRepositoryForSubsequentCalls()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
@@ -49,61 +48,60 @@ public class SimpleApiClientTests
             var repository = new Repository(42);
             gitHubClient.Repository.Get("github", "visualstudio")
                 .Returns(_ => Task.FromResult(repository), _ => { throw new Exception("Should only be called once."); });
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
             var result = await client.GetRepository();
 
-            Assert.Equal(42, result.Id);
+            Assert.That(42, Is.EqualTo(result.Id));
         }
     }
 
     public class TheHasWikiMethod
     {
-        [Theory]
-        [InlineData(WikiProbeResult.Ok, true)]
-        [InlineData(WikiProbeResult.Failed, false)]
-        [InlineData(WikiProbeResult.NotFound, false)]
+        [TestCase(WikiProbeResult.Ok, true)]
+        [TestCase(WikiProbeResult.Failed, false)]
+        [TestCase(WikiProbeResult.NotFound, false)]
         public async Task ReturnsTrueWhenWikiProbeReturnsOk(WikiProbeResult probeResult, bool expected)
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
             var repository = CreateRepository(42, true);
             gitHubClient.Repository.Get("github", "visualstudio").Returns(Task.FromResult(repository));
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             wikiProbe.ProbeAsync(repository)
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
             var result = client.HasWiki();
 
-            Assert.Equal(expected, result);
-            Assert.Equal(expected, client.HasWiki());
+            Assert.That(expected, Is.EqualTo(result));
+            Assert.That(expected, Is.EqualTo(client.HasWiki()));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenWeHaveNotRequestedRepository()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var result = client.HasWiki();
@@ -114,44 +112,43 @@ public class SimpleApiClientTests
 
     public class TheIsEnterpriseMethod
     {
-        [Theory]
-        [InlineData(EnterpriseProbeResult.Ok, true)]
-        [InlineData(EnterpriseProbeResult.Failed, false)]
-        [InlineData(EnterpriseProbeResult.NotFound, false)]
+        [TestCase(EnterpriseProbeResult.Ok, true)]
+        [TestCase(EnterpriseProbeResult.Failed, false)]
+        [TestCase(EnterpriseProbeResult.NotFound, false)]
         public async Task ReturnsTrueWhenEnterpriseProbeReturnsOk(EnterpriseProbeResult probeResult, bool expected)
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
             var repository = CreateRepository(42, true);
             gitHubClient.Repository.Get("github", "visualstudio").Returns(Task.FromResult(repository));
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
-            enterpriseProbe.ProbeAsync(Args.Uri)
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
+            enterpriseProbe.Probe(Args.Uri)
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                "https://github.com/github/visualstudio",
+                "https://github.enterprise/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
             var result = client.IsEnterprise();
 
-            Assert.Equal(expected, result);
-            Assert.Equal(expected, client.IsEnterprise());
+            Assert.That(expected, Is.EqualTo(result));
+            Assert.That(expected, Is.EqualTo(client.IsEnterprise()));
         }
 
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenWeHaveNotRequestedRepository()
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var result = client.IsEnterprise();
@@ -162,7 +159,7 @@ public class SimpleApiClientTests
 
     public class TheIsIsAuthenticatedMethod
     {
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenCredentialsNotSet()
         {
             var gitHubClient = Substitute.For<IGitHubClient>();
@@ -178,7 +175,7 @@ public class SimpleApiClientTests
             Assert.False(result);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsFalseWhenAuthenicationTypeIsAnonymous()
         {
             var connection = Substitute.For<IConnection>();
@@ -197,7 +194,7 @@ public class SimpleApiClientTests
             Assert.False(result);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenLoginIsSetToBasicAuth()
         {
             var connection = Substitute.For<IConnection>();
@@ -216,7 +213,7 @@ public class SimpleApiClientTests
             Assert.True(result);
         }
 
-        [Fact]
+        [Test]
         public void ReturnsTrueWhenLoginIsSetToOAuth()
         {
             var connection = Substitute.For<IConnection>();

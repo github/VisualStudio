@@ -1,12 +1,12 @@
 ﻿using System;
 using GitHub.Primitives;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.Exports
 {
     public class HostAddressTests
     {
-        [Fact]
+        [Test]
         public void ShouldBeEqualIfAddressesMatch()
         {
             var address1 = HostAddress.Create("foo.com");
@@ -20,7 +20,7 @@ namespace UnitTests.GitHub.Exports
             Assert.True(null1 == null2);
         }
 
-        [Fact]
+        [Test]
         public void ShouldBeNotEqualIfAddressesDontMatch()
         {
             var address1 = HostAddress.Create("foo.com");
