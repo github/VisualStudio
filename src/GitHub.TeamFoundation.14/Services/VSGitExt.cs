@@ -29,21 +29,21 @@ namespace GitHub.VisualStudio.Base
         {
             this.serviceProvider = serviceProvider;
 
-            // The IGitExt service is only available when in the SccProvider context.
-            // This could be changed to VSConstants.UICONTEXT.SolutionExists_guid when testing.
+            // The IGitExt service isn't available when a TFS based solution is opened directly.
+            // It will become available when moving to a Git based solution (cause a UIContext event to fire).
             context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
 
             // Start with empty array until we have a change to initialize.
             ActiveRepositories = new ILocalRepositoryModel[0];
 
-            // If we're not in the GitSccProvider context or TryInitialize fails, have another go when the context changes.
             if (context.IsActive && TryInitialize())
             {
-                //// RefreshActiveRepositories on background thread so we don't impact startup.
+                // Refresh ActiveRepositories on background thread so we don't delay startup.
                 InitializeTask = Task.Run(() => RefreshActiveRepositories());
             }
             else
             {
+                // If we're not in the UIContext or TryInitialize fails, have another go when the UIContext changes.
                 context.UIContextChanged += ContextChanged;
                 log.Information("VSGitExt will be initialized later");
                 InitializeTask = Task.CompletedTask;
@@ -52,7 +52,8 @@ namespace GitHub.VisualStudio.Base
 
         void ContextChanged(object sender, VSUIContextChangedEventArgs e)
         {
-            // If we're in the GitSccProvider context and TryInitialize succeeds, we can stop listening for events.
+            // If we're in the UIContext and TryInitialize succeeds, we can stop listening for events.
+            // NOTE: this event can fire with UIContext=true in a TFS solution (not just Git).
             if (e.Activated && TryInitialize())
             {
                 RefreshActiveRepositories();
