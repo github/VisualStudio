@@ -16,21 +16,11 @@ namespace GitHub.TeamFoundation.Services
         }
     }
 
-    class VSUIContextChangedEventArgs : IVSUIContextChangedEventArgs
-    {
-        public bool Activated { get; }
-
-        public VSUIContextChangedEventArgs(bool activated)
-        {
-            Activated = activated;
-        }
-    }
-
     class VSUIContext : IVSUIContext
     {
         readonly UIContext context;
-        readonly Dictionary<EventHandler<IVSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>> handlers =
-            new Dictionary<EventHandler<IVSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>>();
+        readonly Dictionary<EventHandler<VSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>> handlers =
+            new Dictionary<EventHandler<VSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>>();
         public VSUIContext(UIContext context)
         {
             this.context = context;
@@ -38,7 +28,7 @@ namespace GitHub.TeamFoundation.Services
 
         public bool IsActive { get { return context.IsActive; } }
 
-        public event EventHandler<IVSUIContextChangedEventArgs> UIContextChanged
+        public event EventHandler<VSUIContextChangedEventArgs> UIContextChanged
         {
             add
             {

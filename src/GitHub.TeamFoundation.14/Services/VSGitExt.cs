@@ -34,7 +34,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        void ContextChanged(object sender, IVSUIContextChangedEventArgs e)
+        void ContextChanged(object sender, VSUIContextChangedEventArgs e)
         {
             // If we're in the GitSccProvider context and TryInitialize succeeds, we can stop listening for events.
             if (e.Activated && TryInitialize())

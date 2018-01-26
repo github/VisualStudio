@@ -33,9 +33,8 @@ public class VSGitExtTests
             var sp = Substitute.For<IGitHubServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
-            var eventArgs = Substitute.For<IVSUIContextChangedEventArgs>();
-            eventArgs.Activated.Returns(activated);
-            context.UIContextChanged += Raise.Event<EventHandler<IVSUIContextChangedEventArgs>>(context, eventArgs);
+            var eventArgs = new VSUIContextChangedEventArgs(activated);
+            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
 
             sp.Received(expectCalls).GetService<IGitExt>();
         }
@@ -69,9 +68,8 @@ public class VSGitExtTests
             bool wasFired = false;
             target.ActiveRepositoriesChanged += () => wasFired = true;
 
-            var eventArgs = Substitute.For<IVSUIContextChangedEventArgs>();
-            eventArgs.Activated.Returns(true);
-            context.UIContextChanged += Raise.Event<EventHandler<IVSUIContextChangedEventArgs>>(context, eventArgs);
+            var eventArgs = new VSUIContextChangedEventArgs(true);
+            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
 
             Assert.That(wasFired, Is.True);
         }

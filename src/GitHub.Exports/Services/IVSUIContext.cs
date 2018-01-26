@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 
 namespace GitHub.Services
 {
@@ -8,14 +7,19 @@ namespace GitHub.Services
         IVSUIContext GetUIContext(Guid contextGuid);
     }
 
-    public interface IVSUIContextChangedEventArgs
+    public sealed class VSUIContextChangedEventArgs
     {
-        bool Activated { get; }
+        public VSUIContextChangedEventArgs(bool activated)
+        {
+            Activated = activated;
+        }
+
+        public bool Activated { get; }
     }
 
     public interface IVSUIContext
     {
         bool IsActive { get; }
-        event EventHandler<IVSUIContextChangedEventArgs> UIContextChanged;
+        event EventHandler<VSUIContextChangedEventArgs> UIContextChanged;
     }
 }
