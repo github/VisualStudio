@@ -14,6 +14,8 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExt : IVSGitExt
     {
+        static readonly ILogger log = LogManager.ForContext<VSGitExt>();
+
         IGitHubServiceProvider serviceProvider;
         IVSUIContext context;
         IGitExt gitService;
@@ -31,6 +33,7 @@ namespace GitHub.VisualStudio.Base
             if (!context.IsActive || !TryInitialize())
             {
                 context.UIContextChanged += ContextChanged;
+                log.Information("VSGitExt will be initialized later");
             }
         }
 
@@ -40,6 +43,7 @@ namespace GitHub.VisualStudio.Base
             if (e.Activated && TryInitialize())
             {
                 context.UIContextChanged -= ContextChanged;
+                log.Information("Initialized VSGitExt on UIContextChanged");
             }
         }
 
@@ -58,9 +62,11 @@ namespace GitHub.VisualStudio.Base
                     }
                 };
 
+                log.Information("Found IGitExt service and initialized VSGitExt");
                 return true;
             }
 
+            log.Information("Couldn't find IGitExt service");
             return false;
         }
 
