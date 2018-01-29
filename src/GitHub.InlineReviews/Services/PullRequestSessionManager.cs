@@ -10,7 +10,6 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.Helpers;
 using GitHub.InlineReviews.Models;
 using GitHub.Logging;
 using GitHub.Models;

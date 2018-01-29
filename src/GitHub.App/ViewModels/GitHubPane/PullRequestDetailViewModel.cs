@@ -4,8 +4,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;

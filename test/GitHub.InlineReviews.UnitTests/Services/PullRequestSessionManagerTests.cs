@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Factories;
@@ -17,7 +18,6 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using NUnit.Framework;
-using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {

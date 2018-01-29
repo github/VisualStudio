@@ -15,7 +15,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio;
-using GitHub.Helpers;
 using ReactiveUI;
 using OleMenuCommand = Microsoft.VisualStudio.Shell.OleMenuCommand;
 
