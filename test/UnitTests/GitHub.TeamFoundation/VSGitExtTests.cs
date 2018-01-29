@@ -77,6 +77,24 @@ public class VSGitExtTests
         }
 
         [Test]
+        public void ExceptionReadingActiveRepositories_ActiveRepositoriesChangedIsFired()
+        {
+            var context = CreateVSUIContext(true);
+            var gitExt = CreateGitExt();
+            gitExt.ActiveRepositories.Returns(x => { throw new Exception("Boom!"); });
+
+            var target = CreateVSGitExt(context, gitExt);
+
+            bool wasFired = false;
+            target.ActiveRepositoriesChanged += () => wasFired = true;
+            var eventArgs = new PropertyChangedEventArgs(nameof(gitExt.ActiveRepositories));
+            gitExt.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(gitExt, eventArgs);
+
+            Assert.That(wasFired, Is.True);
+            Assert.That(target.ActiveRepositories, Is.Empty);
+        }
+
+        [Test]
         public void WhenUIContextChanged_ActiveRepositoriesChangedIsFired()
         {
             var context = CreateVSUIContext(false);

@@ -25,6 +25,7 @@ namespace GitHub.VisualStudio.Base
         readonly ILocalRepositoryModelFactory repositoryFactory;
 
         IGitExt gitService;
+        IEnumerable<ILocalRepositoryModel> activeRepositories;
 
         [ImportingConstructor]
         public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
@@ -92,7 +93,6 @@ namespace GitHub.VisualStudio.Base
             try
             {
                 ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
-                ActiveRepositoriesChanged?.Invoke();
             }
             catch (Exception e)
             {
@@ -101,7 +101,20 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        public IEnumerable<ILocalRepositoryModel> ActiveRepositories { get; private set; }
+        public IEnumerable<ILocalRepositoryModel> ActiveRepositories
+        {
+            get
+            {
+                return activeRepositories;
+            }
+
+            private set
+            {
+                activeRepositories = value;
+                ActiveRepositoriesChanged?.Invoke();
+            }
+        }
+
         public event Action ActiveRepositoriesChanged;
 
         public Task InitializeTask { get; private set; }
