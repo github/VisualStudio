@@ -426,6 +426,7 @@ namespace GitHub.InlineReviews.Services
                 .Select(x => new PullRequestReviewCommentModel
                 {
                     Id = x.Comment.DatabaseId.Value,
+                    NodeId = x.Comment.Id,
                     Body = x.Comment.Body,
                     CommitId = x.Comment.Commit.Oid,
                     Path = x.Comment.Path,
@@ -434,6 +435,7 @@ namespace GitHub.InlineReviews.Services
                     DiffHunk = x.Comment.DiffHunk,
                     OriginalPosition = x.Comment.OriginalPosition,
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,
+                    PullRequestReviewId = x.Comment.PullRequestReview.DatabaseId.Value,
                     User = user,
                 });
 
