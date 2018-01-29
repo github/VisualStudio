@@ -38,7 +38,7 @@ namespace GitHub.VisualStudio.Base
             context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
 
             // Start with empty array until we have a change to initialize.
-            ActiveRepositories = new ILocalRepositoryModel[0];
+            ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
 
             if (context.IsActive && TryInitialize())
             {
@@ -97,7 +97,7 @@ namespace GitHub.VisualStudio.Base
             catch (Exception e)
             {
                 log.Error(e, "Error refreshing repositories");
-                ActiveRepositories = new ILocalRepositoryModel[0];
+                ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
             }
         }
 
@@ -110,8 +110,11 @@ namespace GitHub.VisualStudio.Base
 
             private set
             {
-                activeRepositories = value;
-                ActiveRepositoriesChanged?.Invoke();
+                if (value != activeRepositories)
+                {
+                    activeRepositories = value;
+                    ActiveRepositoriesChanged?.Invoke();
+                }
             }
         }
 
