@@ -87,8 +87,26 @@ public class VSGitExtTests
 
             var eventArgs = new VSUIContextChangedEventArgs(true);
             context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            target.InitializeTask.Wait();
 
             Assert.That(wasFired, Is.True);
+        }
+
+        [Test]
+        public void WhenUIContextChanged_FiredUsingThreadPoolThread()
+        {
+            var context = CreateVSUIContext(false);
+            var gitExt = CreateGitExt();
+            var target = CreateVSGitExt(context, gitExt);
+
+            bool threadPool = false;
+            target.ActiveRepositoriesChanged += () => threadPool = Thread.CurrentThread.IsThreadPoolThread;
+
+            var eventArgs = new VSUIContextChangedEventArgs(true);
+            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            target.InitializeTask.Wait();
+
+            Assert.That(threadPool, Is.True);
         }
     }
 
@@ -132,7 +150,7 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static IVSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IGitHubServiceProvider sp = null)
+    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IGitHubServiceProvider sp = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();

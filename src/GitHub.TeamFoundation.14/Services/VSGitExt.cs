@@ -56,7 +56,8 @@ namespace GitHub.VisualStudio.Base
             // NOTE: this event can fire with UIContext=true in a TFS solution (not just Git).
             if (e.Activated && TryInitialize())
             {
-                RefreshActiveRepositories();
+                // Refresh ActiveRepositories on background thread so we don't delay UI context change.
+                InitializeTask = Task.Run(() => RefreshActiveRepositories());
                 context.UIContextChanged -= ContextChanged;
                 log.Information("Initialized VSGitExt on UIContextChanged");
             }
@@ -99,7 +100,7 @@ namespace GitHub.VisualStudio.Base
         public IEnumerable<ILocalRepositoryModel> ActiveRepositories { get; private set; }
         public event Action ActiveRepositoriesChanged;
 
-        public Task InitializeTask { get; }
+        public Task InitializeTask { get; private set; }
     }
 
     static class IGitRepositoryInfoExtensions
