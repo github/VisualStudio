@@ -20,14 +20,17 @@ namespace GitHub.VisualStudio.Base
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
 
-        IGitHubServiceProvider serviceProvider;
-        IVSUIContext context;
+        readonly IGitHubServiceProvider serviceProvider;
+        readonly IVSUIContext context;
+        readonly ILocalRepositoryModelFactory repositoryFactory;
+
         IGitExt gitService;
 
         [ImportingConstructor]
-        public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory)
+        public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
         {
             this.serviceProvider = serviceProvider;
+            this.repositoryFactory = repositoryFactory;
 
             // The IGitExt service isn't available when a TFS based solution is opened directly.
             // It will become available when moving to a Git based solution (cause a UIContext event to fire).
@@ -88,12 +91,13 @@ namespace GitHub.VisualStudio.Base
         {
             try
             {
-                ActiveRepositories = gitService?.ActiveRepositories.Select(x => x.ToModel());
+                ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
                 ActiveRepositoriesChanged?.Invoke();
             }
             catch (Exception e)
             {
                 log.Error(e, "Error refreshing repositories");
+                ActiveRepositories = new ILocalRepositoryModel[0];
             }
         }
 
@@ -101,16 +105,5 @@ namespace GitHub.VisualStudio.Base
         public event Action ActiveRepositoriesChanged;
 
         public Task InitializeTask { get; private set; }
-    }
-
-    static class IGitRepositoryInfoExtensions
-    {
-        /// <summary>
-        /// Create a LocalRepositoryModel from a VS git repo object
-        /// </summary>
-        public static ILocalRepositoryModel ToModel(this IGitRepositoryInfo repo)
-        {
-            return repo == null ? null : new LocalRepositoryModel(repo.RepositoryPath);
-        }
     }
 }

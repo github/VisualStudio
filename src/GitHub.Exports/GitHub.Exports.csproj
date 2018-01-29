@@ -149,6 +149,7 @@
     <Compile Include="Models\DiffUtilities.cs" />
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
+    <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Services\EnterpriseProbeTask.cs" />
     <Compile Include="Services\IEnterpriseProbeTask.cs" />

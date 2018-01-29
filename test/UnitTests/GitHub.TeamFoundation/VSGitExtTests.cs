@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.ComponentModel;
 using System.Collections.Generic;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.VisualStudio.Base;
@@ -122,19 +123,37 @@ public class VSGitExtTests
         }
 
         [Test]
-        public void SccProviderContextIsActive_DefaultEmptyListFromGitExt()
+        public void SccProviderContextIsActive_InitializeWithActiveRepositories()
         {
+            var repoPath = "repoPath";
+            var repoFactory = Substitute.For<ILocalRepositoryModelFactory>();
             var context = CreateVSUIContext(true);
-            var gitExt = CreateGitExt(new string[0]);
-            var target = CreateVSGitExt(context, gitExt);
+            var gitExt = CreateGitExt(new[] { repoPath });
+            var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
+            target.InitializeTask.Wait();
 
             var activeRepositories = target.ActiveRepositories;
 
-            Assert.That(activeRepositories.Count(), Is.EqualTo(0));
+            Assert.That(activeRepositories.Count(), Is.EqualTo(1));
+            repoFactory.Received(1).Create(repoPath);
         }
 
-        // TODO: We can't currently test returning a non-empty list because it constructs a live LocalRepositoryModel object.
-        // We could move the responsibility for constructing a LocalRepositoryModel object outside of VSGitExt.
+        [Test]
+        public void ExceptionRefreshingRepositories_ReturnsEmptyList()
+        {
+            var repoPath = "repoPath";
+            var repoFactory = Substitute.For<ILocalRepositoryModelFactory>();
+            repoFactory.Create(repoPath).ReturnsForAnyArgs(x => { throw new Exception("Boom!"); });
+            var context = CreateVSUIContext(true);
+            var gitExt = CreateGitExt(new[] { repoPath });
+            var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
+            target.InitializeTask.Wait();
+
+            var activeRepositories = target.ActiveRepositories;
+
+            repoFactory.Received(1).Create(repoPath);
+            Assert.That(activeRepositories.Count(), Is.EqualTo(0));
+        }
     }
 
     static IReadOnlyList<IGitRepositoryInfo> CreateActiveRepositories(IList<string> repositoryPaths)
@@ -150,17 +169,19 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IGitHubServiceProvider sp = null)
+    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IGitHubServiceProvider sp = null,
+        ILocalRepositoryModelFactory repoFactory = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();
         sp = sp ?? Substitute.For<IGitHubServiceProvider>();
+        repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
         var factory = Substitute.For<IVSUIContextFactory>();
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetService<IVSUIContextFactory>().Returns(factory);
         sp.GetService<IGitExt>().Returns(gitExt);
-        var vsGitExt = new VSGitExt(sp, factory);
+        var vsGitExt = new VSGitExt(sp, factory, repoFactory);
         vsGitExt.InitializeTask.Wait();
         return vsGitExt;
     }
@@ -169,7 +190,7 @@ public class VSGitExtTests
     {
         repositoryPaths = repositoryPaths ?? new string[0];
         var gitExt = Substitute.For<IGitExt>();
-        var repoList = CreateActiveRepositories(new string[0]);
+        var repoList = CreateActiveRepositories(repositoryPaths);
         gitExt.ActiveRepositories.Returns(repoList);
         return gitExt;
     }
