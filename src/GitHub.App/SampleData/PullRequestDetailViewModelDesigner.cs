@@ -72,17 +72,17 @@ This requires that errors be propagated from the viewmodel to the view and from 
                 new PullRequestDetailReviewItem(
                     1,
                     new AccountDesigner { Login = "grokys", IsUser = true },
-                    Octokit.PullRequestReviewState.Approved,
+                    PullRequestReviewState.Approved,
                     5),
                 new PullRequestDetailReviewItem(
                     2,
                     new AccountDesigner { Login = "shana", IsUser = true },
-                    Octokit.PullRequestReviewState.ChangesRequested,
+                    PullRequestReviewState.ChangesRequested,
                     5),
                 new PullRequestDetailReviewItem(
                     2,
                     new AccountDesigner { Login = "grokys", IsUser = true },
-                    Octokit.PullRequestReviewState.Pending,
+                    PullRequestReviewState.Pending,
                     0),
             };
 

@@ -11,8 +11,6 @@ using ReactiveUI;
 using System.Threading;
 using System.Reactive.Subjects;
 using static System.FormattableString;
-using Octokit.GraphQL;
-using Octokit.GraphQL.Model;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -59,6 +57,7 @@ namespace GitHub.InlineReviews.Services
             User = user;
             LocalRepository = localRepository;
             RepositoryOwner = repositoryOwner;
+            UpdatePendingReview();
         }
 
         /// <inheritdoc/>
@@ -235,24 +234,7 @@ namespace GitHub.InlineReviews.Services
                 await UpdateFile(file);
             }
 
-            var pendingReview = pullRequestModel.Reviews
-                .FirstOrDefault(x => x.State == Octokit.PullRequestReviewState.Pending && x.User.Equals(User));
-
-            if (pendingReview != null)
-            {
-                HasPendingReview = true;
-
-                if (pendingReview.NodeId != null)
-                {
-                    pendingReviewId = pendingReview.NodeId;
-                }
-                else
-                {
-                    // TODO: REST->GraphQL mapping not yet implemented on this instance. Display a
-                    // warning telling the user to finish their review online or something.
-                }
-            }
-
+            UpdatePendingReview();
             pullRequestChanged.OnNext(pullRequestModel);
         }
 
@@ -271,6 +253,23 @@ namespace GitHub.InlineReviews.Services
             file.CommitSha = PullRequest.Head.Sha;
             file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
             file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
+        }
+
+        void UpdatePendingReview()
+        {
+            var pendingReview = PullRequest.Reviews
+                .FirstOrDefault(x => x.State == PullRequestReviewState.Pending && x.User.Login == User.Login);
+
+            if (pendingReview != null)
+            {
+                HasPendingReview = true;
+                pendingReviewId = pendingReview.NodeId;
+            }
+            else
+            {
+                HasPendingReview = false;
+                pendingReviewId = null;
+            }
         }
 
         async Task<IReadOnlyList<IPullRequestSessionFile>> CreateAllFiles()

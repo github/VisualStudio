@@ -35,7 +35,6 @@ namespace GitHub.Api
         IObservable<IssueComment> GetIssueComments(string owner, string name, int number);
         IObservable<PullRequest> GetPullRequest(string owner, string name, int number);
         IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number);
-        IObservable<PullRequestReview> GetPullRequestReviews(string owner, string name, int number);
         IObservable<PullRequestReviewComment> GetPullRequestReviewComments(string owner, string name, int number);
         IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name);
         IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo);

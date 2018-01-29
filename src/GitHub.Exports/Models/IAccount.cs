@@ -14,6 +14,7 @@ namespace GitHub.Models
         string Login { get; }
         int OwnedPrivateRepos { get; }
         long PrivateReposInPlan { get; }
+        string AvatarUrl { get; }
         BitmapSource Avatar { get; } 
     }
 }

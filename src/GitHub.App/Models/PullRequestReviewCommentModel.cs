@@ -5,6 +5,7 @@ namespace GitHub.Models
     public class PullRequestReviewCommentModel : IPullRequestReviewCommentModel
     {
         public int Id { get; set; }
+        public string NodeId { get; set; }
         public long PullRequestReviewId { get; set; }
         public string Path { get; set; }
         public int? Position { get; set; }

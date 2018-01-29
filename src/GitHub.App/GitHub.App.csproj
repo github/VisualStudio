@@ -341,6 +341,14 @@
       <Name>Akavache_Net45</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\Octokit.GraphQL\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
+      <Project>{8334b9f4-4468-4800-88da-572031b23308}</Project>
+      <Name>Octokit.GraphQL.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\Octokit.GraphQL\Octokit.GraphQL\Octokit.GraphQL.csproj">
+      <Project>{a2adf518-2909-4556-b63d-12a02f16036d}</Project>
+      <Name>Octokit.GraphQL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>

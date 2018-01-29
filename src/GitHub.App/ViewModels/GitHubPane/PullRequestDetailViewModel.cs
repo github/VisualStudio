@@ -17,7 +17,6 @@ using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
-using PullRequestReviewState = Octokit.PullRequestReviewState;
 using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -460,13 +459,11 @@ namespace GitHub.ViewModels.GitHubPane
             var existing = new Dictionary<string, PullRequestDetailReviewItem>();
             var currentUser = Session.User;
 
-            for (var i = pullRequest.Reviews.Count - 1; i >= 0; --i)
+            foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.Id))
             {
-                var review = pullRequest.Reviews[i];
-
                 if (!existing.ContainsKey(review.User.Login) &&
                     review.State != PullRequestReviewState.Dismissed &&
-                    (review.State != PullRequestReviewState.Pending || review.User.Equals(currentUser)))
+                    (review.State != PullRequestReviewState.Pending || review.User.Login == currentUser.Login))
                 {
                     var commentCount = pullRequest.ReviewComments
                         .Where(x => x.PullRequestReviewId == review.Id)

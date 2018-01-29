@@ -329,7 +329,7 @@ namespace GitHub.InlineReviews.Services
                     Body = x.PullRequestReview.Body,
                     CommitId = x.PullRequestReview.Commit.Oid,
                     NodeId = x.PullRequestReview.Id,
-                    State = ToRest(x.PullRequestReview.State),
+                    State = FromGraphQL(x.PullRequestReview.State),
                     User = user,
                 });
 
@@ -362,7 +362,7 @@ namespace GitHub.InlineReviews.Services
                 Id = result.Id,
                 Body = result.Body,
                 CommitId = result.CommitId,
-                State = result.State.Value,
+                State = (GitHub.Models.PullRequestReviewState)result.State.Value,
                 User = user,
             };
         }
@@ -392,7 +392,7 @@ namespace GitHub.InlineReviews.Services
                     CommitId = x.PullRequestReview.Commit.Oid,
                     Id = x.PullRequestReview.DatabaseId.Value,
                     NodeId = x.PullRequestReview.Id,
-                    State = ToRest(x.PullRequestReview.State),
+                    State = (GitHub.Models.PullRequestReviewState)x.PullRequestReview.State,
                     User = user,
                 });
 
@@ -535,23 +535,10 @@ namespace GitHub.InlineReviews.Services
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
 
-        static Octokit.PullRequestReviewState ToRest(Octokit.GraphQL.Model.PullRequestReviewState state)
+
+        static GitHub.Models.PullRequestReviewState FromGraphQL(Octokit.GraphQL.Model.PullRequestReviewState s)
         {
-            switch (state)
-            {
-                case Octokit.GraphQL.Model.PullRequestReviewState.Approved:
-                    return Octokit.PullRequestReviewState.Approved;
-                case Octokit.GraphQL.Model.PullRequestReviewState.ChangesRequested:
-                    return Octokit.PullRequestReviewState.ChangesRequested;
-                case Octokit.GraphQL.Model.PullRequestReviewState.Commented:
-                    return Octokit.PullRequestReviewState.Commented;
-                case Octokit.GraphQL.Model.PullRequestReviewState.Dismissed:
-                    return Octokit.PullRequestReviewState.Dismissed;
-                case Octokit.GraphQL.Model.PullRequestReviewState.Pending:
-                    return Octokit.PullRequestReviewState.Pending;
-                default:
-                    throw new NotSupportedException();
-            }
+            return (GitHub.Models.PullRequestReviewState)s;
         }
 
         static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)

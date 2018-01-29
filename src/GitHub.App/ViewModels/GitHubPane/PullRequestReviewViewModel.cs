@@ -234,7 +234,7 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
                     State = PullRequestDetailReviewItem.ToString(Model.State);
-                    IsPending = Model.State == Octokit.PullRequestReviewState.Pending;
+                    IsPending = Model.State == PullRequestReviewState.Pending;
                     Body = IsPending || !string.IsNullOrWhiteSpace(Model.Body) ? 
                         Model.Body :
                         Resources.NoDescriptionProvidedMarkdown;

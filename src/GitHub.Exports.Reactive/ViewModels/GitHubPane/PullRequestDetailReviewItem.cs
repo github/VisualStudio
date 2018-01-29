@@ -1,6 +1,5 @@
 ﻿using System;
 using GitHub.Models;
-using Octokit;
 
 namespace GitHub.ViewModels.GitHubPane
 {

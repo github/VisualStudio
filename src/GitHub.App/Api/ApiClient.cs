@@ -251,14 +251,6 @@ namespace GitHub.Api
             return gitHubClient.PullRequest.Files(owner, name, number);
         }
 
-        public IObservable<PullRequestReview> GetPullRequestReviews(string owner, string name, int number)
-        {
-            Guard.ArgumentNotEmptyString(owner, nameof(owner));
-            Guard.ArgumentNotEmptyString(name, nameof(name));
-
-            return gitHubClient.PullRequest.Review.GetAll(owner, name, number);
-        }
-
         public IObservable<PullRequestReviewComment> GetPullRequestReviewComments(string owner, string name, int number)
         {
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
