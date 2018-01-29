@@ -76,10 +76,10 @@ public class VSGitExtTests
         }
 
         [Test]
-        public void ExceptionReadingActiveRepositories_ActiveRepositoriesChangedIsFired()
+        public void ExceptionReadingActiveRepositories_StillEmptySoNoEvent()
         {
             var context = CreateVSUIContext(true);
-            var gitExt = CreateGitExt();
+            var gitExt = CreateGitExt(new[] { "repoPath" });
             gitExt.ActiveRepositories.Returns(x => { throw new Exception("Boom!"); });
 
             var target = CreateVSGitExt(context, gitExt);
@@ -89,8 +89,8 @@ public class VSGitExtTests
             var eventArgs = new PropertyChangedEventArgs(nameof(gitExt.ActiveRepositories));
             gitExt.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(gitExt, eventArgs);
 
-            Assert.That(wasFired, Is.True);
             Assert.That(target.ActiveRepositories, Is.Empty);
+            Assert.That(wasFired, Is.False);
         }
 
         [Test]
@@ -205,7 +205,7 @@ public class VSGitExtTests
 
     static IGitExt CreateGitExt(IList<string> repositoryPaths = null)
     {
-        repositoryPaths = repositoryPaths ?? new string[0];
+        repositoryPaths = repositoryPaths ?? Array.Empty<string>();
         var gitExt = Substitute.For<IGitExt>();
         var repoList = CreateActiveRepositories(repositoryPaths);
         gitExt.ActiveRepositories.Returns(repoList);
