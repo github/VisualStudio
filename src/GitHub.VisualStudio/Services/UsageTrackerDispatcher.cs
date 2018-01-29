@@ -21,6 +21,6 @@ namespace GitHub.Services
             inner = serviceProvider.GetService(typeof(IUsageTracker)) as IUsageTracker;
         }
 
-        public Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter) => inner.IncrementCounter(counter);
+        public Task IncrementCounter(Expression<Func<UsageModel, int>> counter) => inner.IncrementCounter(counter);
     }
 }

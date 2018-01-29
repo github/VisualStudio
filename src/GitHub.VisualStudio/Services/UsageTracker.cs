@@ -43,15 +43,15 @@ namespace GitHub.Services
             timer?.Dispose();
         }
 
-        public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
+        public async Task IncrementCounter(Expression<Func<UsageModel, int>> counter)
         {
             await Initialize();
             var data = await service.ReadLocalData();
             var usage = await GetCurrentReport(data);
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            var value = (int)propertyInfo.GetValue(usage.Measures);
-            propertyInfo.SetValue(usage.Measures, value + 1);
+            var value = (int)propertyInfo.GetValue(usage);
+            propertyInfo.SetValue(usage, value + 1);
             await service.WriteLocalData(data);
         }
 
@@ -93,14 +93,14 @@ namespace GitHub.Services
             if (firstTick)
             {
                 var current = await GetCurrentReport(data);
-                current.Measures.NumberOfStartups++;
+                current.NumberOfStartups++;
                 changed = true;
                 firstTick = false;
             }
 
             for (var i = data.Reports.Count - 1; i >= 0; --i)
             {
-                if (data.Reports[i].Dimensions.Date.Date != DateTimeOffset.Now.Date)
+                if (data.Reports[i].Date.Date != DateTimeOffset.Now.Date)
                 {
                     try
                     {
@@ -123,7 +123,7 @@ namespace GitHub.Services
 
         async Task<UsageModel> GetCurrentReport(UsageData data)
         {
-            var current = data.Reports.FirstOrDefault(x => x.Dimensions.Date.Date == DateTimeOffset.Now.Date);
+            var current = data.Reports.FirstOrDefault(x => x.Date.Date == DateTimeOffset.Now.Date);
 
             if (current == null)
             {
@@ -132,19 +132,19 @@ namespace GitHub.Services
                 data.Reports.Add(current);
             }
 
-            current.Dimensions.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
-            current.Dimensions.CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag;
-            current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
-            current.Dimensions.VSVersion = vsservices.VSVersion;
+            current.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
+            current.CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag;
+            current.AppVersion = AssemblyVersionInformation.Version;
+            current.VSVersion = vsservices.VSVersion;
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
-                current.Dimensions.IsGitHubUser |= true;
+                current.IsGitHubUser |= true;
             }
 
             if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
             {
-                current.Dimensions.IsEnterpriseUser |= true;
+                current.IsEnterpriseUser |= true;
             }
 
             return current;

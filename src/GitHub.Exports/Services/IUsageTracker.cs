@@ -10,6 +10,6 @@ namespace GitHub.Services
     [Guid(Guids.UsageTrackerId)]
     public interface IUsageTracker
     {
-        Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter);
+        Task IncrementCounter(Expression<Func<UsageModel, int>> counter);
     }
 }

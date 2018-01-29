@@ -39,8 +39,8 @@ public class RepositoryCloneServiceTests
             var model = new UsageModel();
 
             await usageTracker.Received().IncrementCounter(
-                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x => 
-                    ((MemberExpression)x.Body).Member.Name == nameof(model.Measures.NumberOfClones)));
+                Arg.Is<Expression<Func<UsageModel, int>>>(x => 
+                    ((MemberExpression)x.Body).Member.Name == nameof(model.NumberOfClones)));
         }
     }
 }
