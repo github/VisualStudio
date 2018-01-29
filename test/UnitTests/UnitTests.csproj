@@ -164,14 +164,12 @@
     <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
+    <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -235,12 +233,14 @@
     <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
+    <Compile Include="GitHub.App\Services\OAuthCallbackListenerTests.cs" />
     <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
     <Compile Include="GitHub.App\Services\TeamExplorerContextTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\GitHubDialogWindowViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\GistCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\Dialog\LoginToGitHubForEnterpriseViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\GitHubPaneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\NavigationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\Dialog\LoginCredentialsViewModelTests.cs" />
