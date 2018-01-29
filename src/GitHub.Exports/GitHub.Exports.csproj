@@ -63,6 +63,10 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.ComponentModelHost.14.0.25424\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.15.103\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.14.0.14.3.25407\lib\Microsoft.VisualStudio.Shell.14.0.dll</HintPath>
       <Private>True</Private>
@@ -116,8 +120,8 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+    <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
@@ -149,11 +153,12 @@
     <Compile Include="Models\DiffUtilities.cs" />
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\IInlineCommentModel.cs" />
+    <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
-    <Compile Include="Services\EnterpriseProbeTask.cs" />
-    <Compile Include="Services\IEnterpriseProbeTask.cs" />
+    <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
+    <Compile Include="Services\ITeamExplorerContext.cs" />
     <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Models\UsageData.cs" />
     <Compile Include="Services\IUsageService.cs" />
@@ -255,7 +260,7 @@
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
     <Compile Include="Services\IVSGitExt.cs" />
-    <Compile Include="Services\IVSUIContext.cs" />
+    <Compile Include="Services\IVSUIContextFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">

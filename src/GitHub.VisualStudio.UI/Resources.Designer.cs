@@ -828,6 +828,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Token.
+        /// </summary>
+        public static string TokenPrompt {
+            get {
+                return ResourceManager.GetString("TokenPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>
         public static string twoFactorAuthText {
