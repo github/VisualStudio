@@ -6,7 +6,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
@@ -14,7 +14,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
     {
         static readonly Uri Uri = new Uri("http://foo");
 
-        [Fact]
+        [Test]
         public async Task ShouldCreateChangesTree()
         {
             var target = CreateTarget();
@@ -31,32 +31,33 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             await target.InitializeAsync(session);
 
-            Assert.Equal(3, target.Items.Count);
+            Assert.That(target.Items.Count, Is.EqualTo(3));
 
             var dir1 = (PullRequestDirectoryNode)target.Items[0];
-            Assert.Equal("dir1", dir1.DirectoryName);
-            Assert.Equal(2, dir1.Files.Count);
-            Assert.Equal(1, dir1.Directories.Count);
-            Assert.Equal("f1.cs", dir1.Files[0].FileName);
-            Assert.Equal("f2.cs", dir1.Files[1].FileName);
-            Assert.Equal("dir1\\f1.cs", dir1.Files[0].RelativePath);
-            Assert.Equal("dir1\\f2.cs", dir1.Files[1].RelativePath);
+            Assert.That(dir1.DirectoryName, Is.EqualTo(dir1));
+            Assert.That(dir1.Files, Has.Exactly(2).Items);
+
+            Assert.That(dir1.Directories, Has.One.Items);
+            Assert.That(dir1.Files[0].FileName, Is.EqualTo("f1.cs"));
+            Assert.That(dir1.Files[1].FileName, Is.EqualTo("f2.cs"));
+            Assert.That(dir1.Files[0].RelativePath, Is.EqualTo("dir1\\f1.cs"));
+            Assert.That(dir1.Files[1].RelativePath, Is.EqualTo("dir1\\f2.cs"));
 
             var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
-            Assert.Equal("dir1a", dir1a.DirectoryName);
-            Assert.Equal(1, dir1a.Files.Count);
-            Assert.Equal(0, dir1a.Directories.Count);
+            Assert.That(dir1a.DirectoryName, Is.EqualTo("dir1a"));
+            Assert.That(dir1a.Files, Has.One.Items);
+            Assert.That(dir1a.Directories.Count, Is.Empty);
 
             var dir2 = (PullRequestDirectoryNode)target.Items[1];
-            Assert.Equal("dir2", dir2.DirectoryName);
-            Assert.Equal(1, dir2.Files.Count);
-            Assert.Equal(0, dir2.Directories.Count);
+            Assert.That(dir2.DirectoryName, Is.EqualTo("dir2"));
+            Assert.That(dir2.Files, Has.One.Items);
+            Assert.That(dir2.Directories.Count, Is.Empty);
 
             var readme = (PullRequestFileNode)target.Items[2];
-            Assert.Equal("readme.md", readme.FileName);
+            Assert.That(readme.FileName, Is.EqualTo("readme.md"));
         }
 
-        [Fact]
+        [Test]
         public async Task FileCommentCountShouldTrackSessionInlineComments()
         {
             var outdatedThread = CreateThread(-1);
@@ -76,16 +77,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget();
 
             await target.InitializeAsync(session);
-            Assert.Equal(1, ((IPullRequestFileNode)target.Items[0]).CommentCount);
+            Assert.That(((IPullRequestFileNode)target.Items[0]).CommentCount, Is.EqualTo(1));
 
             file.InlineCommentThreads.Returns(new[] { thread1, thread2 });
             RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-            Assert.Equal(2, ((IPullRequestFileNode)target.Items[0]).CommentCount);
+            Assert.That(((IPullRequestFileNode)target.Items[0]).CommentCount, Is.EqualTo(2));
 
             // Outdated comment is not included in the count.
             file.InlineCommentThreads.Returns(new[] { thread1, thread2, outdatedThread });
             RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-            Assert.Equal(2, ((IPullRequestFileNode)target.Items[0]).CommentCount);
+            Assert.That(((IPullRequestFileNode)target.Items[0]).CommentCount, Is.EqualTo(2));
 
             file.Received(1).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
         }

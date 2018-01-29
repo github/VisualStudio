@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using GitHub.Primitives;
 
 namespace GitHub.Api
 {
@@ -32,6 +31,11 @@ namespace GitHub.Api
         /// Gets the application's OAUTH client secret.
         /// </summary>
         public static string ClientSecret { get; private set; }
+
+        /// <summary>
+        /// Gets the scopes required by the application.
+        /// </summary>
+        public static IReadOnlyList<string> RequiredScopes { get; } = new[] { "user", "repo", "gist", "write:public_key" };
 
         /// <summary>
         /// Gets a note that will be stored with the OAUTH token.
