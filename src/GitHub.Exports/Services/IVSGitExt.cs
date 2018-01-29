@@ -6,7 +6,7 @@ namespace GitHub.Services
 {
     public interface IVSGitExt
     {
-        IEnumerable<ILocalRepositoryModel> ActiveRepositories { get; }
+        IReadOnlyList<ILocalRepositoryModel> ActiveRepositories { get; }
         event Action ActiveRepositoriesChanged;
     }
 }

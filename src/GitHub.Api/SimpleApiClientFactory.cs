@@ -15,7 +15,7 @@ namespace GitHub.Api
     {
         readonly IKeychain keychain;
         readonly ProductHeaderValue productHeader;
-        readonly Lazy<IEnterpriseProbeTask> lazyEnterpriseProbe;
+        readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
         readonly Lazy<IWikiProbe> lazyWikiProbe;
 
         static readonly ConcurrentDictionary<UriString, ISimpleApiClient> cache = new ConcurrentDictionary<UriString, ISimpleApiClient>();
@@ -24,7 +24,7 @@ namespace GitHub.Api
         public SimpleApiClientFactory(
             IProgram program,
             IKeychain keychain,
-            Lazy<IEnterpriseProbeTask> enterpriseProbe,
+            Lazy<IEnterpriseProbe> enterpriseProbe,
             Lazy<IWikiProbe> wikiProbe)
         {
             this.keychain = keychain;

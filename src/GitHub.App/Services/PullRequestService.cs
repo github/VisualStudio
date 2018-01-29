@@ -14,7 +14,6 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
-using System.Diagnostics;
 using GitHub.Logging;
 
 namespace GitHub.Services

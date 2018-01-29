@@ -1,5 +1,5 @@
-﻿using GitHub.Collections;
-using System;
+﻿using System;
+using GitHub.Collections;
 
 namespace GitHub.Models
 {

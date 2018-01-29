@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -77,6 +76,24 @@ public class VSGitExtTests
         }
 
         [Test]
+        public void ExceptionReadingActiveRepositories_StillEmptySoNoEvent()
+        {
+            var context = CreateVSUIContext(true);
+            var gitExt = CreateGitExt(new[] { "repoPath" });
+            gitExt.ActiveRepositories.Returns(x => { throw new Exception("Boom!"); });
+
+            var target = CreateVSGitExt(context, gitExt);
+
+            bool wasFired = false;
+            target.ActiveRepositoriesChanged += () => wasFired = true;
+            var eventArgs = new PropertyChangedEventArgs(nameof(gitExt.ActiveRepositories));
+            gitExt.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(gitExt, eventArgs);
+
+            Assert.That(target.ActiveRepositories, Is.Empty);
+            Assert.That(wasFired, Is.False);
+        }
+
+        [Test]
         public void WhenUIContextChanged_ActiveRepositoriesChangedIsFired()
         {
             var context = CreateVSUIContext(false);
@@ -134,7 +151,7 @@ public class VSGitExtTests
 
             var activeRepositories = target.ActiveRepositories;
 
-            Assert.That(activeRepositories.Count(), Is.EqualTo(1));
+            Assert.That(activeRepositories.Count, Is.EqualTo(1));
             repoFactory.Received(1).Create(repoPath);
         }
 
@@ -152,7 +169,7 @@ public class VSGitExtTests
             var activeRepositories = target.ActiveRepositories;
 
             repoFactory.Received(1).Create(repoPath);
-            Assert.That(activeRepositories.Count(), Is.EqualTo(0));
+            Assert.That(activeRepositories.Count, Is.EqualTo(0));
         }
     }
 
@@ -188,7 +205,7 @@ public class VSGitExtTests
 
     static IGitExt CreateGitExt(IList<string> repositoryPaths = null)
     {
-        repositoryPaths = repositoryPaths ?? new string[0];
+        repositoryPaths = repositoryPaths ?? Array.Empty<string>();
         var gitExt = Substitute.For<IGitExt>();
         var repoList = CreateActiveRepositories(repositoryPaths);
         gitExt.ActiveRepositories.Returns(repoList);
