@@ -36,6 +36,11 @@ namespace GitHub.ViewModels
         IReactiveCommand<IConnection> Login { get; }
 
         /// <summary>
+        /// Gets a command which, when invoked, performs an OAuth login.
+        /// </summary>
+        IReactiveCommand<IConnection> LoginViaOAuth { get; }
+
+        /// <summary>
         /// Gets a command which, when invoked, direct the user to a
         /// GitHub.com sign up flow
         /// </summary>
@@ -69,5 +74,10 @@ namespace GitHub.ViewModels
         /// Gets an error to display to the user.
         /// </summary>
         UserError Error { get; }
+
+        /// <summary>
+        /// Called when the login UI is hidden or dismissed.
+        /// </summary>
+        void Deactivated();
     }
 }

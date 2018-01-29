@@ -12,6 +12,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHubClient = Octokit.GitHubClient;
 using IGitHubClient = Octokit.IGitHubClient;
+using OauthClient = Octokit.OauthClient;
 using User = Octokit.User;
 
 namespace GitHub.VisualStudio
@@ -29,6 +30,7 @@ namespace GitHub.VisualStudio
         readonly TaskCompletionSource<object> loaded;
         readonly Lazy<ObservableCollectionEx<IConnection>> connections;
         readonly IUsageTracker usageTracker;
+        readonly IVisualStudioBrowser browser;
 
         [ImportingConstructor]
         public ConnectionManager(
@@ -36,13 +38,15 @@ namespace GitHub.VisualStudio
             IConnectionCache cache,
             IKeychain keychain,
             ILoginManager loginManager,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            IVisualStudioBrowser browser)
         {
             this.program = program;
             this.cache = cache;
             this.keychain = keychain;
             this.loginManager = loginManager;
             this.usageTracker = usageTracker;
+            this.browser = browser;
             loaded = new TaskCompletionSource<object>();
             connections = new Lazy<ObservableCollectionEx<IConnection>>(
                 this.CreateConnections,
@@ -71,7 +75,7 @@ namespace GitHub.VisualStudio
 
             if (conns.Any(x => x.HostAddress == address))
             {
-                throw new InvalidOperationException($"A connection to {address} already exists.");
+                throw new InvalidOperationException($"A connection to {address.Title} already exists.");
             }
 
             var client = CreateClient(address);
@@ -85,13 +89,56 @@ namespace GitHub.VisualStudio
         }
 
         /// <inheritdoc/>
+        public async Task<IConnection> LogInViaOAuth(HostAddress address, CancellationToken cancel)
+        {
+            var conns = await GetLoadedConnectionsInternal();
+
+            if (conns.Any(x => x.HostAddress == address))
+            {
+                throw new InvalidOperationException($"A connection to {address} already exists.");
+            }
+
+            var client = CreateClient(address);
+            var oauthClient = new OauthClient(client.Connection);
+            var user = await loginManager.LoginViaOAuth(address, client, oauthClient, OpenBrowser, cancel);
+            var connection = new Connection(address, user.Login, user, null);
+
+            conns.Add(connection);
+            await SaveConnections();
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            await usageTracker.IncrementCounter(x => x.NumberOfOAuthLogins);
+            return connection;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IConnection> LogInWithToken(HostAddress address, string token)
+        {
+            var conns = await GetLoadedConnectionsInternal();
+
+            if (conns.Any(x => x.HostAddress == address))
+            {
+                throw new InvalidOperationException($"A connection to {address.Title} already exists.");
+            }
+
+            var client = CreateClient(address);
+            var user = await loginManager.LoginWithToken(address, client, token);
+            var connection = new Connection(address, user.Login, user, null);
+
+            conns.Add(connection);
+            await SaveConnections();
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            await usageTracker.IncrementCounter(x => x.NumberOfTokenLogins);
+            return connection;
+        }
+
+        /// <inheritdoc/>
         public async Task LogOut(HostAddress address)
         {
             var connection = await GetConnection(address);
 
             if (connection == null)
             {
-                throw new KeyNotFoundException($"Could not find a connection to {address}.");
+                throw new KeyNotFoundException($"Could not find a connection to {address.Title}.");
             }
 
             var client = CreateClient(address);
@@ -159,5 +206,7 @@ namespace GitHub.VisualStudio
             var details = conns.Select(x => new ConnectionDetails(x.HostAddress, x.Username));
             await cache.Save(details);
         }
+
+        void OpenBrowser(Uri uri) => browser.OpenUrl(uri);
     }
 }
