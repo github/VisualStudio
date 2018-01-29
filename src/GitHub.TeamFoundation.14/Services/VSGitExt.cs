@@ -25,7 +25,7 @@ namespace GitHub.VisualStudio.Base
         readonly ILocalRepositoryModelFactory repositoryFactory;
 
         IGitExt gitService;
-        IEnumerable<ILocalRepositoryModel> activeRepositories;
+        IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
         [ImportingConstructor]
         public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        public IEnumerable<ILocalRepositoryModel> ActiveRepositories
+        public IReadOnlyList<ILocalRepositoryModel> ActiveRepositories
         {
             get
             {

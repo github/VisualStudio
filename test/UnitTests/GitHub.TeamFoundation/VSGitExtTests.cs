@@ -152,7 +152,7 @@ public class VSGitExtTests
 
             var activeRepositories = target.ActiveRepositories;
 
-            Assert.That(activeRepositories.Count(), Is.EqualTo(1));
+            Assert.That(activeRepositories.Count, Is.EqualTo(1));
             repoFactory.Received(1).Create(repoPath);
         }
 
@@ -170,7 +170,7 @@ public class VSGitExtTests
             var activeRepositories = target.ActiveRepositories;
 
             repoFactory.Received(1).Create(repoPath);
-            Assert.That(activeRepositories.Count(), Is.EqualTo(0));
+            Assert.That(activeRepositories.Count, Is.EqualTo(0));
         }
     }
 
