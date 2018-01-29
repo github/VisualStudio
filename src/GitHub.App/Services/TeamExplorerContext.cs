@@ -50,9 +50,6 @@ namespace GitHub.Services
             // This is a standard service which should always be available.
             dte = serviceProvider.GetService<DTE>();
 
-            // HACK: In a future version of VSGitExt this hopefully won't be necessary.
-            gitExt.Refresh(serviceProvider);
-
             Refresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
