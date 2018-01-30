@@ -144,7 +144,8 @@ namespace GitHub.Services
                 usage.IsEnterpriseUser = true;
             }
 
-            var model = usage.Clone(weekly, monthly);
+            var guid = await service.GetUserGuid();
+            var model = usage.Clone(guid, weekly, monthly);
             await client.PostUsage(model);
         }
 

@@ -5,6 +5,7 @@ namespace GitHub.Models
 {
     public class UsageModel
     {
+        public Guid Guid { get; set; }
         public bool IsGitHubUser { get; set; }
         public bool IsEnterpriseUser { get; set; }
         public string AppVersion { get; set; }
@@ -40,9 +41,9 @@ namespace GitHub.Models
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
 
-        public UsageModel Clone(bool includeWeekly, bool includeMonthly)
+        public UsageModel Clone(Guid guid, bool includeWeekly, bool includeMonthly)
         {
-            var result = new UsageModel();
+            var result = Create(guid);
             var properties = result.GetType().GetRuntimeProperties();
 
             foreach (var property in properties)
@@ -62,6 +63,14 @@ namespace GitHub.Models
             }
 
             return result;
+        }
+
+        public static UsageModel Create(Guid guid)
+        {
+            return new UsageModel
+            {
+                Guid = guid
+            };
         }
     }
 }

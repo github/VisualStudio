@@ -101,13 +101,16 @@ namespace UnitTests.GitHub.VisualStudio.Services
             [Test]
             public async Task NonWeeklyOrMonthlyCountersShouldBeZeroed()
             {
-                var service = CreateUsageService(new UsageModel
+                var model = new UsageModel
                 {
+                    Guid = Guid.NewGuid(),
                     NumberOfStartups = 1,
                     NumberOfStartupsWeek = 1,
                     NumberOfStartupsMonth = 1,
                     NumberOfClones = 1,
-                }, sameDay: false);
+                };
+
+                var service = CreateUsageService(model, sameDay: false);
                 Func<Task> tick = null;
 
                 service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
@@ -120,6 +123,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await service.Received().WriteLocalData(
                     Arg.Is<UsageData>(x =>
+                        x.Model.Guid == model.Guid &&
                         x.Model.NumberOfStartups == 0 &&
                         x.Model.NumberOfStartupsWeek == 2 &&
                         x.Model.NumberOfStartupsMonth == 2 &&
@@ -129,13 +133,16 @@ namespace UnitTests.GitHub.VisualStudio.Services
             [Test]
             public async Task NonMonthlyCountersShouldBeZeroed()
             {
-                var service = CreateUsageService(new UsageModel
+                var model = new UsageModel
                 {
+                    Guid = Guid.NewGuid(),
                     NumberOfStartups = 1,
                     NumberOfStartupsWeek = 1,
                     NumberOfStartupsMonth = 1,
                     NumberOfClones = 1,
-                }, sameDay: false, sameWeek: false);
+                };
+
+                var service = CreateUsageService(model, sameDay: false, sameWeek: false);
                 Func<Task> tick = null;
 
                 service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
@@ -148,6 +155,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await service.Received().WriteLocalData(
                     Arg.Is<UsageData>(x =>
+                        x.Model.Guid == model.Guid &&
                         x.Model.NumberOfStartups == 0 &&
                         x.Model.NumberOfStartupsWeek == 0 &&
                         x.Model.NumberOfStartupsMonth == 2 &&
@@ -157,13 +165,16 @@ namespace UnitTests.GitHub.VisualStudio.Services
             [Test]
             public async Task AllCountersShouldBeZeroed()
             {
-                var service = CreateUsageService(new UsageModel
+                var model = new UsageModel
                 {
+                    Guid = Guid.NewGuid(),
                     NumberOfStartups = 1,
                     NumberOfStartupsWeek = 1,
                     NumberOfStartupsMonth = 1,
                     NumberOfClones = 1,
-                }, sameDay: false, sameWeek: false, sameMonth: false);
+                };
+
+                var service = CreateUsageService(model, sameDay: false, sameWeek: false, sameMonth: false);
                 Func<Task> tick = null;
 
                 service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
@@ -176,6 +187,7 @@ namespace UnitTests.GitHub.VisualStudio.Services
 
                 await service.Received().WriteLocalData(
                     Arg.Is<UsageData>(x =>
+                        x.Model.Guid == model.Guid &&
                         x.Model.NumberOfStartups == 0 &&
                         x.Model.NumberOfStartupsWeek == 0 &&
                         x.Model.NumberOfStartupsMonth == 0 &&
@@ -233,12 +245,14 @@ namespace UnitTests.GitHub.VisualStudio.Services
             var connectionManager = Substitute.For<IConnectionManager>();
             var metricsService = Substitute.For<IMetricsService>();
             var packageSettings = Substitute.For<IPackageSettings>();
+            var vsservices = Substitute.For<IVSServices>();
 
             connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>());
             packageSettings.CollectMetrics.Returns(true);
 
             result.GetService<IConnectionManager>().Returns(connectionManager);
             result.GetService<IPackageSettings>().Returns(packageSettings);
+            result.GetService<IVSServices>().Returns(vsservices);
             result.TryGetService<IMetricsService>().Returns(hasMetricsService ? metricsService : null);
 
             return result;

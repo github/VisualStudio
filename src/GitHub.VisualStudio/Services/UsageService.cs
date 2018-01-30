@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Models;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -15,14 +17,58 @@ namespace GitHub.Services
     public class UsageService : IUsageService
     {
         const string StoreFileName = "ghfvs.usage";
+        const string UserStoreFileName = "user.json";
+        private static readonly ILogger log = LogManager.ForContext<UsageService>();
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
         readonly IGitHubServiceProvider serviceProvider;
         string storePath;
+        string userStorePath;
+        Guid? userGuid;
 
         [ImportingConstructor]
         public UsageService(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+        }
+
+        public async Task<Guid> GetUserGuid()
+        {
+            await Initialize();
+
+            if (!userGuid.HasValue)
+            {
+                try
+                {
+                    if (File.Exists(userStorePath))
+                    {
+                        var json = await ReadAllTextAsync(userStorePath);
+                        var data = SimpleJson.DeserializeObject<UserData>(json);
+                        userGuid = data.UserGuid;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed reading user metrics GUID");
+                }
+            }
+
+            if (!userGuid.HasValue || userGuid.Value == Guid.Empty)
+            {
+                userGuid = Guid.NewGuid();
+
+                try
+                {
+                    var data = new UserData { UserGuid = userGuid.Value };
+                    var json = SimpleJson.SerializeObject(data);
+                    await WriteAllTextAsync(userStorePath, json);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed reading writing metrics GUID");
+                }
+            }
+
+            return userGuid.Value;
         }
 
         public bool IsSameDay(DateTimeOffset lastUpdated)
@@ -46,7 +92,7 @@ namespace GitHub.Services
                 async _ =>
                 {
                     try { await callback(); }
-                    catch { /* log.Warn("Failed submitting usage data", ex); */ }
+                    catch (Exception ex) { log.Warning(ex, "Failed submitting usage data"); }
                 },
                 null,
                 dueTime,
@@ -79,9 +125,9 @@ namespace GitHub.Services
                 var json = SimpleJson.SerializeObject(data);
                 await WriteAllTextAsync(storePath, json);
             }
-            catch
+            catch (Exception ex)
             {
-                // log.Warn("Failed to write usage data", ex);
+                log.Warning(ex, "Failed to write usage data");
             }
         }
 
@@ -96,6 +142,10 @@ namespace GitHub.Services
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     program.ApplicationName,
                     StoreFileName);
+                userStorePath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    program.ApplicationName,
+                    UserStoreFileName);
             }
         }
 
@@ -131,6 +181,11 @@ namespace GitHub.Services
 
             // Return the week of our adjusted day
             return cal.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
+
+        class UserData
+        {
+            public Guid UserGuid { get; set; }
         }
     }
 }
