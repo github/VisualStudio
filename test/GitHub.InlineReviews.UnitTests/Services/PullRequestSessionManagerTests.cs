@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using NUnit.Framework;
+using System.ComponentModel;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -1066,7 +1067,8 @@ Line 4";
         static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, ILocalRepositoryModel localRepositoryModel)
         {
             teamExplorerContext.ActiveRepository.Returns(localRepositoryModel);
-            teamExplorerContext.StatusChanged += Raise.Event();
+            var eventArgs = new PropertyChangedEventArgs(nameof(teamExplorerContext.ActiveRepository));
+            teamExplorerContext.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(teamExplorerContext, eventArgs);
         }
     }
 }
