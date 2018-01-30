@@ -188,8 +188,8 @@ namespace GitHub.InlineReviews.Services
                 LocalRepository,
                 User,
                 await GetPullRequestNodeId());
-            HasPendingReview = true;
-            pendingReviewId = model.NodeId;
+
+            await AddReview(model);
             return model;
         }
 
@@ -219,7 +219,7 @@ namespace GitHub.InlineReviews.Services
                     e);
             }
 
-            PullRequest.Reviews = PullRequest.Reviews.Concat(new[] { model }).ToList();
+            await AddReview(model);
             return model;
         }
 
@@ -242,6 +242,15 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequest.ReviewComments = PullRequest.ReviewComments
                 .Concat(new[] { comment })
+                .ToList();
+            await Update(PullRequest);
+        }
+
+        async Task AddReview(IPullRequestReviewModel review)
+        {
+            PullRequest.Reviews = PullRequest.Reviews
+                .Where(x => x.NodeId != review.NodeId)
+                .Concat(new[] { review })
                 .ToList();
             await Update(PullRequest);
         }
