@@ -93,14 +93,13 @@ namespace GitHub.InlineReviews.Services
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var firstLine = diffLines.FirstOrDefault();
-                var diffLineType = firstLine != null ? firstLine.Type : DiffChangeType.None;
-
                 if (firstLine == null)
                 {
-                    log.Warning("Couldn't find diff lines for inline comment. RelativePath={RelativePath}, OriginalCommitSha={Sha}, OriginalPosition={Position}, Chunks={Chunks}, DiffHunk={DiffHunk}",
-                        relativePath, comments.Key.Item1, comments.Key.Item2, chunks.Count(), hunk);
+                    log.Warning("Ignoring in-line comment in {RelativePath} with no diff line context", relativePath);
+                    continue;
                 }
 
+                var diffLineType = firstLine.Type;
                 var thread = new InlineCommentThreadModel(
                     relativePath,
                     comments.Key.Item1,
