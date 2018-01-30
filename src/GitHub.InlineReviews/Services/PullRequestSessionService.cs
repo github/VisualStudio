@@ -11,11 +11,13 @@ using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Logging;
 using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -25,6 +27,8 @@ namespace GitHub.InlineReviews.Services
     [Export(typeof(IPullRequestSessionService))]
     public class PullRequestSessionService : IPullRequestSessionService
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
+
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
@@ -88,11 +92,21 @@ namespace GitHub.InlineReviews.Services
                 var chunks = DiffUtilities.ParseFragment(hunk);
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
+                var firstLine = diffLines.FirstOrDefault();
+                var diffLineType = firstLine != null ? firstLine.Type : DiffChangeType.None;
+
+                if (firstLine == null)
+                {
+                    log.Warning("Couldn't find diff lines for inline comment. RelativePath={RelativePath}, OriginalCommitSha={Sha}, OriginalPosition={Position}, Chunks={Chunks}, DiffHunk={DiffHunk}",
+                        relativePath, comments.Key.Item1, comments.Key.Item2, chunks.Count(), hunk);
+                }
+
                 var thread = new InlineCommentThreadModel(
                     relativePath,
                     comments.Key.Item1,
                     comments.Key.Item2,
                     diffLines,
+                    diffLineType,
                     comments);
                 threads.Add(thread);
             }
