@@ -198,22 +198,31 @@ namespace GitHub.InlineReviews.Services
                     repository = localRepositoryModel;
                     CurrentSession = null;
                     sessions.Clear();
+
+                    if (localRepositoryModel == null)
+                    {
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(localRepositoryModel.CloneUrl))
+                    {
+                        return;
+                    }
                 }
 
-                if (string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl)) return;
-
-                var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
                 var session = CurrentSession;
 
-                if (modelService != null)
+                var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
+                if (pr != null)
                 {
-                    var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
+                    var changePR =
+                        pr.Item1 != (session?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
+                        pr.Item2 != (session?.PullRequest.Number);
 
-                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
-                        pr?.Item2 != (CurrentSession?.PullRequest.Number))
+                    if (changePR)
                     {
-                        var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);
-
+                        var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
+                        var pullRequest = await modelService?.GetPullRequest(pr.Item1, localRepositoryModel.Name, pr.Item2);
                         if (pullRequest != null)
                         {
                             var newSession = await GetSessionInternal(pullRequest);
@@ -233,17 +242,6 @@ namespace GitHub.InlineReviews.Services
             {
                 log.Error(e, "Error changing repository");
             }
-        }
-
-        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel localRepositoryModel)
-        {
-            if (modelService != null)
-            {
-                var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel);
-                if (pr != null) return await modelService.GetPullRequest(pr.Item1, localRepositoryModel.Name, pr.Item2).ToTask();
-            }
-
-            return null;
         }
 
         async Task<PullRequestSession> GetSessionInternal(IPullRequestModel pullRequest)
