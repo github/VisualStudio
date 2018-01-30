@@ -5,6 +5,7 @@ namespace GitHub.Models
 {
     public class UsageModel
     {
+        public string Version { get; } = "1.1";
         public bool IsGitHubUser { get; set; }
         public bool IsEnterpriseUser { get; set; }
         public string AppVersion { get; set; }
