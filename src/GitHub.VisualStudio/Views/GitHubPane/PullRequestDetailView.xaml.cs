@@ -128,7 +128,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        async Task DoOpenLiveFile(IPullRequestFileNode file)
+        async Task DoNavigateToEditor(IPullRequestFileNode file)
         {
             try
             {
@@ -149,12 +149,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
                 NavigationService.NavigateToEquivalentPosition(activeView, fullPath);
 
-                // TODO: Add metrics for NumberOfPRDetailsOpenLiveFile
-                await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
+                await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
             }
             catch (Exception e)
             {
-                ShowErrorInStatusBar("Error opening live file", e);
+                ShowErrorInStatusBar("Error navigating to editor", e);
             }
         }
 
@@ -255,11 +254,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec += async (s, e) => await DoOpenLiveFile(file);
+            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec += async (s, e) => await DoNavigateToEditor(file);
 
             var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
             var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
-            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec += async (s, e) => await DoOpenLiveFile(file);
+            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec += async (s, e) => await DoNavigateToEditor(file);
         }
 
         void ShowErrorInStatusBar(string message, Exception e = null)
