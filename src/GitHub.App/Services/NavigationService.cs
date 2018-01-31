@@ -14,6 +14,9 @@ namespace GitHub.Services
     {
         readonly IServiceProvider serviceProvider;
 
+        // If the target line doesn't have a unique match, search this number of lines above looking for a match.
+        public const int MatchLinesAboveTarget = 4;
+
         [ImportingConstructor]
         public NavigationService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
@@ -56,8 +59,39 @@ namespace GitHub.Services
 
         public int FindMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
         {
-            int matchedLines;
-            return FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
+            var matchingLine = -1;
+            var minMatchedLines = -1;
+            for (var offset = 0; offset <= MatchLinesAboveTarget; offset++)
+            {
+                var targetLine = line - offset;
+                if (targetLine < 0)
+                {
+                    break;
+                }
+
+                int matchedLines;
+                var nearestLine = FindNearestMatchingLine(fromLines, toLines, targetLine, out matchedLines);
+                if (nearestLine != -1)
+                {
+                    if (matchingLine == -1 || minMatchedLines >= matchedLines)
+                    {
+                        matchingLine = nearestLine + offset;
+                        minMatchedLines = matchedLines;
+                    }
+
+                    if (minMatchedLines == 1)
+                    {
+                        break; // We've found a unique matching line!
+                    }
+                }
+            }
+
+            if (matchingLine >= toLines.Count)
+            {
+                matchingLine = toLines.Count - 1;
+            }
+
+            return matchingLine;
         }
 
         public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
