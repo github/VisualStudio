@@ -36,11 +36,11 @@ namespace GitHub.Services
 
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
-        readonly Octokit.GraphQL.Connection graphql;
+        readonly Octokit.GraphQL.IConnection graphql;
 
         public ModelService(
             IApiClient apiClient,
-            Octokit.GraphQL.Connection graphql,
+            Octokit.GraphQL.IConnection graphql,
             IBlobCache hostCache,
             IAvatarProvider avatarProvider)
         {

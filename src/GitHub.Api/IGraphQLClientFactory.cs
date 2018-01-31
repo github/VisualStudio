@@ -5,6 +5,6 @@ namespace GitHub.Api
 {
     public interface IGraphQLClientFactory
     {
-        Task<Octokit.GraphQL.Connection> CreateConnection(HostAddress address);
+        Task<Octokit.GraphQL.IConnection> CreateConnection(HostAddress address);
     }
 }

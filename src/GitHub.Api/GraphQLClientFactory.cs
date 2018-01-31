@@ -21,11 +21,11 @@ namespace GitHub.Api
             this.program = program;
         }
 
-        public Task<Octokit.GraphQL.Connection> CreateConnection(HostAddress address)
+        public Task<Octokit.GraphQL.IConnection> CreateConnection(HostAddress address)
         {
             var credentials = new GraphQLKeychainCredentialStore(keychain, address);
             var header = new ProductHeaderValue(program.ProductHeader.Name, program.ProductHeader.Version);
-            return Task.FromResult(new Connection(header, credentials));
+            return Task.FromResult<Octokit.GraphQL.IConnection>(new Connection(header, credentials));
         }
     }
 }
