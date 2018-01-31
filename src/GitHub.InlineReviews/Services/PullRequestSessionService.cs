@@ -99,13 +99,11 @@ namespace GitHub.InlineReviews.Services
                     continue;
                 }
 
-                var diffLineType = firstLine.Type;
                 var thread = new InlineCommentThreadModel(
                     relativePath,
                     comments.Key.Item1,
                     comments.Key.Item2,
                     diffLines,
-                    diffLineType,
                     comments);
                 threads.Add(thread);
             }

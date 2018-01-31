@@ -31,7 +31,6 @@ namespace GitHub.InlineReviews.Models
             string originalCommitSha,
             int originalPosition,
             IList<DiffLine> diffMatch,
-            DiffChangeType diffLineType,
             IEnumerable<IPullRequestReviewCommentModel> comments)
         {
             Guard.ArgumentNotNull(relativePath, nameof(relativePath));
@@ -40,7 +39,7 @@ namespace GitHub.InlineReviews.Models
 
             Comments = comments.ToList();
             DiffMatch = diffMatch;
-            DiffLineType = diffLineType;
+            DiffLineType = diffMatch[0].Type;
             OriginalCommitSha = originalCommitSha;
             OriginalPosition = originalPosition;
             RelativePath = relativePath;
