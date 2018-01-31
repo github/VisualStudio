@@ -1,11 +1,15 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GitHub.Logging;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Setup.Configuration;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
 using Serilog;
@@ -145,22 +149,28 @@ namespace GitHub.Services
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
         const string EnvVersionKey = "EnvVersion";
+        const string InstallationNamePrefix = "VisualStudio/";
         string GetVSVersion()
         {
             var version = typeof(Microsoft.VisualStudio.Shell.ActivityLog).Assembly.GetName().Version;
             var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}.{2}_Config\\SplashInfo", RegistryRootKey, version.Major, version.Minor);
             try
             {
-                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                if (version.Major == 14)
                 {
-                    var value = (string)key.GetValue(EnvVersionKey, String.Empty);
-                    if (!String.IsNullOrEmpty(value))
-                        return value;
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                    {
+                        var value = (string)key.GetValue(EnvVersionKey, String.Empty);
+                        if (!String.IsNullOrEmpty(value))
+                            return value;
+                    }
                 }
-                // fallback to poking the CommonIDE assembly, which most closely follows the advertised version.
-                var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.StartsWith("Microsoft.VisualStudio.CommonIDE", StringComparison.OrdinalIgnoreCase));
-                if (asm != null)
-                    return asm.GetName().Version.ToString();
+                else
+                {
+                    var setupConfiguration = new SetupConfiguration();
+                    var setupInstance = setupConfiguration.GetInstanceForCurrentProcess();
+                    return setupInstance.GetInstallationName().TrimPrefix(InstallationNamePrefix);
+                }
             }
             catch(Exception ex)
             {

@@ -35,7 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
-        readonly IVSGitExt vsGitExt;
+        readonly ITeamExplorerContext teamExplorerContext;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -62,7 +62,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="usageTracker">The usage tracker.</param>
-        /// <param name="vsGitExt">The Visual Studio git service.</param>
+        /// <param name="teamExplorerContext">The context for tracking repo changes</param>
         /// <param name="files">The pull request files view model.</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
@@ -70,19 +70,20 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
-            IVSGitExt vsGitExt,
+            ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
-            this.vsGitExt = vsGitExt;
+            this.teamExplorerContext = teamExplorerContext;
             Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -338,12 +339,25 @@ namespace GitHub.ViewModels.GitHubPane
                 Number = number;
                 WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
-                vsGitExt.ActiveRepositoriesChanged += StateChanged;
+
                 await Refresh();
+                teamExplorerContext.StatusChanged += RefreshIfActive;
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        void RefreshIfActive(object sender, EventArgs e)
+        {
+            if (active)
+            {
+                Refresh().Forget();
+            }
+            else
+            {
+                refreshOnActivate = true;
             }
         }
 
@@ -356,7 +370,7 @@ namespace GitHub.ViewModels.GitHubPane
             try
             {
                 var firstLoad = (Model == null);
-                Model = pullRequest;                
+                Model = pullRequest;
                 Session = await sessionManager.GetSession(pullRequest);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
@@ -499,6 +513,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
+                await ThreadingHelper.SwitchToMainThreadAsync();
+
                 Error = null;
                 OperationError = null;
                 IsBusy = true;
@@ -572,28 +588,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (disposing)
             {
-                vsGitExt.ActiveRepositoriesChanged -= StateChanged;
-                sessionSubscription?.Dispose();
-            }
-        }
-
-        async void StateChanged()
-        {
-            try
-            {
-                if (active)
-                {
-                    await ThreadingHelper.SwitchToMainThreadAsync();
-                    await Refresh();
-                }
-                else
-                {
-                    refreshOnActivate = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Error refreshing in StateChanged.");
+                teamExplorerContext.StatusChanged -= RefreshIfActive;
             }
         }
 
