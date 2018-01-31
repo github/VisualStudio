@@ -12,6 +12,7 @@ using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Logging;
 using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
@@ -19,6 +20,7 @@ using Microsoft.VisualStudio.Text.Projection;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 using ReactiveUI;
+using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
@@ -32,6 +34,8 @@ namespace GitHub.InlineReviews.Services
     [Export(typeof(IPullRequestSessionService))]
     public class PullRequestSessionService : IPullRequestSessionService
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
+
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
@@ -98,6 +102,13 @@ namespace GitHub.InlineReviews.Services
                 var chunks = DiffUtilities.ParseFragment(hunk);
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
+                var firstLine = diffLines.FirstOrDefault();
+                if (firstLine == null)
+                {
+                    log.Warning("Ignoring in-line comment in {RelativePath} with no diff line context", relativePath);
+                    continue;
+                }
+
                 var thread = new InlineCommentThreadModel(
                     relativePath,
                     comments.Key.Item1,

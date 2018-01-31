@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -10,7 +11,6 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.Helpers;
 using GitHub.InlineReviews.Models;
 using GitHub.Logging;
 using GitHub.Models;
@@ -57,21 +57,31 @@ namespace GitHub.InlineReviews.Services
             IConnectionManager connectionManager,
             IModelServiceFactory modelServiceFactory,
             IGraphQLClientFactory graphqlFactory,
-            ITeamExplorerServiceHolder teamExplorerService)
+            ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
-            Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.service = service;
             this.sessionService = sessionService;
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.graphqlFactory = graphqlFactory;
-            teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
+
+            Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
+                .StartWith((EventPattern<object>)null)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => RepoChanged(teamExplorerContext.ActiveRepository).Forget());
+
+            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                .Skip(1)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => RepoChanged(x).Forget());
+
         }
 
         /// <inheritdoc/>
@@ -150,6 +160,8 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
+            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+
             if (await service.EnsureLocalBranchesAreMarkedAsPullRequests(repository, pullRequest))
             {
                 // The branch for the PR was not previously marked with the PR number in the git
@@ -188,8 +200,6 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                await ThreadingHelper.SwitchToMainThreadAsync();
-
                 if (localRepositoryModel != repository)
                 {
                     repository = localRepositoryModel;
@@ -206,7 +216,7 @@ namespace GitHub.InlineReviews.Services
                 {
                     var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
 
-                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) &&
+                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
                         pr?.Item2 != (CurrentSession?.PullRequest.Number))
                     {
                         var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);

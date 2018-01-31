@@ -459,7 +459,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 sessionManager ?? Substitute.For<IPullRequestSessionManager>(),
                 Substitute.For<IModelServiceFactory>(),
                 Substitute.For<IUsageTracker>(),
-                Substitute.For<IVSGitExt>(),
+                Substitute.For<ITeamExplorerContext>(),
                 Substitute.For<IPullRequestFilesViewModel>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
