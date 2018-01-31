@@ -54,32 +54,7 @@ namespace GitHub.Services
             return hresult == VSConstants.S_OK ? view : null;
         }
 
-        string GetText(IVsTextView textView)
-        {
-            IVsTextLines buffer;
-            ErrorHandler.ThrowOnFailure(textView.GetBuffer(out buffer));
-
-            int line;
-            int index;
-            ErrorHandler.ThrowOnFailure(buffer.GetLastLineIndex(out line, out index));
-
-            string text;
-            ErrorHandler.ThrowOnFailure(buffer.GetLineText(0, 0, line, index, out text));
-            return text;
-        }
-
-        IVsTextView OpenDocument(string fullPath)
-        {
-            var logicalView = VSConstants.LOGVIEWID.TextView_guid;
-            IVsUIHierarchy hierarchy;
-            uint itemID;
-            IVsWindowFrame windowFrame;
-            IVsTextView view;
-            VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
-            return view;
-        }
-
-        static int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
+        public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
         {
             line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
             var fromLine = fromLines[line];
@@ -105,6 +80,31 @@ namespace GitHub.Services
                     return -1;
                 }
             }
+        }
+
+        string GetText(IVsTextView textView)
+        {
+            IVsTextLines buffer;
+            ErrorHandler.ThrowOnFailure(textView.GetBuffer(out buffer));
+
+            int line;
+            int index;
+            ErrorHandler.ThrowOnFailure(buffer.GetLastLineIndex(out line, out index));
+
+            string text;
+            ErrorHandler.ThrowOnFailure(buffer.GetLineText(0, 0, line, index, out text));
+            return text;
+        }
+
+        IVsTextView OpenDocument(string fullPath)
+        {
+            var logicalView = VSConstants.LOGVIEWID.TextView_guid;
+            IVsUIHierarchy hierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+            IVsTextView view;
+            VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
+            return view;
         }
 
         static IList<string> ReadLines(string text)
