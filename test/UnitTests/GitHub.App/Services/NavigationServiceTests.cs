@@ -39,7 +39,7 @@ public class NavigationServiceTests
         {
             var target = CreateNavigationService();
 
-            var nearestLine = target.FindMatchingLine(fromLines, toLines, line);
+            var nearestLine = target.FindMatchingLine(fromLines, toLines, line, matchLinesAbove: 1);
 
             Assert.That(nearestLine, Is.EqualTo(matchingLine));
         }

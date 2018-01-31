@@ -34,7 +34,7 @@ namespace GitHub.Services
 
             var fromLines = ReadLines(text1);
             var toLines = ReadLines(text2);
-            var matchingLine = FindMatchingLine(fromLines, toLines, line);
+            var matchingLine = FindMatchingLine(fromLines, toLines, line, matchLinesAbove: MatchLinesAboveTarget);
             if (matchingLine == -1)
             {
                 // If we can't match line use orignal as best guess.
@@ -68,11 +68,11 @@ namespace GitHub.Services
         /// <param name="toLines">The document we're navigating to.</param>
         /// <param name="line">The 0-based line we're navigating from.</param>
         /// <returns>The best matching line in <see cref="toLines"/></returns>
-        public int FindMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
+        public int FindMatchingLine(IList<string> fromLines, IList<string> toLines, int line, int matchLinesAbove = 0)
         {
             var matchingLine = -1;
             var minMatchedLines = -1;
-            for (var offset = 0; offset <= MatchLinesAboveTarget; offset++)
+            for (var offset = 0; offset <= matchLinesAbove; offset++)
             {
                 var targetLine = line - offset;
                 if (targetLine < 0)
