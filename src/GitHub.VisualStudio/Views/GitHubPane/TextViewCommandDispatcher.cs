@@ -5,6 +5,9 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
+    /// <summary>
+    /// Used to filter commands send to <see cref="IVsTextView"/> dispatch them to a <see cref="Exec"/> event. 
+    /// </summary>
     class TextViewCommandDispatcher : IOleCommandTarget, IDisposable
     {
         readonly IVsTextView textView;
@@ -12,6 +15,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         readonly int commandId;
         readonly IOleCommandTarget next;
 
+        /// <summary>
+        /// Add a command filter to <see cref="IVsTextView"/>.
+        /// </summary>
+        /// <param name="textView">The text view to filter commands from.</param>
+        /// <param name="commandGroup">The group of the command to filter.</param>
+        /// <param name="commandId">The ID of the command to filter.</param>
         public TextViewCommandDispatcher(IVsTextView textView, Guid commandGroup, int commandId)
         {
             this.textView = textView;
@@ -21,6 +30,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             ErrorHandler.ThrowOnFailure(textView.AddCommandFilter(this, out next));
         }
 
+        /// <summary>
+        /// Remove the command filter.
+        /// </summary>
         public void Dispose()
         {
             ErrorHandler.ThrowOnFailure(textView.RemoveCommandFilter(this));
@@ -54,6 +66,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             return next?.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText) ?? 0;
         }
 
+        /// <summary>
+        /// Fired when a command of the filtered type is executed.
+        /// </summary>
         public event EventHandler Exec;
     }
 }
