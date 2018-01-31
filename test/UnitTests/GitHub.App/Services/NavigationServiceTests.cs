@@ -28,4 +28,23 @@ public class NavigationServiceTests
             Assert.That(matchedLines, Is.EqualTo(expectMatchingLines));
         }
     }
+
+    public class TheFindMatchingLineMethod
+    {
+        [TestCase(new[] { "void method()", "code" }, new[] { "void method()", "// code" }, 1, 1)]
+        [TestCase(new[] { "void method()", "code" }, new[] { "void method()" }, 1, 0, Description = "Keep within bounds")]
+        [TestCase(new[] { "code" }, new[] { "// code" }, 0, -1)]
+        [TestCase(new[] { "line", "line" }, new[] { "line", "line" }, 0, 0, Description = "Match nearest line")]
+        [TestCase(new[] { "line", "line" }, new[] { "line", "line" }, 1, 1, Description = "Match nearest line")]
+        public void FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line,
+            int matchingLine)
+        {
+            var sp = Substitute.For<IServiceProvider>();
+            var target = new NavigationService(sp);
+
+            var nearestLine = target.FindMatchingLine(fromLines, toLines, line);
+
+            Assert.That(nearestLine, Is.EqualTo(matchingLine));
+        }
+    }
 }
