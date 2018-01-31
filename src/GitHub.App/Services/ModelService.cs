@@ -20,6 +20,7 @@ using GitHub.Primitives;
 using Octokit;
 using Octokit.GraphQL;
 using Serilog;
+using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
@@ -413,76 +414,19 @@ namespace GitHub.Services
 
         async Task<IList<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string owner, string name, int number)
         {
-            string reviewCursor = null;
             var result = new List<IPullRequestReviewCommentModel>();
-
-            while (true)
-            {
-                var query = new Query()
-                    .Repository(owner, name)
-                    .PullRequest(number)
-                    .Reviews(first: 30, after: reviewCursor)
-                    .Select(x => new
-                    {
-                        x.PageInfo.HasNextPage,
-                        x.PageInfo.EndCursor,
-                        Reviews = x.Nodes.Select(y => new
-                        {
-                            y.Id,
-                            CommentPage = y.Comments(30, null, null, null).Select(z => new
-                            {
-                                z.PageInfo.HasNextPage,
-                                z.PageInfo.EndCursor,
-                                Items = z.Nodes.Select(a => new PullRequestReviewCommentModel
-                                {
-                                    Id = a.DatabaseId.Value,
-                                    NodeId = a.Id,
-                                    Body = a.Body,
-                                    CommitId = a.Commit.Oid,
-                                    CreatedAt = a.CreatedAt.Value,
-                                    DiffHunk = a.DiffHunk,
-                                    OriginalCommitId = a.OriginalCommit.Oid,
-                                    OriginalPosition = a.OriginalPosition,
-                                    Path = a.Path,
-                                    Position = a.Position,
-                                    PullRequestReviewId = y.DatabaseId.Value,
-                                    User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
-                                }).ToList(),
-                            }).Single()
-                        }).ToList()
-                    });
-
-                var reviewPage = await graphql.Run(query);
-
-                foreach (var review in reviewPage.Reviews)
+            var query = new Query()
+                .Repository(owner, name)
+                .PullRequest(number)
+                .Reviews(first: 100, after: Var("cursor"))
+                .Select(x => new
                 {
-                    result.AddRange(review.CommentPage.Items);
-
-                    if (review.CommentPage.HasNextPage)
+                    x.PageInfo.HasNextPage,
+                    x.PageInfo.EndCursor,
+                    Reviews = x.Nodes.Select(y => new
                     {
-                        result.AddRange(await GetPullRequestReviewComments(review.Id, review.CommentPage.EndCursor));
-                    }
-                }
-
-                if (reviewPage.HasNextPage)
-                    reviewCursor = reviewPage.EndCursor;
-                else
-                    return result;
-            }
-        }
-
-        private async Task<IEnumerable<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string reviewId, string commentCursor)
-        {
-            var result = new List<IPullRequestReviewCommentModel>();
-
-            while (true)
-            {
-                var query = new Query()
-                    .Node(reviewId)
-                    .Cast<Octokit.GraphQL.Model.PullRequestReview>()
-                    .Select(x => new
-                    {
-                        CommentPage = x.Comments(30, commentCursor, null, null).Select(z => new
+                        y.Id,
+                        CommentPage = y.Comments(100, null, null, null).Select(z => new
                         {
                             z.PageInfo.HasNextPage,
                             z.PageInfo.EndCursor,
@@ -498,17 +442,80 @@ namespace GitHub.Services
                                 OriginalPosition = a.OriginalPosition,
                                 Path = a.Path,
                                 Position = a.Position,
-                                PullRequestReviewId = x.DatabaseId.Value,
+                                PullRequestReviewId = y.DatabaseId.Value,
                                 User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
                             }).ToList(),
                         }).Single()
-                    });
+                    }).ToList()
+                }).Compile();
 
-                var page = await graphql.Run(query);
+            var vars = new Dictionary<string, object>
+            {
+                { "cursor", null }
+            };
+
+            while (true)
+            {
+                var reviewPage = await graphql.Run(query, vars);
+
+                foreach (var review in reviewPage.Reviews)
+                {
+                    result.AddRange(review.CommentPage.Items);
+
+                    if (review.CommentPage.HasNextPage)
+                    {
+                        result.AddRange(await GetPullRequestReviewComments(review.Id, review.CommentPage.EndCursor));
+                    }
+                }
+
+                if (reviewPage.HasNextPage)
+                    vars["cursor"] = reviewPage.EndCursor;
+                else
+                    return result;
+            }
+        }
+
+        private async Task<IEnumerable<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string reviewId, string commentCursor)
+        {
+            var result = new List<IPullRequestReviewCommentModel>();
+            var query = new Query()
+                .Node(reviewId)
+                .Cast<Octokit.GraphQL.Model.PullRequestReview>()
+                .Select(x => new
+                {
+                    CommentPage = x.Comments(100, Var("Cursor"), null, null).Select(z => new
+                    {
+                        z.PageInfo.HasNextPage,
+                        z.PageInfo.EndCursor,
+                        Items = z.Nodes.Select(a => new PullRequestReviewCommentModel
+                        {
+                            Id = a.DatabaseId.Value,
+                            NodeId = a.Id,
+                            Body = a.Body,
+                            CommitId = a.Commit.Oid,
+                            CreatedAt = a.CreatedAt.Value,
+                            DiffHunk = a.DiffHunk,
+                            OriginalCommitId = a.OriginalCommit.Oid,
+                            OriginalPosition = a.OriginalPosition,
+                            Path = a.Path,
+                            Position = a.Position,
+                            PullRequestReviewId = x.DatabaseId.Value,
+                            User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
+                        }).ToList(),
+                    }).Single()
+                }).Compile();
+            var vars = new Dictionary<string, object>
+            {
+                { "cursor", null }
+            };
+
+            while (true)
+            {
+                var page = await graphql.Run(query, vars);
                 result.AddRange(page.CommentPage.Items);
 
                 if (page.CommentPage.HasNextPage)
-                    commentCursor = page.CommentPage.EndCursor;
+                    vars["cursor"] = page.CommentPage.EndCursor;
                 else
                     return result;
             }
