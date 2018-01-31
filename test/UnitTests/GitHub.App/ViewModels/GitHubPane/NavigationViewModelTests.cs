@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -308,6 +310,36 @@ public class NavigationViewModelTests
                 first.Deactivated();
                 first.Dispose();
             });
+        }
+
+        [Test]
+        public void DoesntThrowWhenHistoryHasMoreThan10Items()
+        {
+            var target = new NavigationViewModel();
+            var pages = new List<IPanePageViewModel>();
+
+            for (var i = 0; i < 11; ++i)
+            {
+                var page = CreatePage();
+                pages.Add(page);
+                target.NavigateTo(page);
+            }
+
+            foreach (var page in pages)
+            {
+                page.ClearReceivedCalls();
+            }
+
+            target.Clear();
+
+            pages.Last().Received().Deactivated();
+            pages.Last().Received().Dispose();
+
+            foreach (var page in pages.Take(pages.Count - 1))
+            {
+                page.DidNotReceive().Deactivated();
+                page.Received().Dispose();
+            }
         }
     }
 
