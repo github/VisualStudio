@@ -56,6 +56,18 @@ namespace GitHub.Services
             return hresult == VSConstants.S_OK ? view : null;
         }
 
+        /// <summary>
+        /// Find the closest matching line in <see cref="toLines"/>.
+        /// </summary>
+        /// <remarks>
+        /// When matching we prioritize unique matching lines in <see cref="toLines"/>. If the target line isn't
+        /// unique, continue searching the lines above for a better match and use this as anchor with an offset.
+        /// The closest match to <see cref="line"/> with the fewest duplicate matches will be used for the matching line.
+        /// </remarks>
+        /// <param name="fromLines">The document we're navigating from.</param>
+        /// <param name="toLines">The document we're navigating to.</param>
+        /// <param name="line">The 0-based line we're navigating from.</param>
+        /// <returns>The best matching line in <see cref="toLines"/></returns>
         public int FindMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
         {
             var matchingLine = -1;
@@ -93,6 +105,14 @@ namespace GitHub.Services
             return matchingLine;
         }
 
+        /// <summary>
+        /// Find the nearest matching line to <see cref="line"/> and the number of similar matched lines in the text.
+        /// </summary>
+        /// <param name="fromLines">The document we're navigating from.</param>
+        /// <param name="toLines">The document we're navigating to.</param>
+        /// <param name="line">The 0-based line we're navigating from.</param>
+        /// <param name="matchedLines">The number of similar matched lines in <see cref="toLines"/></param>
+        /// <returns>Find the nearest matching line in <see cref="toLines"/>.</returns>
         public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
         {
             line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
