@@ -34,7 +34,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             Assert.That(target.Items.Count, Is.EqualTo(3));
 
             var dir1 = (PullRequestDirectoryNode)target.Items[0];
-            Assert.That(dir1.DirectoryName, Is.EqualTo(dir1));
+            Assert.That(dir1.DirectoryName, Is.EqualTo("dir1"));
             Assert.That(dir1.Files, Has.Exactly(2).Items);
 
             Assert.That(dir1.Directories, Has.One.Items);
@@ -46,12 +46,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
             Assert.That(dir1a.DirectoryName, Is.EqualTo("dir1a"));
             Assert.That(dir1a.Files, Has.One.Items);
-            Assert.That(dir1a.Directories.Count, Is.Empty);
+            Assert.That(dir1a.Directories, Is.Empty);
 
             var dir2 = (PullRequestDirectoryNode)target.Items[1];
             Assert.That(dir2.DirectoryName, Is.EqualTo("dir2"));
             Assert.That(dir2.Files, Has.One.Items);
-            Assert.That(dir2.Directories.Count, Is.Empty);
+            Assert.That(dir2.Directories, Is.Empty);
 
             var readme = (PullRequestFileNode)target.Items[2];
             Assert.That(readme.FileName, Is.EqualTo("readme.md"));

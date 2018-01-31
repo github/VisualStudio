@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Factories;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
@@ -289,6 +290,7 @@ Line 4";
                 Substitute.For<IGitClient>(),
                 diffService,
                 Substitute.For<IApiClientFactory>(),
+                Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IUsageTracker>());
         }
 

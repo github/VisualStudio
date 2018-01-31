@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using NUnit.Framework;
 using System.ComponentModel;
+using GitHub.Api;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -671,6 +672,7 @@ Line 4";
                     Substitute.For<IGitClient>(),
                     diff,
                     Substitute.For<IApiClientFactory>(),
+                    Substitute.For<IGraphQLClientFactory>(),
                     Substitute.For<IUsageTracker>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())
@@ -830,12 +832,14 @@ Line 4";
             IPullRequestSessionService sessionService = null,
             IConnectionManager connectionManager = null,
             IModelServiceFactory modelServiceFactory = null,
+            IGraphQLClientFactory graphQLClientFactory = null,
             ITeamExplorerContext teamExplorerContext = null)
         {
             service = service ?? CreatePullRequestService();
             sessionService = sessionService ?? CreateSessionService();
             connectionManager = connectionManager ?? CreateConnectionManager();
             modelServiceFactory = modelServiceFactory ?? CreateModelServiceFactory();
+            graphQLClientFactory = graphQLClientFactory ?? Substitute.For<IGraphQLClientFactory>();
             teamExplorerContext = teamExplorerContext ?? CreateTeamExplorerContext(CreateRepositoryModel());
 
             return new PullRequestSessionManager(
@@ -843,6 +847,7 @@ Line 4";
                 sessionService,
                 connectionManager,
                 modelServiceFactory,
+                graphQLClientFactory,
                 teamExplorerContext);
         }
 
