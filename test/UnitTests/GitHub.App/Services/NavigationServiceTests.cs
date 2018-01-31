@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
@@ -18,8 +17,7 @@ public class NavigationServiceTests
         public void FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line,
             int expectNearestLine, int expectMatchingLines)
         {
-            var sp = Substitute.For<IServiceProvider>();
-            var target = new NavigationService(sp);
+            var target = CreateNavigationService();
 
             int matchedLines;
             var nearestLine = target.FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
@@ -39,12 +37,17 @@ public class NavigationServiceTests
         public void FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line,
             int matchingLine)
         {
-            var sp = Substitute.For<IServiceProvider>();
-            var target = new NavigationService(sp);
+            var target = CreateNavigationService();
 
             var nearestLine = target.FindMatchingLine(fromLines, toLines, line);
 
             Assert.That(nearestLine, Is.EqualTo(matchingLine));
         }
+    }
+
+    static NavigationService CreateNavigationService()
+    {
+        var sp = Substitute.For<IGitHubServiceProvider>();
+        return new NavigationService(sp);
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
-using IServiceProvider = System.IServiceProvider;
 using GitHub.Models;
 
 namespace GitHub.Services
@@ -12,13 +11,13 @@ namespace GitHub.Services
     [Export(typeof(INavigationService))]
     public class NavigationService : INavigationService
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         // If the target line doesn't have a unique match, search this number of lines above looking for a match.
         public const int MatchLinesAboveTarget = 4;
 
         [ImportingConstructor]
-        public NavigationService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public NavigationService(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -51,7 +50,7 @@ namespace GitHub.Services
 
         public IVsTextView FindActiveView()
         {
-            var textManager = (IVsTextManager2)serviceProvider.GetService(typeof(SVsTextManager));
+            var textManager = serviceProvider.GetService<SVsTextManager, IVsTextManager2>();
             IVsTextView view;
             var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
             return hresult == VSConstants.S_OK ? view : null;
