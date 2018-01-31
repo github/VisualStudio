@@ -32,7 +32,7 @@ namespace GitHub.Services
 
             var fromLines = ReadLines(text1);
             var toLines = ReadLines(text2);
-            var matchingLine = FindNearestMatchingLine(fromLines, toLines, line);
+            var matchingLine = FindMatchingLine(fromLines, toLines, line);
             if (matchingLine == -1)
             {
                 // If we can't match line use orignal as best guess.
@@ -54,32 +54,52 @@ namespace GitHub.Services
             return hresult == VSConstants.S_OK ? view : null;
         }
 
-        public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
+        public int FindMatchingLine(IList<string> fromLines, IList<string> toLines, int line)
+        {
+            int matchedLines;
+            return FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
+        }
+
+        public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
         {
             line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
             var fromLine = fromLines[line];
 
+            matchedLines = 0;
+            var matchingLine = -1;
             for (var offset = 0; true; offset++)
             {
                 var lineAbove = line + offset;
                 var checkAbove = lineAbove < toLines.Count;
                 if (checkAbove && toLines[lineAbove] == fromLine)
                 {
-                    return lineAbove;
+                    if (matchedLines == 0)
+                    {
+                        matchingLine = lineAbove;
+                    }
+
+                    matchedLines++;
                 }
 
                 var lineBelow = line - offset;
                 var checkBelow = lineBelow >= 0;
-                if (checkBelow && lineBelow < toLines.Count && toLines[lineBelow] == fromLine)
+                if (checkBelow && offset > 0 && lineBelow < toLines.Count && toLines[lineBelow] == fromLine)
                 {
-                    return lineBelow;
+                    if (matchedLines == 0)
+                    {
+                        matchingLine = lineBelow;
+                    }
+
+                    matchedLines++;
                 }
 
                 if (!checkAbove && !checkBelow)
                 {
-                    return -1;
+                    break;
                 }
             }
+
+            return matchingLine;
         }
 
         string GetText(IVsTextView textView)

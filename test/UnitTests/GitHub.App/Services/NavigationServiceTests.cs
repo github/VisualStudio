@@ -8,21 +8,24 @@ public class NavigationServiceTests
 {
     public class TheFindNearestMatchingLineMethod
     {
-        [TestCase(new[] { "line" }, new[] { "line" }, 0, 0, Description = "Match same line")]
-        [TestCase(new[] { "line" }, new[] { "line_no_match" }, 0, -1, Description = "No matching line")]
-        [TestCase(new[] { "line" }, new[] { "", "line" }, 0, 1, Description = "Match line moved up")]
-        [TestCase(new[] { "", "line" }, new[] { "line" }, 1, 0, Description = "Match line moved down")]
-        [TestCase(new[] { "line", "line" }, new[] { "line", "line" }, 0, 0, Description = "Match nearest line")]
-        [TestCase(new[] { "line", "line" }, new[] { "line", "line" }, 1, 1, Description = "Match nearest line")]
-        [TestCase(new[] { "line" }, new[] { "line" }, 1, 0, Description = "Treat after last line the same as last line")]
-        public void FindNearestMatching(IList<string> fromLines, IList<string> toLines, int line, int expectLine)
+        [TestCase(new[] { "line" }, new[] { "line" }, 0, 0, 1, Description = "Match same line")]
+        [TestCase(new[] { "line" }, new[] { "line_no_match" }, 0, -1, 0, Description = "No matching line")]
+        [TestCase(new[] { "line" }, new[] { "", "line" }, 0, 1, 1, Description = "Match line moved up")]
+        [TestCase(new[] { "", "line" }, new[] { "line" }, 1, 0, 1, Description = "Match line moved down")]
+        [TestCase(new[] { "line", "line" }, new[] { "line", "line" }, 0, 0, 2, Description = "Match nearest line")]
+        [TestCase(new[] { "line", "line" }, new[] { "line", "line" }, 1, 1, 2, Description = "Match nearest line")]
+        [TestCase(new[] { "line" }, new[] { "line" }, 1, 0, 1, Description = "Treat after last line the same as last line")]
+        public void FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line,
+            int expectNearestLine, int expectMatchingLines)
         {
             var sp = Substitute.For<IServiceProvider>();
             var target = new NavigationService(sp);
 
-            var matchingLine = target.FindNearestMatchingLine(fromLines, toLines, line);
+            int matchedLines;
+            var nearestLine = target.FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
 
-            Assert.That(matchingLine, Is.EqualTo(expectLine));
+            Assert.That(nearestLine, Is.EqualTo(expectNearestLine));
+            Assert.That(matchedLines, Is.EqualTo(expectMatchingLines));
         }
     }
 }
