@@ -226,6 +226,7 @@
     <Compile Include="GitHub.Api\LoginManagerTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
     <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
+    <Compile Include="GitHub.App\Caches\BlobCacheTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Factories\ModelServiceFactoryTests.cs" />
     <Compile Include="GitHub.App\Models\AccountModelTests.cs" />

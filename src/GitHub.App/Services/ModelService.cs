@@ -87,10 +87,10 @@ namespace GitHub.Services
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
-            return Observable.Zip(
+            return Observable.Concat(
                 GetUser(),
-                GetUserOrganizations(),
-                (user, orgs) => user.Concat(orgs))
+                GetUserOrganizations())
+            .ToList()
             .ToReadOnlyList(Create);
         }
 
@@ -108,49 +108,51 @@ namespace GitHub.Services
                 .Select(GitIgnoreCacheItem.Create);
         }
 
-        IObservable<IEnumerable<AccountCacheItem>> GetUser()
+        IObservable<AccountCacheItem> GetUser()
         {
-            return hostCache.GetAndRefreshObject("user",
-                () => ApiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
-                .TakeLast(1)
-                .ToList();
-        }
-
-        IObservable<IEnumerable<AccountCacheItem>> GetUserOrganizations()
-        {
-            return GetUserFromCache().SelectMany(user =>
-                hostCache.GetAndRefreshObject(user.Login + "|orgs",
-                    () => ApiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
-                    TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
-                // TODO: Akavache returns the cached version followed by the fresh version if > 2
-                // minutes have expired from the last request. Here we make sure the latest value is
-                // returned but it's a hack. We really need a better way to cache this stuff.
-                .TakeLast(1)
-                .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
-                    // This could in theory happen if we try to call this before the user is logged in.
-                    e =>
+            return Observable.Defer(() => hostCache.GetAndRefreshObject("user",
+                    () => ApiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
+                    .Catch<AccountCacheItem, KeyNotFoundException>(e =>
                     {
-                        log.Error(e, "Retrieve user organizations failed because user is not stored in the cache");
-                        return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                        log.Error(e, "Retrieving user failed because user is not stored in the cache");
+                        return Observable.Return<AccountCacheItem>(null);
                     })
-                 .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
-                 {
-                     log.Error(e, "Retrieve user organizations failed");
-                     return Observable.Return(Enumerable.Empty<AccountCacheItem>());
-                 });
+                    .Catch<AccountCacheItem, Exception>(e =>
+                    {
+                        log.Error(e, "Retrieving user failed");
+                        return Observable.Return<AccountCacheItem>(null);
+                    })
+                .WhereNotNull()
+                .TakeLast(1)
+            );
         }
 
-        public IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetRepositories()
+        IObservable<AccountCacheItem> GetUserOrganizations()
         {
-            return GetUserRepositories(RepositoryType.Owner)
-                .TakeLast(1)
-                .Concat(GetUserRepositories(RepositoryType.Member).TakeLast(1))
-                .Concat(GetAllRepositoriesForAllOrganizations());
+            return
+                GetUserFromCache()
+                    .SelectMany(user =>
+                        hostCache.GetAndRefreshObject(user.Login + "|orgs",
+                            () => ApiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
+                            TimeSpan.FromMinutes(2), TimeSpan.FromDays(7))
+                    )
+
+                     // TODO: Akavache returns the cached version followed by the fresh version if > 2
+                     // minutes have expired from the last request. Here we make sure the latest value is
+                     // returned
+                     .Catch<IList<AccountCacheItem>, Exception>(e =>
+                     {
+                         log.Error(e, "Retrieve user organizations failed");
+                         return Observable.Return<IList<AccountCacheItem>>(null);
+                     })
+                     .WhereNotNull()
+                     .TakeLast(1)
+                     .SelectMany(x => x);
         }
 
         IObservable<AccountCacheItem> GetUserFromCache()
         {
-            return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
+            return GetUser();
         }
 
         /// <summary>
@@ -244,7 +246,13 @@ namespace GitHub.Services
                 .SelectMany(key =>
                     hostCache.GetAndFetchLatestFromIndex(key, () =>
                         ApiClient.GetRepositories()
-                                 .Select(RepositoryCacheItem.Create),
+                            .Catch((Exception ex) =>
+                            {
+                                log.Error(ex, "GetRepositories");
+                                return Observable.Return<Repository>(null);
+                            })
+                            .WhereNotNull()
+                            .Select(RepositoryCacheItem.Create),
                         item =>
                         {
                             if (collection.Disposed) return;
@@ -310,60 +318,6 @@ namespace GitHub.Services
 
                 return Observable.Return(tempFile);
             }));
-        }
-
-        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
-        {
-            return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
-                hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
-                    () => GetUserRepositoriesFromApi(repositoryType),
-                        TimeSpan.FromMinutes(2),
-                        TimeSpan.FromDays(7)))
-                .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
-                    // This could in theory happen if we try to call this before the user is logged in.
-                    e =>
-                    {
-                        log.Error(e,
-                            "Retrieving {RepositoryType} user repositories failed because user is not stored in the cache",
-                            repositoryType);
-                        return Observable.Return(new IRemoteRepositoryModel[] {});
-                    });
-        }
-
-        IObservable<IEnumerable<RepositoryCacheItem>> GetUserRepositoriesFromApi(RepositoryType repositoryType)
-        {
-            return ApiClient.GetUserRepositories(repositoryType)
-                .WhereNotNull()
-                .Select(RepositoryCacheItem.Create)
-                .ToList()
-                .Catch<IEnumerable<RepositoryCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<RepositoryCacheItem>()));
-        }
-
-        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetAllRepositoriesForAllOrganizations()
-        {
-            return GetUserOrganizations()
-                .SelectMany(org => org.ToObservable())
-                .SelectMany(org => GetOrganizationRepositories(org.Login).TakeLast(1));
-        }
-
-        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetOrganizationRepositories(string organization)
-        {
-            return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
-                hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
-                    () => ApiClient.GetRepositoriesForOrganization(organization).Select(
-                        RepositoryCacheItem.Create).ToList(),
-                        TimeSpan.FromMinutes(2),
-                        TimeSpan.FromDays(7)))
-                .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
-                    // This could in theory happen if we try to call this before the user is logged in.
-                    e =>
-                    {
-                        log.Error(e, "Retrieveing {Organization} org repositories failed because user is not stored in the cache",
-                            organization);
-                        return Observable.Return(new IRemoteRepositoryModel[] {});
-                    });
         }
 
         public IObservable<IBranch> GetBranches(IRepositoryModel repo)

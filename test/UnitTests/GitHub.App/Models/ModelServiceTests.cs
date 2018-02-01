@@ -14,14 +14,12 @@ using Octokit;
 using NUnit.Framework;
 using System.Globalization;
 using System.Reactive.Subjects;
-using System.Threading;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Collections;
-using ReactiveUI;
 using static GitHub.Services.ModelService;
 
-public class ModelServiceTests
+namespace ModelServiceTests
 {
     public class TheGetCurrentUserMethod : TestBaseClass
     {
@@ -157,20 +155,20 @@ public class ModelServiceTests
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
-            await modelService.InsertUser(new AccountCacheItem { Login = "snoopy" });
+            //await modelService.InsertUser(new AccountCacheItem { Login = "snoopy" });
 
             var fetched = await modelService.GetAccounts();
 
-            Assert.That(3, Is.EqualTo(fetched.Count));
-            Assert.That("snoopy", Is.EqualTo(fetched[0].Login));
-            Assert.That("github", Is.EqualTo(fetched[1].Login));
-            Assert.That("fake", Is.EqualTo(fetched[2].Login));
+            Assert.AreEqual(3, fetched.Count);
+            Assert.AreEqual("snoopy", fetched[0].Login);
+            Assert.AreEqual("github", fetched[1].Login);
+            Assert.AreEqual("fake", fetched[2].Login);
             var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("snoopy|orgs");
-            Assert.That(2, Is.EqualTo(cachedOrgs.Count));
-            Assert.That("github", Is.EqualTo(cachedOrgs[0].Login));
-            Assert.That("fake", Is.EqualTo(cachedOrgs[1].Login));
+            Assert.AreEqual(2, cachedOrgs.Count);
+            Assert.AreEqual("github", cachedOrgs[0].Login);
+            Assert.AreEqual("fake", cachedOrgs[1].Login);
             var cachedUser = await cache.GetObject<AccountCacheItem>("user");
-            Assert.That("snoopy", Is.EqualTo(cachedUser.Login));
+            Assert.AreEqual("snoopy", cachedUser.Login);
         }
 
         [Test]
@@ -226,91 +224,36 @@ public class ModelServiceTests
     public class TheGetRepositoriesMethod : TestBaseClass
     {
         [Test]
-        public async Task CanRetrieveAndCacheRepositoriesForUserAndOrganizations()
+        public async Task CanRetrieveAndCacheRepositories()
         {
-            var orgs = new[]
-            {
-                CreateOctokitOrganization("github"),
-                CreateOctokitOrganization("octokit")
-            };
-            var ownedRepos = new[]
-            {
-                CreateRepository("haacked", "seegit"),
-                CreateRepository("haacked", "codehaacks")
-            };
-            var memberRepos = new[]
-            {
-                CreateRepository("mojombo", "semver"),
-                CreateRepository("ninject", "ninject"),
-                CreateRepository("jabbr", "jabbr"),
-                CreateRepository("fody", "nullguard")
-            };
-            var githubRepos = new[]
-            {
-                CreateRepository("github", "visualstudio")
-            };
+            int count = 1;
             var octokitRepos = new[]
             {
-                CreateRepository("octokit", "octokit.net"),
-                CreateRepository("octokit", "octokit.rb"),
-                CreateRepository("octokit", "octokit.objc")
+                CreateRepository("haacked", "seegit", id: count++),
+                CreateRepository("haacked", "codehaacks", id: count++),
+                CreateRepository("mojombo", "semver", id: count++),
+                CreateRepository("ninject", "ninject", id: count++),
+                CreateRepository("jabbr", "jabbr", id: count++),
+                CreateRepository("fody", "nullguard", id: count++),
+                CreateRepository("github", "visualstudio", id: count++),
+                CreateRepository("octokit", "octokit.net", id: count++),
+                CreateRepository("octokit", "octokit.rb", id: count++),
+                CreateRepository("octokit", "octokit.objc", id: count++),
             };
+            var expectedRepos = octokitRepos.Select(x => new RemoteRepositoryModel(x) as IRemoteRepositoryModel).ToList();
+
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetOrganizations().Returns(orgs.ToObservable());
-            apiClient.GetUserRepositories(RepositoryType.Owner).Returns(ownedRepos.ToObservable());
-            apiClient.GetUserRepositories(RepositoryType.Member).Returns(memberRepos.ToObservable());
-            apiClient.GetRepositoriesForOrganization("github").Returns(githubRepos.ToObservable());
-            apiClient.GetRepositoriesForOrganization("octokit").Returns(octokitRepos.ToObservable());
+            apiClient.GetRepositories().Returns(octokitRepos.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             await modelService.InsertUser(new AccountCacheItem { Login = "opus" });
 
-            var fetched = await modelService.GetRepositories().ToList();
+            var repositories = new TrackingCollection<IRemoteRepositoryModel>();
+            modelService.GetRepositories(repositories);
+            repositories.Subscribe();
+            await repositories.OriginalCompleted;
 
-            Assert.That(4, Is.EqualTo(fetched.Count));
-            Assert.That(2, Is.EqualTo(fetched[0].Count));
-            Assert.That(4, Is.EqualTo(fetched[1].Count));
-            Assert.That(1, Is.EqualTo(fetched[2].Count));
-            Assert.That(3, Is.EqualTo(fetched[3].Count));
-            Assert.That("seegit", Is.EqualTo(fetched[0][0].Name));
-            Assert.That("codehaacks", Is.EqualTo(fetched[0][1].Name));
-            Assert.That("semver", Is.EqualTo(fetched[1][0].Name));
-            Assert.That("ninject", Is.EqualTo(fetched[1][1].Name));
-            Assert.That("jabbr", Is.EqualTo(fetched[1][2].Name));
-            Assert.That("nullguard", Is.EqualTo(fetched[1][3].Name));
-            Assert.That("visualstudio", Is.EqualTo(fetched[2][0].Name));
-            Assert.That("octokit.net", Is.EqualTo(fetched[3][0].Name));
-            Assert.That("octokit.rb", Is.EqualTo(fetched[3][1].Name));
-            Assert.That("octokit.objc", Is.EqualTo(fetched[3][2].Name));
-            var cachedOwnerRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|Owner:repos");
-            Assert.That(2, Is.EqualTo(cachedOwnerRepositories.Count));
-            Assert.That("seegit", Is.EqualTo(cachedOwnerRepositories[0].Name));
-            Assert.That("haacked", Is.EqualTo(cachedOwnerRepositories[0].Owner.Login));
-            Assert.That("codehaacks", Is.EqualTo(cachedOwnerRepositories[1].Name));
-            Assert.That("haacked", Is.EqualTo(cachedOwnerRepositories[1].Owner.Login));
-            var cachedMemberRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|Member:repos");
-            Assert.That(4, Is.EqualTo(cachedMemberRepositories.Count));
-            Assert.That("semver", Is.EqualTo(cachedMemberRepositories[0].Name));
-            Assert.That("mojombo", Is.EqualTo(cachedMemberRepositories[0].Owner.Login));
-            Assert.That("ninject", Is.EqualTo(cachedMemberRepositories[1].Name));
-            Assert.That("ninject", Is.EqualTo(cachedMemberRepositories[1].Owner.Login));
-            Assert.That("jabbr", Is.EqualTo(cachedMemberRepositories[2].Name));
-            Assert.That("jabbr", Is.EqualTo(cachedMemberRepositories[2].Owner.Login));
-            Assert.That("nullguard", Is.EqualTo(cachedMemberRepositories[3].Name));
-            Assert.That("fody", Is.EqualTo(cachedMemberRepositories[3].Owner.Login));
-            var cachedGitHubRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|github|repos");
-            Assert.That(1, Is.EqualTo(cachedGitHubRepositories.Count));
-            Assert.That("seegit", Is.EqualTo(cachedOwnerRepositories[0].Name));
-            Assert.That("haacked", Is.EqualTo(cachedOwnerRepositories[0].Owner.Login));
-            Assert.That("codehaacks", Is.EqualTo(cachedOwnerRepositories[1].Name));
-            Assert.That("haacked", Is.EqualTo(cachedOwnerRepositories[1].Owner.Login));
-            var cachedOctokitRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|octokit|repos");
-            Assert.That("octokit.net", Is.EqualTo(cachedOctokitRepositories[0].Name));
-            Assert.That("octokit", Is.EqualTo(cachedOctokitRepositories[0].Owner.Login));
-            Assert.That("octokit.rb", Is.EqualTo(cachedOctokitRepositories[1].Name));
-            Assert.That("octokit", Is.EqualTo(cachedOctokitRepositories[1].Owner.Login));
-            Assert.That("octokit.objc", Is.EqualTo(cachedOctokitRepositories[2].Name));
-            Assert.That("octokit", Is.EqualTo(cachedOctokitRepositories[2].Owner.Login));
+            CollectionAssert.AreEquivalent(expectedRepos, repositories.OrderBy(x => x.Name));
         }
 
         [Test]
@@ -319,9 +262,12 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
 
-            var repos = await modelService.GetRepositories();
+            var repositories = new TrackingCollection<IRemoteRepositoryModel>();
+            modelService.GetRepositories(repositories);
+            repositories.Subscribe();
+            await repositories.OriginalCompleted;
 
-            Assert.That(0, Is.EqualTo(repos.Count));
+            CollectionAssert.AreEqual(new IRemoteRepositoryModel[] { }, repositories.ToArray());
         }
 
         [Test]
@@ -329,12 +275,16 @@ public class ModelServiceTests
         {
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
-            apiClient.GetOrganizations()
-                .Returns(Observable.Throw<Organization>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
+            await modelService.InsertUser(new AccountCacheItem { Login = "opus" });
+            apiClient.GetRepositories()
+                .Returns(Observable.Throw<Repository>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
 
-            var repos = await modelService.GetRepositories();
+            var repositories = new TrackingCollection<IRemoteRepositoryModel>();
+            modelService.GetRepositories(repositories);
+            repositories.Subscribe();
+            await repositories.OriginalCompleted;
 
-            Assert.That(0, Is.EqualTo(repos.Count));
+            CollectionAssert.AreEquivalent(new IRemoteRepositoryModel[] { }, repositories.ToArray());
         }
     }
 

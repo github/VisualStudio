@@ -111,6 +111,10 @@ public class RepositoryCloneViewModelTests
 
             await col.OriginalCompleted;
 
+            // we need to wait slightly because the subscription OnComplete in the model
+            // runs right after the above await finishes, which means the assert
+            // gets checked before the flag is set
+            await Task.Delay(100);
             Assert.False(vm.IsBusy);
         }
 
@@ -182,7 +186,6 @@ public class RepositoryCloneViewModelTests
 
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
             await col.OriginalCompleted;
-            await Task.Delay(100);
             //Assert.Single(vm.Repositories);
             Assert.False(vm.NoRepositoriesFound);
         }
