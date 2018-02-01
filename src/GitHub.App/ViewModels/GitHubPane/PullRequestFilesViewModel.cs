@@ -27,7 +27,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService service;
         readonly BehaviorSubject<bool> isBranchCheckedOut = new BehaviorSubject<bool>(false);
 
-        IPullRequestSession session;
+        IPullRequestSession pullRequestSession;
         Func<IInlineCommentThreadModel, bool> commentFilter;
         int changedFilesCount;
         IReadOnlyList<IPullRequestChangeNode> items;
@@ -43,16 +43,16 @@ namespace GitHub.ViewModels.GitHubPane
 
             this.service = service;
 
-            DiffFile = ReactiveCommand.CreateAsyncTask(x => 
-                editorService.OpenDiff(session, ((IPullRequestFileNode)x).RelativePath, false));
-            ViewFile = ReactiveCommand.CreateAsyncTask(x => 
-                editorService.OpenFile(session, ((IPullRequestFileNode)x).RelativePath, false));
+            DiffFile = ReactiveCommand.CreateAsyncTask(x =>
+                editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, false));
+            ViewFile = ReactiveCommand.CreateAsyncTask(x =>
+                editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, false));
             DiffFileWithWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
-                x => editorService.OpenDiff(session, ((IPullRequestFileNode)x).RelativePath, true));
+                x => editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
             OpenFileInWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
-                x => editorService.OpenFile(session, ((IPullRequestFileNode)x).RelativePath, true));
+                x => editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
 
             OpenFirstComment = ReactiveCommand.CreateAsyncTask(async x =>
             {
@@ -61,7 +61,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (thread != null)
                 {
-                    await editorService.OpenDiff(session, file.RelativePath, thread);
+                    await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
                 }
             });
         }
@@ -90,13 +90,13 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public async Task InitializeAsync(
             IPullRequestSession session,
-            Func<IInlineCommentThreadModel, bool> commentFilter = null)
+            Func<IInlineCommentThreadModel, bool> filter = null)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
             subscriptions?.Dispose();
-            this.session = session;
-            this.commentFilter = commentFilter;
+            this.pullRequestSession = session;
+            this.commentFilter = filter;
             subscriptions = new CompositeDisposable();
             subscriptions.Add(session.WhenAnyValue(x => x.IsCheckedOut).Subscribe(isBranchCheckedOut));
 
@@ -120,7 +120,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (file != null)
                     {
                         subscriptions.Add(file.WhenAnyValue(x => x.InlineCommentThreads)
-                            .Subscribe(x => node.CommentCount = CountComments(x, commentFilter)));
+                            .Subscribe(x => node.CommentCount = CountComments(x, filter)));
                     }
 
                     var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
@@ -188,7 +188,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task<IInlineCommentThreadModel> GetFirstCommentThread(IPullRequestFileNode file)
         {
-            var sessionFile = await session.GetFile(file.RelativePath);
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
             var threads = sessionFile.InlineCommentThreads.AsEnumerable();
 
             if (commentFilter != null)
