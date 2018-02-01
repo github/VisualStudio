@@ -174,7 +174,8 @@ namespace GitHub.Collections
             Add,
             Insert,
             Remove,
-            Ignore
+            Ignore,
+            End
         }
 
         bool isChanging;
@@ -187,6 +188,7 @@ namespace GitHub.Collections
         IConnectableObservable<T> dataPump;
         IConnectableObservable<Unit> cachePump;
         ConcurrentQueue<ActionData> cache;
+        Queue<ActionData> processingQueue;
 
         ReplaySubject<Unit> signalHaveData;
         ReplaySubject<Unit> signalNeedData;
@@ -211,7 +213,8 @@ namespace GitHub.Collections
         readonly Dictionary<T, int> filteredIndexCache = new Dictionary<T, int>();
 
         bool originalSourceIsCompleted;
-        bool signalOriginalSourceCompletion;
+        bool signaledOriginalSourceCompletion;
+        bool sourceHasData;
         ReplaySubject<Unit> originalSourceCompleted;
         public IObservable<Unit> OriginalCompleted => originalSourceCompleted;
 
@@ -236,6 +239,7 @@ namespace GitHub.Collections
             Func<T, T, int> newer = null, IScheduler scheduler = null)
         {
             cache = new ConcurrentQueue<ActionData>();
+            processingQueue = new Queue<ActionData>();
             ProcessingDelay = TimeSpan.FromMilliseconds(10);
             fuzziness = TimeSpan.FromMilliseconds(1);
 
@@ -287,6 +291,7 @@ namespace GitHub.Collections
                 })
                 .Do(data =>
                 {
+                    sourceHasData = true;
                     cache.Enqueue(new ActionData(data));
                     signalHaveData.OnNext(Unit.Default);
                 })
@@ -296,16 +301,10 @@ namespace GitHub.Collections
                         return;
 
                     originalSourceIsCompleted = true;
-                    if (!cache.IsEmpty)
+                    if (!sourceHasData)
                     {
-                        signalOriginalSourceCompletion = true;
-                    }
-                    else
-                    {
-                        originalSourceCompleted.OnNext(Unit.Default);
-                        originalSourceCompleted.OnCompleted();
-                        signalNeedData.OnCompleted();
-                        signalHaveData.OnCompleted();
+                        var end = new ActionData(TheAction.End, null);
+                        dataListener.OnNext(end);
                     }
                 })
                 .Publish();
@@ -321,16 +320,24 @@ namespace GitHub.Collections
                 {
                     var delay = CalculateProcessingDelay(interval);
                     waitHandle.Wait(delay);
-                    dataListener.OnNext(GetFromQueue());
+                    var data = GetFromQueue();
+                    if (!data.Equals(ActionData.Default))
+                    {
+                        processingQueue.Enqueue(data);
+                        dataListener.OnNext(data);
+                    }
                     return Unit.Default;
                 })
                 .Publish();
 
             source = dataListener
-                .Where(data => data.Item != null)
+                .Where(data => data.Item != null || data.TheAction == TheAction.End)
                 .ObserveOn(scheduler)
                 .Select(data =>
                 {
+                    if (data.TheAction == TheAction.End)
+                        return data;
+
                     data = ProcessItem(data, original);
 
                     // if we're removing an item that doesn't exist, ignore it
@@ -351,15 +358,31 @@ namespace GitHub.Collections
                     data = FilteredRemove(data);
                     return data;
                 })
-                .Do(_ =>
+                .Do(data =>
                 {
-                    if (ManualProcessing)
+                    // only objects coming from the original observable go into this queue
+                    if (processingQueue.Count > 0)
+                        processingQueue.Dequeue();
+                    if (ManualProcessing && processingQueue.Count == 0)
                     {
-                        if (signalOriginalSourceCompletion)
+                        // if we've finished processing we need to raise the Completed event on
+                        // the originalSourceCompleted subject, but we want to do this only
+                        // after listeners have received the last item, so set a flag and
+                        // insert a fake object in the queue so it triggers the Completed
+                        // event on the next processing loop
+                        if (!signaledOriginalSourceCompletion)
                         {
-                            signalOriginalSourceCompletion = false;
-                            originalSourceCompleted.OnNext(Unit.Default);
-                            originalSourceCompleted.OnCompleted();
+                            if (data.TheAction != TheAction.End)
+                            {
+                                var end = new ActionData(TheAction.End, null);
+                                dataListener.OnNext(end);
+                            }
+                            else
+                            {
+                                signaledOriginalSourceCompletion = true;
+                                originalSourceCompleted.OnNext(Unit.Default);
+                                originalSourceCompleted.OnCompleted();
+                            }
                         }
                     }
                     else
@@ -1174,8 +1197,10 @@ namespace GitHub.Collections
             pumpDisposables.Clear();
             disposables.Clear();
             originalSourceIsCompleted = false;
-            signalOriginalSourceCompletion = false;
+            signaledOriginalSourceCompletion = false;
+            sourceHasData = false;
             cache = new ConcurrentQueue<ActionData>();
+            processingQueue = new Queue<ActionData>();
             dataListener = new ReplaySubject<ActionData>();
             disposables.Add(dataListener);
             signalHaveData = new ReplaySubject<Unit>();
