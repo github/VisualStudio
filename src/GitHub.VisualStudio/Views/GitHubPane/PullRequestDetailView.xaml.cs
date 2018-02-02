@@ -70,7 +70,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         IUsageTracker UsageTracker { get; set; }
 
         [Import]
-        INavigationService NavigationService { get; set; }
+        IPullRequestEditorService NavigationService { get; set; }
 
         [Import]
         IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }

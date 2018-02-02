@@ -3,7 +3,7 @@ using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
 
-public class NavigationServiceTests
+public class PullRequestEditorServiceTests
 {
     public class TheFindNearestMatchingLineMethod
     {
@@ -45,9 +45,9 @@ public class NavigationServiceTests
         }
     }
 
-    static NavigationService CreateNavigationService()
+    static PullRequestEditorService CreateNavigationService()
     {
         var sp = Substitute.For<IGitHubServiceProvider>();
-        return new NavigationService(sp);
+        return new PullRequestEditorService(sp);
     }
 }

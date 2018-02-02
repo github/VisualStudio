@@ -234,7 +234,7 @@
     <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
-    <Compile Include="GitHub.App\Services\NavigationServiceTests.cs" />
+    <Compile Include="GitHub.Exports.Reactive\Services\PullRequestEditorServiceTests.cs" />
     <Compile Include="GitHub.App\Services\OAuthCallbackListenerTests.cs" />
     <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />

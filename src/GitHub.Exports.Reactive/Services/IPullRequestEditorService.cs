@@ -2,7 +2,7 @@
 
 namespace GitHub.Services
 {
-    public interface INavigationService
+    public interface IPullRequestEditorService
     {
         /// <summary>
         /// Find the active text view.

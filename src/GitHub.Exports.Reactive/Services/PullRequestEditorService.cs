@@ -8,8 +8,8 @@ using GitHub.Models;
 
 namespace GitHub.Services
 {
-    [Export(typeof(INavigationService))]
-    public class NavigationService : INavigationService
+    [Export(typeof(IPullRequestEditorService))]
+    public class PullRequestEditorService : IPullRequestEditorService
     {
         readonly IGitHubServiceProvider serviceProvider;
 
@@ -17,7 +17,7 @@ namespace GitHub.Services
         public const int MatchLinesAboveTarget = 4;
 
         [ImportingConstructor]
-        public NavigationService(IGitHubServiceProvider serviceProvider)
+        public PullRequestEditorService(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
