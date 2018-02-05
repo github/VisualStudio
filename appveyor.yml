@@ -17,10 +17,13 @@ install:
 
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
+    (new-object Net.WebClient).DownloadString("https://raw.github.com/madskristensen/ExtensionScripts/master/AppVeyor/vsix.ps1") | iex
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test_script:
 - ps: scripts\test.ps1 -AppVeyor
+after_test:
+- ps: Vsix-PushArtifacts | Vsix-PublishToGallery
 on_success:
 - ps: |
     if ($full_build) {
