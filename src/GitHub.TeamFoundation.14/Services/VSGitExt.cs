@@ -28,40 +28,19 @@ namespace GitHub.VisualStudio.Base
         IGitExt gitService;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
+        // Services need to be imported from the current assembly (GitHub.TeamFoundation.14 or 15).
+        // We therefore qualify each service with a contract name that indicates the assembly.
+        // This is a fix for https://github.com/github/VisualStudio/issues/1454
+#if TEAMEXPLORER14
+        const string ContractName = "TEAMEXPLORER14";
+#elif TEAMEXPLORER15
+        const string ContractName = "TEAMEXPLORER15";
+#endif
+
         [ImportingConstructor]
         public VSGitExt(IGitHubServiceProvider serviceProvider,
-            [ImportMany] IEnumerable<IVSUIContextFactory> factory,
-            [ImportMany] IEnumerable<ILocalRepositoryModelFactory> repositoryFactory)
-            : this(serviceProvider, FromDeclaringType(factory), FromDeclaringType(repositoryFactory))
-        {
-        }
-
-        // Find the service that is nested in the current type (not the other GitHub.TeamFoundation.* assembly).
-        // This is a fix for https://github.com/github/VisualStudio/issues/1454
-        static T FromDeclaringType<T>(IEnumerable<T> services)
-        {
-            return services.Where(s => s.GetType().DeclaringType == typeof(VSGitExt)).First();
-        }
-
-        [Export(typeof(ILocalRepositoryModelFactory))]
-        class LocalRepositoryModelFactory : ILocalRepositoryModelFactory
-        {
-            public ILocalRepositoryModel Create(string localPath)
-            {
-                return new LocalRepositoryModel(localPath);
-            }
-        }
-
-        [Export(typeof(IVSUIContextFactory))]
-        class VSUIContextFactory : IVSUIContextFactory
-        {
-            public IVSUIContext GetUIContext(Guid contextGuid)
-            {
-                return new VSUIContext(contextGuid);
-            }
-        }
-
-        public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
+            [Import(ContractName)] IVSUIContextFactory factory,
+            [Import(ContractName)] ILocalRepositoryModelFactory repositoryFactory)
         {
             this.serviceProvider = serviceProvider;
             this.repositoryFactory = repositoryFactory;
@@ -84,6 +63,24 @@ namespace GitHub.VisualStudio.Base
                 context.UIContextChanged += ContextChanged;
                 log.Information("VSGitExt will be initialized later");
                 InitializeTask = Task.CompletedTask;
+            }
+        }
+
+        [Export(ContractName, typeof(ILocalRepositoryModelFactory))]
+        class LocalRepositoryModelFactory : ILocalRepositoryModelFactory
+        {
+            public ILocalRepositoryModel Create(string localPath)
+            {
+                return new LocalRepositoryModel(localPath);
+            }
+        }
+
+        [Export(ContractName, typeof(IVSUIContextFactory))]
+        class VSUIContextFactory : IVSUIContextFactory
+        {
+            public IVSUIContext GetUIContext(Guid contextGuid)
+            {
+                return new VSUIContext(contextGuid);
             }
         }
 
