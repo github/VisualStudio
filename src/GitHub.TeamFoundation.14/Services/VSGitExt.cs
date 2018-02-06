@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Logging;
-using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Task = System.Threading.Tasks.Task;
@@ -29,9 +29,19 @@ namespace GitHub.VisualStudio.Base
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
         [ImportingConstructor]
-        public VSGitExt(IGitHubServiceProvider serviceProvider)
-            : this(serviceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory())
+        public VSGitExt(IGitHubServiceProvider serviceProvider,
+            [ImportMany] IEnumerable<IVSUIContextFactory> factory,
+            [ImportMany] IEnumerable<ILocalRepositoryModelFactory> repositoryFactory)
+            : this(serviceProvider, FromExecutingAssembly(factory), FromExecutingAssembly(repositoryFactory))
         {
+        }
+
+        // Find the service that is defined in the executing assembly (not the other GitHub.TeamFoundation.* assembly).
+        // This is a fix for https://github.com/github/VisualStudio/issues/1454
+        static T FromExecutingAssembly<T>(IEnumerable<T> services)
+        {
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            return services.Where(s => s.GetType().Assembly == executingAssembly).First();
         }
 
         public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
