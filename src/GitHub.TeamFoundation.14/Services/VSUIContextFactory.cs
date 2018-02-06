@@ -1,28 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 using GitHub.Services;
 
 namespace GitHub.TeamFoundation.Services
 {
-    [Export(typeof(IVSUIContextFactory))]
-    class VSUIContextFactory : IVSUIContextFactory
-    {
-        public IVSUIContext GetUIContext(Guid contextGuid)
-        {
-            return new VSUIContext(UIContext.FromUIContextGuid(contextGuid));
-        }
-    }
-
     class VSUIContext : IVSUIContext
     {
         readonly UIContext context;
         readonly Dictionary<EventHandler<VSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>> handlers =
             new Dictionary<EventHandler<VSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>>();
-        public VSUIContext(UIContext context)
+        public VSUIContext(Guid contextGuid)
         {
-            this.context = context;
+            context = UIContext.FromUIContextGuid(contextGuid);
         }
 
         public bool IsActive { get { return context.IsActive; } }

@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.Models;
@@ -9,6 +8,7 @@ using GitHub.Logging;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Task = System.Threading.Tasks.Task;
+using GitHub.TeamFoundation.Services;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -32,16 +32,33 @@ namespace GitHub.VisualStudio.Base
         public VSGitExt(IGitHubServiceProvider serviceProvider,
             [ImportMany] IEnumerable<IVSUIContextFactory> factory,
             [ImportMany] IEnumerable<ILocalRepositoryModelFactory> repositoryFactory)
-            : this(serviceProvider, FromExecutingAssembly(factory), FromExecutingAssembly(repositoryFactory))
+            : this(serviceProvider, FromDeclaringType(factory), FromDeclaringType(repositoryFactory))
         {
         }
 
-        // Find the service that is defined in the executing assembly (not the other GitHub.TeamFoundation.* assembly).
+        // Find the service that is nested in the current type (not the other GitHub.TeamFoundation.* assembly).
         // This is a fix for https://github.com/github/VisualStudio/issues/1454
-        static T FromExecutingAssembly<T>(IEnumerable<T> services)
+        static T FromDeclaringType<T>(IEnumerable<T> services)
         {
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            return services.Where(s => s.GetType().Assembly == executingAssembly).First();
+            return services.Where(s => s.GetType().DeclaringType == typeof(VSGitExt)).First();
+        }
+
+        [Export(typeof(ILocalRepositoryModelFactory))]
+        class LocalRepositoryModelFactory : ILocalRepositoryModelFactory
+        {
+            public ILocalRepositoryModel Create(string localPath)
+            {
+                return new LocalRepositoryModel(localPath);
+            }
+        }
+
+        [Export(typeof(IVSUIContextFactory))]
+        class VSUIContextFactory : IVSUIContextFactory
+        {
+            public IVSUIContext GetUIContext(Guid contextGuid)
+            {
+                return new VSUIContext(contextGuid);
+            }
         }
 
         public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
