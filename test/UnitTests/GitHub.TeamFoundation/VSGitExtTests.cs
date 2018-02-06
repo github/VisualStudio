@@ -8,6 +8,7 @@ using GitHub.VisualStudio;
 using GitHub.VisualStudio.Base;
 using NUnit.Framework;
 using NSubstitute;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 public class VSGitExtTests
@@ -34,8 +35,8 @@ public class VSGitExtTests
             var sp = Substitute.For<IGitHubServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
-            var eventArgs = new VSUIContextChangedEventArgs(activated);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            var eventArgs = new UIContextChangedEventArgs(activated);
+            context.UIContextChanged += Raise.Event<EventHandler<UIContextChangedEventArgs>>(context, eventArgs);
 
             sp.Received(expectCalls).GetService<IGitExt>();
         }
@@ -103,8 +104,8 @@ public class VSGitExtTests
             bool wasFired = false;
             target.ActiveRepositoriesChanged += () => wasFired = true;
 
-            var eventArgs = new VSUIContextChangedEventArgs(true);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            var eventArgs = new UIContextChangedEventArgs(true);
+            context.UIContextChanged += Raise.Event<EventHandler<UIContextChangedEventArgs>>(context, eventArgs);
             target.InitializeTask.Wait();
 
             Assert.That(wasFired, Is.True);
@@ -120,8 +121,8 @@ public class VSGitExtTests
             bool threadPool = false;
             target.ActiveRepositoriesChanged += () => threadPool = Thread.CurrentThread.IsThreadPoolThread;
 
-            var eventArgs = new VSUIContextChangedEventArgs(true);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            var eventArgs = new UIContextChangedEventArgs(true);
+            context.UIContextChanged += Raise.Event<EventHandler<UIContextChangedEventArgs>>(context, eventArgs);
             target.InitializeTask.Wait();
 
             Assert.That(threadPool, Is.True);

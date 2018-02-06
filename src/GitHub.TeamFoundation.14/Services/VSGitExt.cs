@@ -84,7 +84,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        void ContextChanged(object sender, VSUIContextChangedEventArgs e)
+        void ContextChanged(object sender, UIContextChangedEventArgs e)
         {
             // If we're in the UIContext and TryInitialize succeeds, we can stop listening for events.
             // NOTE: this event can fire with UIContext=true in a TFS solution (not just Git).
@@ -153,11 +153,22 @@ namespace GitHub.VisualStudio.Base
         public Task InitializeTask { get; private set; }
     }
 
+    public interface IVSUIContextFactory
+    {
+        IVSUIContext GetUIContext(Guid contextGuid);
+    }
+
+    public interface IVSUIContext
+    {
+        bool IsActive { get; }
+        event EventHandler<UIContextChangedEventArgs> UIContextChanged;
+    }
+
     class VSUIContext : IVSUIContext
     {
         readonly UIContext context;
-        readonly Dictionary<EventHandler<VSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>> handlers =
-            new Dictionary<EventHandler<VSUIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>>();
+        readonly Dictionary<EventHandler<UIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>> handlers =
+            new Dictionary<EventHandler<UIContextChangedEventArgs>, EventHandler<UIContextChangedEventArgs>>();
         public VSUIContext(Guid contextGuid)
         {
             context = UIContext.FromUIContextGuid(contextGuid);
@@ -165,14 +176,13 @@ namespace GitHub.VisualStudio.Base
 
         public bool IsActive { get { return context.IsActive; } }
 
-        public event EventHandler<VSUIContextChangedEventArgs> UIContextChanged
+        public event EventHandler<UIContextChangedEventArgs> UIContextChanged
         {
             add
             {
                 EventHandler<UIContextChangedEventArgs> handler = null;
                 if (!handlers.TryGetValue(value, out handler))
                 {
-                    handler = (s, e) => value.Invoke(s, new VSUIContextChangedEventArgs(e.Activated));
                     handlers.Add(value, handler);
                 }
                 context.UIContextChanged += handler;
