@@ -17,7 +17,9 @@ namespace GitHub.ViewModels.Dialog
     public class LoginToGitHubViewModel : LoginTabViewModel, ILoginToGitHubViewModel
     {
         [ImportingConstructor]
-        public LoginToGitHubViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+        public LoginToGitHubViewModel(
+            IConnectionManager connectionManager,
+            IVisualStudioBrowser browser)
             : base(connectionManager, browser)
         {
             BaseUri = HostAddress.GitHubDotComHostAddress.WebUri;
@@ -37,6 +39,11 @@ namespace GitHub.ViewModels.Dialog
         protected override Task<IConnection> LogIn(object args)
         {
             return LogInToHost(HostAddress.GitHubDotComHostAddress);
+        }
+
+        protected override Task<IConnection> LogInViaOAuth(object args)
+        {
+            return LoginToHostViaOAuth(HostAddress.GitHubDotComHostAddress);
         }
     }
 }

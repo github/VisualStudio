@@ -34,6 +34,8 @@ namespace GitHub.Models
             Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url) : repo;
 #pragma warning restore 0618
             IsTracking = branch.IsTracking;
+            Sha = branch.Tip?.Sha;
+            TrackedSha = branch.TrackedBranch?.Tip?.Sha;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
@@ -42,7 +44,8 @@ namespace GitHub.Models
         public IRepositoryModel Repository { get; private set; }
         public bool IsTracking { get; private set; }
         public string DisplayName { get; set; }
-
+        public string Sha { get; private set; }
+        public string TrackedSha { get; private set; }
 
         #region Equality things
         public void CopyFrom(IBranch other)

@@ -14,7 +14,6 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
-using System.Diagnostics;
 using GitHub.Logging;
 
 namespace GitHub.Services
@@ -380,7 +379,7 @@ https://git-scm.com/download/win";
         {
             if (pullRequest.Head?.RepositoryCloneUrl != null)
             {
-                return repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
+                return repository.CloneUrl?.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
             }
 
             return false;

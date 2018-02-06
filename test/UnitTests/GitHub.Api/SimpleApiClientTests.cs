@@ -6,7 +6,6 @@ using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using NUnit.Framework;
-using EnterpriseProbeResult = GitHub.Services.EnterpriseProbeResult;
 
 public class SimpleApiClientTests
 {
@@ -28,12 +27,12 @@ public class SimpleApiClientTests
             var gitHubClient = Substitute.For<IGitHubClient>();
             var repository = new Repository(42);
             gitHubClient.Repository.Get("github", "visualstudio").Returns(Task.FromResult(repository));
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var result = await client.GetRepository();
@@ -49,12 +48,12 @@ public class SimpleApiClientTests
             var repository = new Repository(42);
             gitHubClient.Repository.Get("github", "visualstudio")
                 .Returns(_ => Task.FromResult(repository), _ => { throw new Exception("Should only be called once."); });
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
@@ -75,14 +74,14 @@ public class SimpleApiClientTests
             var gitHubClient = Substitute.For<IGitHubClient>();
             var repository = CreateRepository(42, true);
             gitHubClient.Repository.Get("github", "visualstudio").Returns(Task.FromResult(repository));
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             wikiProbe.ProbeAsync(repository)
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
@@ -97,12 +96,12 @@ public class SimpleApiClientTests
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var result = client.HasWiki();
@@ -122,14 +121,14 @@ public class SimpleApiClientTests
             var gitHubClient = Substitute.For<IGitHubClient>();
             var repository = CreateRepository(42, true);
             gitHubClient.Repository.Get("github", "visualstudio").Returns(Task.FromResult(repository));
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
-            enterpriseProbe.ProbeAsync(Args.Uri)
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
+            enterpriseProbe.Probe(Args.Uri)
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                "https://github.com/github/visualstudio",
+                "https://github.enterprise/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
@@ -144,12 +143,12 @@ public class SimpleApiClientTests
         {
             var gitHubHost = HostAddress.GitHubDotComHostAddress;
             var gitHubClient = Substitute.For<IGitHubClient>();
-            var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
+            var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
                 "https://github.com/github/visualstudio",
                 gitHubClient,
-                new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
+                new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
             var result = client.IsEnterprise();
