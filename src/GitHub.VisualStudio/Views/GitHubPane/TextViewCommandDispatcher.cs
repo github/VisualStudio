@@ -6,8 +6,12 @@ using Microsoft.VisualStudio.TextManager.Interop;
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
     /// <summary>
-    /// Used to filter commands send to <see cref="IVsTextView"/> dispatch them to a <see cref="Exec"/> event. 
+    /// Intercepts all commands sent to a <see cref="IVsTextView"/> and fires <see href="Exec"/> when a specified command is encountered.
     /// </summary>
+    /// <remarks>
+    /// Intercepting commands like this is necessary if we want to capture commands in context of a <see cref="IVsTextView"/>.
+    /// Well known commands like Copy, Paste and Enter can be captured as well as custom commands.
+    /// </remarks>
     class TextViewCommandDispatcher : IOleCommandTarget, IDisposable
     {
         readonly IVsTextView textView;
@@ -19,8 +23,8 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         /// Add a command filter to <see cref="IVsTextView"/>.
         /// </summary>
         /// <param name="textView">The text view to filter commands from.</param>
-        /// <param name="commandGroup">The group of the command to filter.</param>
-        /// <param name="commandId">The ID of the command to filter.</param>
+        /// <param name="commandGroup">The group of the command to listen for.</param>
+        /// <param name="commandId">The ID of the command to listen for.</param>
         public TextViewCommandDispatcher(IVsTextView textView, Guid commandGroup, int commandId)
         {
             this.textView = textView;
