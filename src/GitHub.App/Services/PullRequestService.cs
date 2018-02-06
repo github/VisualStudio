@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using GitHub.Models;
 using System.Reactive.Linq;
 using Rothko;
