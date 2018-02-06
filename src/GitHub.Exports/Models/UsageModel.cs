@@ -37,6 +37,7 @@ namespace GitHub.Models
         public int NumberOfPRDetailsViewFile { get; set; }
         public int NumberOfPRDetailsCompareWithSolution { get; set; }
         public int NumberOfPRDetailsOpenFileInSolution { get; set; }
+        public int NumberOfPRDetailsNavigateToEditor { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
         public int NumberOfShowCurrentPullRequest { get; set; }

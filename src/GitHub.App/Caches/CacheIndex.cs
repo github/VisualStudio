@@ -62,6 +62,7 @@ namespace GitHub.Caches
             Guard.ArgumentNotNull(item, nameof(item));
 
             return cache.GetOrCreateObject(indexKey, () => Create(indexKey))
+                .Select(x => x.IndexKey == null ? Create(indexKey) : x)
                 .Do(index =>
                 {
                     var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, item.Key);
