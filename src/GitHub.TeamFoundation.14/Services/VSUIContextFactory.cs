@@ -6,8 +6,6 @@ using GitHub.Services;
 
 namespace GitHub.TeamFoundation.Services
 {
-    [Export(typeof(IVSUIContextFactory))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     class VSUIContextFactory : IVSUIContextFactory
     {
         public IVSUIContext GetUIContext(Guid contextGuid)

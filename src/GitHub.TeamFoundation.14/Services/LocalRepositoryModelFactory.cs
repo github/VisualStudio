@@ -3,8 +3,6 @@ using GitHub.Models;
 
 namespace GitHub.TeamFoundation.Services
 {
-    [Export(typeof(ILocalRepositoryModelFactory))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     class LocalRepositoryModelFactory : ILocalRepositoryModelFactory
     {
         public ILocalRepositoryModel Create(string localPath)
