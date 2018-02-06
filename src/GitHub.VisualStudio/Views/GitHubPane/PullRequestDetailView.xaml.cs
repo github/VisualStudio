@@ -69,6 +69,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         [Import]
         IUsageTracker UsageTracker { get; set; }
 
+        [Import]
+        IPullRequestEditorService NavigationService { get; set; }
+
+        [Import]
+        IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -105,6 +111,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     if (!workingDirectory)
                     {
                         AddBufferTag(buffer, ViewModel.Session, fullPath, null);
+
+                        var textView = NavigationService.FindActiveView();
+                        EnableNavigateToEditor(textView, file);
                     }
                 }
 
@@ -117,6 +126,42 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             {
                 ShowErrorInStatusBar("Error opening file", e);
             }
+        }
+
+        async Task DoNavigateToEditor(IPullRequestFileNode file)
+        {
+            try
+            {
+                if (!ViewModel.IsCheckedOut)
+                {
+                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    return;
+                }
+
+                var fullPath = ViewModel.GetLocalFilePath(file);
+
+                var activeView = NavigationService.FindActiveView();
+                if (activeView == null)
+                {
+                    ShowErrorInStatusBar("Couldn't find active view");
+                    return;
+                }
+
+                NavigationService.NavigateToEquivalentPosition(activeView, fullPath);
+
+                await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error navigating to editor", e);
+            }
+        }
+
+        static void ShowInfoMessage(string message)
+        {
+            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
+                Services.GitHubServiceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
         }
 
         async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
@@ -166,6 +211,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, file);
+                    EnableNavigateToEditor(diffViewer.RightView, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, file);
                 }
 
                 if (workingDirectory)
@@ -196,10 +244,31 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        void ShowErrorInStatusBar(string message, Exception e)
+        void EnableNavigateToEditor(IWpfTextView textView, IPullRequestFileNode file)
+        {
+            var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
+            EnableNavigateToEditor(view, file);
+        }
+
+        void EnableNavigateToEditor(IVsTextView textView, IPullRequestFileNode file)
+        {
+            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
+            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
+            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec += async (s, e) => await DoNavigateToEditor(file);
+
+            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
+            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
+            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec += async (s, e) => await DoNavigateToEditor(file);
+        }
+
+        void ShowErrorInStatusBar(string message, Exception e = null)
         {
             var ns = GitHub.VisualStudio.Services.DefaultExportProvider.GetExportedValue<IStatusBarNotificationService>();
-            ns?.ShowMessage(message + ": " + e.Message);
+            if (e != null)
+            {
+                message += ": " + e.Message;
+            }
+            ns?.ShowMessage(message);
         }
 
         private void FileListKeyUp(object sender, KeyEventArgs e)

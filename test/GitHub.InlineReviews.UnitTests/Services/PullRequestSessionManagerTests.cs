@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using NUnit.Framework;
+using System.ComponentModel;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -125,6 +126,60 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 teamExplorerContext.StatusChanged += Raise.Event();
 
                 Assert.That(session, Is.Not.SameAs(target.CurrentSession));
+            }
+
+            [Test]
+            public void LocalRepositoryModelNull()
+            {
+                var repositoryModel = null as LocalRepositoryModel;
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    Substitute.For<IPullRequestSessionService>(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
+                    CreateTeamExplorerContext(null));
+
+                Assert.That(target.CurrentSession, Is.Null);
+            }
+
+            [Test]
+            public void CurrentSessionChangesToNullIfNoPullRequestForCurrentBranch()
+            {
+                var service = CreatePullRequestService();
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = new PullRequestSessionManager(
+                    service,
+                    Substitute.For<IPullRequestSessionService>(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
+                    teamExplorerContext);
+                Assert.That(target.CurrentSession, Is.Not.Null);
+
+                Tuple<string, int> newPullRequest = null;
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(newPullRequest));
+                teamExplorerContext.StatusChanged += Raise.Event();
+
+                var session = target.CurrentSession;
+
+                Assert.That(session, Is.Null);
+            }
+
+            [Test]
+            public void CurrentSessionChangesToNullWhenRepoChangedToNull()
+            {
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = new PullRequestSessionManager(
+                    CreatePullRequestService(),
+                    Substitute.For<IPullRequestSessionService>(),
+                    CreateConnectionManager(),
+                    CreateModelServiceFactory(),
+                    teamExplorerContext);
+                Assert.That(target.CurrentSession, Is.Not.Null);
+
+                SetActiveRepository(teamExplorerContext, null);
+                var session = target.CurrentSession;
+
+                Assert.That(session, Is.Null);
             }
 
             [Test]
@@ -1012,7 +1067,8 @@ Line 4";
         static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, ILocalRepositoryModel localRepositoryModel)
         {
             teamExplorerContext.ActiveRepository.Returns(localRepositoryModel);
-            teamExplorerContext.StatusChanged += Raise.Event();
+            var eventArgs = new PropertyChangedEventArgs(nameof(teamExplorerContext.ActiveRepository));
+            teamExplorerContext.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(teamExplorerContext, eventArgs);
         }
     }
 }
