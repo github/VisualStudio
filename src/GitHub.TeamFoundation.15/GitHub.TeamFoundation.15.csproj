@@ -170,9 +170,6 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Services\VSGitExt.cs">
       <Link>Services\VSGitExt.cs</Link>
     </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Services\VSUIContextFactory.cs">
-      <Link>Services\VSUIContextFactory.cs</Link>
-    </Compile>
     <Compile Include="..\GitHub.TeamFoundation.14\Settings.cs">
       <Link>Settings.cs</Link>
     </Compile>
