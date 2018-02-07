@@ -103,7 +103,7 @@ namespace GitHub.ViewModels.GitHubPane
                 DoPush);
             SubscribeOperationError(Push);
 
-            SyncSubmodules = ReactiveCommand.CreateAsyncObservable(
+            SyncSubmodules = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
                     .Select(x => x != null && x.SyncSubmodulesEnabled),
@@ -676,9 +676,9 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
-        IObservable<Unit> DoSyncSubmodules(object unused)
+        Task DoSyncSubmodules(object unused)
         {
-            return pullRequestsService.SyncSubmodules(LocalRepository).Do(_ => usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget());
+            return pullRequestsService.SyncSubmodules(LocalRepository).ContinueWith(_ => usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget());
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

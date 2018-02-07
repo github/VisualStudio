@@ -187,28 +187,21 @@ namespace GitHub.Services
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201", Justification = "Prototype")]
-        public IObservable<Unit> SyncSubmodules(ILocalRepositoryModel repository)
+        public async Task SyncSubmodules(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(async () =>
+            var exitCode = Where("git");
+            if (exitCode != 0)
             {
-                var exitCode = Where("git");
-                if (exitCode != 0)
-                {
-                    var ex = new ApplicationException(App.Resources.CouldntFindGitOnPath);
-                    return Observable.Throw<Unit>(ex);
-                }
+                throw new ApplicationException(App.Resources.CouldntFindGitOnPath);
+            }
 
-                var output = new StringWriter(CultureInfo.InvariantCulture);
-                exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
-                if (exitCode != 0)
-                {
-                    var message = output.ToString();
-                    var ex = new ApplicationException(message);
-                    return Observable.Throw<Unit>(ex);
-                }
-
-                return Observable.Return(Unit.Default);
-            });
+            var output = new StringWriter(CultureInfo.InvariantCulture);
+            exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
+            if (exitCode != 0)
+            {
+                var message = output.ToString();
+                throw new ApplicationException(message);
+            }
         }
 
         // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
@@ -228,8 +221,8 @@ namespace GitHub.Services
             {
                 await Task.WhenAll(
                     ReadLinesAsync(process.StandardOutput, progress),
-                    ReadLinesAsync(process.StandardError, progress));
-                process.WaitForExit();
+                    ReadLinesAsync(process.StandardError, progress),
+                    Task.Run(() => process.WaitForExit()));
                 return process.ExitCode;
             }
         }
