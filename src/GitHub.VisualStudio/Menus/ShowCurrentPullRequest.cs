@@ -26,6 +26,8 @@ namespace GitHub.VisualStudio.Menus
             try
             {
                 var pullRequestSessionManager = ServiceProvider.ExportProvider.GetExportedValueOrDefault<IPullRequestSessionManager>();
+                await pullRequestSessionManager.EnsureInitialized();
+
                 var session = pullRequestSessionManager?.CurrentSession;
                 if (session == null)
                 {

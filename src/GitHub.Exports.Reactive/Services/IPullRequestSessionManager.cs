@@ -32,6 +32,18 @@ namespace GitHub.Services
         IPullRequestSession CurrentSession { get; }
 
         /// <summary>
+        /// Ensures that the service is initialized.
+        /// </summary>
+        /// <returns>A task that when completed indicates that the service is initialized.</returns>
+        /// <remarks>
+        /// If you are simplying monitoring changes to the <see cref="CurrentSession"/> then you
+        /// don't need to call this method: <see cref="CurrentSession"/> will be updated on
+        /// initialization. If however, you want to be sure that <see cref="CurrentSession"/> is
+        /// initialized, you can await the task returned from this method.
+        /// </remarks>
+        Task EnsureInitialized();
+
+        /// <summary>
         /// Gets an <see cref="IPullRequestSessionFile"/> that tracks the live state of a document.
         /// </summary>
         /// <param name="relativePath">The relative path to the file in the repository.</param>
