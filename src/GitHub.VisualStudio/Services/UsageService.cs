@@ -32,7 +32,7 @@ namespace GitHub.Services
 
         public bool IsSameWeek(DateTimeOffset lastUpdated)
         {
-            return GetIso8601WeekOfYear(lastUpdated) == GetIso8601WeekOfYear(DateTimeOffset.Now);
+            return GetIso8601WeekOfYear(lastUpdated) == GetIso8601WeekOfYear(DateTimeOffset.Now) && lastUpdated.Year != DateTimeOffset.Now.Year;
         }
 
         public bool IsSameMonth(DateTimeOffset lastUpdated)
