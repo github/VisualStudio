@@ -7,11 +7,9 @@ using GitHub.Services;
 using GitHub.Settings;
 using NSubstitute;
 using NUnit.Framework;
-using System.Reflection;
 using System.Linq;
 using System.Globalization;
 using GitHub.Reflection;
-using GitHub;
 
 namespace MetricsTests
 {
@@ -416,6 +414,92 @@ namespace MetricsTests
             result.IsSameWeek(DateTimeOffset.Now).ReturnsForAnyArgs(sameWeek);
             result.IsSameMonth(DateTimeOffset.Now).ReturnsForAnyArgs(sameMonth);
             return result;
+        }
+    }
+
+    public class UsageServiceTests : TestBaseClass
+    {
+        [Test]
+        public void IsSameDayWorks()
+        {
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var now = DateTimeOffset.Now;
+            Assert.True(usageService.IsSameDay(now));
+            Assert.True(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero)));
+            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day+1, 0, 0, 0, TimeSpan.Zero)));
+            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day-1, 0, 0, 0, TimeSpan.Zero)));
+            Assert.True(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day, 10, 3, 1, TimeSpan.Zero)));
+            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day+1, 10, 3, 1, TimeSpan.Zero)));
+            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day-1, 10, 3, 1, TimeSpan.Zero)));
+        }
+
+        [Test]
+        public void IsSameWeekWorks()
+        {
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var now = DateTimeOffset.Now;
+
+            Assert.True(usageService.IsSameWeek(now));
+            var nowWeek = GetIso8601WeekOfYear(now);
+
+            DateTimeOffset nextWeek = now;
+            for (int i = 1; i < 8; i++)
+            {
+                nextWeek = nextWeek.AddDays(1);
+                var week = GetIso8601WeekOfYear(nextWeek);
+                Assert.AreEqual(week == nowWeek, usageService.IsSameWeek(nextWeek));
+            }
+
+            DateTimeOffset prevWeek = now;
+            for (int i = 1; i < 8; i++)
+            {
+                prevWeek = prevWeek.AddDays(-1);
+                var week = GetIso8601WeekOfYear(prevWeek);
+                Assert.AreEqual(week == nowWeek, usageService.IsSameWeek(prevWeek));
+            }
+
+            Assert.False(usageService.IsSameWeek(now.AddYears(1)));
+        }
+
+        [Test]
+        public void IsSameMonthWorks()
+        {
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var now = DateTimeOffset.Now;
+
+            Assert.True(usageService.IsSameMonth(now));
+
+            DateTimeOffset nextMonth = now;
+            for (int i = 1; i < 40; i++)
+            {
+                nextMonth = nextMonth.AddDays(1);
+                Assert.AreEqual(nextMonth.Month == now.Month, usageService.IsSameMonth(nextMonth));
+            }
+
+            DateTimeOffset prevMonth = now;
+            for (int i = 1; i < 40; i++)
+            {
+                prevMonth = prevMonth.AddDays(-1);
+                Assert.AreEqual(prevMonth.Month == now.Month, usageService.IsSameMonth(prevMonth));
+            }
+
+            Assert.False(usageService.IsSameMonth(now.AddYears(1)));
+        }
+
+        // http://blogs.msdn.com/b/shawnste/archive/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net.aspx
+        static int GetIso8601WeekOfYear(DateTimeOffset time)
+        {
+            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
+            // be the same week# as whatever Thursday, Friday or Saturday are,
+            // and we always get those right
+            DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(time.UtcDateTime);
+            if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+            {
+                time = time.AddDays(3);
+            }
+
+            // Return the week of our adjusted day
+            return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
     }
 }

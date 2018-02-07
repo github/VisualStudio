@@ -32,12 +32,12 @@ namespace GitHub.Services
 
         public bool IsSameWeek(DateTimeOffset lastUpdated)
         {
-            return GetIso8601WeekOfYear(lastUpdated) == GetIso8601WeekOfYear(DateTimeOffset.Now) && lastUpdated.Year != DateTimeOffset.Now.Year;
+            return GetIso8601WeekOfYear(lastUpdated) == GetIso8601WeekOfYear(DateTimeOffset.Now) && lastUpdated.Year == DateTimeOffset.Now.Year;
         }
 
         public bool IsSameMonth(DateTimeOffset lastUpdated)
         {
-            return lastUpdated.Month == DateTimeOffset.Now.Month;
+            return lastUpdated.Month == DateTimeOffset.Now.Month && lastUpdated.Year == DateTimeOffset.Now.Year;
         }
 
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)

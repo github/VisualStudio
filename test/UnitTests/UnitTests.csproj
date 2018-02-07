@@ -268,7 +268,7 @@
     <Compile Include="GitHub.VisualStudio\Services\JsonConnectionCacheTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
-    <Compile Include="GitHub.VisualStudio\Services\UsageTrackerTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\MetricsTests.cs" />
     <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
