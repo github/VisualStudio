@@ -219,7 +219,7 @@ https://git-scm.com/download/win";
         // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
         async Task<int> SyncSubmodules(string workingDir, Action<string> progress = null)
         {
-            var cmdArguments = "/C git submodule init && git submodule sync --recursive && git submodule update --recursive";
+            var cmdArguments = "/C git submodule init & git submodule sync --recursive & git submodule update --recursive";
             var startInfo = new ProcessStartInfo("cmd", cmdArguments)
             {
                 WorkingDirectory = workingDir,
