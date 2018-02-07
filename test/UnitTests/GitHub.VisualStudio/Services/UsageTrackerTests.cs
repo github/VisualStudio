@@ -9,6 +9,8 @@ using NSubstitute;
 using NUnit.Framework;
 using System.Reflection;
 using System.Linq;
+using System.Globalization;
+using GitHub.Reflection;
 
 namespace MetricsTests
 {
@@ -184,13 +186,15 @@ namespace MetricsTests
         public async Task ShouldIncrementCounter()
         {
             var model = new UsageModel { NumberOfClones = 4 };
+            var usageService = CreateUsageService(model);
             var target = new UsageTracker(
                 CreateServiceProvider(),
-                CreateUsageService(model));
+                usageService);
 
             await target.IncrementCounter(x => x.NumberOfClones);
+            UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
 
-            Assert.That(5, Is.EqualTo(model.NumberOfClones));
+            Assert.AreEqual(5, result.Model.NumberOfClones);
         }
 
         [Test]
@@ -212,24 +216,34 @@ namespace MetricsTests
         {
             var model = CreateUsageModel();
             var serviceProvider = CreateServiceProvider();
-            var usageService = CreateUsageService(model, sameDay: false);
+            var usageService = CreateUsageService(model, sameDay: true);
             var targetAndTick = CreateTargetAndGetTick(serviceProvider, usageService);
+            var vsservices = serviceProvider.GetService<IVSServices>();
+            vsservices.VSVersion.Returns(model.VSVersion);
 
             await targetAndTick.Item2();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
 
+            var expected = model;
+            expected.NumberOfStartups++;
+            expected.NumberOfStartupsWeek++;
+            expected.NumberOfStartupsMonth++;
+
             UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
             CollectionAssert.AreEquivalent(
-                       model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }),
-                result.Model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(result.Model) }));
+                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetFields(result.Model.GetType()).Select(x => new { x.Name, Value = x.GetValue(result.Model) }));
         }
 
-                [Test]
-        public async Task MetricserviceSendsAllTheDataCorrectly()
+        [Test]
+        public async Task MetricserviceSendsDailyData()
         {
             var model = CreateUsageModel();
             var serviceProvider = CreateServiceProvider();
+            var vsservices = serviceProvider.GetService<IVSServices>();
+            vsservices.VSVersion.Returns(model.VSVersion);
+
             var targetAndTick = CreateTargetAndGetTick(
                 serviceProvider,
                 CreateUsageService(model, sameDay: false));
@@ -237,38 +251,102 @@ namespace MetricsTests
             await targetAndTick.Item2();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
-
             var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
-            var result = metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0] as UsageModel;
+            var result = (UsageModel)metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0];
+
+            var expected = model.Clone(false, false);
+            expected.NumberOfStartups++;
+
             CollectionAssert.AreEquivalent(
-                 model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }),
-                result.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(result) }));
+                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetFields(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
+        }
+
+        [Test]
+        public async Task MetricserviceSendsWeeklyData()
+        {
+            var model = CreateUsageModel();
+            var serviceProvider = CreateServiceProvider();
+            var vsservices = serviceProvider.GetService<IVSServices>();
+            vsservices.VSVersion.Returns(model.VSVersion);
+
+            var targetAndTick = CreateTargetAndGetTick(
+                serviceProvider,
+                CreateUsageService(model, sameDay: false, sameWeek: false));
+
+            await targetAndTick.Item2();
+
+            var metricsService = serviceProvider.TryGetService<IMetricsService>();
+            var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
+            var result = (UsageModel)metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0];
+
+            var expected = model.Clone(true, false);
+            expected.NumberOfStartups++;
+            expected.NumberOfStartupsWeek++;
+
+            CollectionAssert.AreEquivalent(
+                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetFields(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
+        }
+
+        [Test]
+        public async Task MetricserviceSendsMonthlyData()
+        {
+            var model = CreateUsageModel();
+            var serviceProvider = CreateServiceProvider();
+            var vsservices = serviceProvider.GetService<IVSServices>();
+            vsservices.VSVersion.Returns(model.VSVersion);
+
+            var targetAndTick = CreateTargetAndGetTick(
+                serviceProvider,
+                CreateUsageService(model, sameDay: false, sameWeek: false, sameMonth: false));
+
+            await targetAndTick.Item2();
+
+            var metricsService = serviceProvider.TryGetService<IMetricsService>();
+            var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
+            var result = (UsageModel)metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0];
+
+            var expected = model;
+            expected.NumberOfStartups++;
+            expected.NumberOfStartupsWeek++;
+            expected.NumberOfStartupsMonth++;
+
+            CollectionAssert.AreEquivalent(
+                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetFields(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
         private static UsageModel CreateUsageModel()
         {
             var count = 1;
-            var model = new UsageModel();
-            var properties = model.GetType().GetRuntimeProperties();
-            foreach (var property in properties)
+            // UsageModel is a struct so we have to force box it to be able to set values on it
+            object model = new UsageModel();
+            var fields = model.GetType().GetRuntimeFields();
+            foreach (var field in fields)
             {
-                if (property.PropertyType == typeof(int))
+                if (field.FieldType == typeof(int))
                 {
-                    property.SetValue(model, count++);
+                    field.SetValue(model, count++);
                 }
-                else if (property.PropertyType == typeof(string))
+                else if (field.FieldType == typeof(string))
                 {
-                    property.SetValue(model, $"string {count++}");
+                    if (field.Name == "Lang")
+                        field.SetValue(model, CultureInfo.InstalledUICulture.IetfLanguageTag);
+                    else if (field.Name == "AppVersion")
+                        field.SetValue(model, AssemblyVersionInformation.Version);
+                    else
+                        field.SetValue(model, $"string {count++}");
                 }
-                else if (property.PropertyType == typeof(bool))
+                else if (field.FieldType == typeof(bool))
                 {
-                    property.SetValue(model, true);
+                    field.SetValue(model, true);
                 }
                 else
                     Assert.Fail("Unknown field type in UsageModel. Fix this test to support it");
             }
 
-            return model;
+            return (UsageModel)model;
         }
 
         static Tuple<UsageTracker, Func<Task>> CreateTargetAndGetTick(
@@ -291,12 +369,14 @@ namespace MetricsTests
             var connectionManager = Substitute.For<IConnectionManager>();
             var metricsService = Substitute.For<IMetricsService>();
             var packageSettings = Substitute.For<IPackageSettings>();
+            var vsservices = Substitute.For<IVSServices>();
 
             connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>());
             packageSettings.CollectMetrics.Returns(true);
 
             result.GetService<IConnectionManager>().Returns(connectionManager);
             result.GetService<IPackageSettings>().Returns(packageSettings);
+            result.GetService<IVSServices>().Returns(vsservices);
             result.TryGetService<IMetricsService>().Returns(hasMetricsService ? metricsService : null);
 
             return result;

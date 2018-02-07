@@ -273,6 +273,7 @@
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
+    <Compile Include="Helpers\SimpleJson.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -288,7 +289,7 @@
     <Compile Include="..\..\src\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-</ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
       <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
