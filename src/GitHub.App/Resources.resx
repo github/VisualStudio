@@ -288,4 +288,10 @@
   <data name="SyncSubmodules" xml:space="preserve">
     <value>Sync {0} submodules</value>
   </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>Couldn't find Git.exe on PATH.
+
+Please install Git for Windows from:
+https://git-scm.com/download/win</value>
+  </data>
 </root>

@@ -191,23 +191,18 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var output = new StringWriter(CultureInfo.InvariantCulture);
-                var exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
+                var exitCode = Where("git");
                 if (exitCode != 0)
                 {
-                    // Replace with friendly message if Git.exe isn't on path.
-                    // If culture isn't English, user will see the local equivalent of:
-                    // "'git' is not recognized as an internal or external command"                    
+                    var ex = new ApplicationException(App.Resources.CouldntFindGitOnPath);
+                    return Observable.Throw<Unit>(ex);
+                }
+
+                var output = new StringWriter(CultureInfo.InvariantCulture);
+                exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
+                if (exitCode != 0)
+                {
                     var message = output.ToString();
-                    if (exitCode == 1 && message.StartsWith("'git' is not recognized as an internal or external command,", StringComparison.Ordinal))
-                    {
-                        message =
-@"Couldn't find Git.exe on PATH.
-
-Please install Git for Windows from:
-https://git-scm.com/download/win";
-                    }
-
                     var ex = new ApplicationException(message);
                     return Observable.Throw<Unit>(ex);
                 }
@@ -234,6 +229,22 @@ https://git-scm.com/download/win";
                 await Task.WhenAll(
                     ReadLinesAsync(process.StandardOutput, progress),
                     ReadLinesAsync(process.StandardError, progress));
+                process.WaitForExit();
+                return process.ExitCode;
+            }
+        }
+
+        static int Where(string fileName)
+        {
+            var cmdArguments = "/C WHERE /Q " + fileName;
+            var startInfo = new ProcessStartInfo("cmd", cmdArguments)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(startInfo))
+            {
                 process.WaitForExit();
                 return process.ExitCode;
             }
