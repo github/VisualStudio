@@ -40,14 +40,17 @@ namespace GitHub.Services
         readonly IGitService gitService;
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
+        readonly EnvDTE.DTE dte;
 
         [ImportingConstructor]
-        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os, IUsageTracker usageTracker)
+        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os, IUsageTracker usageTracker,
+            IGitHubServiceProvider serviceProvider = null)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
             this.os = os;
             this.usageTracker = usageTracker;
+            dte = serviceProvider?.GetService<EnvDTE.DTE>();
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
@@ -296,6 +299,9 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
+                var solutionFile = dte.Solution.FullName;
+                dte.Solution.Close(true);
+
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
@@ -329,6 +335,8 @@ namespace GitHub.Services
                         await MarkBranchAsPullRequest(repo, branchName, pullRequest);
                     }
                 }
+
+                dte.Solution.Open(solutionFile);
 
                 return Observable.Return(Unit.Default);
             });
