@@ -375,6 +375,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void DoCreate()
         {
+            ServiceProvider.GitServiceProvider = TEServiceProvider;
             var dialogService = ServiceProvider.GetService<IDialogService>();
             dialogService.ShowCreateRepositoryDialog(SectionConnection);
         }

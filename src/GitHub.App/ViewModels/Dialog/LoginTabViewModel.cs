@@ -24,8 +24,11 @@ namespace GitHub.ViewModels.Dialog
     public abstract class LoginTabViewModel : ReactiveObject
     {
         static readonly ILogger log = LogManager.ForContext<LoginTabViewModel>();
+        CancellationTokenSource oauthCancel;
 
-        protected LoginTabViewModel(IConnectionManager connectionManager, IVisualStudioBrowser browser)
+        protected LoginTabViewModel(
+            IConnectionManager connectionManager,
+            IVisualStudioBrowser browser)
         {
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(browser, nameof(browser));
@@ -45,22 +48,13 @@ namespace GitHub.ViewModels.Dialog
                 (x, y) => x.Value && y.Value).ToProperty(this, x => x.CanLogin);
 
             Login = ReactiveCommand.CreateAsyncTask(this.WhenAny(x => x.CanLogin, x => x.Value), LogIn);
-            Login.ThrownExceptions.Subscribe(ex =>
-            {
-                if (ex.IsCriticalException()) return;
-
-                log.Information(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
-                if (ex is Octokit.ForbiddenException)
-                {
-                    Error = new UserError(Resources.LoginFailedForbiddenMessage, ex.Message);
-                }
-                else
-                {
-                    Error = new UserError(ex.Message);
-                }
-            });
-
+            Login.ThrownExceptions.Subscribe(HandleError);
             isLoggingIn = Login.IsExecuting.ToProperty(this, x => x.IsLoggingIn);
+
+            LoginViaOAuth = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.IsLoggingIn, x => !x),
+                LogInViaOAuth);
+            LoginViaOAuth.ThrownExceptions.Subscribe(HandleError);
 
             Reset = ReactiveCommand.CreateAsyncTask(_ => Clear());
 
@@ -81,14 +75,14 @@ namespace GitHub.ViewModels.Dialog
         public IReactiveCommand<Unit> SignUp { get; }
 
         public IReactiveCommand<IConnection> Login { get; }
+        public IReactiveCommand<IConnection> LoginViaOAuth { get; }
         public IReactiveCommand<Unit> Reset { get; }
         public IRecoveryCommand NavigateForgotPassword { get; }
 
         string usernameOrEmail;
         public string UsernameOrEmail
         {
-            get
-            { return usernameOrEmail; }
+            get { return usernameOrEmail; }
             set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
         }
 
@@ -102,8 +96,7 @@ namespace GitHub.ViewModels.Dialog
         string password;
         public string Password
         {
-            get
-            { return password; }
+            get { return password; }
             set { this.RaiseAndSetIfChanged(ref password, value); }
         }
 
@@ -126,6 +119,12 @@ namespace GitHub.ViewModels.Dialog
             get { return canLogin.Value; }
         }
 
+        protected ObservableAsPropertyHelper<bool> canSsoLogin;
+        public bool CanSsoLogin
+        {
+            get { return canSsoLogin.Value; }
+        }
+
         UserError error;
         public UserError Error
         {
@@ -133,7 +132,10 @@ namespace GitHub.ViewModels.Dialog
             set { this.RaiseAndSetIfChanged(ref error, value); }
         }
 
+        public void Deactivated() => oauthCancel?.Cancel();
+
         protected abstract Task<IConnection> LogIn(object args);
+        protected abstract Task<IConnection> LogInViaOAuth(object args);
 
         protected async Task<IConnection> LogInToHost(HostAddress hostAddress)
         {
@@ -145,6 +147,26 @@ namespace GitHub.ViewModels.Dialog
             }
 
             return await ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password);
+        }
+
+        protected async Task<IConnection> LoginToHostViaOAuth(HostAddress address)
+        {
+            oauthCancel = new CancellationTokenSource();
+
+            if (await ConnectionManager.GetConnection(address) != null)
+            {
+                await ConnectionManager.LogOut(address);
+            }
+
+            try
+            {
+                return await ConnectionManager.LogInViaOAuth(address, oauthCancel.Token);
+            }
+            finally
+            {
+                oauthCancel.Dispose();
+                oauthCancel = null;
+            }
         }
 
         async Task Clear()
@@ -160,6 +182,33 @@ namespace GitHub.ViewModels.Dialog
         {
             // noop
             return Task.FromResult(0);
+        }
+
+        void HandleError(Exception ex)
+        {
+            // The Windows ERROR_OPERATION_ABORTED error code.
+            const int operationAborted = 995;
+
+            if (ex is HttpListenerException &&
+                ((HttpListenerException)ex).ErrorCode == operationAborted)
+            {
+                // An Oauth listener was aborted, probably because the user closed the login
+                // dialog or switched between the GitHub and Enterprise tabs while listening
+                // for an Oauth callbacl.
+                return;
+            }
+
+            if (ex.IsCriticalException()) return;
+
+            log.Information(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
+            if (ex is Octokit.ForbiddenException)
+            {
+                Error = new UserError(Resources.LoginFailedForbiddenMessage, ex.Message);
+            }
+            else
+            {
+                Error = new UserError(ex.Message);
+            }
         }
     }
 }
