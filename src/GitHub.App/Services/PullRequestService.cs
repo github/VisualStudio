@@ -196,7 +196,8 @@ namespace GitHub.Services
             }
 
             var output = new StringWriter(CultureInfo.InvariantCulture);
-            exitCode = await SyncSubmodules(repository.LocalPath, line => output.WriteLine(line));
+            var progress = new Progress<string>(line => output.WriteLine(line));
+            exitCode = await SyncSubmodules(repository.LocalPath, progress);
             if (exitCode != 0)
             {
                 var message = output.ToString();
@@ -205,7 +206,7 @@ namespace GitHub.Services
         }
 
         // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
-        async Task<int> SyncSubmodules(string workingDir, Action<string> progress = null)
+        async Task<int> SyncSubmodules(string workingDir, IProgress<string> progress)
         {
             var cmdArguments = "/C git submodule init & git submodule sync --recursive & git submodule update --recursive";
             var startInfo = new ProcessStartInfo("cmd", cmdArguments)
@@ -243,12 +244,12 @@ namespace GitHub.Services
             }
         }
 
-        static async Task ReadLinesAsync(TextReader reader, Action<string> progress)
+        static async Task ReadLinesAsync(TextReader reader, IProgress<string> progress)
         {
             string line;
             while ((line = await reader.ReadLineAsync()) != null)
             {
-                progress?.Invoke(line);
+                progress.Report(line);
             }
         }
 
