@@ -222,7 +222,7 @@ namespace MetricsTests
             UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
             CollectionAssert.AreEquivalent(
                        model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }),
-                result.Model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }));
+                result.Model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(result.Model) }));
         }
 
                 [Test]
@@ -238,10 +238,11 @@ namespace MetricsTests
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
 
-            UsageData result = metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0] as UsageData;
+            var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
+            var result = metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0] as UsageModel;
             CollectionAssert.AreEquivalent(
-                       model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }),
-                result.Model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }));
+                 model.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(model) }),
+                result.GetType().GetRuntimeProperties().Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
         private static UsageModel CreateUsageModel()
