@@ -46,10 +46,10 @@ namespace GitHub.Services
             var usage = await LoadUsage();
             // because Model is a struct, it needs to be boxed in order for reflection to work
             object model = usage.Model;
-            var field = (MemberExpression)counter.Body;
-            var fieldInfo = (FieldInfo)field.Member;
-            var value = (int)fieldInfo.GetValue(model);
-            fieldInfo.SetValue(model, value + 1);
+            var property = (MemberExpression)counter.Body;
+            var propertyInfo = (PropertyInfo)property.Member;
+            var value = (int)propertyInfo.GetValue(model);
+            propertyInfo.SetValue(model, value + 1);
             usage.Model = (UsageModel)model;
             await service.WriteLocalData(usage);
         }

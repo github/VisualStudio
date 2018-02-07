@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Linq;
 using System.Globalization;
 using GitHub.Reflection;
+using GitHub;
 
 namespace MetricsTests
 {
@@ -230,10 +231,10 @@ namespace MetricsTests
             expected.NumberOfStartupsWeek++;
             expected.NumberOfStartupsMonth++;
 
-            UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
+            var result = (usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData).Model;
             CollectionAssert.AreEquivalent(
-                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-                ReflectionUtils.GetFields(result.Model.GetType()).Select(x => new { x.Name, Value = x.GetValue(result.Model) }));
+                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
         [Test]
@@ -258,8 +259,8 @@ namespace MetricsTests
             expected.NumberOfStartups++;
 
             CollectionAssert.AreEquivalent(
-                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-                ReflectionUtils.GetFields(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
+                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
         [Test]
@@ -285,8 +286,8 @@ namespace MetricsTests
             expected.NumberOfStartupsWeek++;
 
             CollectionAssert.AreEquivalent(
-                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-                ReflectionUtils.GetFields(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
+                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
         [Test]
@@ -313,8 +314,8 @@ namespace MetricsTests
             expected.NumberOfStartupsMonth++;
 
             CollectionAssert.AreEquivalent(
-                ReflectionUtils.GetFields(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-                ReflectionUtils.GetFields(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
+                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
+                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
         private static UsageModel CreateUsageModel()
@@ -322,25 +323,25 @@ namespace MetricsTests
             var count = 1;
             // UsageModel is a struct so we have to force box it to be able to set values on it
             object model = new UsageModel();
-            var fields = model.GetType().GetRuntimeFields();
-            foreach (var field in fields)
+            var props = ReflectionUtils.GetProperties(model.GetType());
+            foreach (var prop in props)
             {
-                if (field.FieldType == typeof(int))
+                if (prop.PropertyType == typeof(int))
                 {
-                    field.SetValue(model, count++);
+                    prop.SetValue(model, count++);
                 }
-                else if (field.FieldType == typeof(string))
+                else if (prop.PropertyType == typeof(string))
                 {
-                    if (field.Name == "Lang")
-                        field.SetValue(model, CultureInfo.InstalledUICulture.IetfLanguageTag);
-                    else if (field.Name == "AppVersion")
-                        field.SetValue(model, AssemblyVersionInformation.Version);
+                    if (prop.Name == "Lang")
+                        prop.SetValue(model, CultureInfo.InstalledUICulture.IetfLanguageTag);
+                    else if (prop.Name == "AppVersion")
+                        prop.SetValue(model, AssemblyVersionInformation.Version);
                     else
-                        field.SetValue(model, $"string {count++}");
+                        prop.SetValue(model, $"string {count++}");
                 }
-                else if (field.FieldType == typeof(bool))
+                else if (prop.PropertyType == typeof(bool))
                 {
-                    field.SetValue(model, true);
+                    prop.SetValue(model, true);
                 }
                 else
                     Assert.Fail("Unknown field type in UsageModel. Fix this test to support it");
