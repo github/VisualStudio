@@ -7,6 +7,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Globalization;
 using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -17,7 +18,6 @@ using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
-using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -676,9 +676,24 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
-        Task DoSyncSubmodules(object unused)
+        async Task DoSyncSubmodules(object unused)
         {
-            return pullRequestsService.SyncSubmodules(LocalRepository).ContinueWith(_ => usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget());
+            usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
+
+            var progress = new CaptureProgress();
+            var complete = await pullRequestsService.SyncSubmodules(LocalRepository, progress);
+            if (!complete)
+            {
+                throw new ApplicationException(progress.ToString());
+            }
+        }
+
+        sealed class CaptureProgress : IProgress<string>, IDisposable
+        {
+            StringWriter writer = new StringWriter(CultureInfo.CurrentCulture);
+            public void Report(string value) => writer.WriteLine(value);
+            public override string ToString() => writer.ToString();
+            public void Dispose() => writer.Dispose();
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

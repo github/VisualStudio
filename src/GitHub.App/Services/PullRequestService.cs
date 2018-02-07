@@ -187,22 +187,16 @@ namespace GitHub.Services
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201", Justification = "Prototype")]
-        public async Task SyncSubmodules(ILocalRepositoryModel repository)
+        public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, IProgress<string> progress)
         {
             var exitCode = Where("git");
             if (exitCode != 0)
             {
-                throw new ApplicationException(App.Resources.CouldntFindGitOnPath);
+                progress.Report(App.Resources.CouldntFindGitOnPath);
+                return false;
             }
 
-            var output = new StringWriter(CultureInfo.InvariantCulture);
-            var progress = new Progress<string>(line => output.WriteLine(line));
-            exitCode = await SyncSubmodules(repository.LocalPath, progress);
-            if (exitCode != 0)
-            {
-                var message = output.ToString();
-                throw new ApplicationException(message);
-            }
+            return await SyncSubmodules(repository.LocalPath, progress) == 0;
         }
 
         // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
