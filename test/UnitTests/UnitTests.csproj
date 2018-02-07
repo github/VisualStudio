@@ -285,7 +285,10 @@
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\TestImageCache.cs" />
-  </ItemGroup>
+    <Compile Include="..\..\src\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
       <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
