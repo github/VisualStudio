@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Logging;
+using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Task = System.Threading.Tasks.Task;
@@ -28,6 +29,11 @@ namespace GitHub.VisualStudio.Base
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
         [ImportingConstructor]
+        public VSGitExt(IGitHubServiceProvider serviceProvider)
+            : this(serviceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory())
+        {
+        }
+
         public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
         {
             this.serviceProvider = serviceProvider;
