@@ -238,7 +238,7 @@ namespace MetricsTests
         }
 
         [Test]
-        public async Task MetricserviceSendsDailyData()
+        public async Task MetricsServiceSendsDailyData()
         {
             var model = CreateUsageModel();
             var serviceProvider = CreateServiceProvider();
@@ -264,7 +264,7 @@ namespace MetricsTests
         }
 
         [Test]
-        public async Task MetricserviceSendsWeeklyData()
+        public async Task MetricsServiceSendsWeeklyData()
         {
             var model = CreateUsageModel();
             var serviceProvider = CreateServiceProvider();
@@ -291,7 +291,7 @@ namespace MetricsTests
         }
 
         [Test]
-        public async Task MetricserviceSendsMonthlyData()
+        public async Task MetricsServiceSendsMonthlyData()
         {
             var model = CreateUsageModel();
             var serviceProvider = CreateServiceProvider();
@@ -318,7 +318,7 @@ namespace MetricsTests
                 ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
-        private static UsageModel CreateUsageModel()
+        static UsageModel CreateUsageModel()
         {
             var count = 1;
             // UsageModel is a struct so we have to force box it to be able to set values on it
