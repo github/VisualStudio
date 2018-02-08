@@ -26,7 +26,6 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestReviewViewModel>();
 
-        readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IModelServiceFactory modelServiceFactory;
         IModelService modelService;
@@ -49,24 +48,21 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="files">The pull request files view model.</param>
         [ImportingConstructor]
         public PullRequestReviewViewModel(
-            IPullRequestService pullRequestsService,
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
             IPullRequestFilesViewModel files)
         {
-            Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(files, nameof(files));
 
-            this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
 
             Files = files;
-            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => 
+            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
             Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
 

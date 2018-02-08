@@ -13,6 +13,3 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
-[submodule "submodules/Octokit.GraphQL"]
-	path = submodules/Octokit.GraphQL
-	url = https://github.com/grokys/Octokit.GraphQL

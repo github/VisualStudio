@@ -479,12 +479,12 @@ namespace GitHub.ViewModels.GitHubPane
                     review.State != PullRequestReviewState.Dismissed &&
                     (review.State != PullRequestReviewState.Pending || review.User.Login == currentUser.Login))
                 {
-                    var commentCount = pullRequest.ReviewComments
+                    var count = pullRequest.ReviewComments
                         .Where(x => x.PullRequestReviewId == review.Id)
                         .Count();
                     existing.Add(
                         review.User.Login,
-                        new PullRequestDetailReviewItem(review.Id, review.User, review.State, commentCount));
+                        new PullRequestDetailReviewItem(review.Id, review.User, review.State, count));
                 }
             }
 
@@ -659,7 +659,7 @@ namespace GitHub.ViewModels.GitHubPane
         void DoShowReview(object item)
         {
             var review = (PullRequestDetailReviewItem)item;
-            var id = review.Id > 0 ? review.Id.ToString() : "new";
+            var id = review.Id > 0 ? review.Id + "" : "new";
             NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/{id}"));
         }
 

@@ -38,6 +38,7 @@ namespace GitHub.InlineReviews.Services
         readonly IGraphQLClientFactory graphqlFactory;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
+        TaskCompletionSource<object> initialized;
         IPullRequestSession currentSession;
         ILocalRepositoryModel repository;
 
@@ -71,6 +72,7 @@ namespace GitHub.InlineReviews.Services
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.graphqlFactory = graphqlFactory;
+            initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -89,6 +91,10 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
+        /// <inheritdoc/>
+        public Task EnsureInitialized() => initialized.Task;
+
+        /// <inheritdoc/>
         public async Task<IPullRequestSessionFile> GetLiveFile(
             string relativePath,
             ITextView textView,
@@ -237,6 +243,7 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 CurrentSession = session;
+                initialized.SetResult(null);
             }
             catch (Exception e)
             {
