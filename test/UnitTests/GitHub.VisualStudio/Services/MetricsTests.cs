@@ -18,21 +18,21 @@ namespace MetricsTests
         [Test]
         public void ShouldStartTimer()
         {
-            var service = Substitute.For<IUsageService>();
-            var target = new UsageTracker(CreateServiceProvider(), service);
-
-            service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
+            var serviceProvider = CreateServiceProvider();
+            var usageService = serviceProvider.GetService<IUsageService>();
+            var target = new UsageTracker(serviceProvider, usageService);
+            usageService.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
         }
 
         [Test]
         public async Task FirstTickShouldIncrementLaunchCount()
         {
-            var service = CreateUsageService();
-            var tick = GetTick(service);
+            var usageService = CreateUsageService();
+            var tick = GetTick(usageService);
 
             await tick();
 
-            await service.Received(1).WriteLocalData(
+            await usageService.Received(1).WriteLocalData(
                 Arg.Is<UsageData>(x =>
                     x.Model.NumberOfStartups == 1 &&
                     x.Model.NumberOfStartupsWeek == 1 &&
@@ -42,25 +42,25 @@ namespace MetricsTests
         [Test]
         public async Task SubsequentTickShouldNotIncrementLaunchCount()
         {
-            var service = CreateUsageService();
-            var tick = GetTick(service);
+            var usageService = CreateUsageService();
+            var tick = GetTick(usageService);
 
             await tick();
-            service.ClearReceivedCalls();
+            usageService.ClearReceivedCalls();
             await tick();
 
-            await service.DidNotReceiveWithAnyArgs().WriteLocalData(null);
+            await usageService.DidNotReceiveWithAnyArgs().WriteLocalData(null);
         }
 
         [Test]
         public async Task ShouldDisposeTimerIfMetricsServiceNotFound()
         {
-            var service = CreateUsageService();
+            var usageService = CreateUsageService();
             var disposed = false;
             var disposable = Disposable.Create(() => disposed = true);
-            service.StartTimer(null, new TimeSpan(), new TimeSpan()).ReturnsForAnyArgs(disposable);
+            usageService.StartTimer(null, new TimeSpan(), new TimeSpan()).ReturnsForAnyArgs(disposable);
 
-            var tick = GetTick(service);
+            var tick = GetTick(usageService);
 
             await tick();
 
@@ -70,8 +70,10 @@ namespace MetricsTests
         [Test]
         public async Task TickShouldNotSendDataIfSameDay()
         {
-            var serviceProvider = CreateServiceProvider();
-            var tick = GetTick(CreateUsageService());
+            var usageService = CreateUsageService();
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
             await tick();
 
@@ -82,8 +84,10 @@ namespace MetricsTests
         [Test]
         public async Task TickShouldSendDataIfDifferentDay()
         {
-            var serviceProvider = CreateServiceProvider();
-            var tick = GetTick(CreateUsageService(sameDay: false));
+            var usageService = CreateUsageService(sameDay: false);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
             await tick();
 
@@ -94,7 +98,7 @@ namespace MetricsTests
         [Test]
         public async Task NonWeeklyOrMonthlyCountersShouldBeZeroed()
         {
-            var service = CreateUsageService(new UsageModel
+            var usageService = CreateUsageService(new UsageModel
             {
                 NumberOfStartups = 1,
                 NumberOfStartupsWeek = 1,
@@ -102,11 +106,13 @@ namespace MetricsTests
                 NumberOfClones = 1,
             }, sameDay: false);
 
-            var tick = GetTick(CreateUsageService());
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
             await tick();
 
-            await service.Received().WriteLocalData(
+            await usageService.Received().WriteLocalData(
                 Arg.Is<UsageData>(x =>
                     x.Model.NumberOfStartups == 0 &&
                     x.Model.NumberOfStartupsWeek == 2 &&
@@ -117,7 +123,7 @@ namespace MetricsTests
         [Test]
         public async Task NonMonthlyCountersShouldBeZeroed()
         {
-            var service = CreateUsageService(new UsageModel
+            var usageService = CreateUsageService(new UsageModel
             {
                 NumberOfStartups = 1,
                 NumberOfStartupsWeek = 1,
@@ -125,11 +131,13 @@ namespace MetricsTests
                 NumberOfClones = 1,
             }, sameDay: false, sameWeek: false);
 
-            var tick = GetTick(CreateUsageService());
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
             await tick();
 
-            await service.Received().WriteLocalData(
+            await usageService.Received().WriteLocalData(
                 Arg.Is<UsageData>(x =>
                     x.Model.NumberOfStartups == 0 &&
                     x.Model.NumberOfStartupsWeek == 0 &&
@@ -140,7 +148,7 @@ namespace MetricsTests
         [Test]
         public async Task AllCountersShouldBeZeroed()
         {
-            var service = CreateUsageService(new UsageModel
+            var usageService = CreateUsageService(new UsageModel
             {
                 NumberOfStartups = 1,
                 NumberOfStartupsWeek = 1,
@@ -148,11 +156,13 @@ namespace MetricsTests
                 NumberOfClones = 1,
             }, sameDay: false, sameWeek: false, sameMonth: false);
 
-            var tick = GetTick(CreateUsageService());
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
             await tick();
 
-            await service.Received().WriteLocalData(
+            await usageService.Received().WriteLocalData(
                 Arg.Is<UsageData>(x =>
                     x.Model.NumberOfStartups == 0 &&
                     x.Model.NumberOfStartupsWeek == 0 &&
@@ -165,11 +175,11 @@ namespace MetricsTests
         {
             var model = new UsageModel { NumberOfClones = 4 };
             var usageService = CreateUsageService(model);
-            var target = new UsageTracker(
-                CreateServiceProvider(),
-                usageService);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
-            await target.IncrementCounter(x => x.NumberOfClones);
+            await usageTracker.IncrementCounter(x => x.NumberOfClones);
             UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
 
             Assert.AreEqual(5, result.Model.NumberOfClones);
@@ -179,23 +189,26 @@ namespace MetricsTests
         public async Task ShouldWriteUpdatedData()
         {
             var data = new UsageData { Model = new UsageModel() };
-            var service = CreateUsageService(data);
-            var target = new UsageTracker(
-                CreateServiceProvider(),
-                service);
+            var usageService = CreateUsageService(data);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
 
-            await target.IncrementCounter(x => x.NumberOfClones);
+            await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
-            await service.Received(1).WriteLocalData(data);
+            await usageService.Received(1).WriteLocalData(data);
         }
 
         [Test]
         public async Task UsageServiceWritesAllTheDataCorrectly()
         {
             var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
+
             var usageService = CreateUsageService(model, sameDay: true);
-            var tick = GetTick(usageService);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
+
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
 
@@ -218,11 +231,14 @@ namespace MetricsTests
         public async Task MetricsServiceSendsDailyData()
         {
             var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
+
+            var usageService = CreateUsageService(model, sameDay: false);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
+
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
-
-            var tick = GetTick(CreateUsageService(model, sameDay: false));
 
             await tick();
 
@@ -242,11 +258,14 @@ namespace MetricsTests
         public async Task MetricsServiceSendsWeeklyData()
         {
             var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
+
+            var usageService = CreateUsageService(model, sameDay: false, sameWeek: false);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
+
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
-
-            var tick = GetTick(CreateUsageService(model, sameDay: false, sameWeek: false));
 
             await tick();
 
@@ -267,11 +286,14 @@ namespace MetricsTests
         public async Task MetricsServiceSendsMonthlyData()
         {
             var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
+
+            var usageService = CreateUsageService(model, sameDay: false, sameWeek: false, sameMonth: false);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var usageTracker = new UsageTracker(serviceProvider, usageService);
+            var tick = GetTick(usageService, usageTracker);
+
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
-
-            var tick = GetTick(CreateUsageService(model, sameDay: false, sameWeek: false, sameMonth: false));
 
             await tick();
 
@@ -321,21 +343,28 @@ namespace MetricsTests
             return (UsageModel)model;
         }
 
-        static Func<Task> GetTick(IUsageService service)
+        static Func<Task> GetTick(IUsageService service, IUsageTracker usageTracker = null)
         {
             Func<Task> tick = null;
 
             service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
                 .Do(x => tick = x.ArgAt<Func<Task>>(0));
 
+            if (usageTracker == null)
+                usageTracker = new UsageTracker(CreateServiceProvider(), service);
+
             return tick;
         }
 
-        static IGitHubServiceProvider CreateServiceProvider(bool hasMetricsService = true)
+        static IGitHubServiceProvider CreateServiceProvider(IUsageService usageService = null)
+        {
+            return CreateServiceProvider(Substitute.For<IMetricsService>(), usageService);
+        }
+
+        static IGitHubServiceProvider CreateServiceProvider(IMetricsService metricsService, IUsageService usageService = null)
         {
             var result = Substitute.For<IGitHubServiceProvider>();
             var connectionManager = Substitute.For<IConnectionManager>();
-            var metricsService = Substitute.For<IMetricsService>();
             var packageSettings = Substitute.For<IPackageSettings>();
             var vsservices = Substitute.For<IVSServices>();
 
@@ -345,7 +374,8 @@ namespace MetricsTests
             result.GetService<IConnectionManager>().Returns(connectionManager);
             result.GetService<IPackageSettings>().Returns(packageSettings);
             result.GetService<IVSServices>().Returns(vsservices);
-            result.TryGetService<IMetricsService>().Returns(hasMetricsService ? metricsService : null);
+            result.TryGetService<IMetricsService>().Returns(metricsService);
+            result.GetService<IUsageService>().Returns(usageService ?? CreateUsageService());
 
             return result;
         }
