@@ -36,7 +36,7 @@ namespace GitHub.Services
         /// </summary>
         /// <returns>A task that when completed indicates that the service is initialized.</returns>
         /// <remarks>
-        /// If you are simplying monitoring changes to the <see cref="CurrentSession"/> then you
+        /// If you are simply monitoring changes to the <see cref="CurrentSession"/> then you
         /// don't need to call this method: <see cref="CurrentSession"/> will be updated on
         /// initialization. If however, you want to be sure that <see cref="CurrentSession"/> is
         /// initialized, you can await the task returned from this method.
