@@ -186,7 +186,6 @@ namespace GitHub.Services
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201", Justification = "Prototype")]
         public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, IProgress<string> progress)
         {
             var exitCode = await Where("git");
