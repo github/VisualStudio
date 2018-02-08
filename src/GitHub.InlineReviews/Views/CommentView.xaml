@@ -12,7 +12,7 @@
              xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:CommentViewModelDesigner EditState="Editing">
+        <sample:CommentViewModelDesigner EditState="None">
             <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:CommentViewModelDesigner.Body>
@@ -60,6 +60,14 @@
                                      Command="{Binding OpenOnGitHub}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
                                      Opacity="0.75" />
+                <Border Background="{DynamicResource VsBrush.InfoBackground}"
+                        BorderBrush="{DynamicResource VsBrush.AccentPale}"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="2 1"
+                        Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                    <TextBlock FontSize="10">Pending</TextBlock>
+                </Border>
             </StackPanel>
 
 

@@ -444,6 +444,7 @@ namespace GitHub.Services
                                 Position = a.Position,
                                 PullRequestReviewId = y.DatabaseId.Value,
                                 User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
+                                IsPending = y.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
                             }).ToList(),
                         }).Single()
                     }).ToList()
@@ -633,6 +634,7 @@ namespace GitHub.Services
                         User = Create(x.User),
                         Body = x.Body,
                         CreatedAt = x.CreatedAt,
+                        IsPending = x.IsPending,
                     }).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
@@ -918,6 +920,7 @@ namespace GitHub.Services
                 };
                 Body = comment.Body;
                 CreatedAt = comment.CreatedAt;
+                IsPending = comment.IsPending;
             }
 
             public int Id { get; }
@@ -931,6 +934,7 @@ namespace GitHub.Services
             public AccountCacheItem User { get; set; }
             public string Body { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
+            public bool IsPending { get; set; }
         }
 
         public class GitReferenceCacheItem

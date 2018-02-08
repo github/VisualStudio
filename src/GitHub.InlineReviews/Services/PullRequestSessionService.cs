@@ -448,6 +448,7 @@ namespace GitHub.InlineReviews.Services
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,
                     PullRequestReviewId = x.Comment.PullRequestReview.DatabaseId.Value,
                     User = user,
+                    IsPending = true,
                 });
 
             return await graphql.Run(addComment);

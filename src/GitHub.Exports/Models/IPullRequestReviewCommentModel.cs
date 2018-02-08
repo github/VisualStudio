@@ -43,5 +43,10 @@ namespace GitHub.Models
         /// The diff hunk used to match the pull request.
         /// </summary>
         string DiffHunk { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the comment is part of a pending review.
+        /// </summary>
+        bool IsPending { get; }
     }
 }

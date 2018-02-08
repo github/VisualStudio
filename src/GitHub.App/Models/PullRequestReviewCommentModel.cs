@@ -16,5 +16,6 @@ namespace GitHub.Models
         public IAccount User { get; set; }
         public string Body { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
+        public bool IsPending { get; set; }
     }
 }

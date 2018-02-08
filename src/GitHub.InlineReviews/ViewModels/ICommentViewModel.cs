@@ -13,6 +13,9 @@ namespace GitHub.InlineReviews.ViewModels
         Placeholder,
     }
 
+    /// <summary>
+    /// View model for an issue or pull request comment.
+    /// </summary>
     public interface ICommentViewModel : IViewModel
     {
         /// <summary>
@@ -56,20 +59,6 @@ namespace GitHub.InlineReviews.ViewModels
         ICommentThreadViewModel Thread { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the user can start a new review with this comment.
-        /// </summary>
-        bool CanStartReview { get; }
-
-        /// <summary>
-        /// Gets the caption for the "Commit" button.
-        /// </summary>
-        /// <remarks>
-        /// This will be "Add a single comment" when not in review mode and "Add review comment"
-        /// when in review mode.
-        /// </remarks>
-        string CommitCaption { get; }
-
-        /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
         ReactiveCommand<object> BeginEdit { get; }
@@ -83,11 +72,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets a command which will commit edits to the comment.
         /// </summary>
         ReactiveCommand<Unit> CommitEdit { get; }
-
-        /// <summary>
-        /// Gets a command which will commit a new comment and start a review.
-        /// </summary>
-        ReactiveCommand<Unit> StartReview { get; }
 
         /// <summary>
         /// Gets a command to open the comment in a browser.
