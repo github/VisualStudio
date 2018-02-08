@@ -678,20 +678,32 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task DoSyncSubmodules(object unused)
         {
-            usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
-
-            var progress = new CaptureProgress();
-            var complete = await pullRequestsService.SyncSubmodules(LocalRepository, progress);
-            if (!complete)
+            try
             {
-                throw new ApplicationException(progress.ToString());
+                IsBusy = true;
+                usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
+
+                var progress = new CaptureProgress();
+                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, progress);
+                if (!complete)
+                {
+                    throw new ApplicationException(progress.ToString());
+                }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
         sealed class CaptureProgress : IProgress<string>, IDisposable
         {
             StringWriter writer = new StringWriter(CultureInfo.CurrentCulture);
-            public void Report(string value) => writer.WriteLine(value);
+            public void Report(string value)
+            {
+                VisualStudio.Services.Dte.StatusBar.Text = value;
+                writer.WriteLine(value);
+            }
             public override string ToString() => writer.ToString();
             public void Dispose() => writer.Dispose();
         }
