@@ -132,10 +132,10 @@ public class SimpleApiClientTests
                 new Lazy<IWikiProbe>(() => wikiProbe));
             await client.GetRepository();
 
-            var result = client.IsEnterprise();
+            var result = await client.IsEnterprise();
 
             Assert.That(expected, Is.EqualTo(result));
-            Assert.That(expected, Is.EqualTo(client.IsEnterprise()));
+            Assert.That(expected, Is.EqualTo(await client.IsEnterprise()));
         }
 
         [Test]
@@ -151,7 +151,7 @@ public class SimpleApiClientTests
                 new Lazy<IEnterpriseProbe>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
-            var result = client.IsEnterprise();
+            var result = client.IsEnterprise().Result;
 
             Assert.False(result);
         }

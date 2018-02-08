@@ -126,7 +126,7 @@ namespace GitHub.VisualStudio.Base
             {
                 var repo = await SimpleApiClient.GetRepository();
 
-                if ((repo.FullName == ActiveRepoName || repo.Id == 0) && SimpleApiClient.IsEnterprise())
+                if ((repo.FullName == ActiveRepoName || repo.Id == 0) && await SimpleApiClient.IsEnterprise())
                 {
                     return RepositoryOrigin.Enterprise;
                 }
