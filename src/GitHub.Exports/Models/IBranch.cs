@@ -1,5 +1,5 @@
-﻿using GitHub.Collections;
-using System;
+﻿using System;
+using GitHub.Collections;
 
 namespace GitHub.Models
 {
@@ -11,5 +11,7 @@ namespace GitHub.Models
         IRepositoryModel Repository { get; }
         bool IsTracking { get; }
         string DisplayName { get; set; }
+        string Sha { get; }
+        string TrackedSha { get; }
     }
 }

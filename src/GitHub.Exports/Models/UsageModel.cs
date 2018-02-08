@@ -21,6 +21,8 @@ namespace GitHub.Models
         public int NumberOfOpenInGitHub { get; set; }
         public int NumberOfLinkToGitHub { get; set; }
         public int NumberOfLogins { get; set; }
+        public int NumberOfOAuthLogins { get; set; }
+        public int NumberOfTokenLogins { get; set; }
         public int NumberOfPullRequestsOpened { get; set; }
         public int NumberOfLocalPullRequestsCheckedOut { get; set; }
         public int NumberOfLocalPullRequestPulls { get; set; }
@@ -35,6 +37,7 @@ namespace GitHub.Models
         public int NumberOfPRDetailsViewFile { get; set; }
         public int NumberOfPRDetailsCompareWithSolution { get; set; }
         public int NumberOfPRDetailsOpenFileInSolution { get; set; }
+        public int NumberOfPRDetailsNavigateToEditor { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
 

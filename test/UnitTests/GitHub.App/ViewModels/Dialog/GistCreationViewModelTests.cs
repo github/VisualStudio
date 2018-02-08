@@ -11,7 +11,7 @@ using NSubstitute;
 using Octokit;
 using ReactiveUI;
 using UnitTests;
-using Xunit;
+using NUnit.Framework;
 
 public class GistCreationViewModelTests
 {
@@ -40,9 +40,8 @@ public class GistCreationViewModelTests
 
     public class TheCreateGistCommand : TestBaseClass
     {
-        [Theory]
-        [InlineData("Console.WriteLine", "Gist.cs", true)]
-        [InlineData("Console.WriteLine", "Gist.cs", false)]
+        [TestCase("Console.WriteLine", "Gist.cs", true)]
+        [TestCase("Console.WriteLine", "Gist.cs", false)]
         public void CreatesAGistUsingTheApiClient(string selectedText, string fileName, bool isPrivate)
         {
             var provider = Substitutes.ServiceProvider;
@@ -59,20 +58,19 @@ public class GistCreationViewModelTests
                         && g.Files.First().Value == selectedText));
         }
 
-        [Theory]
-        [InlineData(null, false)]
-        [InlineData("", false)]
-        [InlineData("Gist.cs", true)]
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase("Gist.cs", true)]
         public void CannotCreateGistIfFileNameIsMissing(string fileName, bool expected)
         {
             var provider = Substitutes.ServiceProvider;
             var vm = CreateViewModel(provider, fileName: fileName);
 
             var actual = vm.CreateGist.CanExecute(null);
-            Assert.Equal(expected, actual);
+            Assert.That(expected, Is.EqualTo(actual));
         }
 
-        [Fact]
+        [Test]
         public void Foo()
         {
             var x = new PullRequestDetailViewModelDesigner();

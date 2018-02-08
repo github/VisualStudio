@@ -32,7 +32,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IConnectionManager connectionManager;
-        readonly ITeamExplorerServiceHolder teServiceHolder;
+        readonly ITeamExplorerContext teamExplorerContext;
         readonly IVisualStudioBrowser browser;
         readonly IUsageTracker usageTracker;
         readonly INavigationViewModel navigator;
@@ -46,6 +46,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
         bool initialized;
         IViewModel content;
         ILocalRepositoryModel localRepository;
@@ -56,7 +57,7 @@ namespace GitHub.ViewModels.GitHubPane
             IViewViewModelFactory viewModelFactory,
             ISimpleApiClientFactory apiClientFactory,
             IConnectionManager connectionManager,
-            ITeamExplorerServiceHolder teServiceHolder,
+            ITeamExplorerContext teamExplorerContext,
             IVisualStudioBrowser browser,
             IUsageTracker usageTracker,
             INavigationViewModel navigator,
@@ -67,7 +68,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
             Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
-            Guard.ArgumentNotNull(teServiceHolder, nameof(teServiceHolder));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(browser, nameof(browser));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(navigator, nameof(navigator));
@@ -78,7 +79,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.viewModelFactory = viewModelFactory;
             this.apiClientFactory = apiClientFactory;
             this.connectionManager = connectionManager;
-            this.teServiceHolder = teServiceHolder;
+            this.teamExplorerContext = teamExplorerContext;
             this.browser = browser;
             this.usageTracker = usageTracker;
             this.navigator = navigator;
@@ -199,22 +200,37 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
-            await UpdateContent(teServiceHolder.ActiveRepo);
-            teServiceHolder.Subscribe(this, x => UpdateContentIfRepositoryChanged(x).Forget());
-            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+            await initializing.WaitAsync();
+            if (initialized) return;
 
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+            try
+            {
+                await UpdateContent(teamExplorerContext.ActiveRepository);
+                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                   .Skip(1)
+                   .ObserveOn(RxApp.MainThreadScheduler)
+                   .Subscribe(x => UpdateContent(x).Forget());
 
-            paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                 (_, __) =>
-                 {
-                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
-                 });
+                connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+
+                paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                     (_, __) =>
+                     {
+                         browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                         usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+                     });
+            }
+            finally
+            {
+                initialized = true;
+                initializing.Release();
+            }
         }
 
         /// <inheritdoc/>
@@ -274,7 +290,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public Task ShowPullRequests()
         {
-            return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection)); 
+            return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
         }
 
         /// <inheritdoc/>
@@ -344,7 +360,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task UpdateContent(ILocalRepositoryModel repository)
         {
-            initialized = true;
             LocalRepository = repository;
             Connection = null;
             Content = null;
@@ -385,14 +400,6 @@ namespace GitHub.ViewModels.GitHubPane
             else
             {
                 Content = notAGitHubRepository;
-            }
-        }
-
-        async Task UpdateContentIfRepositoryChanged(ILocalRepositoryModel repository)
-        {
-            if (!initialized || !Equals(repository, LocalRepository))
-            {
-                await UpdateContent(repository);
             }
         }
 
