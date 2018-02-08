@@ -165,14 +165,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\Octokit.GraphQL\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
-      <Project>{8334b9f4-4468-4800-88da-572031b23308}</Project>
-      <Name>Octokit.GraphQL.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\Octokit.GraphQL\Octokit.GraphQL\Octokit.GraphQL.csproj">
-      <Project>{a2adf518-2909-4556-b63d-12a02f16036d}</Project>
-      <Name>Octokit.GraphQL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
@@ -186,7 +178,7 @@
       <Name>Splat-Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
-      <Project>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</Project>
+      <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
@@ -358,6 +350,15 @@
     <Reference Include="Microsoft.VisualStudio.Validation, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.14.1.111\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Octokit.GraphQL, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    </Reference>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{11569514-5AE5-4B5B-92A2-F10B0967DE5F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -103,10 +103,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews.UnitTests", "test\GitHub.InlineReviews.UnitTests\GitHub.InlineReviews.UnitTests.csproj", "{17EB676B-BB91-48B5-AA59-C67695C647C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Logging", "src\GitHub.Logging\GitHub.Logging.csproj", "{8D73575A-A89F-47CC-B153-B47DD06837F0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octokit.GraphQL.Core", "submodules\Octokit.GraphQL\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj", "{8334B9F4-4468-4800-88DA-572031B23308}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octokit.GraphQL", "submodules\Octokit.GraphQL\Octokit.GraphQL\Octokit.GraphQL.csproj", "{A2ADF518-2909-4556-B63D-12A02F16036D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -407,26 +403,6 @@ Global
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{8334B9F4-4468-4800-88DA-572031B23308}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{A2ADF518-2909-4556-B63D-12A02F16036D}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -450,8 +426,6 @@ Global
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{110B206F-8554-4B51-BF86-94DAA32F5E26} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{17EB676B-BB91-48B5-AA59-C67695C647C2} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
-		{8334B9F4-4468-4800-88DA-572031B23308} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
-		{A2ADF518-2909-4556-B63D-12A02F16036D} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {575888CD-BF3E-4821-A2B4-09016D2B6EC7}

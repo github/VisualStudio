@@ -841,7 +841,7 @@ Line 4";
             modelServiceFactory = modelServiceFactory ?? CreateModelServiceFactory();
             graphQLClientFactory = graphQLClientFactory ?? Substitute.For<IGraphQLClientFactory>();
             teamExplorerContext = teamExplorerContext ?? CreateTeamExplorerContext(CreateRepositoryModel());
-
+            
             return new PullRequestSessionManager(
                 service,
                 sessionService,
