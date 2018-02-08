@@ -158,7 +158,7 @@ namespace GitHub.VisualStudio
             return Task.CompletedTask;
         }
 
-        public IGitHubPaneViewModel ShowHomePane()
+        public async Task<IGitHubPaneViewModel> ShowGitHubPane()
         {
             var pane = ShowToolWindow(new Guid(GitHubPane.GitHubPaneGuid));
             if (pane == null)
@@ -168,7 +168,10 @@ namespace GitHub.VisualStudio
             {
                 ErrorHandler.Failed(frame.Show());
             }
-            return (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
+
+            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
+            await viewModel.InitializeAsync(pane);
+            return viewModel;
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)

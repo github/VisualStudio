@@ -182,7 +182,6 @@
     <Compile Include="Services\IShowDialogService.cs" />
     <Compile Include="Services\LocalRepositoriesExtensions.cs" />
     <Compile Include="Services\ModelServiceExtensions.cs" />
-    <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="ViewModels\Dialog\IDialogContentViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IGitHubDialogWindowViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IGistCreationViewModel.cs" />
