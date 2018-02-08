@@ -133,9 +133,7 @@ namespace UnitTests.GitHub.App.Models
                     }
                     return data;
                 }
-                catch (Exception ex)
-                {
-                }
+                catch { }
             }
 
             return data;
