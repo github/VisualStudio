@@ -56,7 +56,7 @@ namespace GitHub.Services
         /// Sync submodules on the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        Task<bool> SyncSubmodules(ILocalRepositoryModel repository, IProgress<string> progress);
+        Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress);
 
         /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.

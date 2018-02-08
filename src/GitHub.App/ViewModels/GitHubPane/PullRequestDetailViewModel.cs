@@ -683,29 +683,17 @@ namespace GitHub.ViewModels.GitHubPane
                 IsBusy = true;
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
-                var progress = new CaptureProgress();
-                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, progress);
+                var writer = new StringWriter(CultureInfo.CurrentCulture);
+                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, writer.WriteLine);
                 if (!complete)
                 {
-                    throw new ApplicationException(progress.ToString());
+                    throw new ApplicationException(writer.ToString());
                 }
             }
             finally
             {
                 IsBusy = false;
             }
-        }
-
-        sealed class CaptureProgress : IProgress<string>, IDisposable
-        {
-            StringWriter writer = new StringWriter(CultureInfo.CurrentCulture);
-            public void Report(string value)
-            {
-                VisualStudio.Services.Dte.StatusBar.Text = value;
-                writer.WriteLine(value);
-            }
-            public override string ToString() => writer.ToString();
-            public void Dispose() => writer.Dispose();
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

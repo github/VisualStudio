@@ -186,12 +186,12 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, IProgress<string> progress)
+        public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress)
         {
             var exitCode = await Where("git");
             if (exitCode != 0)
             {
-                progress.Report(App.Resources.CouldntFindGitOnPath);
+                progress(App.Resources.CouldntFindGitOnPath);
                 return false;
             }
 
@@ -199,7 +199,7 @@ namespace GitHub.Services
         }
 
         // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
-        async Task<int> SyncSubmodules(string workingDir, IProgress<string> progress)
+        async Task<int> SyncSubmodules(string workingDir, Action<string> progress)
         {
             var cmdArguments = "/C git submodule init & git submodule sync --recursive & git submodule update --recursive";
             var startInfo = new ProcessStartInfo("cmd", cmdArguments)
@@ -240,12 +240,12 @@ namespace GitHub.Services
             });
         }
 
-        static async Task ReadLinesAsync(TextReader reader, IProgress<string> progress)
+        static async Task ReadLinesAsync(TextReader reader, Action<string> progress)
         {
             string line;
             while ((line = await reader.ReadLineAsync()) != null)
             {
-                progress.Report(line);
+                progress(line);
             }
         }
 
