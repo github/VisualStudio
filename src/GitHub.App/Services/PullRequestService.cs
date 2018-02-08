@@ -189,7 +189,7 @@ namespace GitHub.Services
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201", Justification = "Prototype")]
         public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, IProgress<string> progress)
         {
-            var exitCode = Where("git");
+            var exitCode = await Where("git");
             if (exitCode != 0)
             {
                 progress.Report(App.Resources.CouldntFindGitOnPath);
@@ -222,20 +222,23 @@ namespace GitHub.Services
             }
         }
 
-        static int Where(string fileName)
+        static Task<int> Where(string fileName)
         {
-            var cmdArguments = "/C WHERE /Q " + fileName;
-            var startInfo = new ProcessStartInfo("cmd", cmdArguments)
+            return Task.Run(() =>
             {
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                var cmdArguments = "/C WHERE /Q " + fileName;
+                var startInfo = new ProcessStartInfo("cmd", cmdArguments)
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-            using (var process = Process.Start(startInfo))
-            {
-                process.WaitForExit();
-                return process.ExitCode;
-            }
+                using (var process = Process.Start(startInfo))
+                {
+                    process.WaitForExit();
+                    return process.ExitCode;
+                }
+            });
         }
 
         static async Task ReadLinesAsync(TextReader reader, IProgress<string> progress)
