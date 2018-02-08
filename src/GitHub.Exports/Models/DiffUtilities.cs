@@ -88,9 +88,15 @@ namespace GitHub.Models
 
         public static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
         {
-            if (target.Count == 0)
+            var matchLines = target.Count;
+            if (matchLines == 0)
             {
                 return null; // no lines to match
+            }
+
+            if (matchLines > 4)
+            {
+                matchLines = 4; // match a maximum of 4 lines
             }
 
             foreach (var source in diff)
@@ -101,7 +107,7 @@ namespace GitHub.Models
                     if (source.Lines[i].Content == target[matches].Content)
                     {
                         matches++;
-                        if (matches == target.Count || i == 0)
+                        if (matches == matchLines || i == 0)
                         {
                             return source.Lines[i + matches - 1];
                         }
