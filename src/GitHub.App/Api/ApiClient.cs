@@ -157,7 +157,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`");
+                log.Warning(e, "Failed to retrieve host name using `DNS.GetHostName`");
                 try
                 {
                     return Environment.MachineName;

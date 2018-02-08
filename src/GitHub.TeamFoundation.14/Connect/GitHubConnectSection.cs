@@ -360,9 +360,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     }
                 })
             );
-#if DEBUG
-            log.Information("Notification");
-#endif
+            log.Debug("Notification");
         }
 
         async Task RefreshRepositories()
@@ -496,12 +494,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 if (machine.PermittedTriggers.Contains(e.PropertyName))
                 {
-#if DEBUG
-                    log.Information("{PropertyName} title:{Title} busy:{IsBusy}",
+                    log.Debug("{PropertyName} title:{Title} busy:{IsBusy}",
                         e.PropertyName,
                         ((ITeamExplorerSection)sender).Title,
                         ((ITeamExplorerSection)sender).IsBusy);
-#endif
                     machine.Fire(e.PropertyName);
                 }
             }

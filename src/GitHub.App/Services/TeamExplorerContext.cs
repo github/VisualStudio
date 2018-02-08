@@ -65,7 +65,7 @@ namespace GitHub.Services
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
                     // https://github.com/github/VisualStudio/issues/1421
-                    log.Information("Ignoring no ActiveRepository when solution hasn't changed");
+                    log.Debug("Ignoring no ActiveRepository when solution hasn't changed");
                 }
                 else
                 {
@@ -76,22 +76,22 @@ namespace GitHub.Services
 
                     if (newRepositoryPath != repositoryPath)
                     {
-                        log.Information("Fire PropertyChanged event for ActiveRepository");
+                        log.Debug("Fire PropertyChanged event for ActiveRepository");
                         ActiveRepository = repo;
                     }
                     else if (newBranchName != branchName)
                     {
-                        log.Information("Fire StatusChanged event when BranchName changes for ActiveRepository");
+                        log.Debug("Fire StatusChanged event when BranchName changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
                     else if (newHeadSha != headSha)
                     {
-                        log.Information("Fire StatusChanged event when HeadSha changes for ActiveRepository");
+                        log.Debug("Fire StatusChanged event when HeadSha changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
                     else if (newTrackedSha != trackedSha)
                     {
-                        log.Information("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
+                        log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
 
