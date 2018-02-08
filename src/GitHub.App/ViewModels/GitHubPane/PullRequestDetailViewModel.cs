@@ -684,7 +684,11 @@ namespace GitHub.ViewModels.GitHubPane
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
                 var writer = new StringWriter(CultureInfo.CurrentCulture);
-                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, writer.WriteLine);
+                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, line =>
+                {
+                    writer.WriteLine(line);
+                    SetStatus(line);
+                });
                 if (!complete)
                 {
                     throw new ApplicationException(writer.ToString());
@@ -693,6 +697,27 @@ namespace GitHub.ViewModels.GitHubPane
             finally
             {
                 IsBusy = false;
+                SetStatus();
+            }
+        }
+
+        // HACK: This should probably be a `Status` property on `IPanePageViewModel`.
+        void SetStatus(string line = null)
+        {
+            try
+            {
+                if (line != null)
+                {
+                    VisualStudio.Services.Dte.StatusBar.Text = line;
+                }
+                else
+                {
+                    VisualStudio.Services.Dte.StatusBar.Clear();
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error writing to StatusBar");
             }
         }
 
