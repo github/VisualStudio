@@ -28,9 +28,9 @@ namespace MetricsTests
         public async Task FirstTickShouldIncrementLaunchCount()
         {
             var service = CreateUsageService();
-            var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
+            var tick = GetTick(service);
 
-            await targetAndTick.Item2();
+            await tick();
 
             await service.Received(1).WriteLocalData(
                 Arg.Is<UsageData>(x =>
@@ -43,11 +43,11 @@ namespace MetricsTests
         public async Task SubsequentTickShouldNotIncrementLaunchCount()
         {
             var service = CreateUsageService();
-            var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
+            var tick = GetTick(service);
 
-            await targetAndTick.Item2();
+            await tick();
             service.ClearReceivedCalls();
-            await targetAndTick.Item2();
+            await tick();
 
             await service.DidNotReceiveWithAnyArgs().WriteLocalData(null);
         }
@@ -60,11 +60,9 @@ namespace MetricsTests
             var disposable = Disposable.Create(() => disposed = true);
             service.StartTimer(null, new TimeSpan(), new TimeSpan()).ReturnsForAnyArgs(disposable);
 
-            var targetAndTick = CreateTargetAndGetTick(
-                CreateServiceProvider(hasMetricsService: false),
-                service);
+            var tick = GetTick(service);
 
-            await targetAndTick.Item2();
+            await tick();
 
             Assert.True(disposed);
         }
@@ -73,11 +71,9 @@ namespace MetricsTests
         public async Task TickShouldNotSendDataIfSameDay()
         {
             var serviceProvider = CreateServiceProvider();
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService());
+            var tick = GetTick(CreateUsageService());
 
-            await targetAndTick.Item2();
+            await tick();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
             await metricsService.DidNotReceive().PostUsage(Arg.Any<UsageModel>());
@@ -87,11 +83,9 @@ namespace MetricsTests
         public async Task TickShouldSendDataIfDifferentDay()
         {
             var serviceProvider = CreateServiceProvider();
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(sameDay: false));
+            var tick = GetTick(CreateUsageService(sameDay: false));
 
-            await targetAndTick.Item2();
+            await tick();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
             await metricsService.Received(1).PostUsage(Arg.Any<UsageModel>());
@@ -107,13 +101,8 @@ namespace MetricsTests
                 NumberOfStartupsMonth = 1,
                 NumberOfClones = 1,
             }, sameDay: false);
-            Func<Task> tick = null;
 
-            service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
-                .Do(x => tick = x.ArgAt<Func<Task>>(0));
-
-            var serviceProvider = CreateServiceProvider();
-            var target = new UsageTracker(serviceProvider, service);
+            var tick = GetTick(CreateUsageService());
 
             await tick();
 
@@ -135,13 +124,8 @@ namespace MetricsTests
                 NumberOfStartupsMonth = 1,
                 NumberOfClones = 1,
             }, sameDay: false, sameWeek: false);
-            Func<Task> tick = null;
 
-            service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
-                .Do(x => tick = x.ArgAt<Func<Task>>(0));
-
-            var serviceProvider = CreateServiceProvider();
-            var target = new UsageTracker(serviceProvider, service);
+            var tick = GetTick(CreateUsageService());
 
             await tick();
 
@@ -163,13 +147,8 @@ namespace MetricsTests
                 NumberOfStartupsMonth = 1,
                 NumberOfClones = 1,
             }, sameDay: false, sameWeek: false, sameMonth: false);
-            Func<Task> tick = null;
 
-            service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
-                .Do(x => tick = x.ArgAt<Func<Task>>(0));
-
-            var serviceProvider = CreateServiceProvider();
-            var target = new UsageTracker(serviceProvider, service);
+            var tick = GetTick(CreateUsageService());
 
             await tick();
 
@@ -216,11 +195,11 @@ namespace MetricsTests
             var model = CreateUsageModel();
             var serviceProvider = CreateServiceProvider();
             var usageService = CreateUsageService(model, sameDay: true);
-            var targetAndTick = CreateTargetAndGetTick(serviceProvider, usageService);
+            var tick = GetTick(usageService);
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
 
-            await targetAndTick.Item2();
+            await tick();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
 
@@ -243,11 +222,9 @@ namespace MetricsTests
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
 
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(model, sameDay: false));
+            var tick = GetTick(CreateUsageService(model, sameDay: false));
 
-            await targetAndTick.Item2();
+            await tick();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
             var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
@@ -269,11 +246,9 @@ namespace MetricsTests
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
 
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(model, sameDay: false, sameWeek: false));
+            var tick = GetTick(CreateUsageService(model, sameDay: false, sameWeek: false));
 
-            await targetAndTick.Item2();
+            await tick();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
             var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
@@ -296,11 +271,9 @@ namespace MetricsTests
             var vsservices = serviceProvider.GetService<IVSServices>();
             vsservices.VSVersion.Returns(model.VSVersion);
 
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(model, sameDay: false, sameWeek: false, sameMonth: false));
+            var tick = GetTick(CreateUsageService(model, sameDay: false, sameWeek: false, sameMonth: false));
 
-            await targetAndTick.Item2();
+            await tick();
 
             var metricsService = serviceProvider.TryGetService<IMetricsService>();
             var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
@@ -348,18 +321,14 @@ namespace MetricsTests
             return (UsageModel)model;
         }
 
-        static Tuple<UsageTracker, Func<Task>> CreateTargetAndGetTick(
-            IGitHubServiceProvider serviceProvider,
-            IUsageService service)
+        static Func<Task> GetTick(IUsageService service)
         {
             Func<Task> tick = null;
 
             service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
                 .Do(x => tick = x.ArgAt<Func<Task>>(0));
 
-            var target = new UsageTracker(serviceProvider, service);
-
-            return Tuple.Create(target, tick);
+            return tick;
         }
 
         static IGitHubServiceProvider CreateServiceProvider(bool hasMetricsService = true)
