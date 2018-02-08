@@ -29,3 +29,4 @@ using Microsoft.VisualStudio.Shell;
 [assembly: ProvideCodeBase(AssemblyName = "Serilog.Sinks.File", CodeBase = @"$PackageFolder$\Serilog.Sinks.File.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig", CodeBase = @"$PackageFolder$\Markdig.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig.Wpf", CodeBase = @"$PackageFolder$\Markdig.Wpf.dll")]
+[assembly: ProvideCodeBase(AssemblyName = "Newtonsoft.Json", CodeBase = @"$PackageFolder$\Newtonsoft.Json.dll")]
