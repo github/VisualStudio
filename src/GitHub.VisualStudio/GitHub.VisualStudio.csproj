@@ -400,6 +400,7 @@
     <Compile Include="Views\GitHubPane\NotAGitRepositoryView.xaml.cs">
       <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\TextViewCommandDispatcher.cs" />
     <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
       <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
     </Compile>

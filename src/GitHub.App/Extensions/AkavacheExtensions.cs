@@ -200,7 +200,11 @@ namespace GitHub.Extensions
             bool shouldInvalidateOnError = false)
                 where T : CacheItem
         {
-            var idx = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))).Replay().RefCount();
+            var idx = Observable.Defer(() => This
+                                            .GetOrCreateObject(key, () => CacheIndex.Create(key)))
+                                            .Select(x => x.IndexKey == null ? CacheIndex.Create(key) : x)
+                                            .Replay()
+                                            .RefCount();
 
 
             var fetch = idx
@@ -264,6 +268,7 @@ namespace GitHub.Extensions
             {
                 var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
                 return blobCache.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                    .Select(x => x.IndexKey == null ? CacheIndex.Create(key) : x)
                     .SelectMany(index => fetchFunc()
                             .Catch<T, Exception>(Observable.Throw<T>)
                             .SelectMany(x => x.Save<T>(blobCache, key, absoluteExpiration))
