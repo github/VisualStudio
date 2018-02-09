@@ -55,7 +55,7 @@ namespace GitHub.VisualStudio.Base
             {
                 // If we're not in the UIContext or TryInitialize fails, have another go when the UIContext changes.
                 context.UIContextChanged += ContextChanged;
-                log.Information("VSGitExt will be initialized later");
+                log.Debug("VSGitExt will be initialized later");
                 InitializeTask = Task.CompletedTask;
             }
         }
@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.Base
                 // Refresh ActiveRepositories on background thread so we don't delay UI context change.
                 InitializeTask = Task.Run(() => RefreshActiveRepositories());
                 context.UIContextChanged -= ContextChanged;
-                log.Information("Initialized VSGitExt on UIContextChanged");
+                log.Debug("Initialized VSGitExt on UIContextChanged");
             }
         }
 
@@ -86,11 +86,11 @@ namespace GitHub.VisualStudio.Base
                     }
                 };
 
-                log.Information("Found IGitExt service and initialized VSGitExt");
+                log.Debug("Found IGitExt service and initialized VSGitExt");
                 return true;
             }
 
-            log.Information("Couldn't find IGitExt service");
+            log.Error("Couldn't find IGitExt service");
             return false;
         }
 
