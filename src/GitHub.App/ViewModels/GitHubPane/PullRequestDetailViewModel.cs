@@ -35,6 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
+        readonly IStatusBarNotificationService statusBarNotificationService;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -67,19 +68,22 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
-            ITeamExplorerContext teamExplorerContext)
+            ITeamExplorerContext teamExplorerContext,
+            IStatusBarNotificationService statusBarNotificationService)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
+            Guard.ArgumentNotNull(statusBarNotificationService, nameof(statusBarNotificationService));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
+            this.statusBarNotificationService = statusBarNotificationService;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -687,7 +691,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var complete = await pullRequestsService.SyncSubmodules(LocalRepository, line =>
                 {
                     writer.WriteLine(line);
-                    SetStatus(line);
+                    statusBarNotificationService.ShowMessage(line);
                 });
                 if (!complete)
                 {
@@ -697,27 +701,7 @@ namespace GitHub.ViewModels.GitHubPane
             finally
             {
                 IsBusy = false;
-                SetStatus();
-            }
-        }
-
-        // HACK: This should probably be a `Status` property on `IPanePageViewModel`.
-        void SetStatus(string line = null)
-        {
-            try
-            {
-                if (line != null)
-                {
-                    VisualStudio.Services.Dte.StatusBar.Text = line;
-                }
-                else
-                {
-                    VisualStudio.Services.Dte.StatusBar.Clear();
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "Error writing to StatusBar");
+                statusBarNotificationService.ShowMessage(string.Empty);
             }
         }
 
