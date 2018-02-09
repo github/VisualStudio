@@ -12,7 +12,7 @@ namespace GitHub.InlineReviews
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.PullRequestStatusPackageId)]
     [ProvideAutoLoad(Guids.GitSccProviderId)]
-    public class PullRequestStatusPackage : AsyncPackage
+    public class PullRequestStatusBarPackage : AsyncPackage
     {
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
