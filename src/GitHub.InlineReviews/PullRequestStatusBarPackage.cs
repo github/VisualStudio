@@ -15,6 +15,9 @@ namespace GitHub.InlineReviews
     [ProvideAutoLoad(Guids.GitSccProviderId)]
     public class PullRequestStatusBarPackage : AsyncPackage
     {
+        /// <summary>
+        /// Initialize the PR status UI on Visual Studio's status bar.
+        /// </summary>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));

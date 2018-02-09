@@ -42,6 +42,10 @@ namespace GitHub.InlineReviews.Services
             this.serviceProvider = serviceProvider;
         }
 
+        /// <summary>
+        /// Lazily initialize when user enters the context of a GitHub repository.
+        /// </summary>
+        /// <param name="window">Visual Studio's main window.</param>
         public void Initialize(Window window)
         {
             mainWindow = window;
