@@ -119,24 +119,13 @@ namespace UnitTests.GitHub.App.Models
 
         public static byte[] BitmapSourceToBytes(BitmapSource image)
         {
-            byte[] data = new byte[] { };
-            if (image != null)
+            var encoder = new BmpBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            using (MemoryStream ms = new MemoryStream())
             {
-                try
-                {
-                    var encoder = new BmpBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(image));
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        encoder.Save(ms);
-                        data = ms.ToArray();
-                    }
-                    return data;
-                }
-                catch { }
+                encoder.Save(ms);
+                return ms.ToArray();
             }
-
-            return data;
         }
     }
 }
