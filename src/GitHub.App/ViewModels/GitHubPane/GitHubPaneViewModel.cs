@@ -379,7 +379,7 @@ namespace GitHub.ViewModels.GitHubPane
             var repositoryUrl = repository.CloneUrl.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             var client = await apiClientFactory.Create(repository.CloneUrl);
-            var isEnterprise = isDotCom ? false : client.IsEnterprise();
+            var isEnterprise = isDotCom ? false : await client.IsEnterprise();
 
             if ((isDotCom || isEnterprise) && await IsValidRepository(client))
             {
