@@ -269,11 +269,13 @@
     <Compile Include="GitHub.VisualStudio\Services\JsonConnectionCacheTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
-    <Compile Include="GitHub.VisualStudio\Services\UsageTrackerTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\MetricsTests.cs" />
     <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
+    <Compile Include="Helpers\RepositoryHelpers.cs" />
+    <Compile Include="Helpers\SimpleJson.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -286,6 +288,9 @@
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\TestImageCache.cs" />
+    <Compile Include="..\..\src\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
