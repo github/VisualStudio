@@ -16,7 +16,7 @@ namespace GitHub.InlineReviews
         {
             var componentModel = (IComponentModel)GetService(typeof(SComponentModel));
             var exportProvider = componentModel.DefaultExportProvider;
-            var pullRequestStatusManager = exportProvider.GetExportedValue<IPullRequestStatusManager>();
+            var pullRequestStatusManager = exportProvider.GetExportedValue<IPullRequestStatusBarManager>();
             pullRequestStatusManager.Initialize();
         }
     }

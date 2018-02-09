@@ -1,6 +1,6 @@
 ﻿namespace GitHub.InlineReviews.Services
 {
-    public interface IPullRequestStatusManager
+    public interface IPullRequestStatusBarManager
     {
         void Initialize();
     }

@@ -16,10 +16,10 @@ using Serilog;
 
 namespace GitHub.InlineReviews.Services
 {
-    [Export(typeof(IPullRequestStatusManager))]
-    public class PullRequestStatusManager : IPullRequestStatusManager
+    [Export(typeof(IPullRequestStatusBarManager))]
+    public class PullRequestStatusBarManager : IPullRequestStatusBarManager
     {
-        static readonly ILogger log = LogManager.ForContext<PullRequestStatusManager>();
+        static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
         readonly IGitHubServiceProvider serviceProvider;
@@ -28,7 +28,7 @@ namespace GitHub.InlineReviews.Services
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestStatusManager(IGitHubServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager, IUsageTracker usageTracker)
+        public PullRequestStatusBarManager(IGitHubServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager, IUsageTracker usageTracker)
             : this()
         {
             this.serviceProvider = serviceProvider;
@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Services
             this.usageTracker = usageTracker;
         }
 
-        public PullRequestStatusManager()
+        public PullRequestStatusBarManager()
         {
             mainWindow = Application.Current.MainWindow;
         }
