@@ -34,7 +34,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    
+
     <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
         <Button
             Foreground="{DynamicResource VsBrush.StatusBarText}"
@@ -55,7 +55,9 @@
             </StackPanel>
         </Button>
         <Grid.ToolTip>
-            <TextBlock Text="{Binding Title}" />
+            <TextBlock VerticalAlignment="Center">
+                    #<Run Text="{Binding Number}" /> - <Run Text="{Binding Title}" />
+            </TextBlock>
         </Grid.ToolTip>
     </Grid>
 </UserControl>
