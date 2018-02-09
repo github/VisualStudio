@@ -13,6 +13,11 @@ namespace GitHub.Models
         int Id { get; }
 
         /// <summary>
+        /// Gets the GraphQL ID of the comment.
+        /// </summary>
+        string NodeId { get; }
+
+        /// <summary>
         /// Gets the author of the comment.
         /// </summary>
         IAccount User { get; }

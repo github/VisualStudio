@@ -28,7 +28,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="commentId">The ID of the comment.</param>
+        /// <param name="commentId">The REST ID of the comment.</param>
+        /// <param name="commentNodeId">The GraphQL ID of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
         /// <param name="user">The author of the comment.</param>
@@ -39,12 +40,13 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             int commentId,
+            string commentNodeId,
             string body,
             CommentEditState state,
             IAccount user,
             DateTimeOffset updatedAt,
             bool isPending)
-            : base(thread, currentUser, commentId, body, state, user, updatedAt)
+            : base(thread, currentUser, commentId, commentNodeId, body, state, user, updatedAt)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
@@ -76,7 +78,7 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             IPullRequestReviewCommentModel model)
-            : this(session, thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt, model.IsPending)
+            : this(session, thread, currentUser, model.Id, model.NodeId, model.Body, CommentEditState.None, model.User, model.CreatedAt, model.IsPending)
         {
         }
 
@@ -96,6 +98,7 @@ namespace GitHub.InlineReviews.ViewModels
                 thread,
                 currentUser,
                 0,
+                null,
                 string.Empty,
                 CommentEditState.Placeholder,
                 currentUser,

@@ -163,15 +163,37 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo)
+        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+            string body,
+            string path,
+            int position,
+            int inReplyTo,
+            string inReplyToNodeId)
         {
-            var model = await service.PostReviewCommentRepy(
-                LocalRepository,
-                RepositoryOwner,
-                User,
-                PullRequest.Number,
-                body,
-                inReplyTo);
+            IPullRequestReviewCommentModel model;
+
+            if (!HasPendingReview)
+            {
+                model = await service.PostReviewCommentRepy(
+                    LocalRepository,
+                    RepositoryOwner,
+                    User,
+                    PullRequest.Number,
+                    body,
+                    inReplyTo);
+            }
+            else
+            {
+                model = await service.PostPendingReviewCommentReply(
+                    LocalRepository,
+                    User,
+                    pendingReviewId,
+                    body,
+                    path,
+                    position,
+                    inReplyToNodeId);
+            }
+
             await AddComment(model);
             return model;
         }

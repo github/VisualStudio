@@ -237,6 +237,15 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position);
 
+        Task<IPullRequestReviewCommentModel> PostPendingReviewCommentReply(
+            ILocalRepositoryModel localRepository,
+            IAccount user,
+            string pendingReviewId,
+            string body,
+            string path,
+            int position,
+            string inReplyTo);
+
         /// <summary>
         /// Posts a new standalone PR review comment.
         /// </summary>

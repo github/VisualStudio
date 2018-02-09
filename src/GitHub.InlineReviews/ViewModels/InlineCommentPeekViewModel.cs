@@ -170,7 +170,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (thread != null)
             {
-                Thread = new InlineCommentThreadViewModel(session, thread.Comments);
+                Thread = new InlineCommentThreadViewModel(session, file, thread.LineNumber, leftBuffer, thread.Comments);
             }
             else
             {

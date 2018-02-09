@@ -624,6 +624,7 @@ namespace GitHub.Services
                     (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
                     {
                         Id = x.Id,
+                        NodeId = x.NodeId,
                         PullRequestReviewId = x.PullRequestReviewId,
                         Path = x.Path,
                         Position = x.Position,
@@ -906,6 +907,7 @@ namespace GitHub.Services
             public PullRequestReviewCommentCacheItem(IPullRequestReviewCommentModel comment)
             {
                 Id = comment.Id;
+                NodeId = comment.NodeId;
                 PullRequestReviewId = comment.PullRequestReviewId;
                 Path = comment.Path;
                 Position = comment.Position;
@@ -924,6 +926,7 @@ namespace GitHub.Services
             }
 
             public int Id { get; }
+            public string NodeId { get; }
             public long PullRequestReviewId { get; set; }
             public string Path { get; set; }
             public int? Position { get; set; }

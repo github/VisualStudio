@@ -147,7 +147,7 @@ Line 4";
                 var service = Substitute.For<IPullRequestSessionService>();
                 var target = CreateTarget(service, "fork", "owner");
 
-                await target.PostReviewComment("New Comment", 1);
+                await target.PostReviewComment("New Comment", null, 1, "1");
 
                 await service.Received(1).PostReviewCommentRepy(
                     Arg.Any<ILocalRepositoryModel>(),

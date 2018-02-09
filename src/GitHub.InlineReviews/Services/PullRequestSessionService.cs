@@ -455,6 +455,50 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> PostPendingReviewCommentReply(
+            ILocalRepositoryModel localRepository,
+            IAccount user,
+            string pendingReviewId,
+            string body,
+            string path,
+            int position,
+            string inReplyTo)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var comment = new AddPullRequestReviewCommentInput
+            {
+                Body = body,
+                InReplyTo = inReplyTo,
+                Path = path,
+                Position = position,
+                PullRequestReviewId = pendingReviewId,
+            };
+
+            var addComment = new Mutation()
+                .AddPullRequestReviewComment(comment)
+                .Select(x => new PullRequestReviewCommentModel
+                {
+                    Id = x.Comment.DatabaseId.Value,
+                    NodeId = x.Comment.Id,
+                    Body = x.Comment.Body,
+                    CommitId = x.Comment.Commit.Oid,
+                    Path = x.Comment.Path,
+                    Position = x.Comment.Position,
+                    CreatedAt = x.Comment.CreatedAt.Value,
+                    DiffHunk = x.Comment.DiffHunk,
+                    OriginalPosition = x.Comment.OriginalPosition,
+                    OriginalCommitId = x.Comment.OriginalCommit.Oid,
+                    PullRequestReviewId = x.Comment.PullRequestReview.DatabaseId.Value,
+                    User = user,
+                    IsPending = true,
+                });
+
+            return await graphql.Run(addComment);
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,

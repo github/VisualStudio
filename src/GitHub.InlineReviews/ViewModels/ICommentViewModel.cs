@@ -24,6 +24,11 @@ namespace GitHub.InlineReviews.ViewModels
         int Id { get; }
 
         /// <summary>
+        /// Gets the GraphQL ID of the comment.
+        /// </summary>
+        string NodeId { get; }
+
+        /// <summary>
         /// Gets or sets the body of the comment.
         /// </summary>
         string Body { get; set; }

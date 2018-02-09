@@ -30,6 +30,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentId">The ID of the comment.</param>
+        /// <param name="commentNodeId">The GraphQL ID of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
         /// <param name="user">The author of the comment.</param>
@@ -38,6 +39,7 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             int commentId,
+            string commentNodeId,
             string body,
             CommentEditState state,
             IAccount user,
@@ -51,6 +53,7 @@ namespace GitHub.InlineReviews.ViewModels
             Thread = thread;
             CurrentUser = currentUser;
             Id = commentId;
+            NodeId = commentNodeId;
             Body = body;
             EditState = state;
             User = user;
@@ -90,7 +93,7 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             ICommentModel model)
-            : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
+            : this(thread, currentUser, model.Id, model.NodeId, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
         }
 
@@ -108,6 +111,7 @@ namespace GitHub.InlineReviews.ViewModels
                 thread,
                 currentUser,
                 0,
+                null,
                 string.Empty,
                 CommentEditState.Placeholder,
                 currentUser,
@@ -144,7 +148,10 @@ namespace GitHub.InlineReviews.ViewModels
             try
             {
                 ErrorMessage = null;
-                Id = (await Thread.PostComment.ExecuteAsyncTask(Body)).Id;
+
+                var model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                Id = model.Id;
+                NodeId = model.NodeId;
                 EditState = CommentEditState.None;
                 UpdatedAt = DateTimeOffset.Now;
             }
@@ -158,6 +165,9 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public int Id { get; private set; }
+
+        /// <inheritdoc/>
+        public string NodeId { get; private set; }
 
         /// <inheritdoc/>
         public string Body
