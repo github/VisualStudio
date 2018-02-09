@@ -15,28 +15,28 @@ namespace GitHub.InlineReviews.UnitTests.Models
             {
                 var chunks = DiffUtilities.ParseFragment("");
 
-				Assert.That(chunks, Is.Empty);
+                Assert.That(chunks, Is.Empty);
             }
 
             [TestCase("@@ -1 +1 @@")]
-			[TestCase("@@ -1 +1,0 @@")]
-			[TestCase("@@ -1,0 +1 @@")]
-			[TestCase("@@ -1,0 +1,0 @@")]
-			[TestCase("@@ -1,0 +1,0 @@ THIS IS A COMMENT THAT WILL BE IGNORED")]
-			public void HeaderOnly_OneChunkNoLines(string header)
+            [TestCase("@@ -1 +1,0 @@")]
+            [TestCase("@@ -1,0 +1 @@")]
+            [TestCase("@@ -1,0 +1,0 @@")]
+            [TestCase("@@ -1,0 +1,0 @@ THIS IS A COMMENT THAT WILL BE IGNORED")]
+            public void HeaderOnly_OneChunkNoLines(string header)
             {
                 var chunks = DiffUtilities.ParseFragment(header);
 
                 Assert.That(chunks, Has.One.Items);
-				var chunk = chunks.First();
-				Assert.That(chunk.Lines, Is.Empty);
+                var chunk = chunks.First();
+                Assert.That(chunk.Lines, Is.Empty);
             }
 
-			[TestCase("@@ -1 +2 @@", 1, 2)]
-			[TestCase("@@ -1 +2,0 @@", 1, 2)]
-			[TestCase("@@ -1,0 +2 @@", 1, 2)]
-			[TestCase("@@ -1,0 +2,0 @@", 1, 2)]
-			[TestCase("@@ -1,0 +2,0 @@ THIS IS A COMMENT THAT WILL BE IGNORED", 1, 2)]
+            [TestCase("@@ -1 +2 @@", 1, 2)]
+            [TestCase("@@ -1 +2,0 @@", 1, 2)]
+            [TestCase("@@ -1,0 +2 @@", 1, 2)]
+            [TestCase("@@ -1,0 +2,0 @@", 1, 2)]
+            [TestCase("@@ -1,0 +2,0 @@ THIS IS A COMMENT THAT WILL BE IGNORED", 1, 2)]
             [TestCase(
 @"diff --git a/src/Foo.cs b/src/Foo.cs
 index b02decb..f7dadae 100644
@@ -44,7 +44,7 @@ index b02decb..f7dadae 100644
 +++ b/src/Foo.cs
 @@ -1 +2 @@", 1, 2)]
 
-			public void HeaderOnly_OldAndNewLineNumbers(string header, int expectOldLineNumber, int expectNewLineNumber)
+            public void HeaderOnly_OldAndNewLineNumbers(string header, int expectOldLineNumber, int expectNewLineNumber)
             {
                 var chunks = DiffUtilities.ParseFragment(header);
                 var chunk = chunks.First();
@@ -63,7 +63,7 @@ index b02decb..f7dadae 100644
                 var chunks = DiffUtilities.ParseFragment(header);
 
                 var chunk = chunks.First();
-				Assert.That(chunk.Lines, Is.Empty);
+                Assert.That(chunk.Lines, Is.Empty);
             }
 
             [Test]
@@ -95,11 +95,11 @@ index b02decb..f7dadae 100644
                 Assert.That(3, Is.EqualTo(line.DiffLineNumber));
             }
 
-			[TestCase("+foo\n+bar\n", "+foo", "+bar")]
-			[TestCase("+fo\ro\n+bar\n", "+fo\ro", "+bar")]
-			[TestCase("+foo\r\r\n+bar\n", "+foo\r", "+bar")]
-			[TestCase("+\\r\n+\r\n", "+\\r", "+")]
-			public void FirstChunk_CheckLineContent(string diffLines, string contentLine0, string contentLine1)
+            [TestCase("+foo\n+bar\n", "+foo", "+bar")]
+            [TestCase("+fo\ro\n+bar\n", "+fo\ro", "+bar")]
+            [TestCase("+foo\r\r\n+bar\n", "+foo\r", "+bar")]
+            [TestCase("+\\r\n+\r\n", "+\\r", "+")]
+            public void FirstChunk_CheckLineContent(string diffLines, string contentLine0, string contentLine1)
             {
                 var header = "@@ -1 +1 @@";
                 var diff = header + "\n" + diffLines;
@@ -110,10 +110,10 @@ index b02decb..f7dadae 100644
                 Assert.That(contentLine1, Is.EqualTo(chunk.Lines[1].Content));
             }
 
-			[TestCase("+foo\n+bar\n", 1, 2)]
-			[TestCase("+fo\ro\n+bar\n", 1, 3)]
-			[TestCase("+foo\r\r\n+bar\n", 1, 3)]
-			public void FirstChunk_CheckNewLineNumber(string diffLines, int lineNumber0, int lineNumber1)
+            [TestCase("+foo\n+bar\n", 1, 2)]
+            [TestCase("+fo\ro\n+bar\n", 1, 3)]
+            [TestCase("+foo\r\r\n+bar\n", 1, 3)]
+            public void FirstChunk_CheckNewLineNumber(string diffLines, int lineNumber0, int lineNumber1)
             {
                 var header = "@@ -1 +1 @@";
                 var diff = header + "\n" + diffLines;
@@ -124,10 +124,10 @@ index b02decb..f7dadae 100644
                 Assert.That(lineNumber1, Is.EqualTo(chunk.Lines[1].NewLineNumber));
             }
 
-			[TestCase("-foo\n-bar\n", 1, 2)]
-			[TestCase("-fo\ro\n-bar\n", 1, 3)]
-			[TestCase("-foo\r\r\n-bar\n", 1, 3)]
-			public void FirstChunk_CheckOldLineNumber(string diffLines, int lineNumber0, int lineNumber1)
+            [TestCase("-foo\n-bar\n", 1, 2)]
+            [TestCase("-fo\ro\n-bar\n", 1, 3)]
+            [TestCase("-foo\r\r\n-bar\n", 1, 3)]
+            public void FirstChunk_CheckOldLineNumber(string diffLines, int lineNumber0, int lineNumber1)
             {
                 var header = "@@ -1 +1 @@";
                 var diff = header + "\n" + diffLines;
@@ -149,8 +149,8 @@ index b02decb..f7dadae 100644
                 Assert.That(expectDiffLine, Is.EqualTo(chunk.DiffLine));
             }
 
-			[TestCase(1, 2)]
-			public void FirstChunk_CheckLineNumbers(int oldLineNumber, int newLineNumber)
+            [TestCase(1, 2)]
+            public void FirstChunk_CheckLineNumbers(int oldLineNumber, int newLineNumber)
             {
                 var header = $"@@ -{oldLineNumber} +{newLineNumber} @@";
 
@@ -160,10 +160,10 @@ index b02decb..f7dadae 100644
                 Assert.That(newLineNumber, Is.EqualTo(chunk.NewLineNumber));
             }
 
-			[TestCase(1, 2, " 1", 1, 2)]
-			[TestCase(1, 2, "+1", -1, 2)]
-			[TestCase(1, 2, "-1", 1, -1)]
-			public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber, string line, int expectOldLineNumber, int expectNewLineNumber)
+            [TestCase(1, 2, " 1", 1, 2)]
+            [TestCase(1, 2, "+1", -1, 2)]
+            [TestCase(1, 2, "-1", 1, -1)]
+            public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber, string line, int expectOldLineNumber, int expectNewLineNumber)
             {
                 var header = $"@@ -{oldLineNumber} +{newLineNumber} @@\n{line}";
 
@@ -174,10 +174,10 @@ index b02decb..f7dadae 100644
                 Assert.That(expectNewLineNumber, Is.EqualTo(diffLine.NewLineNumber));
             }
 
-			[TestCase(" 1", 0, 1)]
-			[TestCase(" 1\n 2", 1, 2)]
-			[TestCase(" 1\n 2\n 3", 2, 3)]
-			public void SkipNLines_CheckDiffLineNumber(string lines, int skip, int expectDiffLineNumber)
+            [TestCase(" 1", 0, 1)]
+            [TestCase(" 1\n 2", 1, 2)]
+            [TestCase(" 1\n 2\n 3", 2, 3)]
+            public void SkipNLines_CheckDiffLineNumber(string lines, int skip, int expectDiffLineNumber)
             {
                 var fragment = $"@@ -1 +1 @@\n{lines}";
 
@@ -187,10 +187,10 @@ index b02decb..f7dadae 100644
                 Assert.That(expectDiffLineNumber, Is.EqualTo(firstLine.DiffLineNumber));
             }
 
-			[TestCase(" FIRST")]
-			[TestCase("+FIRST")]
-			[TestCase("-FIRST")]
-			public void FirstLine_CheckToString(string line)
+            [TestCase(" FIRST")]
+            [TestCase("+FIRST")]
+            [TestCase("-FIRST")]
+            public void FirstLine_CheckToString(string line)
             {
                 var fragment = $"@@ -1 +1 @@\n{line}";
                 var result = DiffUtilities.ParseFragment(fragment);
@@ -201,10 +201,10 @@ index b02decb..f7dadae 100644
                 Assert.That(line, Is.EqualTo(str));
             }
 
-			[TestCase(" FIRST")]
-			[TestCase("+FIRST")]
-			[TestCase("-FIRST")]
-			public void FirstLine_CheckContent(string line)
+            [TestCase(" FIRST")]
+            [TestCase("+FIRST")]
+            [TestCase("-FIRST")]
+            public void FirstLine_CheckContent(string line)
             {
                 var fragment = $"@@ -1,4 +1,4 @@\n{line}";
 
@@ -214,10 +214,10 @@ index b02decb..f7dadae 100644
                 Assert.That(line, Is.EqualTo(firstLine.Content));
             }
 
-			[TestCase(" FIRST", DiffChangeType.None)]
-			[TestCase("+FIRST", DiffChangeType.Add)]
-			[TestCase("-FIRST", DiffChangeType.Delete)]
-			public void FirstLine_CheckDiffChangeTypes(string line, DiffChangeType expectType)
+            [TestCase(" FIRST", DiffChangeType.None)]
+            [TestCase("+FIRST", DiffChangeType.Add)]
+            [TestCase("-FIRST", DiffChangeType.Delete)]
+            public void FirstLine_CheckDiffChangeTypes(string line, DiffChangeType expectType)
             {
                 var fragment = $"@@ -1 +1 @@\n{line}";
 
@@ -227,8 +227,8 @@ index b02decb..f7dadae 100644
                 Assert.That(expectType, Is.EqualTo(firstLine.Type));
             }
 
-			[TestCase("?FIRST", "Invalid diff line change char: '?'.")]
-			public void InvalidDiffLineChangeChar(string line, string expectMessage)
+            [TestCase("?FIRST", "Invalid diff line change char: '?'.")]
+            public void InvalidDiffLineChangeChar(string line, string expectMessage)
             {
                 var fragment = $"@@ -1,4 +1,4 @@\n{line}";
 
@@ -262,6 +262,10 @@ index b02decb..f7dadae 100644
             [TestCase("+a.+x.+x.+b.+x.+x.", "+a.+x.", 2)]
             [TestCase("+a.+x.+x.+b.+x.+x.", "+b.+x.", 5)]
             [TestCase("+a.+b.+x", "+a.+x.", -1)] // backtrack when there is a failed match
+
+            // Tests for https://github.com/github/VisualStudio/issues/1469
+            [TestCase(" 1.+2.+3.+4.", "+1.+2.+3.+4.", -1)] // match all 4 lines
+            [TestCase(" 1.+2.+3.+4.+5.", "+1.+2.+3.+4.+5.", 5)] // match a maximum of 4 lines
             public void MatchLine(string diffLines, string matchLines, int expectedDiffLineNumber /* -1 for no match */)
             {
                 var header = "@@ -1 +1 @@";
@@ -321,7 +325,7 @@ index b02decb..f7dadae 100644
             public void ReadLines(string text, string[] expectLines)
             {
                 var lineReader = new DiffUtilities.LineReader(text);
-            
+
                 foreach (var expectLine in expectLines)
                 {
                     var line = lineReader.ReadLine();
