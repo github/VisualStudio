@@ -11,7 +11,7 @@ namespace GitHub.Api
         UriString OriginalUrl { get; }
         Task<Repository> GetRepository();
         bool HasWiki();
-        bool IsEnterprise();
+        Task<bool> IsEnterprise();
         bool IsAuthenticated();
     }
 }
