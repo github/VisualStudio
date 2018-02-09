@@ -460,8 +460,6 @@ namespace GitHub.InlineReviews.Services
             IAccount user,
             string pendingReviewId,
             string body,
-            string path,
-            int position,
             string inReplyTo)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
@@ -471,8 +469,6 @@ namespace GitHub.InlineReviews.Services
             {
                 Body = body,
                 InReplyTo = inReplyTo,
-                Path = path,
-                Position = position,
                 PullRequestReviewId = pendingReviewId,
             };
 

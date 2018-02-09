@@ -19,7 +19,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var target = new InlineCommentThreadViewModel(
                 Substitute.For<IPullRequestSession>(),
-                Substitute.For<IPullRequestSessionFile>(),
                 CreateComments("Comment 1", "Comment 2"));
 
             Assert.That(3, Is.EqualTo(target.Comments.Count));
@@ -47,7 +46,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var target = new InlineCommentThreadViewModel(
                 Substitute.For<IPullRequestSession>(),
-                Substitute.For<IPullRequestSessionFile>(),
                 CreateComments("Comment 1"));
 
             Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.False);
@@ -62,13 +60,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var session = CreateSession();
             var target = new InlineCommentThreadViewModel(
                 session,
-                Substitute.For<IPullRequestSessionFile>(),
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";
             target.Comments[2].CommitEdit.Execute(null);
 
-            session.Received(1).PostReviewComment("New Comment", null, 1, "1");
+            session.Received(1).PostReviewComment("New Comment", 1, "1");
         }
 
         IApiClient CreateApiClient()

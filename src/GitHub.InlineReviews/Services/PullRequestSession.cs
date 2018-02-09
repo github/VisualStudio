@@ -165,8 +165,6 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
-            string path,
-            int position,
             int inReplyTo,
             string inReplyToNodeId)
         {
@@ -189,8 +187,6 @@ namespace GitHub.InlineReviews.Services
                     User,
                     pendingReviewId,
                     body,
-                    path,
-                    position,
                     inReplyToNodeId);
             }
 

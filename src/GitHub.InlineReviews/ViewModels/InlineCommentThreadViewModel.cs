@@ -26,18 +26,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="session">The current PR review session.</param>
         public InlineCommentThreadViewModel(
             IPullRequestSession session,
-            IPullRequestSessionFile file,
-            int lineNumber,
-            bool leftComparisonBuffer,
             IEnumerable<IPullRequestReviewCommentModel> comments)
             : base(session.User)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
             Session = session;
-            File = file;
-            LineNumber = lineNumber;
-            LeftComparisonBuffer = leftComparisonBuffer;
 
             PostComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(true),
@@ -50,21 +44,6 @@ namespace GitHub.InlineReviews.ViewModels
 
             Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
         }
-
-        /// <summary>
-        /// Gets the file that the comment are on.
-        /// </summary>
-        public IPullRequestSessionFile File { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether comment is being left on the left-hand-side of a diff.
-        /// </summary>
-        public bool LeftComparisonBuffer { get; }
-
-        /// <summary>
-        /// Gets the 0-based line number in the file that the comment thread is on.
-        /// </summary>
-        public int LineNumber { get; }
 
         /// <summary>
         /// Gets the current pull request review session.
@@ -86,23 +65,10 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            var diffPosition = File.Diff
-                .SelectMany(x => x.Lines)
-                .FirstOrDefault(x =>
-                {
-                    var line = LeftComparisonBuffer ? x.OldLineNumber : x.NewLineNumber;
-                    return line == LineNumber + 1;
-                });
-
-            if (diffPosition == null)
-            {
-                throw new InvalidOperationException("Unable to locate line in diff.");
-            }
-
             var body = (string)parameter;
             var replyId = Comments[0].Id;
             var nodeId = Comments[0].NodeId;
-            return await Session.PostReviewComment(body, File.RelativePath, diffPosition.DiffLineNumber, replyId, nodeId);
+            return await Session.PostReviewComment(body, replyId, nodeId);
         }
     }
 }

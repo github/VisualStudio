@@ -242,8 +242,6 @@ namespace GitHub.InlineReviews.Services
             IAccount user,
             string pendingReviewId,
             string body,
-            string path,
-            int position,
             string inReplyTo);
 
         /// <summary>
