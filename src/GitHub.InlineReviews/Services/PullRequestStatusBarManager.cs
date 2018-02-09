@@ -11,8 +11,10 @@ using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.Models;
 using GitHub.Logging;
+using GitHub.Helpers;
 using GitHub.Extensions;
 using Serilog;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -22,29 +24,54 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
-        readonly IGitHubServiceProvider serviceProvider;
+        readonly IVSGitExt gitExt;
         readonly Window mainWindow;
-        readonly IPullRequestSessionManager pullRequestSessionManager;
+        readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly IUsageTracker usageTracker;
+        readonly IGitHubServiceProvider serviceProvider;
+
+        bool initialized;
 
         [ImportingConstructor]
-        public PullRequestStatusBarManager(IGitHubServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager, IUsageTracker usageTracker)
-            : this()
+        public PullRequestStatusBarManager(IVSGitExt gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
+            IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
         {
-            this.serviceProvider = serviceProvider;
+            this.gitExt = gitExt;
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.usageTracker = usageTracker;
-        }
-
-        public PullRequestStatusBarManager()
-        {
+            this.serviceProvider = serviceProvider;
             mainWindow = Application.Current.MainWindow;
         }
 
         public void Initialize()
         {
-            RefreshCurrentSession();
-            pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+            TryInitialize();
+            gitExt.ActiveRepositoriesChanged += TryInitialize;
+        }
+
+        void TryInitialize()
+        {
+            if (!initialized && gitExt.ActiveRepositories.Count > 0)
+            {
+                initialized = true;
+                InitializeAsync().Forget();
+                gitExt.ActiveRepositoriesChanged -= TryInitialize;
+            }
+        }
+
+        async Task InitializeAsync()
+        {
+            try
+            {
+                await ThreadingHelper.SwitchToMainThreadAsync(); // Switch from VSGitExt to Main thread
+
+                RefreshCurrentSession();
+                pullRequestSessionManager.Value.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error initializing");
+            }
         }
 
         void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -57,7 +84,7 @@ namespace GitHub.InlineReviews.Services
 
         void RefreshCurrentSession()
         {
-            var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
+            var pullRequest = pullRequestSessionManager.Value.CurrentSession?.PullRequest;
             var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(pullRequest) : null;
             ShowStatus(viewModel);
         }
