@@ -1,7 +1,9 @@
-﻿namespace GitHub.InlineReviews.Services
+﻿using System.Windows;
+
+namespace GitHub.InlineReviews.Services
 {
     public interface IPullRequestStatusBarManager
     {
-        void Initialize();
+        void Initialize(Window mainWindow);
     }
 }

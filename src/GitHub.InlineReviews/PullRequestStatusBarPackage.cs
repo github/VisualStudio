@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
@@ -19,7 +20,7 @@ namespace GitHub.InlineReviews
             var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));
             var exportProvider = componentModel.DefaultExportProvider;
             var pullRequestStatusManager = exportProvider.GetExportedValue<IPullRequestStatusBarManager>();
-            pullRequestStatusManager.Initialize();
+            pullRequestStatusManager.Initialize(Application.Current.MainWindow);
         }
     }
 }

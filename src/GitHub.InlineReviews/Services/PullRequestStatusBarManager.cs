@@ -25,11 +25,11 @@ namespace GitHub.InlineReviews.Services
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
         readonly IVSGitExt gitExt;
-        readonly Window mainWindow;
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly IUsageTracker usageTracker;
         readonly IGitHubServiceProvider serviceProvider;
 
+        Window mainWindow;
         bool initialized;
 
         [ImportingConstructor]
@@ -40,11 +40,11 @@ namespace GitHub.InlineReviews.Services
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.usageTracker = usageTracker;
             this.serviceProvider = serviceProvider;
-            mainWindow = Application.Current.MainWindow;
         }
 
-        public void Initialize()
+        public void Initialize(Window window)
         {
+            mainWindow = window;
             TryInitialize();
             gitExt.ActiveRepositoriesChanged += TryInitialize;
         }
