@@ -1,9 +1,7 @@
-﻿using System;
-using System.Reflection;
-
-namespace GitHub.Models
+﻿namespace GitHub.Models
 {
-    public class UsageModel
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "It'll use reflection by default and we're fine with that")]
+    public struct UsageModel
     {
         public bool IsGitHubUser { get; set; }
         public bool IsEnterpriseUser { get; set; }
@@ -30,6 +28,7 @@ namespace GitHub.Models
         public int NumberOfForkPullRequestsCheckedOut { get; set; }
         public int NumberOfForkPullRequestPulls { get; set; }
         public int NumberOfForkPullRequestPushes { get; set; }
+        public int NumberOfSyncSubmodules { get; set; }
         public int NumberOfWelcomeDocsClicks { get; set; }
         public int NumberOfWelcomeTrainingClicks { get; set; }
         public int NumberOfGitHubPaneHelpClicks { get; set; }
@@ -43,25 +42,27 @@ namespace GitHub.Models
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
+            var result = this;
+            if (!includeWeekly)
+                result.NumberOfStartupsWeek = 0;
+            if (!includeMonthly)
+                result.NumberOfStartupsMonth = 0;
+            return result;
+        }
+
+        public UsageModel ClearCounters(bool clearWeekly, bool clearMonthly)
+        {
             var result = new UsageModel();
-            var properties = result.GetType().GetRuntimeProperties();
+            if (!clearWeekly)
+                result.NumberOfStartupsWeek = NumberOfStartupsWeek;
+            if (!clearMonthly)
+                result.NumberOfStartupsMonth = NumberOfStartupsMonth;
 
-            foreach (var property in properties)
-            {
-                var cloneValue = property.PropertyType == typeof(int);
-
-                if (property.Name == nameof(result.NumberOfStartupsWeek))
-                    cloneValue = includeWeekly;
-                else if (property.Name == nameof(result.NumberOfStartupsMonth))
-                    cloneValue = includeMonthly;
-
-                if (cloneValue)
-                {
-                    var value = property.GetValue(this);
-                    property.SetValue(result, value);
-                }
-            }
-
+            result.IsGitHubUser = IsGitHubUser;
+            result.IsEnterpriseUser = IsEnterpriseUser;
+            result.AppVersion = AppVersion;
+            result.VSVersion = VSVersion;
+            result.Lang = Lang;
             return result;
         }
     }

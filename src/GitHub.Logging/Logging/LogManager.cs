@@ -21,7 +21,11 @@ namespace GitHub.Logging
 
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()
+#if DEBUG
+                .MinimumLevel.Debug()
+#else
                 .MinimumLevel.Information()
+#endif
                 .WriteTo.File(logPath,
                     fileSizeLimitBytes: null,
                     outputTemplate: outputTemplate)
