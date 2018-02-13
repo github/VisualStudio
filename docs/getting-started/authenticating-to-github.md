@@ -20,11 +20,11 @@ Before you authenticate, you must already have a GitHub or GitHub Enterprise acc
 4. In the **Connect to GitHub dialog** choose **GitHub** or **GitHub Enterprise**, depending on which product you're using.
 
 - **GitHub option**:  
-  ![Connect to GitHub dialog view](images/connect-to-github.png)
+  ![Connect to GitHub dialog view](images/connect-to-github-dialog.png)
   - To sign in with credentials, enter either username or email and password.
   - To sign in with SSO, select `Sign in with your browser`.
 
 - **GitHub Enterprise option**:  
-  ![Connect to GitHub Enterprise dialog view](images/connect-to-github-enterprise.png)
+  ![Connect to GitHub Enterprise dialog view](images/connect-to-github-enterprise-dialog.png)
   - To sign in with credentials, first enter GitHub Enterprise server address. Once a valid server address is entered, a `Token` field appears and a valid token can be entered to sign in.
   - To sign in with SSO, first enter the GitHub Enterprise server address. Once a valid server address is entered, select `Sign in with your browser`. Follow the steps to authenticate with your SSO provider.
