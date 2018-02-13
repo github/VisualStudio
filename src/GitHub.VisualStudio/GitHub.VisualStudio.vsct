@@ -191,6 +191,16 @@
           <ButtonText>Blame</ButtonText>
         </Strings>
       </Button>
+      
+      <Button guid="guidContextMenuSet" id="openFileInSolutionCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Open File in Solution</ButtonText>
+        </Strings>
+      </Button>
 
     </Buttons>
 
@@ -232,6 +242,9 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
+    <CommandPlacement guid="guidContextMenuSet" id="openFileInSolutionCommand" priority="0x1000">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
+    </CommandPlacement>
 
     <!-- Standard toolbar commands -->
     <CommandPlacement guid="guidGitHubToolbarCmdSet" id="backCommand" priority="0x100">
@@ -320,9 +333,9 @@
       <IDSymbol name="idGitHubContextSubMenuGroup" value="0x1002" />
       <IDSymbol name="openLinkCommand" value="0x100" />
       <IDSymbol name="copyLinkCommand" value="0x101"/>
+      <IDSymbol name="openFileInSolutionCommand" value="0x0102" />
       <IDSymbol name="idCreateGistCommand" value="0x0400" />
       <IDSymbol name="idBlameCommand" value="0x0500" />
-
     </GuidSymbol>
 
     <GuidSymbol name="GUID_XAML_EDITOR" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">

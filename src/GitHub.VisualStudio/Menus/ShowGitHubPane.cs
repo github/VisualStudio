@@ -17,7 +17,7 @@ namespace GitHub.VisualStudio.Menus
 
         public void Activate(object data = null)
         {
-            ServiceProvider.TryGetService<IGitHubToolWindowManager>()?.ShowHomePane();
+            ServiceProvider.TryGetService<IGitHubToolWindowManager>()?.ShowGitHubPane();
         }
     }
 }

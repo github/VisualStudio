@@ -55,7 +55,7 @@ public class ImageCacheTests
             Assert.That(retrieved, Is.Null);
             Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
         }
-        
+
         [Test]
         public async Task DownloadsImageWhenMissingAndCachesIt()
         {
@@ -76,7 +76,7 @@ public class ImageCacheTests
         }
 
         [Test]
-        public async Task ThrowsKeyNotFoundExceptionWhenItemNotInCacheAndImageFetchThrowsException()
+        public void ThrowsKeyNotFoundExceptionWhenItemNotInCacheAndImageFetchThrowsException()
         {
             var imageUri = new Uri("https://example.com/poop.gif");
             var cacheFactory = Substitute.For<IBlobCacheFactory>();
@@ -91,7 +91,7 @@ public class ImageCacheTests
         }
 
         [Test]
-        public async Task ThrowsKeyNotFoundExceptionWhenItemNotInCacheAndImageFetchReturnsEmpty()
+        public void ThrowsKeyNotFoundExceptionWhenItemNotInCacheAndImageFetchReturnsEmpty()
         {
             var imageUri = new Uri("https://example.com/poop.gif");
             var cache = new InMemoryBlobCache();
