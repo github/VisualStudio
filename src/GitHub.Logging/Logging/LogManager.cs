@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
 using GitHub.Info;
 using Serilog;
 using Serilog.Core;
@@ -20,7 +21,11 @@ namespace GitHub.Logging
 
             return new LoggerConfiguration()
                 .Enrich.WithThreadId()
+#if DEBUG
+                .MinimumLevel.Debug()
+#else
                 .MinimumLevel.Information()
+#endif
                 .WriteTo.File(logPath,
                     fileSizeLimitBytes: null,
                     outputTemplate: outputTemplate)
@@ -29,10 +34,8 @@ namespace GitHub.Logging
 
         static Lazy<Logger> Logger { get; } = new Lazy<Logger>(CreateLogger);
 
-        //Violates CA1004 - Generic methods should provide type parameter
-#pragma warning disable CA1004
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         public static ILogger ForContext<T>() => ForContext(typeof(T));
-#pragma warning restore CA1004
 
         public static ILogger ForContext(Type type) => Logger.Value.ForContext(type).ForContext("ShortSourceContext", type.Name);
     }

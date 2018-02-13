@@ -157,7 +157,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`");
+                log.Warning(e, "Failed to retrieve host name using `DNS.GetHostName`");
                 try
                 {
                     return Environment.MachineName;
@@ -242,7 +242,8 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(name, nameof(name));
 
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
-                new PullRequestRequest {
+                new PullRequestRequest
+                {
                     State = ItemStateFilter.All,
                     SortProperty = PullRequestSort.Updated,
                     SortDirection = SortDirection.Descending
@@ -268,7 +269,7 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
             Guard.ArgumentNotEmptyString(repo, nameof(repo));
 
-#pragma warning disable CS0618
+#pragma warning disable 618
             // GetAllBranches is obsolete, but don't want to introduce the change to fix the
             // warning in the PR, so disabling for now.
             return gitHubClient.Repository.GetAllBranches(owner, repo);

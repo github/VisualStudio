@@ -97,6 +97,18 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t find Git.exe on PATH.
+        ///
+        ///Please install Git for Windows from:
+        ///https://git-scm.com/download/win.
+        /// </summary>
+        internal static string CouldntFindGitOnPath {
+            get {
+                return ResourceManager.GetString("CouldntFindGitOnPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create a GitHub Gist.
         /// </summary>
         internal static string CreateGistTitle {
@@ -498,6 +510,15 @@ namespace GitHub.App {
         internal static string SourceRepositoryNoLongerAvailable {
             get {
                 return ResourceManager.GetString("SourceRepositoryNoLongerAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync {0} submodules.
+        /// </summary>
+        internal static string SyncSubmodules {
+            get {
+                return ResourceManager.GetString("SyncSubmodules", resourceCulture);
             }
         }
         

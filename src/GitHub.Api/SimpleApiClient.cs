@@ -72,7 +72,7 @@ namespace GitHub.Api
                         if (repo != null)
                         {
                             hasWiki = await HasWikiInternal(repo);
-                            isEnterprise = await IsEnterpriseInternal();
+                            isEnterprise = isEnterprise ?? await IsEnterpriseInternal();
                             repositoryCache = repo;
                         }
                         owner = ownerLogin;
@@ -99,9 +99,14 @@ namespace GitHub.Api
             return hasWiki.HasValue && hasWiki.Value;
         }
 
-        public bool IsEnterprise()
+        public async Task<bool> IsEnterprise()
         {
-            return isEnterprise.HasValue && isEnterprise.Value;
+            if (!isEnterprise.HasValue)
+            {
+                isEnterprise = await IsEnterpriseInternal();
+            }
+
+            return isEnterprise ?? false;
         }
 
         async Task<bool> HasWikiInternal(Repository repo)
