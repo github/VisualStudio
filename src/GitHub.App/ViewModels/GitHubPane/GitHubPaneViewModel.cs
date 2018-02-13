@@ -46,6 +46,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
+        bool initialized;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -198,26 +200,37 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
-            await UpdateContent(teamExplorerContext.ActiveRepository);
-            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
-               .Skip(1)
-               .ObserveOn(RxApp.MainThreadScheduler)
-               .Subscribe(x => UpdateContent(x).Forget());
+            await initializing.WaitAsync();
+            if (initialized) return;
 
-            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+            try
+            {
+                await UpdateContent(teamExplorerContext.ActiveRepository);
+                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                   .Skip(1)
+                   .ObserveOn(RxApp.MainThreadScheduler)
+                   .Subscribe(x => UpdateContent(x).Forget());
 
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+                connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
 
-            paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                 (_, __) =>
-                 {
-                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
-                 });
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+
+                paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                     (_, __) =>
+                     {
+                         browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                         usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+                     });
+            }
+            finally
+            {
+                initialized = true;
+                initializing.Release();
+            }
         }
 
         /// <inheritdoc/>
@@ -366,7 +379,7 @@ namespace GitHub.ViewModels.GitHubPane
             var repositoryUrl = repository.CloneUrl.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             var client = await apiClientFactory.Create(repository.CloneUrl);
-            var isEnterprise = isDotCom ? false : client.IsEnterprise();
+            var isEnterprise = isDotCom ? false : await client.IsEnterprise();
 
             if ((isDotCom || isEnterprise) && await IsValidRepository(client))
             {
