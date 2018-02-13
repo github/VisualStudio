@@ -250,7 +250,7 @@ public class LoginManagerTests
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
-          
+
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
@@ -283,7 +283,7 @@ public class LoginManagerTests
         }
 
         [Test]
-        public async Task InvalidResponseScopesCauseException()
+        public void InvalidResponseScopesCauseException()
         {
             var client = CreateClient(responseScopes: new[] { "user", "repo" });
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())

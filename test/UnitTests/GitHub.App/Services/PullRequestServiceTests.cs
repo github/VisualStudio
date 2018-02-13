@@ -616,7 +616,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task MergeBaseNotAvailable_ThrowsNotFoundException()
+        public void MergeBaseNotAvailable_ThrowsNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
