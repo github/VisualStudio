@@ -17,6 +17,8 @@ using GitHub.ViewModels.Dialog;
 
 public class RepositoryCloneViewModelTests
 {
+    const int Timeout = 2000;
+
     static RepositoryCloneViewModel GetVM(IModelService modelService, IRepositoryCloneService cloneService, IOperatingSystem os)
     {
         var connection = Substitute.For<IConnection>();
@@ -70,7 +72,7 @@ public class RepositoryCloneViewModelTests
                 Substitute.For<IOperatingSystem>());
 
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
-            await col.OriginalCompleted;
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
             Assert.That(3, Is.EqualTo(vm.Repositories.Count));
         }
     }
@@ -102,14 +104,14 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnNext(Substitute.For<IRemoteRepositoryModel>());
             repoSubject.OnNext(Substitute.For<IRemoteRepositoryModel>());
 
-            await done;
+            await done.Timeout(TimeSpan.FromMilliseconds(500));
             done = null;
 
             Assert.True(vm.IsBusy);
 
             repoSubject.OnCompleted();
 
-            await col.OriginalCompleted;
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));;
 
             // we need to wait slightly because the subscription OnComplete in the model
             // runs right after the above await finishes, which means the assert
@@ -185,7 +187,7 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnCompleted();
 
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
-            await col.OriginalCompleted;
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
             //Assert.Single(vm.Repositories);
             Assert.False(vm.NoRepositoriesFound);
         }
