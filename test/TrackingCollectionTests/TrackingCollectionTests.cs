@@ -19,7 +19,7 @@ using GitHub;
 public class TrackingTests : TestBase
 {
 #if !DISABLE_REACTIVE_UI
-    [TestFixtureSetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
         Splat.ModeDetector.Current.SetInUnitTestRunner(true);
