@@ -188,7 +188,6 @@ namespace GitHub.Collections
         IConnectableObservable<T> dataPump;
         IConnectableObservable<Unit> cachePump;
         ConcurrentQueue<ActionData> cache;
-        Queue<ActionData> processingQueue;
 
         ReplaySubject<Unit> signalHaveData;
         ReplaySubject<Unit> signalNeedData;
@@ -213,7 +212,6 @@ namespace GitHub.Collections
         readonly Dictionary<T, int> filteredIndexCache = new Dictionary<T, int>();
 
         bool originalSourceIsCompleted;
-        bool signaledOriginalSourceCompletion;
         bool sourceHasData;
         ReplaySubject<Unit> originalSourceCompleted;
         public IObservable<Unit> OriginalCompleted => originalSourceCompleted;
@@ -239,7 +237,6 @@ namespace GitHub.Collections
             Func<T, T, int> newer = null, IScheduler scheduler = null)
         {
             cache = new ConcurrentQueue<ActionData>();
-            processingQueue = new Queue<ActionData>();
             ProcessingDelay = TimeSpan.FromMilliseconds(10);
             fuzziness = TimeSpan.FromMilliseconds(1);
 
@@ -303,8 +300,13 @@ namespace GitHub.Collections
                     originalSourceIsCompleted = true;
                     if (!sourceHasData)
                     {
-                        var end = new ActionData(TheAction.End, null);
-                        dataListener.OnNext(end);
+                        originalSourceCompleted.OnNext(Unit.Default);
+                        originalSourceCompleted.OnCompleted();
+                    }
+                    else
+                    {
+                        cache.Enqueue(new ActionData(TheAction.End, null));
+                        signalHaveData.OnNext(Unit.Default);
                     }
                 })
                 .Publish();
@@ -323,7 +325,6 @@ namespace GitHub.Collections
                     var data = GetFromQueue();
                     if (!data.Equals(ActionData.Default))
                     {
-                        processingQueue.Enqueue(data);
                         dataListener.OnNext(data);
                     }
                     return Unit.Default;
@@ -360,32 +361,13 @@ namespace GitHub.Collections
                 })
                 .Do(data =>
                 {
-                    // only objects coming from the original observable go into this queue
-                    if (processingQueue.Count > 0)
-                        processingQueue.Dequeue();
-                    if (ManualProcessing && processingQueue.Count == 0)
+                    if (data.TheAction == TheAction.End)
                     {
-                        // if we've finished processing we need to raise the Completed event on
-                        // the originalSourceCompleted subject, but we want to do this only
-                        // after listeners have received the last item, so set a flag and
-                        // insert a fake object in the queue so it triggers the Completed
-                        // event on the next processing loop
-                        if (!signaledOriginalSourceCompletion)
-                        {
-                            if (data.TheAction != TheAction.End)
-                            {
-                                var end = new ActionData(TheAction.End, null);
-                                dataListener.OnNext(end);
-                            }
-                            else
-                            {
-                                signaledOriginalSourceCompletion = true;
-                                originalSourceCompleted.OnNext(Unit.Default);
-                                originalSourceCompleted.OnCompleted();
-                            }
-                        }
+                        originalSourceCompleted.OnNext(Unit.Default);
+                        originalSourceCompleted.OnCompleted();
                     }
-                    else
+
+                    if (!ManualProcessing)
                         signalNeedData.OnNext(Unit.Default);
                 })
                 .Where(data => data.Item != null)
@@ -1197,10 +1179,8 @@ namespace GitHub.Collections
             pumpDisposables.Clear();
             disposables.Clear();
             originalSourceIsCompleted = false;
-            signaledOriginalSourceCompletion = false;
             sourceHasData = false;
             cache = new ConcurrentQueue<ActionData>();
-            processingQueue = new Queue<ActionData>();
             dataListener = new ReplaySubject<ActionData>();
             disposables.Add(dataListener);
             signalHaveData = new ReplaySubject<Unit>();
