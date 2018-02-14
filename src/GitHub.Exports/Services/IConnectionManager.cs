@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -54,6 +55,36 @@ namespace GitHub.Services
         /// A connection to the host already exists.
         /// </exception>
         Task<IConnection> LogIn(HostAddress address, string username, string password);
+
+        /// <summary>
+        /// Attempts to log into a GitHub server via OAuth in the browser.
+        /// </summary>
+        /// <param name="address">The instance address.</param>
+        /// <param name="cancel">A cancellation token used to cancel the operation.</param>
+        /// <returns>
+        /// A connection if the login succeded. If the login fails, throws an exception. An
+        /// exception is also thrown if an existing connection with the same host address already
+        /// exists.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// A connection to the host already exists.
+        /// </exception>
+        Task<IConnection> LogInViaOAuth(HostAddress address, CancellationToken cancel);
+
+        /// <summary>
+        /// Attempts to login to a GitHub instance with a token.
+        /// </summary>
+        /// <param name="address">The instance address.</param>
+        /// <param name="token">The token.</param>
+        /// <returns>
+        /// A connection if the login succeded. If the login fails, throws an exception. An
+        /// exception is also thrown if an existing connection with the same host address already
+        /// exists.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// A connection to the host already exists.
+        /// </exception>
+        Task<IConnection> LogInWithToken(HostAddress address, string token);
 
         /// <summary>
         /// Logs out of a GitHub instance.

@@ -81,12 +81,12 @@ namespace GitHub.UI.Helpers.UnitTests
             [Test]
             public void CalledTwice_DisposeNotCalled()
             {
-                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                using (var factory = SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                 {
                     var disposable = Substitute.For<IDisposable>();
                     factory.TryAddDisposable(disposable);
 
-                    using (SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                    using (SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                     {
                         disposable.Received(0).Dispose();
                     }
@@ -96,20 +96,16 @@ namespace GitHub.UI.Helpers.UnitTests
             [Test]
             public void InvokeMethodOnNewAssembly_DisposeCalled()
             {
-                // HACK: Why does this need to be in app domain?
-                AppDomainContext.Invoke(new AppDomainSetup { ApplicationBase = AppDomain.CurrentDomain.BaseDirectory }, () =>
+                using (var factory = SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                 {
-                    using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
-                    {
-                        var disposable = Substitute.For<IDisposable>();
-                        factory.TryAddDisposable(disposable);
+                    var disposable = Substitute.For<IDisposable>();
+                    factory.TryAddDisposable(disposable);
 
-                        using (InvokeMethodOnNewAssembly(SharedDictionaryManager.GetCurrentDomainCachingFactory))
-                        {
-                            disposable.Received(1).Dispose();
-                        }
+                    using (InvokeMethodOnNewAssembly(SharedDictionaryManager.CachingFactory.GetInstanceForDomain))
+                    {
+                        disposable.Received(1).Dispose();
                     }
-                });
+                }
             }
 
             static IDisposable InvokeMethodOnNewAssembly<T>(Func<T> func)
@@ -144,7 +140,7 @@ namespace GitHub.UI.Helpers.UnitTests
             [TestCase(Urls.Test_SharedDictionary_PackUrl)]
             public void IsEqualToSet(string url)
             {
-                using (SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                using (SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                 {
                     var uri = ResourceDictionaryUtilities.ToPackUri(url);
                     var target = new SharedDictionaryManager();

@@ -18,6 +18,6 @@ using System.Runtime.InteropServices;
 namespace System
 {
     internal static class AssemblyVersionInformation {
-        internal const string Version = "2.3.7.0";
+        internal const string Version = "2.4.3.0";
     }
 }

@@ -25,8 +25,8 @@ namespace GitHub.ViewModels.GitHubPane
         public NavigationViewModel()
         {
             history = new ReactiveList<IPanePageViewModel>();
-            history.BeforeItemsAdded.Subscribe(BeforeItemAdded);
-            history.CollectionChanged += CollectionChanged;
+            history.Changing.Subscribe(CollectionChanging);
+            history.Changed.Subscribe(CollectionChanged);
 
             var pos = this.WhenAnyValue(
                 x => x.Index,
@@ -107,7 +107,7 @@ namespace GitHub.ViewModels.GitHubPane
         public void Clear()
         {
             Index = -1;
-            history.RemoveRange(0, history.Count);
+            history.Clear();
         }
 
         public int RemoveAll(IPanePageViewModel page)
@@ -139,27 +139,34 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void CollectionChanging(NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (IPanePageViewModel page in e.NewItems)
+                {
+                    BeforeItemAdded(page);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                foreach (var page in history)
+                {
+                    page.Dispose();
+                }
+            }
+        }
+
+        void CollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             using (DelayChangeNotifications())
             {
-                switch (e.Action)
+                if (e.Action == NotifyCollectionChangedAction.Remove)
                 {
-                    case NotifyCollectionChangedAction.Add:
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        for (var i = 0; i < e.OldItems.Count; ++i)
-                        {
-                            ItemRemoved(e.OldStartingIndex + i, (IPanePageViewModel)e.OldItems[i]);
-                        }
-                        break;
-
-                    case NotifyCollectionChangedAction.Reset:
-                        throw new NotSupportedException();
-
-                    default:
-                        throw new NotImplementedException();
+                    for (var i = 0; i < e.OldItems.Count; ++i)
+                    {
+                        ItemRemoved(e.OldStartingIndex + i, (IPanePageViewModel)e.OldItems[i]);
+                    }
                 }
             }
         }

@@ -32,10 +32,12 @@ public class FakeCommitLog : List<Commit>, IQueryableCommitLog
         throw new NotImplementedException();
     }
 
+#pragma warning disable 618 // Type or member is obsolete
     public IEnumerable<LogEntry> QueryBy(string path, FollowFilter filter)
     {
         throw new NotImplementedException();
     }
+#pragma warning restore 618 // Type or member is obsolete
 
     public IEnumerable<LogEntry> QueryBy(string path, CommitFilter filter)
     {
