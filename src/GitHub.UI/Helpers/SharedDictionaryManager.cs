@@ -11,7 +11,7 @@ namespace GitHub.UI.Helpers
         CachingFactory factory;
         Uri source;
 
-        public SharedDictionaryManager() : this(GetCurrentDomainCachingFactory())
+        public SharedDictionaryManager() : this(CachingFactory.GetInstanceForDomain())
         {
         }
 
@@ -41,30 +41,10 @@ namespace GitHub.UI.Helpers
             }
         }
 
-        public static CachingFactory GetCurrentDomainCachingFactory()
-        {
-            var dataName = typeof(CachingFactory).FullName;
-            var data = AppDomain.CurrentDomain.GetData(dataName);
-
-            var cachingFactory = data as CachingFactory;
-            if (cachingFactory != null)
-            {
-                return cachingFactory;
-            }
-
-            var disposable = data as IDisposable;
-            if (disposable != null)
-            {
-                disposable.Dispose();
-            }
-
-            cachingFactory = new CachingFactory();
-            AppDomain.CurrentDomain.SetData(dataName, cachingFactory);
-            return cachingFactory;
-        }
-
         public class CachingFactory : IDisposable
         {
+            internal static string DataName = typeof(CachingFactory).FullName;
+
             IDictionary<Uri, ResourceDictionary> sharedDictionaries;
             ISet<IDisposable> disposables;
 
@@ -72,6 +52,27 @@ namespace GitHub.UI.Helpers
             {
                 sharedDictionaries = new Dictionary<Uri, ResourceDictionary>();
                 disposables = new HashSet<IDisposable>();
+
+                AppDomain.CurrentDomain.SetData(DataName, this);
+            }
+
+            public static CachingFactory GetInstanceForDomain()
+            {
+                var data = AppDomain.CurrentDomain.GetData(DataName);
+
+                var cachingFactory = data as CachingFactory;
+                if (cachingFactory != null)
+                {
+                    return cachingFactory;
+                }
+
+                var disposable = data as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+
+                return new CachingFactory();
             }
 
             public ResourceDictionary GetOrCreateResourceDictionary(ResourceDictionary owner, Uri uri)
@@ -118,6 +119,8 @@ namespace GitHub.UI.Helpers
                     disposables.Clear();
                     sharedDictionaries.Clear();
                 }
+
+                AppDomain.CurrentDomain.SetData(DataName, null);
             }
 
             public void Dispose()
