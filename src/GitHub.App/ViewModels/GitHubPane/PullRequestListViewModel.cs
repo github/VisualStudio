@@ -102,10 +102,9 @@ namespace GitHub.ViewModels.GitHubPane
             OpenPullRequestOnGitHub = ReactiveCommand.Create();
             OpenPullRequestOnGitHub.Subscribe(x => DoOpenPullRequestOnGitHub((int)x));
 
-            // Get the current pull request session and the this list's selected repository.
-            // When the session's repository is the same as our selected repository set
-            // CheckedOutPullRequest to the current session's model, so that the checked out
-            // PR can be highlighted.
+            // Get the current pull request session and the selected repository. When the session's
+            // repository is the same as our selected repository set CheckedOutPullRequest to the
+            // current session's model, so that the checked out PR can be highlighted.
             Observable.CombineLatest(
                 sessionManager.WhenAnyValue(x => x.CurrentSession),
                 this.WhenAnyValue(x => x.SelectedRepository),
