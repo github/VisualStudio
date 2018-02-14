@@ -143,9 +143,9 @@ namespace GitHub.Primitives
                 ? url.Scheme
                 : Uri.UriSchemeHttps;
 
-            var nameWithOwner = owner == null || NameWithOwner == null ?
-                NameWithOwner :
-                string.Format(CultureInfo.InvariantCulture, "{0}/{1}", owner, RepositoryName);
+            var nameWithOwner = owner != null && Owner != null ?
+                string.Format(CultureInfo.InvariantCulture, "{0}/{1}", owner, RepositoryName) :
+                NameWithOwner;
 
             return new UriBuilder
             {
