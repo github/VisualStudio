@@ -160,16 +160,16 @@ public class ModelServiceTests
 
             var fetched = await modelService.GetAccounts();
 
-            Assert.AreEqual(3, fetched.Count);
-            Assert.AreEqual("snoopy", fetched[0].Login);
-            Assert.AreEqual("github", fetched[1].Login);
-            Assert.AreEqual("fake", fetched[2].Login);
+            Assert.That(fetched.Count, Is.EqualTo(3));
+            Assert.That(fetched[0].Login, Is.EqualTo("snoopy"));
+            Assert.That(fetched[1].Login, Is.EqualTo("github"));
+            Assert.That(fetched[2].Login, Is.EqualTo("fake"));
             var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("snoopy|orgs");
-            Assert.AreEqual(2, cachedOrgs.Count);
-            Assert.AreEqual("github", cachedOrgs[0].Login);
-            Assert.AreEqual("fake", cachedOrgs[1].Login);
+            Assert.That(cachedOrgs.Count, Is.EqualTo(2));
+            Assert.That(cachedOrgs[0].Login, Is.EqualTo("github"));
+            Assert.That(cachedOrgs[1].Login, Is.EqualTo("fake"));
             var cachedUser = await cache.GetObject<AccountCacheItem>("user");
-            Assert.AreEqual("snoopy", cachedUser.Login);
+            Assert.That(cachedUser.Login, Is.EqualTo("snoopy"));
         }
 
         [Test]
