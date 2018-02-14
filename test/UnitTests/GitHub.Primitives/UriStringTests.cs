@@ -173,7 +173,7 @@ public class UriStringTests
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
         public void ConvertsToWebUrl(string uriString, string expected)
         {
-            Assert.That(new Uri(expected), Is.EqualTo(new UriString(uriString).ToRepositoryUrl()));
+            Assert.That(new UriString(uriString).ToRepositoryUrl(), Is.EqualTo(new Uri(expected)));
         }
 
 
@@ -188,9 +188,11 @@ public class UriStringTests
         [TestCase("git@example.com:org/repo.git", "https://example.com/baz/repo")]
         [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/baz/cef")]
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/baz/encourage")]
-        public void ConvertsWithNewOwner(string uriString, string expected)
+        [TestCase("https://github.com/github", "https://github.com/github")]
+        [TestCase("https://github.com/github/Windows", "https://github.com/github/Windows", null)]
+        public void ConvertsWithNewOwner(string uriString, string expected, string owner = "baz")
         {
-            Assert.That(new Uri(expected), Is.EqualTo(new UriString(uriString).ToRepositoryUrl("baz")));
+            Assert.That(new UriString(uriString).ToRepositoryUrl(owner), Is.EqualTo(new Uri(expected)));
         }
 
         [TestCase("asdf", null)]
