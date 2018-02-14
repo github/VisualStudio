@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Collections;
-using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
-using Rothko;
 using NUnit.Framework;
-using GitHub.Primitives;
-using System.Threading;
-using System.Reactive;
 
 namespace BlobCacheTests
 {
@@ -69,7 +60,8 @@ namespace BlobCacheTests
             await repositories.OriginalCompleted;
             // the second time we do this, it should not fetch
             await apiClient.DidNotReceive().GetRepositories();
-            CollectionAssert.AreEqual(expectedRepos, repositories.ToList());
+
+            Assert.That(expectedRepos, Is.EquivalentTo(repositories));
         }
     }
 
