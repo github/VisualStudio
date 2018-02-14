@@ -156,7 +156,6 @@ public class ModelServiceTests
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
-            //await modelService.InsertUser(new AccountCacheItem { Login = "snoopy" });
 
             var fetched = await modelService.GetAccounts();
 
