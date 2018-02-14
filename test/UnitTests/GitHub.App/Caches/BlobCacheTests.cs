@@ -60,7 +60,7 @@ namespace BlobCacheTests
             await repositories.OriginalCompleted;
 
             // the first time we do this, it should fetch from the API
-            apiClient.Received().GetRepositories();
+            await apiClient.Received().GetRepositories();
             apiClient.ClearReceivedCalls();
 
             repositories = new TrackingCollection<IRemoteRepositoryModel>();
@@ -68,7 +68,7 @@ namespace BlobCacheTests
             repositories.Subscribe();
             await repositories.OriginalCompleted;
             // the second time we do this, it should not fetch
-            apiClient.DidNotReceive().GetRepositories();
+            await apiClient.DidNotReceive().GetRepositories();
             CollectionAssert.AreEqual(expectedRepos, repositories.ToList());
         }
     }
