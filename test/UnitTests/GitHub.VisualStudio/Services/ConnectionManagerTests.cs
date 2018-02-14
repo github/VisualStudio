@@ -47,7 +47,7 @@ public class ConnectionManagerTests
             var result = await target.GetLoadedConnections();
 
             Assert.That(2, Is.EqualTo(result.Count));
-            Assert.That("https://github.com/",Is.EqualTo(result[0].HostAddress.WebUri.ToString()));
+            Assert.That("https://github.com/", Is.EqualTo(result[0].HostAddress.WebUri.ToString()));
             Assert.That("https://invalid.com/", Is.EqualTo(result[1].HostAddress.WebUri.ToString()));
             Assert.That(result[0].ConnectionError, Is.Null);
             Assert.That(result[1].ConnectionError, Is.Not.Null);
@@ -121,7 +121,7 @@ public class ConnectionManagerTests
         }
 
         [Test]
-        public async Task ThrowsWhenLoginFails()
+        public void ThrowsWhenLoginFails()
         {
             var target = new ConnectionManager(
                 CreateProgram(),
@@ -136,7 +136,7 @@ public class ConnectionManagerTests
         }
 
         [Test]
-        public async Task ThrowsWhenExistingConnectionExists()
+        public void ThrowsWhenExistingConnectionExists()
         {
             var target = new ConnectionManager(
                 CreateProgram(),
@@ -208,7 +208,7 @@ public class ConnectionManagerTests
         }
 
         [Test]
-        public async Task ThrowsIfConnectionDoesntExist()
+        public void ThrowsIfConnectionDoesntExist()
         {
             var loginManager = CreateLoginManager();
             var target = new ConnectionManager(
