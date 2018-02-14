@@ -243,7 +243,7 @@ public class NavigationViewModelTests
             target.NavigateTo(second);
             close.OnNext(Unit.Default);
 
-            //Assert.Single(target.History);
+            Assert.That(target.History, Has.Count.EqualTo(1));
             Assert.That(first, Is.SameAs(target.History[0]));
         }
 
@@ -358,7 +358,7 @@ public class NavigationViewModelTests
             target.NavigateTo(second);
             target.RemoveAll(second);
 
-            //Assert.Single(target.History);
+            Assert.That(target.History, Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -376,7 +376,7 @@ public class NavigationViewModelTests
             Assert.That(first, Is.SameAs(target.Content));
             Assert.That(first, Is.SameAs(target.History[0]));
             Assert.That(0, Is.EqualTo(target.Index));
-            //Assert.Single(target.History);
+            Assert.That(target.History, Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -393,7 +393,7 @@ public class NavigationViewModelTests
             Assert.That(first, Is.SameAs(target.Content));
             Assert.That(first, Is.SameAs(target.History[0]));
             Assert.That(0, Is.EqualTo(target.Index));
-            //Assert.Single(target.History);
+            Assert.That(target.History, Has.Count.EqualTo(1));
         }
 
         [Test]

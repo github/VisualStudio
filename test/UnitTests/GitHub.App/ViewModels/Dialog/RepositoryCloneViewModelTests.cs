@@ -189,7 +189,7 @@ public class RepositoryCloneViewModelTests
 
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
             await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
-            //Assert.Single(vm.Repositories);
+            Assert.That(vm.Repositories, Has.Count.EqualTo(1));
             Assert.False(vm.NoRepositoriesFound);
         }
 

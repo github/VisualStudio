@@ -297,11 +297,11 @@ public class ModelServiceTests
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
-            //Assert.Single((await cache.GetAllObjects<AccountCacheItem>()));
+            Assert.That((await cache.GetAllObjects<AccountCacheItem>()), Has.Count.EqualTo(1));
 
             await modelService.InvalidateAll();
 
-            //Assert.That((cache.GetAllObjects<AccountCacheItem>(), Is.Empty));
+            Assert.That((await cache.GetAllObjects<AccountCacheItem>()), Is.Empty);
         }
 
         [Test]
@@ -374,7 +374,7 @@ public class ModelServiceTests
             await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));;
 
             Assert.That(expected, Is.EqualTo(col.Count));
-            //Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.That("Cache", StartsWith(x.Title)))).ToArray());
+            Assert.That(col, Has.All.Matches(Has.Property(nameof(IPullRequestModel.Title)).StartsWith("Cache")));
         }
 
         [Test]
@@ -442,7 +442,7 @@ public class ModelServiceTests
 
             await done;
 
-            //Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.StartsWith("Live", x.Title))).ToArray());
+            Assert.That(col, Has.All.Matches(Has.Property(nameof(IPullRequestModel.Title)).StartsWith("Live")));
         }
 
         [Test]
