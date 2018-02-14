@@ -5,9 +5,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.UI;
+using Octokit;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -16,6 +19,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public class CommentViewModel : ReactiveObject, ICommentViewModel
     {
+        static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
         string body;
         string errorMessage;
         bool isReadOnly;
@@ -93,11 +97,6 @@ namespace GitHub.InlineReviews.ViewModels
         {
         }
 
-        public void Initialize(ViewWithData data)
-        {
-            // Nothing to do here: initialized in constructor.
-        }
-
         /// <summary>
         /// Creates a placeholder comment which can be used to add a new comment to a thread.
         /// </summary>
@@ -154,7 +153,19 @@ namespace GitHub.InlineReviews.ViewModels
             }
             catch (Exception e)
             {
-                ErrorMessage = e.Message;
+                var message = e.Message;
+
+                if (e is ApiValidationException)
+                {
+                    // HACK: If the user has pending review comments on the server then we can't
+                    // post new comments. The correct way to test for this would be to make a
+                    // request to /repos/:owner/:repo/pulls/:number/reviews and check for comments
+                    // with a PENDING state. For the moment however we'll just display a message.
+                    message += ". Do you have pending review comments?";
+                }
+
+                ErrorMessage = message;
+                log.Error(e, "Error posting inline comment");
             }
         }
 

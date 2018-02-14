@@ -5,7 +5,7 @@ using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Menus
 {
-    public class OpenLink: LinkMenuBase, IDynamicMenuHandler
+    public class OpenLink : LinkMenuBase, IDynamicMenuHandler
     {
         public OpenLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
@@ -13,7 +13,7 @@ namespace GitHub.VisualStudio.Menus
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidContextMenuSet;
+        public Guid Guid => Guids.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.openLinkCommand;
 
         public async void Activate(object data = null)
@@ -28,7 +28,7 @@ namespace GitHub.VisualStudio.Menus
             var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
 
-            await UsageTracker.IncrementOpenInGitHubCount();
+            await UsageTracker.IncrementCounter(x => x.NumberOfOpenInGitHub);
         }
     }
 }

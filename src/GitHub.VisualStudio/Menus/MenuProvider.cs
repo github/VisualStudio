@@ -1,4 +1,5 @@
-﻿using GitHub.Services;
+﻿using GitHub.Exports;
+using GitHub.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
@@ -14,7 +15,7 @@ namespace GitHub.VisualStudio.Menus
     /// redirects every request to the actual service, and can be
     /// thrown away as soon as the caller is done (no state is kept)
     /// </summary>
-    [Export(typeof(IMenuProvider))]
+    [ExportForProcess(typeof(IMenuProvider), "devenv")]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class MenuProviderDispatcher : IMenuProvider
     {
@@ -43,7 +44,8 @@ namespace GitHub.VisualStudio.Menus
             {
                 new AddConnection(serviceProvider),
                 new OpenPullRequests(serviceProvider),
-                new ShowGitHubPane(serviceProvider)
+                new ShowGitHubPane(serviceProvider),
+                new ShowCurrentPullRequest(serviceProvider)
             };
 
             DynamicMenus = new List<IDynamicMenuHandler>

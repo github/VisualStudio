@@ -1,13 +1,19 @@
 ﻿using System;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.ComponentModel.Composition;
-using System.Globalization;
+using System.Text.RegularExpressions;
+using GitHub.Logging;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Setup.Configuration;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using DTE = EnvDTE.DTE;
 using Rothko;
+using Serilog;
+using DTE = EnvDTE.DTE;
 
 namespace GitHub.Services
 {
@@ -15,6 +21,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
+        static readonly ILogger log = LogManager.ForContext<VSServices>();
         readonly IGitHubServiceProvider serviceProvider;
 
         // Use a prefix (~$) that is defined in the default VS gitignore.
@@ -86,14 +93,14 @@ namespace GitHub.Services
             var os = serviceProvider.TryGetService<IOperatingSystem>();
             if (os == null)
             {
-                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                log.Error("TryOpenRepository couldn't find IOperatingSystem service");
                 return false;
             }
 
             var dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
-                VsOutputLogger.WriteLine("TryOpenRepository couldn't find DTE service.");
+                log.Error("TryOpenRepository couldn't find DTE service");
                 return false;
             }
 
@@ -113,7 +120,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                VsOutputLogger.WriteLine("Error opening repository. {0}", e);
+                log.Error(e, "Error opening repository");
             }
             finally
             {
@@ -136,32 +143,38 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                VsOutputLogger.WriteLine("Couldn't clean up {0}. {1}", vsTempPath, e);
+                log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
             }
         }
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
         const string EnvVersionKey = "EnvVersion";
+        const string InstallationNamePrefix = "VisualStudio/";
         string GetVSVersion()
         {
             var version = typeof(Microsoft.VisualStudio.Shell.ActivityLog).Assembly.GetName().Version;
             var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}.{2}_Config\\SplashInfo", RegistryRootKey, version.Major, version.Minor);
             try
             {
-                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                if (version.Major == 14)
                 {
-                    var value = (string)key.GetValue(EnvVersionKey, String.Empty);
-                    if (!String.IsNullOrEmpty(value))
-                        return value;
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                    {
+                        var value = (string)key.GetValue(EnvVersionKey, String.Empty);
+                        if (!String.IsNullOrEmpty(value))
+                            return value;
+                    }
                 }
-                // fallback to poking the CommonIDE assembly, which most closely follows the advertised version.
-                var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.StartsWith("Microsoft.VisualStudio.CommonIDE", StringComparison.OrdinalIgnoreCase));
-                if (asm != null)
-                    return asm.GetName().Version.ToString();
+                else
+                {
+                    var setupConfiguration = new SetupConfiguration();
+                    var setupInstance = setupConfiguration.GetInstanceForCurrentProcess();
+                    return setupInstance.GetInstallationName().TrimPrefix(InstallationNamePrefix);
+                }
             }
             catch(Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error getting the Visual Studio version '{0}'", ex));
+                log.Error(ex, "Error getting the Visual Studio version");
             }
             return version.ToString();
         }

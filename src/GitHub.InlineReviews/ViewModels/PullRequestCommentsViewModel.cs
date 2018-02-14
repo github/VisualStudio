@@ -11,16 +11,13 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
-    class PullRequestCommentsViewModel : ReactiveObject, IPullRequestCommentsViewModel
+    class PullRequestCommentsViewModel : ReactiveObject, IPullRequestCommentsViewModel, IDisposable
     {
-        readonly IApiClient apiClient;
         readonly IPullRequestSession session;
 
         public PullRequestCommentsViewModel(
-            IApiClient apiClient,
             IPullRequestSession session)
         {
-            this.apiClient = apiClient;
             this.session = session;
 
             Repository = session.LocalRepository;
@@ -35,6 +32,27 @@ namespace GitHub.InlineReviews.ViewModels
                     Conversation,
                     session.User,
                     comment));
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                disposed = true;
+
+                if (disposing)
+                {
+                    (Conversation as IDisposable)?.Dispose();
+                }
             }
         }
 
@@ -54,7 +72,6 @@ namespace GitHub.InlineReviews.ViewModels
                 foreach (var thread in file.InlineCommentThreads)
                 {
                     var threadViewModel = new InlineCommentThreadViewModel(
-                        apiClient,
                         session,
                         thread.Comments);
 

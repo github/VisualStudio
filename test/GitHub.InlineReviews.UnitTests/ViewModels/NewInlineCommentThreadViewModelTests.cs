@@ -7,58 +7,55 @@ using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
     public class NewInlineCommentThreadViewModelTests
     {
-        [Fact]
+        [Test]
         public void CreatesReplyPlaceholder()
         {
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
                 false);
 
-            Assert.Equal(1, target.Comments.Count);
-            Assert.Equal(string.Empty, target.Comments[0].Body);
-            Assert.Equal(CommentEditState.Editing, target.Comments[0].EditState);
+            Assert.That(target.Comments, Has.One.Items);
+            Assert.That(string.Empty, Is.EqualTo(target.Comments[0].Body));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Comments[0].EditState));
         }
 
-        [Fact]
+        [Test]
         public void NeedsPushTracksFileCommitSha()
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 file,
                 10,
                 false);
 
-            Assert.False(target.NeedsPush);
-            Assert.True(target.PostComment.CanExecute(false));
+            Assert.That(target.NeedsPush, Is.False);
+            Assert.That(target.PostComment.CanExecute(false), Is.True);
 
             file.CommitSha.Returns((string)null);
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.True(target.NeedsPush);
-            Assert.False(target.PostComment.CanExecute(false));
+            Assert.That(target.NeedsPush, Is.True);
+            Assert.That(target.PostComment.CanExecute(false), Is.False);
 
             file.CommitSha.Returns("COMMIT_SHA");
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.False(target.NeedsPush);
-            Assert.True(target.PostComment.CanExecute(false));
+            Assert.That(target.NeedsPush, Is.False);
+            Assert.That(target.PostComment.CanExecute(false), Is.True);
         }
 
-        [Fact]
+        [Test]
         public void PlaceholderCommitEnabledWhenCommentHasBodyAndPostCommentIsEnabled()
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 file,
                 10,
@@ -66,41 +63,36 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             file.CommitSha.Returns((string)null);
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.False(target.Comments[0].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.False);
 
             target.Comments[0].Body = "Foo";
-            Assert.False(target.Comments[0].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.False);
 
             file.CommitSha.Returns("COMMIT_SHA");
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.True(target.Comments[0].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.True);
         }
 
-        [Fact]
+        [Test]
         public void PostsCommentToCorrectAddedLine()
         {
-            var apiClient = CreateApiClient();
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
+            var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
 
-            apiClient.Received(1).CreatePullRequestReviewComment(
-                "owner",
-                "repo",
-                47,
+            session.Received(1).PostReviewComment(
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
                 5);
         }
 
-        [Fact]
+        [Test]
         public void AddsCommentToCorrectDeletedLine()
         {
-            var apiClient = CreateApiClient();
             var session = CreateSession();
             var file = CreateFile();
 
@@ -115,51 +107,16 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }
             });
 
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 16, true);
+            var target = new NewInlineCommentThreadViewModel(session, file, 16, true);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
 
-            apiClient.Received(1).CreatePullRequestReviewComment(
-                "owner",
-                "repo",
-                47,
+            session.Received(1).PostReviewComment(
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
                 7);
-        }
-
-        [Fact]
-        public void AddsPostedCommentToSession()
-        {
-            var apiClient = CreateApiClient();
-            var session = CreateSession();
-            var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
-
-            target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
-
-            session.Received(1).AddComment(Arg.Any<IPullRequestReviewCommentModel>());
-        }
-
-        [Fact]
-        public void SignalsFinishedWhenCommentPosted()
-        {
-            var apiClient = CreateApiClient();
-            var session = CreateSession();
-            var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
-            var signalled = false;
-
-            target.Finished.Subscribe(_ => signalled = true);
-            Assert.False(signalled);
-
-            target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
-
-            Assert.True(signalled);
         }
 
         IApiClient CreateApiClient()

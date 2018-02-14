@@ -15,7 +15,7 @@ namespace GitHub.VisualStudio.Menus
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
         }
 
-        public Guid Guid => GuidList.guidContextMenuSet;
+        public Guid Guid => Guids.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.copyLinkCommand;
 
         public async void Activate(object data = null)
@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Menus
                 Clipboard.SetText(link);
                 var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
-                await UsageTracker.IncrementLinkToGitHubCount();
+                await UsageTracker.IncrementCounter(x => x.NumberOfLinkToGitHub);
             }
             catch
             {

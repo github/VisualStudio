@@ -13,7 +13,7 @@ namespace GitHub.InlineReviews.Models
     class InlineCommentThreadModel : ReactiveObject, IInlineCommentThreadModel
     {
         bool isStale;
-        int lineNumber;
+        int lineNumber = -1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadModel"/> class.
@@ -33,11 +33,13 @@ namespace GitHub.InlineReviews.Models
             IList<DiffLine> diffMatch,
             IEnumerable<IPullRequestReviewCommentModel> comments)
         {
+            Guard.ArgumentNotNull(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(originalCommitSha, nameof(originalCommitSha));
             Guard.ArgumentNotNull(diffMatch, nameof(diffMatch));
 
             Comments = comments.ToList();
             DiffMatch = diffMatch;
+            DiffLineType = diffMatch[0].Type;
             OriginalCommitSha = originalCommitSha;
             OriginalPosition = originalPosition;
             RelativePath = relativePath;
@@ -50,7 +52,7 @@ namespace GitHub.InlineReviews.Models
         public IList<DiffLine> DiffMatch { get; }
 
         /// <inheritdoc/>
-        public DiffChangeType DiffLineType => DiffMatch.First().Type;
+        public DiffChangeType DiffLineType { get; }
 
         /// <inheritdoc/>
         public bool IsStale

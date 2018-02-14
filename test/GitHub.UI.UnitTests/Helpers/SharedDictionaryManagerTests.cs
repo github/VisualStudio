@@ -81,26 +81,27 @@ namespace GitHub.UI.Helpers.UnitTests
             [Test]
             public void CalledTwice_DisposeNotCalled()
             {
-                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                using (var factory = SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                 {
                     var disposable = Substitute.For<IDisposable>();
                     factory.TryAddDisposable(disposable);
 
-                    SharedDictionaryManager.GetCurrentDomainCachingFactory();
-
-                    disposable.Received(0).Dispose();
+                    using (SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
+                    {
+                        disposable.Received(0).Dispose();
+                    }
                 }
             }
 
             [Test]
             public void InvokeMethodOnNewAssembly_DisposeCalled()
             {
-                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                using (var factory = SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                 {
                     var disposable = Substitute.For<IDisposable>();
                     factory.TryAddDisposable(disposable);
 
-                    using (InvokeMethodOnNewAssembly(SharedDictionaryManager.GetCurrentDomainCachingFactory))
+                    using (InvokeMethodOnNewAssembly(SharedDictionaryManager.CachingFactory.GetInstanceForDomain))
                     {
                         disposable.Received(1).Dispose();
                     }
@@ -139,7 +140,7 @@ namespace GitHub.UI.Helpers.UnitTests
             [TestCase(Urls.Test_SharedDictionary_PackUrl)]
             public void IsEqualToSet(string url)
             {
-                using (SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                using (SharedDictionaryManager.CachingFactory.GetInstanceForDomain())
                 {
                     var uri = ResourceDictionaryUtilities.ToPackUri(url);
                     var target = new SharedDictionaryManager();

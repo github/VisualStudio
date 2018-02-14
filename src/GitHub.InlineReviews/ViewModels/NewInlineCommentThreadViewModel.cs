@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -17,14 +14,11 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public class NewInlineCommentThreadViewModel : CommentThreadViewModel
     {
-        readonly IApiClient apiClient;
-        readonly Subject<Unit> finished = new Subject<Unit>();
         bool needsPush;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
-        /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
         /// <param name="file">The file being commented on.</param>
         /// <param name="lineNumber">The 0-based line number in the file.</param>
@@ -32,18 +26,15 @@ namespace GitHub.InlineReviews.ViewModels
         /// True if the comment is being left on the left-hand-side of a diff; otherwise false.
         /// </param>
         public NewInlineCommentThreadViewModel(
-            IApiClient apiClient,
             IPullRequestSession session,
             IPullRequestSessionFile file,
             int lineNumber,
             bool leftComparisonBuffer)
             : base(session.User)
         {
-            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotNull(file, nameof(file));
 
-            this.apiClient = apiClient;
             Session = session;
             File = file;
             LineNumber = lineNumber;
@@ -82,12 +73,6 @@ namespace GitHub.InlineReviews.ViewModels
         public IPullRequestSession Session { get; }
 
         /// <summary>
-        /// Gets an observable that is fired with a single value when a comment is sucessfully
-        /// posted and therefore this is no loner a new comment thread.
-        /// </summary>
-        public IObservable<Unit> Finished => finished;
-
-        /// <summary>
         /// Gets a value indicating whether the user must commit and push their changes before
         /// leaving a comment on the requested line.
         /// </summary>
@@ -121,31 +106,11 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             var body = (string)parameter;
-            var result = await apiClient.CreatePullRequestReviewComment(
-                Session.RepositoryOwner,
-                Session.LocalRepository.Name,
-                Session.PullRequest.Number,
+            var model = await Session.PostReviewComment(
                 body,
                 File.CommitSha,
                 File.RelativePath.Replace("\\", "/"),
                 diffPosition.DiffLineNumber);
-
-            var model = new PullRequestReviewCommentModel
-            {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                CreatedAt = result.CreatedAt,
-                User = Session.User,
-            };
-
-            await Session.AddComment(model);
-            finished.OnNext(Unit.Default);
 
             return model;
         }

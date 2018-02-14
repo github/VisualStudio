@@ -97,6 +97,18 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t find Git.exe on PATH.
+        ///
+        ///Please install Git for Windows from:
+        ///https://git-scm.com/download/win.
+        /// </summary>
+        internal static string CouldntFindGitOnPath {
+            get {
+                return ResourceManager.GetString("CouldntFindGitOnPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create a GitHub Gist.
         /// </summary>
         internal static string CreateGistTitle {
@@ -210,33 +222,6 @@ namespace GitHub.App {
         internal static string LoginTitle {
             get {
                 return ResourceManager.GetString("LoginTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to create a Gist.
-        /// </summary>
-        internal static string LogoutRequiredFeatureGist {
-            get {
-                return ResourceManager.GetString("LogoutRequiredFeatureGist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to To {0} you need to sign out and back in..
-        /// </summary>
-        internal static string LogoutRequiredMessage {
-            get {
-                return ResourceManager.GetString("LogoutRequiredMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sign Out Required.
-        /// </summary>
-        internal static string LogoutRequiredTitle {
-            get {
-                return ResourceManager.GetString("LogoutRequiredTitle", resourceCulture);
             }
         }
         
@@ -525,6 +510,15 @@ namespace GitHub.App {
         internal static string SourceRepositoryNoLongerAvailable {
             get {
                 return ResourceManager.GetString("SourceRepositoryNoLongerAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync {0} submodules.
+        /// </summary>
+        internal static string SyncSubmodules {
+            get {
+                return ResourceManager.GetString("SyncSubmodules", resourceCulture);
             }
         }
         

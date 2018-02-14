@@ -1,9 +1,9 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Linq;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Commands
@@ -18,12 +18,12 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
         /// </summary>
-        public static readonly Guid CommandSet = GlobalCommands.CommandSetGuid;
+        public static readonly Guid CommandSet = Guids.CommandSetGuid;
 
         /// <summary>
         /// Gets the numeric identifier of the command.
         /// </summary>
-        public const int CommandId = GlobalCommands.NextInlineCommentId;
+        public const int CommandId = PkgCmdIDList.NextInlineCommentId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NextInlineCommentCommand"/> class.

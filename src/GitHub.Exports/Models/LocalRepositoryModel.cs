@@ -157,8 +157,10 @@ namespace GitHub.Models
         {
             get
             {
-                var repo = GitService.GitServiceHelper.GetRepository(LocalPath);
-                return repo?.Commits.FirstOrDefault()?.Sha ?? String.Empty;
+                using (var repo = GitService.GitServiceHelper.GetRepository(LocalPath))
+                {
+                    return repo?.Commits.FirstOrDefault()?.Sha ?? string.Empty;
+                }
             }
         }
 
@@ -169,8 +171,11 @@ namespace GitHub.Models
         {
             get
             {
-                var repo = GitService.GitServiceHelper.GetRepository(LocalPath);
-                return new BranchModel(repo?.Head, this);
+                // BranchModel doesn't keep a reference to Repository
+                using (var repo = GitService.GitServiceHelper.GetRepository(LocalPath))
+                {
+                    return new BranchModel(repo?.Head, this);
+                }
             }
         }
 

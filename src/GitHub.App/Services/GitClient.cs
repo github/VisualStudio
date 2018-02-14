@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using NLog;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -16,8 +18,7 @@ namespace GitHub.Services
     public class GitClient : IGitClient
     {
         const string defaultOriginName = "origin";
-
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
@@ -39,11 +40,12 @@ namespace GitHub.Services
         public Task Pull(IRepository repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-
             return Task.Factory.StartNew(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
+#pragma warning disable 0618 // TODO: Replace `Network.Pull` with `Commands.Pull`.
                 repository.Network.Pull(signature, pullOptions);
+#pragma warning restore 0618
             });
         }
 
@@ -74,11 +76,50 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                     repository.Network.Fetch(remote, fetchOptions);
+#pragma warning restore 0618
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
+#if DEBUG
+                    throw;
+#endif
+                }
+            });
+        }
+
+        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        {
+            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
+
+            var originRemote = repo.Network.Remotes[defaultOriginName];
+            if (originRemote != null && originRemote.Url == httpsUrl)
+            {
+                return Fetch(repo, defaultOriginName, refspecs);
+            }
+
+            return Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
+                    var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
+                    try
+                    {
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
+                        repo.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
+                    }
+                    finally
+                    {
+                        repo.Network.Remotes.Remove(tempRemoteName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif
@@ -96,11 +137,13 @@ namespace GitHub.Services
                 try
                 {
                     var remote = repository.Network.Remotes[remoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
                     repository.Network.Fetch(remote, refspecs, fetchOptions);
+#pragma warning restore 0618
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif
@@ -115,7 +158,9 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
+#pragma warning disable 0618 // TODO: Replace `IRepository.Checkout` with `Commands.Checkout`.
                 repository.Checkout(branchName);
+#pragma warning restore 0618
             });
         }
 
@@ -360,13 +405,13 @@ namespace GitHub.Services
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
-                    var head = repository.Head[path];
-                    if (head.TargetType != TreeEntryTargetType.Blob)
+                    var treeEntry = repository.Head[path];
+                    if (treeEntry?.TargetType != TreeEntryTargetType.Blob)
                     {
                         return false;
                     }
 
-                    var blob1 = (Blob)head.Target;
+                    var blob1 = (Blob)treeEntry.Target;
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
                         var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
@@ -380,39 +425,41 @@ namespace GitHub.Services
         }
 
         public async Task<string> GetPullRequestMergeBase(IRepository repo,
-            UriString baseCloneUrl, UriString headCloneUrl, string baseSha, string headSha, string baseRef, string headRef)
+            UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber)
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
-            Guard.ArgumentNotNull(baseCloneUrl, nameof(baseCloneUrl));
-            Guard.ArgumentNotNull(headCloneUrl, nameof(headCloneUrl));
+            Guard.ArgumentNotNull(targetCloneUrl, nameof(targetCloneUrl));
             Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
-
-            var baseCommit = repo.Lookup<Commit>(baseSha);
-            if (baseCommit == null)
-            {
-                await Fetch(repo, baseCloneUrl, baseRef);
-                baseCommit = repo.Lookup<Commit>(baseSha);
-                if (baseCommit == null)
-                {
-                    return null;
-                }
-            }
 
             var headCommit = repo.Lookup<Commit>(headSha);
             if (headCommit == null)
             {
-                await Fetch(repo, headCloneUrl, headRef);
+                // The PR base branch might no longer exist, so we fetch using `refs/pull/<PR>/head` first.
+                // This will often fetch the base commits, even when the base branch no longer exists.
+                var headRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, targetCloneUrl, headRef);
                 headCommit = repo.Lookup<Commit>(headSha);
                 if (headCommit == null)
                 {
-                    return null;
+                    throw new NotFoundException($"Couldn't find {headSha} after fetching from {targetCloneUrl}:{headRef}.");
+                }
+            }
+
+            var baseCommit = repo.Lookup<Commit>(baseSha);
+            if (baseCommit == null)
+            {
+                await Fetch(repo, targetCloneUrl, baseRef);
+                baseCommit = repo.Lookup<Commit>(baseSha);
+                if (baseCommit == null)
+                {
+                    throw new NotFoundException($"Couldn't find {baseSha} after fetching from {targetCloneUrl}:{baseRef}.");
                 }
             }
 
             var mergeBaseCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, headCommit);
-            if(mergeBaseCommit == null)
+            if (mergeBaseCommit == null)
             {
-                return null;
+                throw new NotFoundException($"Couldn't find merge base between {baseCommit} and {headCommit}.");
             }
 
             return mergeBaseCommit.Sha;
@@ -424,37 +471,41 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                if (repo.Head.IsTracking)
-                {
-                    var trackedBranchTip = repo.Head.TrackedBranch.Tip;
-                    if (trackedBranchTip != null)
-                    {
-                        return repo.Head.Tip.Sha == trackedBranchTip.Sha;
-                    }
-                }
-
-                return false;
+                return repo.Head.TrackingDetails.AheadBy == 0;
             });
         }
 
-        public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
+        public Task<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            IRepository repo,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits)
         {
-            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
-            if (repo.Network.Remotes[defaultOriginName]?.Url == httpsUrl)
+            return Task.Factory.StartNew(() =>
             {
-                return Fetch(repo, defaultOriginName, refspecs);
-            }
+                var baseCommit = repo.Lookup<Commit>(baseBranch);
+                var compareCommit = repo.Lookup<Commit>(compareBranch);
+                if (baseCommit == null || compareCommit == null)
+                {
+                    var missingBranch = baseCommit == null ? baseBranch : compareBranch;
+                    throw new NotFoundException(missingBranch);
+                }
 
-            var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
-            repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
-            try
-            {
-                return Fetch(repo, tempRemoteName, refspecs);
-            }
-            finally
-            {
-                repo.Network.Remotes.Remove(tempRemoteName);
-            }
+                var mergeCommit = repo.ObjectDatabase.FindMergeBase(baseCommit, compareCommit);
+                var commitFilter = new CommitFilter
+                {
+                    IncludeReachableFrom = baseCommit,
+                    ExcludeReachableFrom = mergeCommit,
+                };
+
+                var commits = repo.Commits
+                    .QueryBy(commitFilter)
+                    .Take(maxCommits)
+                    .Select(c => new CommitMessage(c.Message))
+                    .ToList();
+
+                return (IReadOnlyList<CommitMessage>)commits;
+            });
         }
 
         static bool IsCanonical(string s)

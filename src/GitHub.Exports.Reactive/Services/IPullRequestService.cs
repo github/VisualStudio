@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
+using System.Text;
+using System.Threading.Tasks;
 using GitHub.Models;
 using LibGit2Sharp;
 using Octokit;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.Services
 {
     public interface IPullRequestService
     {
-        IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
+        IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body);
@@ -19,6 +23,13 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
         IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Count the number of submodules that require syncing.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns>The number of submodules that need to be synced.</returns>
+        IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Checks out a pull request to a local branch.
@@ -40,6 +51,12 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         IObservable<Unit> Push(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Sync submodules on the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress);
 
         /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.
@@ -121,23 +138,30 @@ namespace GitHub.Services
         IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
-        /// Gets the left and right files for a diff.
+        /// Gets the encoding for the specified file.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="modelService">A model service to use as a cache if the file is not fetched.</param>
+        /// <param name="relativePath">The relative path to the file in the repository.</param>
+        /// <returns>
+        /// The file's encoding or <see cref="Encoding.Default"/> if the file doesn't exist.
+        /// </returns>
+        Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath);
+
+        /// <summary>
+        /// Gets a file as it appears in a pull request.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <param name="fileName">The filename relative to the repository root.</param>
-        /// <param name="fileSha">The SHA of the file in the pull request.</param>
-        /// <param name="isPullRequestBranchCheckedOut">
-        /// Whether the pull request branch is currently checked out. If so the right file returned
-        /// will be the path to the file in the working directory.
-        /// </param>
+        /// <param name="head">If true, gets the file at the PR head, otherwise gets the file at the PR base.</param>
+        /// <param name="encoding">The encoding to use.</param>
         /// <returns>The paths of the left and right files for the diff.</returns>
-        IObservable<Tuple<string, string>> ExtractDiffFiles(
+        IObservable<string> ExtractFile(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
             string fileName,
-            bool isPullRequestBranchCheckedOut);
+            bool head,
+            Encoding encoding);
 
         /// <summary>
         /// Remotes all unused remotes that were created by GitHub for Visual Studio to track PRs
@@ -148,5 +172,21 @@ namespace GitHub.Services
         IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Gets the unique commits from <paramref name="compareBranch"/> to the merge base of 
+        /// <paramref name="baseBranch"/> and <paramref name="compareBranch"/> and returns their
+        /// commit messages.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="baseBranch">The base branch to find a merge base with.</param>
+        /// <param name="compareBranch">The compare branch to find a merge base with.</param>
+        /// <param name="maxCommits">The maximum number of commits to return.</param>
+        /// <returns>An enumerable of unique commits from the merge base to the compareBranch.</returns>
+        IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            ILocalRepositoryModel repository,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits);
     }
 }
