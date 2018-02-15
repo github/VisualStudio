@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -151,6 +153,9 @@ namespace GitHub.Services
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
+                    EnableNavigateToEditor(diffViewer.RightView, session, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
                 }
 
                 if (workingDirectory)
@@ -350,6 +355,11 @@ namespace GitHub.Services
             return view;
         }
 
+        void ShowErrorInStatusBar(string message)
+        {
+            statusBar.ShowMessage(message);
+        }
+
         void ShowErrorInStatusBar(string message, Exception e)
         {
             statusBar.ShowMessage(message + ": " + e.Message);
@@ -369,6 +379,54 @@ namespace GitHub.Services
                 {
                     AddBufferTag(source, session, path, side);
                 }
+            }
+        }
+
+        void EnableNavigateToEditor(IWpfTextView textView, IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            var view = vsEditorAdaptersFactory.GetViewAdapter(textView);
+            EnableNavigateToEditor(view, session, file);
+        }
+
+        void EnableNavigateToEditor(IVsTextView textView, IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
+            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
+            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec +=
+                async (s, e) => await DoNavigateToEditor(session, file);
+
+            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
+            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
+            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec +=
+                async (s, e) => await DoNavigateToEditor(session, file);
+        }
+
+        async Task DoNavigateToEditor(IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            try
+            {
+                if (!session.IsCheckedOut)
+                {
+                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    return;
+                }
+
+                var fullPath = GetAbsolutePath(session, file);
+
+                var activeView = FindActiveView();
+                if (activeView == null)
+                {
+                    ShowErrorInStatusBar("Couldn't find active view");
+                    return;
+                }
+
+                NavigateToEquivalentPosition(activeView, fullPath);
+
+                await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error navigating to editor", e);
             }
         }
 
@@ -422,6 +480,13 @@ namespace GitHub.Services
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
                     fileChange.OldPath : file.RelativePath;
             }
+        }
+
+        void ShowInfoMessage(string message)
+        {
+            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
+                serviceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
         }
 
         static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)

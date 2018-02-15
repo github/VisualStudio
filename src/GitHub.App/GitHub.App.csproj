@@ -213,6 +213,7 @@
     <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="Services\TeamExplorerContext.cs" />
     <Compile Include="Services\OAuthCallbackListener.cs" />
+    <Compile Include="Services\TextViewCommandDispatcher.cs" />
     <Compile Include="ViewModels\Dialog\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GitHubDialogWindowViewModel.cs" />
     <Compile Include="ViewModels\Dialog\LoginCredentialsViewModel.cs" />
