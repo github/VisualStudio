@@ -52,7 +52,7 @@ namespace GitHub.InlineReviews.Commands
         }
 
         /// <inheritdoc/>
-        public abstract void Register(IServiceProvider package);
+        public abstract void Register(IServiceProvider package, IMenuCommandService menuService);
 
         /// <summary>
         /// Gets the package that registered the command.
@@ -86,12 +86,10 @@ namespace GitHub.InlineReviews.Commands
         /// </summary>
         /// <param name="package">The package.</param>
         /// <param name="command">The command.</param>
-        protected void Register(IServiceProvider package, MenuCommand command)
+        protected void Register(IServiceProvider package, IMenuCommandService menuService, MenuCommand command)
         {
             Package = package;
-            var serviceProvider = (IServiceProvider)package;
-            var mcs = (IMenuCommandService)serviceProvider.GetService(typeof(IMenuCommandService));
-            mcs?.AddCommand(command);
+            menuService.AddCommand(command);
         }
     }
 }
