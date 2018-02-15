@@ -382,6 +382,9 @@
     <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestFilesView.xaml.cs">
+      <DependentUpon>PullRequestFilesView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\PullRequestListView.xaml.cs">
       <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
@@ -532,6 +535,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestFilesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

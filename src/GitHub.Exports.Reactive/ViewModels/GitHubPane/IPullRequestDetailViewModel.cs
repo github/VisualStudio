@@ -126,9 +126,9 @@ namespace GitHub.ViewModels.GitHubPane
         string Body { get; }
 
         /// <summary>
-        /// Gets the changed files as a tree.
+        /// Gets the pull request's changed files.
         /// </summary>
-        IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }
+        IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.

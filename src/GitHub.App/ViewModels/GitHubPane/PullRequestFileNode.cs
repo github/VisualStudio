@@ -18,7 +18,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// Initializes a new instance of the <see cref="PullRequestFileNode"/> class.
         /// </summary>
         /// <param name="repositoryPath">The absolute path to the repository.</param>
-        /// <param name="path">The path to the file, relative to the repository.</param>
+        /// <param name="relativePath">The path to the file, relative to the repository.</param>
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
@@ -28,17 +28,17 @@ namespace GitHub.ViewModels.GitHubPane
         /// </param>
         public PullRequestFileNode(
             string repositoryPath,
-            string path,
+            string relativePath,
             string sha,
             PullRequestFileStatus status,
             string oldPath)
         {
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
 
-            FileName = Path.GetFileName(path);
-            DirectoryPath = Path.GetDirectoryName(path);
+            FileName = Path.GetFileName(relativePath);
+            RelativePath = relativePath.Replace("/", "\\");
             Sha = sha;
             Status = status;
             OldPath = oldPath;
@@ -51,7 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (oldPath != null)
                 {
-                    StatusDisplay = Path.GetDirectoryName(oldPath) == Path.GetDirectoryName(path) ?
+                    StatusDisplay = Path.GetDirectoryName(oldPath) == Path.GetDirectoryName(relativePath) ?
                             Path.GetFileName(oldPath) : oldPath;
                 }
                 else
@@ -67,9 +67,9 @@ namespace GitHub.ViewModels.GitHubPane
         public string FileName { get; }
 
         /// <summary>
-        /// Gets the path to the file's directory, relative to the root of the repository.
+        /// Gets the path to the file, relative to the root of the repository.
         /// </summary>
-        public string DirectoryPath { get; }
+        public string RelativePath { get; }
 
         /// <summary>
         /// Gets the old path of a moved/renamed file, relative to the root of the repository.

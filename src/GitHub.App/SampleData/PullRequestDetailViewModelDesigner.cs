@@ -31,8 +31,6 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public class PullRequestDetailViewModelDesigner : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        private List<IPullRequestChangeNode> changedFilesTree;
-
         public PullRequestDetailViewModelDesigner()
         {
             var repoPath = @"C:\Repo";
@@ -69,8 +67,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
             modelsDir.Files.Add(oldBranchModel);
             gitHubDir.Directories.Add(modelsDir);
 
-            changedFilesTree = new List<IPullRequestChangeNode>();
-            changedFilesTree.Add(gitHubDir);
+            Files = new PullRequestFilesViewModelDesigner();
         }
 
         public IPullRequestModel Model { get; }
@@ -84,7 +81,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
-        public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;
+        public IPullRequestFilesViewModel Files { get; set; }
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
@@ -94,7 +91,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
-        public ReactiveCommand<Unit> SyncSubmodules { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> DiffFile { get; }
         public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
