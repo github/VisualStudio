@@ -82,6 +82,10 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.CoreUtility.14.3.25407\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Editor, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Editor.14.3.25407\lib\net45\Microsoft.VisualStudio.Editor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Language.Intellisense.14.3.25407\lib\net45\Microsoft.VisualStudio.Language.Intellisense.dll</HintPath>
       <Private>True</Private>
@@ -240,6 +244,7 @@
     <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestFilesViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Services\PullRequestEditorServiceTests.cs" />
     <Compile Include="GitHub.App\Services\OAuthCallbackListenerTests.cs" />
     <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />

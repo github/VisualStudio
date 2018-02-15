@@ -13,10 +13,10 @@ namespace GitHub.ViewModels.GitHubPane
         /// Initializes a new instance of the <see cref="PullRequestDirectoryNode"/> class.
         /// </summary>
         /// <param name="path">The path to the directory, relative to the repository.</param>
-        public PullRequestDirectoryNode(string fullPath)
+        public PullRequestDirectoryNode(string relativePath)
         {
-            DirectoryName = System.IO.Path.GetFileName(fullPath);
-            DirectoryPath = fullPath;
+            DirectoryName = System.IO.Path.GetFileName(relativePath);
+            RelativePath = relativePath.Replace("/", "\\");
             Directories = new List<IPullRequestDirectoryNode>();
             Files = new List<IPullRequestFileNode>();
         }
@@ -27,9 +27,9 @@ namespace GitHub.ViewModels.GitHubPane
         public string DirectoryName { get; }
 
         /// <summary>
-        /// Gets the full directory path, relative to the root of the repository.
+        /// Gets the path to the directory, relative to the root of the repository.
         /// </summary>
-        public string DirectoryPath { get; }
+        public string RelativePath { get; }
 
         /// <summary>
         /// Gets the directory children of the node.
