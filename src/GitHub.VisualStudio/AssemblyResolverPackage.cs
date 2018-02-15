@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
-using GitHub.Logging;
-using Serilog;
 
 namespace GitHub.VisualStudio
 {
@@ -10,9 +8,8 @@ namespace GitHub.VisualStudio
     // This is required for GitHub.VisualStudio.imagemanifest, XAML and when using unsigned assemblies.
     // See: https://github.com/github/VisualStudio/pull/1236/
     [ProvideBindingPath]
-    
     [Guid(Guids.guidAssemblyResolverPkgString)]
-    public class AssemblyResolverPackage : Package
+    public class AssemblyResolverPackage : AsyncPackage
     {
     }
 }
