@@ -63,5 +63,5 @@
   <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#569CD6" />
 
   <SolidColorBrush x:Key="GitHubPeekViewBackground" Color="#252526" />
-  <SolidColorBrush x:Key="GitHubMultilineListItemActiveBrush" Color="#FF2D2D30"/>
+  <SolidColorBrush x:Key="GitHubMultilineListItemActiveBrush" Color="#FF3F3F46"/>
 </ResourceDictionary>
