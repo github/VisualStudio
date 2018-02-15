@@ -143,6 +143,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\INextInlineCommentCommand.cs" />
+    <Compile Include="Commands\InlineCommentNavigationParams.cs" />
+    <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
+    <Compile Include="Commands\IVsCommand.cs" />
+    <Compile Include="Commands\IVsCommandBase.cs" />
     <Compile Include="Exports\ExportForProcess.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />

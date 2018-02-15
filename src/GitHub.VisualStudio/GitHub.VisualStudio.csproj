@@ -666,6 +666,10 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
       <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
       <Name>GitHub.StartPage</Name>

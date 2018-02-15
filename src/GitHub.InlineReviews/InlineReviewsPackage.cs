@@ -2,8 +2,9 @@
 using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
-using GitHub.InlineReviews.Commands;
+using GitHub.Commands;
 using GitHub.InlineReviews.Views;
+using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
@@ -24,9 +25,13 @@ namespace GitHub.InlineReviews
             IProgress<ServiceProgressData> progress)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            PackageResources.Register(this, componentModel.DefaultExportProvider, menuService);
+            var exports = componentModel.DefaultExportProvider;
+
+            menuService.AddCommand(exports.GetExportedValue<INextInlineCommentCommand>());
+            menuService.AddCommand(exports.GetExportedValue<IPreviousInlineCommentCommand>());
         }
     }
 }

@@ -21,6 +21,7 @@ using NSubstitute;
 using Octokit;
 using ReactiveUI;
 using NUnit.Framework;
+using GitHub.Commands;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {

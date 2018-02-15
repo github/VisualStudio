@@ -69,21 +69,9 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Commands\INextInlineCommentCommand.cs" />
-    <Compile Include="Commands\InlineCommentNavigationParams.cs" />
-    <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
-    <Compile Include="Commands\IVsCommandBase.cs" />
-    <Compile Include="Commands\IVsCommand.cs" />
-    <Compile Include="Commands\PackageResources.cs" />
-    <Compile Include="Commands\VsCommand.cs" />
-    <Compile Include="Commands\ExportCommandAttribute.cs" />
-    <Compile Include="Commands\IPackageResource.cs" />
-    <Compile Include="Commands\IExportCommandMetadata.cs" />
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
-    <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
-    <Compile Include="Commands\VsCommandBase.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
@@ -204,6 +192,14 @@
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
       <Name>GitHub.Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services\GitHub.Services.csproj">
+      <Project>{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}</Project>
+      <Name>GitHub.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
@@ -263,6 +259,11 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.14.3.25407\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.14.3.25407\lib\Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Language.Intellisense.14.3.25407\lib\net45\Microsoft.VisualStudio.Language.Intellisense.dll</HintPath>
       <Private>True</Private>
@@ -308,6 +309,11 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.12.0.12.0.30110\lib\Microsoft.VisualStudio.Shell.Interop.12.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime.14.3.25407\lib\Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
