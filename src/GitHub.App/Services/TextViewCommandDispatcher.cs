@@ -3,7 +3,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace GitHub.VisualStudio.Views.GitHubPane
+namespace GitHub.Services
 {
     /// <summary>
     /// Intercepts all commands sent to a <see cref="IVsTextView"/> and fires <see href="Exec"/> when a specified command is encountered.
