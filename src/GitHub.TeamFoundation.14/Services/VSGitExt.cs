@@ -98,6 +98,11 @@ namespace GitHub.VisualStudio.Base
         {
             try
             {
+                log.Debug(
+                    "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
+                    gitService.GetHashCode(),
+                    gitService?.ActiveRepositories.Select(x => x.RepositoryPath));
+
                 ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
             }
             catch (Exception e)
@@ -118,6 +123,7 @@ namespace GitHub.VisualStudio.Base
             {
                 if (value != activeRepositories)
                 {
+                    log.Debug("ActiveRepositories changed to {Repositories}", value.Select(x => x.CloneUrl));
                     activeRepositories = value;
                     ActiveRepositoriesChanged?.Invoke();
                 }
