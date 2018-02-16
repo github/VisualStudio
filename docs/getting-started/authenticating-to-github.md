@@ -7,8 +7,7 @@ Before you authenticate, you must already have a GitHub or GitHub Enterprise acc
 - For more information on creating a GitHub account, see "[Signing up for a new GitHub account](https://help.github.com/articles/signing-up-for-a-new-github-account/)".
 - For a GitHub Enterprise account, contact your GitHub Enterprise site administrator.
 
-> **Note:** If your organization is on the [Business plan](https://help.github.com/articles/organization-billing-plans) and has enabled SAML single sign-on, you must create and authorize a personal access token to access protected content. 
->You will also need to create a personal access token for signing in with GitHub Enterprise if your version is less than 2.12.2 and username/password login is disabled. For versions greater than 2.12.2 you can login with OAUTH.
+> **Note:** If your organization is on the [Business plan](https://help.github.com/articles/organization-billing-plans) and has not enabled SAML single sign-on or login with username and passowrd, you must create and authorize a personal access token to access protected content. In addition, SAML single sign-on is not available for GitHub enterprise versions less than 2.12.2.
 
 > For more information on authenticating with SAML single sign-on, see "[About authentication with SAML single sign-on](https://help.github.com/articles/about-authentication-with-saml-single-sign-on)."
 
