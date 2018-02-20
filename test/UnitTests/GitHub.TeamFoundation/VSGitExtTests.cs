@@ -176,26 +176,20 @@ public class VSGitExtTests
         }
 
         [Test]
-        public async Task ThreadingStressTest()
+        public async Task ActiveRepositoriesChangedOrderingShouldBeCorrectAcrossThreads()
         {
-            for (var i = 0; i < 100; ++i)
-            {
-                var gitExt = new MockGitExt();
-                var repoFactory = new MockRepositoryFactory();
-                var target = CreateVSGitExt(gitExt: gitExt, repoFactory: repoFactory);
-                var activeRepositories1 = CreateActiveRepositories("repo1");
-                var activeRepositories2 = CreateActiveRepositories("repo2");
-                var task1 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories1);
-                await Task.Delay(1);
-                var task2 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories2);
+            var gitExt = new MockGitExt();
+            var repoFactory = new MockRepositoryFactory();
+            var target = CreateVSGitExt(gitExt: gitExt, repoFactory: repoFactory);
+            var activeRepositories1 = CreateActiveRepositories("repo1");
+            var activeRepositories2 = CreateActiveRepositories("repo2");
+            var task1 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories1);
+            await Task.Delay(1);
+            var task2 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories2);
 
-                await Task.WhenAll(task1, task2);
+            await Task.WhenAll(task1, task2);
 
-                Assert.That(
-                    target.ActiveRepositories.Single().LocalPath,
-                    Is.EqualTo("repo2"),
-                    $"Failed at iteration {i}");
-            }
+            Assert.That(target.ActiveRepositories.Single().LocalPath, Is.EqualTo("repo2"));
         }
     }
 
@@ -270,6 +264,15 @@ public class VSGitExtTests
         {
             var result = Substitute.For<ILocalRepositoryModel>();
             result.LocalPath.Returns(localPath);
+
+            if (localPath == "repo1")
+            {
+                // Trying to force #1493 here by introducing a a delay on the first
+                // ActiveRepositories changed notification so that the second completes
+                // first.
+                Thread.Sleep(10);
+            }
+
             return result;
         }
     }
