@@ -49,7 +49,7 @@ namespace GitHub.Services
             var data = await service.ReadLocalData();
             var usage = await GetCurrentReport(data);
             // because Model is a struct, it needs to be boxed in order for reflection to work
-            object model = usage.Model;
+            object model = usage;
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
             log.Verbose("Increment counter {Name}", propertyInfo.Name);
