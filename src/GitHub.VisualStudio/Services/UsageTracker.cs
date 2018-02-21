@@ -140,12 +140,12 @@ namespace GitHub.Services
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
-                current.IsGitHubUser |= true;
+                current.IsGitHubUser = true;
             }
 
             if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
             {
-                current.IsEnterpriseUser |= true;
+                current.IsEnterpriseUser = true;
             }
 
             return current;
