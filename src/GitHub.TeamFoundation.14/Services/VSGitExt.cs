@@ -24,6 +24,7 @@ namespace GitHub.VisualStudio.Base
         readonly IGitHubServiceProvider serviceProvider;
         readonly IVSUIContext context;
         readonly ILocalRepositoryModelFactory repositoryFactory;
+        readonly object refreshLock = new object();
 
         IGitExt gitService;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
@@ -98,7 +99,15 @@ namespace GitHub.VisualStudio.Base
         {
             try
             {
-                ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                lock (refreshLock)
+                {
+                    log.Debug(
+                        "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
+                        gitService.GetHashCode(),
+                        gitService?.ActiveRepositories.Select(x => x.RepositoryPath));
+
+                    ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                }
             }
             catch (Exception e)
             {
@@ -118,6 +127,7 @@ namespace GitHub.VisualStudio.Base
             {
                 if (value != activeRepositories)
                 {
+                    log.Debug("ActiveRepositories changed to {Repositories}", value?.Select(x => x.CloneUrl));
                     activeRepositories = value;
                     ActiveRepositoriesChanged?.Invoke();
                 }
