@@ -8,6 +8,11 @@ namespace GitHub.Models
     public interface IPullRequestReviewCommentModel : ICommentModel
     {
         /// <summary>
+        /// Gets the ID of the related pull request review.
+        /// </summary>
+        int PullRequestReviewId { get; set; }
+
+        /// <summary>
         /// The relative path to the file that the comment was made on.
         /// </summary>
         string Path { get; }
@@ -38,5 +43,10 @@ namespace GitHub.Models
         /// The diff hunk used to match the pull request.
         /// </summary>
         string DiffHunk { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the comment is part of a pending review.
+        /// </summary>
+        bool IsPending { get; }
     }
 }

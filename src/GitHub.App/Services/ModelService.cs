@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
@@ -17,7 +18,9 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
+using Octokit.GraphQL;
 using Serilog;
+using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
@@ -33,13 +36,16 @@ namespace GitHub.Services
 
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
+        readonly Octokit.GraphQL.IConnection graphql;
 
         public ModelService(
             IApiClient apiClient,
+            Octokit.GraphQL.IConnection graphql,
             IBlobCache hostCache,
             IAvatarProvider avatarProvider)
         {
             this.ApiClient = apiClient;
+            this.graphql = graphql;
             this.hostCache = hostCache;
             this.avatarProvider = avatarProvider;
         }
@@ -203,19 +209,22 @@ namespace GitHub.Services
                             ApiClient.GetPullRequest(owner, name, number),
                             ApiClient.GetPullRequestFiles(owner, name, number).ToList(),
                             ApiClient.GetIssueComments(owner, name, number).ToList(),
-                            ApiClient.GetPullRequestReviewComments(owner, name, number).ToList(),
-                            (pr, files, comments, reviewComments) => new
+                            GetPullRequestReviews(owner, name, number).ToObservable(),
+                            GetPullRequestReviewComments(owner, name, number).ToObservable(),
+                            (pr, files, comments, reviews, reviewComments) => new
                             {
                                 PullRequest = pr,
                                 Files = files,
                                 Comments = comments,
+                                Reviews = reviews,
                                 ReviewComments = reviewComments
                             })
                             .Select(x => PullRequestCacheItem.Create(
                                 x.PullRequest, 
                                 (IReadOnlyList<PullRequestFile>)x.Files,
                                 (IReadOnlyList<IssueComment>)x.Comments,
-                                (IReadOnlyList<PullRequestReviewComment>)x.ReviewComments)),
+                                (IReadOnlyList<IPullRequestReviewModel>)x.Reviews,
+                                (IReadOnlyList<IPullRequestReviewCommentModel>)x.ReviewComments)),
                         TimeSpan.Zero,
                         TimeSpan.FromDays(7))
                     .Select(Create);
@@ -366,6 +375,154 @@ namespace GitHub.Services
                     });
         }
 
+#pragma warning disable CS0618 // DatabaseId is marked obsolete by GraphQL but we need it
+        async Task<IList<IPullRequestReviewModel>> GetPullRequestReviews(string owner, string name, int number)
+        {
+            string cursor = null;
+            var result = new List<IPullRequestReviewModel>();
+
+            while (true)
+            {
+                var query = new Query()
+                    .Repository(owner, name)
+                    .PullRequest(number)
+                    .Reviews(first: 30, after: cursor)
+                    .Select(x => new
+                    {
+                        x.PageInfo.HasNextPage,
+                        x.PageInfo.EndCursor,
+                        Items = x.Nodes.Select(y => new PullRequestReviewModel
+                        {
+                            Id = y.DatabaseId.Value,
+                            NodeId = y.Id,
+                            Body = y.Body,
+                            CommitId = y.Commit.Oid,
+                            State = FromGraphQL(y.State),
+                            User = Create(y.Author.Login, y.Author.AvatarUrl(null))
+                        }).ToList()
+                    });
+
+                var page = await graphql.Run(query);
+                result.AddRange(page.Items);
+
+                if (page.HasNextPage)
+                    cursor = page.EndCursor;
+                else
+                    return result;
+            }
+        }
+
+        async Task<IList<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string owner, string name, int number)
+        {
+            var result = new List<IPullRequestReviewCommentModel>();
+            var query = new Query()
+                .Repository(owner, name)
+                .PullRequest(number)
+                .Reviews(first: 100, after: Var("cursor"))
+                .Select(x => new
+                {
+                    x.PageInfo.HasNextPage,
+                    x.PageInfo.EndCursor,
+                    Reviews = x.Nodes.Select(y => new
+                    {
+                        y.Id,
+                        CommentPage = y.Comments(100, null, null, null).Select(z => new
+                        {
+                            z.PageInfo.HasNextPage,
+                            z.PageInfo.EndCursor,
+                            Items = z.Nodes.Select(a => new PullRequestReviewCommentModel
+                            {
+                                Id = a.DatabaseId.Value,
+                                NodeId = a.Id,
+                                Body = a.Body,
+                                CommitId = a.Commit.Oid,
+                                CreatedAt = a.CreatedAt.Value,
+                                DiffHunk = a.DiffHunk,
+                                OriginalCommitId = a.OriginalCommit.Oid,
+                                OriginalPosition = a.OriginalPosition,
+                                Path = a.Path,
+                                Position = a.Position,
+                                PullRequestReviewId = y.DatabaseId.Value,
+                                User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
+                                IsPending = y.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
+                            }).ToList(),
+                        }).Single()
+                    }).ToList()
+                }).Compile();
+
+            var vars = new Dictionary<string, object>
+            {
+                { "cursor", null }
+            };
+
+            while (true)
+            {
+                var reviewPage = await graphql.Run(query, vars);
+
+                foreach (var review in reviewPage.Reviews)
+                {
+                    result.AddRange(review.CommentPage.Items);
+
+                    if (review.CommentPage.HasNextPage)
+                    {
+                        result.AddRange(await GetPullRequestReviewComments(review.Id, review.CommentPage.EndCursor));
+                    }
+                }
+
+                if (reviewPage.HasNextPage)
+                    vars["cursor"] = reviewPage.EndCursor;
+                else
+                    return result;
+            }
+        }
+
+        private async Task<IEnumerable<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string reviewId, string commentCursor)
+        {
+            var result = new List<IPullRequestReviewCommentModel>();
+            var query = new Query()
+                .Node(reviewId)
+                .Cast<Octokit.GraphQL.Model.PullRequestReview>()
+                .Select(x => new
+                {
+                    CommentPage = x.Comments(100, Var("Cursor"), null, null).Select(z => new
+                    {
+                        z.PageInfo.HasNextPage,
+                        z.PageInfo.EndCursor,
+                        Items = z.Nodes.Select(a => new PullRequestReviewCommentModel
+                        {
+                            Id = a.DatabaseId.Value,
+                            NodeId = a.Id,
+                            Body = a.Body,
+                            CommitId = a.Commit.Oid,
+                            CreatedAt = a.CreatedAt.Value,
+                            DiffHunk = a.DiffHunk,
+                            OriginalCommitId = a.OriginalCommit.Oid,
+                            OriginalPosition = a.OriginalPosition,
+                            Path = a.Path,
+                            Position = a.Position,
+                            PullRequestReviewId = x.DatabaseId.Value,
+                            User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
+                        }).ToList(),
+                    }).Single()
+                }).Compile();
+            var vars = new Dictionary<string, object>
+            {
+                { "cursor", null }
+            };
+
+            while (true)
+            {
+                var page = await graphql.Run(query, vars);
+                result.AddRange(page.CommentPage.Items);
+
+                if (page.CommentPage.HasNextPage)
+                    vars["cursor"] = page.CommentPage.EndCursor;
+                else
+                    return result;
+            }
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         public IObservable<IBranch> GetBranches(IRepositoryModel repo)
         {
             var keyobs = GetUserFromCache()
@@ -394,7 +551,20 @@ namespace GitHub.Services
                 accountCacheItem.IsEnterprise,
                 accountCacheItem.OwnedPrivateRepositoriesCount,
                 accountCacheItem.PrivateRepositoriesInPlanCount,
+                accountCacheItem.AvatarUrl,
                 avatarProvider.GetAvatar(accountCacheItem));
+        }
+
+        IAccount Create(string login, string avatarUrl)
+        {
+            return new Models.Account(
+                login,
+                true,
+                false,
+                0,
+                0,
+                avatarUrl,
+                avatarProvider.GetAvatar(avatarUrl));
         }
 
         IRemoteRepositoryModel Create(RepositoryCacheItem item)
@@ -440,10 +610,22 @@ namespace GitHub.Services
                         User = Create(x.User),
                         CreatedAt = x.CreatedAt ?? DateTimeOffset.MinValue,
                     }).ToList(),
+                Reviews = prCacheItem.Reviews.Select(x =>
+                    (IPullRequestReviewModel)new PullRequestReviewModel
+                    {
+                        Id = x.Id,
+                        NodeId = x.NodeId,
+                        User = Create(x.User),
+                        Body = x.Body,
+                        State = x.State,
+                        CommitId = x.CommitId,
+                    }).ToList(),
                 ReviewComments = prCacheItem.ReviewComments.Select(x =>
                     (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
                     {
                         Id = x.Id,
+                        NodeId = x.NodeId,
+                        PullRequestReviewId = x.PullRequestReviewId,
                         Path = x.Path,
                         Position = x.Position,
                         OriginalPosition = x.OriginalPosition,
@@ -453,6 +635,7 @@ namespace GitHub.Services
                         User = Create(x.User),
                         Body = x.Body,
                         CreatedAt = x.CreatedAt,
+                        IsPending = x.IsPending,
                     }).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
@@ -476,6 +659,11 @@ namespace GitHub.Services
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        static GitHub.Models.PullRequestReviewState FromGraphQL(Octokit.GraphQL.Model.PullRequestReviewState s)
+        {
+            return (GitHub.Models.PullRequestReviewState)s;
         }
 
         public class GitIgnoreCacheItem : CacheItem
@@ -539,22 +727,28 @@ namespace GitHub.Services
         {
             public static PullRequestCacheItem Create(PullRequest pr)
             {
-                return new PullRequestCacheItem(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReviewComment[0]);
+                return new PullRequestCacheItem(
+                    pr,
+                    new PullRequestFile[0],
+                    new IssueComment[0],
+                    new IPullRequestReviewModel[0],
+                    new IPullRequestReviewCommentModel[0]);
             }
 
             public static PullRequestCacheItem Create(
                 PullRequest pr,
                 IReadOnlyList<PullRequestFile> files,
                 IReadOnlyList<IssueComment> comments,
-                IReadOnlyList<PullRequestReviewComment> reviewComments)
+                IReadOnlyList<IPullRequestReviewModel> reviews,
+                IReadOnlyList<IPullRequestReviewCommentModel> reviewComments)
             {
-                return new PullRequestCacheItem(pr, files, comments, reviewComments);
+                return new PullRequestCacheItem(pr, files, comments, reviews, reviewComments);
             }
 
             public PullRequestCacheItem() {}
 
             public PullRequestCacheItem(PullRequest pr)
-                : this(pr, new PullRequestFile[0], new IssueComment[0], new PullRequestReviewComment[0])
+                : this(pr, new PullRequestFile[0], new IssueComment[0], new IPullRequestReviewModel[0], new IPullRequestReviewCommentModel[0])
             {
             }
 
@@ -562,7 +756,8 @@ namespace GitHub.Services
                 PullRequest pr,
                 IReadOnlyList<PullRequestFile> files,
                 IReadOnlyList<IssueComment> comments,
-                IReadOnlyList<PullRequestReviewComment> reviewComments)
+                IReadOnlyList<IPullRequestReviewModel> reviews,
+                IReadOnlyList<IPullRequestReviewCommentModel> reviewComments)
             {
                 Title = pr.Title;
                 Number = pr.Number;
@@ -580,7 +775,7 @@ namespace GitHub.Services
                     Sha = pr.Head.Sha,
                     RepositoryCloneUrl = pr.Head.Repository?.CloneUrl
                 };
-                CommentCount = pr.Comments + pr.ReviewComments;
+                CommentCount = pr.Comments;
                 CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
                 Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;
@@ -589,6 +784,7 @@ namespace GitHub.Services
                 Body = pr.Body;
                 ChangedFiles = files.Select(x => new PullRequestFileCacheItem(x)).ToList();
                 Comments = comments.Select(x => new IssueCommentCacheItem(x)).ToList();
+                Reviews = reviews.Select(x => new PullRequestReviewCacheItem(x)).ToList();
                 ReviewComments = reviewComments.Select(x => new PullRequestReviewCommentCacheItem(x)).ToList();
                 State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
@@ -610,6 +806,7 @@ namespace GitHub.Services
             public string Body { get; set; }
             public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
             public IList<IssueCommentCacheItem> Comments { get; set; } = new IssueCommentCacheItem[0];
+            public IList<PullRequestReviewCacheItem> Reviews { get; set; } = new PullRequestReviewCacheItem[0];
             public IList<PullRequestReviewCommentCacheItem> ReviewComments { get; set; } = new PullRequestReviewCommentCacheItem[0];
 
             // Nullable for compatibility with old caches.
@@ -674,27 +871,63 @@ namespace GitHub.Services
             public DateTimeOffset? CreatedAt { get; set; }
         }
 
+        public class PullRequestReviewCacheItem
+        {
+            public PullRequestReviewCacheItem()
+            {
+            }
+
+            public PullRequestReviewCacheItem(IPullRequestReviewModel review)
+            {
+                Id = review.Id;
+                NodeId = review.NodeId;
+                User = new AccountCacheItem
+                {
+                    Login = review.User.Login,
+                    AvatarUrl = review.User.AvatarUrl,
+                };
+                Body = review.Body;
+                State = review.State;
+            }
+
+            public long Id { get; set; }
+            public string NodeId { get; set; }
+            public AccountCacheItem User { get; set; }
+            public string Body { get; set; }
+            public GitHub.Models.PullRequestReviewState State { get; set; }
+            public string CommitId { get; set; }
+        }
+
         public class PullRequestReviewCommentCacheItem
         {
             public PullRequestReviewCommentCacheItem()
             {
             }
 
-            public PullRequestReviewCommentCacheItem(PullRequestReviewComment comment)
+            public PullRequestReviewCommentCacheItem(IPullRequestReviewCommentModel comment)
             {
                 Id = comment.Id;
+                NodeId = comment.NodeId;
+                PullRequestReviewId = comment.PullRequestReviewId;
                 Path = comment.Path;
                 Position = comment.Position;
                 OriginalPosition = comment.OriginalPosition;
                 CommitId = comment.CommitId;
                 OriginalCommitId = comment.OriginalCommitId;
                 DiffHunk = comment.DiffHunk;
-                User = new AccountCacheItem(comment.User);
+                User = new AccountCacheItem
+                {
+                    Login = comment.User.Login,
+                    AvatarUrl = comment.User.AvatarUrl,
+                };
                 Body = comment.Body;
                 CreatedAt = comment.CreatedAt;
+                IsPending = comment.IsPending;
             }
 
             public int Id { get; }
+            public string NodeId { get; }
+            public int PullRequestReviewId { get; set; }
             public string Path { get; set; }
             public int? Position { get; set; }
             public int? OriginalPosition { get; set; }
@@ -704,6 +937,7 @@ namespace GitHub.Services
             public AccountCacheItem User { get; set; }
             public string Body { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
+            public bool IsPending { get; set; }
         }
 
         public class GitReferenceCacheItem

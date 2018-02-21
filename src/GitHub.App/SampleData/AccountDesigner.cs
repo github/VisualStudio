@@ -32,6 +32,7 @@ namespace GitHub.SampleData
         public string Login { get; set; }
         public int OwnedPrivateRepos { get; set; }
         public long PrivateReposInPlan { get; set; }
+        public string AvatarUrl { get; set; }
 
         public override string ToString()
         {
