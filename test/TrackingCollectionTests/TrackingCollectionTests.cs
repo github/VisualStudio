@@ -18,8 +18,10 @@ using GitHub;
 [TestFixture]
 public class TrackingTests : TestBase
 {
+    const int Timeout = 2000;
+
 #if !DISABLE_REACTIVE_UI
-    [TestFixtureSetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
         Splat.ModeDetector.Current.SetInUnitTestRunner(true);
@@ -1907,7 +1909,7 @@ public class TrackingTests : TestBase
         col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
         col.Subscribe();
 
-        await col.OriginalCompleted;
+        await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
 
         // it's initially sorted by date, so id list should not match
         CollectionAssert.AreNotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
@@ -1944,7 +1946,7 @@ public class TrackingTests : TestBase
     }
 
     [Test]
-    public void ListeningTwiceWorks()
+    public async Task ListeningTwiceWorks()
     {
         var count = 10;
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>();
@@ -1954,13 +1956,15 @@ public class TrackingTests : TestBase
         var list1 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, count - i, "Run 1")).ToList());
         var list2 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, i + count, "Run 2")).ToList());
 
+#pragma warning disable 4014
         col.Listen(list1.ToObservable());
         col.Subscribe();
-        col.OriginalCompleted.Wait();
+        await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
 
         col.Listen(list2.ToObservable());
         col.Subscribe();
-        col.OriginalCompleted.Wait();
+        await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
+#pragma warning restore 4014
 
         CollectionAssert.AreEqual(list2, col);
     }
@@ -1980,7 +1984,7 @@ public class TrackingTests : TestBase
     }
 
     [Test]
-    public async void AddingBeforeSubscribingWorks()
+    public async Task AddingBeforeSubscribingWorks()
     {
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
         ReplaySubject<Thing> done = new ReplaySubject<Thing>();
@@ -1995,7 +1999,7 @@ public class TrackingTests : TestBase
                 done.OnCompleted();
         }, () => {});
 
-        await Observable.Timeout(done, TimeSpan.FromMilliseconds(500));
+        await done.Timeout(TimeSpan.FromMilliseconds(500));
         Assert.AreEqual(2, col.Count);
     }
 

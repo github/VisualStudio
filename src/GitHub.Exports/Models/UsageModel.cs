@@ -2,7 +2,8 @@
 
 namespace GitHub.Models
 {
-    public class UsageModel
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "It'll use reflection by default and we're fine with that")]
+    public struct UsageModel
     {
         public Guid Guid { get; set; }
         public DateTimeOffset Date { get; set; }
@@ -30,6 +31,7 @@ namespace GitHub.Models
         public int NumberOfForkPullRequestsCheckedOut { get; set; }
         public int NumberOfForkPullRequestPulls { get; set; }
         public int NumberOfForkPullRequestPushes { get; set; }
+        public int NumberOfSyncSubmodules { get; set; }
         public int NumberOfWelcomeDocsClicks { get; set; }
         public int NumberOfWelcomeTrainingClicks { get; set; }
         public int NumberOfGitHubPaneHelpClicks { get; set; }
@@ -37,6 +39,7 @@ namespace GitHub.Models
         public int NumberOfPRDetailsViewFile { get; set; }
         public int NumberOfPRDetailsCompareWithSolution { get; set; }
         public int NumberOfPRDetailsOpenFileInSolution { get; set; }
+        public int NumberOfPRDetailsNavigateToEditor { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
 

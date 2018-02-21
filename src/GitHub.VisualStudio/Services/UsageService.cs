@@ -101,8 +101,9 @@ namespace GitHub.Services
                     SimpleJson.DeserializeObject<UsageData>(json) :
                     new UsageData { Reports = new List<UsageModel>() };
             }
-            catch
+            catch(Exception ex)
             {
+                log.Error(ex, "Error deserializing usage");
                 return new UsageData { Reports = new List<UsageModel>() };
             }
         }
@@ -115,9 +116,9 @@ namespace GitHub.Services
                 var json = SimpleJson.SerializeObject(data);
                 await WriteAllTextAsync(storePath, json);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                log.Warning(ex, "Failed to write usage data");
+                log.Error(ex,"Failed to write usage data");
             }
         }
 

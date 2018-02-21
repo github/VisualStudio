@@ -54,6 +54,29 @@ Line 4";
             }
 
             [Test]
+            public async Task IgnoreCommentsWithNoDiffLineContext()
+            {
+                var baseContents = "Line 1";
+                var headContents = "Line 1";
+
+                var comment = CreateComment(@"@@ -10,7 +10,6 @@ class Program");
+
+                using (var diffService = new FakeDiffService(FilePath, baseContents))
+                {
+                    var diff = await diffService.Diff(FilePath, headContents);
+                    var pullRequest = CreatePullRequest(FilePath, comment);
+                    var target = CreateTarget(diffService);
+
+                    var result = target.BuildCommentThreads(
+                        pullRequest,
+                        FilePath,
+                        diff);
+
+                    Assert.That(result, Is.Empty);
+                }
+            }
+
+            [Test]
             public async Task MatchesReviewCommentOnDifferentLine()
             {
                 var baseContents = @"Line 1
@@ -212,7 +235,7 @@ Line 4";
 
                     Assert.That(3, Is.EqualTo(threads[0].LineNumber));
                     Assert.That(
-                        new[] 
+                        new[]
                         {
                             Tuple.Create(2, DiffSide.Right),
                             Tuple.Create(3, DiffSide.Right)
