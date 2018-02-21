@@ -48,17 +48,12 @@ namespace GitHub.Services
             await Initialize();
             var data = await service.ReadLocalData();
             var usage = await GetCurrentReport(data);
-            // because Model is a struct, it needs to be boxed in order for reflection to work
-            object model = usage;
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
             log.Verbose("Increment counter {Name}", propertyInfo.Name);
-            var value = (int)propertyInfo.GetValue(model);
-            propertyInfo.SetValue(model, value + 1);
-
-            //TODO:  Understand changes here
-            //usage.Model = (UsageModel)model;
-            //await service.WriteLocalData(data);
+            var value = (int)propertyInfo.GetValue(usage);
+            propertyInfo.SetValue(usage, value + 1);
+            await service.WriteLocalData(data);
         }
 
         IDisposable StartTimer()
@@ -131,7 +126,7 @@ namespace GitHub.Services
         {
             var current = data.Reports.FirstOrDefault(x => x.Date.Date == DateTimeOffset.Now.Date);
 
-            if (current.Equals(UsageModel.Default))
+            if (current == null)
             {
                 var guid = await service.GetUserGuid();
                 current = UsageModel.Create(guid);
