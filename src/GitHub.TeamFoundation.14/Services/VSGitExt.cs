@@ -127,7 +127,7 @@ namespace GitHub.VisualStudio.Base
             {
                 if (value != activeRepositories)
                 {
-                    log.Debug("ActiveRepositories changed to {Repositories}", value.Select(x => x.CloneUrl));
+                    log.Debug("ActiveRepositories changed to {Repositories}", value?.Select(x => x.CloneUrl));
                     activeRepositories = value;
                     ActiveRepositoriesChanged?.Invoke();
                 }
