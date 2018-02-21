@@ -131,7 +131,7 @@ namespace GitHub.Services
         {
             var current = data.Reports.FirstOrDefault(x => x.Date.Date == DateTimeOffset.Now.Date);
 
-            if (current == null)
+            if (current.Equals(UsageModel.Default))
             {
                 var guid = await service.GetUserGuid();
                 current = UsageModel.Create(guid);

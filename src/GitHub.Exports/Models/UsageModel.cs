@@ -5,6 +5,11 @@ namespace GitHub.Models
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "It'll use reflection by default and we're fine with that")]
     public struct UsageModel
     {
+        public static UsageModel Default = new UsageModel
+        {
+            Guid = Guid.Empty
+        };
+
         public Guid Guid { get; set; }
         public DateTimeOffset Date { get; set; }
         public string AppVersion { get; set; }
