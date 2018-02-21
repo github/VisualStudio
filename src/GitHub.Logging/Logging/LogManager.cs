@@ -25,14 +25,16 @@ namespace GitHub.Logging
                 "extension.log");
 
             const string outputTemplate =
-                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u4} [{ThreadId:00}] {ShortSourceContext,-25} {Message:lj}{NewLine}{Exception}";
+                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{ProcessId:00000}] {Level:u4} [{ThreadId:00}] {ShortSourceContext,-25} {Message:lj}{NewLine}{Exception}";
 
             return new LoggerConfiguration()
+                .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
                 .MinimumLevel.ControlledBy(LoggingLevelSwitch)
                 .WriteTo.File(logPath,
                     fileSizeLimitBytes: null,
-                    outputTemplate: outputTemplate)
+                    outputTemplate: outputTemplate,
+                    shared: true)
                 .CreateLogger();
         }
 
