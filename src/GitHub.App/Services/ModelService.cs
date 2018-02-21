@@ -484,7 +484,7 @@ namespace GitHub.Services
                 .Cast<Octokit.GraphQL.Model.PullRequestReview>()
                 .Select(x => new
                 {
-                    CommentPage = x.Comments(100, Var("Cursor"), null, null).Select(z => new
+                    CommentPage = x.Comments(100, Var("cursor"), null, null).Select(z => new
                     {
                         z.PageInfo.HasNextPage,
                         z.PageInfo.EndCursor,
@@ -507,7 +507,7 @@ namespace GitHub.Services
                 }).Compile();
             var vars = new Dictionary<string, object>
             {
-                { "cursor", null }
+                { "cursor", commentCursor }
             };
 
             while (true)
