@@ -140,22 +140,14 @@ namespace GitHub.ViewModels.Dialog
 
             var enterpriseInstance = false;
             var loginMethods = (EnterpriseLoginMethods?)null;
+            var uri = new UriBuilder(url).Uri;
 
-            try
-            {
-                var uri = new UriBuilder(url).Uri;
-                ProbeStatus = EnterpriseProbeStatus.Checking;
+            ProbeStatus = EnterpriseProbeStatus.Checking;
 
-                if (await enterpriseCapabilities.Probe(uri) == EnterpriseProbeResult.Ok)
-                {
-                    loginMethods = await enterpriseCapabilities.ProbeLoginMethods(uri);
-                    enterpriseInstance = true;
-                }
-            }
-            catch
+            if (await enterpriseCapabilities.Probe(uri) == EnterpriseProbeResult.Ok)
             {
-                ProbeStatus = EnterpriseProbeStatus.Invalid;
-                loginMethods = null;
+                loginMethods = await enterpriseCapabilities.ProbeLoginMethods(uri);
+                enterpriseInstance = true;
             }
 
             if (url == EnterpriseUrl)
