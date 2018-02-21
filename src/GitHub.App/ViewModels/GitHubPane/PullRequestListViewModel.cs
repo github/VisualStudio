@@ -221,6 +221,8 @@ namespace GitHub.ViewModels.GitHubPane
                     (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) &&
                     (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
             }
+
+            SaveSettings();
         }
 
         string searchQuery;

@@ -30,22 +30,29 @@ namespace GitHub.Services
 
         public async Task<EnterpriseLoginMethods> ProbeLoginMethods(Uri enterpriseBaseUrl)
         {
-            // It's important that we don't use our cached credentials on this connection, as they
-            // may be wrong - we're trying to log in after all.
-            var hostAddress = HostAddress.Create(enterpriseBaseUrl);
-            var connection = new Octokit.Connection(program.ProductHeader, hostAddress.ApiUri);
-            var meta = await GetMetadata(connection).ConfigureAwait(false);
-            var result = EnterpriseLoginMethods.Token;
-
-            if (meta.VerifiablePasswordAuthentication) result |= EnterpriseLoginMethods.UsernameAndPassword;
-
-            if (meta.InstalledVersion != null)
+            try
             {
-                var version = new Version(meta.InstalledVersion);
-                if (version >= MinimumOAuthVersion) result |= EnterpriseLoginMethods.OAuth;
-            }
+                // It's important that we don't use our cached credentials on this connection, as they
+                // may be wrong - we're trying to log in after all.
+                var hostAddress = HostAddress.Create(enterpriseBaseUrl);
+                var connection = new Octokit.Connection(program.ProductHeader, hostAddress.ApiUri);
+                var meta = await GetMetadata(connection).ConfigureAwait(false);
+                var result = EnterpriseLoginMethods.Token;
 
-            return result;
+                if (meta.VerifiablePasswordAuthentication != false) result |= EnterpriseLoginMethods.UsernameAndPassword;
+
+                if (meta.InstalledVersion != null)
+                {
+                    var version = new Version(meta.InstalledVersion);
+                    if (version >= MinimumOAuthVersion) result |= EnterpriseLoginMethods.OAuth;
+                }
+
+                return result;
+            }
+            catch
+            {
+                return EnterpriseLoginMethods.Token | EnterpriseLoginMethods.UsernameAndPassword;
+            }
         }
 
         private async Task<EnterpriseMeta> GetMetadata(IConnection connection)
@@ -56,9 +63,10 @@ namespace GitHub.Services
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Created via Octokit reflection")]
-        class EnterpriseMeta : Meta
+        class EnterpriseMeta
         {
             public string InstalledVersion { get; private set; }
+            public bool? VerifiablePasswordAuthentication { get; private set; }
         }
     }
 }
