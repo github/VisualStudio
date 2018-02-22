@@ -1,4 +1,6 @@
-﻿namespace GitHub.Models
+﻿using System;
+
+namespace GitHub.Models
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "It'll use reflection by default and we're fine with that")]
     public struct UsageModel
@@ -41,9 +43,9 @@
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
 
-        public UsageModel Clone(Guid guid, bool includeWeekly, bool includeMonthly)
+        public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
-            var result = Create(guid);
+            var result = this;
             if (!includeWeekly)
                 result.NumberOfStartupsWeek = 0;
             if (!includeMonthly)
@@ -65,14 +67,6 @@
             result.VSVersion = VSVersion;
             result.Lang = Lang;
             return result;
-        }
-
-        public static UsageModel Create(Guid guid)
-        {
-            return new UsageModel
-            {
-                Guid = guid
-            };
         }
     }
 }

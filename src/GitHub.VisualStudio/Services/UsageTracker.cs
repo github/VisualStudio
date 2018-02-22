@@ -127,7 +127,7 @@ namespace GitHub.Services
             // Only send stats once a day.
             if (!service.IsSameDay(usage.LastUpdated))
             {
-                usage.Model = UpdateModelUserData(usage.Model);
+                usage.Model = await UpdateModelUserData(usage.Model);
 
                 await SendUsage(usage.Model, includeWeekly, includeMonthly);
 
@@ -144,13 +144,14 @@ namespace GitHub.Services
                 throw new GitHubLogicException("SendUsage should not be called when there is no IMetricsService");
             }
 
-            var guid = await service.GetUserGuid();
-            var model = usage.Clone(weekly, monthly);
+            var model = usage.Clone(includeWeekly, includeMonthly);
             await client.PostUsage(model);
         }
 
-        UsageModel UpdateModelUserData(UsageModel model)
+        async Task<UsageModel> UpdateModelUserData(UsageModel model)
         {
+            model.Guid = await service.GetUserGuid();
+
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
                 model.IsGitHubUser = true;
@@ -160,6 +161,7 @@ namespace GitHub.Services
             {
                 model.IsEnterpriseUser = true;
             }
+
             return model;
         }
     }
