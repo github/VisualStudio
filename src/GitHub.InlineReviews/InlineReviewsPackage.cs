@@ -30,8 +30,9 @@ namespace GitHub.InlineReviews
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            menuService.AddCommand(exports.GetExportedValue<INextInlineCommentCommand>());
-            menuService.AddCommand(exports.GetExportedValue<IPreviousInlineCommentCommand>());
+            menuService.AddCommands(
+                exports.GetExportedValue<INextInlineCommentCommand>(),
+                exports.GetExportedValue<IPreviousInlineCommentCommand>());
         }
     }
 }

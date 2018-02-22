@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -7,16 +8,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using GitHub.Api;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
-using GitHub.VisualStudio.Menus;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
@@ -54,10 +57,8 @@ namespace GitHub.VisualStudio
         {
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
-
             await GetServiceAsync(typeof(IUsageTracker));
-
-            InitializeMenus().Forget();
+            await InitializeMenus();
         }
 
         void LogVersionInformation()
@@ -70,20 +71,19 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
-            if (menus == null)
-            {
-                // Ignore if null because Expression Blend doesn't support custom services or menu extensibility.
-                return;
-            }
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var exports = componentModel.DefaultExportProvider;
 
-            await ThreadingHelper.SwitchToMainThreadAsync();
-
-            foreach (var menu in menus.Menus)
-                serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
-
-            foreach (var menu in menus.DynamicMenus)
-                serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
+            menuService.AddCommands(
+                exports.GetExportedValue<IAddConnectionCommand>(),
+                exports.GetExportedValue<IBlameLinkCommand>(),
+                exports.GetExportedValue<ICopyLinkCommand>(),
+                exports.GetExportedValue<ICreateGistCommand>(),
+                exports.GetExportedValue<IOpenLinkCommand>(),
+                exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                exports.GetExportedValue<IShowGitHubPaneCommand>());
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
@@ -109,7 +109,6 @@ namespace GitHub.VisualStudio
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
@@ -153,7 +152,6 @@ namespace GitHub.VisualStudio
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IUsageService), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
-            AddService(typeof(IMenuProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             return Task.CompletedTask;
         }
@@ -240,11 +238,6 @@ namespace GitHub.VisualStudio
                     ApiClientConfiguration.RequiredScopes,
                     ApiClientConfiguration.AuthorizationNote,
                     ApiClientConfiguration.MachineFingerprint);
-            }
-            else if (serviceType == typeof(IMenuProvider))
-            {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new MenuProvider(sp);
             }
             else if (serviceType == typeof(IUsageService))
             {

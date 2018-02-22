@@ -13,16 +13,21 @@ namespace GitHub.Services.Vssdk.Commands
     public static class MenuCommandServiceExtensions
     {
         /// <summary>
-        /// Adds an <see cref="IVsCommand"/> or <see cref="IVsCommand{TParam}"/> to a menu.
+        /// Adds <see cref="IVsCommand"/>s or <see cref="IVsCommand{TParam}"/>s to a menu.
         /// </summary>
         /// <param name="service">The menu command service.</param>
-        /// <param name="command">The command to add.</param>
-        public static void AddCommand(this IMenuCommandService service, IVsCommandBase command)
+        /// <param name="command">The commands to add.</param>
+        public static void AddCommands(
+            this IMenuCommandService service,
+            params IVsCommandBase[] commands)
         {
             Guard.ArgumentNotNull(service, nameof(service));
-            Guard.ArgumentNotNull(command, nameof(command));
+            Guard.ArgumentNotNull(commands, nameof(commands));
 
-            service.AddCommand((MenuCommand)command);
+            foreach (MenuCommand command in commands)
+            {
+                service.AddCommand(command);
+            }
         }
 
         /// <summary>

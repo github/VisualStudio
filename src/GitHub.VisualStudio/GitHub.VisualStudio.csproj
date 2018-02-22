@@ -306,19 +306,17 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyResolverPackage.cs" />
+    <Compile Include="Commands\BlameLinkCommand.cs" />
+    <Compile Include="Commands\CreateGistCommand.cs" />
+    <Compile Include="Commands\LinkCommandBase.cs" />
+    <Compile Include="Commands\CopyLinkCommand.cs" />
+    <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
+    <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
+    <Compile Include="Commands\OpenPullRequestsCommand.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
-    <Compile Include="Menus\BlameLink.cs" />
-    <Compile Include="Menus\MenuBase.cs" />
-    <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
-    <Compile Include="Menus\OpenLink.cs" />
-    <Compile Include="Menus\LinkMenuBase.cs" />
-    <Compile Include="Menus\ShowCurrentPullRequest.cs" />
-    <Compile Include="Menus\OpenPullRequests.cs" />
-    <Compile Include="Menus\ShowGitHubPane.cs" />
-    <Compile Include="Menus\AddConnection.cs" />
-    <Compile Include="Menus\CopyLink.cs" />
-    <Compile Include="Menus\MenuProvider.cs" />
+    <Compile Include="Commands\AddConnectionCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />

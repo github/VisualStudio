@@ -6,7 +6,6 @@ namespace GitHub.VisualStudio
     {
         public const string PackageId = "c3d3dc68-c977-411f-b3e8-03b0dccf7dfc";
         public const string ImagesId = "27841f47-070a-46d6-90be-a5cbbfc724ac";
-        public const string MenuProviderId = "36FA083F-E0BE-418E-B42F-CB7623C55A00";
         public const string UsageTrackerId = "9362DD38-7E49-4B5D-9DE1-E843D4155716";
         public const string UIProviderId = "304F2186-17C4-4C66-8A54-5C96F9353A28";
         public const string GitHubServiceProviderId = "76909E1A-9D58-41AB-8957-C26B9550787B";

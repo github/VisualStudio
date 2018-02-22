@@ -19,7 +19,7 @@ namespace GitHub.Services.Vssdk.Commands
         /// <param name="commandSet">The GUID of the group the command belongs to.</param>
         /// <param name="commandId">The numeric identifier of the command.</param>
         protected VsCommandBase(Guid commandSet, int commandId)
-            : base(ExecHandler, new CommandID(commandSet, commandId))
+            : base(ExecHandler, delegate { }, QueryStatusHandler, new CommandID(commandSet, commandId))
         {
         }
 
@@ -33,6 +33,7 @@ namespace GitHub.Services.Vssdk.Commands
         /// <inheritdoc/>
         bool ICommand.CanExecute(object parameter)
         {
+            QueryStatus();
             return Enabled && Visible;
         }
 
@@ -55,11 +56,21 @@ namespace GitHub.Services.Vssdk.Commands
             canExecuteChanged?.Invoke(this, e);
         }
 
+        protected virtual void QueryStatus()
+        {
+        }
+
         static void ExecHandler(object sender, EventArgs e)
         {
             var args = (OleMenuCmdEventArgs)e;
             var command = sender as VsCommandBase;
             command?.ExecuteUntyped(args.InValue);
+        }
+
+        static void QueryStatusHandler(object sender, EventArgs e)
+        {
+            var command = sender as VsCommandBase;
+            command?.QueryStatus();
         }
     }
 }

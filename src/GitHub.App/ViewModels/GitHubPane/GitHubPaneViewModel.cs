@@ -50,6 +50,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        readonly ReactiveCommand<object> help;
         readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
         bool initialized;
         IViewModel content;
@@ -157,6 +158,13 @@ namespace GitHub.ViewModels.GitHubPane
                 if (url != null) browser.OpenUrl(url);
             });
 
+            help = ReactiveCommand.Create();
+            help.Subscribe(_ =>
+            {
+                browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+            });
+
             navigator.WhenAnyObservable(x => x.Content.NavigationRequested)
                 .Subscribe(x => NavigateTo(x).Forget());
 
@@ -231,13 +239,7 @@ namespace GitHub.ViewModels.GitHubPane
                 BindNavigatorCommand(menuService, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
                 BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);
                 BindNavigatorCommand(menuService, PkgCmdIDList.githubCommand, openInBrowser);
-
-                paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                     (_, __) =>
-                     {
-                         browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                         usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
-                     });
+                BindNavigatorCommand(menuService, PkgCmdIDList.helpCommand, help);
             }
             finally
             {
