@@ -136,9 +136,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Commands\MenuCommandServiceExtensions.cs" />
     <Compile Include="Commands\VsCommand.cs" />
     <Compile Include="Commands\VsCommandBase.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
