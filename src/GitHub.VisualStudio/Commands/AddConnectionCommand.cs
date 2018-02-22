@@ -13,13 +13,13 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IAddConnectionCommand))]
     public class AddConnectionCommand : VsCommand, IAddConnectionCommand
     {
-        readonly IDialogService dialogService;
+        readonly Lazy<IDialogService> dialogService;
 
         [ImportingConstructor]
-        protected AddConnectionCommand(IDialogService dialogService)
+        protected AddConnectionCommand(IGitHubServiceProvider serviceProvider)
             : base(CommandSet, CommandId)
         {
-            this.dialogService = dialogService;
+            dialogService = new Lazy<IDialogService>(() => serviceProvider.TryGetService<IDialogService>());
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace GitHub.VisualStudio.Commands
         /// </summary>
         public override Task Execute()
         {
-            return dialogService.ShowLoginDialog();
+            return dialogService.Value.ShowLoginDialog();
         }
     }
 }

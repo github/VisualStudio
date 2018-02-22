@@ -14,16 +14,14 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(ICreateGistCommand))]
     public class CreateGistCommand : VsCommand, ICreateGistCommand
     {
-        readonly IDialogService dialogService;
+        readonly Lazy<IDialogService> dialogService;
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
 
         [ImportingConstructor]
-        protected CreateGistCommand(
-            IDialogService dialogService,
-            IGitHubServiceProvider serviceProvider)
+        protected CreateGistCommand(IGitHubServiceProvider serviceProvider)
             : base(CommandSet, CommandId)
         {
-            this.dialogService = dialogService;
+            dialogService = new Lazy<IDialogService>(() => serviceProvider.TryGetService<IDialogService>());
             selectedTextProvider = new Lazy<ISelectedTextProvider>(() => serviceProvider.TryGetService<ISelectedTextProvider>());
         }
 
@@ -44,7 +42,7 @@ namespace GitHub.VisualStudio.Commands
         /// </summary>
         public override Task Execute()
         {
-            return dialogService.ShowCreateGist();
+            return dialogService.Value.ShowCreateGist();
         }
 
         protected override void QueryStatus()
