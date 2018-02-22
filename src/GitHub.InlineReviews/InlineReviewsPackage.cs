@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Views;
+using GitHub.Services;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
@@ -23,10 +24,10 @@ namespace GitHub.InlineReviews
             CancellationToken cancellationToken,
             IProgress<ServiceProgressData> progress)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            PackageResources.Register(this, componentModel.DefaultExportProvider, menuService);
+            var serviceProvider = (IGitHubServiceProvider)(await GetServiceAsync(typeof(IGitHubServiceProvider)));
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            PackageResources.Register(this, serviceProvider.ExportProvider, menuService);
         }
     }
 }
