@@ -104,8 +104,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews.UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Logging", "src\GitHub.Logging\GitHub.Logging.csproj", "{8D73575A-A89F-47CC-B153-B47DD06837F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Services", "src\GitHub.Services\GitHub.Services.csproj", "{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Services.Vssdk", "src\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj", "{2D3D2834-33BE-45CA-B3CC-12F853557D7B}"
 EndProject
 Global
@@ -407,16 +405,6 @@ Global
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{8D73575A-A89F-47CC-B153-B47DD06837F0}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.DebugCodeAnalysis|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.DebugCodeAnalysis|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.DebugWithoutVsix|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 		{2D3D2834-33BE-45CA-B3CC-12F853557D7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2D3D2834-33BE-45CA-B3CC-12F853557D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D3D2834-33BE-45CA-B3CC-12F853557D7B}.DebugCodeAnalysis|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
