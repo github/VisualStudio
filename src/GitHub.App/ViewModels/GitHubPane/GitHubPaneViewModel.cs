@@ -35,8 +35,6 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IConnectionManager connectionManager;
         readonly ITeamExplorerContext teamExplorerContext;
-        readonly IVisualStudioBrowser browser;
-        readonly IUsageTracker usageTracker;
         readonly INavigationViewModel navigator;
         readonly ILoggedOutViewModel loggedOut;
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
@@ -45,8 +43,6 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
         readonly ObservableAsPropertyHelper<bool> isSearchEnabled;
         readonly ObservableAsPropertyHelper<string> title;
-        readonly ReactiveCommand<object> navigateBack;
-        readonly ReactiveCommand<object> navigateForward;
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
@@ -85,8 +81,6 @@ namespace GitHub.ViewModels.GitHubPane
             this.apiClientFactory = apiClientFactory;
             this.connectionManager = connectionManager;
             this.teamExplorerContext = teamExplorerContext;
-            this.browser = browser;
-            this.usageTracker = usageTracker;
             this.navigator = navigator;
             this.loggedOut = loggedOut;
             this.notAGitHubRepository = notAGitHubRepository;
@@ -129,14 +123,6 @@ namespace GitHub.ViewModels.GitHubPane
             isSearchEnabled = currentPage
                 .Select(x => x is ISearchablePageViewModel)
                 .ToProperty(this, x => x.IsSearchEnabled);
-
-            navigateBack = ReactiveCommand.CreateCombined(
-                currentPage.Select(x => x != null),
-                navigator.NavigateBack);
-
-            navigateForward = ReactiveCommand.CreateCombined(
-                currentPage.Select(x => x != null),
-                navigator.NavigateForward);
 
             refresh = ReactiveCommand.CreateAsyncTask(
                 currentPage.SelectMany(x => x?.WhenAnyValue(
