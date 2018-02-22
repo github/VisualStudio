@@ -11,11 +11,13 @@ using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Info;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using ReactiveUI;
+using Serilog;
 using OleMenuCommand = Microsoft.VisualStudio.Shell.OleMenuCommand;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -27,6 +29,7 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public sealed class GitHubPaneViewModel : ViewModelBase, IGitHubPaneViewModel, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubPaneViewModel>();
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
 
         readonly IViewViewModelFactory viewModelFactory;
@@ -46,6 +49,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
+        bool initialized;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -198,26 +203,37 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
-            await UpdateContent(teamExplorerContext.ActiveRepository);
-            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
-               .Skip(1)
-               .ObserveOn(RxApp.MainThreadScheduler)
-               .Subscribe(x => UpdateContent(x).Forget());
+            await initializing.WaitAsync();
+            if (initialized) return;
 
-            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+            try
+            {
+                await UpdateContent(teamExplorerContext.ActiveRepository);
+                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                   .Skip(1)
+                   .ObserveOn(RxApp.MainThreadScheduler)
+                   .Subscribe(x => UpdateContent(x).Forget());
 
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+                connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
 
-            paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                 (_, __) =>
-                 {
-                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
-                 });
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+
+                paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                     (_, __) =>
+                     {
+                         browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                         usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+                     });
+            }
+            finally
+            {
+                initialized = true;
+                initializing.Release();
+            }
         }
 
         /// <inheritdoc/>
@@ -347,6 +363,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task UpdateContent(ILocalRepositoryModel repository)
         {
+            log.Debug("UpdateContent called with {CloneUrl}", repository?.CloneUrl);
+
             LocalRepository = repository;
             Connection = null;
             Content = null;
@@ -354,11 +372,13 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (repository == null)
             {
+                log.Debug("Not a git repository: {CloneUrl}", repository?.CloneUrl);
                 Content = notAGitRepository;
                 return;
             }
             else if (string.IsNullOrWhiteSpace(repository.CloneUrl))
             {
+                log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                 Content = notAGitHubRepository;
                 return;
             }
@@ -366,7 +386,7 @@ namespace GitHub.ViewModels.GitHubPane
             var repositoryUrl = repository.CloneUrl.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             var client = await apiClientFactory.Create(repository.CloneUrl);
-            var isEnterprise = isDotCom ? false : client.IsEnterprise();
+            var isEnterprise = isDotCom ? false : await client.IsEnterprise();
 
             if ((isDotCom || isEnterprise) && await IsValidRepository(client))
             {
@@ -376,16 +396,19 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (Connection?.IsLoggedIn == true)
                 {
+                    log.Debug("Found a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                     Content = navigator;
                     await ShowDefaultPage();
                 }
                 else
                 {
+                    log.Debug("Found a a GitHub repository but not logged in: {CloneUrl}", repository?.CloneUrl);
                     Content = loggedOut;
                 }
             }
             else
             {
+                log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                 Content = notAGitHubRepository;
             }
         }

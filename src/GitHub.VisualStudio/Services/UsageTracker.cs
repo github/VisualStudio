@@ -44,10 +44,13 @@ namespace GitHub.Services
         public async Task IncrementCounter(Expression<Func<UsageModel, int>> counter)
         {
             var usage = await LoadUsage();
+            // because Model is a struct, it needs to be boxed in order for reflection to work
+            object model = usage.Model;
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            var value = (int)propertyInfo.GetValue(usage.Model);
-            propertyInfo.SetValue(usage.Model, value + 1);
+            var value = (int)propertyInfo.GetValue(model);
+            propertyInfo.SetValue(model, value + 1);
+            usage.Model = (UsageModel)model;
             await service.WriteLocalData(usage);
         }
 
@@ -75,9 +78,11 @@ namespace GitHub.Services
         async Task IncrementLaunchCount()
         {
             var usage = await LoadUsage();
-            ++usage.Model.NumberOfStartups;
-            ++usage.Model.NumberOfStartupsWeek;
-            ++usage.Model.NumberOfStartupsMonth;
+            var model = usage.Model;
+            model.NumberOfStartups++;
+            model.NumberOfStartupsWeek++;
+            model.NumberOfStartupsMonth++;
+            usage.Model = model;
             await service.WriteLocalData(usage);
         }
 
@@ -85,11 +90,13 @@ namespace GitHub.Services
         {
             await Initialize();
 
-            var result = await service.ReadLocalData();
-            result.Model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
-            result.Model.AppVersion = AssemblyVersionInformation.Version;
-            result.Model.VSVersion = vsservices.VSVersion;
-            return result;
+            var usage = await service.ReadLocalData();
+            var model = usage.Model;
+            model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
+            model.AppVersion = AssemblyVersionInformation.Version;
+            model.VSVersion = vsservices.VSVersion;
+            usage.Model = model;
+            return usage;
         }
 
         async Task TimerTick()
@@ -120,53 +127,40 @@ namespace GitHub.Services
             // Only send stats once a day.
             if (!service.IsSameDay(usage.LastUpdated))
             {
+                usage.Model = UpdateModelUserData(usage.Model);
+
                 await SendUsage(usage.Model, includeWeekly, includeMonthly);
-                ClearCounters(usage.Model, includeWeekly, includeMonthly);
+
+                usage.Model = usage.Model.ClearCounters(includeWeekly, includeMonthly);
                 usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
                 await service.WriteLocalData(usage);
             }
         }
 
-        async Task SendUsage(UsageModel usage, bool weekly, bool monthly)
+        async Task SendUsage(UsageModel usage, bool includeWeekly, bool includeMonthly)
         {
             if (client == null)
             {
                 throw new GitHubLogicException("SendUsage should not be called when there is no IMetricsService");
             }
 
+            var guid = await service.GetUserGuid();
+            var model = usage.Clone(weekly, monthly);
+            await client.PostUsage(model);
+        }
+
+        UsageModel UpdateModelUserData(UsageModel model)
+        {
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
-                usage.IsGitHubUser = true;
+                model.IsGitHubUser = true;
             }
 
             if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
             {
-                usage.IsEnterpriseUser = true;
+                model.IsEnterpriseUser = true;
             }
-
-            var guid = await service.GetUserGuid();
-            var model = usage.Clone(guid, weekly, monthly);
-            await client.PostUsage(model);
-        }
-
-        static void ClearCounters(UsageModel usage, bool weekly, bool monthly)
-        {
-            var properties = usage.GetType().GetRuntimeProperties();
-
-            foreach (var property in properties)
-            {
-                var setValue = property.PropertyType == typeof(int);
-
-                if (property.Name == nameof(usage.NumberOfStartupsWeek))
-                    setValue = weekly;
-                else if (property.Name == nameof(usage.NumberOfStartupsMonth))
-                    setValue = monthly;
-
-                if (setValue)
-                {
-                    property.SetValue(usage, 0);
-                }
-            }
+            return model;
         }
     }
 }

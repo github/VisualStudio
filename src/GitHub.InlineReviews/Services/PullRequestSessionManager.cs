@@ -36,6 +36,7 @@ namespace GitHub.InlineReviews.Services
         readonly IModelServiceFactory modelServiceFactory;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
+        TaskCompletionSource<object> initialized;
         IPullRequestSession currentSession;
         ILocalRepositoryModel repository;
 
@@ -65,14 +66,13 @@ namespace GitHub.InlineReviews.Services
             this.sessionService = sessionService;
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
+            initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
-                .StartWith((EventPattern<object>)null)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => RepoChanged(teamExplorerContext.ActiveRepository).Forget());
+                .Subscribe(_ => StatusChanged().Forget());
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
-                .Skip(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => RepoChanged(x).Forget());
         }
@@ -84,6 +84,10 @@ namespace GitHub.InlineReviews.Services
             private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
+        /// <inheritdoc/>
+        public Task EnsureInitialized() => initialized.Task;
+
+        /// <inheritdoc/>
         public async Task<IPullRequestSessionFile> GetLiveFile(
             string relativePath,
             ITextView textView,
@@ -159,8 +163,8 @@ namespace GitHub.InlineReviews.Services
             {
                 // The branch for the PR was not previously marked with the PR number in the git
                 // config so we didn't pick up that the current branch is a PR branch. That has
-                // now been corrected, so call RepoChanged to make sure everything is up-to-date.
-                await RepoChanged(repository);
+                // now been corrected, so call StatusChanged to make sure everything is up-to-date.
+                await StatusChanged();
             }
 
             return await GetSessionInternal(pullRequest);
@@ -191,29 +195,33 @@ namespace GitHub.InlineReviews.Services
 
         async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
         {
+            repository = localRepositoryModel;
+            CurrentSession = null;
+            sessions.Clear();
+
+            if (localRepositoryModel != null)
+            {
+                await StatusChanged();
+            }
+        }
+
+        async Task StatusChanged()
+        {
             try
             {
-                if (localRepositoryModel != repository)
-                {
-                    repository = localRepositoryModel;
-                    CurrentSession = null;
-                    sessions.Clear();
-                }
-
-                if (string.IsNullOrWhiteSpace(localRepositoryModel?.CloneUrl)) return;
-
-                var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
                 var session = CurrentSession;
 
-                if (modelService != null)
+                var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                if (pr != null)
                 {
-                    var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel).FirstOrDefaultAsync();
+                    var changePR =
+                        pr.Item1 != (session?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
+                        pr.Item2 != (session?.PullRequest.Number);
 
-                    if (pr?.Item1 != (CurrentSession?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
-                        pr?.Item2 != (CurrentSession?.PullRequest.Number))
+                    if (changePR)
                     {
-                        var pullRequest = await GetPullRequestForTip(modelService, localRepositoryModel);
-
+                        var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
+                        var pullRequest = await modelService?.GetPullRequest(pr.Item1, repository.Name, pr.Item2);
                         if (pullRequest != null)
                         {
                             var newSession = await GetSessionInternal(pullRequest);
@@ -228,22 +236,12 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 CurrentSession = session;
+                initialized.TrySetResult(null);
             }
             catch (Exception e)
             {
                 log.Error(e, "Error changing repository");
             }
-        }
-
-        async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel localRepositoryModel)
-        {
-            if (modelService != null)
-            {
-                var pr = await service.GetPullRequestForCurrentBranch(localRepositoryModel);
-                if (pr != null) return await modelService.GetPullRequest(pr.Item1, localRepositoryModel.Name, pr.Item2).ToTask();
-            }
-
-            return null;
         }
 
         async Task<PullRequestSession> GetSessionInternal(IPullRequestModel pullRequest)

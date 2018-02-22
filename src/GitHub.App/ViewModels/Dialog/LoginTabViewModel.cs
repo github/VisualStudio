@@ -200,7 +200,7 @@ namespace GitHub.ViewModels.Dialog
 
             if (ex.IsCriticalException()) return;
 
-            log.Information(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
+            log.Error(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
             if (ex is Octokit.ForbiddenException)
             {
                 Error = new UserError(Resources.LoginFailedForbiddenMessage, ex.Message);

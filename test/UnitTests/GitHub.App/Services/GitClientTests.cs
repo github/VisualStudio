@@ -250,7 +250,9 @@ public class GitClientTests
 
             var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, targetCloneUrl, baseSha, headSha, baseRef, pullNumber);
 
+#pragma warning disable 618 // Type or member is obsolete
             repo.Network.DidNotReceiveWithAnyArgs().Fetch(null as Remote, null, null as FetchOptions);
+#pragma warning restore 618 // Type or member is obsolete
             Assert.That(expectMergeBaseSha, Is.EqualTo(mergeBaseSha));
         }
 
@@ -274,7 +276,9 @@ public class GitClientTests
             }
             catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
+#pragma warning disable 618 // Type or member is obsolete
             repo.Network.Received(receivedFetch).Fetch(Arg.Any<Remote>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
+#pragma warning restore 618 // Type or member is obsolete
         }
 
         [TestCase("baseSha", null, "mergeBaseSha", "baseRef", 777, "refs/pull/777/head")]
@@ -295,7 +299,9 @@ public class GitClientTests
             }
             catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
+#pragma warning disable 618 // Type or member is obsolete
             repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<IEnumerable<string>>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
+#pragma warning restore 618 // Type or member is obsolete
         }
 
         static IRepository MockRepo(string baseSha, string headSha, string mergeBaseSha)
