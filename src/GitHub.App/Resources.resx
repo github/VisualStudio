@@ -294,4 +294,7 @@
 Please install Git for Windows from:
 https://git-scm.com/download/win</value>
   </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>Issues</value>
+  </data>
 </root>

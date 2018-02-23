@@ -190,6 +190,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Issues.
+        /// </summary>
+        internal static string IssuesNavigationItemText {
+            get {
+                return ResourceManager.GetString("IssuesNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to sign in..
         /// </summary>
         internal static string LoginFailedForbiddenMessage {

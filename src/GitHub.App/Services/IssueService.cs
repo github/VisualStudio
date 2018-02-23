@@ -57,6 +57,7 @@ namespace GitHub.Services
             });
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         CompiledQuery<Page<IssueListModel>> CreateIssuesQuery()
         {
             var order = new IssueOrder
@@ -78,16 +79,21 @@ namespace GitHub.Services
                         NodeId = issue.Id,
                         Number = issue.Number,
                         Title = issue.Title,
-                        Author = issue.Author.Select(author => new ActorModel
+                        State = (Models.IssueState)issue.State,
+                        Author = issue.Author.Select(actor => new ActorModel
                         {
-                            AvatarUrl = issue.Author.AvatarUrl(30),
-                            Login = issue.Author.Login,
+                            AvatarUrl = actor.AvatarUrl(30),
+                            Login = actor.Login,
                         }).SingleOrDefault(),
-#pragma warning disable CS0618 // Type or member is obsolete
+                        Assignees = issue.Assignees(100, null, null, null).Nodes.Select(actor => new ActorModel
+                        {
+                            AvatarUrl = actor.AvatarUrl(30),
+                            Login = actor.Login,
+                        }).ToList(),
                         UpdatedAt = issue.UpdatedAt.Value,
-#pragma warning restore CS0618 // Type or member is obsolete
                     }).ToList(),
                 }).Compile();
         }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

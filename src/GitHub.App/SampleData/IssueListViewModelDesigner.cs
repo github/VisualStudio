@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GitHub.Collections;
@@ -39,10 +40,18 @@ namespace GitHub.SampleData
 
             Issues = new TrackingCollection<IIssueListItemViewModel>();
             foreach (var issue in issues) Issues.Add(new IssueListItemViewModel(issue));
+            States = new[] { IssueStateFilter.Open, IssueStateFilter.Closed, IssueStateFilter.All };
         }
 
+        public IReadOnlyList<string> Assignees { get; set; }
+        public IReadOnlyList<string> Authors { get; set; }
         public ITrackingCollection<IIssueListItemViewModel> Issues { get; }
         public string SearchQuery { get; set; }
+        public string SelectedAssignee { get; set; }
+        public string SelectedAuthor { get; set; }
+        public IReadOnlyList<IssueStateFilter> States { get; }
+        public IssueStateFilter SelectedState { get; set; }
+
         public Uri WebUrl { get; }
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
