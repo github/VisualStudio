@@ -159,7 +159,6 @@
     <Compile Include="ViewModels\Dialog\ForkRepositoryViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositorySelectViewModel.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
-    <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="Services\TeamExplorerContext.cs" />
     <Compile Include="Services\OAuthCallbackListener.cs" />
