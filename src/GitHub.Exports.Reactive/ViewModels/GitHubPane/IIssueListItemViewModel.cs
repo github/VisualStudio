@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using GitHub.Collections;
 using GitHub.Models;
 
@@ -7,8 +7,10 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public interface IIssueListItemViewModel : IViewModel, ICopyable<IIssueListItemViewModel>
     {
-        ObservableCollection<IActorViewModel> Assignees { get; }
+        IReadOnlyList<IActorViewModel> Assignees { get; }
         IActorViewModel Author { get; }
+        int CommentCount { get; }
+        IReadOnlyList<IssueLabelModel> Labels { get; }
         string NodeId { get; }
         int Number { get; }
         IssueState State { get; }

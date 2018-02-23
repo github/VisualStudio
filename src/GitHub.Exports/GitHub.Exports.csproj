@@ -157,6 +157,7 @@
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewModel.cs" />
+    <Compile Include="Models\IssueLabelModel.cs" />
     <Compile Include="Models\IssueListModel.cs" />
     <Compile Include="Models\Page.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />

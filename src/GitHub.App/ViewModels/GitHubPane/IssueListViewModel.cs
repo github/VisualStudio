@@ -95,7 +95,10 @@ namespace GitHub.ViewModels.GitHubPane
             var sw = new Stopwatch();
             sw.Start();
 
-            Issues.Listen(ReadItems());
+            var items = service.GetIssues(LocalRepository)
+                .SelectMany(page => page.Items.Select(x => new IssueListItemViewModel(x)));
+
+            Issues.Listen(items);
 
             Issues.OriginalCompleted.Subscribe(_ =>
             {
@@ -103,7 +106,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Debug.WriteLine("Loaded issues in " + sw.Elapsed);
                 IsBusy = false;
             });
-
+            
             Issues.Subscribe(x =>
             {
                 if (x.Author != null && !authors.Contains(x.Author.Login)) authors.Add(x.Author.Login);
@@ -116,13 +119,8 @@ namespace GitHub.ViewModels.GitHubPane
                     }
                 }
             }, () => { });
-            return Task.CompletedTask;
-        }
 
-        IObservable<IIssueListItemViewModel> ReadItems()
-        {
-            return service.GetIssues(LocalRepository)
-                .SelectMany(page => page.Items.Select(x => new IssueListItemViewModel(x)));
+            return Task.CompletedTask;
         }
 
         void UpdateFilter(IssueStateFilter state, string assignee, string author, string filter)

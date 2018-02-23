@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using GitHub.Models;
@@ -12,6 +12,7 @@ namespace GitHub.ViewModels.GitHubPane
     public class IssueListItemViewModel : ViewModelBase, IIssueListItemViewModel
     {
         IActorViewModel author;
+        int commentCount;
         int number;
         IssueState state;
         string title;
@@ -20,26 +21,36 @@ namespace GitHub.ViewModels.GitHubPane
         public IssueListItemViewModel(IssueListModel model)
         {
             NodeId = model.NodeId;
-            Number = model.Number;
-            State = model.State;
-            Title = model.Title;
+            number = model.Number;
+            state = model.State;
+            title = model.Title;
+            commentCount = model.CommentCount;
+            Labels = model.Labels.ToList();
 
             if (model.Author != null)
             {
-                Author = new ActorViewModel(model.Author);
+                author = new ActorViewModel(model.Author);
             }
 
-            Assignees = new ObservableCollection<IActorViewModel>(
+            Assignees = new List<IActorViewModel>(
                 model.Assignees.Select(x => new ActorViewModel(x)));
         }
 
-        public ObservableCollection<IActorViewModel> Assignees { get; }
+        public IReadOnlyList<IActorViewModel> Assignees { get; }
 
         public IActorViewModel Author
         {
             get { return author; }
             private set { this.RaiseAndSetIfChanged(ref author, value); }
         }
+
+        public int CommentCount
+        {
+            get { return commentCount; }
+            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
+        }
+
+        public IReadOnlyList<IssueLabelModel> Labels { get; }
 
         public string NodeId { get; private set; }
 

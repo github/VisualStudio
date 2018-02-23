@@ -7,11 +7,13 @@
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
              mc:Ignorable="d" d:DesignWidth="300">
     
     <d:DesignData.DataContext>
         <sampleData:IssueListItemViewModelDesigner Number="1431"
                                                    Title="Don't create git blobs in order to calculate inline comment positions."
+                                                   CommentCount="4"
                                                    UpdatedAt="2018-01-29">
             <sampleData:IssueListItemViewModelDesigner.Author>
                 <sampleData:ActorViewModelDesigner Login="grokys"/>
@@ -32,6 +34,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -51,16 +54,42 @@
                 <Run Text="{Binding Title, Mode=OneWay}"/>
             </Hyperlink>
         </TextBlock>
-        
-        <TextBlock Grid.Column="1" Grid.Row="1"
-                   Foreground="{DynamicResource GitHubVsGrayText}"
+
+        <StackPanel Grid.Column="1" Grid.Row="1"
+                    Orientation="Horizontal">
+            <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
                    TextTrimming="CharacterEllipsis">
-            <Hyperlink>
-                <Run Text="{Binding Number, StringFormat=#{0}, Mode=OneWay}"/>
-            </Hyperlink>
-            <Run Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
-            <Run>by</Run>
-            <Run Text="{Binding Author.Login, Mode=OneWay}"/>
-        </TextBlock>
+                <Hyperlink>
+                    <Run Text="{Binding Number, StringFormat=#{0}, Mode=OneWay}"/>
+                </Hyperlink>
+                <Run Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+                <Run>by</Run>
+                <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+            </TextBlock>
+            <ItemsControl ItemsSource="{Binding Labels}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{Binding Color}"
+                                CornerRadius="2"
+                                Margin="2 0"
+                                Padding="4 0">
+                            <TextBlock Text="{Binding Name}"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <TextBlock Grid.Column="2" Grid.RowSpan="2"
+                   Margin="0 -1 0 0"
+                   Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}">
+            <ui:OcticonImage Icon="comment" Width="16" Height="16"/>
+            <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top"/>
+        </TextBlock>                   
     </Grid>
 </UserControl>

@@ -76,10 +76,6 @@ namespace GitHub.Services
                     TotalCount = connection.TotalCount,
                     Items = connection.Nodes.Select(issue => new IssueListModel
                     {
-                        NodeId = issue.Id,
-                        Number = issue.Number,
-                        Title = issue.Title,
-                        State = (Models.IssueState)issue.State,
                         Author = issue.Author.Select(actor => new ActorModel
                         {
                             AvatarUrl = actor.AvatarUrl(30),
@@ -90,6 +86,16 @@ namespace GitHub.Services
                             AvatarUrl = actor.AvatarUrl(30),
                             Login = actor.Login,
                         }).ToList(),
+                        CommentCount = issue.Comments(0, null, null, null).TotalCount,
+                        NodeId = issue.Id,
+                        Number = issue.Number,
+                        State = (Models.IssueState)issue.State,
+                        Labels = issue.Labels(100, null, null, null).Nodes.Select(label => new IssueLabelModel
+                        {
+                            Color = '#' + label.Color,
+                            Name = label.Name,
+                        }).ToList(),
+                        Title = issue.Title,
                         UpdatedAt = issue.UpdatedAt.Value,
                     }).ToList(),
                 }).Compile();
