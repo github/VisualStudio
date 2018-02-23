@@ -1,4 +1,4 @@
-﻿using System.Windows;
+﻿using System.Threading.Tasks;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -7,7 +7,6 @@ namespace GitHub.InlineReviews.Services
         /// <summary>
         /// Place the PR status control on Visual Studio's status bar.
         /// </summary>
-        /// <param name="mainWindow">The main window of Visual Studio.</param>
-        void Initialize(Window mainWindow);
+        Task InitializeAsync();
     }
 }

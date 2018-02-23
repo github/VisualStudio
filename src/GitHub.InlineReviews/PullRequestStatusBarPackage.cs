@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
@@ -10,9 +9,9 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.PullRequestStatusPackageId)]
-    [ProvideAutoLoad(Guids.GitSccProviderId)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideAutoLoad(Guids.GitSccProviderId, PackageAutoLoadFlags.BackgroundLoad)]
     public class PullRequestStatusBarPackage : AsyncPackage
     {
         /// <summary>
@@ -23,7 +22,7 @@ namespace GitHub.InlineReviews
             var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));
             var exportProvider = componentModel.DefaultExportProvider;
             var pullRequestStatusManager = exportProvider.GetExportedValue<IPullRequestStatusBarManager>();
-            pullRequestStatusManager.Initialize(Application.Current.MainWindow);
+            await pullRequestStatusManager.InitializeAsync();
         }
     }
 }

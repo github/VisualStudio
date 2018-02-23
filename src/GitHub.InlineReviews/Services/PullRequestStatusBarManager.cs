@@ -24,15 +24,13 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
-        readonly IVSGitExt gitExt;
+        readonly Lazy<IVSGitExt> gitExt;
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly IUsageTracker usageTracker;
         readonly IGitHubServiceProvider serviceProvider;
 
-        Window mainWindow;
-
         [ImportingConstructor]
-        public PullRequestStatusBarManager(IVSGitExt gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
+        public PullRequestStatusBarManager(Lazy<IVSGitExt> gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
             IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
         {
             this.gitExt = gitExt;
@@ -45,23 +43,24 @@ namespace GitHub.InlineReviews.Services
         /// Lazily initialize when user enters the context of a GitHub repository.
         /// </summary>
         /// <param name="window">Visual Studio's main window.</param>
-        public void Initialize(Window window)
+        public async Task InitializeAsync()
         {
-            mainWindow = window;
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
             OnActiveRepositoriesChanged();
-            gitExt.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
+            gitExt.Value.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
         }
 
         void OnActiveRepositoriesChanged()
         {
-            if (gitExt.ActiveRepositories.Count > 0)
+            if (gitExt.Value.ActiveRepositories.Count > 0)
             {
-                InitializeAsync().Forget();
-                gitExt.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
+                StartShowingStatus().Forget();
+                gitExt.Value.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
             }
         }
 
-        async Task InitializeAsync()
+        async Task StartShowingStatus()
         {
             try
             {
@@ -103,7 +102,7 @@ namespace GitHub.InlineReviews.Services
 
         void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
         {
-            var statusBar = FindSccStatusBar();
+            var statusBar = FindSccStatusBar(Application.Current.MainWindow);
             if (statusBar != null)
             {
                 var githubStatusBar = Find<PullRequestStatusView>(statusBar);
@@ -134,7 +133,7 @@ namespace GitHub.InlineReviews.Services
             return default(T);
         }
 
-        StatusBar FindSccStatusBar()
+        StatusBar FindSccStatusBar(Window mainWindow)
         {
             var contentControl = mainWindow?.Template?.FindName(StatusBarPartName, mainWindow) as ContentControl;
             return contentControl?.Content as StatusBar;
