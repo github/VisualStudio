@@ -135,6 +135,8 @@
     <Compile Include="Home\ForkNavigationItem.cs" />
     <Compile Include="RegistryHelper.cs" />
     <Compile Include="Services\VSGitServices.cs" />
+    <Compile Include="Services\LocalRepositoryModelFactory.cs" />
+    <Compile Include="Services\VSUIContextFactory.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\EnsureLoggedInSection.cs" />
     <Compile Include="Base\TeamExplorerInvitationBase.cs" />

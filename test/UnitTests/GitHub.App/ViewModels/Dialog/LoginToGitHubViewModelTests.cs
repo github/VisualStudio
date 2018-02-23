@@ -10,13 +10,13 @@ using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
 using ReactiveUI;
-using Xunit;
+using NUnit.Framework;
 
 public class LoginToGitHubViewModelTests
 {
     //public class TheLoginCommand : TestBaseClass
     //{
-    //    [Fact]
+    //    [Test]
     //    public void ShowsHelpfulTooltipWhenForbiddenResponseReceived()
     //    {
     //        var response = Substitute.For<IResponse>();
@@ -36,7 +36,7 @@ public class LoginToGitHubViewModelTests
 
     //public class TheSignupCommand : TestBaseClass
     //{
-    //    [Fact]
+    //    [Test]
     //    public void LaunchesBrowserToSignUpPage()
     //    {
     //        var repositoryHosts = Substitute.For<IRepositoryHosts>();
@@ -54,7 +54,7 @@ public class LoginToGitHubViewModelTests
 
     //public class TheForgotPasswordCommand : TestBaseClass
     //{
-    //    [Fact]
+    //    [Test]
     //    public void LaunchesBrowserToForgotPasswordPage()
     //    {
     //        var repositoryHosts = Substitute.For<IRepositoryHosts>();

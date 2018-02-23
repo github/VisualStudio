@@ -27,11 +27,6 @@ namespace GitHub.Api
         /// </summary>
         /// <returns></returns>
         IObservable<Repository> GetRepositoriesForOrganization(string organization);
-        IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
-            string authenticationCode = null,
-            bool useOldScopes = false,
-            bool useFingerprint = true);
 
         IObservable<Repository> GetForks(string owner, string name);
         IObservable<string> GetGitIgnoreTemplates();

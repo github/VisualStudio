@@ -69,6 +69,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         [Import]
         IUsageTracker UsageTracker { get; set; }
 
+        [Import]
+        IPullRequestEditorService NavigationService { get; set; }
+
+        [Import]
+        IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -105,6 +111,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     if (!workingDirectory)
                     {
                         AddBufferTag(buffer, ViewModel.Session, fullPath, null);
+
+                        var textView = NavigationService.FindActiveView();
+                        EnableNavigateToEditor(textView, file);
                     }
                 }
 
@@ -119,16 +128,52 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
+        async Task DoNavigateToEditor(IPullRequestFileNode file)
+        {
+            try
+            {
+                if (!ViewModel.IsCheckedOut)
+                {
+                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    return;
+                }
+
+                var fullPath = ViewModel.GetLocalFilePath(file);
+
+                var activeView = NavigationService.FindActiveView();
+                if (activeView == null)
+                {
+                    ShowErrorInStatusBar("Couldn't find active view");
+                    return;
+                }
+
+                NavigationService.NavigateToEquivalentPosition(activeView, fullPath);
+
+                await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error navigating to editor", e);
+            }
+        }
+
+        static void ShowInfoMessage(string message)
+        {
+            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
+                Services.GitHubServiceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
+        }
+
         async Task DoDiffFile(IPullRequestFileNode file, bool workingDirectory)
         {
             try
             {
-                var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var rightPath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var leftPath = file.OldPath ?? rightPath;
                 var rightFile = workingDirectory ? ViewModel.GetLocalFilePath(file) : await ViewModel.ExtractFile(file, true);
                 var leftFile = await ViewModel.ExtractFile(file, false);
-                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
-                var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
-                var rightLabel = workingDirectory ? relativePath : $"{relativePath};PR {ViewModel.Model.Number}";
+                var leftLabel = $"{leftPath};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
@@ -161,11 +206,14 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
                 var session = ViewModel.Session;
-                AddBufferTag(diffViewer.LeftView.TextBuffer, session, relativePath, DiffSide.Left);
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, DiffSide.Left);
 
                 if (!workingDirectory)
                 {
-                    AddBufferTag(diffViewer.RightView.TextBuffer, session, relativePath, DiffSide.Right);
+                    AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, file);
+                    EnableNavigateToEditor(diffViewer.RightView, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, file);
                 }
 
                 if (workingDirectory)
@@ -196,10 +244,43 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        void ShowErrorInStatusBar(string message, Exception e)
+        void EnableNavigateToEditor(IWpfTextView textView, IPullRequestFileNode file)
+        {
+            var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
+            EnableNavigateToEditor(view, file);
+        }
+
+        void EnableNavigateToEditor(IVsTextView textView, IPullRequestFileNode file)
+        {
+            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
+            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
+            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec += async (s, e) => await DoNavigateToEditor(file);
+
+            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
+            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
+            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec += async (s, e) => await DoNavigateToEditor(file);
+        }
+
+        void ShowErrorInStatusBar(string message, Exception e = null)
         {
             var ns = GitHub.VisualStudio.Services.DefaultExportProvider.GetExportedValue<IStatusBarNotificationService>();
-            ns?.ShowMessage(message + ": " + e.Message);
+            if (e != null)
+            {
+                message += ": " + e.Message;
+            }
+            ns?.ShowMessage(message);
+        }
+
+        private void FileListKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
+                if (file != null)
+                {
+                    DoDiffFile(file, false).Forget();
+                }
+            }
         }
 
         void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)

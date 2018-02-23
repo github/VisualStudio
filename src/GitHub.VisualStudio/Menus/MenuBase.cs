@@ -123,7 +123,7 @@ namespace GitHub.VisualStudio
             {
                 var repo = await SimpleApiClient.GetRepository();
                 var activeRepoFullName = ActiveRepo.Owner + '/' + ActiveRepo.Name;
-                return (repo.FullName == activeRepoFullName || repo.Id == 0) && SimpleApiClient.IsEnterprise();
+                return (repo.FullName == activeRepoFullName || repo.Id == 0) && await SimpleApiClient.IsEnterprise();
             }
             return isdotcom;
         }

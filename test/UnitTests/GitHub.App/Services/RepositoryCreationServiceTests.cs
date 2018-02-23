@@ -6,14 +6,14 @@ using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 using UnitTests;
 
 public class RepositoryCreationServiceTests
 {
     public class TheCreateRepositoryMethod : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void CreatesRepositoryOnlineViaApiAndThenClonesIt()
         {
             var cloneService = Substitutes.RepositoryCloneService;

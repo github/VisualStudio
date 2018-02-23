@@ -33,7 +33,9 @@ namespace GitHub.ViewModels.Dialog
 
             Done = Observable.Merge(
                 loginToGitHubViewModel.Login,
-                EnterpriseLogin.Login)
+                loginToGitHubViewModel.LoginViaOAuth,
+                loginToGitHubEnterpriseViewModel.Login,
+                loginToGitHubEnterpriseViewModel.LoginViaOAuth)
                 .Where(x => x != null);
         }
 

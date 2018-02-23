@@ -11,11 +11,13 @@ using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Info;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using ReactiveUI;
+using Serilog;
 using OleMenuCommand = Microsoft.VisualStudio.Shell.OleMenuCommand;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -27,12 +29,13 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public sealed class GitHubPaneViewModel : ViewModelBase, IGitHubPaneViewModel, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubPaneViewModel>();
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
 
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IConnectionManager connectionManager;
-        readonly ITeamExplorerServiceHolder teServiceHolder;
+        readonly ITeamExplorerContext teamExplorerContext;
         readonly IVisualStudioBrowser browser;
         readonly IUsageTracker usageTracker;
         readonly INavigationViewModel navigator;
@@ -46,6 +49,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
+        readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
+        bool initialized;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -55,7 +60,7 @@ namespace GitHub.ViewModels.GitHubPane
             IViewViewModelFactory viewModelFactory,
             ISimpleApiClientFactory apiClientFactory,
             IConnectionManager connectionManager,
-            ITeamExplorerServiceHolder teServiceHolder,
+            ITeamExplorerContext teamExplorerContext,
             IVisualStudioBrowser browser,
             IUsageTracker usageTracker,
             INavigationViewModel navigator,
@@ -66,7 +71,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
             Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
-            Guard.ArgumentNotNull(teServiceHolder, nameof(teServiceHolder));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(browser, nameof(browser));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(navigator, nameof(navigator));
@@ -77,7 +82,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.viewModelFactory = viewModelFactory;
             this.apiClientFactory = apiClientFactory;
             this.connectionManager = connectionManager;
-            this.teServiceHolder = teServiceHolder;
+            this.teamExplorerContext = teamExplorerContext;
             this.browser = browser;
             this.usageTracker = usageTracker;
             this.navigator = navigator;
@@ -198,22 +203,37 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public async Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
-            await UpdateContent(teServiceHolder.ActiveRepo);
-            teServiceHolder.Subscribe(this, x => UpdateContent(x).Forget());
-            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+            await initializing.WaitAsync();
+            if (initialized) return;
 
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
-            BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+            try
+            {
+                await UpdateContent(teamExplorerContext.ActiveRepository);
+                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                   .Skip(1)
+                   .ObserveOn(RxApp.MainThreadScheduler)
+                   .Subscribe(x => UpdateContent(x).Forget());
 
-            paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                 (_, __) =>
-                 {
-                     browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                     usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
-                 });
+                connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
+
+                paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                     (_, __) =>
+                     {
+                         browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                         usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+                     });
+            }
+            finally
+            {
+                initialized = true;
+                initializing.Release();
+            }
         }
 
         /// <inheritdoc/>
@@ -273,7 +293,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public Task ShowPullRequests()
         {
-            return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection)); 
+            return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
         }
 
         /// <inheritdoc/>
@@ -343,18 +363,22 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task UpdateContent(ILocalRepositoryModel repository)
         {
+            log.Debug("UpdateContent called with {CloneUrl}", repository?.CloneUrl);
+
             LocalRepository = repository;
             Connection = null;
-
             Content = null;
+            navigator.Clear();
 
             if (repository == null)
             {
+                log.Debug("Not a git repository: {CloneUrl}", repository?.CloneUrl);
                 Content = notAGitRepository;
                 return;
             }
             else if (string.IsNullOrWhiteSpace(repository.CloneUrl))
             {
+                log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                 Content = notAGitHubRepository;
                 return;
             }
@@ -362,7 +386,7 @@ namespace GitHub.ViewModels.GitHubPane
             var repositoryUrl = repository.CloneUrl.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             var client = await apiClientFactory.Create(repository.CloneUrl);
-            var isEnterprise = isDotCom ? false : client.IsEnterprise();
+            var isEnterprise = isDotCom ? false : await client.IsEnterprise();
 
             if ((isDotCom || isEnterprise) && await IsValidRepository(client))
             {
@@ -370,19 +394,21 @@ namespace GitHub.ViewModels.GitHubPane
 
                 Connection = await connectionManager.GetConnection(hostAddress);
 
-                if (Connection != null)
+                if (Connection?.IsLoggedIn == true)
                 {
-                    navigator.Clear();
+                    log.Debug("Found a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                     Content = navigator;
                     await ShowDefaultPage();
                 }
                 else
                 {
+                    log.Debug("Found a a GitHub repository but not logged in: {CloneUrl}", repository?.CloneUrl);
                     Content = loggedOut;
                 }
             }
             else
             {
+                log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                 Content = notAGitHubRepository;
             }
         }
@@ -402,8 +428,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         static Regex CreateRoute(string route)
         {
-            // Build RegEx from route (:foo to named group (?<foo>[a-z0-9]+)).
-            var routeFormat = new Regex("(:([a-z]+))\\b").Replace(route, "(?<$2>[a-z0-9]+)");
+            // Build RegEx from route (:foo to named group (?<foo>[\w_.-]+)).
+            var routeFormat = new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)");
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
     }

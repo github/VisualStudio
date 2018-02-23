@@ -23,7 +23,7 @@ namespace GitHub.ViewModels.Dialog
             twoFactorHandler.SetViewModel(twoFactor);
 
             Content = credentials;
-            Done = credentials.Done;            
+            Done = credentials.Done;
 
             twoFactor.WhenAnyValue(x => x.TwoFactorType)
                 .Subscribe(x =>

@@ -42,11 +42,6 @@ namespace GitHub.Services
         void Unsubscribe(object who);
 
         IGitAwareItem HomeSection { get; }
-
-        /// <summary>
-        /// Refresh the information on the active repo (in case of remote url changes or other such things)
-        /// </summary>
-        void Refresh();
     }
 
     public interface IGitAwareItem
