@@ -30,7 +30,6 @@ namespace GitHub.InlineReviews.Services
         readonly IGitHubServiceProvider serviceProvider;
 
         Window mainWindow;
-        bool initialized;
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(IVSGitExt gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
@@ -49,17 +48,16 @@ namespace GitHub.InlineReviews.Services
         public void Initialize(Window window)
         {
             mainWindow = window;
-            TryInitialize();
-            gitExt.ActiveRepositoriesChanged += TryInitialize;
+            OnActiveRepositoriesChanged();
+            gitExt.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
         }
 
-        void TryInitialize()
+        void OnActiveRepositoriesChanged()
         {
-            if (!initialized && gitExt.ActiveRepositories.Count > 0)
+            if (gitExt.ActiveRepositories.Count > 0)
             {
-                initialized = true;
                 InitializeAsync().Forget();
-                gitExt.ActiveRepositoriesChanged -= TryInitialize;
+                gitExt.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
             }
         }
 
