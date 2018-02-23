@@ -47,7 +47,7 @@ namespace GitHub.Factories
                 {
                     result = new ModelService(
                         await apiClientFactory.Create(connection.HostAddress),
-                        await graphQLClientFactory.CreateConnection(connection.HostAddress),
+                        await graphQLClientFactory.Create(connection.HostAddress),
                         await hostCacheFactory.Create(connection.HostAddress),
                         avatarProvider);
                     result.InsertUser(AccountCacheItem.Create(connection.User));

@@ -8,6 +8,7 @@ namespace GitHub.Services
     {
         IObservable<Page<IssueListModel>> GetIssues(
             IRepositoryModel repository,
-            CancellationToken cancel);
+            CancellationToken cancel,
+            bool refresh);
     }
 }

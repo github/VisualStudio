@@ -46,6 +46,10 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
+    <Reference Include="FileCache.Signed, Version=2.0.3.0, Culture=neutral, PublicKeyToken=7542c4e7f6a4d381, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FileCache.Signed.2.0.3\lib\FileCache.Signed.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -66,6 +70,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,7 +83,9 @@
       <Link>ApiClientConfiguration_User.cs</Link>
     </Compile>
     <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
+    <Compile Include="GraphQLClient.cs" />
     <Compile Include="GraphQLKeychainCredentialStore.cs" />
+    <Compile Include="IGraphQLClient.cs" />
     <Compile Include="IGraphQLClientFactory.cs" />
     <Compile Include="GraphQLClientFactory.cs" />
     <Compile Include="IKeychain.cs" />

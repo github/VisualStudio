@@ -28,12 +28,14 @@ namespace GitHub.Services
 
         public IObservable<Page<IssueListModel>> GetIssues(
             IRepositoryModel repository,
-            CancellationToken cancel)
+            CancellationToken cancel,
+            bool refresh)
         {
             return Observable.Create<Page<IssueListModel>>(async subscriber =>
             {
                 var hostAddress = HostAddress.Create(repository.CloneUrl);
-                var graphql = await graphqlFactory.CreateConnection(hostAddress);
+                var graphql = await graphqlFactory.Create(hostAddress);
+                var client = refresh ? graphql.NonCached : graphql;
                 var query = issuesQuery.Value;
                 var vars = new Dictionary<string, object>
                 {
@@ -46,7 +48,7 @@ namespace GitHub.Services
                 {
                     try
                     {
-                        var page = await graphql.Run(query, vars);
+                        var page = await client.Run(query, vars);
                         subscriber.OnNext(page);
                         if (page.HasNextPage) vars["after"] = page.EndCursor;
                         else break;

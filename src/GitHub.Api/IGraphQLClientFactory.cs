@@ -14,6 +14,6 @@ namespace GitHub.Api
         /// </summary>
         /// <param name="address">The address of the server.</param>
         /// <returns>A task returning the created connection.</returns>
-        Task<Octokit.GraphQL.IConnection> CreateConnection(HostAddress address);
+        Task<IGraphQLClient> Create(HostAddress address);
     }
 }

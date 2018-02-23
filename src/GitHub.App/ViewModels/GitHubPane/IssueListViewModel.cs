@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Collections;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
@@ -86,11 +87,13 @@ namespace GitHub.ViewModels.GitHubPane
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
             LocalRepository = repository;
-            Refresh();
+            Load(false).Forget();
             return Task.CompletedTask;
         }
 
-        public override Task Refresh()
+        public override Task Refresh() => Load(true);
+
+        Task Load(bool refresh)
         {
             IsBusy = true;
 
@@ -101,7 +104,7 @@ namespace GitHub.ViewModels.GitHubPane
             cancelLoad?.Dispose();
             cancelLoad = new CancellationTokenSource();
 
-            var items = service.GetIssues(LocalRepository, cancelLoad.Token)
+            var items = service.GetIssues(LocalRepository, cancelLoad.Token, refresh)
                 .SelectMany(page => page.Items.Select(x => new IssueListItemViewModel(x)));
 
             Issues.Clear();
