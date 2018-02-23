@@ -63,7 +63,7 @@ public class VSGitExtTests
     public class TheActiveRepositoriesChangedEvent
     {
         [Test]
-        public void GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
+        public async Task GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
         {
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt();
@@ -75,6 +75,7 @@ public class VSGitExtTests
             var eventArgs = new PropertyChangedEventArgs(nameof(gitExt.ActiveRepositories));
             gitExt.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(gitExt, eventArgs);
 
+            await target.InitializeTask;
             Assert.That(wasFired, Is.True);
         }
 
@@ -188,6 +189,7 @@ public class VSGitExtTests
             var task2 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories2);
 
             await Task.WhenAll(task1, task2);
+            await target.InitializeTask;
 
             Assert.That(target.ActiveRepositories.Single().LocalPath, Is.EqualTo("repo2"));
         }

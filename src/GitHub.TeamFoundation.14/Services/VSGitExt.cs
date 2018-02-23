@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.Models;
@@ -8,7 +9,6 @@ using GitHub.Logging;
 using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -24,7 +24,6 @@ namespace GitHub.VisualStudio.Base
         readonly IGitHubServiceProvider serviceProvider;
         readonly IVSUIContext context;
         readonly ILocalRepositoryModelFactory repositoryFactory;
-        readonly object refreshLock = new object();
 
         IGitExt gitService;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
@@ -41,23 +40,24 @@ namespace GitHub.VisualStudio.Base
             this.repositoryFactory = repositoryFactory;
 
             // The IGitExt service isn't available when a TFS based solution is opened directly.
-            // It will become available when moving to a Git based solution (cause a UIContext event to fire).
+            // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
             context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
 
             // Start with empty array until we have a change to initialize.
             ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
 
+            InitializeTask = Task.CompletedTask;
+
             if (context.IsActive && TryInitialize())
             {
                 // Refresh ActiveRepositories on background thread so we don't delay startup.
-                InitializeTask = Task.Run(() => RefreshActiveRepositories());
+                QueueRefreshActiveRepositories();
             }
             else
             {
                 // If we're not in the UIContext or TryInitialize fails, have another go when the UIContext changes.
                 context.UIContextChanged += ContextChanged;
                 log.Debug("VSGitExt will be initialized later");
-                InitializeTask = Task.CompletedTask;
             }
         }
 
@@ -68,7 +68,7 @@ namespace GitHub.VisualStudio.Base
             if (e.Activated && TryInitialize())
             {
                 // Refresh ActiveRepositories on background thread so we don't delay UI context change.
-                InitializeTask = Task.Run(() => RefreshActiveRepositories());
+                QueueRefreshActiveRepositories();
                 context.UIContextChanged -= ContextChanged;
                 log.Debug("Initialized VSGitExt on UIContextChanged");
             }
@@ -83,7 +83,7 @@ namespace GitHub.VisualStudio.Base
                 {
                     if (e.PropertyName == nameof(gitService.ActiveRepositories))
                     {
-                        RefreshActiveRepositories();
+                        QueueRefreshActiveRepositories();
                     }
                 };
 
@@ -95,19 +95,22 @@ namespace GitHub.VisualStudio.Base
             return false;
         }
 
+        void QueueRefreshActiveRepositories()
+        {
+            // Execute tasks in sequence on thread pool.
+            InitializeTask = InitializeTask.ContinueWith(_ => RefreshActiveRepositories(), TaskScheduler.Default);
+        }
+
         void RefreshActiveRepositories()
         {
             try
             {
-                lock (refreshLock)
-                {
-                    log.Debug(
-                        "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
-                        gitService.GetHashCode(),
-                        gitService?.ActiveRepositories.Select(x => x.RepositoryPath));
+                log.Debug(
+                    "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
+                    gitService.GetHashCode(),
+                    gitService?.ActiveRepositories.Select(x => x.RepositoryPath));
 
-                    ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
-                }
+                ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
             }
             catch (Exception e)
             {
