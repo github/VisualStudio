@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
+using System.Threading;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -25,7 +26,9 @@ namespace GitHub.Services
             issuesQuery = new Lazy<CompiledQuery<Page<IssueListModel>>>(CreateIssuesQuery);
         }
 
-        public IObservable<Page<IssueListModel>> GetIssues(IRepositoryModel repository)
+        public IObservable<Page<IssueListModel>> GetIssues(
+            IRepositoryModel repository,
+            CancellationToken cancel)
         {
             return Observable.Create<Page<IssueListModel>>(async subscriber =>
             {
@@ -47,6 +50,7 @@ namespace GitHub.Services
                         subscriber.OnNext(page);
                         if (page.HasNextPage) vars["after"] = page.EndCursor;
                         else break;
+                        cancel.ThrowIfCancellationRequested();
                     }
                     catch (Exception ex)
                     {

@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Collections;
@@ -22,6 +23,7 @@ namespace GitHub.ViewModels.GitHubPane
         static readonly string[] NoFilterList = new[] { NoFilter };
 
         readonly IIssueService service;
+        CancellationTokenSource cancelLoad;
         ObservableCollection<string> assignees;
         ObservableCollection<string> authors;
         string searchQuery;
@@ -95,9 +97,14 @@ namespace GitHub.ViewModels.GitHubPane
             var sw = new Stopwatch();
             sw.Start();
 
-            var items = service.GetIssues(LocalRepository)
+            cancelLoad?.Cancel();
+            cancelLoad?.Dispose();
+            cancelLoad = new CancellationTokenSource();
+
+            var items = service.GetIssues(LocalRepository, cancelLoad.Token)
                 .SelectMany(page => page.Items.Select(x => new IssueListItemViewModel(x)));
 
+            Issues.Clear();
             Issues.Listen(items);
 
             Issues.OriginalCompleted.Subscribe(_ =>
@@ -121,6 +128,17 @@ namespace GitHub.ViewModels.GitHubPane
             }, () => { });
 
             return Task.CompletedTask;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                cancelLoad?.Cancel();
+                cancelLoad?.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         void UpdateFilter(IssueStateFilter state, string assignee, string author, string filter)
