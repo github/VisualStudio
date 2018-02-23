@@ -341,6 +341,10 @@ namespace MetricsTests
                 {
                     prop.SetValue(model, true);
                 }
+                else if (prop.PropertyType == typeof(Guid))
+                {
+                    prop.SetValue(model, Guid.Empty);
+                }
                 else
                     Assert.Fail("Unknown field type in UsageModel. Fix this test to support it");
             }
