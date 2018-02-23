@@ -239,12 +239,12 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    <Reference Include="Octokit.GraphQL, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
@@ -378,11 +378,20 @@
     <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
       <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\ActorView.xaml.cs">
+      <DependentUpon>ActorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\IssueListItemView.xaml.cs">
+      <DependentUpon>IssueListItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\LoggedOutView.xaml.cs">
       <DependentUpon>LoggedOutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\IssueListView.xaml.cs">
+      <DependentUpon>IssueListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GitHubPane\PullRequestListView.xaml.cs">
       <DependentUpon>PullRequestListView.xaml</DependentUpon>
@@ -464,6 +473,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\icons\git_issue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\icons\link_external.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -529,6 +542,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\GitHubPane\ActorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GitHubPane\IssueListItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\GitHubPane\LoggedOutView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -536,6 +557,10 @@
     <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GitHubPane\IssueListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GitHubPane\PullRequestListView.xaml">
       <Generator>MSBuild:Compile</Generator>

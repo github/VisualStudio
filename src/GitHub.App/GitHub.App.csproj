@@ -93,12 +93,12 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    <Reference Include="Octokit.GraphQL, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -160,11 +160,16 @@
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
+    <Compile Include="SampleData\ActorViewModelDesigner.cs" />
+    <Compile Include="SampleData\IssueListItemViewModelDesigner.cs" />
+    <Compile Include="SampleData\IssueListViewModelDesigner.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
+    <Compile Include="Services\IssueService.cs" />
     <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="Services\TeamExplorerContext.cs" />
     <Compile Include="Services\OAuthCallbackListener.cs" />
+    <Compile Include="ViewModels\ActorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GitHubDialogWindowViewModel.cs" />
     <Compile Include="ViewModels\Dialog\LoginCredentialsViewModel.cs" />
@@ -177,6 +182,8 @@
     <Compile Include="ViewModels\Dialog\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PagedDialogViewModelBase.cs" />
     <Compile Include="ViewModels\Dialog\RepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IssueListItemViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IssueListViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\LoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />

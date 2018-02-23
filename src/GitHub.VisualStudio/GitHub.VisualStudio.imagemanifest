@@ -15,6 +15,7 @@
     <ID Name="clippy" Value="7"/>
     <ID Name="logo_toolbar" Value="8"/>
     <ID Name="question" Value="9"/>
+    <ID Name="issue" Value="10"/>
   </Symbols>
 
   <Images>
@@ -44,6 +45,9 @@
     </Image>
     <Image Guid="$(guidImages)" ID="$(question)">
       <Source Uri="$(Resources)/question.xaml" />
+    </Image>
+    <Image Guid="$(guidImages)" ID="$(issue)">
+      <Source Uri="$(Resources)/git_issue.xaml" />
     </Image>
   </Images>
 </ImageManifest>

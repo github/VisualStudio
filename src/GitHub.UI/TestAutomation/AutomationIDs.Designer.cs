@@ -664,6 +664,15 @@ namespace GitHub.UI.TestAutomation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IssueListViewCustom.
+        /// </summary>
+        public static string IssueListViewCustom {
+            get {
+                return ResourceManager.GetString("IssueListViewCustom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LicenseComboBox.
         /// </summary>
         public static string LicenseComboBox {

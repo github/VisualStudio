@@ -146,6 +146,7 @@
     <Compile Include="Exports\ExportForProcess.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
+    <Compile Include="Models\ActorModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
@@ -156,6 +157,8 @@
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewModel.cs" />
+    <Compile Include="Models\IssueListModel.cs" />
+    <Compile Include="Models\Page.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />

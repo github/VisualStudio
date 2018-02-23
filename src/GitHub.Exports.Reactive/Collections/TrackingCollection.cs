@@ -245,7 +245,7 @@ namespace GitHub.Collections
 #else
             this.scheduler = scheduler ?? RxApp.MainThreadScheduler;
 #endif
-            this.comparer = comparer ?? Comparer<T>.Default.Compare;
+            this.comparer = comparer ?? ((a, b) => -1);
             this.filter = filter;
             this.newer = newer;
         }

@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.IssueListItemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             mc:Ignorable="d" d:DesignWidth="300">
+    
+    <d:DesignData.DataContext>
+        <sampleData:IssueListItemViewModelDesigner Number="1431"
+                                                   Title="Don't create git blobs in order to calculate inline comment positions."
+                                                   UpdatedAt="2018-01-29">
+            <sampleData:IssueListItemViewModelDesigner.Author>
+                <sampleData:ActorViewModelDesigner Login="grokys"/>
+            </sampleData:IssueListItemViewModelDesigner.Author>
+        </sampleData:IssueListItemViewModelDesigner>
+    </d:DesignData.DataContext>
+    
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <local:ActorView Grid.RowSpan="2"
+                         DataContext="{Binding Author}"
+                         Margin="0,0,10,0"
+                         Width="30"
+                         Height="30"/>
+        
+        <TextBlock Grid.Column="1"
+                   Margin="0,-3,5,0"
+                   TextTrimming="CharacterEllipsis">
+            <Hyperlink Foreground="{DynamicResource GitHubVsToolWindowText}">
+                <Run Text="{Binding Title, Mode=OneWay}"/>
+            </Hyperlink>
+        </TextBlock>
+        
+        <TextBlock Grid.Column="1" Grid.Row="1"
+                   Foreground="{DynamicResource GitHubVsGrayText}"
+                   TextTrimming="CharacterEllipsis">
+            <Hyperlink>
+                <Run Text="{Binding Number, StringFormat=#{0}, Mode=OneWay}"/>
+            </Hyperlink>
+            <Run Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+            <Run>by</Run>
+            <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+        </TextBlock>
+    </Grid>
+</UserControl>

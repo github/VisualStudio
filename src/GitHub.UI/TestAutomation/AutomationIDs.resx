@@ -516,4 +516,7 @@
   <data name="TwoFactorAuthenticationInputStackPanel" xml:space="preserve">
     <value>TwoFactorAuthenticationInputStackPanel</value>
   </data>
+  <data name="IssueListViewCustom" xml:space="preserve">
+    <value>IssueListViewCustom</value>
+  </data>
 </root>

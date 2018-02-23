@@ -45,6 +45,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ObservableAsPropertyHelper<string> title;
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
+        readonly ReactiveCommand<Unit> showIssues;
         readonly ReactiveCommand<object> openInBrowser;
         readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
         bool initialized;
@@ -138,6 +139,10 @@ namespace GitHub.ViewModels.GitHubPane
                 this.WhenAny(x => x.Content, x => x.Value == navigator),
                 _ => ShowPullRequests());
 
+            showIssues = ReactiveCommand.CreateAsyncTask(
+                this.WhenAny(x => x.Content, x => x.Value == navigator),
+                _ => ShowIssues());
+
             openInBrowser = ReactiveCommand.Create(currentPage.Select(x => x is IOpenInBrowser));
             openInBrowser.Subscribe(_ =>
             {
@@ -214,6 +219,7 @@ namespace GitHub.ViewModels.GitHubPane
                 connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
 
                 BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
+                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.issuesCommand, showIssues);
                 BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
                 BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
                 BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
@@ -279,12 +285,17 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public Task ShowDefaultPage() => ShowPullRequests();
+        public Task ShowDefaultPage() => ShowIssues();
 
         /// <inheritdoc/>
         public Task ShowCreatePullRequest()
         {
             return NavigateTo<IPullRequestCreationViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
+        }
+
+        public Task ShowIssues()
+        {
+            return NavigateTo<IIssueListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
         }
 
         /// <inheritdoc/>

@@ -126,6 +126,15 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubToolbarCmdSet" id="issuesCommand" type="Button">
+        <Icon guid="guidImages" id="issue" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>Issues</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
         <Icon guid="guidImages" id="refresh" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -264,7 +273,11 @@
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="githubCommand" priority="0x103">
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="issuesCommand" priority="0x103">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="githubCommand" priority="0x104">
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
     </CommandPlacement>
 
@@ -312,6 +325,7 @@
       <IDSymbol name="clippy" value="7"/>
       <IDSymbol name="logo_toolbar" value="8"/>
       <IDSymbol name="question" value="9"/>
+      <IDSymbol name="issue" value="10" />
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
@@ -323,6 +337,7 @@
       <IDSymbol name="forwardCommand" value="0x301" />
       <IDSymbol name="refreshCommand" value="0x302" />
       <IDSymbol name="pullRequestCommand" value="0x310" />
+      <IDSymbol name="issuesCommand" value="0x311" />
       <IDSymbol name="githubCommand" value="0x320" />
       <IDSymbol name="helpCommand" value="0x321" />
     </GuidSymbol>
