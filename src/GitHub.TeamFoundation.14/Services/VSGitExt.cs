@@ -43,10 +43,8 @@ namespace GitHub.VisualStudio.Base
             // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
             context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
 
-            // Start with empty array until we have a change to initialize.
+            // Start with empty array until we have a chance to initialize.
             ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
-
-            InitializeTask = Task.CompletedTask;
 
             if (context.IsActive && TryInitialize())
             {
@@ -97,8 +95,8 @@ namespace GitHub.VisualStudio.Base
 
         void QueueRefreshActiveRepositories()
         {
-            // Execute tasks in sequence on thread pool.
-            InitializeTask = InitializeTask.ContinueWith(_ => RefreshActiveRepositories(), TaskScheduler.Default);
+            // Execute tasks in sequence using thread pool (TaskScheduler.Default).
+            PendingTasks = PendingTasks.ContinueWith(_ => RefreshActiveRepositories(), TaskScheduler.Default);
         }
 
         void RefreshActiveRepositories()
@@ -139,6 +137,9 @@ namespace GitHub.VisualStudio.Base
 
         public event Action ActiveRepositoriesChanged;
 
-        public Task InitializeTask { get; private set; }
+        /// <summary>
+        /// Tasks that are pending execution on the thread pool.
+        /// </summary>
+        public Task PendingTasks { get; private set; } = Task.CompletedTask;
     }
 }
