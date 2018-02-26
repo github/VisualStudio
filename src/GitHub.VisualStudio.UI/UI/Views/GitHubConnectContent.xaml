@@ -3,12 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
-             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
-             xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
              KeyboardNavigation.TabNavigation="Local"
@@ -18,7 +15,7 @@
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
-        <sampleData:GitHubConnectSectionDesigner />
+        <ghfvs:GitHubConnectSectionDesigner />
       </Binding.Source>
     </Binding>
   </d:DesignProperties.DataContext>
@@ -26,11 +23,11 @@
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
-      <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-      <ui:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
+      <ghfvs:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+      <ghfvs:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
       <local:FormatRepositoryNameConverter x:Key="FormatRepositoryNameConverter" />
       <local:IsCurrentRepositoryConverter x:Key="IsCurrentRepositoryConverter" />
 
@@ -148,17 +145,17 @@
   <DockPanel>
     <WrapPanel Orientation="Horizontal" Margin="6,0,0,6" DockPanel.Dock="Top">
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static prop:Resources.CloneLink}"              
-              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CloneHyperlink}"/>
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"
-              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateHyperlink}"/>
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
               Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"
-              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SignOutHyperlink}"/>
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignOutHyperlink}"/>
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
               Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"
-              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SignInHyperlink}"/>
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignInHyperlink}"/>
     </WrapPanel>
  
     <ListView x:Name="repositories"
@@ -177,7 +174,7 @@
               VirtualizingPanel.ScrollUnit="Pixel"
               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
               Visibility="{Binding Repositories, Converter={StaticResource HasItemsVisibilityConverter}}"
-              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerRepositoryListView}" >
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerRepositoryListView}" >
       <ListView.ItemTemplate>
         <DataTemplate>
           <Grid>
@@ -187,7 +184,7 @@
               <ColumnDefinition Width="Auto" />
               <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <ui:OcticonImage Grid.Column="0" Margin="11,1,6,1" Width="16" Height="16"
+            <ghfvs:OcticonImage Grid.Column="0" Margin="11,1,6,1" Width="16" Height="16"
                              Foreground="{DynamicResource GitHubVsToolWindowText}"
                              Icon="{Binding Path=Icon}"/>
             <TextBlock       Grid.Column="1" Style="{StaticResource RepoNameStyle}" />

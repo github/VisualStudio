@@ -4,8 +4,7 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
-                   xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.Exports.Reactive"
-                   xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+                   xmlns:ghfvs="https://github.com/github/VisualStudio"
                    mc:Ignorable="d"
                    Title="{Binding Content.Title, FallbackValue=GitHub}"
                    Width="414"
@@ -25,9 +24,9 @@
                    WindowStartupLocation="CenterOwner"
                    Content="{Binding Content}">
   <Window.Resources>
-    <views:ViewLocator x:Key="viewLocator"/>
-    <DataTemplate DataType="{x:Type vm:ViewModelBase}">
+    <!--<ghfvs:ViewLocator x:Key="viewLocator"/>-->
+    <!--<DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
       <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
-    </DataTemplate>
+    </DataTemplate>-->
   </Window.Resources>
 </pfui:DialogWindow>
