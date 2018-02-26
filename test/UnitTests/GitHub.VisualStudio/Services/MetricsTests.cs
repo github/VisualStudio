@@ -424,6 +424,13 @@ namespace MetricsTests
     public class UsageServiceTests : TestBaseClass
     {
         [Test]
+        public async Task GetUserGuidWorks()
+        {
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var guid = await usageService.GetUserGuid();
+        }
+
+        [Test]
         public void IsSameDayWorks()
         {
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
