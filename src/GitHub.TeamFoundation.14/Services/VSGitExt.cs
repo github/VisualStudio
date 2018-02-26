@@ -16,6 +16,10 @@ namespace GitHub.VisualStudio.Base
     /// <summary>
     /// This service acts as an always available version of <see cref="IGitExt"/>.
     /// </summary>
+    /// <remarks>
+    /// Initialization for this service will be done asynchronously and the <see cref="IGitExt" /> service will be
+    /// retrieved on the Main thread. This means the service to be constructed and subscribed to on a background thread.
+    /// </remarks>
     [Export(typeof(IVSGitExt))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExt : IVSGitExt
