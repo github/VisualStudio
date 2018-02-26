@@ -64,7 +64,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error(ex, "Failed reading writing metrics GUID");
+                    log.Error(ex, "Failed writing user metrics GUID");
                 }
             }
 
