@@ -99,10 +99,7 @@ namespace GitHub.VisualStudio.Base
 
         async Task<bool> TryInitialize()
         {
-            // GetService must be called on the Main thread.
-            await ThreadingHelper.SwitchToMainThreadAsync();
-
-            gitService = serviceProvider.GetService<IGitExt>();
+            gitService = await GetServiceAsync<IGitExt>();
             if (gitService != null)
             {
                 gitService.PropertyChanged += (s, e) =>
@@ -123,6 +120,13 @@ namespace GitHub.VisualStudio.Base
 
             log.Error("Couldn't find IGitExt service");
             return false;
+        }
+
+        async Task<T> GetServiceAsync<T>() where T : class
+        {
+            // GetService must be called from the Main thread.
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            return serviceProvider.GetService<T>();
         }
 
         void RefreshActiveRepositories()
