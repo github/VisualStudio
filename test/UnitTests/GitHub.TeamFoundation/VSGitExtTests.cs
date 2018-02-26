@@ -11,11 +11,10 @@ using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Threading.Tasks;
 using System.Linq;
-using GitHub.TeamFoundation.Services;
 
 public class VSGitExtTests
 {
-    public class TheConstructor
+    public class TheConstructor : TestBaseClass
     {
         [TestCase(true, 1)]
         [TestCase(false, 0)]
@@ -60,7 +59,7 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesChangedEvent
+    public class TheActiveRepositoriesChangedEvent : TestBaseClass
     {
         [Test]
         public async Task GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
@@ -132,7 +131,7 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesProperty
+    public class TheActiveRepositoriesProperty : TestBaseClass
     {
         [Test]
         public void SccProviderContextNotActive_IsEmpty()
