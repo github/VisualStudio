@@ -93,7 +93,6 @@
     <Compile Include="Models\InlineCommentThreadModel.cs" />
     <Compile Include="Models\PullRequestSessionLiveFile.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
-    <Compile Include="Services\IPullRequestStatusBarManager.cs" />
     <Compile Include="Services\PullRequestStatusBarManager.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />

@@ -18,45 +18,35 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews.Services
 {
-    [Export(typeof(IPullRequestStatusBarManager))]
-    public class PullRequestStatusBarManager : IPullRequestStatusBarManager
+    public class PullRequestStatusBarManager
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
-        readonly Lazy<IVSGitExt> gitExt;
+        readonly IVSGitExt gitExt;
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly IUsageTracker usageTracker;
         readonly IGitHubServiceProvider serviceProvider;
 
         [ImportingConstructor]
-        public PullRequestStatusBarManager(Lazy<IVSGitExt> gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
+        public PullRequestStatusBarManager(IVSGitExt gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
             IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
         {
             this.gitExt = gitExt;
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.usageTracker = usageTracker;
             this.serviceProvider = serviceProvider;
-        }
-
-        /// <summary>
-        /// Lazily initialize when user enters the context of a GitHub repository.
-        /// </summary>
-        /// <param name="window">Visual Studio's main window.</param>
-        public async Task InitializeAsync()
-        {
-            await ThreadingHelper.SwitchToMainThreadAsync();
 
             OnActiveRepositoriesChanged();
-            gitExt.Value.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
+            gitExt.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
         }
 
         void OnActiveRepositoriesChanged()
         {
-            if (gitExt.Value.ActiveRepositories.Count > 0)
+            if (gitExt.ActiveRepositories.Count > 0)
             {
                 StartShowingStatus().Forget();
-                gitExt.Value.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
+                gitExt.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
             }
         }
 
