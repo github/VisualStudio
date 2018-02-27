@@ -35,6 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
+        readonly IStatusBarNotificationService statusBarNotificationService;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -67,19 +68,22 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
-            ITeamExplorerContext teamExplorerContext)
+            ITeamExplorerContext teamExplorerContext,
+            IStatusBarNotificationService statusBarNotificationService)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
+            Guard.ArgumentNotNull(statusBarNotificationService, nameof(statusBarNotificationService));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
+            this.statusBarNotificationService = statusBarNotificationService;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -684,7 +688,11 @@ namespace GitHub.ViewModels.GitHubPane
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
                 var writer = new StringWriter(CultureInfo.CurrentCulture);
-                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, writer.WriteLine);
+                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, line =>
+                {
+                    writer.WriteLine(line);
+                    statusBarNotificationService.ShowMessage(line);
+                });
                 if (!complete)
                 {
                     throw new ApplicationException(writer.ToString());
@@ -693,6 +701,7 @@ namespace GitHub.ViewModels.GitHubPane
             finally
             {
                 IsBusy = false;
+                statusBarNotificationService.ShowMessage(string.Empty);
             }
         }
 

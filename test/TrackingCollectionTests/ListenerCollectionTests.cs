@@ -9,7 +9,7 @@ using NUnit.Framework;
 public class ListenerCollectionTests : TestBase
 {
 #if !DISABLE_REACTIVE_UI
-    [TestFixtureSetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
         Splat.ModeDetector.Current.SetInUnitTestRunner(true);

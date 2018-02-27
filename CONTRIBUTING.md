@@ -7,6 +7,8 @@
 
 Hi there! We're thrilled that you'd like to contribute to the __GitHub Extension for Visual Studio__. Your help is essential for keeping it great.
 
+Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license](LICENSE.md).
+
 This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to uphold this code.
 
 ## Submitting a pull request

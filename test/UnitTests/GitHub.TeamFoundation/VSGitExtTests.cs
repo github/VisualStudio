@@ -9,6 +9,9 @@ using GitHub.VisualStudio.Base;
 using NUnit.Framework;
 using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using System.Threading.Tasks;
+using System.Linq;
+using GitHub.TeamFoundation.Services;
 
 public class VSGitExtTests
 {
@@ -171,9 +174,26 @@ public class VSGitExtTests
             repoFactory.Received(1).Create(repoPath);
             Assert.That(activeRepositories.Count, Is.EqualTo(0));
         }
+
+        [Test]
+        public async Task ActiveRepositoriesChangedOrderingShouldBeCorrectAcrossThreads()
+        {
+            var gitExt = new MockGitExt();
+            var repoFactory = new MockRepositoryFactory();
+            var target = CreateVSGitExt(gitExt: gitExt, repoFactory: repoFactory);
+            var activeRepositories1 = CreateActiveRepositories("repo1");
+            var activeRepositories2 = CreateActiveRepositories("repo2");
+            var task1 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories1);
+            await Task.Delay(1);
+            var task2 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories2);
+
+            await Task.WhenAll(task1, task2);
+
+            Assert.That(target.ActiveRepositories.Single().LocalPath, Is.EqualTo("repo2"));
+        }
     }
 
-    static IReadOnlyList<IGitRepositoryInfo> CreateActiveRepositories(IList<string> repositoryPaths)
+    static IReadOnlyList<IGitRepositoryInfo> CreateActiveRepositories(params string[] repositoryPaths)
     {
         var repositories = new List<IGitRepositoryInfo>();
         foreach (var repositoryPath in repositoryPaths)
@@ -203,9 +223,8 @@ public class VSGitExtTests
         return vsGitExt;
     }
 
-    static IGitExt CreateGitExt(IList<string> repositoryPaths = null)
+    static IGitExt CreateGitExt(params string[] repositoryPaths)
     {
-        repositoryPaths = repositoryPaths ?? Array.Empty<string>();
         var gitExt = Substitute.For<IGitExt>();
         var repoList = CreateActiveRepositories(repositoryPaths);
         gitExt.ActiveRepositories.Returns(repoList);
@@ -217,5 +236,44 @@ public class VSGitExtTests
         var context = Substitute.For<IVSUIContext>();
         context.IsActive.Returns(isActive);
         return context;
+    }
+
+    class MockGitExt : IGitExt
+    {
+        IReadOnlyList<IGitRepositoryInfo> activeRepositories = new IGitRepositoryInfo[0];
+
+        public IReadOnlyList<IGitRepositoryInfo> ActiveRepositories
+        {
+            get { return activeRepositories; }
+            set
+            {
+                if (activeRepositories != value)
+                {
+                    activeRepositories = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveRepositories)));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    class MockRepositoryFactory : ILocalRepositoryModelFactory
+    {
+        public ILocalRepositoryModel Create(string localPath)
+        {
+            var result = Substitute.For<ILocalRepositoryModel>();
+            result.LocalPath.Returns(localPath);
+
+            if (localPath == "repo1")
+            {
+                // Trying to force #1493 here by introducing a a delay on the first
+                // ActiveRepositories changed notification so that the second completes
+                // first.
+                Thread.Sleep(10);
+            }
+
+            return result;
+        }
     }
 }
