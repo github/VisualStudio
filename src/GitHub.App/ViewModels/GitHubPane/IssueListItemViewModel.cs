@@ -25,6 +25,7 @@ namespace GitHub.ViewModels.GitHubPane
             state = model.State;
             title = model.Title;
             commentCount = model.CommentCount;
+            updatedAt = model.UpdatedAt;
 
             // Need to reverse the labels: we display them in right-to-left order in the view
             // to make leftmost items have a higher z-index.
