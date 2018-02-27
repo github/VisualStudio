@@ -11,10 +11,8 @@ using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.Models;
 using GitHub.Logging;
-using GitHub.Helpers;
 using GitHub.Extensions;
 using Serilog;
-using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -44,17 +42,15 @@ namespace GitHub.InlineReviews.Services
         {
             if (gitExt.ActiveRepositories.Count > 0)
             {
-                StartShowingStatus().Forget();
                 gitExt.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
+                Application.Current.Dispatcher.Invoke(() => StartShowingStatus());
             }
         }
 
-        async Task StartShowingStatus()
+        void StartShowingStatus()
         {
             try
             {
-                await ThreadingHelper.SwitchToMainThreadAsync(); // Switch from VSGitExt to Main thread
-
                 // Create just in time on Main thread.
                 pullRequestSessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
 
