@@ -25,7 +25,13 @@ namespace GitHub.ViewModels.GitHubPane
             state = model.State;
             title = model.Title;
             commentCount = model.CommentCount;
-            Labels = model.Labels.ToList();
+
+            // Need to reverse the labels: we display them in right-to-left order in the view
+            // to make leftmost items have a higher z-index.
+            Labels = model.Labels
+                .Reverse()
+                .Select(x => new LabelViewModel(x))
+                .ToList();
 
             if (model.Author != null)
             {
@@ -50,7 +56,7 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
         }
 
-        public IReadOnlyList<IssueLabelModel> Labels { get; }
+        public IReadOnlyList<ILabelViewModel> Labels { get; }
 
         public string NodeId { get; private set; }
 

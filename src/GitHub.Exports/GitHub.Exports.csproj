@@ -157,7 +157,7 @@
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewModel.cs" />
-    <Compile Include="Models\IssueLabelModel.cs" />
+    <Compile Include="Models\LabelModel.cs" />
     <Compile Include="Models\IssueListModel.cs" />
     <Compile Include="Models\Page.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
@@ -171,6 +171,7 @@
     <Compile Include="ViewModels\GitHubPane\IGitHubPaneViewModel.cs" />
     <Compile Include="ViewModels\IConnectionInitializedViewModel.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
+    <Compile Include="ViewModels\ILabelViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="ViewModels\IOpenInBrowser.cs" />
     <None Include="..\common\settings.json">

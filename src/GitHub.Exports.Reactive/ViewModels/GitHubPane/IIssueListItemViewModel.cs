@@ -10,7 +10,7 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IActorViewModel> Assignees { get; }
         IActorViewModel Author { get; }
         int CommentCount { get; }
-        IReadOnlyList<IssueLabelModel> Labels { get; }
+        IReadOnlyList<ILabelViewModel> Labels { get; }
         string NodeId { get; }
         int Number { get; }
         IssueState State { get; }

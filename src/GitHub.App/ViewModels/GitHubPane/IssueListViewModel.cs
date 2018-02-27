@@ -115,6 +115,8 @@ namespace GitHub.ViewModels.GitHubPane
                 sw.Stop();
                 Debug.WriteLine("Loaded issues in " + sw.Elapsed);
                 IsBusy = false;
+                cancelLoad.Dispose();
+                cancelLoad = null;
             });
             
             Issues.Subscribe(x =>
@@ -135,10 +137,11 @@ namespace GitHub.ViewModels.GitHubPane
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && cancelLoad != null)
             {
-                cancelLoad?.Cancel();
-                cancelLoad?.Dispose();
+                cancelLoad.Cancel();
+                cancelLoad.Dispose();
+                cancelLoad = null;
             }
 
             base.Dispose(disposing);

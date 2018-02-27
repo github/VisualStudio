@@ -163,6 +163,7 @@
     <Compile Include="SampleData\ActorViewModelDesigner.cs" />
     <Compile Include="SampleData\IssueListItemViewModelDesigner.cs" />
     <Compile Include="SampleData\IssueListViewModelDesigner.cs" />
+    <Compile Include="SampleData\LabelViewModelDesigner.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\IssueService.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="ViewModels\Dialog\RepositoryRecloneViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IssueListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IssueListViewModel.cs" />
+    <Compile Include="ViewModels\LabelViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\LoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />

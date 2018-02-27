@@ -109,6 +109,10 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
+    <Reference Include="FileCache.Signed, Version=2.0.3.0, Culture=neutral, PublicKeyToken=7542c4e7f6a4d381, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FileCache.Signed.2.0.3\lib\FileCache.Signed.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
@@ -378,8 +382,14 @@
     <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
       <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\LabelView.xaml.cs">
+      <DependentUpon>LabelView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\ActorView.xaml.cs">
       <DependentUpon>ActorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ExpandoLabelView.xaml.cs">
+      <DependentUpon>ExpandoLabelView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GitHubPane\IssueListItemView.xaml.cs">
       <DependentUpon>IssueListItemView.xaml</DependentUpon>
@@ -542,7 +552,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\LabelView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\GitHubPane\ActorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ExpandoLabelView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

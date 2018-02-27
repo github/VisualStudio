@@ -96,9 +96,9 @@ namespace GitHub.Services
                         NodeId = issue.Id,
                         Number = issue.Number,
                         State = (Models.IssueState)issue.State,
-                        Labels = issue.Labels(100, null, null, null).Nodes.Select(label => new IssueLabelModel
+                        Labels = issue.Labels(100, null, null, null).Nodes.Select(label => new LabelModel
                         {
-                            Color = '#' + label.Color,
+                            Color = label.Color,
                             Name = label.Name,
                         }).ToList(),
                         Title = issue.Title,

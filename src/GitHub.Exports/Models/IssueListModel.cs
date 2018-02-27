@@ -14,7 +14,7 @@ namespace GitHub.Models
         public ActorModel Author { get; set; }
         public IList<ActorModel> Assignees { get; set; }
         public int CommentCount { get; set; }
-        public IList<IssueLabelModel> Labels { get; set; }
+        public IList<LabelModel> Labels { get; set; }
         public string NodeId { get; set; }
         public int Number { get; set; }
         public IssueState State { get; set; }
