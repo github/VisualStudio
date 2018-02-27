@@ -10,6 +10,10 @@ Before you authenticate, you must already have a GitHub or GitHub Enterprise acc
 **Note:** If your organization is on the [Business plan](https://help.github.com/articles/organization-billing-plans) and has not enabled SAML single sign-on or login with username and passowrd, you must create and authorize a personal access token to access protected content. In addition, SAML single sign-on is not available for GitHub enterprise versions less than 2.12.2.
 
 **Important**: The required scopes for the personal access token are: `user`, `repo`, `gist`, and `write:public_key`. 
+- *user* scope: Grants access to the user profile data. We currently use this to display your avatar and check whether your plans lets you publish private repositories.
+- *repo* scope: Grants read/write access to code, commit statuses, invitations, collaborators, adding team memberships, and deployment statuses for public and private repositories and organizations. This is needed for all git network operations (push, pull, fetch), and for getting information about the repository you're currently working on.
+- *gist* scope: Grants write access to gists. We use this in our gist feature, so you can highlight code and create gists directly from Visual Studio
+- *write:public_key* scope: Grants access to creating, listing, and viewing details for public keys. This will allows us to add ssh support to your repositories, if you are unable to go through https (this feature is not available yet)
 
 For more information on creating personal access tokens, see "[Creating a personal access token for the command line](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line). 
 
