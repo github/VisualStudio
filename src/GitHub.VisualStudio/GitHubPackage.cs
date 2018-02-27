@@ -1,4 +1,7 @@
-﻿using System;
+﻿extern alias TF14;
+extern alias TF15;
+
+using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Reflection;
@@ -22,6 +25,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
+using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.VisualStudio
 {
@@ -107,12 +112,28 @@ namespace GitHub.VisualStudio
         }
     }
 
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class VSGitExtPart
+    {
+        readonly IGitHubServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public VSGitExtPart(IGitHubServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        [Export(typeof(IVSGitExt))]
+        public IVSGitExt VSGitExt => serviceProvider.GetService<IVSGitExt>();
+    }
+
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
@@ -150,6 +171,7 @@ namespace GitHub.VisualStudio
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
+            AddService(typeof(IVSGitExt), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IUsageService), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
@@ -258,6 +280,11 @@ namespace GitHub.VisualStudio
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return new UsageTracker(serviceProvider, usageService);
             }
+            else if (serviceType == typeof(IVSGitExt))
+            {
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                return CreateVSGitExt(sp);
+            }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
                 return this;
@@ -267,6 +294,19 @@ namespace GitHub.VisualStudio
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return sp.TryGetService(serviceType);
+            }
+        }
+
+        IVSGitExt CreateVSGitExt(IGitHubServiceProvider sp)
+        {
+            switch (VSVersion.Major)
+            {
+                case 14:
+                    return new Lazy<IVSGitExt>(() => new VSGitExt14(sp)).Value;
+                case 15:
+                    return new Lazy<IVSGitExt>(() => new VSGitExt15(sp)).Value;
+                default:
+                    return null;
             }
         }
     }

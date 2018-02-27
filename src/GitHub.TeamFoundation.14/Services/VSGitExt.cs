@@ -6,7 +6,6 @@ using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Logging;
-using GitHub.Helpers;
 using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
@@ -20,8 +19,6 @@ namespace GitHub.VisualStudio.Base
     /// Initialization for this service will be done asynchronously and the <see cref="IGitExt" /> service will be
     /// retrieved on the Main thread. This means the service can be constructed and subscribed to on a background thread.
     /// </remarks>
-    [Export(typeof(IVSGitExt))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExt : IVSGitExt
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
@@ -99,7 +96,7 @@ namespace GitHub.VisualStudio.Base
 
         async Task<bool> TryInitialize()
         {
-            gitService = await GetServiceAsync<IGitExt>();
+            gitService = (IGitExt)await serviceProvider.GetServiceAsync(typeof(IGitExt));
             if (gitService != null)
             {
                 gitService.PropertyChanged += (s, e) =>
@@ -120,13 +117,6 @@ namespace GitHub.VisualStudio.Base
 
             log.Error("Couldn't find IGitExt service");
             return false;
-        }
-
-        async Task<T> GetServiceAsync<T>() where T : class
-        {
-            // GetService must be called from the Main thread.
-            await ThreadingHelper.SwitchToMainThreadAsync();
-            return serviceProvider.GetService<T>();
         }
 
         void RefreshActiveRepositories()

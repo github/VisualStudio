@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.ComponentModel.Composition.Hosting;
 using System.Runtime.InteropServices;
 using GitHub.VisualStudio;
@@ -28,5 +29,7 @@ namespace GitHub.Services
         /// <param name="owner">The owner, which either has to match what was passed to AddService,
         /// or if it's null, the service will be removed without checking for ownership</param>
         void RemoveService(Type t, object owner);
+
+        Task<object> GetServiceAsync(Type serviceType);
     }
 }

@@ -71,6 +71,8 @@ namespace GitHub.VisualStudio
         public object TryGetService(Type t) => theRealProvider.TryGetService(t);
 
         public T TryGetService<T>() where T : class => theRealProvider.TryGetService<T>();
+
+        public Task<object> GetServiceAsync(Type serviceType) => theRealProvider.GetServiceAsync(serviceType);
     }
 
     /// <summary>
@@ -309,5 +311,7 @@ namespace GitHub.VisualStudio
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public Task<object> GetServiceAsync(Type serviceType) => asyncServiceProvider.GetServiceAsync(serviceType);
     }
 }
