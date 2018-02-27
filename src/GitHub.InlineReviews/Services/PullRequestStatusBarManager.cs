@@ -24,16 +24,15 @@ namespace GitHub.InlineReviews.Services
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
         readonly IVSGitExt gitExt;
-        readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly IUsageTracker usageTracker;
         readonly IGitHubServiceProvider serviceProvider;
 
+        IPullRequestSessionManager pullRequestSessionManager;
+
         [ImportingConstructor]
-        public PullRequestStatusBarManager(IVSGitExt gitExt, Lazy<IPullRequestSessionManager> pullRequestSessionManager,
-            IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
+        public PullRequestStatusBarManager(IVSGitExt gitExt, IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
         {
             this.gitExt = gitExt;
-            this.pullRequestSessionManager = pullRequestSessionManager;
             this.usageTracker = usageTracker;
             this.serviceProvider = serviceProvider;
 
@@ -56,8 +55,11 @@ namespace GitHub.InlineReviews.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync(); // Switch from VSGitExt to Main thread
 
+                // Create just in time on Main thread.
+                pullRequestSessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
+
                 RefreshCurrentSession();
-                pullRequestSessionManager.Value.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+                pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
             }
             catch (Exception e)
             {
@@ -75,7 +77,7 @@ namespace GitHub.InlineReviews.Services
 
         void RefreshCurrentSession()
         {
-            var pullRequest = pullRequestSessionManager.Value.CurrentSession?.PullRequest;
+            var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
             var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(pullRequest) : null;
             ShowStatus(viewModel);
         }

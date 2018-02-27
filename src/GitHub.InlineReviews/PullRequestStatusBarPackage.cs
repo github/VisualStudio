@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.ComponentModelHost;
 using GitHub.Helpers;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
+using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
@@ -23,13 +22,10 @@ namespace GitHub.InlineReviews
         {
             var usageTracker = (IUsageTracker)await GetServiceAsync(typeof(IUsageTracker));
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
-            var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));
-            var pullRequestSessionManager = componentModel.DefaultExportProvider.GetExport<IPullRequestSessionManager>();
 
             await ThreadingHelper.SwitchToMainThreadAsync();
-            var gitExt = componentModel.DefaultExportProvider.GetExportedValue<IVSGitExt>();
-
-            new PullRequestStatusBarManager(gitExt, pullRequestSessionManager, usageTracker, serviceProvider);
+            var gitExt = serviceProvider.GetService<IVSGitExt>();
+            new PullRequestStatusBarManager(gitExt, usageTracker, serviceProvider);
         }
     }
 }
