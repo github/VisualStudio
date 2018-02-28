@@ -2,11 +2,10 @@
 extern alias TF15;
 
 using System;
-using System.Threading.Tasks;
 using System.ComponentModel.Composition;
+using GitHub.Info;
 using GitHub.Logging;
 using Serilog;
-using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
 using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
@@ -24,19 +23,16 @@ namespace GitHub.Services
             VSGitExt = serviceProvider.GetService<IVSGitExt>();
         }
 
-        public async static Task<IVSGitExt> Create(IAsyncServiceProvider sp)
+        public static IVSGitExt Create(int vsVersion, IAsyncServiceProvider sp)
         {
-            var dte = await sp.GetServiceAsync(typeof(DTE)) as DTE;
-
-            // DTE.Version always ends with ".0" even for later minor versions.
-            switch (dte.Version)
+            switch (vsVersion)
             {
-                case "14.0":
+                case 14:
                     return Create(() => new VSGitExt14(sp.GetServiceAsync));
-                case "15.0":
+                case 15:
                     return Create(() => new VSGitExt15(sp.GetServiceAsync));
                 default:
-                    log.Error("There is no IVSGitExt implementation for DTE version {Version}", dte.Version);
+                    log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
                     return null;
             }
         }
