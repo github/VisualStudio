@@ -2,6 +2,7 @@
 extern alias TF15;
 
 using System;
+using System.ComponentModel.Composition;
 using GitHub.Logging;
 using Serilog;
 using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
@@ -10,9 +11,21 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.Services
 {
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExtFactory
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExtFactory>();
+
+        readonly IGitHubServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public VSGitExtFactory(IGitHubServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        [Export(typeof(IVSGitExt))]
+        public IVSGitExt VSGitExt => serviceProvider.GetService<IVSGitExt>();
 
         public static IVSGitExt Create(string dteVersion, IAsyncServiceProvider sp)
         {
