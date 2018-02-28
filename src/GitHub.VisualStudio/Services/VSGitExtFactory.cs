@@ -18,16 +18,11 @@ namespace GitHub.Services
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExtFactory>();
 
-        readonly IGitHubServiceProvider serviceProvider;
-
         [ImportingConstructor]
         public VSGitExtFactory(IGitHubServiceProvider serviceProvider)
         {
-            this.serviceProvider = serviceProvider;
+            VSGitExt = serviceProvider.GetService<IVSGitExt>();
         }
-
-        [Export(typeof(IVSGitExt))]
-        public IVSGitExt VSGitExt => serviceProvider.GetService<IVSGitExt>();
 
         public async static Task<IVSGitExt> Create(IAsyncServiceProvider sp)
         {
@@ -37,13 +32,20 @@ namespace GitHub.Services
             switch (dte.Version)
             {
                 case "14.0":
-                    return new Lazy<IVSGitExt>(() => new VSGitExt14(sp.GetServiceAsync)).Value;
+                    return Create(() => new VSGitExt14(sp.GetServiceAsync));
                 case "15.0":
-                    return new Lazy<IVSGitExt>(() => new VSGitExt15(sp.GetServiceAsync)).Value;
+                    return Create(() => new VSGitExt15(sp.GetServiceAsync));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", dte.Version);
                     return null;
             }
         }
+
+        // NOTE: We're being careful to only reference VSGitExt14 and VSGitExt15 from inside a lambda expression.
+        // This ensures that only the type that's compatible with the running DTE version is loaded.
+        static IVSGitExt Create(Func<IVSGitExt> factory) => factory.Invoke();
+
+        [Export]
+        public IVSGitExt VSGitExt { get; }
     }
 }
