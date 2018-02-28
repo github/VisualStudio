@@ -9,19 +9,30 @@
              mc:Ignorable="d"
              Height="4" Width="16" ClipToBounds="False">
 
+    <UserControl.Resources>
+        <PopupAnimation x:Key="{x:Static SystemParameters.ToolTipPopupAnimationKey}">Slide</PopupAnimation>
+        <Style TargetType="ToolTip">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <local:LabelView/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ToolTip.Placement" Value="Top"/>
+            <Setter Property="ToolTip.VerticalOffset" Value="{Binding PlacementTarget.ActualHeight, RelativeSource={RelativeSource Self}}"/>
+        </Style>
+    </UserControl.Resources>
+    
     <d:DesignData.DataContext>
         <sampleData:LabelViewModelDesigner Name="bug" BackgroundBrush="Red" ForegroundBrush="Black"/>
     </d:DesignData.DataContext>
 
-    <Canvas Name="canvas">
-        <Rectangle Name="rect"
-                   Fill="{Binding BackgroundBrush}"
-                   RadiusX="2"
-                   RadiusY="2"
-                   Width="{Binding ActualWidth, ElementName=canvas}"
-                   Height="{Binding ActualHeight, ElementName=canvas}"/>
-        <local:LabelView Canvas.Bottom="0"
-                         IsHitTestVisible="False"
-                         Visibility="{Binding IsExpanded, ElementName=userControl, Converter={ui:BooleanToVisibilityConverter}}"/>
-    </Canvas>
+    <Rectangle Name="rect"
+               Fill="{Binding BackgroundBrush}"
+               RadiusX="2"
+               RadiusY="2"
+               Width="{Binding ActualWidth, ElementName=canvas}"
+               Height="{Binding ActualHeight, ElementName=canvas}"
+               ToolTip="{Binding}"/>
 </UserControl>

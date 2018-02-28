@@ -27,20 +27,13 @@ namespace GitHub.ViewModels.GitHubPane
             commentCount = model.CommentCount;
             updatedAt = model.UpdatedAt;
 
-            // Need to reverse the labels: we display them in right-to-left order in the view
-            // to make leftmost items have a higher z-index.
-            Labels = model.Labels
-                .Reverse()
-                .Select(x => new LabelViewModel(x))
-                .ToList();
-
             if (model.Author != null)
             {
                 author = new ActorViewModel(model.Author);
             }
 
-            Assignees = new List<IActorViewModel>(
-                model.Assignees.Select(x => new ActorViewModel(x)));
+            Labels = model.Labels.Select(x => new LabelViewModel(x)).ToList();
+            Assignees = model.Assignees.Select(x => new ActorViewModel(x)).ToList();
         }
 
         public IReadOnlyList<IActorViewModel> Assignees { get; }

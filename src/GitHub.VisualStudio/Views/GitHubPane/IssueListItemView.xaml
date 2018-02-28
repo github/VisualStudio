@@ -47,20 +47,16 @@
         </Grid.RowDefinitions>
 
         <ItemsControl Grid.ColumnSpan="2"
-                      Grid.ZIndex="1" 
                       HorizontalAlignment="Left"
                       ItemsSource="{Binding Labels}">
             <ItemsControl.ItemContainerStyle>
-                <!-- We need to order items right to left so that leftmost items have a higer z-index
-                     and are therefore not obscured by items to the right. -->
                 <Style TargetType="ContentPresenter">
-                    <Setter Property="DockPanel.Dock" Value="Right"/>
                     <Setter Property="Margin" Value="0 1"/>
                 </Style>
             </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <DockPanel/>
+                    <StackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
