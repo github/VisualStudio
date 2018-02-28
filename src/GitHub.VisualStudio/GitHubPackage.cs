@@ -1,7 +1,4 @@
-﻿extern alias TF14;
-extern alias TF15;
-
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -25,8 +22,6 @@ using EnvDTE;
 using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
-using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
-using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.VisualStudio
 {
@@ -268,7 +263,7 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IVSGitExt))
             {
                 var dte = await GetServiceAsync(typeof(DTE)) as DTE;
-                return CreateVSGitExt(dte.Version);
+                return VSGitExtFactory.Create(dte.Version, this);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
@@ -279,21 +274,6 @@ namespace GitHub.VisualStudio
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return sp.TryGetService(serviceType);
-            }
-        }
-
-        IVSGitExt CreateVSGitExt(string dteVersion)
-        {
-            // DTE.Version always ends with ".0" even for later minor versions.
-            switch (dteVersion)
-            {
-                case "14.0":
-                    return new Lazy<IVSGitExt>(() => new VSGitExt14(GetServiceAsync)).Value;
-                case "15.0":
-                    return new Lazy<IVSGitExt>(() => new VSGitExt15(GetServiceAsync)).Value;
-                default:
-                    log.Error("There is no IVSGitExt implementation for DTE version {Version}", dteVersion);
-                    return null;
             }
         }
     }
