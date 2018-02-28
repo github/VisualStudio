@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
+using Rothko;
 using Serilog;
+using Environment = System.Environment;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -21,14 +23,16 @@ namespace GitHub.Services
         static readonly ILogger log = LogManager.ForContext<UsageService>();
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
         readonly IGitHubServiceProvider serviceProvider;
+        private readonly IFileFacade fileFacade;
         string storePath;
         string userStorePath;
         Guid? userGuid;
 
         [ImportingConstructor]
-        public UsageService(IGitHubServiceProvider serviceProvider)
+        public UsageService(IGitHubServiceProvider serviceProvider, IFileFacade fileFacade)
         {
             this.serviceProvider = serviceProvider;
+            this.fileFacade = fileFacade;
         }
 
         public async Task<Guid> GetUserGuid()
@@ -152,7 +156,8 @@ namespace GitHub.Services
 
         async Task<string> ReadAllTextAsync(string path)
         {
-            using (var s = File.OpenRead(path))
+            var fileInfo = fileFacade.GetFile(path);
+            using (var s = fileInfo.OpenRead())
             using (var r = new StreamReader(s, Encoding.UTF8))
             {
                 return await r.ReadToEndAsync();
@@ -161,7 +166,8 @@ namespace GitHub.Services
 
         async Task WriteAllTextAsync(string path, string text)
         {
-            using (var s = new FileStream(path, FileMode.Create))
+            var fileInfo = fileFacade.GetFile(path);
+            using (var s = fileInfo.OpenWrite())
             using (var w = new StreamWriter(s, Encoding.UTF8))
             {
                 await w.WriteAsync(text);
