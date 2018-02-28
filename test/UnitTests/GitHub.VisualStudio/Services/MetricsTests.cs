@@ -530,12 +530,12 @@ namespace MetricsTests
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var now = DateTimeOffset.Now;
             Assert.True(usageService.IsSameDay(now));
-            Assert.True(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero)));
-            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day+1, 0, 0, 0, TimeSpan.Zero)));
-            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day-1, 0, 0, 0, TimeSpan.Zero)));
-            Assert.True(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day, 10, 3, 1, TimeSpan.Zero)));
-            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day+1, 10, 3, 1, TimeSpan.Zero)));
-            Assert.False(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day-1, 10, 3, 1, TimeSpan.Zero)));
+            Assert.True(usageService.IsSameDay(now));
+            Assert.False(usageService.IsSameDay(now.AddDays(1)));
+            Assert.False(usageService.IsSameDay(now.AddDays(-1)));
+            Assert.True(usageService.IsSameDay(now.AddHours(10).AddMinutes(30).AddSeconds(1)));
+            Assert.False(usageService.IsSameDay(now.AddDays(1).AddHours(10).AddMinutes(30).AddSeconds(1)));
+            Assert.False(usageService.IsSameDay(now.AddDays(-1).AddHours(10).AddMinutes(30).AddSeconds(1)));
         }
 
         [Test]
