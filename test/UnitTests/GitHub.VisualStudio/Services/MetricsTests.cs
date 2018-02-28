@@ -615,9 +615,6 @@ namespace MetricsTests
             Assert.True(usageService.IsSameDay(now));
             Assert.False(usageService.IsSameDay(now.AddDays(1)));
             Assert.False(usageService.IsSameDay(now.AddDays(-1)));
-            Assert.True(usageService.IsSameDay(now.AddHours(10).AddMinutes(30).AddSeconds(1)));
-            Assert.False(usageService.IsSameDay(now.AddDays(1).AddHours(10).AddMinutes(30).AddSeconds(1)));
-            Assert.False(usageService.IsSameDay(now.AddDays(-1).AddHours(10).AddMinutes(30).AddSeconds(1)));
         }
 
         [Test]
