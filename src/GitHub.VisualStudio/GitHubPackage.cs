@@ -18,7 +18,6 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using EnvDTE;
 using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
@@ -262,8 +261,7 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IVSGitExt))
             {
-                var dte = await GetServiceAsync(typeof(DTE)) as DTE;
-                return VSGitExtFactory.Create(dte.Version, this);
+                return await VSGitExtFactory.Create(this);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
