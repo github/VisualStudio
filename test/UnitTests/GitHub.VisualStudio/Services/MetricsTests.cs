@@ -425,13 +425,12 @@ namespace MetricsTests
 
     public class UsageServiceTests : TestBaseClass
     {
-        private const string DefaultUserStoreContent =
-@"
-";
-        private const string DefaultUsageContent =
-@"
-";
-        private const string LegacyUsageContent =
+        private static readonly Guid UserGuid = Guid.NewGuid();
+        private static readonly string DefaultUserStoreContent = @"{""UserGuid"":""" + UserGuid + @"""}";
+
+        private static readonly string DefaultUsageContent = string.Empty;
+
+        private static readonly string LegacyUsageContent =
 @"{
 	""LastUpdated"": ""2018-02-28T12:37:09.4771538Z"",
 	""Model"": {
@@ -522,6 +521,7 @@ namespace MetricsTests
         {
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var guid = await usageService.GetUserGuid();
+            Assert.IsTrue(guid.Equals(UserGuid));
         }
 
         [Test]
