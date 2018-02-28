@@ -75,28 +75,27 @@
                          Margin="0,0,10,0"
                          Width="30"
                          Height="30"/>
-        
-        <TextBlock Grid.Column="1" Grid.Row="1"
-                   Margin="0,-3,5,0"
-                   TextTrimming="CharacterEllipsis">
-            <Hyperlink Foreground="{DynamicResource GitHubVsToolWindowText}">
-                <Run Text="{Binding Title, Mode=OneWay}"/>
-            </Hyperlink>
-        </TextBlock>
+
+        <ui:GitHubActionLink Grid.Column="1" Grid.Row="1"
+                             Content="{Binding Title}"
+                             Foreground="{DynamicResource GitHubVsToolWindowText}"
+                             Margin="0,-3,5,0"
+                             TextTrimming="CharacterEllipsis"
+                             ToolTip="{Binding Title}"/>
 
         <StackPanel Grid.Column="1" Grid.Row="2"
                     Orientation="Horizontal"
                     TextBlock.Foreground="{DynamicResource GitHubVsGrayText}">
-            <TextBlock TextTrimming="CharacterEllipsis">
-                <Hyperlink>
-                    <Run Text="{Binding Number, StringFormat=#{0}, Mode=OneWay}"/>
-                </Hyperlink>
+            <Button Content="{Binding Number}"
+                    Command="{Binding ViewModel.OpenIssueOnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:IssueListView}}}"
+                    CommandParameter="{Binding Number}"
+                    Style="{StaticResource HashtagActionLink}"/>
+            <TextBlock Margin="4 0" TextTrimming="CharacterEllipsis">
                 <Run Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
                 <Run>by</Run>
                 <Run Text="{Binding Author.Login, Mode=OneWay}"/>
             </TextBlock>
-            <TextBlock Margin="4 0"
-                       Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}">
+            <TextBlock Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}">
                 <ui:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>
                 <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top"/>
             </TextBlock>

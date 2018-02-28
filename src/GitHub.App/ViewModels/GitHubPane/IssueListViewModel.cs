@@ -23,6 +23,7 @@ namespace GitHub.ViewModels.GitHubPane
         static readonly string NoFilter = "[None]";
         static readonly string[] NoFilterList = new[] { NoFilter };
 
+        readonly IVisualStudioBrowser visualStudioBrowser;
         readonly IIssueService service;
         CancellationTokenSource cancelLoad;
         ObservableCollection<string> assignees;
@@ -33,9 +34,13 @@ namespace GitHub.ViewModels.GitHubPane
         IssueStateFilter selectedState = IssueStateFilter.Open;
 
         [ImportingConstructor]
-        public IssueListViewModel(IIssueService service)
+        public IssueListViewModel(
+            IIssueService service,
+            IVisualStudioBrowser visualStudioBrowser)
         {
             this.service = service;
+            this.visualStudioBrowser = visualStudioBrowser;
+
             assignees = new ObservableCollection<string>(NoFilterList);
             authors = new ObservableCollection<string>(NoFilterList);
             Issues = new TrackingCollection<IIssueListItemViewModel>();
@@ -50,6 +55,9 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a, SearchQuery));
             this.WhenAnyValue(x => x.SearchQuery)
                 .Subscribe(f => UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, f));
+
+            OpenIssueOnGitHub = ReactiveCommand.Create()
+                .OnExecuteCompleted(x => DoOpenIssueOnGitHub((int)x));
         }
 
         public IReadOnlyList<string> Assignees => assignees;
@@ -83,6 +91,8 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         public Uri WebUrl => null;
+
+        public ReactiveCommand<object> OpenIssueOnGitHub { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
@@ -145,6 +155,13 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             base.Dispose(disposing);
+        }
+
+        void DoOpenIssueOnGitHub(int number)
+        {
+            var repoUrl = LocalRepository.CloneUrl.ToRepositoryUrl();
+            var url = repoUrl.Append("issues/" + number);
+            visualStudioBrowser.OpenUrl(url);
         }
 
         void UpdateFilter(IssueStateFilter state, string assignee, string author, string filter)
