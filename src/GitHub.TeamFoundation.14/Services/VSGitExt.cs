@@ -17,7 +17,7 @@ namespace GitHub.VisualStudio.Base
     /// </summary>
     /// <remarks>
     /// Initialization for this service will be done asynchronously and the <see cref="IGitExt" /> service will be
-    /// retrieved on the Main thread. This means the service can be constructed and subscribed to on a background thread.
+    /// retrieved using <see cref="GetServiceAsync" />. This means the service can be constructed and subscribed to from a background thread.
     /// </remarks>
     public class VSGitExt : IVSGitExt
     {

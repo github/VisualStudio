@@ -300,6 +300,7 @@ namespace GitHub.VisualStudio
 
         IVSGitExt CreateVSGitExt(string dteVersion, IGitHubServiceProvider sp)
         {
+            // DTE.Version always ends with ".0" even for later minor versions.
             switch (dteVersion)
             {
                 case "14.0":

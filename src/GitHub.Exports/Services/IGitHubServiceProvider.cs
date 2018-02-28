@@ -31,8 +31,18 @@ namespace GitHub.Services
         /// or if it's null, the service will be removed without checking for ownership</param>
         void RemoveService(Type t, object owner);
 
+        /// <summary>
+        /// Gets a Visual Studio service asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The type of the service.</typeparam>
         Task<T> GetServiceAsync<T>() where T : class;
 
+        /// <summary>
+        /// Gets a Visual Studio service asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The type of the service.</typeparam>
+        /// <typeparam name="Ret">The type of the service instance to return.</typeparam>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         Task<Ret> GetServiceAsync<T, Ret>() where T : class where Ret : class;
     }
