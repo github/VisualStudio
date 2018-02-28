@@ -11,11 +11,10 @@ using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Threading.Tasks;
 using System.Linq;
-using GitHub.TeamFoundation.Services;
 
 public class VSGitExtTests
 {
-    public class TheConstructor
+    public class TheConstructor : TestBaseClass
     {
         [TestCase(true, 1)]
         [TestCase(false, 0)]
@@ -60,10 +59,10 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesChangedEvent
+    public class TheActiveRepositoriesChangedEvent : TestBaseClass
     {
         [Test]
-        public void GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
+        public async Task GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
         {
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt();
@@ -75,6 +74,7 @@ public class VSGitExtTests
             var eventArgs = new PropertyChangedEventArgs(nameof(gitExt.ActiveRepositories));
             gitExt.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(gitExt, eventArgs);
 
+            await target.PendingTasks;
             Assert.That(wasFired, Is.True);
         }
 
@@ -108,7 +108,7 @@ public class VSGitExtTests
 
             var eventArgs = new VSUIContextChangedEventArgs(true);
             context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
-            target.InitializeTask.Wait();
+            target.PendingTasks.Wait();
 
             Assert.That(wasFired, Is.True);
         }
@@ -125,13 +125,13 @@ public class VSGitExtTests
 
             var eventArgs = new VSUIContextChangedEventArgs(true);
             context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
-            target.InitializeTask.Wait();
+            target.PendingTasks.Wait();
 
             Assert.That(threadPool, Is.True);
         }
     }
 
-    public class TheActiveRepositoriesProperty
+    public class TheActiveRepositoriesProperty : TestBaseClass
     {
         [Test]
         public void SccProviderContextNotActive_IsEmpty()
@@ -150,7 +150,7 @@ public class VSGitExtTests
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new[] { repoPath });
             var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
-            target.InitializeTask.Wait();
+            target.PendingTasks.Wait();
 
             var activeRepositories = target.ActiveRepositories;
 
@@ -167,7 +167,7 @@ public class VSGitExtTests
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new[] { repoPath });
             var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
-            target.InitializeTask.Wait();
+            target.PendingTasks.Wait();
 
             var activeRepositories = target.ActiveRepositories;
 
@@ -188,6 +188,7 @@ public class VSGitExtTests
             var task2 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories2);
 
             await Task.WhenAll(task1, task2);
+            await target.PendingTasks;
 
             Assert.That(target.ActiveRepositories.Single().LocalPath, Is.EqualTo("repo2"));
         }
@@ -219,7 +220,7 @@ public class VSGitExtTests
         sp.GetService<IVSUIContextFactory>().Returns(factory);
         sp.GetService<IGitExt>().Returns(gitExt);
         var vsGitExt = new VSGitExt(sp, factory, repoFactory);
-        vsGitExt.InitializeTask.Wait();
+        vsGitExt.PendingTasks.Wait();
         return vsGitExt;
     }
 
