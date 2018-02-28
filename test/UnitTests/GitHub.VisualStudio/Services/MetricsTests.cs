@@ -9,6 +9,7 @@ using NSubstitute;
 using NUnit.Framework;
 using System.Linq;
 using System.Globalization;
+using System.IO;
 using GitHub.Reflection;
 using Rothko;
 
@@ -424,17 +425,109 @@ namespace MetricsTests
 
     public class UsageServiceTests : TestBaseClass
     {
+        private const string DefaultUserStoreContent =
+@"
+";
+        private const string DefaultUsageContent =
+@"
+";
+        private const string LegacyUsageContent =
+@"{
+	""LastUpdated"": ""2018-02-28T12:37:09.4771538Z"",
+	""Model"": {
+		""IsGitHubUser"": true,
+		""IsEnterpriseUser"": false,
+		""AppVersion"": ""2.4.3.0"",
+		""VSVersion"": ""14.0.25431.01 Update 3"",
+		""Lang"": ""en-US"",
+		""NumberOfStartups"": 0,
+		""NumberOfStartupsWeek"": 3,
+		""NumberOfStartupsMonth"": 23,
+		""NumberOfUpstreamPullRequests"": 0,
+		""NumberOfClones"": 0,
+		""NumberOfReposCreated"": 0,
+		""NumberOfReposPublished"": 0,
+		""NumberOfGists"": 0,
+		""NumberOfOpenInGitHub"": 0,
+		""NumberOfLinkToGitHub"": 2,
+		""NumberOfLogins"": 1,
+		""NumberOfOAuthLogins"": 0,
+		""NumberOfTokenLogins"": 0,
+		""NumberOfPullRequestsOpened"": 1,
+		""NumberOfLocalPullRequestsCheckedOut"": 0,
+		""NumberOfLocalPullRequestPulls"": 0,
+		""NumberOfLocalPullRequestPushes"": 0,
+		""NumberOfForkPullRequestsCheckedOut"": 0,
+		""NumberOfForkPullRequestPulls"": 0,
+		""NumberOfForkPullRequestPushes"": 0,
+		""NumberOfSyncSubmodules"": 0,
+		""NumberOfWelcomeDocsClicks"": 0,
+		""NumberOfWelcomeTrainingClicks"": 0,
+		""NumberOfGitHubPaneHelpClicks"": 0,
+		""NumberOfPRDetailsViewChanges"": 1,
+		""NumberOfPRDetailsViewFile"": 0,
+		""NumberOfPRDetailsCompareWithSolution"": 0,
+		""NumberOfPRDetailsOpenFileInSolution"": 0,
+		""NumberOfPRDetailsNavigateToEditor"": 0,
+		""NumberOfPRReviewDiffViewInlineCommentOpen"": 1,
+		""NumberOfPRReviewDiffViewInlineCommentPost"": 0,
+		""NumberOfShowCurrentPullRequest"": 2
+	}
+}";
+
+        private string storeFileName;
+        private string userFileName;
+        private string localApplicationDataPath;
+        private IEnvironment environment;
+
+        [SetUp]
+        public void SetUp()
+        {
+            localApplicationDataPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+            if (File.Exists(localApplicationDataPath))
+            {
+                File.Delete(localApplicationDataPath);
+            }
+
+            if (Directory.Exists(localApplicationDataPath))
+            {
+                Directory.Delete(localApplicationDataPath);
+            }
+
+            Directory.CreateDirectory(localApplicationDataPath);
+
+            storeFileName = Path.Combine(localApplicationDataPath, "ghfvs.usage");
+            userFileName = Path.Combine(localApplicationDataPath, "user.json");
+
+            environment = Substitute.For<IEnvironment>();
+            environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
+                .Returns(localApplicationDataPath);
+
+            WriteUsageFileContent(DefaultUsageContent);
+            WriteUserFileContent(DefaultUserStoreContent);
+        }
+
+        private void WriteUsageFileContent(string content)
+        {
+            File.WriteAllText(storeFileName, content);
+        }
+        private void WriteUserFileContent(string content)
+        {
+            File.WriteAllText(userFileName, content);
+        }
+
         [Test]
         public async Task GetUserGuidWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var guid = await usageService.GetUserGuid();
         }
 
         [Test]
         public void IsSameDayWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var now = DateTimeOffset.Now;
             Assert.True(usageService.IsSameDay(now));
             Assert.True(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero)));
@@ -448,7 +541,7 @@ namespace MetricsTests
         [Test]
         public void IsSameWeekWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var now = DateTimeOffset.Now;
 
             Assert.True(usageService.IsSameWeek(now));
@@ -476,7 +569,7 @@ namespace MetricsTests
         [Test]
         public void IsSameMonthWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var now = DateTimeOffset.Now;
 
             Assert.True(usageService.IsSameMonth(now));
