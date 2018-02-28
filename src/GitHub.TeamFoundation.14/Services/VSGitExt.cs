@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.Base
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
 
-        readonly IGitHubServiceProvider serviceProvider;
+        readonly Func<Type, Task<object>> getServiceAsync;
         readonly IVSUIContext context;
         readonly ILocalRepositoryModelFactory repositoryFactory;
 
@@ -31,14 +31,14 @@ namespace GitHub.VisualStudio.Base
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
         [ImportingConstructor]
-        public VSGitExt(IGitHubServiceProvider serviceProvider)
-            : this(serviceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory())
+        public VSGitExt(Func<Type, Task<object>> getServiceAsync)
+            : this(getServiceAsync, new VSUIContextFactory(), new LocalRepositoryModelFactory())
         {
         }
 
-        public VSGitExt(IGitHubServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
+        public VSGitExt(Func<Type, Task<object>> getServiceAsync, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
         {
-            this.serviceProvider = serviceProvider;
+            this.getServiceAsync = getServiceAsync;
             this.repositoryFactory = repositoryFactory;
 
             // The IGitExt service isn't available when a TFS based solution is opened directly.
@@ -96,7 +96,7 @@ namespace GitHub.VisualStudio.Base
 
         async Task<bool> TryInitialize()
         {
-            gitService = await serviceProvider.GetServiceAsync<IGitExt>();
+            gitService = (IGitExt)await getServiceAsync(typeof(IGitExt));
             if (gitService != null)
             {
                 gitService.PropertyChanged += (s, e) =>

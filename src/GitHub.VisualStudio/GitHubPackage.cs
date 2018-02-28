@@ -283,8 +283,7 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IVSGitExt))
             {
                 var dte = await GetServiceAsync(typeof(DTE)) as DTE;
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return CreateVSGitExt(dte.Version, sp);
+                return CreateVSGitExt(dte.Version);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
@@ -298,15 +297,15 @@ namespace GitHub.VisualStudio
             }
         }
 
-        IVSGitExt CreateVSGitExt(string dteVersion, IGitHubServiceProvider sp)
+        IVSGitExt CreateVSGitExt(string dteVersion)
         {
             // DTE.Version always ends with ".0" even for later minor versions.
             switch (dteVersion)
             {
                 case "14.0":
-                    return new Lazy<IVSGitExt>(() => new VSGitExt14(sp)).Value;
+                    return new Lazy<IVSGitExt>(() => new VSGitExt14(GetServiceAsync)).Value;
                 case "15.0":
-                    return new Lazy<IVSGitExt>(() => new VSGitExt15(sp)).Value;
+                    return new Lazy<IVSGitExt>(() => new VSGitExt15(GetServiceAsync)).Value;
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", dteVersion);
                     return null;

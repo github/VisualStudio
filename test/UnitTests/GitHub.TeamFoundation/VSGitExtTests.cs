@@ -21,11 +21,11 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenSccProviderContextIsActive(bool isActive, int expectCalls)
         {
             var context = CreateVSUIContext(isActive);
-            var sp = Substitute.For<IGitHubServiceProvider>();
+            var sp = Substitute.For<IAsyncServiceProvider>();
 
             var target = CreateVSGitExt(context, sp: sp);
 
-            sp.Received(expectCalls).GetServiceAsync<IGitExt>();
+            sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
         }
 
         [TestCase(true, 1)]
@@ -33,13 +33,13 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenUIContextChanged(bool activated, int expectCalls)
         {
             var context = CreateVSUIContext(false);
-            var sp = Substitute.For<IGitHubServiceProvider>();
+            var sp = Substitute.For<IAsyncServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
             var eventArgs = new VSUIContextChangedEventArgs(activated);
             context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
 
-            sp.Received(expectCalls).GetServiceAsync<IGitExt>();
+            sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
         }
 
         [Test]
@@ -207,21 +207,25 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IGitHubServiceProvider sp = null,
+    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IAsyncServiceProvider sp = null,
         ILocalRepositoryModelFactory repoFactory = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();
-        sp = sp ?? Substitute.For<IGitHubServiceProvider>();
+        sp = sp ?? Substitute.For<IAsyncServiceProvider>();
         repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
         var factory = Substitute.For<IVSUIContextFactory>();
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
-        sp.GetService<IVSUIContextFactory>().Returns(factory);
-        sp.GetServiceAsync<IGitExt>().Returns(gitExt);
-        var vsGitExt = new VSGitExt(sp, factory, repoFactory);
+        sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
+        var vsGitExt = new VSGitExt(sp.GetServiceAsync, factory, repoFactory);
         vsGitExt.PendingTasks.Wait();
         return vsGitExt;
+    }
+
+    public interface IAsyncServiceProvider
+    {
+        Task<object> GetServiceAsync(Type serviceType);
     }
 
     static IGitExt CreateGitExt(params string[] repositoryPaths)
