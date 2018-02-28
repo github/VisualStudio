@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System.Linq;
 using System.Globalization;
 using GitHub.Reflection;
+using Rothko;
 
 namespace MetricsTests
 {
@@ -426,14 +427,14 @@ namespace MetricsTests
         [Test]
         public async Task GetUserGuidWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
             var guid = await usageService.GetUserGuid();
         }
 
         [Test]
         public void IsSameDayWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
             var now = DateTimeOffset.Now;
             Assert.True(usageService.IsSameDay(now));
             Assert.True(usageService.IsSameDay(new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero)));
@@ -447,7 +448,7 @@ namespace MetricsTests
         [Test]
         public void IsSameWeekWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
             var now = DateTimeOffset.Now;
 
             Assert.True(usageService.IsSameWeek(now));
@@ -475,7 +476,7 @@ namespace MetricsTests
         [Test]
         public void IsSameMonthWorks()
         {
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>());
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), Substitute.For<IEnvironment>());
             var now = DateTimeOffset.Now;
 
             Assert.True(usageService.IsSameMonth(now));

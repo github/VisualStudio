@@ -23,16 +23,16 @@ namespace GitHub.Services
         static readonly ILogger log = LogManager.ForContext<UsageService>();
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
         readonly IGitHubServiceProvider serviceProvider;
-        private readonly IFileFacade fileFacade;
+        private readonly IEnvironment environment;
         string storePath;
         string userStorePath;
         Guid? userGuid;
 
         [ImportingConstructor]
-        public UsageService(IGitHubServiceProvider serviceProvider, IFileFacade fileFacade)
+        public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment)
         {
             this.serviceProvider = serviceProvider;
-            this.fileFacade = fileFacade;
+            this.environment = environment;
         }
 
         public async Task<Guid> GetUserGuid()
@@ -143,21 +143,17 @@ namespace GitHub.Services
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
                 var program = serviceProvider.GetService<IProgram>();
-                storePath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    program.ApplicationName,
-                    StoreFileName);
-                userStorePath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    program.ApplicationName,
-                    UserStoreFileName);
+
+                var localApplicationDataPath = environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                storePath = Path.Combine(localApplicationDataPath, program.ApplicationName, StoreFileName);
+                userStorePath = Path.Combine(localApplicationDataPath, program.ApplicationName, UserStoreFileName);
             }
         }
 
         async Task<string> ReadAllTextAsync(string path)
         {
-            var fileInfo = fileFacade.GetFile(path);
-            using (var s = fileInfo.OpenRead())
+            using (var s = File.OpenRead(path))
             using (var r = new StreamReader(s, Encoding.UTF8))
             {
                 return await r.ReadToEndAsync();
@@ -166,8 +162,7 @@ namespace GitHub.Services
 
         async Task WriteAllTextAsync(string path, string text)
         {
-            var fileInfo = fileFacade.GetFile(path);
-            using (var s = fileInfo.OpenWrite())
+            using (var s = new FileStream(path, FileMode.Create))
             using (var w = new StreamWriter(s, Encoding.UTF8))
             {
                 await w.WriteAsync(text);

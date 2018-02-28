@@ -20,6 +20,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
+using Rothko;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -249,7 +250,8 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IUsageService))
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UsageService(sp);
+                var environment = await GetServiceAsync(typeof(IEnvironment)) as IEnvironment;
+                return new UsageService(sp, environment);
             }
             else if (serviceType == typeof(IUsageTracker))
             {
