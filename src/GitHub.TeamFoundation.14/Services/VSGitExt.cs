@@ -96,7 +96,7 @@ namespace GitHub.VisualStudio.Base
 
         async Task<bool> TryInitialize()
         {
-            gitService = (IGitExt)await serviceProvider.GetServiceAsync(typeof(IGitExt));
+            gitService = await serviceProvider.GetServiceAsync<IGitExt>();
             if (gitService != null)
             {
                 gitService.PropertyChanged += (s, e) =>

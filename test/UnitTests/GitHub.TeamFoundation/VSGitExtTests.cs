@@ -25,7 +25,7 @@ public class VSGitExtTests
 
             var target = CreateVSGitExt(context, sp: sp);
 
-            sp.Received(expectCalls).GetService<IGitExt>();
+            sp.Received(expectCalls).GetServiceAsync<IGitExt>();
         }
 
         [TestCase(true, 1)]
@@ -39,7 +39,7 @@ public class VSGitExtTests
             var eventArgs = new VSUIContextChangedEventArgs(activated);
             context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
 
-            sp.Received(expectCalls).GetService<IGitExt>();
+            sp.Received(expectCalls).GetServiceAsync<IGitExt>();
         }
 
         [Test]
@@ -218,7 +218,7 @@ public class VSGitExtTests
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetService<IVSUIContextFactory>().Returns(factory);
-        sp.GetService<IGitExt>().Returns(gitExt);
+        sp.GetServiceAsync<IGitExt>().Returns(gitExt);
         var vsGitExt = new VSGitExt(sp, factory, repoFactory);
         vsGitExt.PendingTasks.Wait();
         return vsGitExt;

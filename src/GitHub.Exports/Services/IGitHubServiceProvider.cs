@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition.Hosting;
 using System.Runtime.InteropServices;
 using GitHub.VisualStudio;
@@ -30,6 +31,9 @@ namespace GitHub.Services
         /// or if it's null, the service will be removed without checking for ownership</param>
         void RemoveService(Type t, object owner);
 
-        Task<object> GetServiceAsync(Type serviceType);
+        Task<T> GetServiceAsync<T>() where T : class;
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        Task<Ret> GetServiceAsync<T, Ret>() where T : class where Ret : class;
     }
 }
