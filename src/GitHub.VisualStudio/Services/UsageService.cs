@@ -113,7 +113,11 @@ namespace GitHub.Services
             {
                 return json != null ?
                     SimpleJson.DeserializeObject<UsageData>(json) :
-                    new UsageData { Model = new UsageModel() };
+                    new UsageData
+                    {
+                        Model = new UsageModel() ,
+                        LastUpdated = DateTimeOffset.Now.UtcDateTime
+                    };
             }
             catch(Exception ex)
             {

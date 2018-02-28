@@ -474,7 +474,7 @@ namespace MetricsTests
 	}
 }";
 
-        private string storeFileName;
+        private string usageFileName;
         private string userFileName;
         private string localApplicationDataPath;
         private IEnvironment environment;
@@ -496,7 +496,7 @@ namespace MetricsTests
 
             Directory.CreateDirectory(localApplicationDataPath);
 
-            storeFileName = Path.Combine(localApplicationDataPath, "ghfvs.usage");
+            usageFileName = Path.Combine(localApplicationDataPath, "ghfvs.usage");
             userFileName = Path.Combine(localApplicationDataPath, "user.json");
 
             environment = Substitute.For<IEnvironment>();
@@ -509,7 +509,7 @@ namespace MetricsTests
 
         private void WriteUsageFileContent(string content)
         {
-            File.WriteAllText(storeFileName, content);
+            File.WriteAllText(usageFileName, content);
         }
         private void WriteUserFileContent(string content)
         {
@@ -522,6 +522,16 @@ namespace MetricsTests
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var guid = await usageService.GetUserGuid();
             Assert.IsTrue(guid.Equals(UserGuid));
+        }
+
+        [Test]
+        public async Task ReadLocalDataWorksWhenFileMissing()
+        {
+            File.Delete(usageFileName);
+
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
+            var usageData = await usageService.ReadLocalData();
+            Assert.AreEqual(usageData.LastUpdated.Date, DateTimeOffset.Now.Date);
         }
 
         [Test]
