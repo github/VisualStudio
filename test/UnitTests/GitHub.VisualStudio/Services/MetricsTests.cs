@@ -428,11 +428,54 @@ namespace MetricsTests
         private static readonly Guid UserGuid = Guid.NewGuid();
         private static readonly string DefaultUserStoreContent = @"{""UserGuid"":""" + UserGuid + @"""}";
 
-        private static readonly string DefaultUsageContent = string.Empty;
+        private static readonly string DefaultUsageContent =
+@"{
+	""LastUpdated"": ""2017-02-24T18:18:52.4298622Z"",
+	""Model"": {
+		""Guid"": """ + UserGuid + @""",
+		""IsGitHubUser"": false,
+		""IsEnterpriseUser"": false,
+		""AppVersion"": ""2.4.3.0"",
+		""VSVersion"": ""14.0.25431.01 Update 3"",
+		""Lang"": ""en-US"",
+		""NumberOfStartups"": 0,
+		""NumberOfStartupsWeek"": 0,
+		""NumberOfStartupsMonth"": 0,
+		""NumberOfUpstreamPullRequests"": 0,
+		""NumberOfClones"": 0,
+		""NumberOfReposCreated"": 0,
+		""NumberOfReposPublished"": 0,
+		""NumberOfGists"": 0,
+		""NumberOfOpenInGitHub"": 0,
+		""NumberOfLinkToGitHub"": 0,
+		""NumberOfLogins"": 1,
+		""NumberOfOAuthLogins"": 0,
+		""NumberOfTokenLogins"": 0,
+		""NumberOfPullRequestsOpened"": 1,
+		""NumberOfLocalPullRequestsCheckedOut"": 0,
+		""NumberOfLocalPullRequestPulls"": 0,
+		""NumberOfLocalPullRequestPushes"": 0,
+		""NumberOfForkPullRequestsCheckedOut"": 0,
+		""NumberOfForkPullRequestPulls"": 0,
+		""NumberOfForkPullRequestPushes"": 0,
+		""NumberOfSyncSubmodules"": 0,
+		""NumberOfWelcomeDocsClicks"": 0,
+		""NumberOfWelcomeTrainingClicks"": 0,
+		""NumberOfGitHubPaneHelpClicks"": 0,
+		""NumberOfPRDetailsViewChanges"": 0,
+		""NumberOfPRDetailsViewFile"": 0,
+		""NumberOfPRDetailsCompareWithSolution"": 0,
+		""NumberOfPRDetailsOpenFileInSolution"": 0,
+		""NumberOfPRDetailsNavigateToEditor"": 0,
+		""NumberOfPRReviewDiffViewInlineCommentOpen"": 0,
+		""NumberOfPRReviewDiffViewInlineCommentPost"": 0
+	}
+}
+";
 
         private static readonly string LegacyUsageContent =
 @"{
-	""LastUpdated"": ""2018-02-28T12:37:09.4771538Z"",
+	""LastUpdated"": ""2017-02-24T12:37:09.4771538Z"",
 	""Model"": {
 		""IsGitHubUser"": true,
 		""IsEnterpriseUser"": false,
@@ -472,7 +515,8 @@ namespace MetricsTests
 		""NumberOfPRReviewDiffViewInlineCommentPost"": 0,
 		""NumberOfShowCurrentPullRequest"": 2
 	}
-}";
+}
+";
 
         private string usageFileName;
         private string userFileName;
@@ -525,7 +569,35 @@ namespace MetricsTests
         }
 
         [Test]
-        public async Task ReadLocalDataWorksWhenFileMissing()
+        public async Task GetUserGuidWorksWhenFileMissing()
+        {
+            File.Delete(userFileName);
+
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
+            var guid = await usageService.GetUserGuid();
+            Assert.AreNotEqual(guid, Guid.Empty);
+        }
+
+        [Test]
+        public async Task ReadUsageDataWorks()
+        {
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
+            var usageData = await usageService.ReadLocalData();
+            Assert.AreEqual(usageData.LastUpdated.Date, DateTime.Parse("2017-02-24"));
+        }
+
+        [Test]
+        public async Task ReadUsageDataWorksWhenLegacyContent()
+        {
+            WriteUsageFileContent(LegacyUsageContent);
+
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
+            var usageData = await usageService.ReadLocalData();
+            Assert.AreEqual(usageData.LastUpdated.Date, DateTime.Parse("2017-02-24"));
+        }
+
+        [Test]
+        public async Task ReadUsageDataWorksWhenFileMissing()
         {
             File.Delete(usageFileName);
 
