@@ -112,21 +112,6 @@ namespace GitHub.VisualStudio
         }
     }
 
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    public class VSGitExtPart
-    {
-        readonly IGitHubServiceProvider serviceProvider;
-
-        [ImportingConstructor]
-        public VSGitExtPart(IGitHubServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
-        [Export(typeof(IVSGitExt))]
-        public IVSGitExt VSGitExt => serviceProvider.GetService<IVSGitExt>();
-    }
-
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
