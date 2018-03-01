@@ -23,6 +23,7 @@ using static GitHub.Services.ModelService;
 
 public class ModelServiceTests
 {
+    const int Timeout = 2000;
     public class TheGetCurrentUserMethod : TestBaseClass
     {
         [Test]
@@ -421,7 +422,7 @@ public class ModelServiceTests
             col.ProcessingDelay = TimeSpan.Zero;
 
             col.Subscribe();
-            await col.OriginalCompleted;
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));;
 
             Assert.That(expected, Is.EqualTo(col.Count));
             //Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.That("Cache", StartsWith(x.Title)))).ToArray());

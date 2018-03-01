@@ -243,7 +243,7 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 CurrentSession = session;
-                initialized.SetResult(null);
+                initialized.TrySetResult(null);
             }
             catch (Exception e)
             {

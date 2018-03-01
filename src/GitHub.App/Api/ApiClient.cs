@@ -180,7 +180,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`");
+                log.Warning(e, "Failed to retrieve host name using `DNS.GetHostName`");
                 try
                 {
                     return Environment.MachineName;
@@ -265,7 +265,8 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(name, nameof(name));
 
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
-                new PullRequestRequest {
+                new PullRequestRequest
+                {
                     State = ItemStateFilter.All,
                     SortProperty = PullRequestSort.Updated,
                     SortDirection = SortDirection.Descending

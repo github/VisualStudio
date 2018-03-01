@@ -25,6 +25,13 @@ namespace GitHub.Services
         IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository);
 
         /// <summary>
+        /// Count the number of submodules that require syncing.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns>The number of submodules that need to be synced.</returns>
+        IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository);
+
+        /// <summary>
         /// Checks out a pull request to a local branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -44,6 +51,12 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         IObservable<Unit> Push(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Sync submodules on the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress);
 
         /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.

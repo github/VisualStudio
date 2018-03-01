@@ -460,6 +460,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<IModelServiceFactory>(),
                 Substitute.For<IUsageTracker>(),
                 Substitute.For<ITeamExplorerContext>(),
+                Substitute.For<IStatusBarNotificationService>(),
                 Substitute.For<IPullRequestFilesViewModel>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 

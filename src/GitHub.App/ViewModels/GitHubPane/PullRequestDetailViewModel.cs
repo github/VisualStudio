@@ -7,6 +7,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Globalization;
 using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -35,6 +36,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
+        readonly IStatusBarNotificationService statusBarNotificationService;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -70,6 +72,7 @@ namespace GitHub.ViewModels.GitHubPane
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
+            IStatusBarNotificationService statusBarNotificationService,
             IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
@@ -77,12 +80,14 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
+            Guard.ArgumentNotNull(statusBarNotificationService, nameof(statusBarNotificationService));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
+            this.statusBarNotificationService = statusBarNotificationService;
             Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -106,6 +111,14 @@ namespace GitHub.ViewModels.GitHubPane
                     .Select(x => x != null && x.PushEnabled),
                 DoPush);
             SubscribeOperationError(Push);
+
+            SyncSubmodules = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.SyncSubmodulesEnabled),
+                DoSyncSubmodules);
+            SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
+            SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create();
             DiffFile = ReactiveCommand.Create();
@@ -279,6 +292,11 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        public ReactiveCommand<Unit> SyncSubmodules { get; }
+
+        /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
@@ -423,7 +441,10 @@ namespace GitHub.ViewModels.GitHubPane
                         pushToolTip = Resources.MustPullBeforePush;
                     }
 
-                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                    var submodulesToSync = await pullRequestsService.CountSubmodulesToSync(LocalRepository);
+                    var syncSubmodulesToolTip = string.Format(Resources.SyncSubmodules, submodulesToSync);
+
+                    UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesToolTip, submodulesToSync);
                     CheckoutState = null;
                 }
                 else
@@ -656,6 +677,31 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
+        async Task DoSyncSubmodules(object unused)
+        {
+            try
+            {
+                IsBusy = true;
+                usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
+
+                var writer = new StringWriter(CultureInfo.CurrentCulture);
+                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, line =>
+                {
+                    writer.WriteLine(line);
+                    statusBarNotificationService.ShowMessage(line);
+                });
+                if (!complete)
+                {
+                    throw new ApplicationException(writer.ToString());
+                }
+            }
+            finally
+            {
+                IsBusy = false;
+                statusBarNotificationService.ShowMessage(string.Empty);
+            }
+        }
+
         void DoShowReview(object item)
         {
             var review = (PullRequestDetailReviewItem)item;
@@ -684,7 +730,9 @@ namespace GitHub.ViewModels.GitHubPane
                 bool pullEnabled,
                 bool pushEnabled,
                 string pullToolTip,
-                string pushToolTip)
+                string pushToolTip,
+                string syncSubmodulesToolTip,
+                int submodulesToSync)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
@@ -692,15 +740,20 @@ namespace GitHub.ViewModels.GitHubPane
                 PullEnabled = pullEnabled;
                 PullToolTip = pullToolTip;
                 PushToolTip = pushToolTip;
+                SyncSubmodulesToolTip = syncSubmodulesToolTip;
+                SubmodulesToSync = submodulesToSync;
             }
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
-            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0 && !SyncSubmodulesEnabled;
             public bool PullEnabled { get; }
             public bool PushEnabled { get; }
+            public bool SyncSubmodulesEnabled => SubmodulesToSync > 0;
             public string PullToolTip { get; }
             public string PushToolTip { get; }
+            public string SyncSubmodulesToolTip { get; }
+            public int SubmodulesToSync { get; }
         }
     }
 }

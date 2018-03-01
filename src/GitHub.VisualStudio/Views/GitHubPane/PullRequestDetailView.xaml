@@ -183,6 +183,16 @@
                                              ToolTip="{Binding UpdateState.PushToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
+                        <!-- Sync submodules -->
+                        <ui:OcticonImage Icon="package"
+                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
+                        <TextBlock  Margin="4 0 0 0" Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"
+                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
+                        <ui:GitHubActionLink Content="Sync"
+                            Command="{Binding SyncSubmodules}"
+                            Margin="4 0"
+                            ToolTip="{Binding UpdateState.SyncSubmodulesToolTip}"
+                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}" />
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->
