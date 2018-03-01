@@ -25,11 +25,6 @@
                 <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
                                                                TargetBranchDisplayName="master-is-always-stable"
                                                                CommentCount="10">
-                    <!--
-                    <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
-                        <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
-                    </sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
-                    -->
                     <sampleData:PullRequestDetailViewModelDesigner.UpdateState>
                         <sampleData:PullRequestUpdateStateDesigner CommitsAhead="0" CommitsBehind="0" UpToDate="True"/>
                     </sampleData:PullRequestDetailViewModelDesigner.UpdateState>
@@ -282,7 +277,7 @@
                                    HeaderText="Reviewers"
                                    IsExpanded="True"
                                    Grid.Row="3">
-                    <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4">
+                    <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4 12 4">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <local:PullRequestDetailReviewItemView/>

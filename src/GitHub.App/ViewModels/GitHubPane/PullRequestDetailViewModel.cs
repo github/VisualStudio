@@ -505,7 +505,13 @@ namespace GitHub.ViewModels.GitHubPane
                         .Count();
                     existing.Add(
                         review.User.Login,
-                        new PullRequestDetailReviewItem(review.Id, review.User, review.State, count));
+                        new PullRequestDetailReviewItem
+                        {
+                            Id = review.Id,
+                            User = review.User,
+                            State = review.State,
+                            FileCommentCount = count
+                        });
                 }
             }
 
@@ -513,11 +519,11 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (!result.Any(x => x.State == PullRequestReviewState.Pending))
             {
-                var newReview = new PullRequestDetailReviewItem(
-                    0,
-                    currentUser,
-                    PullRequestReviewState.Pending,
-                    0);
+                var newReview = new PullRequestDetailReviewItem
+                {
+                    User = currentUser,
+                    State = PullRequestReviewState.Pending,
+                };
                 result = result.Concat(new[] { newReview });
             }
 

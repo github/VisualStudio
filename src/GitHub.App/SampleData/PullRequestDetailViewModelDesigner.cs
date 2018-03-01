@@ -69,21 +69,30 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Reviews = new[]
             {
-                new PullRequestDetailReviewItem(
-                    1,
-                    new AccountDesigner { Login = "grokys", IsUser = true },
-                    PullRequestReviewState.Approved,
-                    5),
-                new PullRequestDetailReviewItem(
-                    2,
-                    new AccountDesigner { Login = "shana", IsUser = true },
-                    PullRequestReviewState.ChangesRequested,
-                    5),
-                new PullRequestDetailReviewItem(
-                    2,
-                    new AccountDesigner { Login = "grokys", IsUser = true },
-                    PullRequestReviewState.Pending,
-                    0),
+                new PullRequestDetailReviewItem
+                {
+                    Id = 2,
+                    User = new AccountDesigner { Login = "grokys", IsUser = true },
+                    State = PullRequestReviewState.Pending,
+                    FileCommentCount = 0,
+                },
+                new PullRequestDetailReviewItem
+                {
+                    Id = 1,
+                    User = new AccountDesigner { Login = "jcansdale", IsUser = true },
+                    State = PullRequestReviewState.Approved,
+                    FileCommentCount = 5,
+                },
+                new PullRequestDetailReviewItem
+                {
+                    Id = 2,
+                    User = new AccountDesigner { Login = "shana", IsUser = true },
+                    State = PullRequestReviewState.ChangesRequested,
+                    FileCommentCount = 5,
+                },
+                new PullRequestDetailReviewItem
+                {
+                },
             };
 
             Files = new PullRequestFilesViewModelDesigner();
