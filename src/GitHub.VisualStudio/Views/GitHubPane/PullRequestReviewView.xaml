@@ -84,44 +84,6 @@
         </StackPanel>
 
         <TabControl Margin="0 16 0 0" Style="{DynamicResource GitHubPRDetailsTabControl}">
-            <TabControl.Resources>
-                <DataTemplate DataType="{x:Type models:PullRequestReviewCommentModel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <ui:OcticonImage Grid.Column="0" 
-                                         Icon="comment"
-                                         Margin="0 2 2 0"/>
-                        <TextBlock Grid.Column="1"
-                                   Margin="0 2"              
-                                   TextTrimming="CharacterEllipsis">
-                            <Hyperlink Command="{Binding DataContext.OpenComment, ElementName=root}"
-                                       CommandParameter="{Binding}">
-                                <Hyperlink.Style>
-                                    <Style TargetType="Hyperlink">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Position}" Value="{x:Null}">
-                                                <Setter Property="IsEnabled" Value="False"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Hyperlink.Style>
-                                <Run Text="{Binding Body, Converter={ui:TrimNewlinesConverter}, Mode=OneWay}"/>
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Grid.Column="1" Grid.Row="1"
-                                   Opacity="0.5"
-                                   Text="{Binding Path}"
-                                   TextTrimming="CharacterEllipsis"/>
-                    </Grid>
-                </DataTemplate>
-            </TabControl.Resources>
             <TabItem Header="{Binding Files.ChangedFilesCount}"
                      HeaderStringFormat="Files changed ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
@@ -130,15 +92,7 @@
             <TabItem Header="{Binding CommentCount}"
                      HeaderStringFormat="File comments ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
-                <StackPanel>
-                    <ItemsControl ItemsSource="{Binding FileComments}"/>
-                    <ui:SectionControl HeaderText="{Binding OutdatedFileComments.Count, StringFormat=Outdated ({0})}"
-                                       IsExpanded="False"
-                                       Margin="0 8 0 0"
-                                       Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
-                        <ItemsControl ItemsSource="{Binding OutdatedFileComments}"/>
-                    </ui:SectionControl>
-                </StackPanel>
+                <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>
             </TabItem>
         </TabControl>
     </StackPanel>
