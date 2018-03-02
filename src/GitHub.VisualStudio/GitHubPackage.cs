@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -113,6 +112,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
@@ -150,6 +150,7 @@ namespace GitHub.VisualStudio
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
+            AddService(typeof(IVSGitExt), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IUsageService), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
@@ -257,6 +258,11 @@ namespace GitHub.VisualStudio
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return new UsageTracker(serviceProvider, usageService);
+            }
+            else if (serviceType == typeof(IVSGitExt))
+            {
+                var vsVersion = ApplicationInfo.GetHostVersionInfo().FileMajorPart;
+                return VSGitExtFactory.Create(vsVersion, this);
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {

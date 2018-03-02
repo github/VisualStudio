@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Threading;
 using System.Runtime.InteropServices;
 using GitHub.Services;
@@ -22,13 +21,9 @@ namespace GitHub.InlineReviews
         {
             var usageTracker = (IUsageTracker)await GetServiceAsync(typeof(IUsageTracker));
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
+            var gitExt = (IVSGitExt)await GetServiceAsync(typeof(IVSGitExt));
 
-            // NOTE: ThreadingHelper.SwitchToMainThreadAsync() doesn't return until a solution is loaded. Using Dispatcher.Invoke instead.
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                var gitExt = serviceProvider.GetService<IVSGitExt>();
-                new PullRequestStatusBarManager(gitExt, usageTracker, serviceProvider);
-            });
+            new PullRequestStatusBarManager(gitExt, usageTracker, serviceProvider);
         }
     }
 }
