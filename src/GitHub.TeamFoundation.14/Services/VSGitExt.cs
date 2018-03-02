@@ -24,8 +24,8 @@ namespace GitHub.VisualStudio.Base
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
 
         readonly Func<Type, Task<object>> getServiceAsync;
-        readonly IVSUIContext context;
         readonly ILocalRepositoryModelFactory repositoryFactory;
+        readonly object refreshLock = new object();
 
         IGitExt gitService;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
@@ -41,94 +41,50 @@ namespace GitHub.VisualStudio.Base
             this.getServiceAsync = getServiceAsync;
             this.repositoryFactory = repositoryFactory;
 
-            // The IGitExt service isn't available when a TFS based solution is opened directly.
-            // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
-            context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
-
             // Start with empty array until we have a chance to initialize.
             ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
 
-            PendingTasks = InitializeAsync();
+            // The IGitExt service isn't available when a TFS based solution is opened directly.
+            // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
+            var context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
+            context.WhenActivated(() => Initialize());
         }
 
-        async Task InitializeAsync()
+        void Initialize()
         {
-            try
+            PendingTasks = getServiceAsync(typeof(IGitExt)).ContinueWith(t =>
             {
-                if (!context.IsActive || !await TryInitialize())
+                gitService = (IGitExt)t.Result;
+                if (gitService == null)
                 {
-                    // If we're not in the UIContext or TryInitialize fails, have another go when the UIContext changes.
-                    context.UIContextChanged += ContextChanged;
-                    log.Debug("VSGitExt will be initialized later");
+                    log.Error("Couldn't find IGitExt service");
+                    return;
                 }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "Initializing");
-            }
-        }
 
-        void ContextChanged(object sender, VSUIContextChangedEventArgs e)
-        {
-            if (e.Activated)
-            {
-                PendingTasks = ContextChangedAsync();
-            }
-        }
-
-        async Task ContextChangedAsync()
-        {
-            try
-            {
-                // If we're in the UIContext and TryInitialize succeeds, we can stop listening for events.
-                // NOTE: this event can fire with UIContext=true in a TFS solution (not just Git).
-                if (await TryInitialize())
-                {
-                    context.UIContextChanged -= ContextChanged;
-                    log.Debug("Initialized VSGitExt on UIContextChanged");
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "UIContextChanged");
-            }
-        }
-
-        async Task<bool> TryInitialize()
-        {
-            gitService = (IGitExt)await getServiceAsync(typeof(IGitExt));
-            if (gitService != null)
-            {
+                RefreshActiveRepositories();
                 gitService.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == nameof(gitService.ActiveRepositories))
                     {
-                        // Execute tasks in sequence using thread pool (TaskScheduler.Default).
-                        PendingTasks = PendingTasks.ContinueWith(_ => RefreshActiveRepositories(), TaskScheduler.Default);
+                        RefreshActiveRepositories();
                     }
                 };
-
-                // Do this after we start listening so we don't miss an event.
-                await Task.Run(() => RefreshActiveRepositories());
-
-                log.Debug("Found IGitExt service and initialized VSGitExt");
-                return true;
-            }
-
-            log.Error("Couldn't find IGitExt service");
-            return false;
+            }, TaskScheduler.Default);
         }
 
         void RefreshActiveRepositories()
         {
             try
             {
-                log.Debug(
-                    "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
-                    gitService.GetHashCode(),
-                    gitService?.ActiveRepositories.Select(x => x.RepositoryPath));
+                lock (refreshLock)
+                {
+                    log.Debug(
+                        "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
+                        gitService.GetHashCode(),
+                        gitService.ActiveRepositories.Select(x => x.RepositoryPath));
 
-                ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                    ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                }
             }
             catch (Exception e)
             {
@@ -160,6 +116,6 @@ namespace GitHub.VisualStudio.Base
         /// <summary>
         /// Tasks that are pending execution on the thread pool.
         /// </summary>
-        public Task PendingTasks { get; private set; }
+        public Task PendingTasks { get; private set; } = Task.CompletedTask;
     }
 }
