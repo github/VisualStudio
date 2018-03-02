@@ -29,72 +29,74 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <StackPanel Margin="8,0">
+    <ScrollViewer>
+        <StackPanel Margin="8,0">
 
-        <!-- Existing review -->
-        <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToInverseVisibilityConverter}}">
-            <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
-                <c:AccountAvatar Account="{Binding Model.User}" Margin="4" Width="24" Height="24"/>
-                <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
+            <!-- Existing review -->
+            <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToInverseVisibilityConverter}}">
+                <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
+                    <c:AccountAvatar Account="{Binding Model.User}" Margin="4" Width="24" Height="24"/>
+                    <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
                 <Run FontWeight="Bold" Text="{Binding Model.User.Login, Mode=OneWay}"/>
                 <Run Text="{Binding State, Mode=OneWay}"/>
                 <Hyperlink Command="{Binding NavigateToPullRequest}">
                     <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
                 </Hyperlink>
-                </TextBlock>
+                    </TextBlock>
+                </StackPanel>
+
+                <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
             </StackPanel>
 
-            <markdig:MarkdownViewer Margin="0 4" Markdown="{Binding Body}"/>
-        </StackPanel>
-
-        <!-- Pending review -->
-        <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}}">
-            <TextBlock FontSize="16" Margin="0 4">
+            <!-- Pending review -->
+            <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}}">
+                <TextBlock FontSize="16" Margin="0 4">
                 <Run>Submit your review for</Run>
                 <Hyperlink Command="{Binding NavigateToPullRequest}">
                     <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
                 </Hyperlink>
-            </TextBlock>
-            <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding Title}" TextWrapping="Wrap"/>
-            <TextBlock Margin="0 4">Review summary</TextBlock>
-            <TextBox AcceptsReturn="True"
+                </TextBlock>
+                <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding Title}" TextWrapping="Wrap"/>
+                <TextBlock Margin="0 4">Review summary</TextBlock>
+                <TextBox AcceptsReturn="True"
                      Margin="0 4"
                      MinHeight="120"
                      Padding="0 4"
                      TextWrapping="Wrap"
                      Text="{Binding Body}"/>
-            <StackPanel Margin="0 4" Orientation="Horizontal">
-                <ui:DropDownButton Content="Submit review">
-                    <ui:DropDownButton.DropDownContent>
-                        <Border Background="{DynamicResource GitHubVsToolWindowBackground}"
+                <StackPanel Margin="0 4" Orientation="Horizontal">
+                    <ui:DropDownButton Content="Submit review">
+                        <ui:DropDownButton.DropDownContent>
+                            <Border Background="{DynamicResource GitHubVsToolWindowBackground}"
                                 BorderBrush="{DynamicResource GitHubComboBoxBorderBrush}"
                                 BorderThickness="1"
                                 Padding="4">
-                            <StackPanel Background="{DynamicResource GitHubVsToolWindowBackground}">
-                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Comment" Margin="4">Comment only</ui:GitHubActionLink>
-                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Approve" Margin="4">Approve</ui:GitHubActionLink>
-                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="RequestChanges" Margin="4">Request changes</ui:GitHubActionLink>
-                            </StackPanel>
-                        </Border>
-                    </ui:DropDownButton.DropDownContent>
-                </ui:DropDownButton>
-                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Width="1" Height="16" Margin="4 0"/>
-                <ui:GitHubActionLink VerticalAlignment="Center">Cancel</ui:GitHubActionLink>
+                                <StackPanel Background="{DynamicResource GitHubVsToolWindowBackground}">
+                                    <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Comment" Margin="4">Comment only</ui:GitHubActionLink>
+                                    <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Approve" Margin="4">Approve</ui:GitHubActionLink>
+                                    <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="RequestChanges" Margin="4">Request changes</ui:GitHubActionLink>
+                                </StackPanel>
+                            </Border>
+                        </ui:DropDownButton.DropDownContent>
+                    </ui:DropDownButton>
+                    <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Width="1" Height="16" Margin="4 0"/>
+                    <ui:GitHubActionLink VerticalAlignment="Center">Cancel</ui:GitHubActionLink>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <TabControl Margin="0 16 0 0" Style="{DynamicResource GitHubPRDetailsTabControl}">
-            <TabItem Header="{Binding Files.ChangedFilesCount}"
+            <TabControl Margin="0 16 0 0" Style="{DynamicResource GitHubPRDetailsTabControl}">
+                <TabItem Header="{Binding Files.ChangedFilesCount}"
                      HeaderStringFormat="Files changed ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
-                <local:PullRequestFilesView DataContext="{Binding Files}"/>
-            </TabItem>
-            <TabItem Header="{Binding CommentCount}"
+                    <local:PullRequestFilesView DataContext="{Binding Files}"/>
+                </TabItem>
+                <TabItem Header="{Binding CommentCount}"
                      HeaderStringFormat="File comments ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
-                <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>
-            </TabItem>
-        </TabControl>
-    </StackPanel>
+                    <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </ScrollViewer>
 
 </local:GenericPullRequestReviewView>
