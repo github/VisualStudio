@@ -56,10 +56,9 @@
                                                 <TextBlock DockPanel.Dock="Right" Text="{Binding Items.Count, Mode=OneWay}"/>
                                                 <ui:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2"/>
                                                 <!-- TODO: Need special control to display long paths -->
-                                                <TextBlock Grid.Column="1"
-                                                           FontWeight="Bold"
-                                                           Text="{Binding Name}"
-                                                           TextTrimming="CharacterEllipsis"/>
+                                                <ui:PathTextBlock Grid.Column="1"
+                                                                  FontWeight="Bold"
+                                                                  Text="{Binding Name}"/>
                                             </DockPanel>
                                         </Expander.Header>
                                         <ItemsControl ItemsSource="{Binding Items}"

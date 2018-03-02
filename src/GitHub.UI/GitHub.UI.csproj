@@ -85,6 +85,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>OcticonPaths.resx</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TrimmedPathTextBlock.cs" />
     <Compile Include="Controls\SectionControl.cs" />
     <Compile Include="Controls\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>
