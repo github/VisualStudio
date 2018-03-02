@@ -21,33 +21,19 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
-        readonly IVSGitExt gitExt;
         readonly IUsageTracker usageTracker;
         readonly IGitHubServiceProvider serviceProvider;
 
         IPullRequestSessionManager pullRequestSessionManager;
 
         [ImportingConstructor]
-        public PullRequestStatusBarManager(IVSGitExt gitExt, IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
+        public PullRequestStatusBarManager(IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
         {
-            this.gitExt = gitExt;
             this.usageTracker = usageTracker;
             this.serviceProvider = serviceProvider;
-
-            OnActiveRepositoriesChanged();
-            gitExt.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
         }
 
-        void OnActiveRepositoriesChanged()
-        {
-            if (gitExt.ActiveRepositories.Count > 0)
-            {
-                gitExt.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
-                Application.Current.Dispatcher.Invoke(() => StartShowingStatus());
-            }
-        }
-
-        void StartShowingStatus()
+        public void StartShowingStatus()
         {
             try
             {
