@@ -36,9 +36,9 @@ public class VSGitExtTests
             var sp = Substitute.For<IAsyncServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
-            var eventArgs = new VSUIContextChangedEventArgs(activated);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            context.IsActive = activated;
 
+            target.PendingTasks.Wait();
             sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
         }
 
@@ -106,8 +106,7 @@ public class VSGitExtTests
             bool wasFired = false;
             target.ActiveRepositoriesChanged += () => wasFired = true;
 
-            var eventArgs = new VSUIContextChangedEventArgs(true);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            context.IsActive = true;
             target.PendingTasks.Wait();
 
             Assert.That(wasFired, Is.True);
@@ -123,8 +122,7 @@ public class VSGitExtTests
             bool threadPool = false;
             target.ActiveRepositoriesChanged += () => threadPool = Thread.CurrentThread.IsThreadPoolThread;
 
-            var eventArgs = new VSUIContextChangedEventArgs(true);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            context.IsActive = true;
             target.PendingTasks.Wait();
 
             Assert.That(threadPool, Is.True);
@@ -236,11 +234,40 @@ public class VSGitExtTests
         return gitExt;
     }
 
-    static IVSUIContext CreateVSUIContext(bool isActive)
+    static MockVSUIContext CreateVSUIContext(bool isActive)
     {
-        var context = Substitute.For<IVSUIContext>();
-        context.IsActive.Returns(isActive);
-        return context;
+        return new MockVSUIContext { IsActive = isActive };
+    }
+
+    class MockVSUIContext : IVSUIContext
+    {
+        bool isActive;
+        Action action;
+
+        public bool IsActive
+        {
+            get { return isActive; }
+            set
+            {
+                isActive = value;
+                if (isActive && action != null)
+                {
+                    action.Invoke();
+                    action = null;
+                }
+            }
+        }
+
+        public void WhenActivated(Action action)
+        {
+            if (isActive)
+            {
+                action.Invoke();
+                return;
+            }
+
+            this.action = action;
+        }
     }
 
     class MockGitExt : IGitExt
