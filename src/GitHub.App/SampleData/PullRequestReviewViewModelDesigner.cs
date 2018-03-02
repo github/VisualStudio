@@ -19,6 +19,7 @@ namespace GitHub.SampleData
                 User = new AccountDesigner { Login = "Haacked", IsUser = true },
             };
 
+            Title = "Fix a ton of potential crashers, odd code and redundant calls in ModelService";
             State = "approved";
             Body = @"Just a few comments. I don't feel too strongly about them though.
 
@@ -60,6 +61,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public int PullRequestNumber { get; set; }
         public long PullRequestReviewId { get; set; }
         public IPullRequestReviewModel Model { get; set; }
+        public string Title { get; set; }
         public string State { get; set; }
         public bool IsPending { get; set; }
         public string Body { get; set; }

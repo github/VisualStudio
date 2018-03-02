@@ -49,7 +49,13 @@
 
         <!-- Pending review -->
         <StackPanel Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}}">
-            <TextBlock FontSize="16" Margin="0 4">Submit your review</TextBlock>
+            <TextBlock FontSize="16" Margin="0 4">
+                <Run>Submit your review for</Run>
+                <Hyperlink Command="{Binding NavigateToPullRequest}">
+                    <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                </Hyperlink>
+            </TextBlock>
+            <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding Title}" TextWrapping="Wrap"/>
             <TextBlock Margin="0 4">Review summary</TextBlock>
             <TextBox AcceptsReturn="True"
                      Margin="0 4"

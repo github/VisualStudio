@@ -32,6 +32,7 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestSession session;
         IPullRequestReviewModel model;
         IDisposable sessionSubscription;
+        string title;
         string state;
         bool isPending;
         string body;
@@ -120,6 +121,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return model; }
             private set { this.RaiseAndSetIfChanged(ref model, value); }
+        }
+
+        /// <inheritdoc/>
+        public string Title
+        {
+            get { return title; }
+            private set { this.RaiseAndSetIfChanged(ref title, value); }
         }
 
         /// <inheritdoc/>
@@ -229,6 +237,7 @@ namespace GitHub.ViewModels.GitHubPane
                 if (PullRequestReviewId > 0)
                 {
                     Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
+                    Title = pullRequest.Title;
                     State = PullRequestDetailReviewItem.ToString(Model.State);
                     IsPending = Model.State == PullRequestReviewState.Pending;
                     Body = IsPending || !string.IsNullOrWhiteSpace(Model.Body) ? 
@@ -238,6 +247,7 @@ namespace GitHub.ViewModels.GitHubPane
                 else
                 {
                     Model = null;
+                    Title = null;
                     State = null;
                     IsPending = true;
                     Body = string.Empty;

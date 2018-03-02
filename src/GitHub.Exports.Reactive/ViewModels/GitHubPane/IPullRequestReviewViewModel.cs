@@ -52,6 +52,11 @@ namespace GitHub.ViewModels.GitHubPane
         bool IsPending { get; }
 
         /// <summary>
+        /// Gets the title of the pull request.
+        /// </summary>
+        string Title { get; }
+
+        /// <summary>
         /// Gets the body of the pull request review.
         /// </summary>
         string Body { get; }
