@@ -52,7 +52,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.settings = settings;
             this.visualStudioBrowser = visualStudioBrowser;
 
-            Title = Resources.PullRequestsNavigationItemText;
+            PaneTitle = Resources.PullRequestsNavigationItemText;
 
             States = new List<PullRequestState> {
                 new PullRequestState { IsOpen = true, Name = "Open" },

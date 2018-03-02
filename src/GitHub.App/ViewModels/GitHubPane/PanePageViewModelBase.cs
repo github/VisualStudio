@@ -53,7 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public string Title
+        public string PaneTitle
         {
             get { return title; }
             protected set { this.RaiseAndSetIfChanged(ref title, value); }

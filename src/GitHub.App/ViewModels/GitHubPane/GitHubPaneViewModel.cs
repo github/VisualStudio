@@ -122,7 +122,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .Select(x => x.Content == navigator ? x.NavigatorContent : null);
 
             title = currentPage
-                .SelectMany(x => x?.WhenAnyValue(y => y.Title) ?? Observable.Return<string>(null))
+                .SelectMany(x => x?.WhenAnyValue(y => y.PaneTitle) ?? Observable.Return<string>(null))
                 .Select(x => x ?? "GitHub")
                 .ToProperty(this, x => x.Title);
 

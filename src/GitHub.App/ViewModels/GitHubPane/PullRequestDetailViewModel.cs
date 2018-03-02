@@ -389,7 +389,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var firstLoad = (Model == null);
                 Model = pullRequest;
                 Session = await sessionManager.GetSession(pullRequest);
-                Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
+                PaneTitle = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
                 IsBusy = true;
                 IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
