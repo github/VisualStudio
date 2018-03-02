@@ -20,10 +20,13 @@ namespace GitHub.Services
     {
         const string StoreFileName = "ghfvs.usage";
         const string UserStoreFileName = "user.json";
+
         static readonly ILogger log = LogManager.ForContext<UsageService>();
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
+
         readonly IGitHubServiceProvider serviceProvider;
-        private readonly IEnvironment environment;
+        readonly IEnvironment environment;
+
         string storePath;
         string userStorePath;
         Guid? userGuid;
