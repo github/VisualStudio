@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Logging;
 using GitHub.Models;
@@ -56,7 +55,8 @@ namespace GitHub.VisualStudio
 
             await GetServiceAsync(typeof(IUsageTracker));
 
-            InitializeMenus().Forget();
+            // This package might be loaded on demand so we must await initialization of menus.
+            await InitializeMenus();
         }
 
         void LogVersionInformation()
@@ -75,8 +75,6 @@ namespace GitHub.VisualStudio
                 // Ignore if null because Expression Blend doesn't support custom services or menu extensibility.
                 return;
             }
-
-            await ThreadingHelper.SwitchToMainThreadAsync();
 
             foreach (var menu in menus.Menus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
