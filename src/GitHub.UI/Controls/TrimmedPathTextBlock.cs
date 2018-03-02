@@ -12,23 +12,23 @@ namespace GitHub.UI
     /// TextBlock that displays a path and intelligently trims with ellipsis when the path doesn't
     /// fit in the allocated size.
     /// </summary>
-    public class PathTextBlock : FrameworkElement
+    public class TrimmedPathTextBlock : FrameworkElement
     {
         public static readonly DependencyProperty FontFamilyProperty =
-            TextBlock.FontFamilyProperty.AddOwner(typeof(PathTextBlock));
+            TextBlock.FontFamilyProperty.AddOwner(typeof(TrimmedPathTextBlock));
         public static readonly DependencyProperty FontSizeProperty =
-            TextBlock.FontSizeProperty.AddOwner(typeof(PathTextBlock));
+            TextBlock.FontSizeProperty.AddOwner(typeof(TrimmedPathTextBlock));
         public static readonly DependencyProperty FontStretchProperty =
-            TextBlock.FontStretchProperty.AddOwner(typeof(PathTextBlock));
+            TextBlock.FontStretchProperty.AddOwner(typeof(TrimmedPathTextBlock));
         public static readonly DependencyProperty FontStyleProperty =
-            TextBlock.FontStyleProperty.AddOwner(typeof(PathTextBlock));
+            TextBlock.FontStyleProperty.AddOwner(typeof(TrimmedPathTextBlock));
         public static readonly DependencyProperty FontWeightProperty =
-            TextBlock.FontWeightProperty.AddOwner(typeof(PathTextBlock));
+            TextBlock.FontWeightProperty.AddOwner(typeof(TrimmedPathTextBlock));
         public static readonly DependencyProperty ForegroundProperty =
-            TextBlock.ForegroundProperty.AddOwner(typeof(PathTextBlock));
+            TextBlock.ForegroundProperty.AddOwner(typeof(TrimmedPathTextBlock));
         public static readonly DependencyProperty TextProperty =
             TextBlock.TextProperty.AddOwner(
-                typeof(PathTextBlock),
+                typeof(TrimmedPathTextBlock),
                 new FrameworkPropertyMetadata(
                     null,
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender,
@@ -137,7 +137,7 @@ namespace GitHub.UI
 
         static void TextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var textBlock = sender as PathTextBlock;
+            var textBlock = sender as TrimmedPathTextBlock;
 
             if (textBlock != null)
             {
