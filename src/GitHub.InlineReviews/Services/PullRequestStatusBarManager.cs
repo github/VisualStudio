@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
@@ -13,6 +12,7 @@ using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Extensions;
 using Serilog;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -39,21 +39,12 @@ namespace GitHub.InlineReviews.Services
             {
                 // Create just in time on Main thread.
                 pullRequestSessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
-
-                RefreshCurrentSession();
-                pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+                pullRequestSessionManager.WhenAnyValue(x => x.CurrentSession)
+                    .Subscribe(x => RefreshCurrentSession());
             }
             catch (Exception e)
             {
                 log.Error(e, "Error initializing");
-            }
-        }
-
-        void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(PullRequestSessionManager.CurrentSession))
-            {
-                RefreshCurrentSession();
             }
         }
 
