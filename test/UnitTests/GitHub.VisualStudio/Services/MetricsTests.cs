@@ -425,10 +425,10 @@ namespace MetricsTests
 
     public class UsageServiceTests : TestBaseClass
     {
-        private static readonly Guid UserGuid = Guid.NewGuid();
-        private static readonly string DefaultUserStoreContent = @"{""UserGuid"":""" + UserGuid + @"""}";
+        static readonly Guid UserGuid = Guid.NewGuid();
+        static readonly string DefaultUserStoreContent = @"{""UserGuid"":""" + UserGuid + @"""}";
 
-        private static readonly string DefaultUsageContent =
+        static readonly string DefaultUsageContent =
 @"{
 	""LastUpdated"": ""2017-02-24T18:18:52.4298622Z"",
 	""Model"": {
@@ -473,7 +473,7 @@ namespace MetricsTests
 }
 ";
 
-        private static readonly string LegacyUsageContent =
+        static readonly string LegacyUsageContent =
 @"{
 	""LastUpdated"": ""2017-02-24T12:37:09.4771538Z"",
 	""Model"": {
@@ -518,10 +518,10 @@ namespace MetricsTests
 }
 ";
 
-        private string usageFileName;
-        private string userFileName;
-        private string localApplicationDataPath;
-        private IEnvironment environment;
+        string usageFileName;
+        string userFileName;
+        string localApplicationDataPath;
+        IEnvironment environment;
 
         [SetUp]
         public void SetUp()
