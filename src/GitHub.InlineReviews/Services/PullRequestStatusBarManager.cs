@@ -16,6 +16,9 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
+    /// <summary>
+    /// Manage the UI that shows the PR for the current branch.
+    /// </summary>
     public class PullRequestStatusBarManager
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
@@ -33,11 +36,16 @@ namespace GitHub.InlineReviews.Services
             this.serviceProvider = serviceProvider;
         }
 
+        /// <summary>
+        /// Start showing the PR for the active branch on the status bar.
+        /// </summary>
+        /// <remarks>
+        /// This must be called from the Main thread.
+        /// </remarks>
         public void StartShowingStatus()
         {
             try
             {
-                // Create just in time on Main thread.
                 pullRequestSessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
                 pullRequestSessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Subscribe(x => RefreshCurrentSession());
