@@ -12,7 +12,7 @@ namespace GitHub.InlineReviews
     [Guid(Guids.InlineReviewsPackageId)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(PullRequestCommentsPane), DocumentLikeTool=true)]
+    [ProvideToolWindow(typeof(PullRequestCommentsPane), DocumentLikeTool = true)]
     public class InlineReviewsPackage : Package
     {
         protected override void Initialize()
