@@ -253,7 +253,6 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IUsageTracker))
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return new UsageTracker(serviceProvider, usageService);
