@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ using Task = System.Threading.Tasks.Task;
 namespace GitHub.VisualStudio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", System.AssemblyVersionInformation.Version, IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version, IconResourceID = 400)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // Only initialize when we're in the context of a Git repository.
@@ -35,7 +34,6 @@ namespace GitHub.VisualStudio
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
 
         public GitHubPackage()
@@ -116,34 +114,7 @@ namespace GitHub.VisualStudio
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
         public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
-        const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
-        const string StartPagePreview5PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
         static readonly ILogger log = LogManager.ForContext<ServiceProviderPackage>();
-
-        Version vsversion;
-        Version VSVersion
-        {
-            get
-            {
-                if (vsversion == null)
-                {
-                    var asm = typeof(ITaskList).Assembly;
-                    try
-                    {
-                        // this will return Microsoft.VisualStudio.Shell.Immutable.14.0 in VS15
-                        // but Microsoft.VisualStudio.Shell.Framework in Dev15
-                        var vinfo = FileVersionInfo.GetVersionInfo(asm.Location);
-                        vsversion = new Version(vinfo.FileMajorPart, vinfo.FileMinorPart, vinfo.FileBuildPart, vinfo.FilePrivatePart);
-                    }
-                    catch
-                    {
-                        // something wrong, fallback to assembly version
-                        vsversion = asm.GetName().Version;
-                    }
-                }
-                return vsversion;
-            }
-        }
 
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
