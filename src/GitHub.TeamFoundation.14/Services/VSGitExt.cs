@@ -1,3 +1,4 @@
+extern alias SI14;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ using GitHub.Logging;
 using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Task = System.Threading.Tasks.Task;
+using IAsyncServiceProvider = SI14::Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -23,7 +26,7 @@ namespace GitHub.VisualStudio.Base
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
 
-        readonly Func<Type, Task<object>> getServiceAsync;
+        readonly IAsyncServiceProvider asyncServiceProvider;
         readonly ILocalRepositoryModelFactory repositoryFactory;
         readonly object refreshLock = new object();
 
@@ -31,14 +34,14 @@ namespace GitHub.VisualStudio.Base
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
         [ImportingConstructor]
-        public VSGitExt(Func<Type, Task<object>> getServiceAsync)
-            : this(getServiceAsync, new VSUIContextFactory(), new LocalRepositoryModelFactory())
+        public VSGitExt(IAsyncServiceProvider asyncServiceProvider)
+            : this(asyncServiceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory())
         {
         }
 
-        public VSGitExt(Func<Type, Task<object>> getServiceAsync, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
+        public VSGitExt(IAsyncServiceProvider asyncServiceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
         {
-            this.getServiceAsync = getServiceAsync;
+            this.asyncServiceProvider = asyncServiceProvider;
             this.repositoryFactory = repositoryFactory;
 
             // Start with empty array until we have a chance to initialize.
@@ -52,7 +55,7 @@ namespace GitHub.VisualStudio.Base
 
         void Initialize()
         {
-            PendingTasks = getServiceAsync(typeof(IGitExt)).ContinueWith(t =>
+            PendingTasks = asyncServiceProvider.GetServiceAsync(typeof(IGitExt)).ContinueWith(t =>
             {
                 gitService = (IGitExt)t.Result;
                 if (gitService == null)

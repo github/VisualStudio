@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -9,8 +10,8 @@ using GitHub.VisualStudio.Base;
 using NUnit.Framework;
 using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using System.Threading.Tasks;
-using System.Linq;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 public class VSGitExtTests
 {
@@ -216,14 +217,9 @@ public class VSGitExtTests
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
-        var vsGitExt = new VSGitExt(sp.GetServiceAsync, factory, repoFactory);
+        var vsGitExt = new VSGitExt(sp, factory, repoFactory);
         vsGitExt.PendingTasks.Wait();
         return vsGitExt;
-    }
-
-    public interface IAsyncServiceProvider
-    {
-        Task<object> GetServiceAsync(Type serviceType);
     }
 
     static IGitExt CreateGitExt(params string[] repositoryPaths)
