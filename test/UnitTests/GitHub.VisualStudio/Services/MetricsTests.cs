@@ -551,11 +551,12 @@ namespace MetricsTests
             WriteUserFileContent(DefaultUserStoreContent);
         }
 
-        private void WriteUsageFileContent(string content)
+        void WriteUsageFileContent(string content)
         {
             File.WriteAllText(usageFileName, content);
         }
-        private void WriteUserFileContent(string content)
+
+        void WriteUserFileContent(string content)
         {
             File.WriteAllText(userFileName, content);
         }
