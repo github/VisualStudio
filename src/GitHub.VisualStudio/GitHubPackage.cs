@@ -248,7 +248,8 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IUsageService))
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UsageService(sp);
+                var environment = new Rothko.Environment();
+                return new UsageService(sp, environment);
             }
             else if (serviceType == typeof(IUsageTracker))
             {

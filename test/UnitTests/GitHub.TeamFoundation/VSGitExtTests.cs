@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -9,8 +10,8 @@ using GitHub.VisualStudio.Base;
 using NUnit.Framework;
 using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using System.Threading.Tasks;
-using System.Linq;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 public class VSGitExtTests
 {
@@ -36,9 +37,9 @@ public class VSGitExtTests
             var sp = Substitute.For<IAsyncServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
-            var eventArgs = new VSUIContextChangedEventArgs(activated);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            context.IsActive = activated;
 
+            target.PendingTasks.Wait();
             sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
         }
 
@@ -106,8 +107,7 @@ public class VSGitExtTests
             bool wasFired = false;
             target.ActiveRepositoriesChanged += () => wasFired = true;
 
-            var eventArgs = new VSUIContextChangedEventArgs(true);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            context.IsActive = true;
             target.PendingTasks.Wait();
 
             Assert.That(wasFired, Is.True);
@@ -123,8 +123,7 @@ public class VSGitExtTests
             bool threadPool = false;
             target.ActiveRepositoriesChanged += () => threadPool = Thread.CurrentThread.IsThreadPoolThread;
 
-            var eventArgs = new VSUIContextChangedEventArgs(true);
-            context.UIContextChanged += Raise.Event<EventHandler<VSUIContextChangedEventArgs>>(context, eventArgs);
+            context.IsActive = true;
             target.PendingTasks.Wait();
 
             Assert.That(threadPool, Is.True);
@@ -218,14 +217,9 @@ public class VSGitExtTests
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
-        var vsGitExt = new VSGitExt(sp.GetServiceAsync, factory, repoFactory);
+        var vsGitExt = new VSGitExt(sp, factory, repoFactory);
         vsGitExt.PendingTasks.Wait();
         return vsGitExt;
-    }
-
-    public interface IAsyncServiceProvider
-    {
-        Task<object> GetServiceAsync(Type serviceType);
     }
 
     static IGitExt CreateGitExt(params string[] repositoryPaths)
@@ -236,11 +230,40 @@ public class VSGitExtTests
         return gitExt;
     }
 
-    static IVSUIContext CreateVSUIContext(bool isActive)
+    static MockVSUIContext CreateVSUIContext(bool isActive)
     {
-        var context = Substitute.For<IVSUIContext>();
-        context.IsActive.Returns(isActive);
-        return context;
+        return new MockVSUIContext { IsActive = isActive };
+    }
+
+    class MockVSUIContext : IVSUIContext
+    {
+        bool isActive;
+        Action action;
+
+        public bool IsActive
+        {
+            get { return isActive; }
+            set
+            {
+                isActive = value;
+                if (isActive && action != null)
+                {
+                    action.Invoke();
+                    action = null;
+                }
+            }
+        }
+
+        public void WhenActivated(Action action)
+        {
+            if (isActive)
+            {
+                action.Invoke();
+                return;
+            }
+
+            this.action = action;
+        }
     }
 
     class MockGitExt : IGitExt

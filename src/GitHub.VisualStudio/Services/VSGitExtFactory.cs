@@ -28,9 +28,9 @@ namespace GitHub.Services
             switch (vsVersion)
             {
                 case 14:
-                    return Create(() => new VSGitExt14(sp.GetServiceAsync));
+                    return Create(() => new VSGitExt14(sp));
                 case 15:
-                    return Create(() => new VSGitExt15(sp.GetServiceAsync));
+                    return Create(() => new VSGitExt15(sp));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
                     return null;
