@@ -36,9 +36,7 @@ namespace GitHub.ViewModels.GitHubPane
         string state;
         bool isPending;
         string body;
-        IReadOnlyList<IPullRequestReviewCommentModel> fileComments;
-        IReadOnlyList<IPullRequestReviewCommentModel> outdatedFileComments;
-        int commentCount;
+        IReadOnlyList<IPullRequestReviewFileCommentViewModel> fileComments;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
@@ -96,24 +94,10 @@ namespace GitHub.ViewModels.GitHubPane
         public IPullRequestFilesViewModel Files { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestReviewCommentModel> FileComments
+        public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments
         {
             get { return fileComments; }
             private set { this.RaiseAndSetIfChanged(ref fileComments, value); }
-        }
-
-        /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestReviewCommentModel> OutdatedFileComments
-        {
-            get { return outdatedFileComments; }
-            private set { this.RaiseAndSetIfChanged(ref outdatedFileComments, value); }
-        }
-
-        /// <inheritdoc/>
-        public int CommentCount
-        {
-            get { return commentCount; }
-            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
         }
 
         /// <inheritdoc/>
@@ -148,7 +132,7 @@ namespace GitHub.ViewModels.GitHubPane
         public string Body
         {
             get { return body; }
-            set { this.RaiseAndSetIfChanged(ref body, value); }
+            private set { this.RaiseAndSetIfChanged(ref body, value); }
         }
 
         /// <inheritdoc/>
@@ -256,8 +240,10 @@ namespace GitHub.ViewModels.GitHubPane
                 await Files.InitializeAsync(session, FilterComments);
 
                 sessionSubscription?.Dispose();
-                sessionSubscription = session.WhenAnyValue(x => x.PullRequest.ReviewComments)
-                    .Subscribe(UpdateFileComments);
+                await UpdateFileComments();
+                sessionSubscription = session.PullRequestChanged
+                    .Skip(1)
+                    .Subscribe(_ => UpdateFileComments().Forget());
             }
             finally
             {
@@ -299,29 +285,27 @@ namespace GitHub.ViewModels.GitHubPane
             return thread.Comments.Any(x => x.PullRequestReviewId == PullRequestReviewId);
         }
 
-        void UpdateFileComments(IReadOnlyList<IPullRequestReviewCommentModel> comments)
+        async Task UpdateFileComments()
         {
-            var current = new List<IPullRequestReviewCommentModel>();
-            var outdated = new List<IPullRequestReviewCommentModel>();
+            var result = new List<PullRequestReviewFileCommentViewModel>();
 
-            foreach (var comment in comments)
+            foreach (var file in await session.GetAllFiles())
             {
-                if (comment.PullRequestReviewId == PullRequestReviewId)
+                foreach (var thread in file.InlineCommentThreads)
                 {
-                    if (comment.Position.HasValue)
+                    foreach (var comment in thread.Comments)
                     {
-                        current.Add(comment);
-                    }
-                    else
-                    {
-                        outdated.Add(comment);
+                        if (comment.PullRequestReviewId == Model.Id)
+                        {
+                            result.Add(new PullRequestReviewFileCommentViewModel(
+                                comment,
+                                thread.LineNumber));
+                        }
                     }
                 }
             }
 
-            FileComments = current;
-            OutdatedFileComments = outdated;
-            CommentCount = current.Count + outdated.Count;
+            FileComments = result;
         }
     }
 }

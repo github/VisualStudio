@@ -69,17 +69,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a list of the file comments in the review.
         /// </summary>
-        IReadOnlyList<IPullRequestReviewCommentModel> FileComments { get; }
-
-        /// <summary>
-        /// Gets a list of the outdated file comments in the review.
-        /// </summary>
-        IReadOnlyList<IPullRequestReviewCommentModel> OutdatedFileComments { get; }
-
-        /// <summary>
-        /// Gets the count of <see cref="FileComments"/> plus <see cref="OutdatedFileComments"/>.
-        /// </summary>
-        int CommentCount { get; }
+        IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; }
 
         /// <summary>
         /// Gets a command which opens an inline comment in a diff view.

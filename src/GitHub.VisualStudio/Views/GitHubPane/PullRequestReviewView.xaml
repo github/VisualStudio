@@ -15,7 +15,7 @@
                                     mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800"
                                     x:Name="root">
     <d:DesignProperties.DataContext>
-        <sampleData:PullRequestReviewViewModelDesigner IsPending="True"/>
+        <sampleData:PullRequestReviewViewModelDesigner IsPending="False"/>
     </d:DesignProperties.DataContext>
 
     <Control.Resources>
@@ -37,11 +37,11 @@
                 <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
                     <c:AccountAvatar Account="{Binding Model.User}" Margin="4" Width="24" Height="24"/>
                     <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
-                <Run FontWeight="Bold" Text="{Binding Model.User.Login, Mode=OneWay}"/>
-                <Run Text="{Binding State, Mode=OneWay}"/>
-                <Hyperlink Command="{Binding NavigateToPullRequest}">
-                    <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
-                </Hyperlink>
+                        <Run FontWeight="Bold" Text="{Binding Model.User.Login, Mode=OneWay}"/>
+                        <Run Text="{Binding State, Mode=OneWay}"/>
+                        <Hyperlink Command="{Binding NavigateToPullRequest}">
+                            <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                        </Hyperlink>
                     </TextBlock>
                 </StackPanel>
 
@@ -90,7 +90,7 @@
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
                     <local:PullRequestFilesView DataContext="{Binding Files}"/>
                 </TabItem>
-                <TabItem Header="{Binding CommentCount}"
+                <TabItem Header="{Binding FileComments.Count}"
                      HeaderStringFormat="File comments ({0})"
                      Style="{DynamicResource GitHubPRDetailsTabItem}">
                     <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>

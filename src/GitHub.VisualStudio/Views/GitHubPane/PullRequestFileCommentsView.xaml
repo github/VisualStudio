@@ -27,7 +27,7 @@
             </ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Key="FileComments" Source="{Binding}">
                 <CollectionViewSource.GroupDescriptions>
-                    <PropertyGroupDescription PropertyName="Path"/>
+                    <PropertyGroupDescription PropertyName="RelativePath"/>
                 </CollectionViewSource.GroupDescriptions>
             </CollectionViewSource>
         </ResourceDictionary>
@@ -73,17 +73,29 @@
                                                                 <ColumnDefinition Width="Auto" SharedSizeGroup="LineNumber"/>
                                                                 <ColumnDefinition Width="*"/>
                                                             </Grid.ColumnDefinitions>
-                                                            <TextBlock DockPanel.Dock="Left" Margin="4">
+                                                            <TextBlock Margin="4"
+                                                                       Visibility="{Binding LineNumber, Converter={ui:NotEqualsToVisibilityConverter -1}}">
                                                                 <Hyperlink>
-                                                                    <!-- TODO: This isn't actually the line number!!! -->
-                                                                    <Run Text="{Binding Position, StringFormat=L{0}, Mode=OneWay}"/>
+                                                                    <Run Text="{Binding LineNumber, StringFormat=L{0}, Mode=OneWay}"/>
                                                                 </Hyperlink>
                                                             </TextBlock>
-                                                            <!-- TODO: Might want to display first X chars instead of entire comment? -->
+                                                            <Border Background="{DynamicResource GitHubVsWindowText}"
+                                                                    CornerRadius="3"
+                                                                    Margin="4"
+                                                                    Padding="2 0"
+                                                                    VerticalAlignment="Top"
+                                                                    Visibility="{Binding LineNumber, Converter={ui:EqualsToVisibilityConverter -1}}">
+                                                                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowBackground}"
+                                                                           FontSize="10">
+                                                                    Outdated
+                                                                </TextBlock>
+                                                            </Border>
                                                             <TextBlock Grid.Column="1"
                                                                        Text="{Binding Body, Converter={ui:TrimNewlinesConverter}}"
                                                                        TextWrapping="Wrap"
-                                                                       Margin="4"/>
+                                                                       TextTrimming="WordEllipsis"
+                                                                       Margin="4"
+                                                                       MaxHeight="100"/>
                                                         </Grid>
                                                     </Border>
                                                 </DataTemplate>

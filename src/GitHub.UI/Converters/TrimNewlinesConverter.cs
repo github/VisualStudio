@@ -10,7 +10,7 @@ namespace GitHub.UI
         {
             var text = value as string;
             if (String.IsNullOrEmpty(text)) return null;
-            return Regex.Replace(text, @"\t|\n|\r", "");
+            return Regex.Replace(text, @"\t|\n|\r", " ");
         }
     }
 }

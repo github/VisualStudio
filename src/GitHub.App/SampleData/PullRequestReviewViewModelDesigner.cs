@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
@@ -25,9 +26,8 @@ namespace GitHub.SampleData
 
 Otherwise, very nice work here! ✨";
             Files = new PullRequestFilesViewModelDesigner();
-            CommentCount = 3;
 
-            FileComments = new[]
+            var comments = new[]
             {
                 new PullRequestReviewCommentModel
                 {
@@ -45,15 +45,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
                 },
             };
 
-            OutdatedFileComments = new[]
-            {
-                new PullRequestReviewCommentModel
-                {
-                    Body = @"So this is just casting a mutable list to an IReadOnlyList which can be cast back to List.",
-                    Path = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
-                    Position = null,
-                }
-            };
+            FileComments = comments.Select((x, i) => new PullRequestReviewFileCommentViewModel(x, (i * 10) - 1)).ToList();
         }
 
         public ILocalRepositoryModel LocalRepository { get; set; }
@@ -66,9 +58,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public bool IsPending { get; set; }
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }
-        public IReadOnlyList<IPullRequestReviewCommentModel> FileComments { get; set; }
-        public IReadOnlyList<IPullRequestReviewCommentModel> OutdatedFileComments { get; set; }
-        public int CommentCount { get; set; }
+        public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; set; }
         public ReactiveCommand<Unit> OpenComment { get; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public ReactiveCommand<Unit> Submit { get; }

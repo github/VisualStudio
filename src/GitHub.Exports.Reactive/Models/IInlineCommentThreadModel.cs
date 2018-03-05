@@ -36,7 +36,7 @@ namespace GitHub.Models
         bool IsStale { get; set; }
 
         /// <summary>
-        /// Gets or sets the 0-based line number of the comment.
+        /// Gets or sets the 0-based line number of the comment, or -1 of the thread is outdated.
         /// </summary>
         int LineNumber { get; set; }
 
