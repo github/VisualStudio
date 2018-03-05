@@ -20,7 +20,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
-using Rothko;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
