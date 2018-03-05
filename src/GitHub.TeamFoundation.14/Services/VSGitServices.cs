@@ -1,4 +1,10 @@
-﻿using System;
+﻿#if TEAMEXPLORER15
+// Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
+extern alias SF15;
+using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
@@ -84,8 +90,7 @@ namespace GitHub.Services
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
-            var typedProgress = ((Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>)progress) ??
-                new Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>();
+            var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
 
             await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {

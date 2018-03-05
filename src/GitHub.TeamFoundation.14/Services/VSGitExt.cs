@@ -1,4 +1,3 @@
-extern alias SI14;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,9 +8,9 @@ using GitHub.Services;
 using GitHub.Logging;
 using GitHub.TeamFoundation.Services;
 using Serilog;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Task = System.Threading.Tasks.Task;
-using IAsyncServiceProvider = SI14::Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
 
 namespace GitHub.VisualStudio.Base
 {
