@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
@@ -13,61 +12,47 @@ using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Extensions;
 using Serilog;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
+    /// <summary>
+    /// Manage the UI that shows the PR for the current branch.
+    /// </summary>
     public class PullRequestStatusBarManager
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
-        readonly IVSGitExt gitExt;
         readonly IUsageTracker usageTracker;
         readonly IGitHubServiceProvider serviceProvider;
 
         IPullRequestSessionManager pullRequestSessionManager;
 
         [ImportingConstructor]
-        public PullRequestStatusBarManager(IVSGitExt gitExt, IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
+        public PullRequestStatusBarManager(IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
         {
-            this.gitExt = gitExt;
             this.usageTracker = usageTracker;
             this.serviceProvider = serviceProvider;
-
-            OnActiveRepositoriesChanged();
-            gitExt.ActiveRepositoriesChanged += OnActiveRepositoriesChanged;
         }
 
-        void OnActiveRepositoriesChanged()
-        {
-            if (gitExt.ActiveRepositories.Count > 0)
-            {
-                gitExt.ActiveRepositoriesChanged -= OnActiveRepositoriesChanged;
-                Application.Current.Dispatcher.Invoke(() => StartShowingStatus());
-            }
-        }
-
-        void StartShowingStatus()
+        /// <summary>
+        /// Start showing the PR for the active branch on the status bar.
+        /// </summary>
+        /// <remarks>
+        /// This must be called from the Main thread.
+        /// </remarks>
+        public void StartShowingStatus()
         {
             try
             {
-                // Create just in time on Main thread.
                 pullRequestSessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
-
-                RefreshCurrentSession();
-                pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+                pullRequestSessionManager.WhenAnyValue(x => x.CurrentSession)
+                    .Subscribe(x => RefreshCurrentSession());
             }
             catch (Exception e)
             {
                 log.Error(e, "Error initializing");
-            }
-        }
-
-        void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(PullRequestSessionManager.CurrentSession))
-            {
-                RefreshCurrentSession();
             }
         }
 

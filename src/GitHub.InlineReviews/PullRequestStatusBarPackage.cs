@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
+using GitHub.Helpers;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
@@ -11,7 +12,7 @@ namespace GitHub.InlineReviews
 {
     [Guid(Guids.PullRequestStatusPackageId)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [ProvideAutoLoad(Guids.GitSccProviderId, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     public class PullRequestStatusBarPackage : AsyncPackage
     {
         /// <summary>
@@ -21,9 +22,11 @@ namespace GitHub.InlineReviews
         {
             var usageTracker = (IUsageTracker)await GetServiceAsync(typeof(IUsageTracker));
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
-            var gitExt = (IVSGitExt)await GetServiceAsync(typeof(IVSGitExt));
+            var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
 
-            new PullRequestStatusBarManager(gitExt, usageTracker, serviceProvider);
+            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
+            // has been loaded. We're using the following instead as a workaround.
+            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() => barManager.StartShowingStatus());
         }
     }
 }
