@@ -173,9 +173,41 @@ public class UriStringTests
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
         public void ConvertsToWebUrl(string uriString, string expected)
         {
-            Assert.That(new Uri(expected), Is.EqualTo(new UriString(uriString).ToRepositoryUrl()));
+            Assert.That(new UriString(uriString).ToRepositoryUrl(), Is.EqualTo(new Uri(expected)));
         }
 
+
+        [TestCase("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
+        [TestCase("http://example.com/", "http://example.com/")]
+        [TestCase("http://haacked@example.com/foo/bar", "http://example.com/baz/bar")]
+        [TestCase("https://github.com/github/Windows", "https://github.com/baz/Windows")]
+        [TestCase("https://github.com/github/Windows.git", "https://github.com/baz/Windows")]
+        [TestCase("https://haacked@github.com/github/Windows.git", "https://github.com/baz/Windows")]
+        [TestCase("http://example.com:4000/github/Windows", "http://example.com:4000/baz/Windows")]
+        [TestCase("git@192.168.1.2:github/Windows.git", "https://192.168.1.2/baz/Windows")]
+        [TestCase("git@example.com:org/repo.git", "https://example.com/baz/repo")]
+        [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/baz/cef")]
+        [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/baz/encourage")]
+        [TestCase("https://github.com/github", "https://github.com/github")]
+        [TestCase("https://github.com/github/Windows", "https://github.com/github/Windows", null)]
+        public void ConvertsWithNewOwner(string uriString, string expected, string owner = "baz")
+        {
+            Assert.That(new UriString(uriString).ToRepositoryUrl(owner), Is.EqualTo(new Uri(expected)));
+        }
+
+        [TestCase("asdf", null)]
+        [TestCase("", null)]
+        [TestCase("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
+        [TestCase("http://example.com/", "http://example.com/")]
+        [TestCase("http://haacked@example.com/foo/bar", "http://example.com/foo/bar")]
+        [TestCase("https://github.com/github/Windows", "https://github.com/github/Windows")]
+        [TestCase("https://github.com/github/Windows.git", "https://github.com/github/Windows")]
+        [TestCase("https://haacked@github.com/github/Windows.git", "https://github.com/github/Windows")]
+        [TestCase("http://example.com:4000/github/Windows", "http://example.com:4000/github/Windows")]
+        [TestCase("git@192.168.1.2:github/Windows.git", "https://192.168.1.2/github/Windows")]
+        [TestCase("git@example.com:org/repo.git", "https://example.com/org/repo")]
+        [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/shana/cef")]
+        [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
         
         [TestCase("asdf", null)]
         [TestCase("", null)]
@@ -190,6 +222,7 @@ public class UriStringTests
         [TestCase("git@example.com:org/repo.git", "https://example.com/org/repo")]
         [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/shana/cef")]
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
+
         public void ShouldNeverThrow(string url, string expected)
         {
             Uri uri;
