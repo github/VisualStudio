@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Logging;
 using GitHub.Models;
@@ -75,6 +76,9 @@ namespace GitHub.VisualStudio
                 // Ignore if null because Expression Blend doesn't support custom services or menu extensibility.
                 return;
             }
+
+            // IMenuCommandService.AddCommand uses IServiceProvider.GetService and must be called on Main thread.
+            await ThreadingHelper.SwitchToMainThreadAsync();
 
             foreach (var menu in menus.Menus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
