@@ -80,7 +80,7 @@
     <FrameworkElement.CommandBindings>
         <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </FrameworkElement.CommandBindings>
-    
+
     <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -237,14 +237,16 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <!-- Author and open time -->
                     <RowDefinition Height="Auto"/>
                     <!-- PR body -->
                     <RowDefinition Height="Auto"/>
                     <!-- View on github link -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Reviewers -->
+                    <RowDefinition Height="Auto"/>
                     <!-- Files changed -->
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Author and open time -->
@@ -252,7 +254,7 @@
                     <ghfvs:AccountAvatar Account="{Binding Model.Author}"
                                             VerticalAlignment="Top"
                                             Width="16"
-                                            Height="16"/>
+                                            Height="16" Margin="0,0,0,1"/>
 
                     <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
                         <Run FontWeight="Bold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
@@ -270,6 +272,19 @@
                 <ghfvs:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ghfvs:GitHubActionLink>
+
+                <ghfvs:SectionControl Name="reviewsSection"
+                                   HeaderText="{x:Static prop:Resources.Reviewers}"
+                                   IsExpanded="True"
+                                   Grid.Row="3">
+                    <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4 12 4">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <local:PullRequestReviewSummaryView/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ghfvs:SectionControl>
 
                 <!-- Files changed -->
                 <ghfvs:SectionControl Name="changesSection" 

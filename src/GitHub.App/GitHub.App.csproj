@@ -236,6 +236,7 @@
     <Compile Include="ViewModels\GitHubPane\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestReviewSummaryViewModel.cs" />
     <Compile Include="ViewModels\RepositoryFormViewModel.cs" />
     <Compile Include="ViewModels\TeamExplorer\RepositoryPublishViewModel.cs" />
     <Compile Include="Caches\CacheIndex.cs" />

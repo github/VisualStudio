@@ -70,6 +70,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Approved.
+        /// </summary>
+        internal static string Approved {
+            get {
+                return ResourceManager.GetString("Approved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select a containing folder for your new repository..
         /// </summary>
         internal static string BrowseForDirectory {
@@ -79,11 +88,29 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Changes Requested.
+        /// </summary>
+        internal static string ChangesRequested {
+            get {
+                return ResourceManager.GetString("ChangesRequested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone a {0} Repository.
         /// </summary>
         internal static string CloneTitle {
             get {
                 return ResourceManager.GetString("CloneTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Commented.
+        /// </summary>
+        internal static string Commented {
+            get {
+                return ResourceManager.GetString("Commented", resourceCulture);
             }
         }
         
@@ -177,6 +204,15 @@ namespace GitHub.App {
         internal static string Fork {
             get {
                 return ResourceManager.GetString("Fork", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InProgress.
+        /// </summary>
+        internal static string InProgress {
+            get {
+                return ResourceManager.GetString("InProgress", resourceCulture);
             }
         }
         

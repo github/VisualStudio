@@ -42,6 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         string targetBranchDisplayName;
         int commentCount;
         string body;
+        IReadOnlyList<IPullRequestReviewSummaryViewModel> reviews;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
@@ -117,6 +118,7 @@ namespace GitHub.ViewModels.GitHubPane
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create();
+            ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
         }
 
         /// <summary>
@@ -245,6 +247,15 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
+        /// Gets the latest pull request review for each user.
+        /// </summary>
+        public IReadOnlyList<IPullRequestReviewSummaryViewModel> Reviews
+        {
+            get { return reviews; }
+            private set { this.RaiseAndSetIfChanged(ref reviews, value); }
+        }
+
+        /// <summary>
         /// Gets the pull request's changed files.
         /// </summary>
         public IPullRequestFilesViewModel Files { get; }
@@ -282,6 +293,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to a pull request review.
+        /// </summary>
+        public ReactiveCommand<object> ShowReview { get; }
 
         /// <summary>
         /// Initializes the view model.
@@ -353,6 +369,8 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
+                Reviews = PullRequestReviewSummaryViewModel.BuildByUser(pullRequest).ToList();
+
                 await Files.InitializeAsync(Session);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
@@ -614,6 +632,11 @@ namespace GitHub.ViewModels.GitHubPane
                 IsBusy = false;
                 statusBarNotificationService.ShowMessage(string.Empty);
             }
+        }
+
+        void DoShowReview(object item)
+        {
+            // TODO
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
