@@ -92,10 +92,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> DiffFile { get; }
-        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
-        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
-        public ReactiveCommand<object> ViewFile { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 

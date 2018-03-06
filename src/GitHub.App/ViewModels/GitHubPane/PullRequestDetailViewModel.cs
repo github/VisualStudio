@@ -117,10 +117,6 @@ namespace GitHub.ViewModels.GitHubPane
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create();
-            DiffFile = ReactiveCommand.Create();
-            DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
-            OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
-            ViewFile = ReactiveCommand.Create();
         }
 
         /// <summary>
@@ -286,27 +282,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
-
-        /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
-        /// </summary>
-        public ReactiveCommand<object> DiffFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
-        /// the working directory and HEAD.
-        /// </summary>
-        public ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
-        /// </summary>
-        public ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
-        /// </summary>
-        public ReactiveCommand<object> ViewFile { get; }
 
         /// <summary>
         /// Initializes the view model.

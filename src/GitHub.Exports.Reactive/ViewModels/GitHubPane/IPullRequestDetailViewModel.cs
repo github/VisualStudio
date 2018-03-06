@@ -166,27 +166,6 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
-        /// </summary>
-        ReactiveCommand<object> DiffFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
-        /// the working directory and HEAD.
-        /// </summary>
-        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
-        /// </summary>
-        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
-        /// </summary>
-        ReactiveCommand<object> ViewFile { get; }
-
-        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
