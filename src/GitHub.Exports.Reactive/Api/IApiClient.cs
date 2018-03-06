@@ -17,6 +17,7 @@ namespace GitHub.Api
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
         IObservable<Gist> CreateGist(NewGist newGist);
         IObservable<User> GetUser();
+        IObservable<User> GetUser(string login);
         IObservable<Organization> GetOrganizations();
         /// <summary>
         /// Retrieves all repositories that belong to this user.

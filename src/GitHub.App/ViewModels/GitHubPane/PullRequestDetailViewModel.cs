@@ -711,8 +711,15 @@ namespace GitHub.ViewModels.GitHubPane
         void DoShowReview(object item)
         {
             var review = (PullRequestDetailReviewItem)item;
-            var id = review.Id > 0 ? review.Id + "" : "new";
-            NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/{id}"));
+
+            if (review.Id == 0)
+            {
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
+            }
+            else
+            {
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/reviews/{review.User.Login}"));
+            }
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

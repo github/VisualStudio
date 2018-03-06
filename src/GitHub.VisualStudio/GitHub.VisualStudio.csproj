@@ -408,6 +408,9 @@
     <Compile Include="Views\GitHubPane\NotAGitRepositoryView.xaml.cs">
       <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestUserReviewsView.xaml.cs">
+      <DependentUpon>PullRequestUserReviewsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\TextViewCommandDispatcher.cs" />
     <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
       <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
@@ -585,6 +588,10 @@
     <Page Include="Views\GitHubPane\PullRequestListItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestUserReviewsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TeamExplorer\RepositoryPublishView.xaml">
       <Generator>MSBuild:Compile</Generator>

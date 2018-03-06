@@ -261,6 +261,7 @@
     <Compile Include="ViewModels\GitHubPane\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewFileCommentViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestUserReviewsViewModel.cs" />
     <Compile Include="ViewModels\RepositoryFormViewModel.cs" />
     <Compile Include="ViewModels\TeamExplorer\RepositoryPublishViewModel.cs" />
     <Compile Include="Caches\CacheIndex.cs" />

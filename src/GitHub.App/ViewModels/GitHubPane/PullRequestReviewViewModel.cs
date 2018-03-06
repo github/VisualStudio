@@ -175,6 +175,19 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
+        public async Task InitializeAsync(
+            ILocalRepositoryModel localRepository,
+            string owner,
+            IPullRequestModel pullRequest,
+            long pullRequestReviewId)
+        {
+            LocalRepository = localRepository;
+            RemoteRepositoryOwner = owner;
+            PullRequestNumber = pullRequest.Number;
+            PullRequestReviewId = pullRequestReviewId;
+            await Load(pullRequest);
+        }
+
         /// <inheritdoc/>
         public Task InitializeNewAsync(
             ILocalRepositoryModel localRepository,
