@@ -11,15 +11,6 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestReviewSummaryViewModel : IPullRequestReviewSummaryViewModel
     {
-        private static Dictionary<PullRequestReviewState, int> StatePriorities = new Dictionary<PullRequestReviewState, int>
-        {
-            { PullRequestReviewState.Approved, 1 },
-            { PullRequestReviewState.ChangesRequested, 1 },
-            { PullRequestReviewState.Commented, 0 },
-            { PullRequestReviewState.Dismissed, 0 },
-            { PullRequestReviewState.Pending, 2 },
-        };
-
         /// <inheritdoc/>
         public long Id { get; set; }
 
