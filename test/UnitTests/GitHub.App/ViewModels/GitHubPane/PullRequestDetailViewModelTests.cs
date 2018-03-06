@@ -577,6 +577,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             var author = Substitute.For<IAccount>();
 
+            reviews = reviews ?? new IPullRequestReviewModel[0];
+
             return new PullRequestModel(number, "PR 1", author, DateTimeOffset.Now)
             {
                 State = PullRequestStateEnum.Open,
