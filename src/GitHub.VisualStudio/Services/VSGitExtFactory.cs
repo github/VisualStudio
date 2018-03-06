@@ -2,8 +2,6 @@
 extern alias TF15;
 
 using System;
-using System.ComponentModel.Composition;
-using GitHub.Info;
 using GitHub.Logging;
 using Serilog;
 using Microsoft.VisualStudio.Shell;
@@ -12,16 +10,9 @@ using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.Services
 {
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExtFactory
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExtFactory>();
-
-        [ImportingConstructor]
-        public VSGitExtFactory(IGitHubServiceProvider serviceProvider)
-        {
-            VSGitExt = serviceProvider.GetService<IVSGitExt>();
-        }
 
         public static IVSGitExt Create(int vsVersion, IAsyncServiceProvider sp)
         {
@@ -40,8 +31,5 @@ namespace GitHub.Services
         // NOTE: We're being careful to only reference VSGitExt14 and VSGitExt15 from inside a lambda expression.
         // This ensures that only the type that's compatible with the running DTE version is loaded.
         static IVSGitExt Create(Func<IVSGitExt> factory) => factory.Invoke();
-
-        [Export]
-        public IVSGitExt VSGitExt { get; }
     }
 }

@@ -8,6 +8,7 @@ using System.Windows;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Info;
+using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -102,6 +103,38 @@ namespace GitHub.VisualStudio
             : base(program.ProductHeader)
         {
         }
+    }
+
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class ServiceProviderExports
+    {
+        // Only export services for the Visual Studio process (they don't work in Expression Blend).
+        const string ProcessName = "devenv";
+
+        readonly IServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public ServiceProviderExports([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        [ExportForProcess(typeof(ILoginManager), ProcessName)]
+        public ILoginManager LoginManager => GetService<ILoginManager>();
+
+        [ExportForProcess(typeof(IMenuProvider), ProcessName)]
+        public IMenuProvider MenuProvider => GetService<IMenuProvider>();
+
+        [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
+        public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
+
+        [ExportForProcess(typeof(IUsageTracker), ProcessName)]
+        public IUsageTracker UsageTracker => GetService<IUsageTracker>();
+
+        [ExportForProcess(typeof(IVSGitExt), ProcessName)]
+        public IVSGitExt VSGitExt => GetService<IVSGitExt>();
+
+        T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
     }
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
