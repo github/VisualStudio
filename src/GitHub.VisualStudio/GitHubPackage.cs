@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Logging;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.Menus;
@@ -16,7 +14,6 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Octokit;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -89,16 +86,6 @@ namespace GitHub.VisualStudio
                 IVsPackage vsPackage;
                 ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref packageGuid, out vsPackage));
             }
-        }
-    }
-
-    [Export(typeof(IGitHubClient))]
-    public class GHClient : GitHubClient
-    {
-        [ImportingConstructor]
-        public GHClient(IProgram program)
-            : base(program.ProductHeader)
-        {
         }
     }
 
