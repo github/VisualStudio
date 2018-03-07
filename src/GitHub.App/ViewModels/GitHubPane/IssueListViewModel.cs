@@ -26,6 +26,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IVisualStudioBrowser visualStudioBrowser;
         readonly IIssueService service;
         CancellationTokenSource cancelLoad;
+        IReadOnlyList<IIssueListItemViewModel> issues;
         ObservableCollection<string> assignees;
         ObservableCollection<string> authors;
         string searchQuery;
@@ -43,7 +44,6 @@ namespace GitHub.ViewModels.GitHubPane
 
             assignees = new ObservableCollection<string>(NoFilterList);
             authors = new ObservableCollection<string>(NoFilterList);
-            Issues = new TrackingCollection<IIssueListItemViewModel>();
             States = new[] { IssueStateFilter.Open, IssueStateFilter.Closed, IssueStateFilter.All };
             Title = Resources.IssuesNavigationItemText;
 
@@ -63,8 +63,13 @@ namespace GitHub.ViewModels.GitHubPane
         public IReadOnlyList<string> Assignees => assignees;
         public IReadOnlyList<string> Authors => authors;
         public IReadOnlyList<IssueStateFilter> States { get; }
-        public ITrackingCollection<IIssueListItemViewModel> Issues { get; }
         public ILocalRepositoryModel LocalRepository { get; private set; }
+
+        public IReadOnlyList<IIssueListItemViewModel> Issues
+        {
+            get { return issues; }
+            private set { this.RaiseAndSetIfChanged(ref issues, value); }
+        }
 
         public string SearchQuery
         {
@@ -105,8 +110,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         Task Load(bool refresh)
         {
-            IsBusy = true;
-
             var sw = new Stopwatch();
             sw.Start();
 
@@ -114,33 +117,7 @@ namespace GitHub.ViewModels.GitHubPane
             cancelLoad?.Dispose();
             cancelLoad = new CancellationTokenSource();
 
-            var items = service.GetIssues(LocalRepository, cancelLoad.Token, refresh)
-                .SelectMany(page => page.Items.Select(x => new IssueListItemViewModel(x)));
-
-            Issues.Clear();
-            Issues.Listen(items);
-
-            Issues.OriginalCompleted.Subscribe(_ =>
-            {
-                sw.Stop();
-                Debug.WriteLine("Loaded issues in " + sw.Elapsed);
-                IsBusy = false;
-                cancelLoad.Dispose();
-                cancelLoad = null;
-            });
-            
-            Issues.Subscribe(x =>
-            {
-                if (x.Author != null && !authors.Contains(x.Author.Login)) authors.Add(x.Author.Login);
-
-                foreach (var assignee in x.Assignees)
-                {
-                    if (!assignees.Contains(assignee.Login))
-                    {
-                        assignees.Add(assignee.Login);
-                    }
-                }
-            }, () => { });
+            Issues = new VirtualizingList<IIssueListItemViewModel>(new IssueSource(this), null);
 
             return Task.CompletedTask;
         }
@@ -187,21 +164,44 @@ namespace GitHub.ViewModels.GitHubPane
 
                 filterTextIsString = hasText && !filterTextIsNumber;
             }
-
-            if (!Issues.Disposed)
-            {
-                Issues.Filter = (issue, index, list) =>
-                    (state == IssueStateFilter.All || (int)issue.State == (int)state) &&
-                    (assignee == null || issue.Assignees.Any(x => x.Login == assignee)) &&
-                    (author == null || author == issue.Author?.Login) &&
-                    (filterTextIsNumber == false || issue.Number == filterPullRequestNumber) &&
-                    (filterTextIsString == false || issue.Title.ToUpperInvariant().Contains(filter.ToUpperInvariant()));
-            }
         }
 
         static string CastFilter(string filter)
         {
             return filter == NoFilter ? null : filter;
+        }
+
+        class IssueSource : SequentialListSource<IssueListModel, IIssueListItemViewModel>
+        {
+            readonly IssueListViewModel owner;
+
+            public IssueSource(IssueListViewModel owner)
+            {
+                this.owner = owner;
+            }
+
+            protected override IIssueListItemViewModel CreateViewModel(IssueListModel model)
+            {
+                return new IssueListItemViewModel(model);
+            }
+
+            protected override Task<Page<IssueListModel>> LoadPage(string after)
+            {
+                return owner.service.GetIssues(
+                    owner.LocalRepository,
+                    after,
+                    false);
+            }
+
+            protected override void OnBeginLoading(int nextPage, int toPage)
+            {
+                owner.IsBusy = true;
+            }
+
+            protected override void OnEndLoading()
+            {
+                owner.IsBusy = false;
+            }
         }
     }
 }

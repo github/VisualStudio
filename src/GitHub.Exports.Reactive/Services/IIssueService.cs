@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using GitHub.Models;
 
 namespace GitHub.Services
 {
     public interface IIssueService
     {
-        IObservable<Page<IssueListModel>> GetIssues(
+        Task<Page<IssueListModel>> GetIssues(
             IRepositoryModel repository,
-            CancellationToken cancel,
+            string after,
             bool refresh);
     }
 }

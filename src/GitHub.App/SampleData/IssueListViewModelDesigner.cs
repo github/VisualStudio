@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
-using GitHub.Collections;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
 
@@ -38,14 +38,12 @@ namespace GitHub.SampleData
                 },
             };
 
-            Issues = new TrackingCollection<IIssueListItemViewModel>();
-            foreach (var issue in issues) Issues.Add(new IssueListItemViewModel(issue));
-            States = new[] { IssueStateFilter.Open, IssueStateFilter.Closed, IssueStateFilter.All };
+            Issues = issues.Select(x => new IssueListItemViewModel(x)).ToList();
         }
 
         public IReadOnlyList<string> Assignees { get; set; }
         public IReadOnlyList<string> Authors { get; set; }
-        public ITrackingCollection<IIssueListItemViewModel> Issues { get; }
+        public IReadOnlyList<IIssueListItemViewModel> Issues { get; }
         public string SearchQuery { get; set; }
         public string SelectedAssignee { get; set; }
         public string SelectedAuthor { get; set; }

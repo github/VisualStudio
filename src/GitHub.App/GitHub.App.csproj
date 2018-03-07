@@ -154,6 +154,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\VirtualizingList.cs" />
     <Compile Include="Factories\ViewViewModelFactory.cs" />
     <Compile Include="Factories\ModelServiceFactory.cs" />
     <Compile Include="Models\IssueCommentModel.cs" />
@@ -166,6 +167,7 @@
     <Compile Include="SampleData\LabelViewModelDesigner.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
+    <Compile Include="Collections\SequentialListSource.cs" />
     <Compile Include="Services\IssueService.cs" />
     <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="Services\TeamExplorerContext.cs" />

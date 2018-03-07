@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -26,42 +27,24 @@ namespace GitHub.Services
             issuesQuery = new Lazy<CompiledQuery<Page<IssueListModel>>>(CreateIssuesQuery);
         }
 
-        public IObservable<Page<IssueListModel>> GetIssues(
+        public async Task<Page<IssueListModel>> GetIssues(
             IRepositoryModel repository,
-            CancellationToken cancel,
+            string after,
             bool refresh)
         {
-            return Observable.Create<Page<IssueListModel>>(async subscriber =>
+            var hostAddress = HostAddress.Create(repository.CloneUrl);
+            var graphql = await graphqlFactory.Create(hostAddress);
+            var client = refresh ? graphql.NonCached : graphql;
+            var query = issuesQuery.Value;
+            var vars = new Dictionary<string, object>
             {
-                var hostAddress = HostAddress.Create(repository.CloneUrl);
-                var graphql = await graphqlFactory.Create(hostAddress);
-                var client = refresh ? graphql.NonCached : graphql;
-                var query = issuesQuery.Value;
-                var vars = new Dictionary<string, object>
-                {
-                    { "owner", repository.Owner },
-                    { "name", repository.Name },
-                    { "after", null }
-                };
-
-                while (true)
-                {
-                    try
-                    {
-                        var page = await client.Run(query, vars);
-                        subscriber.OnNext(page);
-                        if (page.HasNextPage) vars["after"] = page.EndCursor;
-                        else break;
-                        cancel.ThrowIfCancellationRequested();
-                    }
-                    catch (Exception ex)
-                    {
-                        subscriber.OnError(ex);
-                        break;
-                    }
-                }
-            });
+                { "owner", repository.Owner },
+                { "name", repository.Name },
+                { "after", after },
+            };
+            return await client.Run(query, vars);
         }
+
 
 #pragma warning disable CS0618 // Type or member is obsolete
         CompiledQuery<Page<IssueListModel>> CreateIssuesQuery()

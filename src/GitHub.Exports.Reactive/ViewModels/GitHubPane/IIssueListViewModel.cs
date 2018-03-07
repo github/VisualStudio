@@ -23,7 +23,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the list of issues.
         /// </summary>
-        ITrackingCollection<IIssueListItemViewModel> Issues { get; }
+        IReadOnlyList<IIssueListItemViewModel> Issues { get; }
 
         /// <summary>
         /// Gets a list of the open/closed state filters.
