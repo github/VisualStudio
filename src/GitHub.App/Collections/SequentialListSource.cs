@@ -31,7 +31,7 @@ namespace GitHub.Collections
             return count;
         }
 
-        public async Task<IList<TViewModel>> GetPage(int pageNumber)
+        public async Task<IReadOnlyList<TViewModel>> GetPage(int pageNumber)
         {
             await LoadTo(pageNumber);
 

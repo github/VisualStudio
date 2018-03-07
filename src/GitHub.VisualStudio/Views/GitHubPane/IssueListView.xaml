@@ -59,7 +59,7 @@
                              SelectedItem="{Binding SelectedAuthor}"
                              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAuthorFilterComboBox}" />
         </WrapPanel>
-        <ListBox ItemsSource="{Binding Issues}"
+        <ListBox ItemsSource="{Binding IssuesView}"
                  Background="Transparent"
                  BorderThickness="0"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">

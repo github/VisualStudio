@@ -8,6 +8,6 @@ namespace GitHub.Collections
     {
         int PageSize { get; }
         Task<int> GetCount();
-        Task<IList<T>> GetPage(int pageNumber);
+        Task<IReadOnlyList<T>> GetPage(int pageNumber);
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -11,10 +10,10 @@ namespace GitHub.Collections
 {
     public class VirtualizingList<T> : IReadOnlyList<T>, IList, INotifyCollectionChanged
     {
-        readonly Dictionary<int, IList<T>> pages = new Dictionary<int, IList<T>>();
+        readonly Dictionary<int, IReadOnlyList<T>> pages = new Dictionary<int, IReadOnlyList<T>>();
         readonly IVirtualizingListSource<T> source;
         readonly IList<T> emptyPage;
-        readonly IList<T> placeholderPage;
+        readonly IReadOnlyList<T> placeholderPage;
         readonly Dispatcher dispatcher;
         int? count;
 
@@ -23,8 +22,8 @@ namespace GitHub.Collections
             T placeholder)
         {
             this.source = source;
-            emptyPage = Enumerable.Repeat(default(T), source.PageSize).ToList();
-            placeholderPage = Enumerable.Repeat(placeholder, source.PageSize).ToList();
+            emptyPage = Enumerable.Repeat(default(T), PageSize).ToList();
+            placeholderPage = Enumerable.Repeat(placeholder, PageSize).ToList();
             dispatcher = Application.Current.Dispatcher;
         }
 
@@ -32,9 +31,9 @@ namespace GitHub.Collections
         {
             get
             {
-                var pageNumber = index / source.PageSize;
-                var pageIndex = index % source.PageSize;
-                IList<T> page;
+                var pageNumber = index / PageSize;
+                var pageIndex = index % PageSize;
+                IReadOnlyList<T> page;
 
                 if (pages.TryGetValue(pageNumber, out page))
                 {
@@ -58,12 +57,14 @@ namespace GitHub.Collections
                 {
                     count = 0;
                     LoadCount();
-                    return 0;
                 }
 
                 return count.Value;
             }
         }
+
+        public IReadOnlyDictionary<int, IReadOnlyList<T>> Pages => pages;
+        public int PageSize => source.PageSize;
 
         object IList.this[int index]
         {
@@ -129,7 +130,7 @@ namespace GitHub.Collections
             return placeholderPage.GetEnumerator();
         }
 
-        async void LoadCount()
+        void LoadCount()
         {
             dispatcher.VerifyAccess();
 
@@ -145,8 +146,11 @@ namespace GitHub.Collections
                 }
                 else
                 {
-                    count = await countTask;
-                    SendReset();
+                    countTask.ContinueWith(x =>
+                    {
+                        count = x.Result;
+                        SendReset();
+                    });
                 }
             }
             catch (Exception)

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Extensions;
@@ -27,6 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IIssueService service;
         CancellationTokenSource cancelLoad;
         IReadOnlyList<IIssueListItemViewModel> issues;
+        ICollectionView issuesView;
         ObservableCollection<string> assignees;
         ObservableCollection<string> authors;
         string searchQuery;
@@ -47,14 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
             States = new[] { IssueStateFilter.Open, IssueStateFilter.Closed, IssueStateFilter.All };
             Title = Resources.IssuesNavigationItemText;
 
-            this.WhenAnyValue(x => x.SelectedState)
-                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor, SearchQuery));
-            this.WhenAnyValue(x => x.SelectedAssignee)
-                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor, SearchQuery));
-            this.WhenAnyValue(x => x.SelectedAuthor)
-                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a, SearchQuery));
-            this.WhenAnyValue(x => x.SearchQuery)
-                .Subscribe(f => UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, f));
+            this.WhenAnyValue(x => x.SelectedState).Subscribe(_ => issuesView?.Refresh());
 
             OpenIssueOnGitHub = ReactiveCommand.Create()
                 .OnExecuteCompleted(x => DoOpenIssueOnGitHub((int)x));
@@ -69,6 +66,12 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return issues; }
             private set { this.RaiseAndSetIfChanged(ref issues, value); }
+        }
+
+        public ICollectionView IssuesView
+        {
+            get { return issuesView; }
+            private set { this.RaiseAndSetIfChanged(ref issuesView, value); }
         }
 
         public string SearchQuery
@@ -117,7 +120,10 @@ namespace GitHub.ViewModels.GitHubPane
             cancelLoad?.Dispose();
             cancelLoad = new CancellationTokenSource();
 
-            Issues = new VirtualizingList<IIssueListItemViewModel>(new IssueSource(this), null);
+            var issues = new VirtualizingList<IIssueListItemViewModel>(new IssueSource(this), null);
+            Issues = issues;
+            IssuesView = new VirtualizingListCollectionView<IIssueListItemViewModel>(issues);
+            IssuesView.Filter = FilterItem;
 
             return Task.CompletedTask;
         }
@@ -141,28 +147,20 @@ namespace GitHub.ViewModels.GitHubPane
             visualStudioBrowser.OpenUrl(url);
         }
 
-        void UpdateFilter(IssueStateFilter state, string assignee, string author, string filter)
+        bool FilterItem(object o)
         {
-            var filterTextIsNumber = false;
-            var filterTextIsString = false;
-            var filterPullRequestNumber = 0;
+            var item = (IIssueListItemViewModel)o;
 
-            if (filter != null)
+            switch (selectedState)
             {
-                filter = filter.Trim();
-
-                var hasText = !string.IsNullOrEmpty(filter);
-
-                if (hasText && filter.StartsWith("#", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filterTextIsNumber = int.TryParse(filter.Substring(1), out filterPullRequestNumber);
-                }
-                else
-                {
-                    filterTextIsNumber = int.TryParse(filter, out filterPullRequestNumber);
-                }
-
-                filterTextIsString = hasText && !filterTextIsNumber;
+                case IssueStateFilter.All:
+                    return true;
+                case IssueStateFilter.Open:
+                    return item.State == IssueState.Open;
+                case IssueStateFilter.Closed:
+                    return item.State == IssueState.Closed;
+                default:
+                    throw new NotSupportedException();
             }
         }
 
