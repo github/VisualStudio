@@ -23,6 +23,7 @@ namespace GitHub.Collections
             T placeholder)
         {
             this.source = source;
+            Placeholder = placeholder;
             emptyPage = Enumerable.Repeat(default(T), PageSize).ToList();
             placeholderPage = Enumerable.Repeat(placeholder, PageSize).ToList();
             dispatcher = Application.Current.Dispatcher;
@@ -64,6 +65,7 @@ namespace GitHub.Collections
             }
         }
 
+        public T Placeholder { get; }
         public IReadOnlyDictionary<int, IReadOnlyList<T>> Pages => pages;
         public int PageSize => source.PageSize;
 

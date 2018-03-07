@@ -48,7 +48,7 @@ namespace GitHub.Collections
 
                         foreach (var item in page)
                         {
-                            if (Filter(item))
+                            if (Equals(item, inner.Placeholder) || Filter(item))
                             {
                                 result.Add((i * inner.PageSize) + j);
                             }
