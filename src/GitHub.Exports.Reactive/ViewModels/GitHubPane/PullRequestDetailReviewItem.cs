@@ -48,6 +48,7 @@ namespace GitHub.ViewModels.GitHubPane
                 case PullRequestReviewState.ChangesRequested:
                     return "Changes requested";
                 case PullRequestReviewState.Commented:
+                case PullRequestReviewState.Dismissed:
                     return "Commented";
                 case PullRequestReviewState.Pending:
                     return "In progress";
