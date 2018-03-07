@@ -9,11 +9,13 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
-             mc:Ignorable="d" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignWidth="300"
+             Name="root">
     
     <d:DesignData.DataContext>
         <sampleData:IssueListItemViewModelDesigner Number="1431"
                                                    Title="Don't create git blobs in order to calculate inline comment positions."
+                                                   State="Closed"
                                                    CommentCount="4"
                                                    UpdatedAt="2018-01-29">
             <sampleData:IssueListItemViewModelDesigner.Author>
@@ -70,7 +72,17 @@
                          DataContext="{Binding Author}"
                          Margin="0,0,10,0"
                          Width="30"
-                         Height="30"/>
+                         Height="30">
+            <local:ActorView.Style>
+                <Style TargetType="local:ActorView">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DataContext.State, ElementName=root}" Value="Closed">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </local:ActorView.Style>
+        </local:ActorView>
 
         <ui:GitHubActionLink Grid.Column="1" Grid.Row="1"
                              Content="{Binding Title}"
