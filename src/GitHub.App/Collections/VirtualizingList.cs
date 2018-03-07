@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -150,7 +151,7 @@ namespace GitHub.Collections
                     {
                         count = x.Result;
                         SendReset();
-                    });
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
             catch (Exception)
