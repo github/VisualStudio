@@ -76,8 +76,10 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         public void SetVerticalOffset(double offset)
         {
             var max = ItemsSource?.Count ?? 0 - Children.Count;
-            this.offset = (int)Math.Max(0, Math.Min(offset, max));
-            AssignContainers();
+            offset = Math.Max(0, Math.Min(offset, max));
+            var delta = (int)(offset - this.offset);
+            this.offset = (int)offset;
+            AssignContainers(delta);
             InvalidateScrollInfo();
         }
 
@@ -108,7 +110,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             CreateContainers(finalSize.Height);
             PositionContainers(finalSize);
-            AssignContainers();
+            AssignContainers(0);
             return finalSize;
         }
 
@@ -144,15 +146,36 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        void AssignContainers()
+        void AssignContainers(int delta)
         {
             if (ItemsSource != null)
             {
-                var i = offset;
-
-                foreach (var child in InternalChildren)
+                // When the scroll delta is 1 item up or down it's better to take the first or last item
+                // and move it to the bottom/top. Doing this for more items seems to be slower than just
+                // reassigning the DataContext, though I'm not sure where the cutoff point is. However 
+                // given that the mouse-wheel and scroll button scroll by 1 item, we'll just special-case
+                // the single item.
+                if (delta == -1)
                 {
-                    ((FrameworkElement)child).DataContext = ItemsSource[i++];
+                    var child = InternalChildren[InternalChildren.Count - 1];
+                    InternalChildren.RemoveAt(InternalChildren.Count - 1);
+                    InternalChildren.Insert(0, child);
+                    ((FrameworkElement)child).DataContext = ItemsSource[offset];
+                }
+                else if (delta == 1)
+                {
+                    var child = InternalChildren[0];
+                    InternalChildren.RemoveAt(0);
+                    InternalChildren.Add(child);
+                    ((FrameworkElement)child).DataContext = ItemsSource[offset + InternalChildren.Count - 1];
+                }
+                else
+                {
+                    var index = offset;
+                    foreach (var child in InternalChildren)
+                    {
+                        ((FrameworkElement)child).DataContext = ItemsSource[index++];
+                    }
                 }
             }
         }
@@ -168,7 +191,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     break;
                 case NotifyCollectionChangedAction.Move:
                 case NotifyCollectionChangedAction.Replace:
-                    AssignContainers();
+                    AssignContainers(0);
                     break;
             }
 
