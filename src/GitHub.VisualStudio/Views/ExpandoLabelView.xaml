@@ -32,7 +32,5 @@
                Fill="{Binding BackgroundBrush}"
                RadiusX="2"
                RadiusY="2"
-               Width="{Binding ActualWidth, ElementName=canvas}"
-               Height="{Binding ActualHeight, ElementName=canvas}"
                ToolTip="{Binding}"/>
 </UserControl>
