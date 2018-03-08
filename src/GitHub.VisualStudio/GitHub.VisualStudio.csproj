@@ -384,12 +384,10 @@
     <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
       <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ExpandoLabelsView.cs" />
     <Compile Include="Views\GitHubPane\QuickListPresenter.cs" />
     <Compile Include="Views\LabelView.xaml.cs">
       <DependentUpon>LabelView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ExpandoLabelView.xaml.cs">
-      <DependentUpon>ExpandoLabelView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GitHubPane\IssueListItemView.xaml.cs">
       <DependentUpon>IssueListItemView.xaml</DependentUpon>
@@ -563,10 +561,6 @@
     <Page Include="Views\LabelView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ExpandoLabelView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GitHubPane\IssueListItemView.xaml">
       <SubType>Designer</SubType>

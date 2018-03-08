@@ -28,7 +28,7 @@
         </sampleData:IssueListItemViewModelDesigner>
     </d:DesignData.DataContext>
     
-    <!--<Control.Resources>
+    <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
@@ -36,31 +36,15 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/GitHubPaneStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Control.Resources>-->
+    </Control.Resources>
 
     <DockPanel>
-        <!--<ItemsControl DockPanel.Dock="Top"
-                      ItemsSource="{Binding Labels}">
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Margin" Value="0 1"/>
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <views:ExpandoLabelView/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>-->
-
+        <views:ExpandoLabelsView DockPanel.Dock="Top"
+                                 ViewModels="{Binding Labels}"/>
+        
         <views:ActorAvatarView DockPanel.Dock="Left"
                                ViewModel="{Binding Author}"
-                               Margin="0,0,10,0"
+                               Margin="0,1,10,0"
                                Width="30"
                                Height="30"
                                VerticalAlignment="Top">
