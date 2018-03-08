@@ -28,28 +28,18 @@
         </sampleData:IssueListItemViewModelDesigner>
     </d:DesignData.DataContext>
     
-    <Control.Resources>
+    <!--<Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/GitHubPaneStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Control.Resources>
+    </Control.Resources>-->
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <ItemsControl Grid.ColumnSpan="2"
-                      HorizontalAlignment="Left"
+    <DockPanel>
+        <!--<ItemsControl DockPanel.Dock="Top"
                       ItemsSource="{Binding Labels}">
             <ItemsControl.ItemContainerStyle>
                 <Style TargetType="ContentPresenter">
@@ -66,47 +56,52 @@
                     <views:ExpandoLabelView/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </ItemsControl>-->
 
-        <local:ActorView Grid.RowSpan="2" Grid.Row="1"
-                         DataContext="{Binding Author}"
-                         Margin="0,0,10,0"
-                         Width="30"
-                         Height="30">
-            <local:ActorView.Style>
-                <Style TargetType="local:ActorView">
+        <views:ActorAvatarView DockPanel.Dock="Left"
+                               ViewModel="{Binding Author}"
+                               Margin="0,0,10,0"
+                               Width="30"
+                               Height="30"
+                               VerticalAlignment="Top">
+            <views:ActorAvatarView.Style>
+                <Style TargetType="views:ActorAvatarView">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding DataContext.State, ElementName=root}" Value="Closed">
                             <Setter Property="Opacity" Value="0.5"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </local:ActorView.Style>
-        </local:ActorView>
+            </views:ActorAvatarView.Style>
+        </views:ActorAvatarView>
 
-        <ui:GitHubActionLink Grid.Column="1" Grid.Row="1"
-                             Content="{Binding Title}"
-                             Foreground="{DynamicResource GitHubVsToolWindowText}"
-                             Margin="0,-3,5,0"
-                             TextTrimming="CharacterEllipsis"
-                             ToolTip="{Binding Title}"/>
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="0,-1,5,0"
+                   TextTrimming="CharacterEllipsis">
+            <Hyperlink>
+                <Run Text="{Binding Title, Mode=OneWay}"/>
+            </Hyperlink>
+        </TextBlock>
 
-        <StackPanel Grid.Column="1" Grid.Row="2"
+        <StackPanel DockPanel.Dock="Top"
+                    Margin="0,2,5,0"
                     Orientation="Horizontal"
                     TextBlock.Foreground="{DynamicResource GitHubVsGrayText}">
-            <Button Content="{Binding Number}"
-                    Command="{Binding ViewModel.OpenIssueOnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:IssueListView}}}"
-                    CommandParameter="{Binding Number}"
-                    Style="{StaticResource HashtagActionLink}"/>
-            <TextBlock Margin="4 0" TextTrimming="CharacterEllipsis">
+            <TextBlock>
+                <Hyperlink Command="{Binding ViewModel.OpenIssueOnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:IssueListView}}}"
+                           CommandParameter="{Binding Number}"
+                           Style="{DynamicResource BlueHyperlink}">
+                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                </Hyperlink>
                 <Run Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
                 <Run>by</Run>
                 <Run Text="{Binding Author.Login, Mode=OneWay}"/>
             </TextBlock>
-            <TextBlock Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}">
+            <TextBlock Margin="4 0" 
+                       Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}">
                 <ui:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>
                 <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top"/>
             </TextBlock>
         </StackPanel>
-    </Grid>
+    </DockPanel>
 </UserControl>

@@ -2,7 +2,7 @@
 
 namespace GitHub.ViewModels
 {
-    public interface IActorViewModel
+    public interface IActorViewModel : IViewModel
     {
         BitmapSource Avatar { get; }
         string Login { get; }

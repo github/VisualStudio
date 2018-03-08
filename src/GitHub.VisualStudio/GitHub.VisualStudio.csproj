@@ -361,6 +361,7 @@
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ActorAvatarView.cs" />
     <Compile Include="Views\ContentView.cs" />
     <Compile Include="Views\Dialog\GistCreationView.xaml.cs">
       <DependentUpon>GistCreationView.xaml</DependentUpon>
@@ -386,9 +387,6 @@
     <Compile Include="Views\GitHubPane\QuickListPresenter.cs" />
     <Compile Include="Views\LabelView.xaml.cs">
       <DependentUpon>LabelView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\GitHubPane\ActorView.xaml.cs">
-      <DependentUpon>ActorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ExpandoLabelView.xaml.cs">
       <DependentUpon>ExpandoLabelView.xaml</DependentUpon>
@@ -565,10 +563,6 @@
     <Page Include="Views\LabelView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\GitHubPane\ActorView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ExpandoLabelView.xaml">
       <SubType>Designer</SubType>

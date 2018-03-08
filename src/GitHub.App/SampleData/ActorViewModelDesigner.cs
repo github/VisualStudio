@@ -5,7 +5,7 @@ using GitHub.ViewModels;
 
 namespace GitHub.SampleData
 {
-    public class ActorViewModelDesigner : IActorViewModel
+    public class ActorViewModelDesigner : ViewModelBase, IActorViewModel
     {
         public ActorViewModelDesigner()
         {
