@@ -61,7 +61,7 @@
         </WrapPanel>
 
         <ScrollViewer CanContentScroll="True">
-            <local:QuickListPresenter ItemsSource="{Binding Issues}" 
+            <local:QuickListPresenter ItemsSource="{Binding IssuesView}" 
                                       ItemContainerType="{x:Type local:IssueListItemView}"
                                       ItemHeight="48"/>
         </ScrollViewer>

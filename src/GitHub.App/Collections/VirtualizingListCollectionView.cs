@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Data;
 
 namespace GitHub.Collections
 {
-    public class VirtualizingListCollectionView<T> : CollectionView
+    public class VirtualizingListCollectionView<T> : CollectionView, IList
     {
         readonly VirtualizingList<T> inner;
         List<int> filtered;
@@ -19,6 +20,17 @@ namespace GitHub.Collections
         public override int Count => filtered?.Count ?? inner.Count;
         public override bool IsEmpty => Count == 0;
 
+        bool IList.IsReadOnly => true;
+        bool IList.IsFixedSize => false;
+        object ICollection.SyncRoot => null;
+        bool ICollection.IsSynchronized => false;
+
+        object IList.this[int index]
+        {
+            get { return GetItemAt(index); }
+            set { throw new NotImplementedException(); }
+        }
+
         public override object GetItemAt(int index)
         {
             if (filtered == null)
@@ -30,6 +42,15 @@ namespace GitHub.Collections
                 return inner[filtered[index]];
             }
         }
+
+        int IList.Add(object value) { throw new NotSupportedException(); }
+        bool IList.Contains(object value) { throw new NotImplementedException(); }
+        void IList.Clear() { throw new NotSupportedException(); }
+        int IList.IndexOf(object value) { throw new NotImplementedException(); }
+        void IList.Insert(int index, object value) { throw new NotSupportedException(); }
+        void IList.Remove(object value) { throw new NotSupportedException(); }
+        void IList.RemoveAt(int index) { throw new NotSupportedException(); }
+        void ICollection.CopyTo(Array array, int index) { throw new NotImplementedException(); }
 
         protected override void RefreshOverride()
         {
