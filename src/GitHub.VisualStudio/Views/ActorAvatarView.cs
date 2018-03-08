@@ -2,8 +2,8 @@
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Threading;
 using GitHub.Exports;
 using GitHub.ViewModels;
 
@@ -13,6 +13,13 @@ namespace GitHub.VisualStudio.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ActorAvatarView : FrameworkElement
     {
+        public static readonly DependencyProperty IdleUpdateProperty =
+            DependencyProperty.Register(
+                nameof(IdleUpdate),
+                typeof(bool),
+                typeof(ActorAvatarView),
+                new FrameworkPropertyMetadata(true));
+
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register(
                 nameof(ViewModel),
@@ -20,9 +27,7 @@ namespace GitHub.VisualStudio.Views
                 typeof(ActorAvatarView),
                 new FrameworkPropertyMetadata(HandleViewModelChanged));
 
-        readonly DispatcherTimer invalidateTimer;
         IActorViewModel toRender;
-        long updateStart;
         Geometry clip;
 
         static ActorAvatarView()
@@ -33,14 +38,12 @@ namespace GitHub.VisualStudio.Views
 
         public ActorAvatarView()
         {
-            invalidateTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
-            invalidateTimer.Interval = TimeSpan.FromMilliseconds(10);
-            invalidateTimer.Tick += (s, e) =>
-            {
-                toRender = ViewModel;
-                InvalidateVisual();
-                invalidateTimer.Stop();
-            };
+        }
+
+        public bool IdleUpdate
+        {
+            get { return (bool)GetValue(IdleUpdateProperty); }
+            set { SetValue(IdleUpdateProperty, value); }
         }
 
         public IActorViewModel ViewModel
@@ -79,22 +82,47 @@ namespace GitHub.VisualStudio.Views
                 oldValue.PropertyChanged -= ViewModelPropertyChanged;
             }
 
-            if (newValue != null)
+            if (IdleUpdate)
             {
-                newValue.PropertyChanged += ViewModelPropertyChanged;
+                QueueIdleUpdate();
+            }
+            else
+            {
+                toRender = newValue;
+
+                if (toRender != null)
+                {
+                    toRender.PropertyChanged += ViewModelPropertyChanged;
+                }
             }
 
-            updateStart = Environment.TickCount;
-            toRender = null;
-            invalidateTimer.Start();
             InvalidateVisual();
+        }
+
+        void QueueIdleUpdate()
+        {
+            toRender = null;
+            ComponentDispatcher.ThreadIdle += OnIdle;
+        }
+
+        void OnIdle(object sender, EventArgs e)
+        {
+            toRender = ViewModel;
+
+            if (toRender != null)
+            {
+                toRender.PropertyChanged += ViewModelPropertyChanged;
+            }
+
+            InvalidateVisual();
+            ComponentDispatcher.ThreadIdle -= OnIdle;
         }
 
         void ViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IActorViewModel.Avatar))
             {
-                InvalidateVisual();
+                QueueIdleUpdate();
             }
         }
 
