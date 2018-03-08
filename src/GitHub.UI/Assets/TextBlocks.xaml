@@ -247,18 +247,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="{x:Type Hyperlink}" TargetType="{x:Type Hyperlink}">
-        <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonTextBrush}" />
-        <Setter Property="TextDecorations" Value="None" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="true">
-                <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonHoverBrush}" />
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="false">
-                <Setter Property="Foreground"  Value="{DynamicResource GHBlueLinkButtonDisabledTextBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
 
     <Style x:Key="LockIconPath" TargetType="{x:Type Path}">
         <Setter Property="Data" Value="F1M2,9C2,9 2,16 2,16 2,16 9,16 9,16 9,16 9,15.891 9,15.699L9,15C9,15 3,15 3,15 3,15 3,14 3,14 3,14 9,14 9,14L9,13C9,13 3,13 3,13 3,13 3,12 3,12 3,12 9,12 9,12L9,11C9,11 3,11 3,11 3,11 3,10 3,10 3,10 9,10 9,10 9,9.438 9,9 9,9 9,9 2,9 2,9z M7,3C5.895,3 5,3.895 5,5 5,6.105 5,8 5,8 5,8 9,8 9,8 9,8 9,5.707 9,5 9,3.895 8.105,3 7,3z M7,1C9.209,1 11,2.791 11,5 11,5.298 11,5.822 11,6.441L11,8 11.57,8C11.844,8 12,8 12,8 12.552,8 13,8.448 13,9 13,9 13,16 13,16 13,16.552 12.552,17 12,17 12,17 2,17 2,17 1.448,17 1,16.552 1,16 1,16 1,9 1,9 1,8.448 1.448,8 2,8 2,8 2.156,8 2.43,8L3,8 3,6.869C3,6.203 3,5.552 3,5 3,2.791 4.791,1 7,1z" />

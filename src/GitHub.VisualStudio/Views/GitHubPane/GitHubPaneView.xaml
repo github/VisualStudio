@@ -18,6 +18,7 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/GitHubPaneStyles.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
       <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">

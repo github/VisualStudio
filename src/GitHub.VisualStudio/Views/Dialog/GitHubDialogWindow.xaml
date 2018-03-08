@@ -6,6 +6,7 @@
                    xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
                    xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.Exports.Reactive"
                    xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+                   xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                    mc:Ignorable="d"
                    Title="{Binding Content.Title, FallbackValue=GitHub}"
                    Width="414"
@@ -25,9 +26,14 @@
                    WindowStartupLocation="CenterOwner"
                    Content="{Binding Content}">
   <Window.Resources>
-    <views:ViewLocator x:Key="viewLocator"/>
-    <DataTemplate DataType="{x:Type vm:ViewModelBase}">
-      <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
-    </DataTemplate>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/Dialog/DialogStyles.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+      <views:ViewLocator x:Key="viewLocator"/>
+      <DataTemplate DataType="{x:Type vm:ViewModelBase}">
+        <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
+      </DataTemplate>
+    </ResourceDictionary>    
   </Window.Resources>
 </pfui:DialogWindow>
