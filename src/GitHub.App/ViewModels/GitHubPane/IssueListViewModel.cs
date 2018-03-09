@@ -191,7 +191,7 @@ namespace GitHub.ViewModels.GitHubPane
                     false);
             }
 
-            protected override void OnBeginLoading(int nextPage, int toPage)
+            protected override void OnBeginLoading()
             {
                 owner.IsBusy = true;
             }

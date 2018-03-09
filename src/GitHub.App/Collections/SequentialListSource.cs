@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using GitHub.Logging;
 using GitHub.Models;
 using Serilog;
@@ -13,40 +14,51 @@ namespace GitHub.Collections
     {
         static readonly ILogger log = LogManager.ForContext<SequentialListSource<TModel, TViewModel>>();
 
-        readonly SemaphoreSlim loading = new SemaphoreSlim(1);
-        Dictionary<int, Page<TModel>> pages;
-        int count;
+        readonly Dispatcher dispatcher;
+        readonly object loadLock = new object();
+        Dictionary<int, Page<TModel>> pages = new Dictionary<int, Page<TModel>>();
+        Task loading = Task.CompletedTask;
+        int? count;
         int nextPage;
+        int loadTo;
         string after;
 
-        public virtual int PageSize => 100;
+        public SequentialListSource()
+        {
+            dispatcher = Application.Current.Dispatcher;
+        }
 
+        public virtual int PageSize => 100;
+        event EventHandler PageLoaded;
+        
         public async Task<int> GetCount()
         {
-            if (pages == null)
+            dispatcher.VerifyAccess();
+
+            if (!count.HasValue)
             {
-                await LoadNextPage().ConfigureAwait(false);
+                count = (await EnsureLoaded(0).ConfigureAwait(false)).TotalCount;
             }
 
-            return count;
+            return count.Value;
         }
 
         public async Task<IReadOnlyList<TViewModel>> GetPage(int pageNumber)
         {
-            await LoadTo(pageNumber);
+            dispatcher.VerifyAccess();
 
-            var result = pages[pageNumber].Items
+            var page = await EnsureLoaded(pageNumber);
+            var result = page.Items
                 .Select(CreateViewModel)
                 .ToList();
-
-            pages[pageNumber] = null;
+            pages.Remove(pageNumber);
             return result;
         }
 
         protected abstract TViewModel CreateViewModel(TModel model);
         protected abstract Task<Page<TModel>> LoadPage(string after);
 
-        protected virtual void OnBeginLoading(int nextPage, int toPage)
+        protected virtual void OnBeginLoading()
         {
         }
 
@@ -54,33 +66,62 @@ namespace GitHub.Collections
         {
         }
 
-        async Task LoadTo(int pageNumber)
+        async Task<Page<TModel>> EnsureLoaded(int pageNumber)
         {
-            await loading.WaitAsync().ConfigureAwait(false);
-
-            try
+            if (pageNumber < nextPage)
             {
-                var needsLoad = nextPage <= pageNumber;
+                return pages[pageNumber];
+            }
 
-                if (needsLoad)
+            var pageLoaded = WaitPageLoaded(pageNumber);
+            loadTo = Math.Max(loadTo, pageNumber);
+
+            while (true)
+            {
+                lock (loadLock)
                 {
-                    OnBeginLoading(nextPage, pageNumber);
+                    if (loading.IsCompleted)
+                    {
+                        loading = Load();
+                    }
                 }
 
-                while (nextPage <= pageNumber)
-                {
-                    await LoadNextPage().ConfigureAwait(false);
-                }
+                await Task.WhenAny(loading, pageLoaded).ConfigureAwait(false);
 
-                if (needsLoad)
+                if (pageLoaded.IsCompleted)
                 {
-                    OnEndLoading();
+                    return pages[pageNumber];
                 }
             }
-            finally
+        }
+
+        Task WaitPageLoaded(int page)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EventHandler handler = null;
+            handler = (s, e) =>
             {
-                loading.Release();
+                if (nextPage > page)
+                {
+                    tcs.SetResult(true);
+                    PageLoaded -= handler;
+                }
+            };
+            PageLoaded += handler;
+            return tcs.Task;
+        }
+
+        async Task Load()
+        {
+            OnBeginLoading();
+
+            while (nextPage <= loadTo)
+            {
+                await LoadNextPage().ConfigureAwait(false);
+                PageLoaded?.Invoke(this, EventArgs.Empty);
             }
+
+            OnEndLoading();
         }
 
         async Task LoadNextPage()
@@ -88,13 +129,6 @@ namespace GitHub.Collections
             log.Debug("Loading page {Number} of {ModelType}", nextPage, typeof(TModel));
 
             var page = await LoadPage(after).ConfigureAwait(false);
-
-            if (pages == null)
-            {
-                pages = new Dictionary<int, Page<TModel>>();
-                count = page.TotalCount;
-            }
-
             pages[nextPage++] = page;
             after = page.EndCursor;
         }
