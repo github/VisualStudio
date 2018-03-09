@@ -385,7 +385,6 @@
       <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ExpandoLabelsView.cs" />
-    <Compile Include="Views\GitHubPane\QuickListPresenter.cs" />
     <Compile Include="Views\LabelView.xaml.cs">
       <DependentUpon>LabelView.xaml</DependentUpon>
     </Compile>

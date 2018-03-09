@@ -10,7 +10,7 @@
              xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              mc:Ignorable="d" d:DesignWidth="300"
-             Name="root">
+             Name="root" Height="38">
     
     <d:DesignData.DataContext>
         <sampleData:IssueListItemViewModelDesigner Number="1431"
@@ -62,7 +62,8 @@
 
         <DockPanel Visibility="{Binding Converter={ui:NullToVisibilityConverter}}">
             <views:ExpandoLabelsView DockPanel.Dock="Top"
-                                 ViewModels="{Binding Labels}"/>
+                                     Height="4"
+                                     ViewModels="{Binding Labels}"/>
 
             <views:ActorAvatarView DockPanel.Dock="Left"
                                    ViewModel="{Binding Author}"
