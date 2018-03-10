@@ -22,8 +22,8 @@
 
     <ScrollViewer>
         <StackPanel>
-            <StackPanel DockPanel.Dock="Top" Margin="0 4" Orientation="Horizontal">
-                <TextBlock FontSize="16" Margin="2 0 2 1" VerticalAlignment="Center">
+            <StackPanel DockPanel.Dock="Top" Margin="8 0 8 8" Orientation="Vertical">
+                <TextBlock FontSize="16" VerticalAlignment="Center">
                         <Run>Reviews by</Run>
                         <Run FontWeight="Bold" Text="{Binding User.Login, Mode=OneWay}"/>
                         <Run>for</Run>
@@ -31,14 +31,14 @@
                             <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
                         </Hyperlink>
                 </TextBlock>
-            </StackPanel>
-            <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding Title}" TextWrapping="Wrap"/>
-            <StackPanel Orientation="Horizontal">
-                <c:AccountAvatar Account="{Binding User}" Margin="4" Width="16" Height="16"/>
-                <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
-                           VerticalAlignment="Center"/>
-            </StackPanel>
 
+                <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Margin="0" Text="{Binding Title}" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Margin="0 4">
+                    <c:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
             <ItemsControl ItemsSource="{Binding Reviews}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
