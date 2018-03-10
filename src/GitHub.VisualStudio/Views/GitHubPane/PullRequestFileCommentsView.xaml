@@ -57,7 +57,7 @@
                                                 <ui:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2"/>
                                                 <!-- TODO: Need special control to display long paths -->
                                                 <ui:TrimmedPathTextBlock Grid.Column="1"
-                                                                         FontWeight="Bold"
+                                                                         FontWeight="SemiBold"
                                                                          Text="{Binding Name}"
                                                                          ToolTip="{Binding Name}"/>
                                             </DockPanel>
