@@ -48,9 +48,12 @@
                             <Expander Style="{DynamicResource GitHubExpander}" IsExpanded="True">
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
-                                        <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
-                                        <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
+                                        <StackPanel Width="16" Height="16">
+                                            <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
+                                            <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
+                                            <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
+                                        </StackPanel>
+
                                         <TextBlock FontWeight="SemiBold" Margin="2 0">
                                         <Run Text="{Binding Model.User.Login, Mode=OneWay}"/>
                                         <Run Text="{Binding State, Mode=OneWay}"/>
