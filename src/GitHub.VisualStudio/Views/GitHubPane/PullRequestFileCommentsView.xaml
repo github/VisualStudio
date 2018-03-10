@@ -73,7 +73,7 @@
                                                                 <TextBlock 
                                                                            Visibility="{Binding LineNumber, Converter={ui:NotEqualsToVisibilityConverter -1}}">
                                                                     <Hyperlink>
-                                                                        <Run Text="{Binding LineNumber, StringFormat=L{0}, Mode=OneWay}"/>
+                                                                        <Run Text="{Binding LineNumber, StringFormat=Line {0}, Mode=OneWay}"/>
                                                                     </Hyperlink>
                                                                 </TextBlock>
                                                                 <Border Background="{DynamicResource GitHubVsWindowText}"
