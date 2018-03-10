@@ -58,7 +58,7 @@
                                         </TextBlock>
                                     </StackPanel>
                                 </Expander.Header>
-                                <StackPanel Margin="16 4">
+                                <StackPanel Margin="24 4 4 16">
                                     <ui:SectionControl HeaderText="Description" IsExpanded="True">
                                         <TextBlock Text="{Binding Body}" Margin="0 4"/>
                                     </ui:SectionControl>

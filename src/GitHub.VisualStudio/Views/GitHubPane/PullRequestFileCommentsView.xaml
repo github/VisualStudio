@@ -68,6 +68,33 @@
                                                 <DataTemplate>
                                                     <Border BorderBrush="{DynamicResource GitHubExpanderHeaderBackground}"
                                                             BorderThickness="1 0 1 1">
+                                                        <StackPanel Orientation="Vertical" Margin="20 0 0 0">
+                                                            <StackPanel Orientation="Horizontal" Margin="4 0">
+                                                                <TextBlock 
+                                                                           Visibility="{Binding LineNumber, Converter={ui:NotEqualsToVisibilityConverter -1}}">
+                                                                    <Hyperlink>
+                                                                        <Run Text="{Binding LineNumber, StringFormat=L{0}, Mode=OneWay}"/>
+                                                                    </Hyperlink>
+                                                                </TextBlock>
+                                                                <Border Background="{DynamicResource GitHubVsWindowText}"
+                                                                        CornerRadius="3"
+                                                                        Padding="4 2"
+                                                                        VerticalAlignment="Top"
+                                                                        Visibility="{Binding LineNumber, Converter={ui:EqualsToVisibilityConverter -1}}">
+                                                                    <TextBlock Foreground="{DynamicResource GitHubVsToolWindowBackground}"
+                                                                               FontSize="10">
+                                                                        Outdated
+                                                                    </TextBlock>
+                                                                </Border>
+                                                            </StackPanel>
+
+                                                            <TextBlock Text="{Binding Body, Converter={ui:TrimNewlinesConverter}}"
+                                                                       TextWrapping="Wrap"
+                                                                       TextTrimming="WordEllipsis"
+                                                                       Margin="4"
+                                                                       MaxHeight="100"/>
+                                                        </StackPanel>
+                                                        <!--
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="Auto" SharedSizeGroup="LineNumber"/>
@@ -97,6 +124,7 @@
                                                                        Margin="4"
                                                                        MaxHeight="100"/>
                                                         </Grid>
+                                                        -->
                                                     </Border>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
