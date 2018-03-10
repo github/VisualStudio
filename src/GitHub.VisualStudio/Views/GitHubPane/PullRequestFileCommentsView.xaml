@@ -94,37 +94,6 @@
                                                                        Margin="4"
                                                                        MaxHeight="100"/>
                                                         </StackPanel>
-                                                        <!--
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="LineNumber"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                            </Grid.ColumnDefinitions>
-                                                            <TextBlock Margin="4"
-                                                                       Visibility="{Binding LineNumber, Converter={ui:NotEqualsToVisibilityConverter -1}}">
-                                                                <Hyperlink>
-                                                                    <Run Text="{Binding LineNumber, StringFormat=L{0}, Mode=OneWay}"/>
-                                                                </Hyperlink>
-                                                            </TextBlock>
-                                                            <Border Background="{DynamicResource GitHubVsWindowText}"
-                                                                    CornerRadius="3"
-                                                                    Margin="4"
-                                                                    Padding="2 0"
-                                                                    VerticalAlignment="Top"
-                                                                    Visibility="{Binding LineNumber, Converter={ui:EqualsToVisibilityConverter -1}}">
-                                                                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowBackground}"
-                                                                           FontSize="10">
-                                                                    Outdated
-                                                                </TextBlock>
-                                                            </Border>
-                                                            <TextBlock Grid.Column="1"
-                                                                       Text="{Binding Body, Converter={ui:TrimNewlinesConverter}}"
-                                                                       TextWrapping="Wrap"
-                                                                       TextTrimming="WordEllipsis"
-                                                                       Margin="4"
-                                                                       MaxHeight="100"/>
-                                                        </Grid>
-                                                        -->
                                                     </Border>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
