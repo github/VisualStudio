@@ -22,10 +22,10 @@
 
     <ScrollViewer>
         <StackPanel>
-            <StackPanel DockPanel.Dock="Top" Margin="8 0 8 8" Orientation="Vertical">
+            <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
                 <TextBlock FontSize="16" VerticalAlignment="Center">
                         <Run>Reviews by</Run>
-                        <Run FontWeight="Bold" Text="{Binding User.Login, Mode=OneWay}"/>
+                        <Run FontWeight="SemiBold" Text="{Binding User.Login, Mode=OneWay}"/>
                         <Run>for</Run>
                         <Hyperlink Command="{Binding NavigateToPullRequest}">
                             <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
@@ -51,7 +51,7 @@
                                         <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
                                         <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
                                         <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
-                                        <TextBlock FontWeight="Bold" Margin="2 0">
+                                        <TextBlock FontWeight="SemiBold" Margin="2 0">
                                         <Run Text="{Binding Model.User.Login, Mode=OneWay}"/>
                                         <Run Text="{Binding State, Mode=OneWay}"/>
                                         <Run FontWeight="Normal">5 days ago</Run>
