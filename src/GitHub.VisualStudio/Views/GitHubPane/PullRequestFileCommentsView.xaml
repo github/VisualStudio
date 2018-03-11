@@ -76,7 +76,7 @@
                                                                         <Run Text="{Binding LineNumber, StringFormat=Line {0}, Mode=OneWay}"/>
                                                                     </Hyperlink>
                                                                 </TextBlock>
-                                                                <Border Background="{DynamicResource GitHubVsWindowText}"
+                                                                <Border Background="#4a4a4a"
                                                                         CornerRadius="3"
                                                                         Padding="4 2"
                                                                         VerticalAlignment="Top"
