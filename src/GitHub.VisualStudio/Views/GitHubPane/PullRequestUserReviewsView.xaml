@@ -48,7 +48,7 @@
                             <Expander Style="{DynamicResource GitHubExpander}" IsExpanded="True">
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <StackPanel Width="16" Height="16">
+                                        <StackPanel Width="20" Height="16" HorizontalAlignment="Center">
                                             <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
                                             <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
                                             <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
