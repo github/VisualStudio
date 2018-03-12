@@ -14,14 +14,23 @@ namespace GitHub.Services
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExtFactory>();
 
-        public static IVSGitExt Create(int vsVersion, IAsyncServiceProvider sp)
+        readonly int vsVersion;
+        readonly IAsyncServiceProvider asyncServiceProvider;
+
+        public VSGitExtFactory(int vsVersion, IAsyncServiceProvider asyncServiceProvider)
+        {
+            this.vsVersion = vsVersion;
+            this.asyncServiceProvider = asyncServiceProvider;
+        }
+
+        public IVSGitExt Create()
         {
             switch (vsVersion)
             {
                 case 14:
-                    return Create(() => new VSGitExt14(sp));
+                    return Create(() => new VSGitExt14(asyncServiceProvider));
                 case 15:
-                    return Create(() => new VSGitExt15(sp));
+                    return Create(() => new VSGitExt15(asyncServiceProvider));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
                     return null;
