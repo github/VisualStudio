@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
