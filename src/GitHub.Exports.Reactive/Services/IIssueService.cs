@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Models;
 
@@ -11,5 +10,9 @@ namespace GitHub.Services
             IRepositoryModel repository,
             string after,
             bool refresh);
+
+        Task<Page<ActorModel>> GetAssignees(
+            IRepositoryModel repository,
+            string after);
     }
 }

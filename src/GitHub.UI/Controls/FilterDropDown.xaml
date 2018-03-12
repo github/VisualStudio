@@ -1,0 +1,49 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:GitHub.UI">
+    <Thickness x:Key="FilterDropDownBorderThickness">1</Thickness>
+    <Style TargetType="local:FilterDropDown">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:FilterDropDown">
+                    <local:DropDownButton x:Name="PART_DropDownButton"
+                                          Content="{TemplateBinding Header}">
+                        <local:DropDownButton.DropDownContent>
+                            <Border Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                                    BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                                    BorderThickness="1"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <DockPanel>
+                                    <local:PromptTextBox x:Name="PART_FilterTextBox"
+                                                         DockPanel.Dock="Top"
+                                                         Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, Delay=300, UpdateSourceTrigger=PropertyChanged}"
+                                                         PromptText="Search"
+                                                         Margin="2"/>
+                                    <Button DockPanel.Dock="Top"
+                                            Name="PART_ClearButton"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Margin="2"
+                                            HorizontalContentAlignment="Stretch"
+                                            Visibility="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Converter={local:NullToVisibilityConverter}}">
+                                        <DockPanel>
+                                            <local:OcticonImage DockPanel.Dock="Right" Icon="x"/>
+                                            <TextBlock>Clear filter</TextBlock>
+                                        </DockPanel>
+                                    </Button>
+                                    <ListBox Name="PART_Selector"
+                                             ItemContainerStyle="{TemplateBinding ItemContainerStyle}"
+                                             ItemsPanel="{TemplateBinding ItemsPanel}"
+                                             ItemsSource="{TemplateBinding ItemsSource}"
+                                             ItemTemplate="{TemplateBinding ItemTemplate}"
+                                             Background="Transparent"
+                                             BorderThickness="0"/>
+                                </DockPanel>
+                            </Border>
+                        </local:DropDownButton.DropDownContent>
+                    </local:DropDownButton>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

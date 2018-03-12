@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Data;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Extensions;
@@ -31,11 +28,10 @@ namespace GitHub.ViewModels.GitHubPane
         CancellationTokenSource cancelLoad;
         IReadOnlyList<IIssueListItemViewModel> issues;
         ICollectionView issuesView;
-        ObservableCollection<string> assignees;
-        ObservableCollection<string> authors;
+        IUserFilterViewModel authorFilter;
+        IUserFilterViewModel assigneeFilter;
         string searchQuery;
         string selectedAssignee;
-        string selectedAuthor;
         IssueStateFilter selectedState = IssueStateFilter.Open;
 
         [ImportingConstructor]
@@ -46,21 +42,32 @@ namespace GitHub.ViewModels.GitHubPane
             this.service = service;
             this.visualStudioBrowser = visualStudioBrowser;
 
-            assignees = new ObservableCollection<string>(NoFilterList);
-            authors = new ObservableCollection<string>(NoFilterList);
             States = new[] { IssueStateFilter.Open, IssueStateFilter.Closed, IssueStateFilter.All };
             Title = Resources.IssuesNavigationItemText;
 
-            this.WhenAnyValue(x => x.SelectedState).Subscribe(_ => issuesView?.Refresh());
+            this.WhenAnyValue(
+                x => x.SelectedState,
+                x => x.AuthorFilter.Selected)
+                .Subscribe(_ => issuesView?.Refresh());
 
             OpenIssueOnGitHub = ReactiveCommand.Create()
                 .OnExecuteCompleted(x => DoOpenIssueOnGitHub((int)x));
         }
 
-        public IReadOnlyList<string> Assignees => assignees;
-        public IReadOnlyList<string> Authors => authors;
         public IReadOnlyList<IssueStateFilter> States { get; }
         public ILocalRepositoryModel LocalRepository { get; private set; }
+
+        public IUserFilterViewModel AuthorFilter
+        {
+            get { return authorFilter; }
+            private set { this.RaiseAndSetIfChanged(ref authorFilter, value); }
+        }
+
+        public IUserFilterViewModel AssigneeFilter
+        {
+            get { return assigneeFilter; }
+            private set { this.RaiseAndSetIfChanged(ref assigneeFilter, value); }
+        }
 
         public IReadOnlyList<IIssueListItemViewModel> Issues
         {
@@ -86,12 +93,6 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, CastFilter(value)); }
         }
 
-        public string SelectedAuthor
-        {
-            get { return selectedAuthor; }
-            set { this.RaiseAndSetIfChanged(ref selectedAuthor, CastFilter(value)); }
-        }
-
         public IssueStateFilter SelectedState
         {
             get { return selectedState; }
@@ -111,6 +112,18 @@ namespace GitHub.ViewModels.GitHubPane
 
         public override Task Refresh() => Load(true);
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && cancelLoad != null)
+            {
+                cancelLoad.Cancel();
+                cancelLoad.Dispose();
+                cancelLoad = null;
+            }
+
+            base.Dispose(disposing);
+        }
+
         Task Load(bool refresh)
         {
             var sw = new Stopwatch();
@@ -125,20 +138,13 @@ namespace GitHub.ViewModels.GitHubPane
             IssuesView = new VirtualizingListCollectionView<IIssueListItemViewModel>(issues);
             IssuesView.Filter = FilterItem;
 
+            AuthorFilter = new UserFilterViewModel("Author", LoadAssignees);
+            AssigneeFilter = new UserFilterViewModel("Assignee", LoadAssignees);
+
             return Task.CompletedTask;
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && cancelLoad != null)
-            {
-                cancelLoad.Cancel();
-                cancelLoad.Dispose();
-                cancelLoad = null;
-            }
-
-            base.Dispose(disposing);
-        }
+        Task<Page<ActorModel>> LoadAssignees(string after) => service.GetAssignees(LocalRepository, after);
 
         void DoOpenIssueOnGitHub(int number)
         {
@@ -149,7 +155,14 @@ namespace GitHub.ViewModels.GitHubPane
 
         bool FilterItem(object o)
         {
-            var item = (IIssueListItemViewModel)o;
+            var item = o as IIssueListItemViewModel;
+            if (item == null) return false;
+
+            if (!string.IsNullOrWhiteSpace(AuthorFilter?.Selected?.Login) &&
+                item.Author?.Login != AuthorFilter.Selected?.Login)
+            {
+                return false;
+            }
 
             switch (selectedState)
             {
@@ -159,15 +172,12 @@ namespace GitHub.ViewModels.GitHubPane
                     return item.State == IssueState.Open;
                 case IssueStateFilter.Closed:
                     return item.State == IssueState.Closed;
-                default:
-                    throw new NotSupportedException();
             }
+
+            return true;
         }
 
-        static string CastFilter(string filter)
-        {
-            return filter == NoFilter ? null : filter;
-        }
+        static string CastFilter(string filter) => filter == NoFilter ? null : filter;
 
         class IssueSource : SequentialListSource<IssueListModel, IIssueListItemViewModel>
         {
@@ -180,7 +190,8 @@ namespace GitHub.ViewModels.GitHubPane
 
             protected override IIssueListItemViewModel CreateViewModel(IssueListModel model)
             {
-                return new IssueListItemViewModel(model);
+                var result = new IssueListItemViewModel(model);
+                return result;
             }
 
             protected override Task<Page<IssueListModel>> LoadPage(string after)

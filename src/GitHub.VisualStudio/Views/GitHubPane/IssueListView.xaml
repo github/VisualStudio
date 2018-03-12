@@ -10,6 +10,8 @@
                             xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                            xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+                            xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300"
                             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.IssueListViewCustom}">
     <d:DesignData.DataContext>
@@ -41,23 +43,34 @@
 
     <DockPanel Margin="6,6,6,0">
         <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+            <WrapPanel.Resources>
+                <DataTemplate DataType="{x:Type vm:ActorViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <views:ActorAvatarView ViewModel="{Binding}" Width="12" Height="12" Margin="2"/>
+                        <TextBlock Text="{Binding Login}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </WrapPanel.Resources>
+            
             <ui:LinkDropDown ItemsSource="{Binding States}"
                              SelectedItem="{Binding SelectedState}"
                              AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListStatusFilterComboBox}"/>
-        
-            <Separator Style="{StaticResource VerticalSeparator}" />
-
-            <ui:LinkDropDown Header="Assignee"
-                             ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
-                             SelectedItem="{Binding SelectedAssignee}"
-                             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
 
             <Separator Style="{StaticResource VerticalSeparator}" />
 
-            <ui:LinkDropDown Header="Author"
-                             ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
-                             SelectedItem="{Binding SelectedAuthor}"
-                             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAuthorFilterComboBox}" />
+            <ui:FilterDropDown Header="{Binding AuthorFilter.Header}"
+                               ItemsSource="{Binding AuthorFilter.UsersView}"
+                               Filter="{Binding AuthorFilter.Filter}"
+                               SelectedItem="{Binding AuthorFilter.Selected}"
+                               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
+
+            <Separator Style="{StaticResource VerticalSeparator}" />
+
+            <ui:FilterDropDown Header="{Binding AssigneeFilter.Header}"
+                               ItemsSource="{Binding AssigneeFilter.UsersView}"
+                               Filter="{Binding AssigneeFilter.Filter}"
+                               SelectedItem="{Binding AssigneeFilter.Selected}"
+                               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
         </WrapPanel>
 
         <ScrollViewer CanContentScroll="True">

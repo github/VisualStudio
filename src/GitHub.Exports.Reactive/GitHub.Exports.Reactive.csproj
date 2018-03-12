@@ -225,6 +225,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ViewModels\IUserFilterViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\TeamExplorer\IRepositoryPublishViewModel.cs" />
   </ItemGroup>

@@ -79,6 +79,8 @@
     <Compile Include="Behaviours\ClosePopupAction.cs" />
     <Compile Include="Behaviours\OpenPopupAction.cs" />
     <Compile Include="Controls\ComboBoxes\LinkDropDown.cs" />
+    <Compile Include="Controls\DropDownButton.cs" />
+    <Compile Include="Controls\FilterDropDown.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -217,6 +219,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\DropDownButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FilterDropDown.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\HorizontalShadowDivider.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -237,6 +247,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="SharedDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 
 namespace GitHub.SampleData
@@ -41,8 +42,8 @@ namespace GitHub.SampleData
             Issues = issues.Select(x => new IssueListItemViewModel(x)).ToList();
         }
 
-        public IReadOnlyList<string> Assignees { get; set; }
-        public IReadOnlyList<string> Authors { get; set; }
+        public IUserFilterViewModel AuthorFilter { get; set; }
+        public IUserFilterViewModel AssigneeFilter { get; set; }
         public IReadOnlyList<IIssueListItemViewModel> Issues { get; }
         public string SearchQuery { get; set; }
         public string SelectedAssignee { get; set; }

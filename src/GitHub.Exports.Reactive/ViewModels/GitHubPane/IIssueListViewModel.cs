@@ -36,19 +36,14 @@ namespace GitHub.ViewModels.GitHubPane
         IssueStateFilter SelectedState { get; set; }
 
         /// <summary>
-        /// Gets a list of issue author filters.
+        /// Gets the author filter.
         /// </summary>
-        IReadOnlyList<string> Authors { get; }
+        IUserFilterViewModel AuthorFilter { get; }
 
         /// <summary>
-        /// Gets or sets the selected issue author filter.
+        /// Gets the assignee filter.
         /// </summary>
-        string SelectedAuthor { get; set; }
-
-        /// <summary>
-        /// Gets a list of issue assignee filters.
-        /// </summary>
-        IReadOnlyList<string> Assignees { get; }
+        IUserFilterViewModel AssigneeFilter { get; }
 
         /// <summary>
         /// Gets or sets the selected issue assignee filter.

@@ -3,27 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Data;
+using GitHub.Extensions;
 
 namespace GitHub.Collections
 {
     public class VirtualizingListCollectionView<T> : CollectionView, IList
     {
-        readonly VirtualizingList<T> inner;
         List<int> filtered;
 
         public VirtualizingListCollectionView(VirtualizingList<T> inner)
             : base(inner)
         {
-            this.inner = inner;
         }
 
-        public override int Count => filtered?.Count ?? inner.Count;
+        public override int Count => filtered?.Count ?? Inner.Count;
         public override bool IsEmpty => Count == 0;
 
         bool IList.IsReadOnly => true;
         bool IList.IsFixedSize => false;
         object ICollection.SyncRoot => null;
         bool ICollection.IsSynchronized => false;
+
+        protected VirtualizingList<T> Inner => (VirtualizingList<T>)SourceCollection;
 
         object IList.this[int index]
         {
@@ -35,11 +36,11 @@ namespace GitHub.Collections
         {
             if (filtered == null)
             {
-                return inner[index];
+                return Inner[index];
             }
             else
             {
-                return inner[filtered[index]];
+                return Inner[filtered[index]];
             }
         }
 
@@ -57,21 +58,22 @@ namespace GitHub.Collections
             if (Filter != null)
             {
                 var result = new List<int>();
-                var count = inner.Count;
+                var count = Inner.Count;
+                var pageCount = (int)Math.Ceiling((double)count / Inner.PageSize);
 
-                for (var i = 0; i < count / inner.PageSize; ++i)
+                for (var i = 0; i < pageCount; ++i)
                 {
                     IReadOnlyList<T> page;
 
-                    if (inner.Pages.TryGetValue(i, out page))
+                    if (Inner.Pages.TryGetValue(i, out page))
                     {
                         var j = 0;
 
                         foreach (var item in page)
                         {
-                            if (Equals(item, inner.Placeholder) || Filter(item))
+                            if (Equals(item, Inner.Placeholder) || Filter(item))
                             {
-                                result.Add((i * inner.PageSize) + j);
+                                result.Add((i * Inner.PageSize) + j);
                             }
 
                             ++j;
@@ -79,9 +81,9 @@ namespace GitHub.Collections
                     }
                     else
                     {
-                        for (var j = 0; j < inner.PageSize; ++j)
+                        for (var j = 0; j < Inner.PageSize; ++j)
                         {
-                            result.Add((i * inner.PageSize) + j);
+                            result.Add((i * Inner.PageSize) + j);
                         }
                     }
                 }

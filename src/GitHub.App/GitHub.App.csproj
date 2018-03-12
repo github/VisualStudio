@@ -234,6 +234,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ViewModels\UserFilterViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AkavacheSqliteLinkerOverride.cs" />

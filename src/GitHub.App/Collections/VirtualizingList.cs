@@ -85,7 +85,8 @@ namespace GitHub.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            var i = 0;
+            while (i < Count) yield return this[i++];
         }
 
         int IList.Add(object value)
@@ -128,10 +129,7 @@ namespace GitHub.Collections
             throw new NotImplementedException();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return placeholderPage.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         void LoadCount()
         {
