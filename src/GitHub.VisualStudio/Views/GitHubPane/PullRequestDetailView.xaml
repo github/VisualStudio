@@ -105,10 +105,11 @@
 
                 <TextBlock FontWeight="Bold"
                            Margin="0 0 4 0"
+                           VerticalAlignment="Center"
                            Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                            Style="{StaticResource StateIndicator}"/>
 
-                <Rectangle Grid.Column="1" Margin="5 0 10 0" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
+                <Rectangle Grid.Column="1" Margin="5 0 10 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
 
                 <!-- source and target branches -->
                 <Grid Margin="0 -3" HorizontalAlignment="Left">
