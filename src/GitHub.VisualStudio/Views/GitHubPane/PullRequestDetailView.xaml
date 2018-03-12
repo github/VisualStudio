@@ -89,7 +89,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -99,12 +99,35 @@
                        Margin="0 0 5 3"
                        Text="{Binding Model.Title}"/>
 
-            <TextBlock Grid.Column="0"
-                       Grid.Row="1"
-                       FontWeight="Bold"
-                       Margin="0 0 4 0"
-                       Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
-                       Style="{StaticResource StateIndicator}"/>
+            <StackPanel Grid.Column="0"
+                Grid.Row="1"
+                Orientation="Horizontal">
+                <TextBlock FontWeight="Bold"
+                           Margin="0 0 4 0"
+                           Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
+                           Style="{StaticResource StateIndicator}"/>
+
+                <!-- source and target branches -->
+                <Grid Margin="0 -3" HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
+                    </Border>
+
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="into" />
+
+                    <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
+                    </Border>
+                </Grid>
+            </StackPanel>
+
         </Grid>
 
         <!-- Avatar, PR Title, Open/Merged/Closed state and actions area -->
@@ -122,27 +145,6 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
-                <!-- source and target branches -->
-                <Grid Margin="0 -3" HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <ui:OcticonImage Grid.Column="0" VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.5" Margin="0 0 3 0" />
-                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
-                    </Border>
-
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="into" />
-
-                    <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
-                    </Border>
-                </Grid>
-
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
