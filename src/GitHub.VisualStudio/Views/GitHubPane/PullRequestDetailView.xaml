@@ -120,13 +120,13 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
                         <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
                     </Border>
 
                     <ui:OcticonImage Grid.Column="2" VerticalAlignment="Center" Margin="5" Icon="arrow_left" />
 
-                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                    <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
                         <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
                     </Border>
                 </Grid>
