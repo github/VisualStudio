@@ -88,15 +88,21 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
             <TextBlock Grid.Column="0"
                        Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                        TextWrapping="Wrap"
                        Margin="0 0 5 3"
                        Text="{Binding Model.Title}"/>
 
-            <TextBlock Grid.Column="1"
+            <TextBlock Grid.Column="0"
+                       Grid.Row="1"
                        FontWeight="Bold"
-                       Margin="10 4 0 0"
+                       Margin="0 0 4 0"
                        Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                        Style="{StaticResource StateIndicator}"/>
         </Grid>
