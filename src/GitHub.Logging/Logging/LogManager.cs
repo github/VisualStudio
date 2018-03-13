@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using GitHub.Info;
 using Serilog;
 using Serilog.Core;
+using Serilog.Events;
 
 namespace GitHub.Logging
 {
