@@ -126,7 +126,7 @@ namespace GitHub.Services
         {
             var current = data.Reports.FirstOrDefault(x => x.Dimensions.Date.Date == DateTimeOffset.Now.Date);
 
-            if (Guid.Empty.Equals(current.Dimensions.Guid))
+            if (current == null)
             {
                 var guid = await service.GetUserGuid();
                 current = UsageModel.Create(guid);
@@ -140,12 +140,12 @@ namespace GitHub.Services
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
-                current.Dimensions.IsGitHubUser |= true;
+                current.Dimensions.IsGitHubUser = true;
             }
 
             if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
             {
-                current.Dimensions.IsEnterpriseUser |= true;
+                current.Dimensions.IsEnterpriseUser = true;
             }
 
             return current;

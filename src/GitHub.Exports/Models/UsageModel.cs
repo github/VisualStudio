@@ -2,8 +2,7 @@
 
 namespace GitHub.Models
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "It'll use reflection by default and we're fine with that")]
-    public struct UsageModel
+    public class UsageModel
     {
         public DimensionsModel Dimensions { get; set; }
         public MeasuresModel Measures { get; set; }

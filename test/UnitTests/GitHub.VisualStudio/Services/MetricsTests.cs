@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -8,11 +11,8 @@ using GitHub.Services;
 using GitHub.Settings;
 using NSubstitute;
 using NUnit.Framework;
-using System.Linq;
-using System.Globalization;
-using System.IO;
-using GitHub.Reflection;
 using Rothko;
+using Environment = System.Environment;
 
 namespace MetricsTests
 {
@@ -30,7 +30,14 @@ namespace MetricsTests
         [Test]
         public async Task FirstTickShouldIncrementLaunchCount()
         {
-            var service = CreateUsageService();
+            var service = CreateUsageService(new UsageModel
+            {
+                Dimensions = new UsageModel.DimensionsModel
+                {
+                    Date = DateTimeOffset.Now
+                },
+                Measures = new UsageModel.MeasuresModel()
+            });
             var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
 
             await targetAndTick.Item2();
@@ -41,7 +48,14 @@ namespace MetricsTests
         [Test]
         public async Task SubsequentTickShouldNotIncrementLaunchCount()
         {
-            var service = CreateUsageService();
+            var service = CreateUsageService(new UsageModel
+            {
+                Dimensions = new UsageModel.DimensionsModel
+                {
+                    Date = DateTimeOffset.Now
+                },
+                Measures = new UsageModel.MeasuresModel()
+            });
             var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
 
             await targetAndTick.Item2();
@@ -54,7 +68,14 @@ namespace MetricsTests
         [Test]
         public async Task ShouldDisposeTimerIfMetricsServiceNotFound()
         {
-            var service = CreateUsageService();
+            var service = CreateUsageService(new UsageModel
+            {
+                Dimensions = new UsageModel.DimensionsModel
+                {
+                    Date = DateTimeOffset.Now
+                },
+                Measures = new UsageModel.MeasuresModel()
+            });
             var disposed = false;
             var disposable = Disposable.Create(() => disposed = true);
             service.StartTimer(null, new TimeSpan(), new TimeSpan()).ReturnsForAnyArgs(disposable);
@@ -74,7 +95,14 @@ namespace MetricsTests
             var serviceProvider = CreateServiceProvider();
             var targetAndTick = CreateTargetAndGetTick(
                 serviceProvider,
-                CreateUsageService());
+                CreateUsageService(new UsageModel
+                {
+                    Dimensions = new UsageModel.DimensionsModel
+                    {
+                        Date = DateTimeOffset.Now
+                    },
+                    Measures = new UsageModel.MeasuresModel()
+                }));
 
             await targetAndTick.Item2();
 
@@ -88,7 +116,14 @@ namespace MetricsTests
             var serviceProvider = CreateServiceProvider();
             var targetAndTick = CreateTargetAndGetTick(
                 serviceProvider,
-                CreateUsageService());
+                CreateUsageService(new UsageModel
+                {
+                    Dimensions = new UsageModel.DimensionsModel
+                    {
+                        Date = DateTimeOffset.Now.AddDays(-2)
+                    },
+                    Measures = new UsageModel.MeasuresModel()
+                }));
 
             await targetAndTick.Item2();
 
@@ -99,30 +134,78 @@ namespace MetricsTests
         [Test]
         public async Task ShouldIncrementCounter()
         {
-//            var model = new UsageModel { NumberOfClones = 4 };
-//            var usageService = CreateUsageService(model);
-//            var target = new UsageTracker(
-//                CreateServiceProvider(),
-//                usageService);
-//
-//            await target.IncrementCounter(x => x.NumberOfClones);
-//            UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
-//
-//            Assert.AreEqual(5, result.Model.NumberOfClones);
+            var model = new UsageModel {
+                Dimensions = new UsageModel.DimensionsModel {
+                    Date = DateTimeOffset.Now
+                },
+                Measures = new UsageModel.MeasuresModel
+                {
+                    NumberOfClones = 4
+                }
+            };
+            var usageService = CreateUsageService(model);
+            var target = new UsageTracker(
+                CreateServiceProvider(),
+                usageService);
+
+            await target.IncrementCounter(x => x.NumberOfClones);
+            UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
+
+            Assert.AreEqual(5, result.Reports[0].Measures.NumberOfClones);
         }
 
         [Test]
-        public async Task ShouldWriteUpdatedData()
+        public async Task ShouldWriteData()
         {
-            var data = new UsageData { Reports = new List<UsageModel> {new UsageModel()} };
-            var service = CreateUsageService(data);
+            var service = CreateUsageService();
+
             var target = new UsageTracker(
                 CreateServiceProvider(),
                 service);
 
             await target.IncrementCounter(x => x.NumberOfClones);
+            await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data => 
+                data.Reports.Count == 1 &&
+                data.Reports[0].Dimensions.Date.Date == DateTimeOffset.Now.Date &&
+                data.Reports[0].Dimensions.AppVersion == AssemblyVersionInformation.Version &&
+                data.Reports[0].Dimensions.Lang == CultureInfo.InstalledUICulture.IetfLanguageTag &&
+                data.Reports[0].Dimensions.CurrentLang == CultureInfo.CurrentCulture.IetfLanguageTag &&
+                data.Reports[0].Measures.NumberOfClones == 1
+                ));
+        }
 
-            await service.Received(1).WriteLocalData(data);
+        [Test]
+        public async Task ShouldWriteUpdatedData()
+        {
+            var date = DateTimeOffset.Now;
+            var service = CreateUsageService(new UsageModel
+            {
+                Dimensions = new UsageModel.DimensionsModel
+                {
+                    AppVersion = AssemblyVersionInformation.Version,
+                    Lang = CultureInfo.InstalledUICulture.IetfLanguageTag,
+                    CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag,
+                    Date = date
+                },
+                Measures = new UsageModel.MeasuresModel
+                {
+                    NumberOfClones = 1
+                }
+            });
+
+            var target = new UsageTracker(
+                CreateServiceProvider(),
+                service);
+
+            await target.IncrementCounter(x => x.NumberOfClones);
+            await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data =>
+                data.Reports.Count == 1 &&
+                data.Reports[0].Dimensions.Date.Date == DateTimeOffset.Now.Date &&
+                data.Reports[0].Dimensions.AppVersion == AssemblyVersionInformation.Version &&
+                data.Reports[0].Dimensions.Lang == CultureInfo.InstalledUICulture.IetfLanguageTag &&
+                data.Reports[0].Dimensions.CurrentLang == CultureInfo.CurrentCulture.IetfLanguageTag &&
+                data.Reports[0].Measures.NumberOfClones == 2
+            ));
         }
 
         [Test]
@@ -150,121 +233,14 @@ namespace MetricsTests
 //                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
         }
 
-        [Test]
-        public async Task MetricsServiceSendsDailyData()
-        {
-            var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
-            var vsservices = serviceProvider.GetService<IVSServices>();
-//            vsservices.VSVersion.Returns(model.VSVersion);
-
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(model));
-
-            await targetAndTick.Item2();
-
-            var metricsService = serviceProvider.TryGetService<IMetricsService>();
-            var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
-            var result = (UsageModel)metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0];
-
-//            var expected = model.Clone(false, false);
-//            expected.NumberOfStartups++;
-
-//            CollectionAssert.AreEquivalent(
-//                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-//                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
-        }
-
-        [Test]
-        public async Task MetricsServiceSendsWeeklyData()
-        {
-            var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
-            var vsservices = serviceProvider.GetService<IVSServices>();
-//            vsservices.VSVersion.Returns(model.VSVersion);
-
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(model));
-
-            await targetAndTick.Item2();
-
-            var metricsService = serviceProvider.TryGetService<IMetricsService>();
-            var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
-            var result = (UsageModel)metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0];
-
-//            var expected = model.Clone(true, false);
-//            expected.NumberOfStartups++;
-//            expected.NumberOfStartupsWeek++;
-
-//            CollectionAssert.AreEquivalent(
-//                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-//                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
-        }
-
-        [Test]
-        public async Task MetricsServiceSendsMonthlyData()
-        {
-            var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
-            var vsservices = serviceProvider.GetService<IVSServices>();
-//            vsservices.VSVersion.Returns(model.VSVersion);
-
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(model));
-
-            await targetAndTick.Item2();
-
-            var metricsService = serviceProvider.TryGetService<IMetricsService>();
-            var list = metricsService.ReceivedCalls().Select(x => x.GetMethodInfo().Name);
-            var result = (UsageModel)metricsService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "PostUsage").GetArguments()[0];
-
-            var expected = model;
-//            expected.NumberOfStartups++;
-//            expected.NumberOfStartupsWeek++;
-//            expected.NumberOfStartupsMonth++;
-
-            CollectionAssert.AreEquivalent(
-                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
-        }
-
         static UsageModel CreateUsageModel()
         {
-            var count = 1;
-            // UsageModel is a struct so we have to force box it to be able to set values on it
-            object model = new UsageModel();
-            var props = ReflectionUtils.GetProperties(model.GetType());
-            foreach (var prop in props)
+            return new UsageModel
             {
-                if (prop.PropertyType == typeof(int))
-                {
-                    prop.SetValue(model, count++);
-                }
-                else if (prop.PropertyType == typeof(string))
-                {
-                    if (prop.Name == "Lang")
-                        prop.SetValue(model, CultureInfo.InstalledUICulture.IetfLanguageTag);
-                    else if (prop.Name == "AppVersion")
-                        prop.SetValue(model, AssemblyVersionInformation.Version);
-                    else
-                        prop.SetValue(model, $"string {count++}");
-                }
-                else if (prop.PropertyType == typeof(bool))
-                {
-                    prop.SetValue(model, true);
-                }
-                else if (prop.PropertyType == typeof(Guid))
-                {
-                    prop.SetValue(model, Guid.Empty);
-                }
-                else
-                    Assert.Fail("Unknown field type in UsageModel. Fix this test to support it");
-            }
+                Dimensions = new UsageModel.DimensionsModel(),
+                Measures = new UsageModel.MeasuresModel()
 
-            return (UsageModel)model;
+            };
         }
 
         static Tuple<UsageTracker, Func<Task>> CreateTargetAndGetTick(
@@ -300,17 +276,12 @@ namespace MetricsTests
             return result;
         }
 
-        static IUsageService CreateUsageService()
-        {
-            return CreateUsageService(new UsageModel());
-        }
-
         static IUsageService CreateUsageService(
-            UsageModel model)
+            UsageModel model = null)
         {
             return CreateUsageService(new UsageData
             {
-                Reports = new List<UsageModel>{ model }
+                Reports = model != null ? new List<UsageModel>{ model } : new List<UsageModel>()
             });
         }
 
@@ -443,7 +414,7 @@ namespace MetricsTests
             userFileName = Path.Combine(localApplicationDataPath, "user.json");
 
             environment = Substitute.For<IEnvironment>();
-            environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
+            environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
                 .Returns(localApplicationDataPath);
 
             WriteUsageFileContent(DefaultUsageContent);

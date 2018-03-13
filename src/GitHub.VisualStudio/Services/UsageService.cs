@@ -77,11 +77,6 @@ namespace GitHub.Services
             return userGuid.Value;
         }
 
-        public bool IsToday(DateTimeOffset date)
-        {
-            return date.Date == DateTimeOffset.Now.Date;
-        }
-
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)
         {
             return new Timer(
