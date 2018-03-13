@@ -6,7 +6,7 @@ using GitHub.Services;
 using GitHub.ViewModels.Dialog;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.ViewModels.Dialog
 {
@@ -14,7 +14,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
     {
         public class TheShowMethod
         {
-            [Fact]
+            [Test]
             public void ClearsIsBusy()
             {
                 var target = CreateTarget();
@@ -26,7 +26,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 Assert.False(target.IsBusy);
             }
 
-            [Fact]
+            [Test]
             public void InvalidAuthenticationCodeIsSetWhenRetryFailed()
             {
                 var target = CreateTarget();
@@ -37,7 +37,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 Assert.True(target.InvalidAuthenticationCode);
             }
 
-            [Fact]
+            [Test]
             public async Task OkCommandCompletesAndReturnsNullWithNoAuthorizationCode()
             {
                 var target = CreateTarget();
@@ -48,10 +48,10 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 target.OkCommand.Execute(null);
                 var result = await task;
 
-                Assert.Null(result);
+                Assert.That(result, Is.Null);
             }
 
-            [Fact]
+            [Test]
             public async Task OkCommandCompletesAndReturnsAuthorizationCode()
             {
                 var target = CreateTarget();
@@ -63,10 +63,10 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 target.OkCommand.Execute(null);
 
                 var result = await task;
-                Assert.Equal("123456", result.AuthenticationCode);
+                Assert.That("123456", Is.EqualTo(result.AuthenticationCode));
             }
 
-            [Fact]
+            [Test]
             public async Task ResendCodeCommandCompletesAndReturnsRequestResendCode()
             {
                 var target = CreateTarget();
@@ -79,10 +79,10 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var result = await task;
 
                 Assert.False(target.IsBusy);
-                Assert.Equal(TwoFactorChallengeResult.RequestResendCode, result);
+                Assert.That(TwoFactorChallengeResult.RequestResendCode, Is.EqualTo(result));
             }
            
-            [Fact]
+            [Test]
             public async Task ShowErrorMessageIsClearedWhenAuthenticationCodeSent()
             {
                 var target = CreateTarget();
@@ -100,7 +100,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
 
         public class TheCancelMethod
         {
-            [Fact]
+            [Test]
             public async Task CancelCommandCompletesAndReturnsNull()
             {
                 var target = CreateTarget();
@@ -113,10 +113,10 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var result = await task;
 
                 Assert.False(target.IsBusy);
-                Assert.Null(result);
+                Assert.That(result, Is.Null);
             }
 
-            [Fact]
+            [Test]
             public async Task Cancel_Resets_TwoFactorType()
             {
                 var target = CreateTarget();
@@ -124,14 +124,14 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var userError = new TwoFactorRequiredUserError(exception);
                 var task = target.Show(userError).ToTask();
 
-                Assert.Equal(TwoFactorType.Sms, target.TwoFactorType);
+                Assert.That(TwoFactorType.Sms, Is.EqualTo(target.TwoFactorType));
 
                 target.Cancel();
                 await task;
 
                 // TwoFactorType must be cleared here as the UIController uses it as a trigger
                 // to show the 2FA dialog view.
-                Assert.Equal(TwoFactorType.None, target.TwoFactorType);
+                Assert.That(TwoFactorType.None, Is.EqualTo(target.TwoFactorType));
             }
         }
 

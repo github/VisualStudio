@@ -11,7 +11,7 @@ using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
 using Octokit;
 using UnitTests;
-using Xunit;
+using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
 
 /// <summary>
@@ -121,7 +121,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         };
     }
 
-    [Fact]
+    [Test]
     public void TargetBranchDisplayNameIncludesRepoOwnerWhenFork()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
@@ -129,21 +129,20 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
         vm.InitializeAsync(data.ActiveRepo, data.Connection).Wait();
-        Assert.Equal("octokit/master", vm.TargetBranch.DisplayName);
+        Assert.That("octokit/master", Is.EqualTo(vm.TargetBranch.DisplayName));
     }
 
-    [Theory]
-    [InlineData("repo-name-1", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "target-branch", "title", null)]
-    [InlineData("repo-name-2", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "master", "title", "description")]
-    [InlineData("repo-name-3", "source-repo-owner", "master", true, true, "target-repo-owner", "master", "title", "description")]
-    [InlineData("repo-name-4", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "target-branch", "title", null)]
-    [InlineData("repo-name-5", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "master", "title", "description")]
-    [InlineData("repo-name-6", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "target-branch", "title", null)]
-    [InlineData("repo-name-7", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "master", "title", "description")]
-    [InlineData("repo-name-8", "source-repo-owner", "master", true, false, "target-repo-owner", "master", "title", "description")]
-    [InlineData("repo-name-9", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "target-branch", "title", null)]
-    [InlineData("repo-name-10", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", "title", "description")]
-    [InlineData("repo-name-11", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", null, null)]
+    [TestCase("repo-name-1", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "target-branch", "title", null)]
+    [TestCase("repo-name-2", "source-repo-owner", "source-branch", true, true, "target-repo-owner", "master", "title", "description")]
+    [TestCase("repo-name-3", "source-repo-owner", "master", true, true, "target-repo-owner", "master", "title", "description")]
+    [TestCase("repo-name-4", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "target-branch", "title", null)]
+    [TestCase("repo-name-5", "source-repo-owner", "source-branch", false, true, "source-repo-owner", "master", "title", "description")]
+    [TestCase("repo-name-6", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "target-branch", "title", null)]
+    [TestCase("repo-name-7", "source-repo-owner", "source-branch", true, false, "target-repo-owner", "master", "title", "description")]
+    [TestCase("repo-name-8", "source-repo-owner", "master", true, false, "target-repo-owner", "master", "title", "description")]
+    [TestCase("repo-name-9", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "target-branch", "title", null)]
+    [TestCase("repo-name-10", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", "title", "description")]
+    [TestCase("repo-name-11", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", null, null)]
     public async Task CreatingPRs(
         string repoName, string sourceRepoOwner, string sourceBranchName,
         bool repoIsFork, bool sourceBranchIsTracking,
@@ -188,7 +187,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var unused = ms.Received().CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, title ?? "Source branch", body ?? String.Empty);
     }
 
-    [Fact]
+    [Test]
     public void TemplateIsUsedIfPresent()
     {
         var data = PrepareTestData("stuff", "owner", "master", "owner", "master",
@@ -200,6 +199,6 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
         vm.InitializeAsync(data.ActiveRepo, data.Connection).Wait();
 
-        Assert.Equal("Test PR template", vm.Description);
+        Assert.That("Test PR template", Is.EqualTo(vm.Description));
     }
 }

@@ -1,4 +1,4 @@
-version: '2.3.7.{build}'
+version: '2.4.4.{build}'
 skip_tags: true
 install:
 - ps: |
@@ -19,8 +19,10 @@ install:
     nuget restore GitHubVS.sln
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
-test_script:
-- ps: scripts\test.ps1 -AppVeyor
+test:
+  categories:
+    except:
+      - Timings
 on_success:
 - ps: |
     if ($full_build) {

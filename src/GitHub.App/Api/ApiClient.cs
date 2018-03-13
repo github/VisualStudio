@@ -7,17 +7,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Primitives;
 using Octokit;
 using Octokit.Reactive;
-using ReactiveUI;
-using System.Threading.Tasks;
-using System.Reactive.Threading.Tasks;
-using Octokit.Internal;
-using System.Collections.Generic;
-using GitHub.Models;
-using GitHub.Extensions;
-using GitHub.Logging;
 using Serilog;
 
 namespace GitHub.Api
@@ -29,13 +23,6 @@ namespace GitHub.Api
         static readonly ILogger log = LogManager.ForContext<ApiClient>();
 
         readonly IObservableGitHubClient gitHubClient;
-        // There are two sets of authorization scopes, old and new:
-        // The old scopes must be used by older versions of Enterprise that don't support the new scopes:
-        readonly string[] oldAuthorizationScopes = { "user", "repo", "gist" };
-        // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
-        readonly string[] newAuthorizationScopes = { "user", "repo", "gist", "write:public_key" };
-        readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
-        readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
         string ClientId { get; set; }
         string ClientSecret { get; set; }
@@ -99,42 +86,6 @@ namespace GitHub.Api
         public IObservable<User> GetUser()
         {
             return gitHubClient.User.Current();
-        }
-
-        public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
-            string authenticationCode = null,
-            bool useOldScopes = false,
-            bool useFingerPrint = true)
-        {
-            var newAuthorization = new NewAuthorization
-            {
-                Scopes = useOldScopes
-                    ? oldAuthorizationScopes
-                    : newAuthorizationScopes,
-                Note = lazyNote.Value,
-                Fingerprint = useFingerPrint ? lazyFingerprint.Value : null
-            };
-
-            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
-                ex => Observable.Start(() => twoFactorChallengeHander(ex), RxApp.MainThreadScheduler).Merge();
-
-            var authorizationsClient = gitHubClient.Authorization;
-
-            return string.IsNullOrEmpty(authenticationCode)
-                ? authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
-                        ClientId,
-                        ClientSecret,
-                        newAuthorization,
-                        dispatchedHandler,
-                        true)
-                :   authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
-                        ClientId,
-                        ClientSecret,
-                        newAuthorization,
-                        dispatchedHandler,
-                        authenticationCode,
-                        true);
         }
 
         public IObservable<Organization> GetOrganizations()
@@ -206,7 +157,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`");
+                log.Warning(e, "Failed to retrieve host name using `DNS.GetHostName`");
                 try
                 {
                     return Environment.MachineName;
@@ -291,7 +242,8 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(name, nameof(name));
 
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
-                new PullRequestRequest {
+                new PullRequestRequest
+                {
                     State = ItemStateFilter.All,
                     SortProperty = PullRequestSort.Updated,
                     SortDirection = SortDirection.Descending
@@ -317,7 +269,7 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
             Guard.ArgumentNotEmptyString(repo, nameof(repo));
 
-#pragma warning disable CS0618
+#pragma warning disable 618
             // GetAllBranches is obsolete, but don't want to introduce the change to fix the
             // warning in the PR, so disabling for now.
             return gitHubClient.Repository.GetAllBranches(owner, repo);

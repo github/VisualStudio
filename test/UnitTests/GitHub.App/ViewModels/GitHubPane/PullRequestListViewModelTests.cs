@@ -9,22 +9,23 @@ using GitHub.Settings;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.Primitives;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 using GitHub.Factories;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
     public class PullRequestListViewModelTests : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void SelectingAssigneeShouldTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
+            var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, browser);
+            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -33,15 +34,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Fact]
+        [Test]
         public void ResettingAssigneeToNoneShouldNotTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
+            var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, browser);
+            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -56,15 +58,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Fact]
+        [Test]
         public void SelectingAuthorShouldTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
+            var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, browser);
+            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -73,15 +76,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Fact]
+        [Test]
         public void ResettingAuthorToNoneShouldNotTriggerFilter()
         {
             var connection = Substitute.For<IConnection>();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
+            var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, browser);
+            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -96,16 +100,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
-        [Theory]
-        [InlineData("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
+        [TestCase("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
         public void OpenPullRequestOnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
         {
             var connection = Substitute.For<IConnection>();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
+            var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, browser);
+            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();

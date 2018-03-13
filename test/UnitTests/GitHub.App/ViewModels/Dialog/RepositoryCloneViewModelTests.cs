@@ -8,15 +8,18 @@ using GitHub.Services;
 using GitHub.Validation;
 using NSubstitute;
 using Rothko;
-using Xunit;
+using NUnit.Framework;
 using GitHub.Collections;
 using NSubstitute.Core;
 using GitHub.Factories;
 using GitHub.Primitives;
 using GitHub.ViewModels.Dialog;
+using System.Diagnostics;
 
 public class RepositoryCloneViewModelTests
 {
+    const int Timeout = 2000;
+
     static RepositoryCloneViewModel GetVM(IModelService modelService, IRepositoryCloneService cloneService, IOperatingSystem os)
     {
         var connection = Substitute.For<IConnection>();
@@ -50,7 +53,7 @@ public class RepositoryCloneViewModelTests
 
     public class TheLoadRepositoriesCommand : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task LoadsRepositories()
         {
             var repos = new IRemoteRepositoryModel[]
@@ -70,14 +73,14 @@ public class RepositoryCloneViewModelTests
                 Substitute.For<IOperatingSystem>());
 
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
-            await col.OriginalCompleted;
-            Assert.Equal(3, vm.Repositories.Count);
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
+            Assert.That(3, Is.EqualTo(vm.Repositories.Count));
         }
     }
 
     public class TheIsBusyProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public async Task StartsTrueBecomesFalseWhenCompleted()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -102,19 +105,23 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnNext(Substitute.For<IRemoteRepositoryModel>());
             repoSubject.OnNext(Substitute.For<IRemoteRepositoryModel>());
 
-            await done;
+            await done.Timeout(TimeSpan.FromMilliseconds(Timeout));
             done = null;
 
             Assert.True(vm.IsBusy);
 
             repoSubject.OnCompleted();
 
-            await col.OriginalCompleted;
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
 
+            // we need to wait slightly because the subscription OnComplete in the model
+            // runs right after the above await finishes, which means the assert
+            // gets checked before the flag is set
+            await Task.Delay(100);
             Assert.False(vm.IsBusy);
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenLoadingReposFailsImmediately()
         {
             var repoSubject = Observable.Throw<IRemoteRepositoryModel>(new InvalidOperationException("Doh!"));
@@ -135,7 +142,7 @@ public class RepositoryCloneViewModelTests
 
     public class TheNoRepositoriesFoundProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTrueInitially()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -161,7 +168,7 @@ public class RepositoryCloneViewModelTests
             Assert.True(vm.NoRepositoriesFound);
         }
 
-        [Fact]
+        [Test]
         public async Task IsFalseWhenLoadingAndCompletedWithRepository()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -181,13 +188,12 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnCompleted();
 
             var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
-            await col.OriginalCompleted;
-            await Task.Delay(100);
-            Assert.Single(vm.Repositories);
+            await col.OriginalCompleted.Timeout(TimeSpan.FromMilliseconds(Timeout));
+            //Assert.Single(vm.Repositories);
             Assert.False(vm.NoRepositoriesFound);
         }
 
-        [Fact]
+        [Test]
         public void IsFalseWhenFailed()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -205,8 +211,8 @@ public class RepositoryCloneViewModelTests
             Assert.False(vm.NoRepositoriesFound);
         }
 
-        [Fact]
-        public void IsTrueWhenLoadingCompleteNotFailedAndNoRepositories()
+        [Test]
+        public async Task IsTrueWhenLoadingCompleteNotFailedAndNoRepositories()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
             var modelService = Substitute.For<IModelService>();
@@ -221,13 +227,16 @@ public class RepositoryCloneViewModelTests
 
             repoSubject.OnCompleted();
 
+            // we need to delay slightly because the subscribers listening for OnComplete
+            // need to run before the assert is checked
+            await Task.Delay(100);
             Assert.True(vm.NoRepositoriesFound);
         }
     }
 
     public class TheFilterTextEnabledProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTrueInitially()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -245,7 +254,7 @@ public class RepositoryCloneViewModelTests
             Assert.True(vm.FilterTextIsEnabled);
         }
 
-        [Fact]
+        [Test]
         public void IsFalseIfLoadingReposFails()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -267,8 +276,8 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnCompleted();
         }
 
-        [Fact]
-        public void IsFalseWhenLoadingCompleteNotFailedAndNoRepositories()
+        [Test]
+        public async Task IsFalseWhenLoadingCompleteNotFailedAndNoRepositories()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
             var modelService = Substitute.For<IModelService>();
@@ -283,13 +292,16 @@ public class RepositoryCloneViewModelTests
 
             repoSubject.OnCompleted();
 
+            // we need to delay slightly because the subscribers listening for OnComplete
+            // need to run before the assert is checked
+            await Task.Delay(100);
             Assert.False(vm.FilterTextIsEnabled);
         }
     }
 
     public class TheLoadingFailedProperty : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsTrueIfLoadingReposFails()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
@@ -314,7 +326,7 @@ public class RepositoryCloneViewModelTests
 
     public class TheBaseRepositoryPathValidator
     {
-        [Fact]
+        [Test]
         public void IsInvalidWhenDestinationRepositoryExists()
         {
             var repo = Substitute.For<IRemoteRepositoryModel>();
@@ -339,13 +351,13 @@ public class RepositoryCloneViewModelTests
             vm.BaseRepositoryPath = @"c:\foo";
             vm.SelectedRepository = repo;
 
-            Assert.Equal(ValidationStatus.Invalid, vm.BaseRepositoryPathValidator.ValidationResult.Status);
+            Assert.That(ValidationStatus.Invalid, Is.EqualTo(vm.BaseRepositoryPathValidator.ValidationResult.Status));
         }
     }
 
     public class TheCloneCommand : TestBaseClass
     {
-        [Fact]
+        [Test]
         public void IsEnabledWhenRepositorySelectedAndPathValid()
         {
             var modelService = Substitute.For<IModelService>();
@@ -365,7 +377,7 @@ public class RepositoryCloneViewModelTests
             Assert.True(vm.CloneCommand.CanExecute(null));
         }
 
-        [Fact]
+        [Test]
         public void IsNotEnabledWhenPathIsNotValid()
         {
             var modelService = Substitute.For<IModelService>();

@@ -8,53 +8,53 @@ using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
 using Octokit;
-using Xunit;
+using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
     public class InlineCommentThreadViewModelTests
     {
-        [Fact]
+        [Test]
         public void CreatesComments()
         {
             var target = new InlineCommentThreadViewModel(
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1", "Comment 2"));
 
-            Assert.Equal(3, target.Comments.Count);
-            Assert.Equal(
+            Assert.That(3, Is.EqualTo(target.Comments.Count));
+            Assert.That(
                 new[] 
                 {
                     "Comment 1",
                     "Comment 2",
                     string.Empty
-                }, 
-                target.Comments.Select(x => x.Body));
+                },
+                Is.EqualTo(target.Comments.Select(x => x.Body)));
 
-            Assert.Equal(
+            Assert.That(
                 new[]
                 {
                     CommentEditState.None,
                     CommentEditState.None,
                     CommentEditState.Placeholder,
                 },
-                target.Comments.Select(x => x.EditState));
+                Is.EqualTo(target.Comments.Select(x => x.EditState)));
         }
 
-        [Fact]
+        [Test]
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
             var target = new InlineCommentThreadViewModel(
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1"));
 
-            Assert.False(target.Comments[1].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.False);
 
             target.Comments[1].Body = "Foo";
-            Assert.True(target.Comments[1].CommitEdit.CanExecute(null));
+            Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.True);
         }
 
-        [Fact]
+        [Test]
         public void PostsCommentInReplyToCorrectComment()
         {
             var session = CreateSession();

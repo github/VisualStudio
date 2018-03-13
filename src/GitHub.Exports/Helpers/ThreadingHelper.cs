@@ -24,7 +24,7 @@ namespace GitHub.Helpers
 
     public static class ThreadingHelper
     {
-        public static bool InUIThread => (!Guard.InUnitTestRunner && Application.Current.Dispatcher.CheckAccess()) || !(Guard.InUnitTestRunner);
+        public static bool InUIThread => Guard.InUnitTestRunner ? true : Application.Current.Dispatcher.CheckAccess();
 
         /// <summary>
         /// Gets the Dispatcher for the main thread.
@@ -88,7 +88,7 @@ namespace GitHub.Helpers
             {
                 isCompleted = () => true;
                 onCompleted = c => c();
-                getResult = () => {};
+                getResult = () => { };
             }
 
             public AwaiterWrapper(MainThreadAwaiter awaiter)

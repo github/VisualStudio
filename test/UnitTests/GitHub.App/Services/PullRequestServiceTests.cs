@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -13,13 +14,13 @@ using LibGit2Sharp;
 using NSubstitute;
 using Rothko;
 using UnitTests;
-using Xunit;
+using NUnit.Framework;
 
 public class PullRequestServiceTests : TestBaseClass
 {
     public class TheIsWorkingDirectoryCleanMethod
     {
-        [Fact]
+        [Test]
         public async Task NewRepo_True()
         {
             using (var tempDir = new TempDirectory())
@@ -34,7 +35,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task UntrackedFile_True()
         {
             using (var tempDir = new TempDirectory())
@@ -52,7 +53,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
 
-        [Fact]
+        [Test]
         public async Task CommitFile_True()
         {
             using (var tempDir = new TempDirectory())
@@ -71,7 +72,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task AddedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -90,7 +91,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task ModifiedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -111,7 +112,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task StagedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -133,7 +134,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task MissingFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -154,7 +155,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task RemovedFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -176,7 +177,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task RenamedInIndexFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -201,7 +202,7 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        [Fact]
+        [Test]
         public async Task RenamedInWorkingDirFile_False()
         {
             using (var tempDir = new TempDirectory())
@@ -227,36 +228,360 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        static Repository CreateRepository(TempDirectory tempDirectory)
+        [Test] // WorkDirModified
+        public async Task ChangedSubmodule_True()
         {
-            var repoDir = tempDirectory.Directory.FullName;
-            return new Repository(Repository.Init(repoDir));
-        }
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Add submodule", Author, Author);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Update submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
 
-        static IPullRequestService CreatePullRequestService(Repository repo)
-        {
-            var repoDir = repo.Info.WorkingDirectory;
-            var serviceProvider = Substitutes.ServiceProvider;
-            var gitService = serviceProvider.GetGitService();
-            gitService.GetRepository(repoDir).Returns(repo);
-            var service = new PullRequestService(Substitute.For<IGitClient>(), gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
-            return service;
-        }
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-        static ILocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
-        {
-            var repoDir = repo.Info.WorkingDirectory;
-            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
-            repositoryModel.LocalPath.Returns(repoDir);
-            return repositoryModel;
+                Assert.True(isClean);
+            }
         }
-
-        static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
     }
+
+    public class TheCountSubmodulesToSyncMethod
+    {
+        [Test] // WorkDirDeleted
+        public async Task CommittedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit($"Add submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(1, Is.EqualTo(count));
+            }
+        }
+
+        [Test] // WorkDirUninitialized
+        public async Task UninitializedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                var subPath = "sub/path";
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", subPath, subRepo);
+                repo.Commit($"Add submodule", Author, Author);
+                var subDir = Path.Combine(repo.Info.WorkingDirectory, subPath);
+                Directory.CreateDirectory(subDir);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(1, Is.EqualTo(count));
+            }
+        }
+
+        [Test] // WorkDirModified
+        public async Task ChangedSubmodule_True()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Add submodule", Author, Author);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content2", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit("Update submodule", Author, Author);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(1, Is.EqualTo(count));
+            }
+        }
+
+        // TODO: Find out when `SubmoduleStatus.WorkDirAdded` is used.
+
+        [Test]
+        public async Task UpdatedSubmodule_False()
+        {
+            using (var subRepoDir = new TempDirectory())
+            using (var subRepo = CreateRepository(subRepoDir))
+            using (var repoDir = new TempDirectory())
+            using (var repo = CreateRepository(repoDir))
+            {
+                RepositoryHelpers.CommitFile(subRepo, "readme.txt", "content", Author);
+                RepositoryHelpers.AddSubmodule(repo, "sub_name", "sub/path", subRepo);
+                repo.Commit($"Add submodule", Author, Author);
+                RepositoryHelpers.UpdateSubmodules(repo);
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task NewRepo_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task UntrackedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
+                File.WriteAllText(file, "contents");
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task CommitFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var file = Path.Combine(repo.Info.WorkingDirectory, "file.txt");
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, file);
+                repo.Commit("foo", Author, Author);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task AddedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task ModifiedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task StagedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
+                Commands.Stage(repo, path);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task MissingFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Delete(file);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task RemovedFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Delete(file);
+                Commands.Stage(repo, path);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task RenamedInIndexFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var renamedPath = "renamed.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                var renamedFile = Path.Combine(repo.Info.WorkingDirectory, renamedPath);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Move(file, renamedFile);
+                Commands.Stage(repo, path);
+                Commands.Stage(repo, renamedPath);
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task RenamedInWorkingDirFile_False()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var renamedPath = "renamed.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                var renamedFile = Path.Combine(repo.Info.WorkingDirectory, renamedPath);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.Move(file, renamedFile);
+
+                // NOTE: `RetrieveStatus(new StatusOptions { DetectRenamesInWorkDir = true })` would need to be used
+                // for renamed files to appear as `RenamedInWorkingDir` rather than `Missing` and `Untracked`.
+                // This isn't required in the current implementation.
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+    }
+
+    protected static Repository CreateRepository(TempDirectory tempDirectory)
+    {
+        var repoDir = tempDirectory.Directory.FullName;
+        return new Repository(Repository.Init(repoDir));
+    }
+
+    static PullRequestService CreatePullRequestService(Repository repo)
+    {
+        var repoDir = repo.Info.WorkingDirectory;
+        var serviceProvider = Substitutes.ServiceProvider;
+        var gitService = serviceProvider.GetGitService();
+        gitService.GetRepository(repoDir).Returns(repo);
+        var service = new PullRequestService(Substitute.For<IGitClient>(), gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        return service;
+    }
+
+    static ILocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
+    {
+        var repoDir = repo.Info.WorkingDirectory;
+        var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+        repositoryModel.LocalPath.Returns(repoDir);
+        return repositoryModel;
+    }
+
+    static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
 
     public class TheExtractFileMethod
     {
-        [Fact]
+        [Test]
         public async Task ExtractHead()
         {
             var baseFileContent = "baseFileContent";
@@ -269,10 +594,10 @@ public class PullRequestServiceTests : TestBaseClass
             var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
                 fileName, head, Encoding.UTF8);
 
-            Assert.Equal(headFileContent, File.ReadAllText(file));
+            Assert.That(headFileContent, Is.EqualTo(File.ReadAllText(file)));
         }
 
-        [Fact]
+        [Test]
         public async Task ExtractBase_MergeBaseAvailable_UseMergeBaseSha()
         {
             var baseFileContent = "baseFileContent";
@@ -287,11 +612,11 @@ public class PullRequestServiceTests : TestBaseClass
             var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
                 fileName, head, Encoding.UTF8);
 
-            Assert.Equal(mergeBaseFileContent, File.ReadAllText(file));
+            Assert.That(mergeBaseFileContent, Is.EqualTo(File.ReadAllText(file)));
         }
 
-        [Fact]
-        public async void MergeBaseNotAvailable_ThrowsNotFoundException()
+        [Test]
+        public void MergeBaseNotAvailable_ThrowsNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
@@ -303,11 +628,11 @@ public class PullRequestServiceTests : TestBaseClass
             var head = false;
             var mergeBaseException = new NotFoundException();
 
-            var ex = await Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+            var ex = Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
                                 fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
         }
 
-        [Fact]
+        [Test]
         public async Task FileAdded_BaseFileEmpty()
         {
             var baseFileContent = null as string;
@@ -320,10 +645,10 @@ public class PullRequestServiceTests : TestBaseClass
             var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
                 fileName, head, Encoding.UTF8);
 
-            Assert.Equal(string.Empty, File.ReadAllText(file));
+            Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
         }
 
-        [Fact]
+        [Test]
         public async Task FileDeleted_HeadFileEmpty()
         {
             var baseFileContent = "baseFileContent";
@@ -338,13 +663,12 @@ public class PullRequestServiceTests : TestBaseClass
             var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
                 fileName, head, Encoding.UTF8);
 
-            Assert.Equal(string.Empty, File.ReadAllText(file));
+            Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
         }
 
         // https://github.com/github/VisualStudio/issues/1010
-        [Theory]
-        [InlineData("utf-8")]        // Unicode (UTF-8)
-        [InlineData("Windows-1252")] // Western European (Windows)        
+        [TestCase("utf-8")]        // Unicode (UTF-8)
+        [TestCase("Windows-1252")] // Western European (Windows)        
         public async Task ChangeEncoding(string encodingName)
         {
             var encoding = Encoding.GetEncoding(encodingName);
@@ -364,8 +688,8 @@ public class PullRequestServiceTests : TestBaseClass
             var expectedContent = baseFileContent;
             File.WriteAllText(expectedPath, expectedContent, encoding);
 
-            Assert.Equal(File.ReadAllText(expectedPath), File.ReadAllText(file));
-            Assert.Equal(File.ReadAllBytes(expectedPath), File.ReadAllBytes(file));
+            Assert.That(File.ReadAllText(expectedPath), Is.EqualTo(File.ReadAllText(file)));
+            Assert.That(File.ReadAllBytes(expectedPath), Is.EqualTo(File.ReadAllBytes(file)));
         }
 
         static bool HasPreamble(string file, Encoding encoding)
@@ -455,7 +779,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
     }
 
-    [Fact]
+    [Test]
     public void CreatePullRequestAllArgsMandatory()
     {
         var serviceProvider = Substitutes.ServiceProvider;
@@ -497,8 +821,8 @@ public class PullRequestServiceTests : TestBaseClass
 
     public class TheCheckoutMethod
     {
-        [Fact]
-        public async void ShouldCheckoutExistingBranch()
+        [Test]
+        public async Task ShouldCheckoutExistingBranch()
         {
             var gitClient = MockGitClient();
             var service = new PullRequestService(
@@ -517,11 +841,11 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
             gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr-owner-number", "owner#4").Forget();
 
-            Assert.Equal(2, gitClient.ReceivedCalls().Count());
+            Assert.That(2, Is.EqualTo(gitClient.ReceivedCalls().Count()));
         }
 
-        [Fact]
-        public async void ShouldCheckoutLocalBranch()
+        [Test]
+        public async Task ShouldCheckoutLocalBranch()
         {
             var gitClient = MockGitClient();
             var service = new PullRequestService(
@@ -544,11 +868,11 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "prbranch").Forget();
             gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.prbranch.ghfvs-pr-owner-number", "owner#5").Forget();
 
-            Assert.Equal(4, gitClient.ReceivedCalls().Count());
+            Assert.That(4, Is.EqualTo(gitClient.ReceivedCalls().Count()));
         }
 
-        [Fact]
-        public async void ShouldCheckoutBranchFromFork()
+        [Test]
+        public async Task ShouldCheckoutBranchFromFork()
         {
             var gitClient = MockGitClient();
             var service = new PullRequestService(
@@ -574,11 +898,11 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/5-fork-branch").Forget();
             gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/prbranch").Forget();
             gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr-owner-number", "owner#5").Forget();
-            Assert.Equal(7, gitClient.ReceivedCalls().Count());
+            Assert.That(7, Is.EqualTo(gitClient.ReceivedCalls().Count()));
         }
 
-        [Fact]
-        public async void ShouldUseUniquelyNamedRemoteForFork()
+        [Test]
+        public async Task ShouldUseUniquelyNamedRemoteForFork()
         {
             var gitClient = MockGitClient();
             var gitService = MockGitService();
@@ -613,7 +937,7 @@ public class PullRequestServiceTests : TestBaseClass
 
     public class TheGetDefaultLocalBranchNameMethod
     {
-        [Fact]
+        [Test]
         public async Task ShouldReturnCorrectDefaultLocalBranchName()
         {
             var service = new PullRequestService(
@@ -624,10 +948,10 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "Pull requests can be \"named\" all sorts of thing's (sic)");
-            Assert.Equal("pr/123-pull-requests-can-be-named-all-sorts-of-thing-s-sic", result);
+            Assert.That("pr/123-pull-requests-can-be-named-all-sorts-of-thing-s-sic", Is.EqualTo(result));
         }
 
-        [Fact]
+        [Test]
         public async Task ShouldReturnCorrectDefaultLocalBranchNameForPullRequestsWithNonLatinChars()
         {
             var service = new PullRequestService(
@@ -638,10 +962,10 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "コードをレビューする準備ができたこと");
-            Assert.Equal("pr/123", result);
+            Assert.That("pr/123", Is.EqualTo(result));
         }
 
-        [Fact]
+        [Test]
         public async Task DefaultLocalBranchNameShouldNotClashWithExistingBranchNames()
         {
             var service = new PullRequestService(
@@ -652,13 +976,13 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "foo1");
-            Assert.Equal("pr/123-foo1-3", result);
+            Assert.That("pr/123-foo1-3", Is.EqualTo(result));
         }
     }
 
     public class TheGetLocalBranchesMethod
     {
-        [Fact]
+        [Test]
         public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepository()
         {
             var service = new PullRequestService(
@@ -672,10 +996,10 @@ public class PullRequestServiceTests : TestBaseClass
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
 
-            Assert.Equal("source", result.Name);
+            Assert.That("source", Is.EqualTo(result.Name));
         }
 
-        [Fact]
+        [Test]
         public async Task ShouldReturnMarkedBranchForPullRequestFromFork()
         {
             var repo = Substitute.For<IRepository>();
@@ -707,7 +1031,7 @@ public class PullRequestServiceTests : TestBaseClass
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(true));
 
-            Assert.Equal("pr/1-foo", result.Name);
+            Assert.That("pr/1-foo", Is.EqualTo(result.Name));
         }
 
         static IPullRequestModel CreatePullRequest(bool fromFork)
@@ -733,7 +1057,7 @@ public class PullRequestServiceTests : TestBaseClass
 
     public class TheRemoteUnusedRemotesMethod
     {
-        [Fact]
+        [Test]
         public async Task ShouldRemoveUnusedRemote()
         {
             var gitClient = MockGitClient();
