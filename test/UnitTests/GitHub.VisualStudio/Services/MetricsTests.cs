@@ -353,15 +353,5 @@ namespace MetricsTests
             Assert.IsNotNull(usageData.Reports);
             Assert.AreEqual(0, usageData.Reports.Count);
         }
-
-        [Test]
-        public async Task ReadUsageDataWorksWhenFileMissing()
-        {
-            File.Delete(usageFileName);
-
-            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
-            var usageData = await usageService.ReadLocalData();
-            //Assert.AreEqual(usageData.LastUpdated.Date, DateTimeOffset.Now.Date);
-        }
     }
 }
