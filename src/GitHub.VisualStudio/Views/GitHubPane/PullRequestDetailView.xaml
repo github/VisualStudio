@@ -278,7 +278,7 @@
                         </StackPanel>
                         <!-- PR Body -->
                         <markdig:MarkdownViewer Name="bodyMarkdown"
-                                                Margin="2 10 10 6"
+                                                Margin="2 4 10 6"
                                                 Markdown="{Binding Body}"/>
                     </StackPanel>
                 </ui:SectionControl>
@@ -286,6 +286,7 @@
                 <ui:SectionControl Name="reviewsSection"
                                    HeaderText="Reviewers"
                                    IsExpanded="True"
+                                   Margin="0 8 0 0"
                                    Grid.Row="2">
                     <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4 12 4">
                         <ItemsControl.ItemTemplate>
@@ -301,7 +302,7 @@
                                    Grid.Row="4"
                                    IsExpanded="True"
                                    HeaderText="{Binding Files.ChangedFilesCount, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
-                                   Margin="0 5 10 0">
+                                   Margin="0 8 10 0">
                     <local:PullRequestFilesView DataContext="{Binding Files}"/>
                 </ui:SectionControl>
             </Grid>
