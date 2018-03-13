@@ -186,7 +186,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0 -8 0 -4">
                             <ui:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
                                 View on GitHub
                             </ui:GitHubActionLink>
@@ -265,7 +265,7 @@
                     Grid.Row="1">
                     <StackPanel Orientation="Vertical">
                         <!-- View conversation on GitHub -->
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                             <controls:AccountAvatar Account="{Binding Model.Author}"
                                                     VerticalAlignment="Bottom"
                                                     Width="16"
