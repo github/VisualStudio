@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GitHub.Models
 {
     /// <summary>
-    /// Holds a collection of <see cref="UsageData"/> daily usage reports.
+    /// Holds a collection of <see cref="UsageModel"/> daily usage reports.
     /// </summary>
     public class UsageData
     {
