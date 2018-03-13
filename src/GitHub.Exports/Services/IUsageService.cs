@@ -29,6 +29,11 @@ namespace GitHub.Services
         /// <param name="lastUpdated">The last updated date.</param>
         /// <returns>True if the last updated date is the same month as today; otherwise false.</returns>
         bool IsSameMonth(DateTimeOffset lastUpdated);
+        
+        /// <summary>
+        /// Gets a GUID that anonymously represents the user.
+        /// </summary>
+        Task<Guid> GetUserGuid();
 
         /// <summary>
         /// Starts a timer.

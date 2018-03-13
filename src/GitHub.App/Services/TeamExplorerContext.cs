@@ -76,7 +76,7 @@ namespace GitHub.Services
 
                     if (newRepositoryPath != repositoryPath)
                     {
-                        log.Debug("Fire PropertyChanged event for ActiveRepository");
+                        log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
                         ActiveRepository = repo;
                     }
                     else if (newBranchName != branchName)

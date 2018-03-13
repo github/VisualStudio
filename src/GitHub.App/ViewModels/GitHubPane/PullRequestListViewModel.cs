@@ -41,10 +41,12 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestListViewModel(
             IModelServiceFactory modelServiceFactory,
             IPackageSettings settings,
+            IPullRequestSessionManager sessionManager,
             IVisualStudioBrowser visualStudioBrowser)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
 
             constructing = true;
@@ -99,6 +101,19 @@ namespace GitHub.ViewModels.GitHubPane
 
             OpenPullRequestOnGitHub = ReactiveCommand.Create();
             OpenPullRequestOnGitHub.Subscribe(x => DoOpenPullRequestOnGitHub((int)x));
+
+            // Get the current pull request session and the selected repository. When the session's
+            // repository is the same as our selected repository set CheckedOutPullRequest to the
+            // current session's model, so that the checked out PR can be highlighted.
+            Observable.CombineLatest(
+                sessionManager.WhenAnyValue(x => x.CurrentSession),
+                this.WhenAnyValue(x => x.SelectedRepository),
+                (s, r) => new { Session = s, Repository = r })
+                .Subscribe(x =>
+                {
+                    CheckedOutPullRequest = x.Session?.RepositoryOwner == x.Repository?.Owner ?
+                        x.Session?.PullRequest : null;
+                });
 
             constructing = false;
         }
@@ -206,6 +221,8 @@ namespace GitHub.ViewModels.GitHubPane
                     (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) &&
                     (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
             }
+
+            SaveSettings();
         }
 
         string searchQuery;
@@ -241,6 +258,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return selectedPullRequest; }
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
+        }
+
+        IPullRequestModel checkedOutPullRequest;
+        public IPullRequestModel CheckedOutPullRequest
+        {
+            get { return checkedOutPullRequest; }
+            set { this.RaiseAndSetIfChanged(ref checkedOutPullRequest, value); }
         }
 
         IReadOnlyList<PullRequestState> states;
