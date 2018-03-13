@@ -13,8 +13,6 @@ namespace GitHub.Models
         public string VSVersion { get; set; }
         public string Lang { get; set; }
         public string CurrentLang { get; set; }
-        public bool IsGitHubUser { get; set; }
-        public bool IsEnterpriseUser { get; set; }
         public int NumberOfStartups { get; set; }
         public int NumberOfUpstreamPullRequests { get; set; }
         public int NumberOfClones { get; set; }

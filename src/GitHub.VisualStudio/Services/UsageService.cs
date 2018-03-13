@@ -77,46 +77,6 @@ namespace GitHub.Services
             return userGuid.Value;
         }
 
-        public async Task<Guid> GetUserGuid()
-        {
-            await Initialize();
-
-            if (!userGuid.HasValue)
-            {
-                try
-                {
-                    if (File.Exists(userStorePath))
-                    {
-                        var json = await ReadAllTextAsync(userStorePath);
-                        var data = SimpleJson.DeserializeObject<UserData>(json);
-                        userGuid = data.UserGuid;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex, "Failed reading user metrics GUID");
-                }
-            }
-
-            if (!userGuid.HasValue || userGuid.Value == Guid.Empty)
-            {
-                userGuid = Guid.NewGuid();
-
-                try
-                {
-                    var data = new UserData { UserGuid = userGuid.Value };
-                    var json = SimpleJson.SerializeObject(data);
-                    await WriteAllTextAsync(userStorePath, json);
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex, "Failed reading writing metrics GUID");
-                }
-            }
-
-            return userGuid.Value;
-        }
-
         public bool IsToday(DateTimeOffset date)
         {
             return date.Date == DateTimeOffset.Now.Date;
