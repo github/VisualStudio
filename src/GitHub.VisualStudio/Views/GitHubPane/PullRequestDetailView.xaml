@@ -186,14 +186,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Author and open time -->
-                <ui:SectionControl Name="descriptionSection"
-                    HeaderText="Description"
-                    IsExpanded="True"
-                    Grid.Row="0">
-                    <StackPanel Orientation="Vertical">
-                        <!-- View conversation on GitHub -->
-                        <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Grid.Row="0">
                             <ui:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
                                 View on GitHub
                             </ui:GitHubActionLink>
@@ -265,6 +258,13 @@
                             </TextBlock>
                         </StackPanel>
 
+                <!-- Author and open time -->
+                <ui:SectionControl Name="descriptionSection"
+                    HeaderText="Description"
+                    IsExpanded="True"
+                    Grid.Row="1">
+                    <StackPanel Orientation="Vertical">
+                        <!-- View conversation on GitHub -->
                         <StackPanel Orientation="Horizontal">
                             <controls:AccountAvatar Account="{Binding Model.Author}"
                                                     VerticalAlignment="Bottom"
