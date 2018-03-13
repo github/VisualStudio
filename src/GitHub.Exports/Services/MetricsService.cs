@@ -102,11 +102,31 @@ namespace GitHub.App
         static StringContent SerializeRequest(UsageModel model)
         {
             var serializer = new SimpleJsonSerializer();
-            var dictionary = ToModelDictionary(model);
+            var dictionary = new Dictionary<string, object>
+            {
+                {ToJsonPropertyName("Dimensions"), ToStringDictionary(model.Dimensions) },
+                {ToJsonPropertyName("Measures"), ToObjectDictionary(model.Measures) }
+            };
             return new StringContent(serializer.Serialize(dictionary), Encoding.UTF8, "application/json");
         }
 
-        static Dictionary<string, object> ToModelDictionary(object model)
+        static Dictionary<string, string> ToStringDictionary(object model)
+        {
+            var dict = new Dictionary<string, string>();
+            var type = model.GetType();
+
+            foreach (var prop in type.GetProperties())
+            {
+                if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
+                {
+                    dict.Add(ToJsonPropertyName(prop.Name), prop.GetValue(model).ToString());
+                }
+            }
+
+            return dict;
+        }
+
+        static Dictionary<string, object> ToObjectDictionary(object model)
         {
             var dict = new Dictionary<string, object>();
             var type = model.GetType();
@@ -116,19 +136,6 @@ namespace GitHub.App
                 if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
                 {
                     dict.Add(ToJsonPropertyName(prop.Name), prop.GetValue(model));
-                }
-                else
-                {
-                    var value = prop.GetValue(model);
-
-                    if (value == null)
-                    {
-                        dict.Add(ToJsonPropertyName(prop.Name), value);
-                    }
-                    else
-                    {
-                        dict.Add(ToJsonPropertyName(prop.Name), ToModelDictionary(value));
-                    }
                 }
             }
 
