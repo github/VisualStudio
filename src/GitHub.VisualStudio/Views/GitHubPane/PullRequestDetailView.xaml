@@ -261,33 +261,38 @@
                 </Grid.RowDefinitions>
 
                 <!-- Author and open time -->
-                <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
-                    <controls:AccountAvatar Account="{Binding Model.Author}"
-                                            VerticalAlignment="Bottom"
-                                            Width="16"
-                                            Height="16" Margin="0,0,0,1"/>
+                <ui:SectionControl Name="descriptionSection"
+                    HeaderText="Description"
+                    IsExpanded="True"
+                    Grid.Row="0">
+                    <StackPanel Orientation="Vertical">
+                        <!-- View conversation on GitHub -->
+                        <ui:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
+                            View conversation on GitHub
+                        </ui:GitHubActionLink>
 
-                    <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
-                        <Run FontWeight="Bold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
-                        <Run Text="wrote" />
-                    </TextBlock>
-                </StackPanel>
+                        <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
+                            <controls:AccountAvatar Account="{Binding Model.Author}"
+                                                    VerticalAlignment="Bottom"
+                                                    Width="16"
+                                                    Height="16" Margin="0,0,0,1"/>
 
-                <!-- PR Body -->
-                <markdig:MarkdownViewer Name="bodyMarkdown"
-                                        Grid.Row="1"
-                                        Margin="2 10 10 6"
-                                        Markdown="{Binding Body}"/>
-
-                <!-- View conversation on GitHub -->
-                <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
-                    View conversation on GitHub
-                </ui:GitHubActionLink>
+                            <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
+                                <Run FontWeight="Bold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
+                                <Run Text="wrote" />
+                            </TextBlock>
+                        </StackPanel>
+                        <!-- PR Body -->
+                        <markdig:MarkdownViewer Name="bodyMarkdown"
+                                                Margin="2 10 10 6"
+                                                Markdown="{Binding Body}"/>
+                    </StackPanel>
+                </ui:SectionControl>
 
                 <ui:SectionControl Name="reviewsSection"
                                    HeaderText="Reviewers"
                                    IsExpanded="True"
-                                   Grid.Row="3">
+                                   Grid.Row="2">
                     <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4 12 4">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
