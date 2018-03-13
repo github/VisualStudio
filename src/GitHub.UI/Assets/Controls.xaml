@@ -433,7 +433,8 @@
                                 DockPanel.Dock="Left"
                                 Height="10"
                                 Margin="5,0,0,0"
-                                Icon="triangle_right" />
+                                Icon="triangle_right"
+                                Visibility="{TemplateBinding IsEnabled, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
                             <ContentPresenter Margin="0"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -504,6 +505,7 @@
                                 FontStyle="{TemplateBinding FontStyle}"
                                 FontWeight="{TemplateBinding FontWeight}"
                                 Foreground="{TemplateBinding Foreground}"
+                                IsEnabled="{TemplateBinding IsEnabled}"
                                 IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                 Padding="{TemplateBinding Padding}"
                                 Style="{StaticResource TriangleToggleButton}" />

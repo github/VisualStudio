@@ -52,13 +52,26 @@
                             <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
                             <Expander Style="{DynamicResource GitHubExpander}"
-                                      IsExpanded="{Binding IsLatest, Mode=OneTime}">
+                                      Foreground="{DynamicResource GitHubVsWindowText}">
+                                <Expander.IsEnabled>
+                                    <MultiBinding Converter="{ui:OrConverter}" Mode="OneWay">
+                                        <Binding Path="Body" Converter="{ui:NotEqualsConverter {x:Null}}"/>
+                                        <Binding Path="FileComments.Count" Converter="{ui:NotEqualsConverter 0}"/>
+                                    </MultiBinding>
+                                </Expander.IsEnabled>
+                                <Expander.IsExpanded>
+                                    <MultiBinding Converter="{ui:AndConverter}" Mode="OneWay">
+                                        <Binding Path="IsLatest"/>
+                                        <Binding Path="IsEnabled" RelativeSource="{RelativeSource Self}"/>
+                                    </MultiBinding>
+                                </Expander.IsExpanded>
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel Width="20" Height="16" HorizontalAlignment="Center">
                                             <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
                                             <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
                                             <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
+                                            <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Dismissed}}"/>
                                         </StackPanel>
 
                                         <TextBlock FontWeight="SemiBold" Margin="2 0">
