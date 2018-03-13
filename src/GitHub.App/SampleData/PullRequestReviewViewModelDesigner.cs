@@ -13,15 +13,16 @@ namespace GitHub.SampleData
     {
         public PullRequestReviewViewModelDesigner()
         {
-            PullRequestNumber = 734;
-
+            PullRequestNumber = 419;
             Model = new PullRequestReviewModel
             {
+                SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(1),
                 User = new AccountDesigner { Login = "Haacked", IsUser = true },
             };
 
             Title = "Fix a ton of potential crashers, odd code and redundant calls in ModelService";
-            State = "approved";
+            State = PullRequestReviewState.Approved;
+            StateDisplay = "approved";
             Body = @"Just a few comments. I don't feel too strongly about them though.
 
 Otherwise, very nice work here! ✨";
@@ -54,7 +55,10 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public long PullRequestReviewId { get; set; }
         public IPullRequestReviewModel Model { get; set; }
         public string Title { get; set; }
-        public string State { get; set; }
+        public PullRequestReviewState State { get; set; }
+        public string StateDisplay { get; set; }
+        public bool IsEmpty { get; set; }
+        public bool IsLatest { get; set; }
         public bool IsPending { get; set; }
         public string Body { get; set; }
         public IPullRequestFilesViewModel Files { get; set; }

@@ -42,9 +42,19 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestReviewModel Model { get; }
 
         /// <summary>
+        /// Gets the state of the pull request review.
+        /// </summary>
+        PullRequestReviewState State { get; }
+
+        /// <summary>
         /// Gets the state of the pull request review as a string.
         /// </summary>
-        string State { get; }
+        string StateDisplay { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request review is the latest by the author.
+        /// </summary>
+        bool IsLatest { get; }
 
         /// <summary>
         /// Gets a value indicating whether the review is in the pending state.

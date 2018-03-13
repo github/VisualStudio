@@ -33,7 +33,9 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestReviewModel model;
         IDisposable sessionSubscription;
         string title;
-        string state;
+        PullRequestReviewState state;
+        ObservableAsPropertyHelper<string> stateDisplay;
+        bool isLatest;
         bool isPending;
         string body;
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> fileComments;
@@ -61,6 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.modelServiceFactory = modelServiceFactory;
 
             Files = files;
+            stateDisplay = this.WhenAnyValue(x => x.State, x => ToString(x)).ToProperty(this, x => x.StateDisplay);
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
             Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
@@ -115,10 +118,20 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public string State
+        public PullRequestReviewState State
         {
             get { return state; }
             private set { this.RaiseAndSetIfChanged(ref state, value); }
+        }
+
+        /// <inheritdoc/>
+        public string StateDisplay => stateDisplay.Value;
+
+        /// <inheritdoc/>
+        public bool IsLatest
+        {
+            get { return isLatest; }
+            private set { this.RaiseAndSetIfChanged(ref isLatest, value); }
         }
 
         /// <inheritdoc/>
@@ -235,17 +248,15 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     Model = pullRequest.Reviews.Single(x => x.Id == PullRequestReviewId);
                     Title = pullRequest.Title;
-                    State = PullRequestDetailReviewItem.ToString(Model.State);
+                    State = Model.State;
+                    IsLatest = CalculateIsLatest(pullRequest, Model);
                     IsPending = Model.State == PullRequestReviewState.Pending;
-                    Body = IsPending || !string.IsNullOrWhiteSpace(Model.Body) ? 
-                        Model.Body :
-                        Resources.NoDescriptionProvidedMarkdown;
+                    Body = !string.IsNullOrWhiteSpace(Model.Body) ? Model.Body : null;
                 }
                 else
                 {
                     Model = null;
                     Title = null;
-                    State = null;
                     IsPending = true;
                     Body = string.Empty;
                 }
@@ -319,6 +330,29 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             FileComments = result;
+        }
+
+        static bool CalculateIsLatest(IPullRequestModel pullRequest, IPullRequestReviewModel model)
+        {
+            return !pullRequest.Reviews.Any(x =>
+                x.User.Login == model.User.Login &&
+                x.SubmittedAt > model.SubmittedAt);    
+        }
+
+        static string ToString(PullRequestReviewState state)
+        {
+            switch (state)
+            {
+                case PullRequestReviewState.Approved:
+                    return "approved";
+                case PullRequestReviewState.ChangesRequested:
+                    return "requested changes";
+                case PullRequestReviewState.Commented:
+                case PullRequestReviewState.Dismissed:
+                    return "commented";
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

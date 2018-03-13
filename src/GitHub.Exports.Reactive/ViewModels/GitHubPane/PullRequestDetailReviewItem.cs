@@ -34,12 +34,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         public int FileCommentCount { get; set; }
 
-        /// <summary>
-        /// Gets the string representation of a <see cref="PullRequestReviewState"/>
-        /// </summary>
-        /// <param name="state">The state.</param>
-        /// <returns>The string representation.</returns>
-        public static string ToString(PullRequestReviewState state)
+        static string ToString(PullRequestReviewState state)
         {
             switch (state)
             {

@@ -7,7 +7,13 @@
              xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
          mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+
+    <d:DesignData.DataContext>
+        <sampleData:PullRequestUserReviewsViewModelDesigner/>
+    </d:DesignData.DataContext>
+    
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -45,7 +51,8 @@
                         <StackPanel>
                             <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
-                            <Expander Style="{DynamicResource GitHubExpander}" IsExpanded="True">
+                            <Expander Style="{DynamicResource GitHubExpander}"
+                                      IsExpanded="{Binding IsLatest, Mode=OneTime}">
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel Width="20" Height="16" HorizontalAlignment="Center">
@@ -55,17 +62,21 @@
                                         </StackPanel>
 
                                         <TextBlock FontWeight="SemiBold" Margin="2 0">
-                                        <Run Text="{Binding Model.User.Login, Mode=OneWay}"/>
-                                        <Run Text="{Binding State, Mode=OneWay}"/>
-                                        <Run FontWeight="Normal">5 days ago</Run>
+                                            <Run Text="{Binding Model.User.Login, Mode=OneWay}"/>
+                                            <Run Text="{Binding StateDisplay, Mode=OneWay}"/>
+                                            <Run FontWeight="Normal" Text="{Binding Model.SubmittedAt, Mode=OneWay, Converter={ui:DurationToStringConverter}}"/>
                                         </TextBlock>
                                     </StackPanel>
                                 </Expander.Header>
                                 <StackPanel Margin="24 4 4 16">
-                                    <ui:SectionControl HeaderText="Description" IsExpanded="True">
+                                    <ui:SectionControl HeaderText="Description"
+                                                       IsExpanded="True"
+                                                       Visibility="{Binding Body, Converter={ui:NullToVisibilityConverter}}">
                                         <TextBlock Text="{Binding Body}" Margin="0 4"/>
                                     </ui:SectionControl>
-                                    <ui:SectionControl HeaderText="Comments" IsExpanded="True">
+                                    <ui:SectionControl HeaderText="Comments"
+                                                       IsExpanded="True"
+                                                       Visibility="{Binding FileComments.Count, Converter={ui:CountToVisibilityConverter}}">
                                         <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" Margin="0 4"/>
                                     </ui:SectionControl>
                                 </StackPanel>

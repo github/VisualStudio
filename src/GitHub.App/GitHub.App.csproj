@@ -232,6 +232,7 @@
     <Compile Include="Models\PullRequestDetailArgument.cs" />
     <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\PullRequestEditorService.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />

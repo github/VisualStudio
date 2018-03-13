@@ -405,7 +405,8 @@ namespace GitHub.Services
                             Body = y.Body,
                             CommitId = y.Commit.Oid,
                             State = FromGraphQL(y.State),
-                            User = Create(y.Author.Login, y.Author.AvatarUrl(null))
+                            User = Create(y.Author.Login, y.Author.AvatarUrl(null)),
+                            SubmittedAt = y.SubmittedAt.Value,
                         }).ToList()
                     });
 
@@ -626,6 +627,7 @@ namespace GitHub.Services
                         Body = x.Body,
                         State = x.State,
                         CommitId = x.CommitId,
+                        SubmittedAt = x.SubmittedAt,
                     }).ToList(),
                 ReviewComments = prCacheItem.ReviewComments.Select(x =>
                     (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
@@ -895,6 +897,7 @@ namespace GitHub.Services
                 };
                 Body = review.Body;
                 State = review.State;
+                SubmittedAt = review.SubmittedAt;
             }
 
             public long Id { get; set; }
@@ -903,6 +906,7 @@ namespace GitHub.Services
             public string Body { get; set; }
             public GitHub.Models.PullRequestReviewState State { get; set; }
             public string CommitId { get; set; }
+            public DateTimeOffset SubmittedAt { get; set; }
         }
 
         public class PullRequestReviewCommentCacheItem

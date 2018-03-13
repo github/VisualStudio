@@ -152,7 +152,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var reviews = new List<IPullRequestReviewViewModel>();
 
-                foreach (var review in pullRequest.Reviews)
+                foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.SubmittedAt))
                 {
                     if (review.User.Login == user.Login)
                     {
