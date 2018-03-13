@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using GitHub;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -208,41 +209,6 @@ namespace MetricsTests
             ));
         }
 
-        [Test]
-        public async Task UsageServiceWritesAllTheDataCorrectly()
-        {
-            var model = CreateUsageModel();
-            var serviceProvider = CreateServiceProvider();
-            var usageService = CreateUsageService(model);
-            var targetAndTick = CreateTargetAndGetTick(serviceProvider, usageService);
-            var vsservices = serviceProvider.GetService<IVSServices>();
-//            vsservices.VSVersion.Returns(model.VSVersion);
-
-            await targetAndTick.Item2();
-
-            var metricsService = serviceProvider.TryGetService<IMetricsService>();
-
-            var expected = model;
-//            expected.NumberOfStartups++;
-//            expected.NumberOfStartupsWeek++;
-//            expected.NumberOfStartupsMonth++;
-
-//            var result = (usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData).Model;
-//            CollectionAssert.AreEquivalent(
-//                ReflectionUtils.GetProperties(expected.GetType()).Select(x => new { x.Name, Value = x.GetValue(expected) }),
-//                ReflectionUtils.GetProperties(result.GetType()).Select(x => new { x.Name, Value = x.GetValue(result) }));
-        }
-
-        static UsageModel CreateUsageModel()
-        {
-            return new UsageModel
-            {
-                Dimensions = new UsageModel.DimensionsModel(),
-                Measures = new UsageModel.MeasuresModel()
-
-            };
-        }
-
         static Tuple<UsageTracker, Func<Task>> CreateTargetAndGetTick(
             IGitHubServiceProvider serviceProvider,
             IUsageService service)
@@ -298,95 +264,7 @@ namespace MetricsTests
         static readonly Guid UserGuid = Guid.NewGuid();
         static readonly string DefaultUserStoreContent = @"{""UserGuid"":""" + UserGuid + @"""}";
 
-        static readonly string DefaultUsageContent =
-@"{
-	""LastUpdated"": ""2017-02-24T18:18:52.4298622Z"",
-	""Model"": {
-		""Guid"": """ + UserGuid + @""",
-		""IsGitHubUser"": false,
-		""IsEnterpriseUser"": false,
-		""AppVersion"": ""2.4.3.0"",
-		""VSVersion"": ""14.0.25431.01 Update 3"",
-		""Lang"": ""en-US"",
-		""NumberOfStartups"": 0,
-		""NumberOfStartupsWeek"": 0,
-		""NumberOfStartupsMonth"": 0,
-		""NumberOfUpstreamPullRequests"": 0,
-		""NumberOfClones"": 0,
-		""NumberOfReposCreated"": 0,
-		""NumberOfReposPublished"": 0,
-		""NumberOfGists"": 0,
-		""NumberOfOpenInGitHub"": 0,
-		""NumberOfLinkToGitHub"": 0,
-		""NumberOfLogins"": 1,
-		""NumberOfOAuthLogins"": 0,
-		""NumberOfTokenLogins"": 0,
-		""NumberOfPullRequestsOpened"": 1,
-		""NumberOfLocalPullRequestsCheckedOut"": 0,
-		""NumberOfLocalPullRequestPulls"": 0,
-		""NumberOfLocalPullRequestPushes"": 0,
-		""NumberOfForkPullRequestsCheckedOut"": 0,
-		""NumberOfForkPullRequestPulls"": 0,
-		""NumberOfForkPullRequestPushes"": 0,
-		""NumberOfSyncSubmodules"": 0,
-		""NumberOfWelcomeDocsClicks"": 0,
-		""NumberOfWelcomeTrainingClicks"": 0,
-		""NumberOfGitHubPaneHelpClicks"": 0,
-		""NumberOfPRDetailsViewChanges"": 0,
-		""NumberOfPRDetailsViewFile"": 0,
-		""NumberOfPRDetailsCompareWithSolution"": 0,
-		""NumberOfPRDetailsOpenFileInSolution"": 0,
-		""NumberOfPRDetailsNavigateToEditor"": 0,
-		""NumberOfPRReviewDiffViewInlineCommentOpen"": 0,
-		""NumberOfPRReviewDiffViewInlineCommentPost"": 0
-	}
-}
-";
-
-        static readonly string LegacyUsageContent =
-@"{
-	""LastUpdated"": ""2017-02-24T12:37:09.4771538Z"",
-	""Model"": {
-		""IsGitHubUser"": true,
-		""IsEnterpriseUser"": false,
-		""AppVersion"": ""2.4.3.0"",
-		""VSVersion"": ""14.0.25431.01 Update 3"",
-		""Lang"": ""en-US"",
-		""NumberOfStartups"": 0,
-		""NumberOfStartupsWeek"": 3,
-		""NumberOfStartupsMonth"": 23,
-		""NumberOfUpstreamPullRequests"": 0,
-		""NumberOfClones"": 0,
-		""NumberOfReposCreated"": 0,
-		""NumberOfReposPublished"": 0,
-		""NumberOfGists"": 0,
-		""NumberOfOpenInGitHub"": 0,
-		""NumberOfLinkToGitHub"": 2,
-		""NumberOfLogins"": 1,
-		""NumberOfOAuthLogins"": 0,
-		""NumberOfTokenLogins"": 0,
-		""NumberOfPullRequestsOpened"": 1,
-		""NumberOfLocalPullRequestsCheckedOut"": 0,
-		""NumberOfLocalPullRequestPulls"": 0,
-		""NumberOfLocalPullRequestPushes"": 0,
-		""NumberOfForkPullRequestsCheckedOut"": 0,
-		""NumberOfForkPullRequestPulls"": 0,
-		""NumberOfForkPullRequestPushes"": 0,
-		""NumberOfSyncSubmodules"": 0,
-		""NumberOfWelcomeDocsClicks"": 0,
-		""NumberOfWelcomeTrainingClicks"": 0,
-		""NumberOfGitHubPaneHelpClicks"": 0,
-		""NumberOfPRDetailsViewChanges"": 1,
-		""NumberOfPRDetailsViewFile"": 0,
-		""NumberOfPRDetailsCompareWithSolution"": 0,
-		""NumberOfPRDetailsOpenFileInSolution"": 0,
-		""NumberOfPRDetailsNavigateToEditor"": 0,
-		""NumberOfPRReviewDiffViewInlineCommentOpen"": 1,
-		""NumberOfPRReviewDiffViewInlineCommentPost"": 0,
-		""NumberOfShowCurrentPullRequest"": 2
-	}
-}
-";
+        static readonly string DefaultUsageContent = @"{""Reports"":[{""Dimensions"":{""Guid"":""26fa0c25-653f-4fa5-ad83-7438ad526b0a"",""Date"":""2018-03-13T18:45:19.0453424Z"",""IsGitHubUser"":false,""IsEnterpriseUser"":false,""AppVersion"":null,""VSVersion"":null,""Lang"":null,""CurrentLang"":null},""Measures"":{""NumberOfStartups"":0,""NumberOfUpstreamPullRequests"":0,""NumberOfClones"":1,""NumberOfReposCreated"":0,""NumberOfReposPublished"":2,""NumberOfGists"":0,""NumberOfOpenInGitHub"":0,""NumberOfLinkToGitHub"":0,""NumberOfLogins"":0,""NumberOfOAuthLogins"":0,""NumberOfTokenLogins"":0,""NumberOfPullRequestsOpened"":3,""NumberOfLocalPullRequestsCheckedOut"":0,""NumberOfLocalPullRequestPulls"":0,""NumberOfLocalPullRequestPushes"":0,""NumberOfForkPullRequestsCheckedOut"":0,""NumberOfForkPullRequestPulls"":0,""NumberOfForkPullRequestPushes"":0,""NumberOfSyncSubmodules"":0,""NumberOfWelcomeDocsClicks"":0,""NumberOfWelcomeTrainingClicks"":0,""NumberOfGitHubPaneHelpClicks"":0,""NumberOfPRDetailsViewChanges"":0,""NumberOfPRDetailsViewFile"":0,""NumberOfPRDetailsCompareWithSolution"":0,""NumberOfPRDetailsOpenFileInSolution"":0,""NumberOfPRDetailsNavigateToEditor"":0,""NumberOfPRReviewDiffViewInlineCommentOpen"":0,""NumberOfPRReviewDiffViewInlineCommentPost"":0,""NumberOfShowCurrentPullRequest"":0}}]}";
 
         string usageFileName;
         string userFileName;
@@ -410,7 +288,7 @@ namespace MetricsTests
 
             Directory.CreateDirectory(localApplicationDataPath);
 
-            usageFileName = Path.Combine(localApplicationDataPath, "ghfvs.usage");
+            usageFileName = Path.Combine(localApplicationDataPath, "metrics.json");
             userFileName = Path.Combine(localApplicationDataPath, "user.json");
 
             environment = Substitute.For<IEnvironment>();
@@ -454,17 +332,26 @@ namespace MetricsTests
         {
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var usageData = await usageService.ReadLocalData();
-            //Assert.AreEqual(usageData.LastUpdated.Date, DateTime.Parse("2017-02-24"));
+
+            Assert.IsNotNull(usageData);
+            Assert.IsNotNull(usageData.Reports);
+            Assert.AreEqual(1, usageData.Reports.Count);
+            Assert.AreEqual(1, usageData.Reports[0].Measures.NumberOfClones);
+            Assert.AreEqual(2, usageData.Reports[0].Measures.NumberOfReposPublished);
+            Assert.AreEqual(3, usageData.Reports[0].Measures.NumberOfPullRequestsOpened);
         }
 
         [Test]
-        public async Task ReadUsageDataWorksWhenLegacyContent()
+        public async Task ReadUsageDataWorksWhenFileMissing()
         {
-            WriteUsageFileContent(LegacyUsageContent);
+            File.Delete(usageFileName);
 
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
             var usageData = await usageService.ReadLocalData();
-            //Assert.AreEqual(usageData.LastUpdated.Date, DateTime.Parse("2017-02-24"));
+
+            Assert.IsNotNull(usageData);
+            Assert.IsNotNull(usageData.Reports);
+            Assert.AreEqual(0, usageData.Reports.Count);
         }
 
         [Test]
