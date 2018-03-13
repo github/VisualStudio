@@ -10,6 +10,8 @@ using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using Serilog;
+using Rothko;
+using Environment = System.Environment;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -19,16 +21,60 @@ namespace GitHub.Services
     {
         const string StoreFileName = "metrics.json";
         const string UserStoreFileName = "user.json";
-        private static readonly ILogger log = LogManager.ForContext<UsageService>();
+        static readonly ILogger log = LogManager.ForContext<UsageService>();
+
         readonly IGitHubServiceProvider serviceProvider;
+        readonly IEnvironment environment;
+
         string storePath;
         string userStorePath;
         Guid? userGuid;
 
         [ImportingConstructor]
-        public UsageService(IGitHubServiceProvider serviceProvider)
+        public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment)
         {
             this.serviceProvider = serviceProvider;
+            this.environment = environment;
+        }
+
+        public async Task<Guid> GetUserGuid()
+        {
+            await Initialize();
+
+            if (!userGuid.HasValue)
+            {
+                try
+                {
+                    if (File.Exists(userStorePath))
+                    {
+                        var json = await ReadAllTextAsync(userStorePath);
+                        var data = SimpleJson.DeserializeObject<UserData>(json);
+                        userGuid = data.UserGuid;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed reading user metrics GUID");
+                }
+            }
+
+            if (!userGuid.HasValue || userGuid.Value == Guid.Empty)
+            {
+                userGuid = Guid.NewGuid();
+
+                try
+                {
+                    var data = new UserData { UserGuid = userGuid.Value };
+                    var json = SimpleJson.SerializeObject(data);
+                    await WriteAllTextAsync(userStorePath, json);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed writing user metrics GUID");
+                }
+            }
+
+            return userGuid.Value;
         }
 
         public async Task<Guid> GetUserGuid()
@@ -116,7 +162,7 @@ namespace GitHub.Services
                 var json = SimpleJson.SerializeObject(data);
                 await WriteAllTextAsync(storePath, json);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex,"Failed to write usage data");
             }
@@ -129,14 +175,11 @@ namespace GitHub.Services
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
                 var program = serviceProvider.GetService<IProgram>();
-                storePath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    program.ApplicationName,
-                    StoreFileName);
-                userStorePath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    program.ApplicationName,
-                    UserStoreFileName);
+
+                var localApplicationDataPath = environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                storePath = Path.Combine(localApplicationDataPath, program.ApplicationName, StoreFileName);
+                userStorePath = Path.Combine(localApplicationDataPath, program.ApplicationName, UserStoreFileName);
             }
         }
 
