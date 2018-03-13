@@ -8,7 +8,8 @@
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
     <d:DesignData.DataContext>
         <sampleData:PullRequestUserReviewsViewModelDesigner/>
@@ -85,7 +86,7 @@
                                     <ui:SectionControl HeaderText="Description"
                                                        IsExpanded="True"
                                                        Visibility="{Binding Body, Converter={ui:NullToVisibilityConverter}}">
-                                        <TextBlock Text="{Binding Body}" Margin="0 4"/>
+                                        <markdig:MarkdownViewer Markdown="{Binding Body}"/>
                                     </ui:SectionControl>
                                     <ui:SectionControl HeaderText="Comments"
                                                        IsExpanded="True"
