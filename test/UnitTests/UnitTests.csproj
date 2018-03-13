@@ -175,7 +175,6 @@
       <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    </Reference>
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
       <Private>True</Private>
