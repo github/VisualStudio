@@ -327,8 +327,6 @@
     <Compile Include="Services\ShowDialogService.cs" />
     <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
-    <Compile Include="Services\LoginManagerDispatcher.cs" />
-    <Compile Include="Services\UsageTrackerDispatcher.cs" />
     <Compile Include="Services\VSGitExtFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
