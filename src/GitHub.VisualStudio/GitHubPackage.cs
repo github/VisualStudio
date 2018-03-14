@@ -24,13 +24,11 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
 {
-    // Initialize menus on Main thread.
-    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version, IconResourceID = 400)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    // Only initialize when we're in the context of a Git repository.
-    [ProvideAutoLoad(Guids.UIContext_Git)]
+    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
@@ -71,17 +69,20 @@ namespace GitHub.VisualStudio
         {
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-
             var exports = componentModel.DefaultExportProvider;
-            menuService.AddCommands(
-                exports.GetExportedValue<IAddConnectionCommand>(),
-                exports.GetExportedValue<IBlameLinkCommand>(),
-                exports.GetExportedValue<ICopyLinkCommand>(),
-                exports.GetExportedValue<ICreateGistCommand>(),
-                exports.GetExportedValue<IOpenLinkCommand>(),
-                exports.GetExportedValue<IOpenPullRequestsCommand>(),
-                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>());
+
+            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
+            // has been loaded. We're using the following instead as a workaround.
+            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() =>
+                menuService.AddCommands(
+                    exports.GetExportedValue<IAddConnectionCommand>(),
+                    exports.GetExportedValue<IBlameLinkCommand>(),
+                    exports.GetExportedValue<ICopyLinkCommand>(),
+                    exports.GetExportedValue<ICreateGistCommand>(),
+                    exports.GetExportedValue<IOpenLinkCommand>(),
+                    exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                    exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                    exports.GetExportedValue<IShowGitHubPaneCommand>()));
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
