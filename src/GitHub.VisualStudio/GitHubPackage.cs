@@ -1,16 +1,12 @@
 ﻿using System;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.ComponentModel.Composition;
+using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using System.ComponentModel.Design;
+using System.ComponentModel.Composition;
+using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Exports;
@@ -74,10 +70,10 @@ namespace GitHub.VisualStudio
         {
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            
+
             // IMenuCommandService.AddCommand uses IServiceProvider.GetService and must be called on Main thread.
             await ThreadingHelper.SwitchToMainThreadAsync();
-            
+
             var exports = componentModel.DefaultExportProvider;
             menuService.AddCommands(
                 exports.GetExportedValue<IAddConnectionCommand>(),
