@@ -29,17 +29,23 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Builds a collection of <see cref="PullRequestReviewSummaryViewModel"/>s by user.
         /// </summary>
+        /// <param name="currentUser">The current user.</param>
         /// <param name="pullRequest">The pull request model.</param>
         /// <remarks>
         /// This method builds a list similar to that found in the "Reviewers" section at the top-
         /// right of the Pull Request page on GitHub.
         /// </remarks>
-        public static IEnumerable<PullRequestReviewSummaryViewModel> BuildByUser(IPullRequestModel pullRequest)
+        public static IEnumerable<PullRequestReviewSummaryViewModel> BuildByUser(
+            IAccount currentUser,
+            IPullRequestModel pullRequest)
         {
             var existing = new Dictionary<string, PullRequestReviewSummaryViewModel>();
 
             foreach (var review in pullRequest.Reviews.OrderBy(x => x.Id))
             {
+                if (review.State == PullRequestReviewState.Pending && review.User.Login != currentUser.Login)
+                    continue;
+
                 PullRequestReviewSummaryViewModel previous;
                 existing.TryGetValue(review.User.Login, out previous);
 
@@ -68,6 +74,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var newReview = new PullRequestReviewSummaryViewModel
                 {
                     State = PullRequestReviewState.Pending,
+                    User = currentUser,
                 };
                 result = result.Concat(new[] { newReview });
             }

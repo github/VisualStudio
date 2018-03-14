@@ -68,7 +68,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Assert.That(target.Reviews, Has.Count.EqualTo(3));
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
                 Assert.That(target.Reviews[1].User.Login, Is.EqualTo("shana"));
-                Assert.That(target.Reviews[2].User, Is.Null);
+                Assert.That(target.Reviews[2].User.Login, Is.EqualTo("grokys"));
                 Assert.That(target.Reviews[0].Id, Is.EqualTo(3));
                 Assert.That(target.Reviews[1].Id, Is.EqualTo(2));
                 Assert.That(target.Reviews[2].Id, Is.EqualTo(0));
@@ -79,14 +79,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.Commented),
-                    CreatePullRequestReviewModel(2, "grokys", PullRequestReviewState.Commented));
+                    CreatePullRequestReviewModel(1, "shana", PullRequestReviewState.Commented),
+                    CreatePullRequestReviewModel(2, "shana", PullRequestReviewState.Commented));
 
                 await target.Load(model);
 
                 Assert.That(target.Reviews, Has.Count.EqualTo(2));
-                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
-                Assert.That(target.Reviews[1].User, Is.Null);
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("shana"));
+                Assert.That(target.Reviews[1].User.Login, Is.EqualTo("grokys"));
                 Assert.That(target.Reviews[0].Id, Is.EqualTo(2));
             }
 
@@ -117,6 +117,20 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Assert.That(target.Reviews, Has.Count.EqualTo(1));
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
                 Assert.That(target.Reviews[0].Id, Is.EqualTo(2));
+            }
+
+            [Test]
+            public async Task ShouldNotShowPendingReviewForOtherUser()
+            {
+                var target = CreateTarget();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel(1, "shana", PullRequestReviewState.Pending));
+
+                await target.Load(model);
+
+                Assert.That(target.Reviews, Has.Count.EqualTo(1));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo(0));
             }
 
             static PullRequestModel CreatePullRequestModel(
@@ -550,7 +564,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             if (sessionManager == null)
             {
                 var currentSession = Substitute.For<IPullRequestSession>();
-                currentSession.User.Login.Returns("[CurrentUser]");
+                currentSession.User.Login.Returns("grokys");
 
                 sessionManager = Substitute.For<IPullRequestSessionManager>();
                 sessionManager.CurrentSession.Returns(currentSession);
