@@ -7,7 +7,6 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Factories;
-using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
@@ -19,8 +18,8 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
 using Octokit;
-using ReactiveUI;
 using NUnit.Framework;
+using GitHub.Commands;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {

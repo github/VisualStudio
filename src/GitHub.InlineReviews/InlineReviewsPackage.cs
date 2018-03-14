@@ -1,22 +1,37 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
-using GitHub.InlineReviews.Commands;
+using System.Threading;
+using GitHub.Helpers;
+using GitHub.Commands;
+using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(Guids.InlineReviewsPackageId)]
-    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
+    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    public class InlineReviewsPackage : Package
+    public class InlineReviewsPackage : AsyncPackage
     {
-        protected override void Initialize()
+        protected override async Task InitializeAsync(
+            CancellationToken cancellationToken,
+            IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
-            PackageResources.Register(this);
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var exports = componentModel.DefaultExportProvider;
+
+            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
+            // has been loaded. We're using the following instead as a workaround.
+            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() =>
+                menuService.AddCommands(
+                    exports.GetExportedValue<INextInlineCommentCommand>(),
+                    exports.GetExportedValue<IPreviousInlineCommentCommand>()));
         }
     }
 }

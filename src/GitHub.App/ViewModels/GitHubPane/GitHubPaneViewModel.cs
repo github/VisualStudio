@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -15,6 +16,7 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
 using ReactiveUI;
 using Serilog;
@@ -38,8 +40,6 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ISimpleApiClientFactory apiClientFactory;
         readonly IConnectionManager connectionManager;
         readonly ITeamExplorerContext teamExplorerContext;
-        readonly IVisualStudioBrowser browser;
-        readonly IUsageTracker usageTracker;
         readonly INavigationViewModel navigator;
         readonly ILoggedOutViewModel loggedOut;
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
@@ -51,8 +51,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
-        readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
-        bool initialized;
+        readonly ReactiveCommand<object> help;
+        Task initializeTask;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -85,8 +85,6 @@ namespace GitHub.ViewModels.GitHubPane
             this.apiClientFactory = apiClientFactory;
             this.connectionManager = connectionManager;
             this.teamExplorerContext = teamExplorerContext;
-            this.browser = browser;
-            this.usageTracker = usageTracker;
             this.navigator = navigator;
             this.loggedOut = loggedOut;
             this.notAGitHubRepository = notAGitHubRepository;
@@ -150,6 +148,13 @@ namespace GitHub.ViewModels.GitHubPane
                 if (url != null) browser.OpenUrl(url);
             });
 
+            help = ReactiveCommand.Create();
+            help.Subscribe(_ =>
+            {
+                browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
+            });
+
             navigator.WhenAnyObservable(x => x.Content.NavigationRequested)
                 .Subscribe(x => NavigateTo(x).Forget());
 
@@ -203,39 +208,9 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(IServiceProvider paneServiceProvider)
+        public Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
-            await initializing.WaitAsync();
-            if (initialized) return;
-
-            try
-            {
-                await UpdateContent(teamExplorerContext.ActiveRepository);
-                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
-                   .Skip(1)
-                   .ObserveOn(RxApp.MainThreadScheduler)
-                   .Subscribe(x => UpdateContent(x).Forget());
-
-                connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
-
-                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.pullRequestCommand, showPullRequests);
-                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.backCommand, navigator.NavigateBack);
-                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
-                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.refreshCommand, refresh);
-                BindNavigatorCommand(paneServiceProvider, PkgCmdIDList.githubCommand, openInBrowser);
-
-                paneServiceProvider.AddCommandHandler(Guids.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
-                     (_, __) =>
-                     {
-                         browser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                         usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
-                     });
-            }
-            finally
-            {
-                initialized = true;
-                initializing.Release();
-            }
+            return initializeTask = initializeTask ?? CreateInitializeTask(paneServiceProvider);
         }
 
         /// <inheritdoc/>
@@ -353,27 +328,31 @@ namespace GitHub.ViewModels.GitHubPane
             //         x.IsPending);
         }
 
-        OleMenuCommand BindNavigatorCommand<T>(IServiceProvider paneServiceProvider, int commandId, ReactiveCommand<T> command)
+        async Task CreateInitializeTask(IServiceProvider paneServiceProvider)
         {
-            Guard.ArgumentNotNull(paneServiceProvider, nameof(paneServiceProvider));
+            await UpdateContent(teamExplorerContext.ActiveRepository);
+            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+               .Skip(1)
+               .ObserveOn(RxApp.MainThreadScheduler)
+               .Subscribe(x => UpdateContent(x).Forget());
+
+            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+
+            var menuService = (IMenuCommandService)paneServiceProvider.GetService(typeof(IMenuCommandService));
+            BindNavigatorCommand(menuService, PkgCmdIDList.pullRequestCommand, showPullRequests);
+            BindNavigatorCommand(menuService, PkgCmdIDList.backCommand, navigator.NavigateBack);
+            BindNavigatorCommand(menuService, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
+            BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);
+            BindNavigatorCommand(menuService, PkgCmdIDList.githubCommand, openInBrowser);
+            BindNavigatorCommand(menuService, PkgCmdIDList.helpCommand, help);
+        }
+
+        OleMenuCommand BindNavigatorCommand<T>(IMenuCommandService menu, int commandId, ReactiveCommand<T> command)
+        {
+            Guard.ArgumentNotNull(menu, nameof(menu));
             Guard.ArgumentNotNull(command, nameof(command));
 
-            Func<bool> canExecute = () => Content == navigator && command.CanExecute(null);
-
-            var result = paneServiceProvider.AddCommandHandler(
-                Guids.guidGitHubToolbarCmdSet,
-                commandId,
-                canExecute,
-                () => command.Execute(null),
-                true);
-
-            Observable.CombineLatest(
-                this.WhenAnyValue(x => x.Content),
-                command.CanExecuteObservable,
-                (c, e) => c == navigator && e)
-                .Subscribe(x => result.Enabled = x);
-
-            return result;
+            return menu.BindCommand(new CommandID(Guids.guidGitHubToolbarCmdSet, commandId), command);
         }
 
         async Task NavigateTo<TViewModel>(Func<TViewModel, Task> initialize, Func<TViewModel, bool> match = null)

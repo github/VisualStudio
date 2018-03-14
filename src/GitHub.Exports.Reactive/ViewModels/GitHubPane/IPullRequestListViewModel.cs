@@ -33,6 +33,7 @@ namespace GitHub.ViewModels.GitHubPane
         IRemoteRepositoryModel SelectedRepository { get; set; }
         ITrackingCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
+        IPullRequestModel CheckedOutPullRequest { get; }
         IReadOnlyList<PullRequestState> States { get; set; }
         PullRequestState SelectedState { get; set; }
         ObservableCollection<IAccount> Authors { get; }

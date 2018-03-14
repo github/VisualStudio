@@ -20,6 +20,6 @@ namespace GitHub.Services
     public interface IVSUIContext
     {
         bool IsActive { get; }
-        event EventHandler<VSUIContextChangedEventArgs> UIContextChanged;
+        void WhenActivated(Action action);
     }
 }
