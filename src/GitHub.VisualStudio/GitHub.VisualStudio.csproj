@@ -513,6 +513,10 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
+    <Page Include="Views\Dialog\DialogStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Dialog\GistCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -538,6 +542,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialog\RepositoryRecloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\GitHubPaneStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
