@@ -4,6 +4,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,6 +13,7 @@ using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Info;
+using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
@@ -97,6 +99,38 @@ namespace GitHub.VisualStudio
                 ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref packageGuid, out vsPackage));
             }
         }
+    }
+
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class ServiceProviderExports
+    {
+        // Only export services for the Visual Studio process (they don't work in Expression Blend).
+        const string ProcessName = "devenv";
+
+        readonly IServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public ServiceProviderExports([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        [ExportForProcess(typeof(ILoginManager), ProcessName)]
+        public ILoginManager LoginManager => GetService<ILoginManager>();
+
+        [ExportForProcess(typeof(IMenuProvider), ProcessName)]
+        public IMenuProvider MenuProvider => GetService<IMenuProvider>();
+
+        [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
+        public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
+
+        [ExportForProcess(typeof(IUsageTracker), ProcessName)]
+        public IUsageTracker UsageTracker => GetService<IUsageTracker>();
+
+        [ExportForProcess(typeof(IVSGitExt), ProcessName)]
+        public IVSGitExt VSGitExt => GetService<IVSGitExt>();
+
+        T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
     }
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -221,7 +255,7 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IVSGitExt))
             {
                 var vsVersion = ApplicationInfo.GetHostVersionInfo().FileMajorPart;
-                return VSGitExtFactory.Create(vsVersion, this);
+                return new VSGitExtFactory(vsVersion, this).Create();
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {

@@ -2,8 +2,6 @@
 extern alias TF15;
 
 using System;
-using System.ComponentModel.Composition;
-using GitHub.Info;
 using GitHub.Logging;
 using Serilog;
 using Microsoft.VisualStudio.Shell;
@@ -12,25 +10,27 @@ using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.Services
 {
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitExtFactory
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExtFactory>();
 
-        [ImportingConstructor]
-        public VSGitExtFactory(IGitHubServiceProvider serviceProvider)
+        readonly int vsVersion;
+        readonly IAsyncServiceProvider asyncServiceProvider;
+
+        public VSGitExtFactory(int vsVersion, IAsyncServiceProvider asyncServiceProvider)
         {
-            VSGitExt = serviceProvider.GetService<IVSGitExt>();
+            this.vsVersion = vsVersion;
+            this.asyncServiceProvider = asyncServiceProvider;
         }
 
-        public static IVSGitExt Create(int vsVersion, IAsyncServiceProvider sp)
+        public IVSGitExt Create()
         {
             switch (vsVersion)
             {
                 case 14:
-                    return Create(() => new VSGitExt14(sp));
+                    return Create(() => new VSGitExt14(asyncServiceProvider));
                 case 15:
-                    return Create(() => new VSGitExt15(sp));
+                    return Create(() => new VSGitExt15(asyncServiceProvider));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
                     return null;
@@ -40,8 +40,5 @@ namespace GitHub.Services
         // NOTE: We're being careful to only reference VSGitExt14 and VSGitExt15 from inside a lambda expression.
         // This ensures that only the type that's compatible with the running DTE version is loaded.
         static IVSGitExt Create(Func<IVSGitExt> factory) => factory.Invoke();
-
-        [Export]
-        public IVSGitExt VSGitExt { get; }
     }
 }
