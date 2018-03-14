@@ -13,7 +13,8 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
 {
-    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    // Initialize menus on Main thread.
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
     [Guid(Guids.InlineReviewsPackageId)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -24,12 +25,10 @@ namespace GitHub.InlineReviews
             CancellationToken cancellationToken,
             IProgress<ServiceProgressData> progress)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            var exports = componentModel.DefaultExportProvider;
 
+            var exports = componentModel.DefaultExportProvider;
             menuService.AddCommands(
                 exports.GetExportedValue<INextInlineCommentCommand>(),
                 exports.GetExportedValue<IPreviousInlineCommentCommand>());

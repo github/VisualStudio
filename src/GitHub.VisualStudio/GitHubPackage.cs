@@ -24,12 +24,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
 {
-    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    // Initialize menus on Main thread.
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version, IconResourceID = 400)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // Only initialize when we're in the context of a Git repository.
-    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(Guids.UIContext_Git)]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
@@ -70,9 +71,6 @@ namespace GitHub.VisualStudio
         {
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-
-            // IMenuCommandService.AddCommand uses IServiceProvider.GetService and must be called on Main thread.
-            await ThreadingHelper.SwitchToMainThreadAsync();
 
             var exports = componentModel.DefaultExportProvider;
             menuService.AddCommands(
