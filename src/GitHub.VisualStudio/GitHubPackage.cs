@@ -35,18 +35,6 @@ namespace GitHub.VisualStudio
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
 
-        readonly IServiceProvider serviceProvider;
-
-        public GitHubPackage()
-        {
-            serviceProvider = this;
-        }
-
-        public GitHubPackage(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             LogVersionInformation();
