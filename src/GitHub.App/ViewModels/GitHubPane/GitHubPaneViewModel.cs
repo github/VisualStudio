@@ -50,8 +50,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
         readonly ReactiveCommand<object> help;
-        readonly SemaphoreSlim initializing = new SemaphoreSlim(1);
-        bool initialized;
+        Task initializeTask;
         IViewModel content;
         ILocalRepositoryModel localRepository;
         string searchQuery;
@@ -207,34 +206,9 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(IServiceProvider paneServiceProvider)
+        public Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
-            await initializing.WaitAsync();
-            if (initialized) return;
-
-            try
-            {
-                await UpdateContent(teamExplorerContext.ActiveRepository);
-                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
-                   .Skip(1)
-                   .ObserveOn(RxApp.MainThreadScheduler)
-                   .Subscribe(x => UpdateContent(x).Forget());
-
-                connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
-
-                var menuService = (IMenuCommandService)paneServiceProvider.GetService(typeof(IMenuCommandService));
-                BindNavigatorCommand(menuService, PkgCmdIDList.pullRequestCommand, showPullRequests);
-                BindNavigatorCommand(menuService, PkgCmdIDList.backCommand, navigator.NavigateBack);
-                BindNavigatorCommand(menuService, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
-                BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);
-                BindNavigatorCommand(menuService, PkgCmdIDList.githubCommand, openInBrowser);
-                BindNavigatorCommand(menuService, PkgCmdIDList.helpCommand, help);
-            }
-            finally
-            {
-                initialized = true;
-                initializing.Release();
-            }
+            return initializeTask = initializeTask ?? CreateInitializeTask(paneServiceProvider);
         }
 
         /// <inheritdoc/>
@@ -306,6 +280,25 @@ namespace GitHub.ViewModels.GitHubPane
             return NavigateTo<IPullRequestDetailViewModel>(
                 x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number),
                 x => x.RemoteRepositoryOwner == owner && x.LocalRepository.Name == repo && x.Number == number);
+        }
+
+        async Task CreateInitializeTask(IServiceProvider paneServiceProvider)
+        {
+            await UpdateContent(teamExplorerContext.ActiveRepository);
+            teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+               .Skip(1)
+               .ObserveOn(RxApp.MainThreadScheduler)
+               .Subscribe(x => UpdateContent(x).Forget());
+
+            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget();
+
+            var menuService = (IMenuCommandService)paneServiceProvider.GetService(typeof(IMenuCommandService));
+            BindNavigatorCommand(menuService, PkgCmdIDList.pullRequestCommand, showPullRequests);
+            BindNavigatorCommand(menuService, PkgCmdIDList.backCommand, navigator.NavigateBack);
+            BindNavigatorCommand(menuService, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
+            BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);
+            BindNavigatorCommand(menuService, PkgCmdIDList.githubCommand, openInBrowser);
+            BindNavigatorCommand(menuService, PkgCmdIDList.helpCommand, help);
         }
 
         OleMenuCommand BindNavigatorCommand<T>(IMenuCommandService menu, int commandId, ReactiveCommand<T> command)
