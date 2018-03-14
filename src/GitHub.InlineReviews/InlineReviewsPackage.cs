@@ -16,7 +16,7 @@ namespace GitHub.InlineReviews
     // Initialize menus on Main thread.
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
     [Guid(Guids.InlineReviewsPackageId)]
-    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
+    [ProvideAutoLoad(Guids.UIContext_Git)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(PullRequestCommentsPane), DocumentLikeTool = true)]
     public class InlineReviewsPackage : AsyncPackage
