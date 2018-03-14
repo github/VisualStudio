@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Windows.Input;
 using GitHub.Extensions;
 using Microsoft.VisualStudio.Shell;
@@ -37,14 +38,14 @@ namespace GitHub.InlineReviews.Commands
         }
 
         /// <inheritdoc/>
-        public override void Register(IServiceProvider package)
+        public override void Register(IServiceProvider package, IMenuCommandService menuService)
         {
             var command = new OleMenuCommand(
                 (s, e) => Execute().Forget(),
                 (s, e) => { },
                 (s, e) => BeforeQueryStatus((OleMenuCommand)s),
                 VsCommandID);
-            Register(package, command);
+            Register(package, menuService, command);
         }
 
         /// <summary>
@@ -88,14 +89,14 @@ namespace GitHub.InlineReviews.Commands
         }
 
         /// <inheritdoc/>
-        public override void Register(IServiceProvider package)
+        public override void Register(IServiceProvider package, IMenuCommandService menuService)
         {
             var command = new OleMenuCommand(
                 (s, e) => Execute((TParam)((OleMenuCmdEventArgs)e).InValue).Forget(),
                 (s, e) => { },
                 (s, e) => BeforeQueryStatus((OleMenuCommand)s),
                 VsCommandID);
-            Register(package, command);
+            Register(package, menuService, command);
         }
 
         /// <summary>

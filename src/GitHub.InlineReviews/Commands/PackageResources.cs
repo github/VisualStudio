@@ -1,6 +1,6 @@
 ﻿using System;
-using GitHub.Extensions;
-using GitHub.Services;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.InlineReviews.Commands
@@ -12,10 +12,13 @@ namespace GitHub.InlineReviews.Commands
         /// </summary>
         /// <typeparam name="TPackage">The type of the package.</typeparam>
         /// <param name="package">The package.</param>
-        public static void Register<TPackage>(TPackage package) where TPackage : Package
+        public static void Register<TPackage>(
+            TPackage package,
+            ExportProvider exportProvider,
+            IMenuCommandService menuService)
+                where TPackage : Package
         {
-            var serviceProvider = package.GetServiceSafe<IGitHubServiceProvider>();
-            var commands = serviceProvider?.ExportProvider?.GetExports<IPackageResource, IExportCommandMetadata>();
+            var commands = exportProvider.GetExports<IPackageResource, IExportCommandMetadata>();
 
             if (commands != null)
             {
@@ -23,7 +26,7 @@ namespace GitHub.InlineReviews.Commands
                 {
                     if (command.Metadata.PackageType == typeof(TPackage))
                     {
-                        command.Value.Register(package);
+                        command.Value.Register(package, menuService);
                     }
                 }
             }
