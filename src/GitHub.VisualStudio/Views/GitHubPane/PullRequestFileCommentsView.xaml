@@ -24,6 +24,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/GitHubPaneStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Key="FileComments" Source="{Binding}">
                 <CollectionViewSource.GroupDescriptions>
@@ -66,8 +67,9 @@
                                                 <DataTemplate>
                                                     <Border BorderBrush="{DynamicResource GitHubExpanderHeaderBackground}"
                                                             BorderThickness="1 0 1 1">
-                                                        <TextBlock TextTrimming="WordEllipsis" Margin="4">
-                                                            <Hyperlink>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="4">
+                                                            <!-- WPF you suck. https://stackoverflow.com/questions/2476305 -->
+                                                            <Hyperlink Style="{StaticResource BlackHyperlink}">
                                                                 <Run Text="{Binding Body, Converter={ui:TrimNewlinesConverter}, Mode=OneWay}"/>
                                                             </Hyperlink>
                                                         </TextBlock>
