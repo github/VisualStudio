@@ -114,9 +114,6 @@ namespace GitHub.VisualStudio
         [ExportForProcess(typeof(ILoginManager), ProcessName)]
         public ILoginManager LoginManager => GetService<ILoginManager>();
 
-        [ExportForProcess(typeof(IMenuProvider), ProcessName)]
-        public IMenuProvider MenuProvider => GetService<IMenuProvider>();
-
         [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
         public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
 
