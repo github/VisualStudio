@@ -31,7 +31,6 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPaneViewModel>();
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
-        static readonly Regex pullReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/:id");
         static readonly Regex pullNewReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/new");
         static readonly Regex pullUserReviewsUri = CreateRoute("/:owner/:repo/pull/:number/reviews/:login");
 
@@ -278,14 +277,6 @@ namespace GitHub.ViewModels.GitHubPane
                 var number = int.Parse(match.Groups["number"].Value);
                 await ShowCreatePullRequestReview(owner, repo, number);
             }
-            else if ((match = pullReviewUri.Match(uri.AbsolutePath))?.Success == true)
-            {
-                var owner = match.Groups["owner"].Value;
-                var repo = match.Groups["repo"].Value;
-                var number = int.Parse(match.Groups["number"].Value);
-                var id = long.Parse(match.Groups["id"].Value);
-                await ShowPullRequestReview(owner, repo, number, id);
-            }
             else if ((match = pullUserReviewsUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
@@ -334,20 +325,6 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public Task ShowPullRequestReview(string owner, string repo, int number, long id)
-        {
-            Guard.ArgumentNotNull(owner, nameof(owner));
-            Guard.ArgumentNotNull(repo, nameof(repo));
-
-            return NavigateTo<IPullRequestReviewViewModel>(
-                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, id),
-                x => x.RemoteRepositoryOwner == owner &&
-                     x.LocalRepository.Name == repo &&
-                     x.PullRequestNumber == number &&
-                     x.PullRequestReviewId == id);
-        }
-
-        /// <inheritdoc/>
         public Task ShowPullRequestReviews(string owner, string repo, int number, string login)
         {
             Guard.ArgumentNotNull(owner, nameof(owner));
@@ -367,12 +344,13 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(owner, nameof(owner));
             Guard.ArgumentNotNull(repo, nameof(repo));
 
-            return NavigateTo<IPullRequestReviewViewModel>(
-                x => x.InitializeNewAsync(LocalRepository, Connection, owner, repo, number),
-                x => x.RemoteRepositoryOwner == owner &&
-                     x.LocalRepository.Name == repo &&
-                     x.PullRequestNumber == number &&
-                     x.IsPending);
+            throw new NotImplementedException();
+            //return NavigateTo<IPullRequestReviewViewModel>(
+            //    x => x.InitializeNewAsync(LocalRepository, Connection, owner, repo, number),
+            //    x => x.RemoteRepositoryOwner == owner &&
+            //         x.LocalRepository.Name == repo &&
+            //         x.PullRequestNumber == number &&
+            //         x.IsPending);
         }
 
         OleMenuCommand BindNavigatorCommand<T>(IServiceProvider paneServiceProvider, int commandId, ReactiveCommand<T> command)

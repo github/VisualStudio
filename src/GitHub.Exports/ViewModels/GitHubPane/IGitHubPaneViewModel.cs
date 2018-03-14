@@ -98,13 +98,13 @@ namespace GitHub.ViewModels.GitHubPane
         Task ShowPullRequest(string owner, string repo, int number);
 
         /// <summary>
-        /// Shows the details for a pull request review in the GitHub pane.
+        /// Shows the pull requests reviews authored by a user.
         /// </summary>
         /// <param name="owner">The repository owner.</param>
         /// <param name="repo">The repository name.</param>
         /// <param name="number">The pull rqeuest number.</param>
-        /// <param name="id">The pull rqeuest review ID.</param>
-        Task ShowPullRequestReview(string owner, string repo, int number, long id);
+        /// <param name="login">The user login.</param>
+        Task ShowPullRequestReviews(string owner, string repo, int number, string login);
 
         /// <summary>
         /// Shows a pane for creating a new pull request review.

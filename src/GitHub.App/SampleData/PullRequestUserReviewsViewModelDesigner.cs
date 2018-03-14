@@ -13,22 +13,18 @@ namespace GitHub.SampleData
         {
             User = new AccountDesigner { Login = "Haacked", IsUser = true };
             PullRequestNumber = 123;
-            Title = "Error handling/bubbling from viewmodels to views to viewhosts";
+            PullRequestTitle = "Error handling/bubbling from viewmodels to views to viewhosts";
             Reviews = new[]
             {
                 new PullRequestReviewViewModelDesigner()
                 {
-                    Body = null,
-                    IsEmpty = true,
                     IsLatest = true,
                     FileComments = new PullRequestReviewFileCommentViewModel[0],
-                    State = PullRequestReviewState.Approved,
                     StateDisplay = "approved",
                 },
                 new PullRequestReviewViewModelDesigner()
                 {
                     IsLatest = true,
-                    State = PullRequestReviewState.ChangesRequested,
                     StateDisplay = "requested changes",
                 }
             };
@@ -39,7 +35,7 @@ namespace GitHub.SampleData
         public int PullRequestNumber { get; set; }
         public IAccount User { get; set; }
         public IReadOnlyList<IPullRequestReviewViewModel> Reviews { get; set; }
-        public string Title { get; set; }
+        public string PullRequestTitle { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)

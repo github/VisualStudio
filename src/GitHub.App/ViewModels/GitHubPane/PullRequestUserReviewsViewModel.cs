@@ -16,7 +16,7 @@ using static System.FormattableString;
 namespace GitHub.ViewModels.GitHubPane
 {
     /// <summary>
-    /// View model for displaying details of a pull request review.
+    /// Displays all reviews made by a user on a pull request.
     /// </summary>
     [Export(typeof(IPullRequestUserReviewsViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
@@ -26,7 +26,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestSessionManager sessionManager;
         readonly IModelServiceFactory modelServiceFactory;
-        readonly IViewViewModelFactory viewModelFactory;
         IModelService modelService;
         IPullRequestSession session;
         IAccount user;
@@ -38,7 +37,6 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
             IModelServiceFactory modelServiceFactory,
-            IViewViewModelFactory viewModelFactory,
             IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
@@ -48,7 +46,6 @@ namespace GitHub.ViewModels.GitHubPane
 
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
-            this.viewModelFactory = viewModelFactory;
 
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
@@ -77,7 +74,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public string Title
+        public string PullRequestTitle
         {
             get { return title; }
             private set { this.RaiseAndSetIfChanged(ref title, value); }
@@ -148,7 +145,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 session = await sessionManager.GetSession(pullRequest);
                 User = user;
-                Title = pullRequest.Title;
+                PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();
 
@@ -156,8 +153,7 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     if (review.User.Login == user.Login)
                     {
-                        var vm = (PullRequestReviewViewModel)viewModelFactory.CreateViewModel<IPullRequestReviewViewModel>();
-                        await vm.InitializeAsync(
+                        var vm = new PullRequestReviewViewModel(
                             LocalRepository,
                             RemoteRepositoryOwner,
                             pullRequest,

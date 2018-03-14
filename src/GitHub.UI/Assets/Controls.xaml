@@ -472,7 +472,7 @@
     <CornerRadius x:Key="GitHubExpanderCornerRadius">3</CornerRadius>
     <SolidColorBrush x:Key="GitHubExpanderHeaderBackground" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
 
-    <Style x:Key="GitHubExpander" TargetType="{x:Type Expander}">
+    <Style TargetType="{x:Type Expander}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />

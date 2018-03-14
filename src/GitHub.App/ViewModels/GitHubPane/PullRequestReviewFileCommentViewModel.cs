@@ -8,20 +8,14 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestReviewFileCommentViewModel : IPullRequestReviewFileCommentViewModel
     {
-        public PullRequestReviewFileCommentViewModel(
-            IPullRequestReviewCommentModel model,
-            int lineNumber)
+        public PullRequestReviewFileCommentViewModel(IPullRequestReviewCommentModel model)
         {
             Body = model.Body;
-            LineNumber = lineNumber;
             RelativePath = model.Path;
         }
 
         /// <inheritdoc/>
         public string Body { get; }
-
-        /// <inheritdoc/>
-        public int LineNumber { get; }
 
         /// <inheritdoc/>
         public string RelativePath { get; }

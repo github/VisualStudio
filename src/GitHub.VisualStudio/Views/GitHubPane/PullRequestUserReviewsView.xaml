@@ -9,7 +9,7 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
-             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
 
     <d:DesignData.DataContext>
         <sampleData:PullRequestUserReviewsViewModelDesigner/>
@@ -27,7 +27,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <ScrollViewer>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
                 <TextBlock FontSize="16" VerticalAlignment="Center">
@@ -39,7 +39,10 @@
                         </Hyperlink>
                 </TextBlock>
 
-                <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Margin="0" Text="{Binding Title}" TextWrapping="Wrap"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
+                           Margin="0"
+                           Text="{Binding PullRequestTitle}"
+                           TextWrapping="Wrap"/>
                 <StackPanel Orientation="Horizontal" Margin="0 4">
                     <c:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
                     <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
@@ -52,20 +55,7 @@
                         <StackPanel>
                             <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
-                            <Expander Style="{DynamicResource GitHubExpander}"
-                                      Foreground="{DynamicResource GitHubVsWindowText}">
-                                <Expander.IsEnabled>
-                                    <MultiBinding Converter="{ui:OrConverter}" Mode="OneWay">
-                                        <Binding Path="Body" Converter="{ui:NotEqualsConverter {x:Null}}"/>
-                                        <Binding Path="FileComments.Count" Converter="{ui:NotEqualsConverter 0}"/>
-                                    </MultiBinding>
-                                </Expander.IsEnabled>
-                                <Expander.IsExpanded>
-                                    <MultiBinding Converter="{ui:AndConverter}" Mode="OneWay">
-                                        <Binding Path="IsLatest"/>
-                                        <Binding Path="IsEnabled" RelativeSource="{RelativeSource Self}"/>
-                                    </MultiBinding>
-                                </Expander.IsExpanded>
+                            <Expander Margin="0 0 4 0">
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel Width="20" Height="16" HorizontalAlignment="Center">
@@ -82,17 +72,33 @@
                                         </TextBlock>
                                     </StackPanel>
                                 </Expander.Header>
-                                <StackPanel Margin="24 4 4 16">
-                                    <ui:SectionControl HeaderText="Description"
-                                                       IsExpanded="True"
-                                                       Visibility="{Binding Body, Converter={ui:NullToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer Markdown="{Binding Body}"/>
-                                    </ui:SectionControl>
-                                    <ui:SectionControl HeaderText="Comments"
-                                                       IsExpanded="True"
-                                                       Visibility="{Binding FileComments.Count, Converter={ui:CountToVisibilityConverter}}">
-                                        <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" Margin="0 4"/>
-                                    </ui:SectionControl>
+                                <StackPanel Margin="16 4 0 16">
+                                    <Expander IsExpanded="True"
+                                              Margin="0 4"
+                                              Visibility="{Binding Body, Converter={ui:NullToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock FontWeight="SemiBold">Description</TextBlock>
+                                        </Expander.Header>
+                                        <markdig:MarkdownViewer Margin="22 4 0 0" Markdown="{Binding Body}"/>
+                                    </Expander>
+                                    <Expander IsExpanded="True"
+                                              Margin="0 4"
+                                              Visibility="{Binding FileComments.Count, Converter={ui:CountToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock FontWeight="SemiBold">Comments</TextBlock>
+                                        </Expander.Header>
+                                        <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" 
+                                                                           Margin="22 4 0 0"/>
+                                    </Expander>
+                                    <Expander IsExpanded="True"
+                                              Margin="0 4"
+                                              Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock FontWeight="SemiBold">Outdated comments</TextBlock>
+                                        </Expander.Header>
+                                        <local:PullRequestFileCommentsView DataContext="{Binding OutdatedFileComments}"
+                                                                           Margin="22 4 0 0"/>
+                                    </Expander>
                                 </StackPanel>
                             </Expander>
                         </StackPanel>
