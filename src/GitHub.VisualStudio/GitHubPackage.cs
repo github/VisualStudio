@@ -59,18 +59,16 @@ namespace GitHub.VisualStudio
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
-            // has been loaded. We're using the following instead as a workaround.
-            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() =>
-                menuService.AddCommands(
-                    exports.GetExportedValue<IAddConnectionCommand>(),
-                    exports.GetExportedValue<IBlameLinkCommand>(),
-                    exports.GetExportedValue<ICopyLinkCommand>(),
-                    exports.GetExportedValue<ICreateGistCommand>(),
-                    exports.GetExportedValue<IOpenLinkCommand>(),
-                    exports.GetExportedValue<IOpenPullRequestsCommand>(),
-                    exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                    exports.GetExportedValue<IShowGitHubPaneCommand>()));
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            menuService.AddCommands(
+                exports.GetExportedValue<IAddConnectionCommand>(),
+                exports.GetExportedValue<IBlameLinkCommand>(),
+                exports.GetExportedValue<ICopyLinkCommand>(),
+                exports.GetExportedValue<ICreateGistCommand>(),
+                exports.GetExportedValue<IOpenLinkCommand>(),
+                exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                exports.GetExportedValue<IShowGitHubPaneCommand>());
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
