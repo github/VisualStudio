@@ -18,11 +18,11 @@ namespace GitHub.VisualStudio.Commands
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
 
         [ImportingConstructor]
-        protected CreateGistCommand(IGitHubServiceProvider serviceProvider)
+        protected CreateGistCommand(Lazy<IDialogService> dialogService, Lazy<ISelectedTextProvider> selectedTextProvider)
             : base(CommandSet, CommandId)
         {
-            dialogService = new Lazy<IDialogService>(() => serviceProvider.TryGetService<IDialogService>());
-            selectedTextProvider = new Lazy<ISelectedTextProvider>(() => serviceProvider.TryGetService<ISelectedTextProvider>());
+            this.dialogService = dialogService;
+            this.selectedTextProvider = selectedTextProvider;
         }
 
         /// <summary>
