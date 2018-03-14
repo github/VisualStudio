@@ -89,6 +89,7 @@
                                                             </StackPanel>
 
                                                             <TextBlock Text="{Binding Body, Converter={ui:TrimNewlinesConverter}}"
+                                                                       Foreground="{DynamicResource VsBrush.WindowText}"
                                                                        TextWrapping="Wrap"
                                                                        TextTrimming="WordEllipsis"
                                                                        Margin="4"
