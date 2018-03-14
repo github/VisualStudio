@@ -19,9 +19,14 @@ namespace GitHub.ViewModels.GitHubPane
         string StateDisplay { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the pull request review is the latest by the author.
+        /// Gets a value indicating whether the pull request review should initially be expanded.
         /// </summary>
-        bool IsLatest { get; }
+        bool IsExpanded { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request review has a body or file comments.
+        /// </summary>
+        bool HasDetails { get; }
 
         /// <summary>
         /// Gets a list of the file comments in the review.

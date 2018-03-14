@@ -39,7 +39,6 @@ namespace GitHub.ViewModels.GitHubPane
             Model = GetModel(pullRequest, pullRequestReviewId);
             PullRequestModel = pullRequest;
             Body = string.IsNullOrWhiteSpace(Model.Body) ? null : Model.Body;
-            IsLatest = CalculateIsLatest(pullRequest, Model);
             StateDisplay = ToString(Model.State);
 
             var comments = new List<IPullRequestReviewFileCommentViewModel>();
@@ -60,6 +59,11 @@ namespace GitHub.ViewModels.GitHubPane
 
             FileComments = comments;
             OutdatedFileComments = outdated;
+
+            HasDetails = Body != null ||
+                FileComments.Count > 0 ||
+                OutdatedFileComments.Count > 0;
+            IsExpanded = HasDetails && CalculateIsLatest(pullRequest, Model);
         }
 
         /// <inheritdoc/>
@@ -81,7 +85,10 @@ namespace GitHub.ViewModels.GitHubPane
         public string StateDisplay { get; }
 
         /// <inheritdoc/>
-        public bool IsLatest { get; }
+        public bool IsExpanded { get; }
+
+        /// <inheritdoc/>
+        public bool HasDetails { get; }
 
         /// <inheritdoc/>
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; }
