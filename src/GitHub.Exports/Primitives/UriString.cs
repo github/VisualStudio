@@ -129,10 +129,12 @@ namespace GitHub.Primitives
         public bool IsValidUri => url != null;
 
         /// <summary>
-        /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL.
+        /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL,
+        /// optionally changing the owner.
         /// </summary>
+        /// <param name="owner">The owner to use, if null uses <see cref="Owner"/>.</param>
         /// <returns>A converted uri, or the existing one if we can't convert it (which might be null)</returns>
-        public Uri ToRepositoryUrl()
+        public Uri ToRepositoryUrl(string owner = null)
         {
             // we only want to process urls that represent network resources
             if (!IsScpUri && (!IsValidUri || IsFileUri)) return url;
@@ -141,11 +143,15 @@ namespace GitHub.Primitives
                 ? url.Scheme
                 : Uri.UriSchemeHttps;
 
+            var nameWithOwner = owner != null && Owner != null ?
+                string.Format(CultureInfo.InvariantCulture, "{0}/{1}", owner, RepositoryName) :
+                NameWithOwner;
+
             return new UriBuilder
             {
                 Scheme = scheme,
                 Host = Host,
-                Path = NameWithOwner,
+                Path = nameWithOwner,
                 Port = url?.Port == 80
                     ? -1
                     : (url?.Port ?? -1)

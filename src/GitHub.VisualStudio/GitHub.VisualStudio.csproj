@@ -314,6 +314,7 @@
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\OpenPullRequestsCommand.cs" />
+    <Compile Include="GitContextPackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Commands\AddConnectionCommand.cs" />
@@ -326,6 +327,7 @@
     <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="Services\LoginManagerDispatcher.cs" />
     <Compile Include="Services\UsageTrackerDispatcher.cs" />
+    <Compile Include="Services\VSGitExtFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
@@ -681,6 +683,7 @@
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF14</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
@@ -688,6 +691,7 @@
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF15</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>

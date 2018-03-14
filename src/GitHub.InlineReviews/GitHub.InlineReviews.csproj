@@ -76,10 +76,12 @@
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
     <Compile Include="Glyph\IGlyphFactory.cs" />
+    <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
     <Compile Include="Models\PullRequestSessionLiveFile.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
+    <Compile Include="Services\PullRequestStatusBarManager.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCommentsViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
     <Compile Include="Views\DiffCommentThreadView.xaml.cs">
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
@@ -148,6 +151,9 @@
     </Compile>
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PullRequestStatusView.xaml.cs">
+      <DependentUpon>PullRequestStatusView.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
@@ -448,6 +454,10 @@
     <Page Include="Views\CommentView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PullRequestStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
