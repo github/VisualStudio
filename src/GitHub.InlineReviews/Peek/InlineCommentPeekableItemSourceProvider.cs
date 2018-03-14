@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.Commands;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;

@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
@@ -63,14 +64,14 @@ namespace GitHub.InlineReviews.ViewModels
             peekSession.Dismissed += (s, e) => Dispose();
 
             NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextCommentCommand.IsEnabled),
+                Observable.Return(nextCommentCommand.Enabled),
                 _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
             PreviousComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(previousCommentCommand.IsEnabled),
+                Observable.Return(previousCommentCommand.Enabled),
                 _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
