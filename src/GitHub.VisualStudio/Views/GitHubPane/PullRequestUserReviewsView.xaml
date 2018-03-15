@@ -93,8 +93,7 @@
                                         <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" 
                                                                            Margin="22 4 0 0"/>
                                     </Expander>
-                                    <Expander IsExpanded="True"
-                                              Margin="0 4"
+                                    <Expander Margin="0 4"
                                               Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
                                         <Expander.Header>
                                             <TextBlock FontWeight="SemiBold">Outdated comments</TextBlock>
