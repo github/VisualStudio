@@ -28,12 +28,10 @@ namespace GitHub.InlineReviews
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
-            // has been loaded. We're using the following instead as a workaround.
-            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() =>
-                menuService.AddCommands(
-                    exports.GetExportedValue<INextInlineCommentCommand>(),
-                    exports.GetExportedValue<IPreviousInlineCommentCommand>()));
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            menuService.AddCommands(
+                exports.GetExportedValue<INextInlineCommentCommand>(),
+                exports.GetExportedValue<IPreviousInlineCommentCommand>());
         }
     }
 }
