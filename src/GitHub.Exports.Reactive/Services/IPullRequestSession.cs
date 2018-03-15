@@ -69,11 +69,14 @@ namespace GitHub.Services
         /// Gets a file touched by the pull request.
         /// </summary>
         /// <param name="relativePath">The relative path to the file.</param>
+        /// <param name="commitSha">
+        /// The commit at which to get the file contents, or "HEAD" to track the pull request head.
+        /// </param>
         /// <returns>
         /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
         /// the pull request.
         /// </returns>
-        Task<IPullRequestSessionFile> GetFile(string relativePath);
+        Task<IPullRequestSessionFile> GetFile(string relativePath, string commitSha = "HEAD");
 
         /// <summary>
         /// Gets the merge base SHA for the pull request.

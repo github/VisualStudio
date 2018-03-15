@@ -47,13 +47,14 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
-                if (thread == null && model.Position.HasValue)
+                if (thread == null)
                 {
-                    var file = await session.GetFile(RelativePath);
+                    var commit = model.Position.HasValue ? model.CommitId : model.OriginalCommitId;
+                    var file = await session.GetFile(RelativePath, commit);
                     thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Id == model.Id));
                 }
 
-                if (thread?.LineNumber != -1)
+                if (thread != null && thread.LineNumber != -1)
                 {
                     await editorService.OpenDiff(session, RelativePath, thread);
                 }

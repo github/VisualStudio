@@ -86,7 +86,8 @@ namespace GitHub.InlineReviews.Services
         public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             IPullRequestModel pullRequest,
             string relativePath,
-            IReadOnlyList<DiffChunk> diff)
+            IReadOnlyList<DiffChunk> diff,
+            string headSha)
         {
             relativePath = relativePath.Replace("\\", "/");
 
@@ -111,8 +112,7 @@ namespace GitHub.InlineReviews.Services
 
                 var thread = new InlineCommentThreadModel(
                     relativePath,
-                    comments.Key.Item1,
-                    comments.Key.Item2,
+                    headSha,
                     diffLines,
                     comments);
                 threads.Add(thread);

@@ -138,7 +138,7 @@ namespace GitHub.InlineReviews.Tags
             {
                 session = bufferInfo.Session;
                 relativePath = bufferInfo.RelativePath;
-                file = await session.GetFile(relativePath);
+                file = await session.GetFile(relativePath, bufferInfo.CommitSha ?? "HEAD");
                 fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
                 side = bufferInfo.Side ?? DiffSide.Right;
                 NotifyTagsChanged();
