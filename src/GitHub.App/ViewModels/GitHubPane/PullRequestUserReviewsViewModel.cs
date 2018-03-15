@@ -24,6 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestReviewViewModel>();
 
+        readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IModelServiceFactory modelServiceFactory;
         IModelService modelService;
@@ -36,14 +37,13 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestUserReviewsViewModel(
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
-            IModelServiceFactory modelServiceFactory,
-            IPullRequestFilesViewModel files)
+            IModelServiceFactory modelServiceFactory)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
-            Guard.ArgumentNotNull(files, nameof(files));
 
+            this.editorService = editorService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
 
@@ -154,6 +154,8 @@ namespace GitHub.ViewModels.GitHubPane
                     if (review.User.Login == user.Login)
                     {
                         var vm = new PullRequestReviewViewModel(
+                            editorService,
+                            session,
                             LocalRepository,
                             RemoteRepositoryOwner,
                             pullRequest,

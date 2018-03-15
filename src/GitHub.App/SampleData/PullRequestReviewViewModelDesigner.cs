@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
@@ -34,33 +32,28 @@ Otherwise, very nice work here! ✨";
 
             var comments = new[]
             {
-                new PullRequestReviewCommentModel
+                new PullRequestReviewFileCommentViewModelDesigner
                 {
                     Body = @"These should probably be properties. Most likely they should be readonly properties. I know that makes creating instances of these not look as nice as using property initializers when constructing an instance, but if these properties should never be mutated after construction, then it guides future consumers to the right behavior.
 
 However, if you're two-way binding these properties to a UI, then ignore the readonly part and make them properties. But in that case they should probably be reactive properties (or implement INPC).",
-                    Path = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
-                    Position = 1,
+                    RelativePath = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
                 },
-                new PullRequestReviewCommentModel
+                new PullRequestReviewFileCommentViewModelDesigner
                 {
                     Body = "While I have no problems with naming a variable ass I think we should probably avoid swear words in case Microsoft runs their Policheck tool against this code.",
-                    Path = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
-                    Position = 1,
+                    RelativePath = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
                 },
             };
 
             var outdated = new[]
             {
-                new PullRequestReviewCommentModel
+                new PullRequestReviewFileCommentViewModelDesigner
                 {
                     Body = @"So this is just casting a mutable list to an IReadOnlyList which can be cast back to List. I know we probably won't do that, but I'm thinking of the next person to come along. The safe thing to do is to wrap List with a ReadOnlyList. We have an extension method ToReadOnlyList for observables. Wouldn't be hard to write one for IEnumerable.",
-                    Path = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
+                    RelativePath = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
                 },
             };
-
-            FileComments = comments.Select((x, i) => new PullRequestReviewFileCommentViewModel(x)).ToList();
-            OutdatedFileComments = outdated.Select((x, i) => new PullRequestReviewFileCommentViewModel(x)).ToList();
         }
 
         public string Body { get; }
@@ -70,7 +63,6 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public ILocalRepositoryModel LocalRepository { get; set; }
         public IPullRequestReviewModel Model { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
-        public ReactiveCommand<Unit> OpenComment { get; }
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; set; }
         public IPullRequestModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }

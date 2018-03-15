@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive;
+using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Services;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -8,16 +14,54 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestReviewFileCommentViewModel : IPullRequestReviewFileCommentViewModel
     {
-        public PullRequestReviewFileCommentViewModel(IPullRequestReviewCommentModel model)
+        readonly IPullRequestEditorService editorService;
+        readonly IPullRequestSession session;
+        readonly IPullRequestReviewCommentModel model;
+        IInlineCommentThreadModel thread;
+
+        public PullRequestReviewFileCommentViewModel(
+            IPullRequestEditorService editorService,
+            IPullRequestSession session,
+            IPullRequestReviewCommentModel model)
         {
-            Body = model.Body;
-            RelativePath = model.Path;
+            Guard.ArgumentNotNull(editorService, nameof(editorService));
+            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotNull(model, nameof(model));
+
+            this.editorService = editorService;
+            this.session = session;
+            this.model = model;
+            Open = ReactiveCommand.CreateAsyncTask(DoOpen);
         }
 
         /// <inheritdoc/>
-        public string Body { get; }
+        public string Body => model.Body;
 
         /// <inheritdoc/>
-        public string RelativePath { get; }
+        public string RelativePath => model.Path;
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> Open { get; }
+
+        async Task DoOpen(object o)
+        {
+            try
+            {
+                if (thread == null && model.Position.HasValue)
+                {
+                    var file = await session.GetFile(RelativePath);
+                    thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Id == model.Id));
+                }
+
+                if (thread?.LineNumber != -1)
+                {
+                    await editorService.OpenDiff(session, RelativePath, thread);
+                }
+            }
+            catch (Exception)
+            {
+                // TODO: Show error.
+            }
+        }
     }
 }

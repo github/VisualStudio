@@ -230,6 +230,7 @@
     <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
+    <Compile Include="SampleData\PullRequestReviewFileCommentViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />

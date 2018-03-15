@@ -33,10 +33,5 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the underlying pull request model.
         /// </summary>
         IPullRequestModel PullRequestModel { get; }
-
-        /// <summary>
-        /// Gets a command which opens an inline comment in a diff view.
-        /// </summary>
-        ReactiveCommand<Unit> OpenComment { get; }
     }
 }

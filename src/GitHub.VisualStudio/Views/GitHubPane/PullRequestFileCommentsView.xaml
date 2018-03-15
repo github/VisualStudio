@@ -69,7 +69,8 @@
                                                             BorderThickness="1 0 1 1">
                                                         <TextBlock TextTrimming="CharacterEllipsis" Margin="4">
                                                             <!-- WPF you suck. https://stackoverflow.com/questions/2476305 -->
-                                                            <Hyperlink Style="{StaticResource BlackHyperlink}">
+                                                            <Hyperlink Command="{Binding Open}"
+                                                                       Style="{StaticResource BlackHyperlink}">
                                                                 <Run Text="{Binding Body, Converter={ui:TrimNewlinesConverter}, Mode=OneWay}"/>
                                                             </Hyperlink>
                                                         </TextBlock>

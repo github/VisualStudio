@@ -4,8 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 using Serilog;
 
@@ -14,11 +16,12 @@ namespace GitHub.ViewModels.GitHubPane
     /// <summary>
     /// View model for displaying details of a pull request review.
     /// </summary>
-    [Export(typeof(IPullRequestReviewViewModel))]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestReviewViewModel : ViewModelBase, IPullRequestReviewViewModel
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestReviewViewModel>();
+
+        readonly IPullRequestEditorService editorService;
+        readonly IPullRequestSession session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
@@ -27,13 +30,23 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="owner">The pull request's repository owner.</param>
         /// <param name="pullRequest">The pull request model.</param>
         /// <param name="pullRequestReviewId">The pull request review ID.</param>
-        [ImportingConstructor]
         public PullRequestReviewViewModel(
+            IPullRequestEditorService editorService,
+            IPullRequestSession session,
             ILocalRepositoryModel localRepository,
             string owner,
             IPullRequestModel pullRequest,
             long pullRequestReviewId)
         {
+            Guard.ArgumentNotNull(editorService, nameof(editorService));
+            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotNull(localRepository, nameof(localRepository));
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+
+            this.editorService = editorService;
+            this.session = session;
+
             LocalRepository = localRepository;
             RemoteRepositoryOwner = owner;
             Model = GetModel(pullRequest, pullRequestReviewId);
@@ -48,7 +61,10 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (comment.PullRequestReviewId == pullRequestReviewId)
                 {
-                    var vm = new PullRequestReviewFileCommentViewModel(comment);
+                    var vm = new PullRequestReviewFileCommentViewModel(
+                        editorService,
+                        session,
+                        comment);
 
                     if (comment.Position.HasValue)
                         comments.Add(vm);
@@ -95,9 +111,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenComment { get; }
 
         static bool CalculateIsLatest(IPullRequestModel pullRequest, IPullRequestReviewModel model)
         {

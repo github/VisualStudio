@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reactive;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -16,5 +18,10 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the path to the file, relative to the root of the repository.
         /// </summary>
         string RelativePath { get; }
+
+        /// <summary>
+        /// Gets a comment which opens the comment in a diff view.
+        /// </summary>
+        ReactiveCommand<Unit> Open { get; }
     }
 }
