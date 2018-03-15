@@ -8,6 +8,7 @@ using GitHub.InlineReviews.Services;
 using Microsoft.VisualStudio.Shell;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using GitHub.Helpers;
 
 namespace GitHub.InlineReviews
 {
@@ -27,13 +28,15 @@ namespace GitHub.InlineReviews
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
             var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
 
-            log.Information("SwitchToMainThreadAsync");
-            await JoinableTaskFactory
-               .WithPriority(VsTaskRunContext.UIThreadNormalPriority)
-               .SwitchToMainThreadAsync();
+            // Unfortunately this doesn't return until after the GitHub pane has finnished refreshing.
+            //log.Information("SwitchToMainThreadAsync");
+            //await JoinableTaskFactory
+            //   .WithPriority(VsTaskRunContext.UIThreadNormalPriority)
+            //   .SwitchToMainThreadAsync();
 
-            log.Information("StartShowingStatus");
-            barManager.StartShowingStatus();
+            // Posting a task like this seems to work.            
+            await ThreadingHelper.RunOnMainThreadNormalPriority(() => barManager.StartShowingStatus());
         }
+
     }
 }

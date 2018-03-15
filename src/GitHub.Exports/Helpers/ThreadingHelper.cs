@@ -8,6 +8,9 @@ using System.Windows;
 using static Microsoft.VisualStudio.Threading.JoinableTaskFactory;
 using static Microsoft.VisualStudio.Threading.AwaitExtensions;
 using System.Windows.Threading;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Helpers
 {
@@ -54,6 +57,17 @@ namespace GitHub.Helpers
             return Guard.InUnitTestRunner ?
                 new AwaitableWrapper() :
                 new AwaitableWrapper(scheduler ?? TaskScheduler.Default);
+        }
+
+        // HACK: This is a workaround because the following doesn't seem to work.
+        //await JoinableTaskFactory
+        //   .WithPriority(VsTaskRunContext.UIThreadNormalPriority)
+        //   .SwitchToMainThreadAsync();
+        public static Task RunOnMainThreadNormalPriority(Action action)
+        {
+            var service = (IVsTaskSchedulerService2)VsTaskLibraryHelper.ServiceInstance;
+            var scheduler = service.GetTaskScheduler((uint)VsTaskRunContext.UIThreadNormalPriority);
+            return Task.Factory.StartNew(action, default(CancellationToken), TaskCreationOptions.HideScheduler, scheduler);
         }
 
         class AwaitableWrapper : IAwaitable
