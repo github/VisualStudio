@@ -35,7 +35,7 @@
                 <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Margin="0" Text="{Binding Title}" TextWrapping="Wrap"/>
                 <StackPanel Orientation="Horizontal" Margin="0 4">
                     <c:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
-                    <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
+                    <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
             </StackPanel>
@@ -62,10 +62,10 @@
                                     </StackPanel>
                                 </Expander.Header>
                                 <StackPanel Margin="24 4 4 16">
-                                    <ui:SectionControl HeaderText="Description" IsExpanded="True">
+                                    <ui:SectionControl Foreground="{DynamicResource VsBrush.WindowText}" HeaderText="Description" IsExpanded="True">
                                         <TextBlock Text="{Binding Body}" Margin="0 4"/>
                                     </ui:SectionControl>
-                                    <ui:SectionControl HeaderText="Comments" IsExpanded="True">
+                                    <ui:SectionControl Foreground="{DynamicResource VsBrush.WindowText}" HeaderText="Comments" IsExpanded="True">
                                         <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" Margin="0 4"/>
                                     </ui:SectionControl>
                                 </StackPanel>
