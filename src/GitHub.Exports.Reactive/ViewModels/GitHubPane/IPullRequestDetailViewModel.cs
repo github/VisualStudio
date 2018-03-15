@@ -126,9 +126,14 @@ namespace GitHub.ViewModels.GitHubPane
         string Body { get; }
 
         /// <summary>
-        /// Gets the changed files as a tree.
+        /// Gets the latest pull request review for each user.
         /// </summary>
-        IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }
+        IReadOnlyList<PullRequestDetailReviewItem> Reviews { get; }
+
+        /// <summary>
+        /// Gets the pull request's changed files.
+        /// </summary>
+        IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
@@ -166,27 +171,6 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
-        /// </summary>
-        ReactiveCommand<object> DiffFile { get; }
-
-        /// <summary>
-        /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
-        /// the working directory and HEAD.
-        /// </summary>
-        ReactiveCommand<object> DiffFileWithWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
-        /// </summary>
-        ReactiveCommand<object> OpenFileInWorkingDirectory { get; }
-
-        /// <summary>
-        /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
-        /// </summary>
-        ReactiveCommand<object> ViewFile { get; }
-
-        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
@@ -200,16 +184,6 @@ namespace GitHub.ViewModels.GitHubPane
             string owner,
             string repo,
             int number);
-
-        /// <summary>
-        /// Gets a file as it appears in the pull request.
-        /// </summary>
-        /// <param name="file">The changed file.</param>
-        /// <param name="head">
-        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
-        /// </param>
-        /// <returns>The path to a temporary file.</returns>
-        Task<string> ExtractFile(IPullRequestFileNode file, bool head);
 
         /// <summary>
         /// Gets the full path to a file in the working directory.

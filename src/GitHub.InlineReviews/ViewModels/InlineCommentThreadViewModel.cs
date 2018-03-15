@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -21,6 +22,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="apiClient">The API client to use to post/update comments.</param>
+        /// <param name="file">The file being commented on.</param>
         /// <param name="session">The current PR review session.</param>
         public InlineCommentThreadViewModel(
             IPullRequestSession session,
@@ -37,10 +39,10 @@ namespace GitHub.InlineReviews.ViewModels
 
             foreach (var comment in comments)
             {
-                Comments.Add(new CommentViewModel(this, CurrentUser, comment));
+                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment));
             }
 
-            Comments.Add(CommentViewModel.CreatePlaceholder(this, CurrentUser));
+            Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
         }
 
         /// <summary>
@@ -65,7 +67,8 @@ namespace GitHub.InlineReviews.ViewModels
 
             var body = (string)parameter;
             var replyId = Comments[0].Id;
-            return await Session.PostReviewComment(body, replyId);
+            var nodeId = Comments[0].NodeId;
+            return await Session.PostReviewComment(body, replyId, nodeId);
         }
     }
 }

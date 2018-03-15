@@ -31,8 +31,6 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public class PullRequestDetailViewModelDesigner : PanePageViewModelBase, IPullRequestDetailViewModel
     {
-        private List<IPullRequestChangeNode> changedFilesTree;
-
         public PullRequestDetailViewModelDesigner()
         {
             var repoPath = @"C:\Repo";
@@ -69,8 +67,35 @@ This requires that errors be propagated from the viewmodel to the view and from 
             modelsDir.Files.Add(oldBranchModel);
             gitHubDir.Directories.Add(modelsDir);
 
-            changedFilesTree = new List<IPullRequestChangeNode>();
-            changedFilesTree.Add(gitHubDir);
+            Reviews = new[]
+            {
+                new PullRequestDetailReviewItem
+                {
+                    Id = 2,
+                    User = new AccountDesigner { Login = "grokys", IsUser = true },
+                    State = PullRequestReviewState.Pending,
+                    FileCommentCount = 0,
+                },
+                new PullRequestDetailReviewItem
+                {
+                    Id = 1,
+                    User = new AccountDesigner { Login = "jcansdale", IsUser = true },
+                    State = PullRequestReviewState.Approved,
+                    FileCommentCount = 5,
+                },
+                new PullRequestDetailReviewItem
+                {
+                    Id = 2,
+                    User = new AccountDesigner { Login = "shana", IsUser = true },
+                    State = PullRequestReviewState.ChangesRequested,
+                    FileCommentCount = 5,
+                },
+                new PullRequestDetailReviewItem
+                {
+                },
+            };
+
+            Files = new PullRequestFilesViewModelDesigner();
         }
 
         public IPullRequestModel Model { get; }
@@ -84,7 +109,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
-        public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;
+        public IReadOnlyList<PullRequestDetailReviewItem> Reviews { get; }
+        public IPullRequestFilesViewModel Files { get; set; }
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }

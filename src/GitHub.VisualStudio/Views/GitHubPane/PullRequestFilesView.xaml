@@ -1,0 +1,139 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestFilesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:vm="clr-namespace:GitHub.ViewModels.GitHubPane;assembly=GitHub.App"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:sample="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
+             Name="root">
+
+    <d:DesignProperties.DataContext>
+        <sample:PullRequestFilesViewModelDesigner/>
+    </d:DesignProperties.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <ContextMenu x:Key="FileContextMenu">
+                <MenuItem Header="{x:Static prop:Resources.ViewChanges}" Command="{Binding DiffFile}"/>
+                <MenuItem Header="{x:Static prop:Resources.ViewFile}" Command="{Binding ViewFile}"/>
+                <MenuItem Header="{x:Static prop:Resources.ViewChangesInSolution}" Command="{Binding DiffFileWithWorkingDirectory}"/>
+                <MenuItem Header="{x:Static prop:Resources.OpenFileInSolution}" Command="{Binding OpenFileInWorkingDirectory}"/>
+            </ContextMenu>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <TreeView Name="changesTree"
+              ItemsSource="{Binding Items}"
+              ContextMenu="{StaticResource FileContextMenu}"
+              Background="Transparent"
+              BorderThickness="0"
+              Margin="0 6 0 0"
+              ContextMenuOpening="changesTree_ContextMenuOpening"
+              KeyUp="changesTree_KeyUp"
+              MouseDoubleClick="changesTree_MouseDoubleClick"
+              MouseRightButtonDown="changesTree_MouseRightButtonDown">
+        <TreeView.ItemContainerStyle>
+            <Style TargetType="TreeViewItem">
+                <Setter Property="IsExpanded" Value="True"/>
+                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
+            </Style>
+        </TreeView.ItemContainerStyle>
+        <TreeView.Resources>
+            <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryNode}"
+                                      ItemsSource="{Binding Children}">
+                <StackPanel Orientation="Horizontal">
+                    <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" Margin="0,0,0,2"/>
+                    <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
+                <StackPanel Orientation="Horizontal"
+                            Tag="{Binding DataContext, ElementName=root}"
+                            KeyboardNavigation.DirectionalNavigation="None">
+                    
+                    <!-- 
+                      We need to change the color of the file icon when the file is deleted, but applying the style
+                      to OcticonImage directly borks the designer (see #1410). Work around this by applying the color
+                      to a parent control and let the foreground be inherited by the icon.
+                    -->
+                    <Decorator>
+                        <Decorator.Style>
+                            <Style TargetType="Decorator">
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Status}" Value="Removed"/>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Path=IsSelected}" Value="False"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="TextBlock.Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Decorator.Style>
+                        <ui:OcticonImage Icon="file_code" Margin="0,0,0,2"/>
+                    </Decorator>
+
+                    <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Status}" Value="Removed"/>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Path=IsSelected}" Value="False"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    
+                    <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CommentCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <ui:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0"/>
+                        <Hyperlink Command="{Binding DataContext.OpenFirstComment, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding CommentCount, Mode=OneWay}"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </DataTemplate>
+        </TreeView.Resources>
+    </TreeView>
+</UserControl>

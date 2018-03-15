@@ -8,6 +8,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
@@ -34,6 +35,7 @@ namespace GitHub.InlineReviews.Services
         readonly IPullRequestSessionService sessionService;
         readonly IConnectionManager connectionManager;
         readonly IModelServiceFactory modelServiceFactory;
+        readonly IGraphQLClientFactory graphqlFactory;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         TaskCompletionSource<object> initialized;
@@ -47,6 +49,7 @@ namespace GitHub.InlineReviews.Services
         /// <param name="sessionService">The PR session service to use.</param>
         /// <param name="connectionManager">The connectionManager to use.</param>
         /// <param name="modelServiceFactory">The ModelService factory.</param>
+        /// <param name="graphqlFactory">The GraphQL client factory.</param>
         /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
@@ -54,18 +57,21 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService sessionService,
             IConnectionManager connectionManager,
             IModelServiceFactory modelServiceFactory,
+            IGraphQLClientFactory graphqlFactory,
             ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
+            Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.service = service;
             this.sessionService = sessionService;
             this.connectionManager = connectionManager;
             this.modelServiceFactory = modelServiceFactory;
+            this.graphqlFactory = graphqlFactory;
             initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
@@ -75,6 +81,7 @@ namespace GitHub.InlineReviews.Services
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => RepoChanged(x).Forget());
+
         }
 
         /// <inheritdoc/>
@@ -257,7 +264,8 @@ namespace GitHub.InlineReviews.Services
 
             if (session == null)
             {
-                var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
+                var connection = await connectionManager.GetConnection(repository);
+                var modelService = await modelServiceFactory.CreateAsync(connection);
 
                 if (modelService != null)
                 {
@@ -301,7 +309,8 @@ namespace GitHub.InlineReviews.Services
                     file.InlineCommentThreads = sessionService.BuildCommentThreads(
                         session.PullRequest,
                         file.RelativePath,
-                        file.Diff);
+                        file.Diff,
+                        session.PullRequest.Head.Sha);
                 }
                 else
                 {

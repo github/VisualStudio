@@ -46,6 +46,15 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Octokit.GraphQL, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    </Reference>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.1\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
@@ -66,11 +75,14 @@
       <Link>ApiClientConfiguration_User.cs</Link>
     </Compile>
     <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
+    <Compile Include="GraphQLClientFactory.cs" />
+    <Compile Include="IGraphQLClientFactory.cs" />
     <Compile Include="IKeychain.cs" />
     <Compile Include="ILoginManager.cs" />
     <Compile Include="IOAuthCallbackListener.cs" />
     <Compile Include="IncorrectScopesException.cs" />
     <Compile Include="ITwoFactorChallengeHandler.cs" />
+    <Compile Include="GraphQLKeychainCredentialStore.cs" />
     <Compile Include="LoginManager.cs" />
     <Compile Include="KeychainCredentialStore.cs" />
     <Compile Include="WindowsKeychain.cs" />

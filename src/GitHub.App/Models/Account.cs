@@ -23,6 +23,7 @@ namespace GitHub.Models
             bool isEnterprise,
             int ownedPrivateRepositoryCount,
             long privateRepositoryInPlanCount,
+            string avatarUrl,
             IObservable<BitmapSource> bitmapSource)
         {
             Guard.ArgumentNotEmptyString(login, nameof(login));
@@ -34,6 +35,7 @@ namespace GitHub.Models
             PrivateReposInPlan = privateRepositoryInPlanCount;
             IsOnFreePlan = privateRepositoryInPlanCount == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+            AvatarUrl = avatarUrl;
             this.bitmapSource = bitmapSource;
 
             bitmapSourceSubscription = bitmapSource
@@ -54,6 +56,7 @@ namespace GitHub.Models
             OwnedPrivateRepos = account.OwnedPrivateRepos;
             IsOnFreePlan = PrivateReposInPlan == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+            AvatarUrl = account.AvatarUrl;
         }
 
         public Account(Octokit.Account account, IObservable<BitmapSource> bitmapSource)
@@ -76,6 +79,8 @@ namespace GitHub.Models
         public int OwnedPrivateRepos { get; private set; }
 
         public long PrivateReposInPlan { get; private set; }
+
+        public string AvatarUrl { get; private set; }
 
         public BitmapSource Avatar
         {

@@ -13,12 +13,20 @@ namespace GitHub.InlineReviews.ViewModels
         Placeholder,
     }
 
+    /// <summary>
+    /// View model for an issue or pull request comment.
+    /// </summary>
     public interface ICommentViewModel : IViewModel
     {
         /// <summary>
         /// Gets the ID of the comment.
         /// </summary>
         int Id { get; }
+
+        /// <summary>
+        /// Gets the GraphQL ID of the comment.
+        /// </summary>
+        string NodeId { get; }
 
         /// <summary>
         /// Gets or sets the body of the comment.

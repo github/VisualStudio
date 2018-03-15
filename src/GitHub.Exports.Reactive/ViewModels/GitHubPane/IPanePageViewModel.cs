@@ -35,7 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the title to display in the pane when the page is shown.
         /// </summary>
-        string Title { get; }
+        string PaneTitle { get; }
 
         /// <summary>
         /// Gets an observable that is fired when the pane wishes to close itself.

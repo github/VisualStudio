@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Linq;
 using GitHub.Api;
@@ -87,6 +88,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
+                Arg.Any<IReadOnlyList<DiffChunk>>(),
                 5);
         }
 
@@ -116,6 +118,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
+                Arg.Any<IReadOnlyList<DiffChunk>>(),
                 7);
         }
 

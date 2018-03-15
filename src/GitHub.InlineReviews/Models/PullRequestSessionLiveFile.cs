@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.Models
             string relativePath,
             ITextBuffer textBuffer,
             ISubject<ITextSnapshot, ITextSnapshot> rebuild)
-            : base(relativePath)
+            : base(relativePath, "HEAD")
         {
             TextBuffer = textBuffer;
             Rebuild = rebuild;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Services;
@@ -127,9 +128,9 @@ Line 4";
                 var service = Substitute.For<IPullRequestSessionService>();
                 var target = CreateTarget(service, "fork", "owner");
 
-                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", 1);
+                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", null, 1);
 
-                await service.Received(1).PostReviewComment(
+                await service.Received(1).PostStandaloneReviewComment(
                     Arg.Any<ILocalRepositoryModel>(),
                     "owner",
                     Arg.Any<IAccount>(),
@@ -146,9 +147,9 @@ Line 4";
                 var service = Substitute.For<IPullRequestSessionService>();
                 var target = CreateTarget(service, "fork", "owner");
 
-                await target.PostReviewComment("New Comment", 1);
+                await target.PostReviewComment("New Comment", 1, "1");
 
-                await service.Received(1).PostReviewComment(
+                await service.Received(1).PostReviewCommentRepy(
                     Arg.Any<ILocalRepositoryModel>(),
                     "owner",
                     Arg.Any<IAccount>(),
@@ -340,6 +341,7 @@ Line 4";
                 Substitute.For<IGitClient>(),
                 diffService ?? Substitute.For<IDiffService>(),
                 Substitute.For<IApiClientFactory>(),
+                Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IUsageTracker>());
 
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");

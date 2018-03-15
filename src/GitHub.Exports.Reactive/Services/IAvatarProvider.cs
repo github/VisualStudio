@@ -10,6 +10,7 @@ namespace GitHub.Services
         BitmapImage DefaultUserBitmapImage { get; }
         BitmapImage DefaultOrgBitmapImage { get; }
         IObservable<BitmapSource> GetAvatar(IAvatarContainer account);
+        IObservable<BitmapSource> GetAvatar(string avatarUri);
         IObservable<Unit> InvalidateAvatar(IAvatarContainer account);
     }
 }

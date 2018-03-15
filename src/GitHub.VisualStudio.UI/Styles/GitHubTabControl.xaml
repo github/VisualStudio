@@ -78,10 +78,10 @@
                             BorderThickness="1,1,1,0"
                             Padding="10,5">
                         <DockPanel HorizontalAlignment="Center">
-                            <TextBlock
+                            <ContentPresenter
                                 x:Name="ContentSite"
                                 VerticalAlignment="Center"
-                                Text="{TemplateBinding Header}" />
+                                ContentSource="Header" />
                         </DockPanel>
                     </Border>
 
@@ -89,15 +89,15 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
                             <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource GitHubTabItemSelectedBorder}" />
-                            <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+                            <Setter TargetName="ContentSite" Property="Control.Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="False">
-                            <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsGrayText}" />
+                            <Setter TargetName="ContentSite" Property="Control.Foreground" Value="{DynamicResource GitHubVsGrayText}" />
                         </Trigger>
 
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
+                            <Setter TargetName="ContentSite" Property="Control.Foreground" Value="{DynamicResource GitHubVsWindowText}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

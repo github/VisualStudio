@@ -18,6 +18,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -42,7 +43,7 @@ namespace GitHub.ViewModels.GitHubPane
         string targetBranchDisplayName;
         int commentCount;
         string body;
-        IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
+        IReadOnlyList<PullRequestDetailReviewItem> reviews;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
@@ -52,6 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool active;
         bool refreshOnActivate;
         Uri webUrl;
+        IDisposable sessionSubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -62,6 +64,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="usageTracker">The usage tracker.</param>
         /// <param name="teamExplorerContext">The context for tracking repo changes</param>
+        /// <param name="files">The pull request files view model.</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
@@ -69,7 +72,8 @@ namespace GitHub.ViewModels.GitHubPane
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
-            IStatusBarNotificationService statusBarNotificationService)
+            IStatusBarNotificationService statusBarNotificationService,
+            IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -84,6 +88,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
             this.statusBarNotificationService = statusBarNotificationService;
+            Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -120,6 +125,7 @@ namespace GitHub.ViewModels.GitHubPane
             DiffFileWithWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             OpenFileInWorkingDirectory = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             ViewFile = ReactiveCommand.Create();
+            ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
         }
 
         /// <summary>
@@ -248,13 +254,18 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
-        /// Gets the changed files as a tree.
+        /// Gets the latest pull request review for each user.
         /// </summary>
-        public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree
+        public IReadOnlyList<PullRequestDetailReviewItem> Reviews
         {
-            get { return changedFilesTree; }
-            private set { this.RaiseAndSetIfChanged(ref changedFilesTree, value); }
+            get { return reviews; }
+            private set { this.RaiseAndSetIfChanged(ref reviews, value); }
         }
+
+        /// <summary>
+        /// Gets the pull request's changed files.
+        /// </summary>
+        public IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
         /// Gets the web URL for the pull request.
@@ -310,6 +321,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
         /// </summary>
         public ReactiveCommand<object> ViewFile { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to a pull request review.
+        /// </summary>
+        public ReactiveCommand<object> ShowReview { get; }
 
         /// <summary>
         /// Initializes the view model.
@@ -373,7 +389,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var firstLoad = (Model == null);
                 Model = pullRequest;
                 Session = await sessionManager.GetSession(pullRequest);
-                Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
+                PaneTitle = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
                 IsBusy = true;
                 IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
@@ -381,9 +397,9 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
                 CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
+                Reviews = BuildReviews(pullRequest);
 
-                var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
-                ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
+                await Files.InitializeAsync(Session);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
@@ -452,6 +468,11 @@ namespace GitHub.ViewModels.GitHubPane
                     UpdateState = null;
                 }
 
+                sessionSubscription?.Dispose();
+                sessionSubscription = Session.WhenAnyValue(x => x.HasPendingReview)
+                    .Skip(1)
+                    .Subscribe(_ => Reviews = BuildReviews(Session.PullRequest));
+
                 if (firstLoad)
                 {
                     usageTracker.IncrementCounter(x => x.NumberOfPullRequestsOpened).Forget();
@@ -466,6 +487,47 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 IsBusy = false;
             }
+        }
+
+        IReadOnlyList<PullRequestDetailReviewItem> BuildReviews(IPullRequestModel pullRequest)
+        {
+            var existing = new Dictionary<string, PullRequestDetailReviewItem>();
+            var currentUser = Session.User;
+
+            foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.Id))
+            {
+                if (!existing.ContainsKey(review.User.Login) &&
+                    review.State != PullRequestReviewState.Dismissed &&
+                    (review.State != PullRequestReviewState.Pending || review.User.Login == currentUser.Login))
+                {
+                    var count = pullRequest.ReviewComments
+                        .Where(x => x.PullRequestReviewId == review.Id)
+                        .Count();
+                    existing.Add(
+                        review.User.Login,
+                        new PullRequestDetailReviewItem
+                        {
+                            Id = review.Id,
+                            User = review.User,
+                            State = review.State,
+                            FileCommentCount = count
+                        });
+                }
+            }
+
+            var result = existing.Values.OrderBy(x => x.User).AsEnumerable();
+
+            if (!result.Any(x => x.State == PullRequestReviewState.Pending))
+            {
+                var newReview = new PullRequestDetailReviewItem
+                {
+                    User = currentUser,
+                    State = PullRequestReviewState.Pending,
+                };
+                result = result.Concat(new[] { newReview });
+            }
+
+            return result.ToList();
         }
 
         /// <summary>
@@ -498,34 +560,13 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
-        /// Gets a file as it appears in the pull request.
-        /// </summary>
-        /// <param name="file">The changed file.</param>
-        /// <param name="head">
-        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
-        /// </param>
-        /// <returns>The path to a temporary file.</returns>
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
-        {
-            var relativePath = Path.Combine(file.DirectoryPath, file.FileName);
-            var encoding = pullRequestsService.GetEncoding(LocalRepository, relativePath);
-
-            if (!head && file.OldPath != null)
-            {
-                relativePath = file.OldPath;
-            }
-
-            return pullRequestsService.ExtractFile(LocalRepository, model, relativePath, head, encoding).ToTask();
-        }
-
-        /// <summary>
         /// Gets the full path to a file in the working directory.
         /// </summary>
         /// <param name="file">The file.</param>
         /// <returns>The full path to the file in the working directory.</returns>
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
-            return Path.Combine(LocalRepository.LocalPath, file.DirectoryPath, file.FileName);
+            return Path.Combine(LocalRepository.LocalPath, file.RelativePath);
         }
 
         /// <inheritdoc/>
@@ -560,54 +601,6 @@ namespace GitHub.ViewModels.GitHubPane
             command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        async Task<IPullRequestDirectoryNode> CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
-        {
-            var dirs = new Dictionary<string, PullRequestDirectoryNode>
-            {
-                { string.Empty, new PullRequestDirectoryNode(string.Empty) }
-            };
-
-            foreach (var changedFile in pullRequest.ChangedFiles)
-            {
-                var node = new PullRequestFileNode(
-                    LocalRepository.LocalPath,
-                    changedFile.FileName,
-                    changedFile.Sha,
-                    changedFile.Status,
-                    GetOldFileName(changedFile, changes));
-
-                var file = await Session.GetFile(changedFile.FileName);
-                var fileCommentCount = file?.WhenAnyValue(x => x.InlineCommentThreads)
-                    .Subscribe(x => node.CommentCount = x.Count(y => y.LineNumber != -1));
-
-                var dir = GetDirectory(node.DirectoryPath, dirs);
-                dir.Files.Add(node);
-            }
-
-            return dirs[string.Empty];
-        }
-
-        static PullRequestDirectoryNode GetDirectory(string path, Dictionary<string, PullRequestDirectoryNode> dirs)
-        {
-            PullRequestDirectoryNode dir;
-
-            if (!dirs.TryGetValue(path, out dir))
-            {
-                var parentPath = Path.GetDirectoryName(path);
-                var parentDir = GetDirectory(parentPath, dirs);
-
-                dir = new PullRequestDirectoryNode(path);
-
-                if (!parentDir.Directories.Any(x => x.DirectoryName == dir.DirectoryName))
-                {
-                    parentDir.Directories.Add(dir);
-                    dirs.Add(path, dir);
-                }
-            }
-
-            return dir;
-        }
-
         static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
         {
             if (targetBranchLabel != null)
@@ -618,17 +611,6 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 return Resources.InvalidBranchName;
             }
-        }
-
-        string GetOldFileName(IPullRequestFileModel file, TreeChanges changes)
-        {
-            if (file.Status == PullRequestFileStatus.Renamed)
-            {
-                var fileName = file.FileName.Replace("/", "\\");
-                return changes?.Renamed.FirstOrDefault(x => x.Path == fileName)?.OldPath;
-            }
-
-            return null;
         }
 
         IObservable<Unit> DoCheckout(object unused)
@@ -702,6 +684,20 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 IsBusy = false;
                 statusBarNotificationService.ShowMessage(string.Empty);
+            }
+        }
+
+        void DoShowReview(object item)
+        {
+            var review = (PullRequestDetailReviewItem)item;
+
+            if (review.Id == 0)
+            {
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
+            }
+            else
+            {
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/reviews/{review.User.Login}"));
             }
         }
 

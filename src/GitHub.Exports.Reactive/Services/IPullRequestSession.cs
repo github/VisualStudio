@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Octokit;
 
 namespace GitHub.Services
 {
@@ -51,6 +52,12 @@ namespace GitHub.Services
         string RepositoryOwner { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request has a pending review for the current
+        /// user.
+        /// </summary>
+        bool HasPendingReview { get; }
+
+        /// <summary>
         /// Gets all files touched by the pull request.
         /// </summary>
         /// <returns>
@@ -62,11 +69,14 @@ namespace GitHub.Services
         /// Gets a file touched by the pull request.
         /// </summary>
         /// <param name="relativePath">The relative path to the file.</param>
+        /// <param name="commitSha">
+        /// The commit at which to get the file contents, or "HEAD" to track the pull request head.
+        /// </param>
         /// <returns>
         /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
         /// the pull request.
         /// </returns>
-        Task<IPullRequestSessionFile> GetFile(string relativePath);
+        Task<IPullRequestSessionFile> GetFile(string relativePath, string commitSha = "HEAD");
 
         /// <summary>
         /// Gets the merge base SHA for the pull request.
@@ -80,17 +90,40 @@ namespace GitHub.Services
         /// <param name="body">The comment body.</param>
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
+        /// <param name="fileDiff">The diff between the PR head and base.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
         /// <returns>A comment model.</returns>
-        Task<IPullRequestReviewCommentModel> PostReviewComment(string body, string commitId, string path, int position);
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            string body,
+            string commitId,
+            string path,
+            IReadOnlyList<DiffChunk> fileDiff,
+            int position);
 
         /// <summary>
         /// Posts a PR review comment reply.
         /// </summary>
         /// <param name="body">The comment body.</param>
-        /// <param name="inReplyTo">The comment ID to reply to.</param>
+        /// <param name="inReplyTo">The REST ID of the comment to reply to.</param>
+        /// <param name="inReplyToNodeId">The GraphQL ID of the comment to reply to.</param>
         /// <returns></returns>
-        Task<IPullRequestReviewCommentModel> PostReviewComment(string body, int inReplyTo);
+        Task<IPullRequestReviewCommentModel> PostReviewComment(
+            string body,
+            int inReplyTo,
+            string inReplyToNodeId);
+
+        /// <summary>
+        /// Starts a new pending pull request review.
+        /// </summary>
+        Task<IPullRequestReviewModel> StartReview();
+
+        /// <summary>
+        /// Posts the currently pending review.
+        /// </summary>
+        /// <param name="body">The review body.</param>
+        /// <param name="state">The review event.</param>
+        /// <returns>The review model.</returns>
+        Task<IPullRequestReviewModel> PostReview(string body, PullRequestReviewEvent e);
 
         /// <summary>
         /// Updates the pull request session with a new pull request model in response to a refresh

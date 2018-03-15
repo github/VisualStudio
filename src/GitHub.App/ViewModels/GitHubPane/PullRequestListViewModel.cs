@@ -54,7 +54,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.settings = settings;
             this.visualStudioBrowser = visualStudioBrowser;
 
-            Title = Resources.PullRequestsNavigationItemText;
+            PaneTitle = Resources.PullRequestsNavigationItemText;
 
             States = new List<PullRequestState> {
                 new PullRequestState { IsOpen = true, Name = "Open" },
@@ -309,7 +309,7 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
         }
 
-        IAccount emptyUser = new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>());
+        IAccount emptyUser = new Account("[None]", false, false, 0, 0, string.Empty, Observable.Empty<BitmapSource>());
         public IAccount EmptyUser
         {
             get { return emptyUser; }

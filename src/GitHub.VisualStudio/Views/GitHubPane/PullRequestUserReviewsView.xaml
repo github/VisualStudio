@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestUserReviewsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
+
+    <d:DesignData.DataContext>
+        <sampleData:PullRequestUserReviewsViewModelDesigner/>
+    </d:DesignData.DataContext>
+    
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="GitHubExpanderHeaderBackground" Color="Transparent"/>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
+                <TextBlock FontSize="16" VerticalAlignment="Center">
+                        <Run>Reviews by</Run>
+                        <Run FontWeight="SemiBold" Text="{Binding User.Login, Mode=OneWay}"/>
+                        <Run>for</Run>
+                        <Hyperlink Command="{Binding NavigateToPullRequest}">
+                            <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                        </Hyperlink>
+                </TextBlock>
+
+                <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
+                           Margin="0"
+                           Text="{Binding PullRequestTitle}"
+                           TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Margin="0 4">
+                    <c:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding Reviews}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+
+                            <Expander Margin="0 0 4 0"
+                                      Foreground="{DynamicResource GitHubVsWindowText}"
+                                      IsExpanded="{Binding IsExpanded, Mode=OneTime}"
+                                      IsEnabled="{Binding HasDetails}">
+                                <Expander.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel Width="20" Height="16" HorizontalAlignment="Center">
+                                            <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Model.State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
+                                            <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Model.State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
+                                            <ui:OcticonImage Icon="comment" Visibility="{Binding Model.State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
+                                            <ui:OcticonImage Icon="comment" Visibility="{Binding Model.State, Converter={ui:EqualsToVisibilityConverter Dismissed}}"/>
+                                        </StackPanel>
+
+                                        <TextBlock FontWeight="SemiBold" Margin="2 0">
+                                            <Run Text="{Binding Model.User.Login, Mode=OneWay}"/>
+                                            <Run Text="{Binding StateDisplay, Mode=OneWay}"/>
+                                            <Run FontWeight="Normal" Text="{Binding Model.SubmittedAt, Mode=OneWay, Converter={ui:DurationToStringConverter}}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Expander.Header>
+                                <StackPanel Margin="16 4 0 4">
+                                    <Expander IsExpanded="True"
+                                              Margin="0 4"
+                                              Visibility="{Binding Body, Converter={ui:NullToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock FontWeight="SemiBold">Description</TextBlock>
+                                        </Expander.Header>
+                                        <markdig:MarkdownViewer Margin="22 4 0 0" Markdown="{Binding Body}"/>
+                                    </Expander>
+                                    <Expander IsExpanded="True"
+                                              Margin="0 4"
+                                              Visibility="{Binding FileComments.Count, Converter={ui:CountToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock FontWeight="SemiBold">Comments</TextBlock>
+                                        </Expander.Header>
+                                        <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" 
+                                                                           Margin="22 4 0 0"/>
+                                    </Expander>
+                                    <Expander IsExpanded="True"
+                                              Margin="0 4"
+                                              Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock FontWeight="SemiBold">Outdated comments</TextBlock>
+                                        </Expander.Header>
+                                        <local:PullRequestFileCommentsView DataContext="{Binding OutdatedFileComments}"
+                                                                           Margin="22 4 0 0"/>
+                                    </Expander>
+                                </StackPanel>
+                            </Expander>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

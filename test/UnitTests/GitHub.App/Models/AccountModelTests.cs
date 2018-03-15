@@ -30,7 +30,7 @@ namespace UnitTests.GitHub.App.Models
             const string login = "foo";
             const int initialOwnedPrivateRepositoryCount = 1;
 
-            var initialAccount = new Account(login, true, false, initialOwnedPrivateRepositoryCount, 0, initialBitmapImageSubject);
+            var initialAccount = new Account(login, true, false, initialOwnedPrivateRepositoryCount, 0, null, initialBitmapImageSubject);
 
             //Creating the test collection
             var col = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(), OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
@@ -78,7 +78,7 @@ namespace UnitTests.GitHub.App.Models
             //Creating an account update
             const int updatedOwnedPrivateRepositoryCount = 2;
             var updatedBitmapImageSubject = new Subject<BitmapImage>();
-            var updatedAccount = new Account(login, true, false, updatedOwnedPrivateRepositoryCount, 0, updatedBitmapImageSubject);
+            var updatedAccount = new Account(login, true, false, updatedOwnedPrivateRepositoryCount, 0, null, updatedBitmapImageSubject);
 
             //Updating the account in the collection
             col.AddItem(updatedAccount);

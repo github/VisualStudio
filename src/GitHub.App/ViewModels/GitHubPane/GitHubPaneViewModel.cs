@@ -33,6 +33,8 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPaneViewModel>();
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
+        static readonly Regex pullNewReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/new");
+        static readonly Regex pullUserReviewsUri = CreateRoute("/:owner/:repo/pull/:number/reviews/:login");
 
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
@@ -118,7 +120,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .Select(x => x.Content == navigator ? x.NavigatorContent : null);
 
             title = currentPage
-                .SelectMany(x => x?.WhenAnyValue(y => y.Title) ?? Observable.Return<string>(null))
+                .SelectMany(x => x?.WhenAnyValue(y => y.PaneTitle) ?? Observable.Return<string>(null))
                 .Select(x => x ?? "GitHub")
                 .ToProperty(this, x => x.Title);
 
@@ -243,6 +245,21 @@ namespace GitHub.ViewModels.GitHubPane
                 var number = int.Parse(match.Groups["number"].Value);
                 await ShowPullRequest(owner, repo, number);
             }
+            else if ((match = pullNewReviewUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                await ShowCreatePullRequestReview(owner, repo, number);
+            }
+            else if ((match = pullUserReviewsUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                var login = match.Groups["login"].Value;
+                await ShowPullRequestReviews(owner, repo, number, login);
+            }
             else
             {
                 throw new NotSupportedException("Unrecognised GitHub pane URL: " + uri.AbsolutePath);
@@ -280,6 +297,35 @@ namespace GitHub.ViewModels.GitHubPane
             return NavigateTo<IPullRequestDetailViewModel>(
                 x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number),
                 x => x.RemoteRepositoryOwner == owner && x.LocalRepository.Name == repo && x.Number == number);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowPullRequestReviews(string owner, string repo, int number, string login)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            return NavigateTo<IPullRequestUserReviewsViewModel>(
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, login),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestNumber == number &&
+                     x.User.Login == login);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowCreatePullRequestReview(string owner, string repo, int number)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            throw new NotImplementedException();
+            //return NavigateTo<IPullRequestReviewViewModel>(
+            //    x => x.InitializeNewAsync(LocalRepository, Connection, owner, repo, number),
+            //    x => x.RemoteRepositoryOwner == owner &&
+            //         x.LocalRepository.Name == repo &&
+            //         x.PullRequestNumber == number &&
+            //         x.IsPending);
         }
 
         async Task CreateInitializeTask(IServiceProvider paneServiceProvider)
@@ -408,7 +454,7 @@ namespace GitHub.ViewModels.GitHubPane
         static Regex CreateRoute(string route)
         {
             // Build RegEx from route (:foo to named group (?<foo>[\w_.-]+)).
-            var routeFormat = new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)");
+            var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)") + "$";
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
     }
