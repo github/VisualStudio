@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
-using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
 using Microsoft.VisualStudio.Shell;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
@@ -15,6 +16,8 @@ namespace GitHub.InlineReviews
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     public class PullRequestStatusBarPackage : AsyncPackage
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarPackage>();
+
         /// <summary>
         /// Initialize the PR status UI on Visual Studio's status bar.
         /// </summary>
@@ -24,7 +27,12 @@ namespace GitHub.InlineReviews
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
             var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
 
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            log.Information("SwitchToMainThreadAsync");
+            await JoinableTaskFactory
+               .WithPriority(VsTaskRunContext.UIThreadNormalPriority)
+               .SwitchToMainThreadAsync();
+
+            log.Information("StartShowingStatus");
             barManager.StartShowingStatus();
         }
     }
