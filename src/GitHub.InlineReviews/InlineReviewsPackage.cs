@@ -30,13 +30,19 @@ namespace GitHub.InlineReviews
 
             // Avoid delays when there is ongoing UI activity.
             // See: https://github.com/github/VisualStudio/issues/1537
-            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, async () =>
-            {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
-                menuService.AddCommands(
-                    exports.GetExportedValue<INextInlineCommentCommand>(),
-                    exports.GetExportedValue<IPreviousInlineCommentCommand>());
-            });
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
+        }
+
+        async Task InitializeMenus()
+        {
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var exports = componentModel.DefaultExportProvider;
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            menuService.AddCommands(
+                exports.GetExportedValue<INextInlineCommentCommand>(),
+                exports.GetExportedValue<IPreviousInlineCommentCommand>());
         }
     }
 }
