@@ -127,7 +127,7 @@ namespace GitHub.Services
             // Only send stats once a day.
             if (!service.IsSameDay(usage.LastUpdated))
             {
-                usage.Model = UpdateModelUserData(usage.Model);
+                usage.Model = await UpdateModelUserData(usage.Model);
 
                 await SendUsage(usage.Model, includeWeekly, includeMonthly);
 
@@ -148,8 +148,10 @@ namespace GitHub.Services
             await client.PostUsage(model);
         }
 
-        UsageModel UpdateModelUserData(UsageModel model)
+        async Task<UsageModel> UpdateModelUserData(UsageModel model)
         {
+            model.Guid = await service.GetUserGuid();
+
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
                 model.IsGitHubUser = true;
@@ -159,6 +161,7 @@ namespace GitHub.Services
             {
                 model.IsEnterpriseUser = true;
             }
+
             return model;
         }
     }

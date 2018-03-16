@@ -31,8 +31,6 @@
 
       <Style x:Key="PullRequestListItemContainerStyle" TargetType="{x:Type ListViewItem}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Margin" Value="0,0,0,10" />
-        <Setter Property="Padding" Value="1" />
 
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
