@@ -1,19 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -22,38 +26,36 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
-        readonly IApiClientFactory apiClientFactory;
+        static readonly ILogger log = LogManager.ForContext<InlineCommentPeekViewModel>();
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        IDisposable fileSubscription;
         ICommentThreadViewModel thread;
+        IDisposable fileSubscription;
+        IDisposable sessionSubscription;
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
-        string fullPath;
-        bool leftBuffer;
+        string relativePath;
+        DiffSide side;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
         public InlineCommentPeekViewModel(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
 
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
@@ -62,14 +64,14 @@ namespace GitHub.InlineReviews.ViewModels
             peekSession.Dismissed += (s, e) => Dispose();
 
             NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextCommentCommand.IsEnabled),
+                Observable.Return(nextCommentCommand.Enabled),
                 _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
             PreviousComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(previousCommentCommand.IsEnabled),
+                Observable.Return(previousCommentCommand.Enabled),
                 _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
@@ -97,6 +99,10 @@ namespace GitHub.InlineReviews.ViewModels
 
         public void Dispose()
         {
+            threadSubscription?.Dispose();
+            threadSubscription = null;
+            sessionSubscription?.Dispose();
+            sessionSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
         }
@@ -108,19 +114,40 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (info != null)
             {
-                fullPath = info.FilePath;
-                leftBuffer = info.IsLeftComparisonBuffer;
-                await SessionChanged(info.Session);
+                relativePath = info.RelativePath;
+                side = info.Side ?? DiffSide.Right;
+                file = await info.Session.GetFile(relativePath);
+                session = info.Session;
+                await UpdateThread();
             }
             else
             {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                fullPath = document.FilePath;
-
+                relativePath = sessionManager.GetRelativePath(buffer);
+                file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer);
                 await SessionChanged(sessionManager.CurrentSession);
-                sessionManager.WhenAnyValue(x => x.CurrentSession)
+                sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(x => SessionChanged(x).Forget());
+            }
+
+            fileSubscription?.Dispose();
+            fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+        }
+
+        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        {
+            try
+            {
+                var lineNumber = peekService.GetLineNumber(peekSession, triggerPoint).Item1;
+
+                if (lines.Contains(Tuple.Create(lineNumber, side)))
+                {
+                    await UpdateThread();
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error updating InlineCommentViewModel");
             }
         }
 
@@ -137,19 +164,17 @@ namespace GitHub.InlineReviews.ViewModels
             var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
             var lineNumber = lineAndLeftBuffer.Item1;
             var leftBuffer = lineAndLeftBuffer.Item2;
-            var thread = file.InlineCommentThreads.FirstOrDefault(x => 
+            var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
-                (!leftBuffer || x.DiffLineType == DiffChangeType.Delete));
-            var apiClient = await CreateApiClient(session.Repository);
+                ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
 
             if (thread != null)
             {
-                Thread = new InlineCommentThreadViewModel(apiClient, session, thread.Comments);
+                Thread = new InlineCommentThreadViewModel(session, thread.Comments);
             }
             else
             {
-                var newThread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber, leftBuffer);
-                threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread().Forget());
+                var newThread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
                 Thread = newThread;
             }
 
@@ -165,27 +190,21 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task SessionChanged(IPullRequestSession session)
+        async Task SessionChanged(IPullRequestSession pullRequestSession)
         {
-            this.session = session;
-            fileSubscription?.Dispose();
+            this.session = pullRequestSession;
 
-            if (session == null)
+            if (pullRequestSession == null)
             {
                 Thread = null;
                 threadSubscription?.Dispose();
+                threadSubscription = null;
                 return;
             }
-
-            var relativePath = session.GetRelativePath(fullPath);
-            file = await session.GetFile(relativePath);
-            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
-        }
-
-        Task<IApiClient> CreateApiClient(ILocalRepositoryModel repository)
-        {
-            var hostAddress = HostAddress.Create(repository.CloneUrl.Host);
-            return apiClientFactory.Create(hostAddress);
+            else
+            {
+                await UpdateThread();
+            }
         }
 
         async Task<string> GetPlaceholderBodyToPreserve()

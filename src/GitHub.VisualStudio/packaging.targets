@@ -8,10 +8,25 @@
                               $([System.String]::Copy('%(Filename)').Contains('Microsoft.')) or
                               $([System.String]::Copy('%(Extension)').Contains('.dylib')) or
                               $([System.String]::Copy('%(Extension)').Contains('.so')) or
-                              $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.*\\libgit2\\.*\.pdb'))
+                              $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.*\\LibGit2Sharp.NativeBinaries.*\\.*\.pdb'))
                              "/>
       <VSIXSourceItem Remove="@(SuppressPackaging)" />
     </ItemGroup>
     <Message Importance="High" Text='Suppressed "@(SuppressPackaging)" from being included in VSIX.' />
+  </Target>
+
+  <Target Name="UpdateManifestVersion"
+    AfterTargets="DetokenizeVsixManifestFile"
+    DependsOnTargets="GetBuildVersion"
+    Outputs="$(IntermediateVsixManifest)">
+    <Message Text="Stamping package with version '$(BuildVersion)'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Metadata/x:Identity/@Version" Value="$(BuildVersion)" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+  </Target>
+
+  <!-- set AllUsers="false" and Experimental="true" when $(IsExperimental)' == 'true' -->
+  <Target Name="ExperimentalManifest" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(IsExperimental)' == 'true' ">
+    <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to have AllUsers='false' and Experimental='true'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="false" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="true" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
   </Target>
 </Project>

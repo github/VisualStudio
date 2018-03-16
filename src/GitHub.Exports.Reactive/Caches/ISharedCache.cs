@@ -12,7 +12,6 @@ namespace GitHub.Caches
     {
         IBlobCache UserAccount { get; }
         IBlobCache LocalMachine { get; }
-        ISecureBlobCache Secure { get; }
 
         /// <summary>
         /// Retrieves the Enterpise Host Uri from cache if present.

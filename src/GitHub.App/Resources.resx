@@ -159,15 +159,6 @@
   <data name="LoginTitle" xml:space="preserve">
     <value>Connect To GitHub</value>
   </data>
-  <data name="LogoutRequiredFeatureGist" xml:space="preserve">
-    <value>create a Gist</value>
-  </data>
-  <data name="LogoutRequiredMessage" xml:space="preserve">
-    <value>To {0} you need to sign out and back in.</value>
-  </data>
-  <data name="LogoutRequiredTitle" xml:space="preserve">
-    <value>Sign Out Required</value>
-  </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
     <value>Please enter your password</value>
   </data>
@@ -293,5 +284,14 @@
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
     <value>Cannot checkout as your working directory has uncommitted changes.</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>Sync {0} submodules</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>Couldn't find Git.exe on PATH.
+
+Please install Git for Windows from:
+https://git-scm.com/download/win</value>
   </data>
 </root>

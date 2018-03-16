@@ -1,0 +1,187 @@
+﻿<local:GenericPullRequestCreationView x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestCreationView"
+                                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                      xmlns:ghfvs="https://github.com/github/VisualStudio"
+                                      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+                                      xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+                                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                      xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                                      d:DesignHeight="450"
+                                      d:DesignWidth="300"
+                                      Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                      DataContext="{Binding ViewModel}"
+                                      IsEnabled="{Binding IsBusy, Converter={ghfvs:InverseBooleanConverter}}"
+                                      AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationViewCustom}"
+                                      mc:Ignorable="d">
+
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <ghfvs:PullRequestCreationViewModelDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="CommitListItemContainerStyle" TargetType="{x:Type ListViewItem}">
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Padding" Value="1" />
+
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                            <Border x:Name="Bd"
+                      Background="{TemplateBinding Background}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="GitHubPopupThing" TargetType="{x:Type ListBox}">
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <ghfvs:BranchNameConverter x:Key="BranchNameConverter" />
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <Grid VerticalAlignment="Top" 
+          MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GenericPullRequestCreationView}}}"
+          Margin="0 8 0 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0">
+            <Grid Margin="10,-3,10,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ghfvs:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
+                    <ghfvs:LinkDropDown Header="Target Branch"
+                                     ItemsSource="{Binding Branches}"
+                                     SelectedItem="{Binding TargetBranch}"
+                                     ToolTip="Select a branch"
+                                     Margin="0,1,0,0"
+                                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestTargetBranchComboBox}" >
+                        <ghfvs:LinkDropDown.ItemTemplate>
+                            <DataTemplate DataType="models:BranchModel">
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource BranchNameConverter}">
+                                            <Binding/>
+                                            <Binding Path="ViewModel.GitHubRepository" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestCreationView}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ghfvs:LinkDropDown.ItemTemplate>
+                        <ghfvs:LinkDropDown.LinkItemTemplate>
+                            <DataTemplate DataType="models:BranchModel">
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource BranchNameConverter}">
+                                            <Binding/>
+                                            <Binding Path="ViewModel.GitHubRepository" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestCreationView}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ghfvs:LinkDropDown.LinkItemTemplate>
+                    </ghfvs:LinkDropDown>
+                    <ghfvs:OcticonImage Height="13"
+                                     Margin="5,2,3,0"
+                                     VerticalAlignment="Center"
+                                     Foreground="{DynamicResource GitHubVsGrayText}"
+                                     Icon="chevron_left" />
+                </StackPanel>
+
+                <ghfvs:GitHubActionLink Margin="5,0,0,0"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Left"
+                                     Content="{Binding SourceBranch.Name}"
+                                     HasDropDown="False"
+                                     Grid.Column="1"
+                                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestSourceBranchHyperlink}"/>
+            </Grid>
+        </DockPanel>
+
+        <ghfvs:PromptTextBox x:Name="titleText"
+                            Grid.Row="1"
+                            Margin="10,5"
+                            Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
+                            PromptText="{x:Static prop:Resources.TitleRequired}"
+                            Style="{DynamicResource GitHubVsPromptTextBox}" 
+                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationTitleTextBox}"/>
+
+        <ghfvs:PromptTextBox Grid.Row="2"
+                            MinHeight="100"
+                            Margin="10,5"
+                            AcceptsReturn="True"
+                            PromptText="{x:Static prop:Resources.Description}"
+                            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{DynamicResource GitHubVsPromptTextBox}"
+                            VerticalScrollBarVisibility="Auto"
+                            TextWrapping="Wrap"
+                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationDescriptionTextBox}"/>
+        
+        <ghfvs:ValidationMessage x:Name="titleValidationMessage"
+                                Grid.Row="3"
+                                Fill="{StaticResource GitHubWarningBrush}"
+                                Icon="alert"
+                                ValidatesControl="{Binding ElementName=titleText}"
+                                ReactiveValidator="{Binding TitleValidator, Mode=OneWay}"/>
+
+        <DockPanel Grid.Row="4" Margin="10,10,10,20" HorizontalAlignment="Stretch">
+            <Button DockPanel.Dock="Right"
+                    Margin="6,0,0,0"
+                    HorizontalAlignment="Right"
+                    Command="{Binding CreatePullRequest}"
+                    Content="Create pull request"
+                    Style="{StaticResource GitHubVsPrimaryActionButton}" 
+                    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCreateButton}"/>
+            <Button DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Cancel}"
+                    Content="Cancel"
+                    Style="{StaticResource GitHubVsButton}" 
+                    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCancelButton}"/>
+
+        </DockPanel>
+    </Grid>
+</local:GenericPullRequestCreationView>

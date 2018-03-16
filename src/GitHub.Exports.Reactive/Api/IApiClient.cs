@@ -15,7 +15,7 @@ namespace GitHub.Api
 
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
         IObservable<Gist> CreateGist(NewGist newGist);
-        IObservable<UserAndScopes> GetUser();
+        IObservable<User> GetUser();
         IObservable<Organization> GetOrganizations();
         /// <summary>
         /// Retrieves all repositories that belong to this user.
@@ -27,11 +27,6 @@ namespace GitHub.Api
         /// </summary>
         /// <returns></returns>
         IObservable<Repository> GetRepositoriesForOrganization(string organization);
-        IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
-            string authenticationCode = null,
-            bool useOldScopes = false,
-            bool useFingerprint = true);
 
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();

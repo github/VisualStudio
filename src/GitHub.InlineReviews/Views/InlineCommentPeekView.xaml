@@ -18,11 +18,24 @@
 
             <Style x:Key="GitHubToolbarButton" TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}" BorderThickness="1">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
 
                 <Style.Triggers>
                     <Trigger Property="IsEnabled" Value="False">
                         <Setter Property="Opacity" Value="0.25" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource VsBrush.CommandBarHover}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -51,8 +64,8 @@
 
         <Border DockPanel.Dock="Top"
                 BorderThickness="0 0 0 1"
-                Background="#FFEEEEF2"
-                BorderBrush="#FFD1D5DA">
+                Background="{DynamicResource VsBrush.CommandBarOptionsBackground}"
+                BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}">
             <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Left" >
                 <Button Margin="2 0" Padding="2" Command="{Binding PreviousComment}"
@@ -60,9 +73,13 @@
                     <Button.ToolTip>
                         <TextBlock FontSize="11">Previous Comment</TextBlock>
                     </Button.ToolTip>
-                    <ui:OcticonImage Width="16"
-                                     Height="16"
-                                     Icon="arrow_left" />
+                    <Canvas Width="16" Height="16">
+                        <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
+                        <Polygon Points="10 2 5 8 8 8 8 12 12 12 12 8 15 8" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1.25" Canvas.Top="9" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1.25" Canvas.Top="10.75" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="1.25" Canvas.Top="12.75" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                    </Canvas>
                 </Button>
 
                 <Button Margin="2 0" Padding="2" Command="{Binding NextComment}"
@@ -70,18 +87,24 @@
                     <Button.ToolTip>
                         <TextBlock FontSize="11">Next Comment</TextBlock>
                     </Button.ToolTip>
-                    <ui:OcticonImage Width="16"
-                                     Height="16"
-                                     Icon="arrow_right" />
+
+                    <Canvas Width="16" Height="16">
+                        <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
+                        <Polygon Points="8 8 8 4 4 4 4 8 1 8 6 14 11 8" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="9" Canvas.Top="2" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="9" Canvas.Top="4" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                        <Rectangle Canvas.Left="9" Canvas.Top="6" Width="6" Height="1" Fill="{DynamicResource VsBrush.CommandBarOptionsGlyph}" StrokeThickness="1"/>
+                    </Canvas>
                 </Button>
-                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Separator Background="{DynamicResource GitHubButtonBorderBrush}" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             </StackPanel>
         </Border>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      Background="#FFF5F5F5">
+        <ScrollViewer Name="threadScroller"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="{DynamicResource GitHubPeekViewBackground}">
             <Grid>
-                <local:CommentThreadView DataContext="{Binding Thread}"/>
+                <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
             </Grid>
         </ScrollViewer>
     </DockPanel>

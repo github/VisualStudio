@@ -1,24 +1,23 @@
 ﻿<UserControl x:Class="GitHub.VisualStudio.UI.Controls.InfoPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
-             Background="Beige"
-             d:DataContext="{d:DesignInstance Type=sampleData:InfoPanelDesigner, IsDesignTimeCreatable=True}"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             Background="{DynamicResource VsBrush.InfoBackground}"
+             d:DataContext="{d:DesignInstance Type=ghfvs:InfoPanelDesigner, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d"
-             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GitHubInfoPanel}">
+             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitHubInfoPanel}">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="DocumentStyle" TargetType="FlowDocument">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -33,15 +32,19 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+
     <DockPanel Margin="8" LastChildFill="True">
-        <ui:OcticonImage Width="16"
+        <ghfvs:OcticonImage Width="16"
                          Height="16"
                          Margin="0,0,8,0"
                          VerticalAlignment="Top"
                          DockPanel.Dock="Left"
                          Foreground="{Binding IconColor}"
                          Icon="{Binding Icon}"/>
-        <ui:OcticonButton Width="16"
+        <ghfvs:OcticonButton Width="16"
                           Height="16"
                           Margin="0"
                           VerticalAlignment="Top"
@@ -51,17 +54,14 @@
                           Foreground="Black"
                           Icon="x"/>
 
-        <ui:MarkdownViewer x:Name="document"
-                           Margin="8,0"
-                           VerticalAlignment="Top"
-                           DockPanel.Dock="Top"
-                           DocumentStyle="{StaticResource DocumentStyle}"
-                           Foreground="Black"
-                           LinkStyle="{StaticResource LinkStyle}"
-                           RawContent="{Binding Message}"
-                           HyperlinkCommand="{Binding LinkCommand}"
-                           ScrollViewer.CanContentScroll="False"
-                           ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                           ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+        <markdig:MarkdownViewer x:Name="document"
+                                Margin="8,0"
+                                VerticalAlignment="Top"
+                                DockPanel.Dock="Top"
+                                Foreground="Black"
+                                Markdown="{Binding Message}"
+                                ScrollViewer.CanContentScroll="False"
+                                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
     </DockPanel>
 </UserControl>

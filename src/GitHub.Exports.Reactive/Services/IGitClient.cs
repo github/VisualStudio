@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using LibGit2Sharp;
+using GitHub.Primitives;
+using System.Collections.Generic;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -38,6 +41,20 @@ namespace GitHub.Services
         /// <param name="refspecs">The custom refspecs</param>
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
+
+        /// <summary>
+        /// Fetches from a remote URI, using custom refspecs. 
+        /// </summary>
+        /// <remarks>
+        /// If the URI is the same as origin then origin will be used, otherwise a
+        /// temporary remote will be created for the fetch. The fetch will always be made
+        /// using HTTPS.
+        /// </remarks>
+        /// <param name="repository">The repository to pull</param>
+        /// <param name="remoteUri">The remote URI to fetch from</param>
+        /// <param name="refspecs">The custom refspecs</param>
+        /// <returns></returns>
+        Task Fetch(IRepository repository, UriString remoteUri, params string[] refspecs);
 
         /// <summary>
         /// Checks out a branch.
@@ -84,13 +101,14 @@ namespace GitHub.Services
         /// Compares a file in a commit to a string.
         /// </summary>
         /// <param name="repository">The repository</param>
-        /// <param name="sha">The SHA of the first commit.</param>
+        /// <param name="sha1">The SHA of the first commit.</param>
+        /// <param name="sha2">The SHA of the second commit.</param>
         /// <param name="path">The relative path to the file.</param>
         /// <param name="contents">The contents to compare with the file.</param>
         /// <returns>
         /// A <see cref="Patch"/> object or null if the commit could not be found in the repository.
         /// </returns>
-        Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, byte[] contents);
+        Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents);
 
         /// Gets the value of a configuration key.
         /// </summary>
@@ -172,7 +190,7 @@ namespace GitHub.Services
         /// Find the merge base SHA between two commits.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="remoteName">The name of the remote (e.g. 'origin').</param>
+        /// <param name="targetCloneUrl">The clone url of the PR target repo.</param>
         /// <param name="baseSha">The PR base SHA.</param>
         /// <param name="headSha">The PR head SHA.</param>
         /// <param name="baseRef">The PR base ref (e.g. 'master').</param>
@@ -180,12 +198,29 @@ namespace GitHub.Services
         /// <returns>
         /// The merge base SHA or null.
         /// </returns>
-        Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber);
+        /// <exception cref="LibGit2Sharp.NotFoundException">Thrown when the merge base can't be found.</exception>
+        Task<string> GetPullRequestMergeBase(IRepository repo, UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber);
 
         /// Checks whether the current head is pushed to its remote tracking branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
         Task<bool> IsHeadPushed(IRepository repo);
+
+        /// <summary>
+        /// Gets the unique commits from <paramref name="compareBranch"/> to the merge base of 
+        /// <paramref name="baseBranch"/> and <paramref name="compareBranch"/> and returns their
+        /// commit messages.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="baseBranch">The base branch to find a merge base with.</param>
+        /// <param name="compareBranch">The compare branch to find a merge base with.</param>
+        /// <param name="maxCommits">The maximum number of commits to return.</param>
+        /// <returns>An enumerable of unique commits from the merge base to the compareBranch.</returns>
+        Task<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            IRepository repo,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits);
     }
 }

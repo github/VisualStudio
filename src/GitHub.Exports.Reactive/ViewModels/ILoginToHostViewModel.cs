@@ -1,5 +1,5 @@
 ﻿using System.Reactive;
-using GitHub.Authentication;
+using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -33,7 +33,12 @@ namespace GitHub.ViewModels
         /// Gets a command which, when invoked, performs the actual 
         /// login procedure.
         /// </summary>
-        IReactiveCommand<AuthenticationResult> Login { get; }
+        IReactiveCommand<IConnection> Login { get; }
+
+        /// <summary>
+        /// Gets a command which, when invoked, performs an OAuth login.
+        /// </summary>
+        IReactiveCommand<IConnection> LoginViaOAuth { get; }
 
         /// <summary>
         /// Gets a command which, when invoked, direct the user to a
@@ -69,5 +74,10 @@ namespace GitHub.ViewModels
         /// Gets an error to display to the user.
         /// </summary>
         UserError Error { get; }
+
+        /// <summary>
+        /// Called when the login UI is hidden or dismissed.
+        /// </summary>
+        void Deactivated();
     }
 }

@@ -11,9 +11,9 @@
     <AssemblyName>GitHub.Api</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <TargetFrameworkProfile />
+    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,10 +22,18 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,16 +42,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -55,20 +61,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiClientConfiguration.cs"/>
+    <Compile Include="ApiClientConfiguration.cs" />
     <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs" Condition="$(Buildtype) == 'Internal'">
       <Link>ApiClientConfiguration_User.cs</Link>
     </Compile>
-    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'"/>
-    <Compile Include="ILoginCache.cs" />
+    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
+    <Compile Include="IKeychain.cs" />
     <Compile Include="ILoginManager.cs" />
+    <Compile Include="IOAuthCallbackListener.cs" />
+    <Compile Include="IncorrectScopesException.cs" />
     <Compile Include="ITwoFactorChallengeHandler.cs" />
     <Compile Include="LoginManager.cs" />
-    <Compile Include="SimpleCredentialStore.cs" />
-    <Compile Include="WindowsLoginCache.cs" />
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
+    <Compile Include="KeychainCredentialStore.cs" />
+    <Compile Include="WindowsKeychain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -95,6 +100,13 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

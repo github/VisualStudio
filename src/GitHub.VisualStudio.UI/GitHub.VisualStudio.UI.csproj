@@ -11,35 +11,49 @@
     <AssemblyName>GitHub.VisualStudio.UI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <OutputPath>..\..\build\$(Configuration)\</OutputPath>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
+    <Reference Include="Markdig, Version=0.13.0.0, Culture=neutral, PublicKeyToken=870da25a133885f8, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Signed.0.13.0\lib\net40\Markdig.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig.Wpf, Version=0.2.1.0, Culture=neutral, PublicKeyToken=a0d0cdbebd8d164b, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Wpf.Signed.0.2.1\lib\net452\Markdig.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.14.0.14.3.25407\lib\Microsoft.VisualStudio.Shell.14.0.dll</HintPath>
       <Private>True</Private>
@@ -94,9 +108,6 @@
     <Compile Include="UI\Views\GitHubInvitationContent.xaml.cs">
       <DependentUpon>GitHubInvitationContent.xaml</DependentUpon>
     </Compile>
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
@@ -164,6 +175,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Styles\VsBrushesBlue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\VsBrushesDark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\VsBrushesLight.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\VsColorsBlue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\VsColorsDark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\VsColorsLight.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\Controls\AccountAvatar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -206,6 +241,10 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
@@ -220,6 +259,11 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

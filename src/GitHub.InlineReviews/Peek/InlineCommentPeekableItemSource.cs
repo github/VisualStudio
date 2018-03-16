@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
@@ -11,20 +12,17 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItemSource : IPeekableItemSource
     {
-        readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
 
         public InlineCommentPeekableItemSource(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.nextCommentCommand = nextCommentCommand;
@@ -36,7 +34,6 @@ namespace GitHub.InlineReviews.Peek
             if (session.RelationshipName == InlineCommentPeekRelationship.Instance.Name)
             {
                 var viewModel = new InlineCommentPeekViewModel(
-                    apiClientFactory,
                     peekService,
                     session,
                     sessionManager,

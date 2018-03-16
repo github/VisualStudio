@@ -17,23 +17,18 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public class InlineCommentThreadViewModel : CommentThreadViewModel
     {
-        readonly IApiClient apiClient;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
         public InlineCommentThreadViewModel(
-            IApiClient apiClient,
             IPullRequestSession session,
             IEnumerable<IPullRequestReviewCommentModel> comments)
             : base(session.User)
         {
-            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
             Guard.ArgumentNotNull(session, nameof(session));
 
-            this.apiClient = apiClient;
             Session = session;
 
             PostComment = ReactiveCommand.CreateAsyncTask(
@@ -59,7 +54,7 @@ namespace GitHub.InlineReviews.ViewModels
             return new Uri(string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}/pull/{1}#discussion_r{2}",
-                Session.Repository.CloneUrl.ToRepositoryUrl(),
+                Session.LocalRepository.CloneUrl.ToRepositoryUrl(Session.RepositoryOwner),
                 Session.PullRequest.Number,
                 id));
         }
@@ -70,29 +65,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             var body = (string)parameter;
             var replyId = Comments[0].Id;
-            var result = await apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
-                Session.PullRequest.Number,
-                body,
-                replyId);
-
-            var model = new PullRequestReviewCommentModel
-            {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                CreatedAt = result.CreatedAt,
-                User = Session.User,
-            };
-
-            await Session.AddComment(model);
-            return model;
+            return await Session.PostReviewComment(body, replyId);
         }
     }
 }

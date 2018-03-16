@@ -2,9 +2,9 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Models;
-using GitHub.UI;
-using GitHub.ViewModels;
+using GitHub.ViewModels.Dialog;
 
 namespace GitHub.Services
 {
@@ -12,65 +12,64 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DialogService : IDialogService
     {
-        readonly IUIProvider uiProvider;
+        readonly IViewViewModelFactory factory;
+        readonly IShowDialogService showDialog;
 
         [ImportingConstructor]
-        public DialogService(IUIProvider uiProvider)
+        public DialogService(
+            IViewViewModelFactory factory,
+            IShowDialogService showDialog)
         {
-            Guard.ArgumentNotNull(uiProvider, nameof(uiProvider));
+            Guard.ArgumentNotNull(factory, nameof(factory));
+            Guard.ArgumentNotNull(showDialog, nameof(showDialog));
 
-            this.uiProvider = uiProvider;
+            this.factory = factory;
+            this.showDialog = showDialog;
         }
 
-        public Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
+        public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
         {
-            var controller = uiProvider.Configure(UIControllerFlow.Clone, connection);
-            var basePath = default(string);
-            var repository = default(IRepositoryModel);
+            var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
 
-            controller.TransitionSignal.Subscribe(x =>
+            if (connection != null)
             {
-                var vm = x.View.ViewModel as IBaseCloneViewModel;
-
-                vm.Done.Subscribe(_ =>
-                {
-                    basePath = vm?.BaseRepositoryPath;
-                    repository = vm?.SelectedRepository;
-                });
-            });
-
-            uiProvider.RunInDialog(controller);
-
-            var result = repository != null && basePath != null ?
-                new CloneDialogResult(basePath, repository) : null;
-            return Task.FromResult(result);
+                await viewModel.InitializeAsync(connection);
+                return (CloneDialogResult)await showDialog.Show(viewModel);
+            }
+            else
+            {
+                return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel);
+            }
         }
 
-        public Task<string> ShowReCloneDialog(IRepositoryModel repository)
+        public async Task<string> ShowReCloneDialog(IRepositoryModel repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
 
-            var controller = uiProvider.Configure(UIControllerFlow.ReClone);
-            var basePath = default(string);
+            var viewModel = factory.CreateViewModel<IRepositoryRecloneViewModel>();
+            viewModel.SelectedRepository = repository;
+            return (string)await showDialog.ShowWithFirstConnection(viewModel);
+        }
 
-            controller.TransitionSignal.Subscribe(x =>
-            {
-                var vm = x.View.ViewModel as IBaseCloneViewModel;
+        public async Task ShowCreateGist()
+        {
+            var viewModel = factory.CreateViewModel<IGistCreationViewModel>();
+            await showDialog.ShowWithFirstConnection(viewModel);
+        }
 
-                if (vm != null)
-                {
-                    vm.SelectedRepository = repository;
-                }
+        public async Task ShowCreateRepositoryDialog(IConnection connection)
+        {
+            Guard.ArgumentNotNull(connection, nameof(connection));
 
-                vm.Done.Subscribe(_ =>
-                {
-                    basePath = vm?.BaseRepositoryPath;
-                });
-            });
+            var viewModel = factory.CreateViewModel<IRepositoryCreationViewModel>();
+            await viewModel.InitializeAsync(connection);
+            await showDialog.Show(viewModel);
+        }
 
-            uiProvider.RunInDialog(controller);
-
-            return Task.FromResult(basePath);
+        public async Task<IConnection> ShowLoginDialog()
+        {
+            var viewModel = factory.CreateViewModel<ILoginViewModel>();
+            return (IConnection)await showDialog.Show(viewModel);
         }
     }
 }

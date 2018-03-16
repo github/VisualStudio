@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.props')" />
   <PropertyGroup>
     <!-- This is added to prevent forced migrations in Visual Studio 2012 and newer -->
@@ -10,13 +10,6 @@
     </NuGetPackageImportStamp>
     <UseCodebase>true</UseCodebase>
     <TargetFrameworkProfile />
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,52 +29,59 @@
     <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
     <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
+    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <CreateVsixContainer>False</CreateVsixContainer>
+    <DeployExtension>False</DeployExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CreateVsixContainer>False</CreateVsixContainer>
-    <DeployExtension>False</DeployExtension>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Commands\INextInlineCommentCommand.cs" />
-    <Compile Include="Commands\InlineCommentNavigationParams.cs" />
-    <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
-    <Compile Include="Commands\IVsCommandBase.cs" />
-    <Compile Include="Commands\IVsCommand.cs" />
-    <Compile Include="Commands\PackageResources.cs" />
-    <Compile Include="Commands\VsCommand.cs" />
-    <Compile Include="Commands\ExportCommandAttribute.cs" />
-    <Compile Include="Commands\IPackageResource.cs" />
-    <Compile Include="Commands\IExportCommandMetadata.cs" />
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
-    <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
-    <Compile Include="Commands\VsCommandBase.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
     <Compile Include="Glyph\IGlyphFactory.cs" />
+    <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
+    <Compile Include="Models\PullRequestSessionLiveFile.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
+    <Compile Include="Services\PullRequestStatusBarManager.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
@@ -123,6 +123,7 @@
     <Compile Include="Views\TooltipCommentThreadView.xaml.cs">
       <DependentUpon>TooltipCommentThreadView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
     <Compile Include="Views\DiffCommentThreadView.xaml.cs">
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
@@ -160,14 +161,15 @@
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\PullRequestStatusView.xaml.cs">
+      <DependentUpon>PullRequestStatusView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
     </None>
-    <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -201,6 +203,18 @@
       <Project>{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services\GitHub.Services.csproj">
+      <Project>{DDB343BA-2EC8-40D4-B991-951ABFF2F5DB}</Project>
+      <Name>GitHub.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
@@ -227,8 +241,16 @@
     <Reference Include="EnvDTE90, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+    <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig, Version=0.13.0.0, Culture=neutral, PublicKeyToken=870da25a133885f8, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Signed.0.13.0\lib\net40\Markdig.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig.Wpf, Version=0.2.1.0, Culture=neutral, PublicKeyToken=a0d0cdbebd8d164b, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Wpf.Signed.0.2.1\lib\net452\Markdig.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
@@ -236,9 +258,9 @@
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\VSSDK.ComponentModelHost.12.0.4\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.ComponentModelHost.14.0.25424\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.CoreUtility.14.3.25407\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
@@ -250,6 +272,11 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.14.3.25407\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.14.3.25407\lib\Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -299,6 +326,11 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.12.0.12.0.30110\lib\Microsoft.VisualStudio.Shell.Interop.12.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime.14.3.25407\lib\Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
       <Private>True</Private>
@@ -345,8 +377,8 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -403,6 +435,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+    </Page>
     <Page Include="Views\DiffCommentThreadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -435,8 +472,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\PullRequestStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\SerilogAnalyzer.0.12.0.0\analyzers\dotnet\cs\SerilogAnalyzer.dll" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\logo_32x32%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -450,7 +493,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.VSSDK.BuildTools.14.3.25407\build\Microsoft.VSSDK.BuildTools.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

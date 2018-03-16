@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Windows.Controls;
-using System.Windows.Threading;
+using System.Windows.Input;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
+using GitHub.UI;
 using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Views
 {
-    public class GenericCommentView : GitHub.UI.ViewBase<ICommentViewModel, GenericCommentView> { }
+    public class GenericCommentView : ViewBase<ICommentViewModel, GenericCommentView> { }
 
     public partial class CommentView : GenericCommentView
     {
@@ -23,11 +23,15 @@ namespace GitHub.InlineReviews.Views
             });
         }
 
-        void DoOpenOnGitHub()
+        IVisualStudioBrowser GetBrowser()
         {
             var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
-            var browser = serviceProvider.GetService<IVisualStudioBrowser>();
-            browser.OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
+            return serviceProvider.GetService<IVisualStudioBrowser>();
+        }
+
+        void DoOpenOnGitHub()
+        {
+            GetBrowser().OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
         }
 
         private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -54,6 +58,16 @@ namespace GitHub.InlineReviews.Views
             if (buttonPanel.IsVisible)
             {
                 BringIntoView();
+            }
+        }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                GetBrowser().OpenUrl(uri);
             }
         }
     }

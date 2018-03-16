@@ -164,7 +164,7 @@ namespace GitHub.Collections
     /// for T
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IDisposable
+    public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IReadOnlyObservableCollection<T>, IDisposable
         where T : class, ICopyable<T>
     {
         enum TheAction
@@ -174,7 +174,8 @@ namespace GitHub.Collections
             Add,
             Insert,
             Remove,
-            Ignore
+            Ignore,
+            End
         }
 
         bool isChanging;
@@ -211,7 +212,7 @@ namespace GitHub.Collections
         readonly Dictionary<T, int> filteredIndexCache = new Dictionary<T, int>();
 
         bool originalSourceIsCompleted;
-        bool signalOriginalSourceCompletion;
+        bool sourceHasData;
         ReplaySubject<Unit> originalSourceCompleted;
         public IObservable<Unit> OriginalCompleted => originalSourceCompleted;
 
@@ -287,6 +288,7 @@ namespace GitHub.Collections
                 })
                 .Do(data =>
                 {
+                    sourceHasData = true;
                     cache.Enqueue(new ActionData(data));
                     signalHaveData.OnNext(Unit.Default);
                 })
@@ -296,16 +298,15 @@ namespace GitHub.Collections
                         return;
 
                     originalSourceIsCompleted = true;
-                    if (!cache.IsEmpty)
-                    {
-                        signalOriginalSourceCompletion = true;
-                    }
-                    else
+                    if (!sourceHasData)
                     {
                         originalSourceCompleted.OnNext(Unit.Default);
                         originalSourceCompleted.OnCompleted();
-                        signalNeedData.OnCompleted();
-                        signalHaveData.OnCompleted();
+                    }
+                    else
+                    {
+                        cache.Enqueue(new ActionData(TheAction.End, null));
+                        signalHaveData.OnNext(Unit.Default);
                     }
                 })
                 .Publish();
@@ -321,16 +322,23 @@ namespace GitHub.Collections
                 {
                     var delay = CalculateProcessingDelay(interval);
                     waitHandle.Wait(delay);
-                    dataListener.OnNext(GetFromQueue());
+                    var data = GetFromQueue();
+                    if (!data.Equals(ActionData.Default))
+                    {
+                        dataListener.OnNext(data);
+                    }
                     return Unit.Default;
                 })
                 .Publish();
 
             source = dataListener
-                .Where(data => data.Item != null)
+                .Where(data => data.Item != null || data.TheAction == TheAction.End)
                 .ObserveOn(scheduler)
                 .Select(data =>
                 {
+                    if (data.TheAction == TheAction.End)
+                        return data;
+
                     data = ProcessItem(data, original);
 
                     // if we're removing an item that doesn't exist, ignore it
@@ -351,18 +359,15 @@ namespace GitHub.Collections
                     data = FilteredRemove(data);
                     return data;
                 })
-                .Do(_ =>
+                .Do(data =>
                 {
-                    if (ManualProcessing)
+                    if (data.TheAction == TheAction.End)
                     {
-                        if (signalOriginalSourceCompletion)
-                        {
-                            signalOriginalSourceCompletion = false;
-                            originalSourceCompleted.OnNext(Unit.Default);
-                            originalSourceCompleted.OnCompleted();
-                        }
+                        originalSourceCompleted.OnNext(Unit.Default);
+                        originalSourceCompleted.OnCompleted();
                     }
-                    else
+
+                    if (!ManualProcessing)
                         signalNeedData.OnNext(Unit.Default);
                 })
                 .Where(data => data.Item != null)
@@ -1174,7 +1179,7 @@ namespace GitHub.Collections
             pumpDisposables.Clear();
             disposables.Clear();
             originalSourceIsCompleted = false;
-            signalOriginalSourceCompletion = false;
+            sourceHasData = false;
             cache = new ConcurrentQueue<ActionData>();
             dataListener = new ReplaySubject<ActionData>();
             disposables.Add(dataListener);

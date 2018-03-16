@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.Commands;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
@@ -15,7 +16,6 @@ namespace GitHub.InlineReviews.Peek
     [Name("GitHub Inline Comments Peekable Item Source")]
     class InlineCommentPeekableItemSourceProvider : IPeekableItemSourceProvider
     {
-        readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand nextCommentCommand;
@@ -23,13 +23,11 @@ namespace GitHub.InlineReviews.Peek
 
         [ImportingConstructor]
         public InlineCommentPeekableItemSourceProvider(
-            IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand)
         {
-            this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.nextCommentCommand = nextCommentCommand;
@@ -39,7 +37,6 @@ namespace GitHub.InlineReviews.Peek
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
         {
             return new InlineCommentPeekableItemSource(
-                apiClientFactory,
                 peekService,
                 sessionManager,
                 nextCommentCommand,

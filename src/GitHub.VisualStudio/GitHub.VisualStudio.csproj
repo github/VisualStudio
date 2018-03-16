@@ -1,32 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
+  <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
-  <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
-  <!--
-  Update to have AllUsers="true" and Experimental="false" when $(IsExperimental)' == 'false'
-  -->
-  <Target Name="MakeVsixManifestAllUsers" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(IsExperimental)' == 'false' ">
-    <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to have AllUsers='true' and Experimental='false'" />
-    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="true" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
-    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="false" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
-  </Target>
   <PropertyGroup>
     <!-- This is added to prevent forced migrations in Visual Studio 2012 and newer -->
     <MinimumVisualStudioVersion>$(MSBuildToolsVersion)</MinimumVisualStudioVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">$(MSBuildToolsVersion)</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
-    <ApplicationVersion>2.2.0.7</ApplicationVersion>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.2.1.100</ApplicationVersion>
-    <ApplicationVersion>2.3.0.0</ApplicationVersion>
-    <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
+    <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -39,14 +26,30 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.VisualStudio</RootNamespace>
     <AssemblyName>GitHub.VisualStudio</AssemblyName>
-    <SignAssembly>true</SignAssembly>
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
+    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CreateVsixContainer>True</CreateVsixContainer>
+    <DeployExtension>True</DeployExtension>
+    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <OutputPath>..\..\build\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -54,12 +57,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CreateVsixContainer>True</CreateVsixContainer>
     <DeployExtension>True</DeployExtension>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <OutputPath>..\..\build\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugWithoutVsix|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CreateVsixContainer>False</CreateVsixContainer>
+    <DeployExtension>False</DeployExtension>
+    <OutputPath>..\..\build\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -68,32 +80,22 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <CreateVsixContainer>True</CreateVsixContainer>
+    <DeployExtension>True</DeployExtension>
+    <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Publish|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseWithoutVsix|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CreateVsixContainer>False</CreateVsixContainer>
     <DeployExtension>False</DeployExtension>
+    <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <!-- Only deploy extension when building inside Visual Studio -->
-    <DeployExtension>false</DeployExtension>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Buildtype) == 'Internal'">
-    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+  <Import Project="..\common\signing.props" />
   <ItemGroup>
     <Reference Include="EditorUtils2013">
       <HintPath>..\..\packages\EditorUtils2013.1.4.1.1\lib\net40\EditorUtils2013.dll</HintPath>
@@ -107,8 +109,16 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
-    <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+    <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig, Version=0.13.0.0, Culture=neutral, PublicKeyToken=870da25a133885f8, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Signed.0.13.0\lib\net40\Markdig.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Markdig.Wpf, Version=0.2.1.0, Culture=neutral, PublicKeyToken=a0d0cdbebd8d164b, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Markdig.Wpf.Signed.0.2.1\lib\net452\Markdig.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -117,6 +127,10 @@
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Expression.Blend.Sdk.WPF.1.0.1\lib\net45\Microsoft.Expression.Interactions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.ComponentModelHost.14.0.25424\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -135,10 +149,6 @@
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6070\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\VSSDK.ComponentModelHost.12.0.4\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.14.0.14.3.25407\lib\Microsoft.VisualStudio.Shell.14.0.dll</HintPath>
@@ -229,12 +239,12 @@
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NLog, Version=3.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
+    <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="rothko, Version=0.0.2.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rothko.0.0.2-ghfvs\lib\net45\rothko.dll</HintPath>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SQLitePCL.raw, Version=0.7.3.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
@@ -292,33 +302,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
-      <Link>Key.snk</Link>
-    </None>
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyResolverPackage.cs" />
-    <Compile Include="Helpers\VisualTreeExtensions.cs" />
+    <Compile Include="Commands\BlameLinkCommand.cs" />
+    <Compile Include="Commands\CreateGistCommand.cs" />
+    <Compile Include="Commands\LinkCommandBase.cs" />
+    <Compile Include="Commands\CopyLinkCommand.cs" />
+    <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
+    <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
+    <Compile Include="Commands\OpenPullRequestsCommand.cs" />
+    <Compile Include="GitContextPackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
-    <Compile Include="Menus\BlameLink.cs" />
-    <Compile Include="Menus\MenuBase.cs" />
-    <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
-    <Compile Include="Menus\OpenLink.cs" />
-    <Compile Include="Menus\LinkMenuBase.cs" />
-    <Compile Include="Menus\OpenPullRequests.cs" />
-    <Compile Include="Menus\ShowGitHubPane.cs" />
-    <Compile Include="Menus\AddConnection.cs" />
-    <Compile Include="Menus\CopyLink.cs" />
-    <Compile Include="Menus\MenuProvider.cs" />
+    <Compile Include="Commands\AddConnectionCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
-    <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="Services\LocalRepositories.cs" />
+    <Compile Include="Services\ShowDialogService.cs" />
+    <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
-    <Compile Include="Services\LoginManagerDispatcher.cs" />
-    <Compile Include="Services\UsageTrackerDispatcher.cs" />
+    <Compile Include="Services\VSGitExtFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
@@ -332,64 +339,61 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="Settings\Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
-    <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
-      <DependentUpon>GistCreationControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\Controls\LogoutRequiredControl.xaml.cs">
-      <DependentUpon>LogoutRequiredControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\StartPageCloneView.xaml.cs">
-      <DependentUpon>StartPageCloneView.xaml</DependentUpon>
+    <Compile Include="Views\ContentView.cs" />
+    <Compile Include="Views\Dialog\GistCreationView.xaml.cs">
+      <DependentUpon>GistCreationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
-      <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\GitHubDialogWindow.xaml.cs">
+      <DependentUpon>GitHubDialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryCreationControl.xaml.cs">
-      <DependentUpon>RepositoryCreationControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\LoginCredentialsView.xaml.cs">
+      <DependentUpon>LoginCredentialsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
-      <DependentUpon>LoginControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\Login2FaView.xaml.cs">
+      <DependentUpon>Login2FaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\RepositoryPublishControl.xaml.cs">
-      <DependentUpon>RepositoryPublishControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryCloneView.xaml.cs">
+      <DependentUpon>RepositoryCloneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\Controls\TwoFactorControl.xaml.cs">
-      <DependentUpon>TwoFactorControl.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryCreationView.xaml.cs">
+      <DependentUpon>RepositoryCreationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
-      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
+      <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
-    <Compile Include="UI\Views\NotAGitRepositoryView.xaml.cs">
-      <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\NotAGitHubRepositoryView.xaml.cs">
-      <DependentUpon>NotAGitHubRepositoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\LoggedOutView.xaml.cs">
+    <Compile Include="Views\GitHubPane\LoggedOutView.xaml.cs">
       <DependentUpon>LoggedOutView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestCreationView.xaml.cs">
-      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
+      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestDetailView.xaml.cs">
-      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\PullRequestListView.xaml.cs">
+    <Compile Include="Views\GitHubPane\PullRequestListView.xaml.cs">
       <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\WindowController.xaml.cs">
-      <DependentUpon>WindowController.xaml</DependentUpon>
+    <Compile Include="Views\GitHubPane\PullRequestDetailView.xaml.cs">
+      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestCreationView.xaml.cs">
+      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\NotAGitHubRepositoryView.xaml.cs">
+      <DependentUpon>NotAGitHubRepositoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\NotAGitRepositoryView.xaml.cs">
+      <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\TextViewCommandDispatcher.cs" />
+    <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
+      <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ViewLocator.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
@@ -399,10 +403,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Resources\preview_200x200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -421,7 +421,6 @@
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
       <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
     </Content>
-    <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -431,6 +430,7 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="..\..\build\version" />
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="GitHub.VisualStudio.vsct">
@@ -486,127 +486,123 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\LogoutRequiredControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\Controls\StartPageCloneView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\Settings\OptionsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
-    <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCreationControl.xaml">
+    <Page Include="Views\Dialog\GistCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\Controls\LoginControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryPublishControl.xaml">
+    <Page Include="Views\Dialog\GitHubDialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\Controls\TwoFactorControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>
-      </SubType>
-    </Page>
-    <Page Include="UI\Views\GitHubPaneView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\NotAGitRepositoryView.xaml">
+    <Page Include="Views\Dialog\LoginCredentialsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\NotAGitHubRepositoryView.xaml">
+    <Page Include="Views\Dialog\Login2FaView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\LoggedOutView.xaml">
+    <Page Include="Views\Dialog\RepositoryCloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\RepositoryCreationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\RepositoryRecloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\LoggedOutView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestCreationView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestDetailView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestDetailView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\PullRequestListView.xaml">
+    <Page Include="Views\GitHubPane\PullRequestCreationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\WindowController.xaml">
+    <Page Include="Views\GitHubPane\NotAGitHubRepositoryView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\NotAGitRepositoryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestListItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TeamExplorer\RepositoryPublishView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache.Sqlite3\Akavache.Sqlite3.csproj">
       <Project>{241c47df-ca8e-4296-aa03-2c48bb646abd}</Project>
       <Name>Akavache.Sqlite3</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
       <Project>{b4e665e5-6caf-4414-a6e2-8de1c3bcf203}</Project>
       <Name>Akavache_Net45</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj">
       <Project>{600998c4-54dd-4755-bfa8-6f44544d8e2e}</Project>
       <Name>ReactiveUI.Events_Net45</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
       <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
       <Name>ReactiveUI_Net45</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
@@ -618,95 +614,110 @@
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1a1da411-8d1f-4578-80a6-04576bea2dc5}</Project>
       <Name>GitHub.App</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bGetCopyToOutputDirectoryItems%3bDebugSymbolsProjectOutputGroup%3bBuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
       <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
       <Name>GitHub.Extensions.Reactive</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
+      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
+      <Name>GitHub.Logging</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
       <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
       <Name>GitHub.InlineReviews</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
       <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
       <Name>GitHub.StartPage</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF14</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
       <Name>GitHub.TeamFoundation.15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF15</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
       <Name>GitHub.VisualStudio.UI</Name>
-      <Private>False</Private>
+      <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\SerilogAnalyzer.0.12.0.0\analyzers\dotnet\cs\SerilogAnalyzer.dll" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
@@ -715,26 +726,20 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != '' And '$(NCrunch)' != '1'" />
   <Import Project="packaging.targets" />
   <!-- For regenerating templates on build -->
-  <Import Project="$(SolutionDir)\src\common\t4.targets" />
+  <Import Project="..\common\t4.targets" />
+  <Import Project="versioning.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
   </Target>
   <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" />
-  <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" />
 </Project>

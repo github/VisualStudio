@@ -1,29 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using GitHub.Api;
-using GitHub.Authentication;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
-using GitHub.Services;
 using GitHub.UI;
 using GitHub.Validation;
 using GitHub.ViewModels;
+using GitHub.ViewModels.Dialog;
+using GitHub.ViewModels.TeamExplorer;
+using GitHub.VisualStudio.TeamExplorer.Connect;
 using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
-using GitHub.VisualStudio.TeamExplorer.Connect;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : DialogViewModelBase, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : ViewModelBase, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -55,7 +52,7 @@ namespace GitHub.SampleData
             SelectedLicense = Licenses[0];
         }
 
-        public new string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         public IReadOnlyList<IAccount> Accounts
         {
@@ -187,7 +184,9 @@ namespace GitHub.SampleData
             set;
         }
 
-        public override IObservable<Unit> Done { get; }
+        public IObservable<object> Done { get; }
+
+        public Task InitializeAsync(IConnection connection) => Task.CompletedTask;
     }
 
     [ExcludeFromCodeCoverage]
@@ -200,29 +199,23 @@ namespace GitHub.SampleData
             public string Username { get; set; }
             public ObservableCollection<ILocalRepositoryModel> Repositories { get; set;  }
 
-            public IObservable<IConnection> Login()
-            {
-                return null;
-            }
+            public Octokit.User User => null;
+            public bool IsLoggedIn => true;
 
-            public void Logout()
-            {
-            }
-
-            public void Dispose()
-            {
-            }
+            public Exception ConnectionError => null;
         }
 
         public RepositoryPublishViewModelDesigner()
         {
-            Connections = new ObservableCollection<IConnection>
+            Connections = new ObservableCollectionEx<IConnection>
             {
                 new Conn() { HostAddress = new HostAddress() },
                 new Conn() { HostAddress = HostAddress.Create("ghe.io") }
             };
             SelectedConnection = Connections[0];
         }
+
+        public bool IsBusy { get; set; }
 
         public bool IsHostComboBoxVisible
         {
@@ -238,7 +231,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ObservableCollection<IConnection> Connections
+        public IReadOnlyObservableCollection<IConnection> Connections
         {
             get;
             private set;
@@ -251,81 +244,17 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public sealed class RepositoryHostDesigner : ReactiveObject, IRepositoryHost
-    {
-        public RepositoryHostDesigner(string title)
-        {
-            this.Title = title;
-        }
-
-        public HostAddress Address
-        {
-            get;
-            private set;
-        }
-
-        public IApiClient ApiClient
-        {
-            get;
-            private set;
-        }
-
-        public bool IsLoggedIn
-        {
-            get;
-            private set;
-        }
-
-        public bool SupportsGist
-        {
-            get;
-            private set;
-        }
-
-        public IModelService ModelService
-        {
-            get;
-            private set;
-        }
-
-        public string Title
-        {
-            get;
-            private set;
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<AuthenticationResult> LogInFromCache()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> LogOut()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
     public static class RepositoryModelDesigner
     {
         public static IRemoteRepositoryModel Create(string name = null, string owner = null)
         {
             name = name ?? "octocat";
             owner = owner ?? "github";
-            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner });
+            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner }, null);
         }
     }
 
-    public class RepositoryCloneViewModelDesigner : DialogViewModelBase, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : ViewModelBase, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
@@ -372,7 +301,7 @@ namespace GitHub.SampleData
 
         public string FilterText { get; set; }
 
-        public new string Title { get { return "Clone a GitHub Repository"; } }
+        public string Title { get { return "Clone a GitHub Repository"; } }
 
         public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
         {
@@ -415,7 +344,9 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public override IObservable<Unit> Done { get; }
+        public IObservable<object> Done { get; }
+
+        public Task InitializeAsync(IConnection connection) => Task.CompletedTask;
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection

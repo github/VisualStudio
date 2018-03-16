@@ -7,73 +7,20 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using GitHub.Infrastructure;
+using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Exports;
 using GitHub.Services;
-using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using NLog;
 using Task = System.Threading.Tasks.Task;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using Serilog;
+using Log = GitHub.Logging.Log;
 
 namespace GitHub.VisualStudio
 {
-    /// <summary>
-    /// This is a thin MEF wrapper around the GitHubServiceProvider
-    /// which is registered as a global VS service. This class just
-    /// redirects every request to the actual service, and can be
-    /// thrown away as soon as the caller is done (no state is kept)
-    /// </summary>
-    [Export(typeof(IGitHubServiceProvider))]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GitHubProviderDispatcher : IGitHubServiceProvider
-    {
-        readonly IGitHubServiceProvider theRealProvider;
-
-        [ImportingConstructor]
-        public GitHubProviderDispatcher([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-        {
-            theRealProvider = serviceProvider.GetService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-        }
-
-        public ExportProvider ExportProvider => theRealProvider.ExportProvider;
-
-        public IServiceProvider GitServiceProvider
-        {
-            get
-            {
-                return theRealProvider.GitServiceProvider;
-            }
-
-            set
-            {
-                theRealProvider.GitServiceProvider = value;
-            }
-        }
-
-        public void AddService(Type t, object owner, object instance) => theRealProvider.AddService(t, owner, instance);
-
-        public void AddService<T>(object owner, T instance) where T : class => theRealProvider.AddService(owner, instance);
-
-        public T GetService<T>() where T : class => theRealProvider.GetService<T>();
-
-        public object GetService(Type serviceType) => theRealProvider.GetService(serviceType);
-
-        public Ret GetService<T, Ret>() where T : class where Ret : class => theRealProvider.GetService<T, Ret>();
-
-        public void RemoveService(Type t, object owner) => theRealProvider.RemoveService(t, owner);
-
-        public object TryGetService(string typename) => theRealProvider.TryGetService(typename);
-
-        public object TryGetService(Type t) => theRealProvider.TryGetService(t);
-
-        public T TryGetService<T>() where T : class => theRealProvider.TryGetService<T>();
-    }
-
     /// <summary>
     /// This is a globally registered service (see `GitHubPackage`).
     /// If you need to access this service via MEF, use the `IGitHubServiceProvider` type
@@ -88,13 +35,12 @@ namespace GitHub.VisualStudio
             public ComposablePart Part { get; set; }
         }
 
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-        CompositeDisposable disposables = new CompositeDisposable();
+        static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
         readonly IServiceProviderPackage asyncServiceProvider;
         readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         readonly Version currentVersion;
-        bool initializingLogging = false;
+        List<IDisposable> disposables = new List<IDisposable>();
         bool initialized = false;
 
         public ExportProvider ExportProvider { get; private set; }
@@ -133,7 +79,7 @@ namespace GitHub.VisualStudio
         {
             IComponentModel componentModel = await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
 
-            Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+            Log.Assert(componentModel != null, "Service of type SComponentModel not found");
             if (componentModel == null)
             {
                 log.Error("Service of type SComponentModel not found");
@@ -143,7 +89,7 @@ namespace GitHub.VisualStudio
             ExportProvider = componentModel.DefaultExportProvider;
             if (ExportProvider == null)
             {
-                log.Error("DefaultExportProvider could not be obtained.");
+                log.Error("DefaultExportProvider could not be obtained");
             }
             initialized = true;
         }
@@ -151,24 +97,6 @@ namespace GitHub.VisualStudio
 
         public object TryGetService(Type serviceType)
         {
-            Guard.ArgumentNotNull(serviceType, nameof(serviceType));
-
-            if (!initializingLogging && log.Factory.Configuration == null)
-            {
-                initializingLogging = true;
-                try
-                {
-                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
-                    logging.Configure();
-                }
-                catch
-                {
-#if DEBUG
-                    throw;
-#endif
-                }
-            }
-
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
@@ -277,7 +205,7 @@ namespace GitHub.VisualStudio
             Guard.ArgumentNotNull(t, nameof(t));
 
             string contract = AttributedModelServices.GetContractName(t);
-            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+            Log.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
             OwnedComposablePart part;
             if (tempParts.TryGetValue(contract, out part))
@@ -309,7 +237,13 @@ namespace GitHub.VisualStudio
                 if (disposed) return;
 
                 if (disposables != null)
-                    disposables.Dispose();
+                {
+                    foreach (var disposable in disposables)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+
                 disposables = null;
                 if (tempContainer != null)
                     tempContainer.Dispose();

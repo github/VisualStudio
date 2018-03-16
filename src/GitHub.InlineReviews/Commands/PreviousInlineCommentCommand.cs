@@ -2,38 +2,42 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
-using GitHub.InlineReviews.Services;
 using Microsoft.VisualStudio.Text.Tagging;
+using GitHub.VisualStudio;
+using GitHub.InlineReviews.Services;
+using GitHub.Commands;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.Commands
 {
     /// <summary>
     /// Navigates to and opens the the previous inline comment thread in the currently active text view.
     /// </summary>
-    [ExportCommand(typeof(InlineReviewsPackage))]
     [Export(typeof(IPreviousInlineCommentCommand))]
     class PreviousInlineCommentCommand : InlineCommentNavigationCommand, IPreviousInlineCommentCommand
     {
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
         /// </summary>
-        public static readonly Guid CommandSet = GlobalCommands.CommandSetGuid;
+        public static readonly Guid CommandSet = Guids.CommandSetGuid;
 
         /// <summary>
         /// Gets the numeric identifier of the command.
         /// </summary>
-        public const int CommandId = GlobalCommands.PreviousInlineCommentId;
+        public const int CommandId = PkgCmdIDList.PreviousInlineCommentId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PreviousInlineCommentCommand"/> class.
         /// </summary>
+        /// <param name="serviceProvider">The GitHub service provider.</param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         [ImportingConstructor]
-        public PreviousInlineCommentCommand(
+        protected PreviousInlineCommentCommand(
+            IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService)
-            : base(tagAggregatorFactory, peekService, CommandSet, CommandId)
+            : base(serviceProvider, tagAggregatorFactory, peekService, CommandSet, CommandId)
         {
         }
 

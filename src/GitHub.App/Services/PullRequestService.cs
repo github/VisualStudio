@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using GitHub.Models;
 using System.Reactive.Linq;
 using Rothko;
@@ -14,8 +15,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
-using PullRequest = Octokit.PullRequest;
-using System.Diagnostics;
+using GitHub.Logging;
 
 namespace GitHub.Services
 {
@@ -24,7 +24,7 @@ namespace GitHub.Services
     public class PullRequestService : IPullRequestService
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
-        const string SettingGHfVSPullRequest = "ghfvs-pr";
+        const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
 
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
@@ -51,13 +51,13 @@ namespace GitHub.Services
             this.usageTracker = usageTracker;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
+        public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body
         )
         {
-            Extensions.Guard.ArgumentNotNull(host, nameof(host));
+            Extensions.Guard.ArgumentNotNull(modelService, nameof(modelService));
             Extensions.Guard.ArgumentNotNull(sourceRepository, nameof(sourceRepository));
             Extensions.Guard.ArgumentNotNull(targetRepository, nameof(targetRepository));
             Extensions.Guard.ArgumentNotNull(sourceBranch, nameof(sourceBranch));
@@ -65,7 +65,7 @@ namespace GitHub.Services
             Extensions.Guard.ArgumentNotNull(title, nameof(title));
             Extensions.Guard.ArgumentNotNull(body, nameof(body));
 
-            return PushAndCreatePR(host, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
+            return PushAndCreatePR(modelService, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
         public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
@@ -87,18 +87,88 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
+            ILocalRepositoryModel repository,
+            string baseBranch,
+            string compareBranch,
+            int maxCommits)
+        {
+            return Observable.Defer(async () =>
+            {
+                // CommitMessage doesn't keep a reference to Repository
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    var messages = await gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits);
+                    return Observable.Return(messages);
+                }
+            });
+        }
+
+        public IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository)
+        {
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                var count = 0;
+                foreach (var submodule in repo.Submodules)
+                {
+                    var status = submodule.RetrieveStatus();
+                    if ((status & SubmoduleStatus.WorkDirAdded) != 0)
+                    {
+                        count++;
+                    }
+                    else if ((status & SubmoduleStatus.WorkDirDeleted) != 0)
+                    {
+                        count++;
+                    }
+                    else if ((status & SubmoduleStatus.WorkDirModified) != 0)
+                    {
+                        count++;
+                    }
+                    else if ((status & SubmoduleStatus.WorkDirUninitialized) != 0)
+                    {
+                        count++;
+                    }
+                }
+
+                return Observable.Return(count);
+            }
+        }
+
         public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
-            var repo = gitService.GetRepository(repository.LocalPath);
-            return Observable.Return(!repo.RetrieveStatus().IsDirty);
+            // The `using` appears to resolve this issue:
+            // https://github.com/github/VisualStudio/issues/1306
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                var statusOptions = new StatusOptions { ExcludeSubmodules = true };
+                var isClean = !IsFilthy(repo.RetrieveStatus(statusOptions));
+                return Observable.Return(isClean);
+            }
+        }
+
+        static bool IsFilthy(RepositoryStatus status)
+        {
+            if (status.IsDirty)
+            {
+                // This is similar to IsDirty, but also allows NewInWorkdir files
+                return status.Any(entry =>
+                    entry.State != FileStatus.Ignored &&
+                    entry.State != FileStatus.Unaltered &&
+                    entry.State != FileStatus.NewInWorkdir);
+            }
+
+            return false;
         }
 
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                return gitClient.Pull(repo).ToObservable();
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    await gitClient.Pull(repo);
+                    return Observable.Return(Unit.Default);
+                }
             });
         }
 
@@ -106,45 +176,114 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
-                return gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name).ToObservable();
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    var remoteName = repo.Head.RemoteName;
+                    var remote = await gitClient.GetHttpRemote(repo, remoteName);
+                    await gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name);
+                    return Observable.Return(Unit.Default);
+                }
             });
+        }
+
+        public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress)
+        {
+            var exitCode = await Where("git");
+            if (exitCode != 0)
+            {
+                progress(App.Resources.CouldntFindGitOnPath);
+                return false;
+            }
+
+            return await SyncSubmodules(repository.LocalPath, progress) == 0;
+        }
+
+        // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
+        async Task<int> SyncSubmodules(string workingDir, Action<string> progress)
+        {
+            var cmdArguments = "/C git submodule init & git submodule sync --recursive & git submodule update --recursive";
+            var startInfo = new ProcessStartInfo("cmd", cmdArguments)
+            {
+                WorkingDirectory = workingDir,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            using (var process = Process.Start(startInfo))
+            {
+                await Task.WhenAll(
+                    ReadLinesAsync(process.StandardOutput, progress),
+                    ReadLinesAsync(process.StandardError, progress),
+                    Task.Run(() => process.WaitForExit()));
+                return process.ExitCode;
+            }
+        }
+
+        static Task<int> Where(string fileName)
+        {
+            return Task.Run(() =>
+            {
+                var cmdArguments = "/C WHERE /Q " + fileName;
+                var startInfo = new ProcessStartInfo("cmd", cmdArguments)
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(startInfo))
+                {
+                    process.WaitForExit();
+                    return process.ExitCode;
+                }
+            });
+        }
+
+        static async Task ReadLinesAsync(TextReader reader, Action<string> progress)
+        {
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                progress(line);
+            }
         }
 
         public IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName)
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var existing = repo.Branches[localBranchName];
-
-                if (existing != null)
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    await gitClient.Checkout(repo, localBranchName);
-                }
-                else if (repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl())
-                {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    await gitClient.Fetch(repo, remote.Name);
-                    await gitClient.Checkout(repo, localBranchName);
-                }
-                else
-                {
-                    var refSpec = $"{pullRequest.Head.Ref}:{localBranchName}";
-                    var remoteName = await CreateRemote(repo, pullRequest.Head.RepositoryCloneUrl);
+                    var existing = repo.Branches[localBranchName];
 
-                    await gitClient.Fetch(repo, remoteName);
-                    await gitClient.Fetch(repo, remoteName, new[] { refSpec });
-                    await gitClient.Checkout(repo, localBranchName);
-                    await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.Head.Ref}");
+                    if (existing != null)
+                    {
+                        await gitClient.Checkout(repo, localBranchName);
+                    }
+                    else if (repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl())
+                    {
+                        var remote = await gitClient.GetHttpRemote(repo, "origin");
+                        await gitClient.Fetch(repo, remote.Name);
+                        await gitClient.Checkout(repo, localBranchName);
+                    }
+                    else
+                    {
+                        var refSpec = $"{pullRequest.Head.Ref}:{localBranchName}";
+                        var remoteName = await CreateRemote(repo, pullRequest.Head.RepositoryCloneUrl);
+
+                        await gitClient.Fetch(repo, remoteName);
+                        await gitClient.Fetch(repo, remoteName, new[] { refSpec });
+                        await gitClient.Checkout(repo, localBranchName);
+                        await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.Head.Ref}");
+                    }
+
+                    // Store the PR number in the branch config with the key "ghfvs-pr".
+                    var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
+                    await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
+
+                    return Observable.Return(Unit.Default);
                 }
-
-                // Store the PR number in the branch config with the key "ghfvs-pr".
-                var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
-                await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
-
-                return Observable.Return(Unit.Default);
             });
         }
 
@@ -154,12 +293,14 @@ namespace GitHub.Services
             {
                 var initial = "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
                 var current = initial;
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var index = 2;
-
-                while (repo.Branches[current] != null)
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    current = initial + '-' + index++;
+                    var index = 2;
+
+                    while (repo.Branches[current] != null)
+                    {
+                        current = initial + '-' + index++;
+                    }
                 }
 
                 return Observable.Return(current.TrimEnd('-'));
@@ -170,15 +311,18 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-
-                if (repo.Head.Remote != null)
+                // BranchTrackingDetails doesn't keep a reference to Repository
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, repo.Head.Remote.Name);
-                    await gitClient.Fetch(repo, remote.Name);
-                }
+                    var remoteName = repo.Head.RemoteName;
+                    if (remoteName != null)
+                    {
+                        var remote = await gitClient.GetHttpRemote(repo, remoteName);
+                        await gitClient.Fetch(repo, remote.Name);
+                    }
 
-                return Observable.Return(repo.Head.TrackingDetails);
+                    return Observable.Return(repo.Head.TrackingDetails);
+                }
             });
         }
 
@@ -186,11 +330,14 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name);
-                var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
-                return Observable.Return(changes);
+                // TreeChanges doesn't keep a reference to Repository
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    await gitClient.Fetch(repo, remote.Name);
+                    var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
+                    return Observable.Return(changes);
+                }
             });
         }
 
@@ -198,9 +345,12 @@ namespace GitHub.Services
         {
             return Observable.Defer(() =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
-                return result.ToObservable();
+                // BranchModel doesn't keep a reference to rep
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
+                    return result.ToList().ToObservable();
+                }
             });
         }
 
@@ -208,30 +358,30 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var branches = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
-                var result = false;
-
-                foreach (var branch in branches)
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest.Number))
-                    {
-                        await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.Number);
-                        result = true;
-                    }
-                }
+                    var branches = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
+                    var result = false;
 
-                return Observable.Return(result);
+                    foreach (var branch in branches)
+                    {
+                        if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest))
+                        {
+                            await MarkBranchAsPullRequest(repo, branch.Name, pullRequest);
+                            result = true;
+                        }
+                    }
+
+                    return Observable.Return(result);
+                }
             });
         }
 
-        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            if (pullRequest.Head?.Label != null && pullRequest.Base?.Label != null)
+            if (pullRequest.Head?.RepositoryCloneUrl != null)
             {
-                var headOwner = pullRequest.Head.Label.Split(':')[0];
-                var baseOwner = pullRequest.Base.Label.Split(':')[0];
-                return headOwner != baseOwner;
+                return repository.CloneUrl?.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
             }
 
             return false;
@@ -241,99 +391,111 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
-
-                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
-
-                if (branchName != null)
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    await gitClient.Fetch(repo, remote.Name);
+                    var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                    var branch = repo.Branches[branchName];
+                    Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
 
-                    if (branch == null)
+                    if (branchName != null)
                     {
-                        var trackedBranchName = $"refs/remotes/{remote.Name}/" + branchName;
-                        var trackedBranch = repo.Branches[trackedBranchName];
+                        var remote = await gitClient.GetHttpRemote(repo, "origin");
+                        await gitClient.Fetch(repo, remote.Name);
 
-                        if (trackedBranch != null)
+                        var branch = repo.Branches[branchName];
+
+                        if (branch == null)
                         {
-                            branch = repo.CreateBranch(branchName, trackedBranch.Tip);
-                            await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                            var trackedBranchName = $"refs/remotes/{remote.Name}/" + branchName;
+                            var trackedBranch = repo.Branches[trackedBranchName];
+
+                            if (trackedBranch != null)
+                            {
+                                branch = repo.CreateBranch(branchName, trackedBranch.Tip);
+                                await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
+                            }
                         }
-                        else
-                        {
-                            throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
-                        }
+
+                        await gitClient.Checkout(repo, branchName);
+                        await MarkBranchAsPullRequest(repo, branchName, pullRequest);
                     }
-
-                    await gitClient.Checkout(repo, branchName);
-                    await MarkBranchAsPullRequest(repo, branchName, pullRequest.Number);
                 }
 
                 return Observable.Return(Unit.Default);
             });
         }
 
-        public IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
-        {
-            return Observable.Defer(() =>
-            {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var configKey = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "branch.{0}.{1}",
-                    repo.Head.FriendlyName,
-                    SettingGHfVSPullRequest);
-                return gitClient.GetConfig<int>(repo, configKey).ToObservable();
-            });
-        }
-
-        public IObservable<Tuple<string, string>> ExtractDiffFiles(
-            ILocalRepositoryModel repository,
-            IPullRequestModel pullRequest,
-            string fileName,
-            bool isPullRequestBranchCheckedOut)
+        public IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-
-                var baseSha = pullRequest.Base.Sha;
-                var headSha = pullRequest.Head.Sha;
-                var baseRef = pullRequest.Base.Ref;
-                string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
-                if (mergeBase == null)
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+                    var configKey = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "branch.{0}.{1}",
+                        repo.Head.FriendlyName,
+                        SettingGHfVSPullRequest);
+                    var value = await gitClient.GetConfig<string>(repo, configKey);
+                    return Observable.Return(ParseGHfVSConfigKeyValue(value));
                 }
-
-                string left;
-                string right;
-                if (isPullRequestBranchCheckedOut)
-                {
-                    right = Path.Combine(repository.LocalPath, fileName);
-                    left = await ExtractToTempFile(repo, mergeBase, fileName, GetEncoding(right));
-                }
-                else
-                {
-                    left = await ExtractToTempFile(repo, mergeBase, fileName, Encoding.UTF8);
-                    right = await ExtractToTempFile(repo, headSha, fileName, Encoding.UTF8);
-                }
-
-                return Observable.Return(Tuple.Create(left, right));
             });
         }
 
-        static Encoding GetEncoding(string file)
+        public IObservable<string> ExtractFile(
+            ILocalRepositoryModel repository,
+            IPullRequestModel pullRequest,
+            string fileName,
+            bool head,
+            Encoding encoding)
         {
-            if (File.Exists(file))
+            return Observable.Defer(async () =>
+            {
+                using (var repo = gitService.GetRepository(repository.LocalPath))
+                {
+                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    string sha;
+
+                    if (head)
+                    {
+                        sha = pullRequest.Head.Sha;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            sha = await gitClient.GetPullRequestMergeBase(
+                                repo,
+                                pullRequest.Base.RepositoryCloneUrl,
+                                pullRequest.Base.Sha,
+                                pullRequest.Head.Sha,
+                                pullRequest.Base.Ref,
+                                pullRequest.Number);
+                        }
+                        catch (NotFoundException ex)
+                        {
+                            throw new NotFoundException($"The Pull Request file failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
+                        }
+                    }
+
+                    var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);
+                    return Observable.Return(file);
+                }
+            });
+        }
+
+        public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
+        {
+            var fullPath = Path.Combine(repository.LocalPath, relativePath);
+
+            if (File.Exists(fullPath))
             {
                 var encoding = Encoding.UTF8;
-                if (HasPreamble(file, encoding))
+                if (HasPreamble(fullPath, encoding))
                 {
                     return encoding;
                 }
@@ -348,7 +510,7 @@ namespace GitHub.Services
             {
                 foreach (var b in encoding.GetPreamble())
                 {
-                    if(b != stream.ReadByte())
+                    if (b != stream.ReadByte())
                     {
                         return false;
                     }
@@ -362,24 +524,26 @@ namespace GitHub.Services
         {
             return Observable.Defer(async () =>
             {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var usedRemotes = new HashSet<string>(
-                    repo.Branches
-                        .Where(x => !x.IsRemote && x.Remote != null)
-                        .Select(x => x.Remote?.Name));
-
-                foreach (var remote in repo.Network.Remotes)
+                using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var key = $"remote.{remote.Name}.{SettingCreatedByGHfVS}";
-                    var createdByUs = await gitClient.GetConfig<bool>(repo, key);
+                    var usedRemotes = new HashSet<string>(
+                        repo.Branches
+                            .Where(x => !x.IsRemote && x.RemoteName != null)
+                            .Select(x => x.RemoteName));
 
-                    if (createdByUs && !usedRemotes.Contains(remote.Name))
+                    foreach (var remote in repo.Network.Remotes)
                     {
-                        repo.Network.Remotes.Remove(remote.Name);
-                    }
-                }
+                        var key = $"remote.{remote.Name}.{SettingCreatedByGHfVS}";
+                        var createdByUs = await gitClient.GetConfig<bool>(repo, key);
 
-                return Observable.Return(Unit.Default);
+                        if (createdByUs && !usedRemotes.Contains(remote.Name))
+                        {
+                            repo.Network.Remotes.Remove(remote.Name);
+                        }
+                    }
+
+                    return Observable.Return(Unit.Default);
+                }
             });
         }
 
@@ -412,9 +576,27 @@ namespace GitHub.Services
             return uniqueName;
         }
 
-        async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName, Encoding encoding)
+        async Task<string> ExtractToTempFile(
+            IRepository repo,
+            int pullRequestNumber,
+            string commitSha,
+            string fileName,
+            Encoding encoding)
         {
-            var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            string contents;
+
+            try
+            {
+                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            }
+            catch (FileNotFoundException)
+            {
+                var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
+                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+            }
+
             return CreateTempFile(fileName, commitSha, contents, encoding);
         }
 
@@ -434,52 +616,59 @@ namespace GitHub.Services
             IRepository repository,
             IPullRequestModel pullRequest)
         {
-            if (!IsPullRequestFromFork(localRepository, pullRequest))
+            if (IsPullRequestFromRepository(localRepository, pullRequest))
             {
                 return new[] { pullRequest.Head.Ref };
             }
             else
             {
-                var pr = pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+                var key = BuildGHfVSConfigKeyValue(pullRequest);
+
                 return repository.Config
                     .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == key)
                     .Select(x => x.Branch);
             }
         }
 
-        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, int number)
+        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            return await gitClient.GetConfig<int>(repo, prConfigKey) == number;
+            var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
+            return value != null &&
+                value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
+                value.Item2 == pullRequest.Number;
         }
 
-        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, int number)
+        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
         {
             // Store the PR number in the branch config with the key "ghfvs-pr".
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            await gitClient.SetConfig(repo, prConfigKey, number.ToString());
+            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
         }
 
-        async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
+        async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
         {
-            var repo = await Task.Run(() => gitService.GetRepository(sourceRepository.LocalPath));
-            var remote = await gitClient.GetHttpRemote(repo, "origin");
-            await gitClient.Push(repo, sourceBranch.Name, remote.Name);
+            // PullRequestModel doesn't keep a reference to repo
+            using (var repo = await Task.Run(() => gitService.GetRepository(sourceRepository.LocalPath)))
+            {
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Push(repo, sourceBranch.Name, remote.Name);
 
-            if (!repo.Branches[sourceBranch.Name].IsTracking)
-                await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name);
+                if (!repo.Branches[sourceBranch.Name].IsTracking)
+                    await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name);
 
-            // delay things a bit to avoid a race between pushing a new branch and creating a PR on it
-            if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
-                await Task.Delay(TimeSpan.FromSeconds(5));
+                // delay things a bit to avoid a race between pushing a new branch and creating a PR on it
+                if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
+                    await Task.Delay(TimeSpan.FromSeconds(5));
 
-            var ret = await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
-            await usageTracker.IncrementUpstreamPullRequestCount();
-            return ret;
+                var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
+                await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests);
+                return ret;
+            }
         }
 
         static string GetSafeBranchName(string name)
@@ -497,6 +686,33 @@ namespace GitHub.Services
 
                 before = after;
             }
+        }
+
+        static string BuildGHfVSConfigKeyValue(IPullRequestModel pullRequest)
+        {
+            return pullRequest.Base.RepositoryCloneUrl.Owner + '#' +
+                   pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+        }
+
+        static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
+        {
+            if (value != null)
+            {
+                var separator = value.IndexOf('#');
+
+                if (separator != -1)
+                {
+                    var owner = value.Substring(0, separator);
+                    int number;
+
+                    if (int.TryParse(value.Substring(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                    {
+                        return Tuple.Create(owner, number);
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

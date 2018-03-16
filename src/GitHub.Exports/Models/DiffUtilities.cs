@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
@@ -12,41 +13,42 @@ namespace GitHub.Models
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
         {
-            using (var reader = new StringReader(diff))
+            Guard.ArgumentNotNull(diff, nameof(diff));
+
+            var reader = new LineReader(diff);
+            string line;
+            DiffChunk chunk = null;
+            int diffLine = -1;
+            int oldLine = -1;
+            int newLine = -1;
+
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                DiffChunk chunk = null;
-                int diffLine = 0;
-                int oldLine = -1;
-                int newLine = -1;
+                var headerMatch = ChunkHeaderRegex.Match(line);
 
-                while ((line = reader.ReadLine()) != null)
+                if (headerMatch.Success)
                 {
-                    var headerMatch = ChunkHeaderRegex.Match(line);
-
-                    if (headerMatch.Success)
+                    if (chunk != null)
                     {
-                        if (chunk != null)
-                        {
-                            yield return chunk;
-                        }
-
-                        chunk = new DiffChunk
-                        {
-                            OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value),
-                            NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
-                            DiffLine = diffLine,
-                        };
+                        yield return chunk;
                     }
-                    else if (chunk != null)
-                    {
-                        var type = GetLineChange(line[0]);
-                        if (type == DiffChangeType.Control)
-                        {
-                            // This might contain info about previous line (e.g. "\ No newline at end of file").
-                            continue;
-                        }
 
+                    if (diffLine == -1) diffLine = 0;
+
+                    chunk = new DiffChunk
+                    {
+                        OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value),
+                        NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
+                        DiffLine = diffLine,
+                    };
+                }
+                else if (chunk != null)
+                {
+                    var type = GetLineChange(line[0]);
+
+                    // This might contain info about previous line (e.g. "\ No newline at end of file").
+                    if (type != DiffChangeType.Control)
+                    {
                         chunk.Lines.Add(new DiffLine
                         {
                             Type = type,
@@ -56,35 +58,36 @@ namespace GitHub.Models
                             Content = line,
                         });
 
+                        var lineCount = 1;
+                        lineCount += LineReader.CountCarriageReturns(line);
+
                         switch (type)
                         {
                             case DiffChangeType.None:
-                                ++oldLine;
-                                ++newLine;
+                                oldLine += lineCount;
+                                newLine += lineCount;
                                 break;
                             case DiffChangeType.Delete:
-                                ++oldLine;
+                                oldLine += lineCount;
                                 break;
                             case DiffChangeType.Add:
-                                ++newLine;
+                                newLine += lineCount;
                                 break;
                         }
                     }
-
-                    ++diffLine;
                 }
 
-                if (chunk != null)
-                {
-                    yield return chunk;
-                }
+                if (diffLine != -1) ++diffLine;
+            }
+
+            if (chunk != null)
+            {
+                yield return chunk;
             }
         }
 
         public static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
         {
-            int j = 0;
-
             if (target.Count == 0)
             {
                 return null; // no lines to match
@@ -92,23 +95,93 @@ namespace GitHub.Models
 
             foreach (var source in diff)
             {
+                var matches = 0;
                 for (var i = source.Lines.Count - 1; i >= 0; --i)
                 {
-                    if (source.Lines[i].Content == target[j].Content)
+                    if (source.Lines[i].Content == target[matches].Content)
                     {
-                        if (++j == target.Count || i == 0)
+                        matches++;
+                        if (matches == target.Count || i == 0)
                         {
-                            return source.Lines[i + j - 1];
+                            return source.Lines[i + matches - 1];
                         }
                     }
                     else
                     {
-                        j = 0;
+                        i += matches;
+                        matches = 0;
                     }
                 }
             }
 
             return null;
+        }
+
+        /// Here are some alternative implementations we tried:
+        /// https://gist.github.com/shana/200e4719d4f571caab9dbf5921fa5276
+        /// Scanning with `text.IndexOf('\n', index)` appears to the the best compromise for average .diff files.
+        /// It's likely that `text.IndexOfAny(new [] {'\r', '\n'}, index)` would be faster if lines were much longer.
+        public class LineReader
+        {
+            readonly string text;
+            int index = 0;
+
+            public LineReader(string text)
+            {
+                Guard.ArgumentNotNull(text, nameof(text));
+
+                this.text = text;
+            }
+
+            public string ReadLine()
+            {
+                if (EndOfText)
+                {
+                    if (StartOfText)
+                    {
+                        index = -1;
+                        return string.Empty;
+                    }
+
+                    return null;
+                }
+
+                var startIndex = index;
+                index = text.IndexOf('\n', index);
+                var endIndex = index != -1 ? index : text.Length;
+                var length = endIndex - startIndex;
+
+                if (index != -1)
+                {
+                    if (index > 0 && text[index - 1] == '\r')
+                    {
+                        length--;
+                    }
+
+                    index++;
+                }
+
+                return text.Substring(startIndex, length);
+            }
+
+            public static int CountCarriageReturns(string text)
+            {
+                Guard.ArgumentNotNull(text, nameof(text));
+
+                int count = 0;
+                int index = 0;
+                while ((index = text.IndexOf('\r', index)) != -1)
+                {
+                    index++;
+                    count++;
+                }
+
+                return count;
+            }
+
+            bool StartOfText => index == 0;
+
+            bool EndOfText => index == -1 || index == text.Length;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]

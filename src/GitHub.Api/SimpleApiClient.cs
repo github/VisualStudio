@@ -14,8 +14,7 @@ namespace GitHub.Api
         public HostAddress HostAddress { get; }
         public UriString OriginalUrl { get; }
 
-        readonly IGitHubClient client;
-        readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
+        readonly Lazy<IEnterpriseProbe> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);
 
@@ -25,17 +24,19 @@ namespace GitHub.Api
         bool? hasWiki;
 
         public SimpleApiClient(UriString repoUrl, IGitHubClient githubClient,
-            Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
+            Lazy<IEnterpriseProbe> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
             Guard.ArgumentNotNull(repoUrl, nameof(repoUrl));
             Guard.ArgumentNotNull(githubClient, nameof(githubClient));
 
             HostAddress = HostAddress.Create(repoUrl);
             OriginalUrl = repoUrl;
-            client = githubClient;
+            Client = githubClient;
             this.enterpriseProbe = enterpriseProbe;
             this.wikiProbe = wikiProbe;
         }
+
+        public IGitHubClient Client { get; }
 
         public async Task<Repository> GetRepository()
         {
@@ -51,7 +52,7 @@ namespace GitHub.Api
         {
             // this doesn't account for auth revoke on the server but its much faster 
             // than doing the API hit.
-            var authType = client.Connection.Credentials?.AuthenticationType ?? AuthenticationType.Anonymous;
+            var authType = Client.Connection.Credentials?.AuthenticationType ?? AuthenticationType.Anonymous;
             return authType != AuthenticationType.Anonymous;
         }
 
@@ -67,11 +68,11 @@ namespace GitHub.Api
 
                     if (ownerLogin != null && repositoryName != null)
                     {
-                        var repo = await client.Repository.Get(ownerLogin, repositoryName);
+                        var repo = await Client.Repository.Get(ownerLogin, repositoryName);
                         if (repo != null)
                         {
                             hasWiki = await HasWikiInternal(repo);
-                            isEnterprise = await IsEnterpriseInternal();
+                            isEnterprise = isEnterprise ?? await IsEnterpriseInternal();
                             repositoryCache = repo;
                         }
                         owner = ownerLogin;
@@ -98,9 +99,14 @@ namespace GitHub.Api
             return hasWiki.HasValue && hasWiki.Value;
         }
 
-        public bool IsEnterprise()
+        public async Task<bool> IsEnterprise()
         {
-            return isEnterprise.HasValue && isEnterprise.Value;
+            if (!isEnterprise.HasValue)
+            {
+                isEnterprise = await IsEnterpriseInternal();
+            }
+
+            return isEnterprise ?? false;
         }
 
         async Task<bool> HasWikiInternal(Repository repo)
@@ -126,13 +132,16 @@ namespace GitHub.Api
 
         async Task<bool> IsEnterpriseInternal()
         {
+            if (HostAddress == HostAddress.GitHubDotComHostAddress)
+                return false;
+
             var probe = enterpriseProbe.Value;
             Debug.Assert(probe != null, "Lazy<Enterprise> probe is not set, something is wrong.");
 #if !DEBUG
             if (probe == null)
                 return false;
 #endif
-            var ret = await probe.ProbeAsync(HostAddress.WebUri);
+            var ret = await probe.Probe(HostAddress.WebUri);
             return (ret == EnterpriseProbeResult.Ok);
         }
     }

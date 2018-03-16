@@ -6,9 +6,12 @@ using GitHub.InlineReviews.Views;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class InlineCommentPeekResultPresentation : IPeekResultPresentation
+    class InlineCommentPeekResultPresentation : IPeekResultPresentation, IDesiredHeightProvider
     {
+        const double PeekBorders = 28.0;
         readonly InlineCommentPeekViewModel viewModel;
+        InlineCommentPeekView view;
+        double desiredHeight;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
@@ -24,9 +27,33 @@ namespace GitHub.InlineReviews.Peek
             set { }
         }
 
-        public event EventHandler IsDirtyChanged;
-        public event EventHandler IsReadOnlyChanged;
-        public event EventHandler<RecreateContentEventArgs> RecreateContent;
+        public double DesiredHeight
+        {
+            get { return desiredHeight; }
+            private set
+            {
+                if (desiredHeight != value && DesiredHeightChanged != null)
+                {
+                    desiredHeight = value;
+                    DesiredHeightChanged(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        public event EventHandler IsDirtyChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler IsReadOnlyChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler<RecreateContentEventArgs> RecreateContent = delegate { };
+        public event EventHandler<EventArgs> DesiredHeightChanged;
 
         public bool CanSave(out string defaultPath)
         {
@@ -45,8 +72,15 @@ namespace GitHub.InlineReviews.Peek
 
         public UIElement Create(IPeekSession session, IPeekResultScrollState scrollState)
         {
-            var view = new InlineCommentPeekView();
+            view = new InlineCommentPeekView();
             view.DataContext = viewModel;
+
+            // Report the desired size back to the peek view. Unfortunately the peek view
+            // helpfully assigns this desired size to the control that also contains the tab at
+            // the top of the peek view, so we need to put in a fudge factor. Using a const
+            // value for the moment, as there's no easy way to get the size of the control.
+            view.DesiredHeight.Subscribe(x => DesiredHeight = x + PeekBorders);
+
             return view;
         }
 
