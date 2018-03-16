@@ -1,0 +1,82 @@
+﻿<local:GenericPullRequestReviewAuthoringView x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestReviewAuthoringView"
+                                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+                                             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+                                             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+                                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                                             xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+                                             xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.App"
+                                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                             Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                             Foreground="{DynamicResource GitHubVsWindowText}"
+                                             mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800">
+    <d:DesignProperties.DataContext>
+        <sampleData:PullRequestReviewAuthoringViewModelDesigner/>
+    </d:DesignProperties.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <ScrollViewer>
+        <StackPanel Margin="8,0">
+            <TextBlock FontSize="16" Margin="0 4">
+                <Run>Submit your review for</Run>
+                <Hyperlink Command="{Binding NavigateToPullRequest}">
+                    <Run>#</Run><Run Text="{Binding PullRequestModel.Number, Mode=OneWay}"/>
+                </Hyperlink>
+            </TextBlock>
+            <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding PullRequestModel.Title}" TextWrapping="Wrap"/>
+            <TextBlock Margin="0 4">Review summary</TextBlock>
+            <TextBox AcceptsReturn="True"
+                     Margin="0 4"
+                     MinHeight="120"
+                     Padding="0 4"
+                     TextWrapping="Wrap"
+                     Text="{Binding Body}"/>
+            
+            <StackPanel Margin="0 4" Orientation="Horizontal">
+                <ui:DropDownButton Content="Submit review">
+                    <ui:DropDownButton.DropDownContent>
+                        <Border Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                BorderBrush="{DynamicResource GitHubComboBoxBorderBrush}"
+                                BorderThickness="1"
+                                Padding="4">
+                            <StackPanel Background="{DynamicResource GitHubVsToolWindowBackground}">
+                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Comment" Margin="4">Comment only</ui:GitHubActionLink>
+                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Approve" Margin="4">Approve</ui:GitHubActionLink>
+                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="RequestChanges" Margin="4">Request changes</ui:GitHubActionLink>
+                            </StackPanel>
+                        </Border>
+                    </ui:DropDownButton.DropDownContent>
+                </ui:DropDownButton>
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Width="1" Height="16" Margin="4 0"/>
+                <ui:GitHubActionLink VerticalAlignment="Center">Cancel</ui:GitHubActionLink>
+            </StackPanel>
+
+            <TabControl Margin="0 16 0 0" Style="{DynamicResource GitHubPRDetailsTabControl}">
+                <TabItem Header="{Binding Files.ChangedFilesCount}"
+                         HeaderStringFormat="Files changed ({0})"
+                         Style="{DynamicResource GitHubPRDetailsTabItem}">
+                    <local:PullRequestFilesView DataContext="{Binding Files}"/>
+                </TabItem>
+                <TabItem Header="{Binding FileComments.Count}"
+                         HeaderStringFormat="File comments ({0})"
+                         Style="{DynamicResource GitHubPRDetailsTabItem}">
+                    <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </ScrollViewer>
+
+</local:GenericPullRequestReviewAuthoringView>

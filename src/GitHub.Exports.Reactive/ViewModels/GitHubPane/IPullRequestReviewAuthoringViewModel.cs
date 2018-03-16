@@ -46,18 +46,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="owner">The pull request's repository owner.</param>
         /// <param name="repo">The pull request's repository name.</param>
         /// <param name="pullRequestNumber">The pull request number.</param>
+        /// <param name="pullRequestReviewId">
+        /// The ID of the pending pull request review, or 0 to start a new review.
+        /// </param>
         Task InitializeAsync(
             ILocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,
-            int pullRequestNumber);
-
-        /// <summary>
-        /// Updates the data from a pull request model.
-        /// </summary>
-        /// <param name="pullRequest">The pull request model.</param>
-        /// <returns>A task tracking the operation.</returns>
-        Task Load(IPullRequestModel pullRequest);
+            int pullRequestNumber,
+            long pullRequestReviewId);
     }
 }

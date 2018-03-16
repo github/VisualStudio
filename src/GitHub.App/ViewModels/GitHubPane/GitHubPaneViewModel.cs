@@ -319,13 +319,11 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(owner, nameof(owner));
             Guard.ArgumentNotNull(repo, nameof(repo));
 
-            throw new NotImplementedException();
-            //return NavigateTo<IPullRequestReviewViewModel>(
-            //    x => x.InitializeNewAsync(LocalRepository, Connection, owner, repo, number),
-            //    x => x.RemoteRepositoryOwner == owner &&
-            //         x.LocalRepository.Name == repo &&
-            //         x.PullRequestNumber == number &&
-            //         x.IsPending);
+            return NavigateTo<IPullRequestReviewAuthoringViewModel>(
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, 0),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestModel.Number == number);
         }
 
         async Task CreateInitializeTask(IServiceProvider paneServiceProvider)
