@@ -26,7 +26,9 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/PullRequestListItem.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/GitHubPaneStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Hyperlink" BasedOn="{StaticResource BlueHyperlink}"/>
         </ResourceDictionary>
     </Control.Resources>
     
@@ -79,9 +81,9 @@
                 <TextBlock Grid.ColumnSpan="3" Grid.Row="1"
                        Margin="1 0"
                        Foreground="{DynamicResource GitHubVsGrayText}">
-                <Run Text="{Binding StateDisplay, Mode=OneWay}"/>
-                <Run>|</Run>
-                <Run Text="{Binding FileCommentCount, Mode=OneWay, StringFormat={}{0} file comments}"/>
+                    <Run Text="{Binding StateDisplay, Mode=OneWay}"/>
+                    <Run>|</Run>
+                    <Run Text="{Binding FileCommentCount, Mode=OneWay, StringFormat={}{0} file comments}"/>
                 </TextBlock>
             </Grid>
         </Border>

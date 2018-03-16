@@ -320,7 +320,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(repo, nameof(repo));
 
             return NavigateTo<IPullRequestReviewAuthoringViewModel>(
-                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, 0),
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number),
                 x => x.RemoteRepositoryOwner == owner &&
                      x.LocalRepository.Name == repo &&
                      x.PullRequestModel.Number == number);

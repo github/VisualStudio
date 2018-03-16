@@ -96,8 +96,7 @@ namespace GitHub.ViewModels.GitHubPane
             IConnection connection,
             string owner,
             string repo,
-            int pullRequestNumber,
-            long pullRequestReviewId)
+            int pullRequestNumber)
         {
             if (repo != localRepository.Name)
             {
@@ -115,7 +114,7 @@ namespace GitHub.ViewModels.GitHubPane
                     RemoteRepositoryOwner,
                     LocalRepository.Name,
                     pullRequestNumber);
-                await Load(pullRequest, pullRequestReviewId);
+                await Load(pullRequest);
             }
             finally
             {
@@ -134,7 +133,7 @@ namespace GitHub.ViewModels.GitHubPane
                     RemoteRepositoryOwner,
                     LocalRepository.Name,
                     PullRequestModel.Number);
-                await Load(pullRequest, Model.Id);
+                await Load(pullRequest);
             }
             catch (Exception ex)
             {
@@ -152,28 +151,22 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public async Task Load(IPullRequestModel pullRequest, long pullRequestReviewId)
+        public async Task Load(IPullRequestModel pullRequest)
         {
             try
             {
                 session = await sessionManager.GetSession(pullRequest);
                 PullRequestModel = pullRequest;
 
-                if (pullRequestReviewId > 0)
-                {
-                    Model = pullRequest.Reviews.Single(x => x.Id == Model.Id);
-                    Body = Model.Body;
-                }
-                else
-                {
-                    Model = new PullRequestReviewModel
+                Model = pullRequest.Reviews.FirstOrDefault(x => x.User.Login == session.User.Login) ??
+                    new PullRequestReviewModel
                     {
+                        Body = string.Empty,
                         User = session.User,
                         State = PullRequestReviewState.Pending,
                     };
-                    Body = string.Empty;
-                }
 
+                Body = Model.Body;
                 await Files.InitializeAsync(session, FilterComments);
 
                 sessionSubscription?.Dispose();
@@ -196,6 +189,19 @@ namespace GitHub.ViewModels.GitHubPane
         async Task UpdateFileComments()
         {
             var result = new List<PullRequestReviewFileCommentViewModel>();
+
+            if (Model.Id != session.PendingReviewId)
+            {
+                if (Model.Id == 0)
+                {
+                    ((PullRequestReviewModel)Model).Id = session.PendingReviewId;
+                }
+                else
+                {
+                    Refresh().Forget();
+                    return;
+                }
+            }
 
             foreach (var file in await session.GetAllFiles())
             {

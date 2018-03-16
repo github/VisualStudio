@@ -52,8 +52,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
             IConnection connection,
             string owner,
             string repo,
-            int pullRequestNumber,
-            long pullRequestReviewId)
+            int pullRequestNumber)
         {
             throw new NotImplementedException();
         }

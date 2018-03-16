@@ -691,7 +691,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             var review = (PullRequestDetailReviewItem)item;
 
-            if (review.Id == 0)
+            if (review.State == PullRequestReviewState.Pending)
             {
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
             }

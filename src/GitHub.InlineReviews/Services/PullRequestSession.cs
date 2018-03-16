@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Services
         string pullRequestNodeId;
         Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
         bool hasPendingReview;
-        string pendingReviewId { get; set; }
+        string pendingReviewNodeId { get; set; }
 
         public PullRequestSession(
             IPullRequestSessionService service,
@@ -153,7 +153,7 @@ namespace GitHub.InlineReviews.Services
                 model = await service.PostPendingReviewComment(
                     LocalRepository,
                     User,
-                    pendingReviewId,
+                    pendingReviewNodeId,
                     body,
                     commitId,
                     path,
@@ -187,7 +187,7 @@ namespace GitHub.InlineReviews.Services
                 model = await service.PostPendingReviewCommentReply(
                     LocalRepository,
                     User,
-                    pendingReviewId,
+                    pendingReviewNodeId,
                     body,
                     inReplyToNodeId);
             }
@@ -218,7 +218,7 @@ namespace GitHub.InlineReviews.Services
         {
             IPullRequestReviewModel model;
 
-            if (pendingReviewId == null)
+            if (pendingReviewNodeId == null)
             {
                 model = await service.PostReview(
                     LocalRepository,
@@ -234,7 +234,7 @@ namespace GitHub.InlineReviews.Services
                 model = await service.SubmitPendingReview(
                     LocalRepository,
                     User,
-                    pendingReviewId,
+                    pendingReviewNodeId,
                     body,
                     e);
             }
@@ -292,12 +292,14 @@ namespace GitHub.InlineReviews.Services
             if (pendingReview != null)
             {
                 HasPendingReview = true;
-                pendingReviewId = pendingReview.NodeId;
+                pendingReviewNodeId = pendingReview.NodeId;
+                PendingReviewId = pendingReview.Id;
             }
             else
             {
                 HasPendingReview = false;
-                pendingReviewId = null;
+                pendingReviewNodeId = null;
+                PendingReviewId = 0;
             }
         }
 
