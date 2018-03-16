@@ -72,7 +72,6 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
-    <Compile Include="Commands\VsCommandBase.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
@@ -106,15 +105,7 @@
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
     <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\InlineCommentViewModel.cs" />
-    <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
-    <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\PullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
-    <Compile Include="Views\DiffCommentThreadView.xaml.cs">
-      <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DiffView.cs" />
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
     </Compile>
