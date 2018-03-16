@@ -3,13 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
-             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-             xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.Exports.Reactive"
-             xmlns:u="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:uc="clr-namespace:GitHub.UI.Controls;assembly=GitHub.UI"
-             xmlns:vuc="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              Foreground="{DynamicResource GitHubVsWindowText}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -17,8 +13,8 @@
   <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
       <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">
         <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
@@ -36,14 +32,14 @@
         </Setter>
       </Style>
       <views:ViewLocator x:Key="viewLocator"/>
-      <DataTemplate DataType="{x:Type vm:ViewModelBase}">
+      <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
         <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
       </DataTemplate>
     </ResourceDictionary>
   </Control.Resources>
 
   <DockPanel>
-    <vuc:InfoPanel Name="infoPanel"
+    <ghfvs:InfoPanel Name="infoPanel"
                    DockPanel.Dock="Top"
                    MessageType="{Binding MessageType}"
                    Message="{Binding Message}"
@@ -70,24 +66,24 @@
                Style="{StaticResource PaneHorizontalSeparator}" />
 
     <Grid>
-      <DockPanel Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter None}}">
-        <u:GitHubProgressBar DockPanel.Dock="Top"
+      <DockPanel Visibility="{Binding ContentOverride, Converter={ghfvs:EqualsToVisibilityConverter None}}">
+        <ghfvs:GitHubProgressBar DockPanel.Dock="Top"
                              Foreground="{DynamicResource GitHubAccentBrush}"
                              IsIndeterminate="True"
                              Style="{DynamicResource GitHubProgressBar}"
-                             Visibility="{Binding Content.Content.IsBusy, Converter={u:BooleanToHiddenVisibilityConverter}, FallbackValue=Hidden}"/>
+                             Visibility="{Binding Content.Content.IsBusy, Converter={ghfvs:BooleanToHiddenVisibilityConverter}, FallbackValue=Hidden}"/>
         <ContentControl Content="{Binding Content}"/>
       </DockPanel>
-      <uc:Spinner Width="48"
+      <ghfvs:Spinner Width="48"
                   Height="48"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
-                  Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter Spinner}, FallbackValue=Collapsed}"/>
+                  Visibility="{Binding ContentOverride, Converter={ghfvs:EqualsToVisibilityConverter Spinner}, FallbackValue=Collapsed}"/>
       <Border HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
-              Visibility="{Binding ContentOverride, Converter={u:EqualsToVisibilityConverter Error}, FallbackValue=Collapsed}">
+              Visibility="{Binding ContentOverride, Converter={ghfvs:EqualsToVisibilityConverter Error}, FallbackValue=Collapsed}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-          <u:OcticonImage Icon="alert" Width="32" Height="32" Margin="8"/>
+          <ghfvs:OcticonImage Icon="alert" Width="32" Height="32" Margin="8"/>
           <TextBlock Text="{Binding Content.Content.Error.Message}" TextAlignment="Center" TextWrapping="Wrap"/>
         </StackPanel>
       </Border>
