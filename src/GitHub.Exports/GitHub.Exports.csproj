@@ -143,6 +143,19 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ICopyLinkCommand.cs" />
+    <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\IOpenLinkCommand.cs" />
+    <Compile Include="Commands\ICreateGistCommand.cs" />
+    <Compile Include="Commands\IShowCurrentPullRequestCommand.cs" />
+    <Compile Include="Commands\IShowGitHubPaneCommand.cs" />
+    <Compile Include="Commands\IOpenPullRequestsCommand.cs" />
+    <Compile Include="Commands\IAddConnectionCommand.cs" />
+    <Compile Include="Commands\INextInlineCommentCommand.cs" />
+    <Compile Include="Commands\InlineCommentNavigationParams.cs" />
+    <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
+    <Compile Include="Commands\IVsCommand.cs" />
+    <Compile Include="Commands\IVsCommandBase.cs" />
     <Compile Include="Exports\ExportForProcess.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
@@ -206,8 +219,6 @@
     <Compile Include="Services\IGitService.cs" />
     <Compile Include="Services\IMetricsService.cs" />
     <Compile Include="Services\ISelectedTextProvider.cs" />
-    <Compile Include="Services\IMenuHandler.cs" />
-    <Compile Include="Services\IMenuProvider.cs" />
     <Compile Include="Services\INotificationDispatcher.cs" />
     <Compile Include="Services\IStatusBarNotificationService.cs" />
     <Compile Include="Services\ITeamExplorerServices.cs" />

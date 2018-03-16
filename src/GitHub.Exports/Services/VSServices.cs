@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
 using Serilog;
-using DTE = EnvDTE.DTE;
+using EnvDTE;
 
 namespace GitHub.Services
 {
@@ -21,17 +21,22 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
-        static readonly ILogger log = LogManager.ForContext<VSServices>();
+        readonly ILogger log;
         readonly IGitHubServiceProvider serviceProvider;
 
         // Use a prefix (~$) that is defined in the default VS gitignore.
         public const string TempSolutionName = "~$GitHubVSTemp$~";
 
-
         [ImportingConstructor]
-        public VSServices(IGitHubServiceProvider serviceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider) :
+            this(serviceProvider, LogManager.ForContext<VSServices>())
+        {
+        }
+
+        public VSServices(IGitHubServiceProvider serviceProvider, ILogger log)
         {
             this.serviceProvider = serviceProvider;
+            this.log = log;
         }
 
         string vsVersion;
@@ -42,41 +47,6 @@ namespace GitHub.Services
                 if (vsVersion == null)
                     vsVersion = GetVSVersion();
                 return vsVersion;
-            }
-        }
-
-
-        public void ActivityLogMessage(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log message to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogError(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log error to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogWarning(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
             }
         }
 
@@ -105,7 +75,7 @@ namespace GitHub.Services
             }
 
             var repoDir = os.Directory.GetDirectory(repoPath);
-            if(!repoDir.Exists)
+            if (!repoDir.Exists)
             {
                 return false;
             }
@@ -172,7 +142,7 @@ namespace GitHub.Services
                     return setupInstance.GetInstallationName().TrimPrefix(InstallationNamePrefix);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex, "Error getting the Visual Studio version");
             }

@@ -1,11 +1,9 @@
 ﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubHomeContent"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
              Width="Auto"
              Height="auto"
@@ -17,7 +15,7 @@
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
-        <sampleData:GitHubHomeSectionDesigner />
+        <ghfvs:GitHubHomeSectionDesigner />
       </Binding.Source>
     </Binding>
   </d:DesignProperties.DataContext>
@@ -25,16 +23,16 @@
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
-      <ui:BooleanToInverseVisibilityConverter x:Key="BooleanToInverseVisibilityConverter" />
+      <ghfvs:BooleanToInverseVisibilityConverter x:Key="BooleanToInverseVisibilityConverter" />
     </ResourceDictionary>
   </UserControl.Resources>
 
   <StackPanel Margin="4,6,4,6">
     <DockPanel>
-      <ui:OcticonImage x:Name="repositoryIcon"
+      <ghfvs:OcticonImage x:Name="repositoryIcon"
                   Width="32"
                   Height="32"
                   Margin="0,0,8,0"
