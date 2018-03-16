@@ -19,6 +19,11 @@ namespace GitHub.ViewModels.GitHubPane
         string Body { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the user can approve/request changes on the pull request.
+        /// </summary>
+        bool CanApproveRequestChanges { get; }
+
+        /// <summary>
         /// Gets the pull request's changed files.
         /// </summary>
         IPullRequestFilesViewModel Files { get; }

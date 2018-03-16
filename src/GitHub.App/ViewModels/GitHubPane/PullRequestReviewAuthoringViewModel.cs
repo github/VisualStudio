@@ -30,6 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestReviewModel model;
         IPullRequestModel pullRequestModel;
         string body;
+        ObservableAsPropertyHelper<bool> canApproveRequestChanges;
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> fileComments;
         string operationError;
 
@@ -48,6 +49,12 @@ namespace GitHub.ViewModels.GitHubPane
             this.editorService = editorService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
+
+            canApproveRequestChanges = this.WhenAnyValue(
+                x => x.Model,
+                x => x.PullRequestModel,
+                (review, pr) => review != null && pr != null && review.User.Login != pr.Author.Login)
+                .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
             Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
@@ -82,6 +89,9 @@ namespace GitHub.ViewModels.GitHubPane
             get { return body; }
             set { this.RaiseAndSetIfChanged(ref body, value); }
         }
+
+        /// <inheritdoc/>
+        public bool CanApproveRequestChanges => canApproveRequestChanges.Value;
 
         /// <summary>
         /// Gets the error message to be displayed in the action area as a result of an error in a
@@ -170,7 +180,8 @@ namespace GitHub.ViewModels.GitHubPane
                 session = await sessionManager.GetSession(pullRequest);
                 PullRequestModel = pullRequest;
 
-                Model = pullRequest.Reviews.FirstOrDefault(x => x.User.Login == session.User.Login) ??
+                Model = pullRequest.Reviews.FirstOrDefault(x =>
+                    x.State == PullRequestReviewState.Pending && x.User.Login == session.User.Login) ??
                     new PullRequestReviewModel
                     {
                         Body = string.Empty,
@@ -208,7 +219,7 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     ((PullRequestReviewModel)Model).Id = session.PendingReviewId;
                 }
-                else
+                else if (session.PendingReviewId != 0)
                 {
                     Refresh().Forget();
                     return;

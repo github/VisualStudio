@@ -38,6 +38,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         }
 
         public string Body { get; set; }
+        public bool CanApproveRequestChanges { get; set; }
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; }
         public IPullRequestFilesViewModel Files { get; }
         public ILocalRepositoryModel LocalRepository { get; set; }
