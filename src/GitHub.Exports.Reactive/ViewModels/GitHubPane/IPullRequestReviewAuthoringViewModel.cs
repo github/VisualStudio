@@ -29,6 +29,11 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; }
 
         /// <summary>
+        /// Gets the error message to be displayed in the action area as a result of an error submitting.
+        /// </summary>
+        string OperationError { get; }
+
+        /// <summary>
         /// Gets a command which navigates to the parent pull request.
         /// </summary>
         ReactiveCommand<object> NavigateToPullRequest { get; }

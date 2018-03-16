@@ -43,6 +43,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public ILocalRepositoryModel LocalRepository { get; set; }
         public IPullRequestReviewModel Model { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public string OperationError { get; set; }
         public IPullRequestModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public ReactiveCommand<Unit> Submit { get; }

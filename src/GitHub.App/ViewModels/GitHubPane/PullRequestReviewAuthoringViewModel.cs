@@ -31,6 +31,7 @@ namespace GitHub.ViewModels.GitHubPane
         IPullRequestModel pullRequestModel;
         string body;
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> fileComments;
+        string operationError;
 
         [ImportingConstructor]
         public PullRequestReviewAuthoringViewModel(
@@ -49,6 +50,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.modelServiceFactory = modelServiceFactory;
 
             Files = files;
+            Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
         }
 
         /// <inheritdoc/>
@@ -79,6 +81,16 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return body; }
             set { this.RaiseAndSetIfChanged(ref body, value); }
+        }
+
+        /// <summary>
+        /// Gets the error message to be displayed in the action area as a result of an error in a
+        /// git operation.
+        /// </summary>
+        public string OperationError
+        {
+            get { return operationError; }
+            private set { this.RaiseAndSetIfChanged(ref operationError, value); }
         }
 
         /// <inheritdoc/>
@@ -221,6 +233,31 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             FileComments = result;
+        }
+
+        async Task DoSubmit(object arg)
+        {
+            OperationError = null;
+            IsBusy = true;
+
+            try
+            {
+                Octokit.PullRequestReviewEvent e;
+
+                if (Enum.TryParse(arg.ToString(), out e))
+                {
+                    await session.PostReview(Body, e);
+                    Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                OperationError = ex.Message;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

@@ -7,6 +7,8 @@ namespace GitHub.UI
 {
     public class DropDownButton : ContentControl
     {
+        public static readonly DependencyProperty AutoCloseOnClickProperty =
+            DependencyProperty.Register("AutoCloseOnClick", typeof(bool), typeof(DropDownButton));
         public static readonly DependencyProperty DropDownContentProperty =
             DependencyProperty.Register(nameof(DropDownContent), typeof(object), typeof(DropDownButton));
         public static readonly DependencyProperty IsOpenProperty =
@@ -20,6 +22,12 @@ namespace GitHub.UI
             DefaultStyleKeyProperty.OverrideMetadata(
                 typeof(DropDownButton),
                 new FrameworkPropertyMetadata(typeof(DropDownButton)));
+        }
+
+        public bool AutoCloseOnClick
+        {
+            get { return (bool)GetValue(AutoCloseOnClickProperty); }
+            set { SetValue(AutoCloseOnClickProperty, value); }
         }
 
         public object DropDownContent
@@ -42,6 +50,7 @@ namespace GitHub.UI
             button.Click += ButtonClick;
             popup.Opened += PopupOpened;
             popup.Closed += PopupClosed;
+            popup.AddHandler(MouseUpEvent, new RoutedEventHandler(PopupMouseUp), true);
         }
 
         void ButtonClick(object sender, RoutedEventArgs e)
@@ -58,6 +67,14 @@ namespace GitHub.UI
         {
             IsOpen = false;
             IsHitTestVisible = true;
+        }
+
+        private void PopupMouseUp(object sender, RoutedEventArgs e)
+        {
+            if (AutoCloseOnClick)
+            {
+                IsOpen = false;
+            }
         }
     }
 }
