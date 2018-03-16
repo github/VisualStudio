@@ -28,14 +28,13 @@ namespace GitHub.InlineReviews
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
             var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
 
-            // Unfortunately this doesn't return until after the GitHub pane has finnished refreshing.
-            //log.Information("SwitchToMainThreadAsync");
-            //await JoinableTaskFactory
-            //   .WithPriority(VsTaskRunContext.UIThreadNormalPriority)
-            //   .SwitchToMainThreadAsync();
-
-            // Posting a task like this seems to work.            
-            await ThreadingHelper.RunOnMainThreadNormalPriority(() => barManager.StartShowingStatus());
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, async () =>
+            {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                barManager.StartShowingStatus();
+            });
         }
 
     }

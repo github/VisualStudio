@@ -59,16 +59,21 @@ namespace GitHub.VisualStudio
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            await ThreadingHelper.SwitchToMainThreadAsync();
-            menuService.AddCommands(
-                exports.GetExportedValue<IAddConnectionCommand>(),
-                exports.GetExportedValue<IBlameLinkCommand>(),
-                exports.GetExportedValue<ICopyLinkCommand>(),
-                exports.GetExportedValue<ICreateGistCommand>(),
-                exports.GetExportedValue<IOpenLinkCommand>(),
-                exports.GetExportedValue<IOpenPullRequestsCommand>(),
-                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>());
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, async () =>
+            {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                menuService.AddCommands(
+                    exports.GetExportedValue<IAddConnectionCommand>(),
+                    exports.GetExportedValue<IBlameLinkCommand>(),
+                    exports.GetExportedValue<ICopyLinkCommand>(),
+                    exports.GetExportedValue<ICreateGistCommand>(),
+                    exports.GetExportedValue<IOpenLinkCommand>(),
+                    exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                    exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                    exports.GetExportedValue<IShowGitHubPaneCommand>());
+            });
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)

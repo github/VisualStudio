@@ -59,17 +59,6 @@ namespace GitHub.Helpers
                 new AwaitableWrapper(scheduler ?? TaskScheduler.Default);
         }
 
-        // HACK: This is a workaround because the following doesn't seem to work.
-        //await JoinableTaskFactory
-        //   .WithPriority(VsTaskRunContext.UIThreadNormalPriority)
-        //   .SwitchToMainThreadAsync();
-        public static Task RunOnMainThreadNormalPriority(Action action)
-        {
-            var service = (IVsTaskSchedulerService2)VsTaskLibraryHelper.ServiceInstance;
-            var scheduler = service.GetTaskScheduler((uint)VsTaskRunContext.UIThreadNormalPriority);
-            return Task.Factory.StartNew(action, default(CancellationToken), TaskCreationOptions.HideScheduler, scheduler);
-        }
-
         class AwaitableWrapper : IAwaitable
         {
             Func<IAwaiter> getAwaiter;
