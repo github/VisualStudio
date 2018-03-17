@@ -187,7 +187,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var session = Substitute.For<IPullRequestSession>();
                 session.GetFile("file.cs").Returns(file);
 
-                var info = new PullRequestTextBufferInfo(session, "file.cs", side);
+                var info = new PullRequestTextBufferInfo(session, "file.cs", "SHA", side);
                 var result = Substitute.For<IPullRequestSessionManager>();
                 result.GetTextBufferInfo(null).ReturnsForAnyArgs(info);
                 return result;

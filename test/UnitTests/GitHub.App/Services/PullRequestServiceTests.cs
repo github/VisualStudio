@@ -579,7 +579,7 @@ public class PullRequestServiceTests : TestBaseClass
 
     static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
 
-    public class TheExtractFileMethod
+    public class TheExtractToTempFileMethod
     {
         [Test]
         public async Task ExtractHead()
@@ -589,63 +589,11 @@ public class PullRequestServiceTests : TestBaseClass
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
-            var head = true;
 
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, head, Encoding.UTF8);
+            var file = await ExtractToTempFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, Encoding.UTF8);
 
             Assert.That(headFileContent, Is.EqualTo(File.ReadAllText(file)));
-        }
-
-        [Test]
-        public async Task ExtractBase_MergeBaseAvailable_UseMergeBaseSha()
-        {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = "headFileContent";
-            var mergeBaseFileContent = "mergeBaseFileContent";
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var mergeBaseSha = "mergeBaseSha";
-            var head = false;
-
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                fileName, head, Encoding.UTF8);
-
-            Assert.That(mergeBaseFileContent, Is.EqualTo(File.ReadAllText(file)));
-        }
-
-        [Test]
-        public void MergeBaseNotAvailable_ThrowsNotFoundException()
-        {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = "headFileContent";
-            var mergeBaseFileContent = null as string;
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var mergeBaseSha = null as string;
-            var head = false;
-            var mergeBaseException = new NotFoundException();
-
-            var ex = Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                                fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
-        }
-
-        [Test]
-        public async Task FileAdded_BaseFileEmpty()
-        {
-            var baseFileContent = null as string;
-            var headFileContent = "headFileContent";
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var head = false;
-
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, head, Encoding.UTF8);
-
-            Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
         }
 
         [Test]
@@ -658,10 +606,77 @@ public class PullRequestServiceTests : TestBaseClass
             var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
             var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-            var head = true;
 
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, head, Encoding.UTF8);
+            var file = await ExtractToTempFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, Encoding.UTF8);
+
+            Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
+        }
+
+        static async Task<string> ExtractToTempFile(
+            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
+            string fileName, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef")
+        {
+            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+            repositoryModel.LocalPath.Returns(repoDir);
+
+            var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Number.Returns(1);
+
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitClient = MockGitClient();
+            var gitService = serviceProvider.GetGitService();
+            var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
+            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
+
+            return await service.ExtractToTempFile(repositoryModel, pullRequest, fileName, headSha, encoding);
+        }
+    }
+
+    public class TheExtractToTempFileAtBaseMethod
+    {
+        [Test]
+        public async Task ExtractBase_MergeBaseAvailable_UseMergeBaseSha()
+        {
+            var baseFileContent = "baseFileContent";
+            var mergeBaseFileContent = "mergeBaseFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = "mergeBaseSha";
+
+            var file = await ExtractToTempFileAtBase(baseSha, baseFileContent, headSha, mergeBaseSha, mergeBaseFileContent,
+                fileName, Encoding.UTF8);
+
+            Assert.That(mergeBaseFileContent, Is.EqualTo(File.ReadAllText(file)));
+        }
+
+        [Test]
+        public void MergeBaseNotAvailable_ThrowsNotFoundException()
+        {
+            var baseFileContent = "baseFileContent";
+            var mergeBaseFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = null as string;
+            var mergeBaseException = new NotFoundException();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() => ExtractToTempFileAtBase(baseSha, baseFileContent, headSha, mergeBaseSha, mergeBaseFileContent,
+                                fileName, Encoding.UTF8, mergeBaseException: mergeBaseException));
+        }
+
+        [Test]
+        public async Task FileAdded_BaseFileEmpty()
+        {
+            var baseFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+
+            var file = await ExtractToTempFileAtBase(baseSha, baseFileContent, headSha, baseSha, baseFileContent,
+                fileName, Encoding.UTF8);
 
             Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
         }
@@ -679,10 +694,9 @@ public class PullRequestServiceTests : TestBaseClass
             var baseSha = "baseSha";
             var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var head = false;
 
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent,
-                baseSha, baseFileContent, fileName, head, encoding, repoDir);
+            var file = await ExtractToTempFileAtBase(baseSha, baseFileContent, headSha,
+                baseSha, baseFileContent, fileName, encoding, repoDir);
 
             var expectedPath = Path.Combine(repoDir, fileName);
             var expectedContent = baseFileContent;
@@ -692,25 +706,9 @@ public class PullRequestServiceTests : TestBaseClass
             Assert.That(File.ReadAllBytes(expectedPath), Is.EqualTo(File.ReadAllBytes(file)));
         }
 
-        static bool HasPreamble(string file, Encoding encoding)
-        {
-            using (var stream = File.OpenRead(file))
-            {
-                foreach (var b in encoding.GetPreamble())
-                {
-                    if (b != stream.ReadByte())
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        static async Task<string> ExtractFile(
-            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
-            string fileName, bool head, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef",
+        static async Task<string> ExtractToTempFileAtBase(
+            string baseSha, object baseFileContent, string headSha, string mergeBaseSha, object mergeBaseFileContent,
+            string fileName, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef",
             Exception mergeBaseException = null)
         {
             var repositoryModel = Substitute.For<ILocalRepositoryModel>();
@@ -738,44 +736,8 @@ public class PullRequestServiceTests : TestBaseClass
 
             gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
-            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
 
-            return await service.ExtractFile(repositoryModel, pullRequest, fileName, head, encoding);
-        }
-
-        static IObservable<string> GetFileObservable(object fileOrException)
-        {
-            if (fileOrException is string)
-            {
-                return Observable.Return((string)fileOrException);
-            }
-
-            if (fileOrException is Exception)
-            {
-                return Observable.Throw<string>((Exception)fileOrException);
-            }
-
-            return Observable.Throw<string>(new FileNotFoundException());
-        }
-
-        static Task<string> GetFileTask(object content)
-        {
-            if (content is string)
-            {
-                return Task.FromResult((string)content);
-            }
-
-            if (content is Exception)
-            {
-                return Task.FromException<string>((Exception)content);
-            }
-
-            if (content == null)
-            {
-                return Task.FromResult<string>(null);
-            }
-
-            throw new ArgumentException("Unsupported content type: " + content);
+            return await service.ExtractToTempFileAtBase(repositoryModel, pullRequest, fileName, encoding);
         }
     }
 
@@ -1137,5 +1099,25 @@ public class PullRequestServiceTests : TestBaseClass
         var result = Substitute.For<IGitService>();
         result.GetRepository(Arg.Any<string>()).Returns(repository);
         return result;
+    }
+
+    static Task<string> GetFileTask(object content)
+    {
+        if (content is string)
+        {
+            return Task.FromResult((string)content);
+        }
+
+        if (content is Exception)
+        {
+            return Task.FromException<string>((Exception)content);
+        }
+
+        if (content == null)
+        {
+            return Task.FromResult<string>(null);
+        }
+
+        throw new ArgumentException("Unsupported content type: " + content);
     }
 }

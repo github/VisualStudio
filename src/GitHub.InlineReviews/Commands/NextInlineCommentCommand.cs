@@ -6,13 +6,13 @@ using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
 using Microsoft.VisualStudio.Text.Tagging;
 using GitHub.Commands;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.Commands
 {
     /// <summary>
     /// Navigates to and opens the the next inline comment thread in the currently active text view.
     /// </summary>
-    [ExportCommand(typeof(InlineReviewsPackage))]
     [Export(typeof(INextInlineCommentCommand))]
     class NextInlineCommentCommand : InlineCommentNavigationCommand, INextInlineCommentCommand
     {
@@ -29,13 +29,15 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="NextInlineCommentCommand"/> class.
         /// </summary>
+        /// <param name="serviceProvider">The GitHub service provider.</param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         [ImportingConstructor]
-        public NextInlineCommentCommand(
+        protected NextInlineCommentCommand(
+            IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService)
-            : base(tagAggregatorFactory, peekService, CommandSet, CommandId)
+            : base(serviceProvider, tagAggregatorFactory, peekService, CommandSet, CommandId)
         {
         }
 

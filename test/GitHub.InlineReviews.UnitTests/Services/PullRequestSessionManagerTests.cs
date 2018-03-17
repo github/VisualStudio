@@ -261,7 +261,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     FilePath,
-                    Arg.Any<IReadOnlyList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
                     .Returns(threads);
 
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -285,7 +286,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     FilePath,
-                    Arg.Any<IReadOnlyList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -308,7 +310,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     FilePath,
-                    Arg.Any<IReadOnlyList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -347,7 +350,8 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.BuildCommentThreads(
                     target.CurrentSession.PullRequest,
                     FilePath,
-                    Arg.Any<IReadOnlyList<DiffChunk>>())
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
                     .Returns(threads);
 
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -636,7 +640,7 @@ Line 4";
                     CreateInlineCommentThreadModel(expectedLineNumber),
                 };
 
-                sessionService.BuildCommentThreads(null, null, null).ReturnsForAnyArgs(threads);
+                sessionService.BuildCommentThreads(null, null, null, null).ReturnsForAnyArgs(threads);
 
                 var target = CreateTarget(sessionService: sessionService);
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);

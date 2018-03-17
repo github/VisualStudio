@@ -56,7 +56,7 @@ namespace GitHub.InlineReviews.ViewModels
             return new Uri(string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}/pull/{1}#discussion_r{2}",
-                Session.LocalRepository.CloneUrl.ToRepositoryUrl(),
+                Session.LocalRepository.CloneUrl.ToRepositoryUrl(Session.RepositoryOwner),
                 Session.PullRequest.Number,
                 id));
         }

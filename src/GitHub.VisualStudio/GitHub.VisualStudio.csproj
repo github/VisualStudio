@@ -311,19 +311,18 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyResolverPackage.cs" />
+    <Compile Include="Commands\BlameLinkCommand.cs" />
+    <Compile Include="Commands\CreateGistCommand.cs" />
+    <Compile Include="Commands\LinkCommandBase.cs" />
+    <Compile Include="Commands\CopyLinkCommand.cs" />
+    <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
+    <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
+    <Compile Include="Commands\OpenPullRequestsCommand.cs" />
+    <Compile Include="GitContextPackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
-    <Compile Include="Menus\BlameLink.cs" />
-    <Compile Include="Menus\MenuBase.cs" />
-    <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
-    <Compile Include="Menus\OpenLink.cs" />
-    <Compile Include="Menus\LinkMenuBase.cs" />
-    <Compile Include="Menus\ShowCurrentPullRequest.cs" />
-    <Compile Include="Menus\OpenPullRequests.cs" />
-    <Compile Include="Menus\ShowGitHubPane.cs" />
-    <Compile Include="Menus\AddConnection.cs" />
-    <Compile Include="Menus\CopyLink.cs" />
-    <Compile Include="Menus\MenuProvider.cs" />
+    <Compile Include="Commands\AddConnectionCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Services\JsonConnectionCache.cs" />
@@ -331,8 +330,7 @@
     <Compile Include="Services\ShowDialogService.cs" />
     <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
-    <Compile Include="Services\LoginManagerDispatcher.cs" />
-    <Compile Include="Services\UsageTrackerDispatcher.cs" />
+    <Compile Include="Services\VSGitExtFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
@@ -513,6 +511,10 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
+    <Page Include="Views\Dialog\DialogStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Dialog\GistCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -538,6 +540,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialog\RepositoryRecloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\GitHubPaneStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -706,6 +712,10 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
       <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
       <Name>GitHub.StartPage</Name>
@@ -719,6 +729,7 @@
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF14</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
@@ -726,6 +737,7 @@
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF15</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>

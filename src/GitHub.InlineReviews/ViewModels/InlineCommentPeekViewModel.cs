@@ -4,15 +4,11 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Extensions;
-using GitHub.Factories;
-using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.Logging;
 using GitHub.Models;
-using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -64,14 +60,14 @@ namespace GitHub.InlineReviews.ViewModels
             peekSession.Dismissed += (s, e) => Dispose();
 
             NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextCommentCommand.IsEnabled),
+                Observable.Return(nextCommentCommand.Enabled),
                 _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
             PreviousComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(previousCommentCommand.IsEnabled),
+                Observable.Return(previousCommentCommand.Enabled),
                 _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
@@ -116,7 +112,7 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 relativePath = info.RelativePath;
                 side = info.Side ?? DiffSide.Right;
-                file = await info.Session.GetFile(relativePath);
+                file = await info.Session.GetFile(relativePath, info.CommitSha ?? "HEAD");
                 session = info.Session;
                 await UpdateThread();
             }

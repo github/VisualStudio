@@ -10,5 +10,6 @@ namespace GitHub.Models
         public string Body { get; set; }
         public PullRequestReviewState State { get; set; }
         public string CommitId { get; set; }
+        public DateTimeOffset SubmittedAt { get; set; }
     }
 }

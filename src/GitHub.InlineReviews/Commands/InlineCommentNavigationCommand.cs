@@ -6,6 +6,8 @@ using GitHub.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
 using GitHub.Logging;
+using GitHub.Services;
+using GitHub.Services.Vssdk.Commands;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
@@ -25,6 +27,7 @@ namespace GitHub.InlineReviews.Commands
     abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
     {
         static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
 
@@ -36,24 +39,17 @@ namespace GitHub.InlineReviews.Commands
         /// <param name="commandSet">The GUID of the group the command belongs to.</param>
         /// <param name="commandId">The numeric identifier of the command.</param>
         protected InlineCommentNavigationCommand(
+            IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
             Guid commandSet,
             int commandId)
             : base(commandSet, commandId)
         {
+            this.serviceProvider = serviceProvider;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEnabled
-        {
-            get
-            {
-                var tags = GetTags(GetCurrentTextViews());
-                return tags.Count > 0;
-            }
+            BeforeQueryStatus += QueryStatus;
         }
 
         /// <summary>
@@ -105,7 +101,6 @@ namespace GitHub.InlineReviews.Commands
 
             try
             {
-                var serviceProvider = Package;
                 var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
                 if (monitorSelection == null)
                 {
@@ -258,6 +253,12 @@ namespace GitHub.InlineReviews.Commands
         SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)
         {
             return p.GetPoint(textSnapshot.TextBuffer, PositionAffinity.Predecessor);
+        }
+
+        void QueryStatus(object sender, EventArgs e)
+        {
+            var tags = GetTags(GetCurrentTextViews());
+            Enabled = tags.Count > 0;
         }
 
         protected interface ITagInfo

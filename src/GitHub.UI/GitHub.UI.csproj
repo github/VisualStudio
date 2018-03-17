@@ -91,7 +91,12 @@
       <DependentUpon>Spinner.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\AllCapsConverter.cs" />
+    <Compile Include="Converters\OrConverter.cs" />
+    <Compile Include="Converters\AndConverter.cs" />
+    <Compile Include="Converters\EqualsConverter.cs" />
+    <Compile Include="Converters\NotEqualsConverter.cs" />
     <Compile Include="Converters\NotEqualsToVisibilityConverter.cs" />
+    <Compile Include="Converters\EqualityConverter.cs" />
     <Compile Include="Converters\EqualsToVisibilityConverter.cs" />
     <Compile Include="Converters\MultiBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />

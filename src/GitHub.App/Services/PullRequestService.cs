@@ -445,47 +445,50 @@ namespace GitHub.Services
                 }
             });
         }
-
-        public IObservable<string> ExtractFile(
+        
+        public async Task<string> ExtractToTempFile(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
-            string fileName,
-            bool head,
+            string relativePath,
+            string commitSha,
             Encoding encoding)
         {
-            return Observable.Defer(async () =>
+            using (var repo = gitService.GetRepository(repository.LocalPath))
             {
-                using (var repo = gitService.GetRepository(repository.LocalPath))
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                return await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding);
+            }
+        }
+
+        public async Task<string> ExtractToTempFileAtBase(
+            ILocalRepositoryModel repository,
+            IPullRequestModel pullRequest,
+            string relativePath,
+            Encoding encoding)
+        {
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+
+                try
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    string sha;
-
-                    if (head)
-                    {
-                        sha = pullRequest.Head.Sha;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            sha = await gitClient.GetPullRequestMergeBase(
-                                repo,
-                                pullRequest.Base.RepositoryCloneUrl,
-                                pullRequest.Base.Sha,
-                                pullRequest.Head.Sha,
-                                pullRequest.Base.Ref,
-                                pullRequest.Number);
-                        }
-                        catch (NotFoundException ex)
-                        {
-                            throw new NotFoundException($"The Pull Request file failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
-                        }
-                    }
-
-                    var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);
-                    return Observable.Return(file);
+                    var sha = await gitClient.GetPullRequestMergeBase(
+                        repo,
+                        pullRequest.Base.RepositoryCloneUrl,
+                        pullRequest.Base.Sha,
+                        pullRequest.Head.Sha,
+                        pullRequest.Base.Ref,
+                        pullRequest.Number);
+                    return await ExtractToTempFile(repo, pullRequest.Number, sha, relativePath, encoding);
                 }
-            });
+                catch (NotFoundException ex)
+                {
+                    throw new NotFoundException(
+                        $"The Pull Request file failed to load. Please check your network connection and click refresh to try again. " +
+                        "If this issue persists, please let us know at support@github.com",
+                        ex);
+                }
+            }
         }
 
         public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)

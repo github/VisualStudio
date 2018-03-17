@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
@@ -13,75 +11,75 @@ namespace GitHub.SampleData
     {
         public PullRequestReviewViewModelDesigner()
         {
-            PullRequestNumber = 734;
+            PullRequestModel = new PullRequestModel(
+                419,
+                "Fix a ton of potential crashers, odd code and redundant calls in ModelService",
+                new AccountDesigner { Login = "Haacked", IsUser = true },
+                DateTimeOffset.Now - TimeSpan.FromDays(2));
 
             Model = new PullRequestReviewModel
             {
+                
+                SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(1),
                 User = new AccountDesigner { Login = "Haacked", IsUser = true },
             };
 
-            Title = "Fix a ton of potential crashers, odd code and redundant calls in ModelService";
-            State = "approved";
             Body = @"Just a few comments. I don't feel too strongly about them though.
 
 Otherwise, very nice work here! ✨";
-            Files = new PullRequestFilesViewModelDesigner();
+
+            StateDisplay = "approved";
 
             var comments = new[]
             {
-                new PullRequestReviewCommentModel
+                new PullRequestReviewFileCommentViewModelDesigner
                 {
                     Body = @"These should probably be properties. Most likely they should be readonly properties. I know that makes creating instances of these not look as nice as using property initializers when constructing an instance, but if these properties should never be mutated after construction, then it guides future consumers to the right behavior.
 
 However, if you're two-way binding these properties to a UI, then ignore the readonly part and make them properties. But in that case they should probably be reactive properties (or implement INPC).",
-                    Path = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
-                    Position = 1,
+                    RelativePath = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
                 },
-                new PullRequestReviewCommentModel
+                new PullRequestReviewFileCommentViewModelDesigner
                 {
                     Body = "While I have no problems with naming a variable ass I think we should probably avoid swear words in case Microsoft runs their Policheck tool against this code.",
-                    Path = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
-                    Position = 1,
+                    RelativePath = "src/GitHub.App/ViewModels/PullRequestListViewModel.cs",
                 },
             };
 
-            FileComments = comments.Select((x, i) => new PullRequestReviewFileCommentViewModel(x, (i * 10) - 1)).ToList();
+            var outdated = new[]
+            {
+                new PullRequestReviewFileCommentViewModelDesigner
+                {
+                    Body = @"So this is just casting a mutable list to an IReadOnlyList which can be cast back to List. I know we probably won't do that, but I'm thinking of the next person to come along. The safe thing to do is to wrap List with a ReadOnlyList. We have an extension method ToReadOnlyList for observables. Wouldn't be hard to write one for IEnumerable.",
+                    RelativePath = "src/GitHub.Exports.Reactive/ViewModels/IPullRequestListViewModel.cs",
+                },
+            };
         }
 
-        public ILocalRepositoryModel LocalRepository { get; set; }
-        public string RemoteRepositoryOwner { get; set; }
-        public int PullRequestNumber { get; set; }
-        public long PullRequestReviewId { get; set; }
-        public IPullRequestReviewModel Model { get; set; }
-        public string Title { get; set; }
-        public string State { get; set; }
-        public bool IsPending { get; set; }
-        public string Body { get; set; }
-        public IPullRequestFilesViewModel Files { get; set; }
+        public string Body { get; }
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; set; }
-        public ReactiveCommand<Unit> OpenComment { get; }
+        public bool IsExpanded { get; set; }
+        public bool HasDetails { get; set; }
+        public ILocalRepositoryModel LocalRepository { get; set; }
+        public IPullRequestReviewModel Model { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
-        public ReactiveCommand<Unit> Submit { get; }
+        public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; set; }
+        public IPullRequestModel PullRequestModel { get; set; }
+        public string RemoteRepositoryOwner { get; set; }
+        public string StateDisplay { get; set; }
 
         public Task InitializeAsync(
             ILocalRepositoryModel localRepository,
-            IConnection connection,
             string owner,
-            string repo,
-            int pullRequestNumber,
+            IPullRequestModel pullRequest,
             long pullRequestReviewId)
         {
-            return Task.CompletedTask;
-        }
-
-        public Task InitializeNewAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber)
-        {
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
 
         public Task Load(IPullRequestModel pullRequest)
         {
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
     }
 }

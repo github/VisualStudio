@@ -49,13 +49,15 @@ namespace GitHub.InlineReviews.Services
         /// <param name="pullRequest">The pull request session.</param>
         /// <param name="relativePath">The relative path to the file.</param>
         /// <param name="diff">The diff.</param>
+        /// <param name="headSha">The SHA of the <paramref name="diff"/> HEAD.</param>
         /// <returns>
         /// A collection of <see cref="IInlineCommentThreadModel"/> objects with updated line numbers.
         /// </returns>
         IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             IPullRequestModel pullRequest,
             string relativePath,
-            IReadOnlyList<DiffChunk> diff);
+            IReadOnlyList<DiffChunk> diff,
+            string headSha);
 
         /// <summary>
         /// Updates a set of comment thread models for a file based on a new diff.

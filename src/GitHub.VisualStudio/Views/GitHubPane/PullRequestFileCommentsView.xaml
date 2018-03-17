@@ -12,7 +12,7 @@
     <d:DesignData.DataContext>
         <Binding Path="FileComments">
             <Binding.Source>
-                <sampleData:PullRequestReviewViewModelDesigner IsPending="True"/>
+                <sampleData:PullRequestReviewViewModelDesigner/>
             </Binding.Source>
         </Binding>
     </d:DesignData.DataContext>
@@ -24,6 +24,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/GitHubPaneStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Key="FileComments" Source="{Binding}">
                 <CollectionViewSource.GroupDescriptions>
@@ -32,7 +33,7 @@
             </CollectionViewSource>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <ListBox ItemsSource="{Binding Source={StaticResource FileComments}}"
              Background="Transparent"
              BorderThickness="0"
@@ -48,14 +49,12 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type GroupItem}">
                                     <Expander IsExpanded="True"
-                                              Padding="0 4 4 4"
-                                              Style="{DynamicResource GitHubExpander}">
+                                              Padding="0 4 4 4">
                                         <Expander.Header>
                                             <DockPanel>
                                                 <ui:OcticonImage DockPanel.Dock="Left" Icon="file_text" Foreground="{DynamicResource VsBrush.WindowText}" Margin="2 0"/>
                                                 <TextBlock DockPanel.Dock="Right" Text="{Binding Items.Count, Mode=OneWay}" Foreground="{DynamicResource VsBrush.WindowText}"/>
                                                 <ui:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2" Foreground="{DynamicResource VsBrush.WindowText}"/>
-                                                <!-- TODO: Need special control to display long paths -->
                                                 <ui:TrimmedPathTextBlock Grid.Column="1"
                                                                          FontWeight="SemiBold"
                                                                          Foreground="{DynamicResource VsBrush.WindowText}"
@@ -69,33 +68,13 @@
                                                 <DataTemplate>
                                                     <Border BorderBrush="{DynamicResource GitHubExpanderHeaderBackground}"
                                                             BorderThickness="1 0 1 1">
-                                                        <StackPanel Orientation="Vertical" Margin="20 0 0 0">
-                                                            <StackPanel Orientation="Horizontal" Margin="4 0">
-                                                                <TextBlock 
-                                                                           Visibility="{Binding LineNumber, Converter={ui:NotEqualsToVisibilityConverter -1}}">
-                                                                    <Hyperlink>
-                                                                        <Run Text="{Binding LineNumber, StringFormat=Line {0}, Mode=OneWay}"/>
-                                                                    </Hyperlink>
-                                                                </TextBlock>
-                                                                <Border Background="#4a4a4a"
-                                                                        CornerRadius="3"
-                                                                        Padding="4 2"
-                                                                        VerticalAlignment="Top"
-                                                                        Visibility="{Binding LineNumber, Converter={ui:EqualsToVisibilityConverter -1}}">
-                                                                    <TextBlock Foreground="{DynamicResource GitHubVsToolWindowBackground}"
-                                                                               FontSize="10">
-                                                                        Outdated
-                                                                    </TextBlock>
-                                                                </Border>
-                                                            </StackPanel>
-
-                                                            <TextBlock Text="{Binding Body, Converter={ui:TrimNewlinesConverter}}"
-                                                                       Foreground="{DynamicResource VsBrush.WindowText}"
-                                                                       TextWrapping="Wrap"
-                                                                       TextTrimming="WordEllipsis"
-                                                                       Margin="4"
-                                                                       MaxHeight="100"/>
-                                                        </StackPanel>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="4">
+                                                            <!-- WPF you suck. https://stackoverflow.com/questions/2476305 -->
+                                                            <Hyperlink Command="{Binding Open}"
+                                                                       Style="{StaticResource BlackHyperlink}">
+                                                                <Run Text="{Binding Body, Converter={ui:TrimNewlinesConverter}, Mode=OneWay}"/>
+                                                            </Hyperlink>
+                                                        </TextBlock>
                                                     </Border>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>

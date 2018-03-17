@@ -309,7 +309,8 @@ namespace GitHub.InlineReviews.Services
                     file.InlineCommentThreads = sessionService.BuildCommentThreads(
                         session.PullRequest,
                         file.RelativePath,
-                        file.Diff);
+                        file.Diff,
+                        session.PullRequest.Head.Sha);
                 }
                 else
                 {

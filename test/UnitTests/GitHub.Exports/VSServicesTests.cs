@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using DTE = EnvDTE.DTE;
 using Rothko;
+using Serilog;
 
 public class VSServicesTests
 {
@@ -27,24 +28,22 @@ public class VSServicesTests
         {
             var repoDir = @"x:\repo";
             var dte = Substitute.For<DTE>();
-            dte.Solution.When(s => s.Create(Arg.Any<string>(), Arg.Any<string>())).Do(
-                ci => { throw new COMException(); });
-            var target = CreateVSServices(repoDir, dte: dte);
+            var log = Substitute.For<ILogger>();
+            var ex = new COMException();
+            dte.Solution.When(s => s.Create(Arg.Any<string>(), Arg.Any<string>())).Do(ci => { throw ex; });
+            var target = CreateVSServices(repoDir, dte: dte, log: log);
 
-            var success = target.TryOpenRepository("");
+            var success = target.TryOpenRepository(repoDir);
 
             Assert.False(success);
+            log.Received(1).Error(ex, "Error opening repository");
         }
 
         [Test]
         public void RepoDirExistsFalse_ReturnFalse()
         {
             var repoDir = @"x:\repo";
-            var os = Substitute.For<IOperatingSystem>();
-            //var directoryInfo = Substitute.For<IDirectoryInfo>();
-            //directoryInfo.Exists.Returns(false);
-            //os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
-            var target = CreateVSServices(null, os: os);
+            var target = CreateVSServices(repoDir, repoDirExists: false);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -85,22 +84,23 @@ public class VSServicesTests
             directoryInfo.Received().Delete(true);
         }
 
-        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null)
+        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null, bool repoDirExists = true, ILogger log = null)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
+            log = log ?? Substitute.For<ILogger>();
 
             if (repoDir != null)
             {
                 var directoryInfo = Substitute.For<IDirectoryInfo>();
-                directoryInfo.Exists.Returns(true);
+                directoryInfo.Exists.Returns(repoDirExists);
                 os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
             }
 
             var provider = Substitute.For<IGitHubServiceProvider>();
             provider.TryGetService<DTE>().Returns(dte);
             provider.TryGetService<IOperatingSystem>().Returns(os);
-            return new VSServices(provider);
+            return new VSServices(provider, log);
         }
     }
 

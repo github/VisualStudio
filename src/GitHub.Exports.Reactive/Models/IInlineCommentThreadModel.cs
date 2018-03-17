@@ -41,14 +41,9 @@ namespace GitHub.Models
         int LineNumber { get; set; }
 
         /// <summary>
-        /// Gets the SHA of the commit that the thread was left con.
+        /// Gets the SHA of the commit that the thread appears on.
         /// </summary>
-        string OriginalCommitSha { get; }
-
-        /// <summary>
-        /// Gets the 1-based line number in the original diff that the thread was left on.
-        /// </summary>
-        int OriginalPosition { get; }
+        string CommitSha { get; }
 
         /// <summary>
         /// Gets the relative path to the file that the thread is on.
