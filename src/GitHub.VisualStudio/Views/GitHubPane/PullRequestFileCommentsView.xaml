@@ -39,7 +39,7 @@
              BorderThickness="0"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ListBox.Resources>
-            <SolidColorBrush x:Key="GitHubExpanderHeaderBackground" Color="{DynamicResource VsColor.ScrollBar}"/>
+            <SolidColorBrush x:Key="GitHubExpanderHeaderBackground" Color="{DynamicResource GitHubFileExpanderHeaderBackgroundColor}"/>
         </ListBox.Resources>
         <ListBox.GroupStyle>
             <GroupStyle>
