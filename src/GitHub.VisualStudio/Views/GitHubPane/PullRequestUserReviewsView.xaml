@@ -82,7 +82,7 @@
                                         <Expander.Header>
                                             <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold">Description</TextBlock>
                                         </Expander.Header>
-                                        <markdig:MarkdownViewer Margin="22 4 0 0" Markdown="{Binding Body}"/>
+                                        <markdig:MarkdownViewer Margin="22 4 0 0" Foreground="{DynamicResource VsBrush.WindowText}" Markdown="{Binding Body}"/>
                                     </Expander>
                                     <Expander IsExpanded="True"
                                               Margin="0 4"
@@ -97,7 +97,7 @@
                                               Margin="0 4"
                                               Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Outdated comments</TextBlock>
+                                            <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold">Outdated comments</TextBlock>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding OutdatedFileComments}"
                                                                            Margin="22 4 0 0"/>
