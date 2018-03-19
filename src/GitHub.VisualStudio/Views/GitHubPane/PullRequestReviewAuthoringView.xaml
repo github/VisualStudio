@@ -95,7 +95,7 @@
                     <local:PullRequestFilesView DataContext="{Binding Files}"/>
                 </TabItem>
                 <TabItem Header="{Binding FileComments.Count}"
-                         HeaderStringFormat="File comments ({0})"
+                         HeaderStringFormat="Your file comments ({0})"
                          Style="{DynamicResource GitHubPRDetailsTabItem}">
                     <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>
                 </TabItem>
