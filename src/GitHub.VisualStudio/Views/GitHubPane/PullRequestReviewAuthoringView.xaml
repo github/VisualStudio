@@ -37,7 +37,7 @@
                 </Hyperlink>
             </TextBlock>
             <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding PullRequestModel.Title}" TextWrapping="Wrap"/>
-            <TextBlock Margin="0 4">Review summary</TextBlock>
+            <TextBlock Margin="0 4">Your review summary</TextBlock>
             <TextBox AcceptsReturn="True"
                      Margin="0 4"
                      MinHeight="120"
