@@ -8,9 +8,6 @@ using System.Windows;
 using static Microsoft.VisualStudio.Threading.JoinableTaskFactory;
 using static Microsoft.VisualStudio.Threading.AwaitExtensions;
 using System.Windows.Threading;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Helpers
 {
