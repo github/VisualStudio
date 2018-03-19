@@ -408,7 +408,7 @@ namespace GitHub.ViewModels.GitHubPane
         static Regex CreateRoute(string route)
         {
             // Build RegEx from route (:foo to named group (?<foo>[\w_.-]+)).
-            var routeFormat = new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)");
+            var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)") + "$";
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
     }
