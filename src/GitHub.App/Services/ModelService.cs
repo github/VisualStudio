@@ -57,6 +57,13 @@ namespace GitHub.Services
             return GetUserFromCache().Select(Create);
         }
 
+        public IObservable<IAccount> GetUser(string login)
+        {
+            return hostCache.GetAndRefreshObject("user|" + login,
+                () => ApiClient.GetUser(login).Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
+                .Select(Create);
+        }
+
         public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
