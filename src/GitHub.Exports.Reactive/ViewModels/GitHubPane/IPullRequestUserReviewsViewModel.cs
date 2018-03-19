@@ -65,13 +65,5 @@ namespace GitHub.ViewModels.GitHubPane
             string repo,
             int pullRequestNumber,
             string login);
-
-        /// <summary>
-        /// Loads the view model from pre-loaded models.
-        /// </summary>
-        /// <param name="user">The user model.</param>
-        /// <param name="pullRequest">The pull request model.</param>
-        /// <returns></returns>
-        Task Load(IAccount user, IPullRequestModel pullRequest);
     }
 }

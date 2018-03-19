@@ -139,8 +139,10 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public async Task Load(IAccount user, IPullRequestModel pullRequest)
+        async Task Load(IAccount user, IPullRequestModel pullRequest)
         {
+            IsBusy = true;
+
             try
             {
                 session = await sessionManager.GetSession(pullRequest);
@@ -148,19 +150,17 @@ namespace GitHub.ViewModels.GitHubPane
                 PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();
+                var isFirst = true;
 
                 foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.SubmittedAt))
                 {
-                    if (review.User.Login == user.Login)
+                    if (review.User.Login == user.Login &&
+                        review.State != PullRequestReviewState.Pending)
                     {
-                        var vm = new PullRequestReviewViewModel(
-                            editorService,
-                            session,
-                            LocalRepository,
-                            RemoteRepositoryOwner,
-                            pullRequest,
-                            review.Id);
+                        var vm = new PullRequestReviewViewModel(editorService, session, pullRequest, review);
+                        vm.IsExpanded = isFirst;
                         reviews.Add(vm);
+                        isFirst = false;
                     }
                 }
 

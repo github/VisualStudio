@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using ReactiveUI;
 using Serilog;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -19,44 +18,38 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSession session;
+        bool isExpanded;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewViewModel"/> class.
         /// </summary>
-        /// <param name="localRepository">The local repository.</param>
-        /// <param name="owner">The pull request's repository owner.</param>
+        /// <param name="editorService">The pull request editor service.</param>
+        /// <param name="session">The pull request session.</param>
         /// <param name="pullRequest">The pull request model.</param>
-        /// <param name="pullRequestReviewId">The pull request review ID.</param>
+        /// <param name="model">The pull request review model.</param>
         public PullRequestReviewViewModel(
             IPullRequestEditorService editorService,
             IPullRequestSession session,
-            ILocalRepositoryModel localRepository,
-            string owner,
             IPullRequestModel pullRequest,
-            long pullRequestReviewId)
+            IPullRequestReviewModel model)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(session, nameof(session));
-            Guard.ArgumentNotNull(localRepository, nameof(localRepository));
-            Guard.ArgumentNotNull(owner, nameof(owner));
-            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+            Guard.ArgumentNotNull(model, nameof(model));
 
             this.editorService = editorService;
             this.session = session;
 
-            LocalRepository = localRepository;
-            RemoteRepositoryOwner = owner;
-            Model = GetModel(pullRequest, pullRequestReviewId);
-            PullRequestModel = pullRequest;
+            Model = model;
             Body = string.IsNullOrWhiteSpace(Model.Body) ? null : Model.Body;
             StateDisplay = ToString(Model.State);
 
             var comments = new List<IPullRequestReviewFileCommentViewModel>();
             var outdated = new List<IPullRequestReviewFileCommentViewModel>();
 
-            foreach (var comment in PullRequestModel.ReviewComments)
+            foreach (var comment in pullRequest.ReviewComments)
             {
-                if (comment.PullRequestReviewId == pullRequestReviewId)
+                if (comment.PullRequestReviewId == model.Id)
                 {
                     var vm = new PullRequestReviewFileCommentViewModel(
                         editorService,
@@ -76,20 +69,10 @@ namespace GitHub.ViewModels.GitHubPane
             HasDetails = Body != null ||
                 FileComments.Count > 0 ||
                 OutdatedFileComments.Count > 0;
-            IsExpanded = HasDetails && CalculateIsLatest(pullRequest, Model);
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
-
-        /// <inheritdoc/>
-        public string RemoteRepositoryOwner { get; private set; }
-
-        /// <inheritdoc/>
         public IPullRequestReviewModel Model { get; }
-
-        /// <inheritdoc/>
-        public IPullRequestModel PullRequestModel { get; }
 
         /// <inheritdoc/>
         public string Body { get; }
@@ -98,7 +81,11 @@ namespace GitHub.ViewModels.GitHubPane
         public string StateDisplay { get; }
 
         /// <inheritdoc/>
-        public bool IsExpanded { get; }
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+        }
 
         /// <inheritdoc/>
         public bool HasDetails { get; }
@@ -108,26 +95,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; }
-
-        static bool CalculateIsLatest(IPullRequestModel pullRequest, IPullRequestReviewModel model)
-        {
-            return !pullRequest.Reviews.Any(x =>
-                x.User.Login == model.User.Login &&
-                x.SubmittedAt > model.SubmittedAt);
-        }
-
-        static IPullRequestReviewModel GetModel(IPullRequestModel pullRequest, long pullRequestReviewId)
-        {
-            var result = pullRequest.Reviews.FirstOrDefault(x => x.Id == pullRequestReviewId);
-
-            if (result == null)
-            {
-                throw new KeyNotFoundException(
-                    $"Unable to find review {pullRequestReviewId} in pull request #{pullRequest.Number}");
-            }
-
-            return result;
-        }
 
         static string ToString(PullRequestReviewState state)
         {

@@ -10,28 +10,9 @@ namespace GitHub.ViewModels.GitHubPane
     public interface IPullRequestReviewViewModel : IViewModel
     {
         /// <summary>
-        /// Gets the local repository.
-        /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
-
-        /// <summary>
-        /// Gets the owner of the remote repository that contains the pull request.
-        /// </summary>
-        /// <remarks>
-        /// The remote repository may be different from the local repository if the local
-        /// repository is a fork and the user is viewing pull requests from the parent repository.
-        /// </remarks>
-        string RemoteRepositoryOwner { get; }
-
-        /// <summary>
         /// Gets the underlying pull request review model.
         /// </summary>
         IPullRequestReviewModel Model { get; }
-
-        /// <summary>
-        /// Gets the underlying pull request model.
-        /// </summary>
-        IPullRequestModel PullRequestModel { get; }
 
         /// <summary>
         /// Gets the body of the review.
