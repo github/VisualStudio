@@ -58,6 +58,11 @@ namespace GitHub.Services
         bool HasPendingReview { get; }
 
         /// <summary>
+        /// Gets the ID of the current pending pull request review for the user.
+        /// </summary>
+        long PendingReviewId { get; }
+
+        /// <summary>
         /// Gets all files touched by the pull request.
         /// </summary>
         /// <returns>

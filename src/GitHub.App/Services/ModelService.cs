@@ -406,7 +406,7 @@ namespace GitHub.Services
                             CommitId = y.Commit.Oid,
                             State = FromGraphQL(y.State),
                             User = Create(y.Author.Login, y.Author.AvatarUrl(null)),
-                            SubmittedAt = y.SubmittedAt.Value,
+                            SubmittedAt = y.SubmittedAt,
                         }).ToList()
                     });
 
@@ -906,7 +906,7 @@ namespace GitHub.Services
             public string Body { get; set; }
             public GitHub.Models.PullRequestReviewState State { get; set; }
             public string CommitId { get; set; }
-            public DateTimeOffset SubmittedAt { get; set; }
+            public DateTimeOffset? SubmittedAt { get; set; }
         }
 
         public class PullRequestReviewCommentCacheItem

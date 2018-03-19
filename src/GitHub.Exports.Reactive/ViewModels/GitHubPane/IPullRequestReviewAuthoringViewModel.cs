@@ -19,6 +19,11 @@ namespace GitHub.ViewModels.GitHubPane
         string Body { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the user can approve/request changes on the pull request.
+        /// </summary>
+        bool CanApproveRequestChanges { get; }
+
+        /// <summary>
         /// Gets the pull request's changed files.
         /// </summary>
         IPullRequestFilesViewModel Files { get; }
@@ -27,6 +32,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a list of the file comments in the review.
         /// </summary>
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; }
+
+        /// <summary>
+        /// Gets the error message to be displayed in the action area as a result of an error submitting.
+        /// </summary>
+        string OperationError { get; }
 
         /// <summary>
         /// Gets a command which navigates to the parent pull request.
@@ -52,12 +62,5 @@ namespace GitHub.ViewModels.GitHubPane
             string owner,
             string repo,
             int pullRequestNumber);
-
-        /// <summary>
-        /// Updates the data from a pull request model.
-        /// </summary>
-        /// <param name="pullRequest">The pull request model.</param>
-        /// <returns>A task tracking the operation.</returns>
-        Task Load(IPullRequestModel pullRequest);
     }
 }

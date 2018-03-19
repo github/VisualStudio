@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
-using ReactiveUI;
 using Serilog;
 
 namespace GitHub.ViewModels.GitHubPane

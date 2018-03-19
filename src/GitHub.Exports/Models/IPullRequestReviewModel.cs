@@ -71,6 +71,6 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the date/time that the review was submitted.
         /// </summary>
-        DateTimeOffset SubmittedAt { get; }
+        DateTimeOffset? SubmittedAt { get; }
     }
 }
