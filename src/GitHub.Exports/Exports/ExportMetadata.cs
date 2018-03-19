@@ -1,10 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
-using GitHub.VisualStudio;
 
 namespace GitHub.Exports
 {
@@ -46,21 +43,6 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// A MEF export attribute that defines an export of type <see cref="IMenuHandler"/> with
-    /// <see cref="MenuType"/> metadata.
-    /// </summary>
-    [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public sealed class ExportMenuAttribute : ExportAttribute
-    {
-        public ExportMenuAttribute() : base(typeof(IMenuHandler))
-        {
-        }
-
-        public MenuType MenuType { get; set; }
-    }
-
-    /// <summary>
     /// Defines a MEF metadata view that matches <see cref="ExportViewModelForAttribute"/> and
     /// <see cref="ExportViewForAttribute"/>.
     /// </summary>
@@ -72,36 +54,5 @@ namespace GitHub.Exports
     {
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         string[] ViewModelType { get; }
-    }
-
-    /// <summary>
-    /// Defines a MEF metadata view that matches <see cref="ExportMenuAttribute"/>.
-    /// </summary>
-    /// <remarks>
-    /// For more information see the Metadata and Metadata views section at
-    /// https://msdn.microsoft.com/en-us/library/ee155691(v=vs.110).aspx#Anchor_3
-    /// </remarks>
-    public interface IMenuMetadata
-    {
-        MenuType MenuType { get; }
-    }
-
-    public static class ExportMetadataAttributeExtensions
-    {
-        public static bool IsMenuType(this IMenuHandler c, MenuType type)
-        {
-            return c.GetType().GetCustomAttributesData().Any(attr => IsMenuType(attr, type));
-        }
-
-        static bool IsMenuType(CustomAttributeData attributeData, MenuType type)
-        {
-            if (attributeData.NamedArguments == null)
-            {
-                throw new GitHubLogicException("attributeData.NamedArguments may not be null");
-            }
-
-            return attributeData.AttributeType == typeof(ExportMenuAttribute)
-                && (MenuType)attributeData.NamedArguments[0].TypedValue.Value == type;
-        }
     }
 }

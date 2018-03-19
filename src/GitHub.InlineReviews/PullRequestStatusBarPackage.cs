@@ -24,9 +24,8 @@ namespace GitHub.InlineReviews
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
             var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
 
-            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
-            // has been loaded. We're using the following instead as a workaround.
-            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() => barManager.StartShowingStatus());
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            barManager.StartShowingStatus();
         }
     }
 }
