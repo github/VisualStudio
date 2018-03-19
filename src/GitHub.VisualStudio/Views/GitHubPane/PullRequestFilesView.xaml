@@ -43,6 +43,7 @@
         <TreeView.ItemContainerStyle>
             <Style TargetType="TreeViewItem">
                 <Setter Property="IsExpanded" Value="True"/>
+                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>
