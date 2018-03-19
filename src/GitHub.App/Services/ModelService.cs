@@ -415,6 +415,8 @@ namespace GitHub.Services
         async Task<IList<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string owner, string name, int number)
         {
             var result = new List<IPullRequestReviewCommentModel>();
+
+            // Reads a single page of reviews and for each review the first page of review comments.
             var query = new Query()
                 .Repository(owner, name)
                 .PullRequest(number)
@@ -455,6 +457,7 @@ namespace GitHub.Services
                 { "cursor", null }
             };
 
+            // Read all pages of reviews.
             while (true)
             {
                 var reviewPage = await graphql.Run(query, vars);
@@ -463,6 +466,7 @@ namespace GitHub.Services
                 {
                     result.AddRange(review.CommentPage.Items);
 
+                    // The the review has >1 page of review comments, read the remaining pages.
                     if (review.CommentPage.HasNextPage)
                     {
                         result.AddRange(await GetPullRequestReviewComments(review.Id, review.CommentPage.EndCursor));
