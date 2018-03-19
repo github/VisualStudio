@@ -3,33 +3,28 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-    xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+    xmlns:ghfvs="https://github.com/github/VisualStudio"
     xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
-    xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-    xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
-    xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
     mc:Ignorable="d"
     d:DesignWidth="414"
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
-    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationCustom}" >
+    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <Control.Resources>
         <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
-            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
-  
+
     <StackPanel
         Style="{DynamicResource DialogContainerStackPanel}"
-        helpers:AccessKeysManagerScoping.IsEnabled="True">
-        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
+        ghfvs:AccessKeysManagerScoping.IsEnabled="True">
+        <ghfvs:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
         <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,12">
             <TextBlock 
                 Text="{x:Static prop:Resources.twoFactorAuthText}" 
@@ -39,29 +34,29 @@
                 Foreground="{DynamicResource GHTextBrush}" />
         </WrapPanel>
 
-        <ui:HorizontalShadowDivider />
+        <ghfvs:HorizontalShadowDivider />
 
         <TextBlock
             Margin="30,0,30,16"
             HorizontalAlignment="Center"
             TextWrapping="Wrap"
             Style="{DynamicResource GitHubDescriptionTextBlock}"
-            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationInformationTextBlock}" >
+            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationInformationTextBlock}" >
             <Run x:Name="description" Text="{x:Static prop:Resources.openTwoFactorAuthAppText}"/>
             <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication" 
-                       AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationLearnMoreHyperlink}">
+                       AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationLearnMoreHyperlink}">
                 <TextBlock Text="{x:Static prop:Resources.learnMoreLink}"/></Hyperlink>
         </TextBlock>
-        <uirx:TwoFactorInput
+        <ghfvs:TwoFactorInput
             x:Name="authenticationCode"
             TabIndex="1" 
-            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonInputCustom}" />
+            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticatonInputCustom}" />
         <Grid Margin="0,12,0,0" Height="18">
-            <uirx:ErrorMessageDisplay
+            <ghfvs:ErrorMessageDisplay
                 x:Name="authenticationFailedLabel"
                 Message="{x:Static prop:Resources.authenticationFailedLabelMessage}"
                 Content="{x:Static prop:Resources.authenticationFailedLabelContent}" />
-            <uirx:ErrorMessageDisplay
+            <ghfvs:ErrorMessageDisplay
                 x:Name="authenticationSentLabel"
                 Icon="check"
                 IconFill="{DynamicResource GitHubAccentBrush}"
@@ -72,14 +67,14 @@
             Orientation="Horizontal"
             HorizontalAlignment="Center"
             Margin="0,18,0,60">
-            <ui:OcticonCircleButton
+            <ghfvs:OcticonCircleButton
                 x:Name="okButton" 
                 TabIndex="2" 
                 Icon="check"
                 IsDefault="True"
                 Content="{x:Static prop:Resources.verifyText}"
-                AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonVerifyButton}" />
-            <ui:OcticonLinkButton 
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticatonVerifyButton}" />
+            <ghfvs:OcticonLinkButton 
                 x:Name="resendCodeButton"
                 TabIndex="3"
                 ToolTip="{x:Static prop:Resources.resendCodeButtonToolTip}"

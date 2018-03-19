@@ -15,6 +15,8 @@ namespace GitHub.VisualStudio.Views.Dialog
     public class GenericGistCreationView : ViewBase<IGistCreationViewModel, GistCreationView>
     { }
 
+    public class FooBar { }
+
     [ExportViewFor(typeof(IGistCreationViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)] 
     public partial class GistCreationView : GenericGistCreationView

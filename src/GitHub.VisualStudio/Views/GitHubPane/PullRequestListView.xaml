@@ -1,27 +1,22 @@
 ﻿<local:GenericPullRequestListView x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestListView"
                                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                  xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                                  xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+                                  xmlns:ghfvs="https://github.com/github/VisualStudio"
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
                                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                                  xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-                                  xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                   xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-                                  xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
                                   mc:Ignorable="d"
-                                  AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListViewCustom}">
+                                  AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
 
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
-        <sampleData:PullRequestListViewModelDesigner />
+        <ghfvs:PullRequestListViewModelDesigner />
       </Binding.Source>
     </Binding>
   </d:DesignProperties.DataContext>
@@ -29,9 +24,9 @@
   <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/PullRequestListItem.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/PullRequestListItem.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
       <Style x:Key="PullRequestListItemContainerStyle" TargetType="{x:Type ListViewItem}">
@@ -113,54 +108,54 @@
 
       <WrapPanel Grid.Column="0" HorizontalAlignment="Left">
 
-        <ui:LinkDropDown ItemsSource="{Binding States}"
+        <ghfvs:LinkDropDown ItemsSource="{Binding States}"
                          SelectedItem="{Binding SelectedState}"
-                         AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListStatusFilterComboBox}" />
+                         AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListStatusFilterComboBox}" />
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ui:LinkDropDown Header="Assignee"
+        <ghfvs:LinkDropDown Header="Assignee"
                          ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAssignee}"
-                         AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
+                         AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
           
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ui:LinkDropDown Header="Author"
+        <ghfvs:LinkDropDown Header="Author"
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"
-                         AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAuthorFilterComboBox}" />          
+                         AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListAuthorFilterComboBox}" />          
         <Separator Style="{StaticResource VerticalSeparator}" />
         
-        <ui:LinkDropDown ItemsSource="{Binding Repositories}"
+        <ghfvs:LinkDropDown ItemsSource="{Binding Repositories}"
                          SelectedItem="{Binding SelectedRepository}">
-          <ui:LinkDropDown.Resources>
-            <Style TargetType="{x:Type ui:LinkDropDown}" BasedOn="{StaticResource {x:Type ui:LinkDropDown}}">
+          <ghfvs:LinkDropDown.Resources>
+            <Style TargetType="{x:Type ghfvs:LinkDropDown}" BasedOn="{StaticResource {x:Type ghfvs:LinkDropDown}}">
               <Style.Triggers>
                 <DataTrigger Binding="{Binding Repositories.Count}" Value="1">
                   <Setter Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
               </Style.Triggers>
             </Style>
-          </ui:LinkDropDown.Resources>
-          <ui:LinkDropDown.ItemTemplate>
+          </ghfvs:LinkDropDown.Resources>
+          <ghfvs:LinkDropDown.ItemTemplate>
             <DataTemplate>
               <TextBlock Text="{Binding CloneUrl.NameWithOwner}"/>
             </DataTemplate>
-          </ui:LinkDropDown.ItemTemplate>
-          <ui:LinkDropDown.LinkItemTemplate>
+          </ghfvs:LinkDropDown.ItemTemplate>
+          <ghfvs:LinkDropDown.LinkItemTemplate>
             <DataTemplate>
               <TextBlock Text="{Binding CloneUrl.NameWithOwner}"/>
             </DataTemplate>
-          </ui:LinkDropDown.LinkItemTemplate>
-        </ui:LinkDropDown>
+          </ghfvs:LinkDropDown.LinkItemTemplate>
+        </ghfvs:LinkDropDown>
       </WrapPanel>
 
-      <ui:GitHubActionLink Grid.Column="1"
+      <ghfvs:GitHubActionLink Grid.Column="1"
                            HorizontalAlignment="Right"
                            Command="{Binding CreatePullRequest}"
                            Content="Create New"
-                           AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateNewHyperlink}" />
+                           AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateNewHyperlink}" />
     </Grid>
 
     <ListView x:Name="pullRequests"
