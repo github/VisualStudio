@@ -42,8 +42,8 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type GroupItem}">
-                                    <Expander Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-                                              Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                    <Expander Background="{DynamicResource GitHubFileExpanderHeaderBackgroundBrush}"
+                                              Foreground="{DynamicResource VsBrush.WindowText}"
                                               IsExpanded="True"
                                               Padding="0 4 4 4">
                                         <Expander.Header>
@@ -53,6 +53,7 @@
                                                 <ghfvs:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2"/>
                                                 <ghfvs:TrimmedPathTextBlock Grid.Column="1"
                                                                             FontWeight="SemiBold"
+                                                                            Foreground="{DynamicResource VsBrush.WindowText}"
                                                                             Text="{Binding Name}"
                                                                             ToolTip="{Binding Name}"/>
                                             </DockPanel>
@@ -61,7 +62,7 @@
                                                       Grid.IsSharedSizeScope="True">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                                                    <Border BorderBrush="{DynamicResource GitHubFileExpanderHeaderBackgroundBrush}"
                                                             BorderThickness="1 0 1 1">
                                                         <ghfvs:GitHubActionLink Command="{Binding Open}"
                                                                                 Content="{Binding Body, Converter={ghfvs:TrimNewlinesConverter}, Mode=OneWay}"
