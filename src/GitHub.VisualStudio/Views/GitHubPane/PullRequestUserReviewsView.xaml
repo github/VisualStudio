@@ -45,7 +45,7 @@
                            TextWrapping="Wrap"/>
                 <StackPanel Orientation="Horizontal" Margin="0 4">
                     <c:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
-                    <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
+                    <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
             </StackPanel>
@@ -75,20 +75,20 @@
                                         </TextBlock>
                                     </StackPanel>
                                 </Expander.Header>
-                                <StackPanel Margin="16 4 0 4">
+                                <StackPanel Margin="21 4 0 4">
                                     <Expander IsExpanded="True"
                                               Margin="0 4"
                                               Visibility="{Binding Body, Converter={ui:NullToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Description</TextBlock>
+                                            <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold">Description</TextBlock>
                                         </Expander.Header>
-                                        <markdig:MarkdownViewer Margin="22 4 0 0" Markdown="{Binding Body}"/>
+                                        <markdig:MarkdownViewer Margin="22 4 0 0" Foreground="{DynamicResource VsBrush.WindowText}" Markdown="{Binding Body}"/>
                                     </Expander>
                                     <Expander IsExpanded="True"
                                               Margin="0 4"
                                               Visibility="{Binding FileComments.Count, Converter={ui:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Comments</TextBlock>
+                                            <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold">Comments</TextBlock>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" 
                                                                            Margin="22 4 0 0"/>
@@ -96,7 +96,7 @@
                                     <Expander Margin="0 4"
                                               Visibility="{Binding OutdatedFileComments.Count, Converter={ui:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Outdated comments</TextBlock>
+                                            <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold">Outdated comments</TextBlock>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding OutdatedFileComments}"
                                                                            Margin="22 4 0 0"/>

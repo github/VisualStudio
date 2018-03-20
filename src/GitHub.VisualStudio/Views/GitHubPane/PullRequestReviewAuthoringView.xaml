@@ -30,15 +30,18 @@
 
     <ScrollViewer>
         <StackPanel Margin="8,0">
-            <TextBlock FontSize="16" Margin="0 4">
+            <TextBlock FontSize="16" Margin="0 4 0 0">
                 <Run>Submit your review for</Run>
                 <Hyperlink Command="{Binding NavigateToPullRequest}">
                     <Run>#</Run><Run Text="{Binding PullRequestModel.Number, Mode=OneWay}"/>
                 </Hyperlink>
             </TextBlock>
             <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding PullRequestModel.Title}" TextWrapping="Wrap"/>
-            <TextBlock Margin="0 4">Review summary</TextBlock>
+            <TextBlock Margin="0 12 0 4">Your review summary</TextBlock>
             <TextBox AcceptsReturn="True"
+                     Background="{DynamicResource VsBrush.BrandedUIBackground}"
+                     Foreground="{DynamicResource VsBrush.BrandedUIText}"
+                     BorderBrush="{DynamicResource VsBrush.ActiveBorder}"
                      Margin="0 4"
                      MinHeight="120"
                      Padding="0 4"
@@ -92,7 +95,7 @@
                     <local:PullRequestFilesView DataContext="{Binding Files}"/>
                 </TabItem>
                 <TabItem Header="{Binding FileComments.Count}"
-                         HeaderStringFormat="File comments ({0})"
+                         HeaderStringFormat="Your file comments ({0})"
                          Style="{DynamicResource GitHubPRDetailsTabItem}">
                     <local:PullRequestFileCommentsView DataContext="{Binding FileComments}"/>
                 </TabItem>

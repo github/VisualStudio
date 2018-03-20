@@ -64,4 +64,6 @@
 
   <SolidColorBrush x:Key="GitHubPeekViewBackground" Color="#F5F5F5" />
   <SolidColorBrush x:Key="GitHubMultilineListItemActiveBrush" Color="#FFCCCEDB"/>
+
+  <Color x:Key="GitHubFileExpanderHeaderBackgroundColor">#ffeeeef2</Color>
 </ResourceDictionary>

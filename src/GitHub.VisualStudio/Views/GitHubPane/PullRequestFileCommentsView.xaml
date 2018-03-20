@@ -39,7 +39,7 @@
              BorderThickness="0"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ListBox.Resources>
-            <SolidColorBrush x:Key="GitHubExpanderHeaderBackground" Color="#F5F5F5"/>
+            <SolidColorBrush x:Key="GitHubExpanderHeaderBackground" Color="{DynamicResource GitHubFileExpanderHeaderBackgroundColor}"/>
         </ListBox.Resources>
         <ListBox.GroupStyle>
             <GroupStyle>
@@ -52,11 +52,12 @@
                                               Padding="0 4 4 4">
                                         <Expander.Header>
                                             <DockPanel>
-                                                <ui:OcticonImage DockPanel.Dock="Left" Icon="file_text" Margin="2 0"/>
-                                                <TextBlock DockPanel.Dock="Right" Text="{Binding Items.Count, Mode=OneWay}"/>
-                                                <ui:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2"/>
+                                                <ui:OcticonImage DockPanel.Dock="Left" Icon="file_text" Foreground="{DynamicResource VsBrush.WindowText}" Margin="2 0"/>
+                                                <TextBlock DockPanel.Dock="Right" Text="{Binding Items.Count, Mode=OneWay}" Foreground="{DynamicResource VsBrush.WindowText}"/>
+                                                <ui:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2" Foreground="{DynamicResource VsBrush.WindowText}"/>
                                                 <ui:TrimmedPathTextBlock Grid.Column="1"
                                                                          FontWeight="SemiBold"
+                                                                         Foreground="{DynamicResource VsBrush.WindowText}"
                                                                          Text="{Binding Name}"
                                                                          ToolTip="{Binding Name}"/>
                                             </DockPanel>
