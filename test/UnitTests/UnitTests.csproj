@@ -257,6 +257,8 @@
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
     <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestFilesViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestReviewViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestUserReviewsViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Services\PullRequestEditorServiceTests.cs" />
     <Compile Include="GitHub.App\Services\OAuthCallbackListenerTests.cs" />
     <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />
