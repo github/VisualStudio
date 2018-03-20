@@ -424,10 +424,10 @@
     <!-- Expander -->
 
     <!-- 
-         A toggle button that displays a triangle expander icon for use in an Expander.
-         Note that when the button is disabled, the triangle expander is hidden.  This is because
-         this is the behavior we want in the only place where we use disabled expanders currently 
-         (PullRequestUserReviewsView).
+         A toggle button that displays a triangle expander for use in an Expander. Note that when 
+         the button is disabled, the triangle expander is hidden.  This is because this is the
+         behavior we want in the only place where we use disabled expanders currently (in 
+         PullRequestUserReviewsView).
     -->
     <Style x:Key="TriangleToggleButton" TargetType="{x:Type ToggleButton}">
         <Setter Property="Template">
@@ -436,13 +436,18 @@
                     <Border Background="{TemplateBinding Background}"
                             Padding="{TemplateBinding Padding}">
                         <DockPanel>
-                            <ui:OcticonImage x:Name="arrow"
-                                DockPanel.Dock="Left"
-                                Height="10"
-                                Margin="5,0,0,0"
-                                Icon="triangle_right"
-                                Foreground="{TemplateBinding Foreground}"
-                                Visibility="{TemplateBinding IsEnabled, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+                            <Border Background="Transparent" Width="10" Margin="5,0">
+                                <Path Name="arrow"
+                                      DockPanel.Dock="Left"
+                                      Fill="{TemplateBinding Foreground}"
+                                      Height="7"
+                                      Width="7"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      Stretch="UniformToFill"
+                                      Data="M7 1l-.025 5H2z"
+                                      Visibility="{TemplateBinding IsEnabled, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+                            </Border>
                             <ContentPresenter Margin="0"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -452,8 +457,12 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="arrow" Property="Icon" Value="triangle_down" />
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="arrow" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-45" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
