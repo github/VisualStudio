@@ -41,8 +41,9 @@ namespace GitHub.VisualStudio
             await base.InitializeAsync(cancellationToken, progress);
             await GetServiceAsync(typeof(IUsageTracker));
 
-            // This package might be loaded on demand so we must await initialization of menus.
-            await InitializeMenus();
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
         }
 
         void LogVersionInformation()
@@ -59,7 +60,7 @@ namespace GitHub.VisualStudio
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
             menuService.AddCommands(
                 exports.GetExportedValue<IAddConnectionCommand>(),
                 exports.GetExportedValue<IBlameLinkCommand>(),
