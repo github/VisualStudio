@@ -7,7 +7,6 @@ using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Exports;
 using GitHub.Logging;
@@ -59,9 +58,8 @@ namespace GitHub.VisualStudio
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
-
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
-            menuService.AddCommands(
+            var commands = new IVsCommandBase[]
+            {
                 exports.GetExportedValue<IAddConnectionCommand>(),
                 exports.GetExportedValue<IBlameLinkCommand>(),
                 exports.GetExportedValue<ICopyLinkCommand>(),
@@ -69,7 +67,11 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenLinkCommand>(),
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>());
+                exports.GetExportedValue<IShowGitHubPaneCommand>()
+            };
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
