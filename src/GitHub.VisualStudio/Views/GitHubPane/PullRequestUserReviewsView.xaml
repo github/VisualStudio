@@ -52,6 +52,7 @@
                             <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
                             <Expander Margin="0 0 4 0"
+                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
                                       IsExpanded="{Binding IsExpanded, Mode=OneTime}"
                                       IsEnabled="{Binding HasDetails}">
                                 <Expander.Header>
@@ -69,7 +70,8 @@
                                     </StackPanel>
                                 </Expander.Header>
                                 <StackPanel Margin="16 4 0 4">
-                                    <Expander IsExpanded="True"
+                                    <Expander Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                              IsExpanded="True"
                                               Margin="0 4"
                                               Visibility="{Binding Body, Converter={ghfvs:NullToVisibilityConverter}}">
                                         <Expander.Header>
