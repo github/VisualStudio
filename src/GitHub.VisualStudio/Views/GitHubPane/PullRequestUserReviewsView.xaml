@@ -69,7 +69,8 @@
                                         </TextBlock>
                                     </StackPanel>
                                 </Expander.Header>
-                                <StackPanel Margin="16 4 0 4">
+                                <StackPanel Margin="16 4 0 4"
+                                            Visibility="{Binding HasDetails, Converter={ghfvs:BooleanToVisibilityConverter}}">
                                     <Expander Foreground="{DynamicResource GitHubVsToolWindowText}"
                                               IsExpanded="True"
                                               Margin="0 4"
