@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
@@ -7,6 +8,7 @@ using ReactiveUI;
 
 namespace GitHub.SampleData
 {
+    [ExcludeFromCodeCoverage]
     public class PullRequestUserReviewsViewModelDesigner : PanePageViewModelBase, IPullRequestUserReviewsViewModel
     {
         public PullRequestUserReviewsViewModelDesigner()
@@ -65,11 +67,6 @@ namespace GitHub.SampleData
         public ReactiveCommand<object> NavigateToPullRequest { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Load(IAccount user, IPullRequestModel pullRequest)
         {
             return Task.CompletedTask;
         }

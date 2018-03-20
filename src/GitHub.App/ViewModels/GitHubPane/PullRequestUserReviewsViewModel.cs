@@ -139,14 +139,14 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        async Task Load(IAccount user, IPullRequestModel pullRequest)
+        async Task Load(IAccount author, IPullRequestModel pullRequest)
         {
             IsBusy = true;
 
             try
             {
                 session = await sessionManager.GetSession(pullRequest);
-                User = user;
+                User = author;
                 PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();
@@ -154,7 +154,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.SubmittedAt))
                 {
-                    if (review.User.Login == user.Login &&
+                    if (review.User.Login == author.Login &&
                         review.State != PullRequestReviewState.Pending)
                     {
                         var vm = new PullRequestReviewViewModel(editorService, session, pullRequest, review);

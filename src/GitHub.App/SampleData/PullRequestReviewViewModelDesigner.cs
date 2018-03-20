@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
@@ -7,6 +8,7 @@ using ReactiveUI;
 
 namespace GitHub.SampleData
 {
+    [ExcludeFromCodeCoverage]
     public class PullRequestReviewViewModelDesigner : PanePageViewModelBase, IPullRequestReviewViewModel
     {
         public PullRequestReviewViewModelDesigner()
@@ -67,19 +69,5 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public IPullRequestModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public string StateDisplay { get; set; }
-
-        public Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
-            string owner,
-            IPullRequestModel pullRequest,
-            long pullRequestReviewId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Load(IPullRequestModel pullRequest)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -14,10 +14,6 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestReviewViewModel : ViewModelBase, IPullRequestReviewViewModel
     {
-        static readonly ILogger log = LogManager.ForContext<PullRequestReviewViewModel>();
-
-        readonly IPullRequestEditorService editorService;
-        readonly IPullRequestSession session;
         bool isExpanded;
 
         /// <summary>
@@ -36,9 +32,6 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotNull(model, nameof(model));
-
-            this.editorService = editorService;
-            this.session = session;
 
             Model = model;
             Body = string.IsNullOrWhiteSpace(Model.Body) ? null : Model.Body;
