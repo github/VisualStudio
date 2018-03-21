@@ -401,4 +401,7 @@
   <data name="TokenPrompt" xml:space="preserve">
     <value>Token</value>
   </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>Press Enter to navigate to Editor</value>
+  </data>
 </root>

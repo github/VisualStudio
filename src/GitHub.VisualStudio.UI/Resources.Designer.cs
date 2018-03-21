@@ -484,6 +484,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Press Enter to navigate to Editor.
+        /// </summary>
+        public static string NavigateToEditorStatusMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No repositories.
         /// </summary>
         public static string noRepositoriesMessageText {

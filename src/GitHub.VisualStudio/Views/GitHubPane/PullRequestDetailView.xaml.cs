@@ -74,6 +74,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         [Import]
         IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }
 
+        [Import]
+        IStatusBarNotificationService StatusBarNotificationService { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -247,6 +250,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
             EnableNavigateToEditor(view, file);
+
+            textView.GotAggregateFocus += (s, e) =>
+                StatusBarNotificationService.ShowMessage(UI.Resources.NavigateToEditorStatusMessage);
+
+            textView.LostAggregateFocus += (s, e) =>
+                StatusBarNotificationService.ShowMessage(string.Empty);
         }
 
         void EnableNavigateToEditor(IVsTextView textView, IPullRequestFileNode file)
