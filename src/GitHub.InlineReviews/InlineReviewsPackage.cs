@@ -8,7 +8,6 @@ using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
@@ -28,24 +27,15 @@ namespace GitHub.InlineReviews
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            // Avoid delays when there is ongoing UI activity.
-            // See: https://github.com/github/VisualStudio/issues/1537
-            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
-        }
-
-        async Task InitializeMenus()
-        {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            var exports = componentModel.DefaultExportProvider;
-            var commands = new IVsCommandBase[]
-            {
+            menuService.AddCommands(
                 exports.GetExportedValue<INextInlineCommentCommand>(),
-                exports.GetExportedValue<IPreviousInlineCommentCommand>()
-            };
-
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
-            menuService.AddCommands(commands);
+                exports.GetExportedValue<IPreviousInlineCommentCommand>());
         }
+
+        // The IDesignerHost and ISelectionService services are requested by MenuCommandService.EnsureVerbs().
+        // When called from a non-Main thread this would throw despite the fact these services don't exist.
+        // This override allows IMenuCommandService.AddCommands to be called form a background thread.
+        protected override object GetService(Type serviceType)
+            => (serviceType == typeof(ISelectionService) || serviceType == typeof(IDesignerHost)) ? null : base.GetService(serviceType);
     }
 }
