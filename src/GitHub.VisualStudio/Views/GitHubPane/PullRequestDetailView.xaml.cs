@@ -136,7 +136,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             {
                 if (!ViewModel.IsCheckedOut)
                 {
-                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    ShowInfoMessage(UI.Resources.NavigateToEditorNotCheckedOutInfoMessage);
                     return;
                 }
 
