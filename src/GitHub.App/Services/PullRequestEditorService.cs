@@ -71,9 +71,26 @@ namespace GitHub.Services
 
             try
             {
-                var file = await session.GetFile(relativePath);
-                var fullPath = GetAbsolutePath(session, file);
-                var fileName = workingDirectory ? fullPath : await ExtractFile(session, file, true);
+                var fullPath = Path.Combine(session.LocalRepository.LocalPath, relativePath);
+                string fileName;
+                string commitSha;
+
+                if (workingDirectory)
+                {
+                    fileName = fullPath;
+                    commitSha = null;
+                }
+                else
+                {
+                    var file = await session.GetFile(relativePath);
+                    fileName = await pullRequestService.ExtractToTempFile(
+                        session.LocalRepository,
+                        session.PullRequest,
+                        file.RelativePath,
+                        file.CommitSha,
+                        pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath));
+                    commitSha = file.CommitSha;
+                }
 
                 using (workingDirectory ? null : OpenInProvisionalTab())
                 {
@@ -84,7 +101,7 @@ namespace GitHub.Services
 
                     if (!workingDirectory)
                     {
-                        AddBufferTag(buffer, session, fullPath, null);
+                        AddBufferTag(buffer, session, fullPath, commitSha, null);
                     }
                 }
 
@@ -100,21 +117,33 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task OpenDiff(
-            IPullRequestSession session,
-            string relativePath,
-            bool workingDirectory)
+        public async Task OpenDiff(IPullRequestSession session, string relativePath, string headSha)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
 
             try
             {
-                var file = await session.GetFile(relativePath);
+                var workingDirectory = headSha == null;
+                var file = await session.GetFile(relativePath, headSha ?? "HEAD");
+                var mergeBase = await pullRequestService.GetMergeBase(session.LocalRepository, session.PullRequest);
+                var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath);
                 var rightPath = file.RelativePath;
                 var leftPath = await GetBaseFileName(session, file);
-                var rightFile = workingDirectory ? GetAbsolutePath(session, file) : await ExtractFile(session, file, true);
-                var leftFile = await ExtractFile(session, file, false);
+                var rightFile = workingDirectory ?
+                    Path.Combine(session.LocalRepository.LocalPath, relativePath) :
+                    await pullRequestService.ExtractToTempFile(
+                        session.LocalRepository,
+                        session.PullRequest,
+                        relativePath,
+                        file.CommitSha,
+                        encoding);
+                var leftFile = await pullRequestService.ExtractToTempFile(
+                    session.LocalRepository,
+                    session.PullRequest,
+                    relativePath,
+                    mergeBase,
+                    encoding);
                 var leftLabel = $"{leftPath};{session.GetBaseBranchDisplay()}";
                 var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {session.PullRequest.Number}";
                 var caption = $"Diff - {Path.GetFileName(file.RelativePath)}";
@@ -148,14 +177,11 @@ namespace GitHub.Services
                 frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
-                AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, DiffSide.Left);
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, mergeBase, DiffSide.Left);
 
                 if (!workingDirectory)
                 {
-                    AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, DiffSide.Right);
-                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
-                    EnableNavigateToEditor(diffViewer.RightView, session, file);
-                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
+                    AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, file.CommitSha, DiffSide.Right);
                 }
 
                 if (workingDirectory)
@@ -179,7 +205,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(thread, nameof(thread));
 
-            await OpenDiff(session, relativePath, false);
+            await OpenDiff(session, relativePath, thread.CommitSha);
 
             // HACK: We need to wait here for the diff view to set itself up and move its cursor
             // to the first changed line. There must be a better way of doing this.
@@ -365,11 +391,16 @@ namespace GitHub.Services
             statusBar.ShowMessage(message + ": " + e.Message);
         }
 
-        void AddBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, DiffSide? side)
+        void AddBufferTag(
+            ITextBuffer buffer,
+            IPullRequestSession session,
+            string path,
+            string commitSha,
+            DiffSide? side)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, path, side));
+                () => new PullRequestTextBufferInfo(session, path, commitSha, side));
 
             var projection = buffer as IProjectionBuffer;
 
@@ -377,7 +408,7 @@ namespace GitHub.Services
             {
                 foreach (var source in projection.SourceBuffers)
                 {
-                    AddBufferTag(source, session, path, side);
+                    AddBufferTag(source, session, path, commitSha, side);
                 }
             }
         }
@@ -428,19 +459,6 @@ namespace GitHub.Services
             {
                 ShowErrorInStatusBar("Error navigating to editor", e);
             }
-        }
-
-        async Task<string> ExtractFile(IPullRequestSession session, IPullRequestSessionFile file, bool head)
-        {
-            var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath);
-            var relativePath = head ? file.RelativePath : await GetBaseFileName(session, file);
-
-            return await pullRequestService.ExtractFile(
-                session.LocalRepository,
-                session.PullRequest,
-                relativePath,
-                head,
-                encoding).ToTask();
         }
 
         ITextBuffer GetBufferAt(string filePath)

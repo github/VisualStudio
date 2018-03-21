@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -13,11 +14,10 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestReviewFileCommentViewModel : IPullRequestReviewFileCommentViewModel
     {
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "This will be used in a later PR")]
         readonly IPullRequestEditorService editorService;
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "This will be used in a later PR")]
         readonly IPullRequestSession session;
         readonly IPullRequestReviewCommentModel model;
+        IInlineCommentThreadModel thread;
 
         public PullRequestReviewFileCommentViewModel(
             IPullRequestEditorService editorService,
@@ -31,6 +31,8 @@ namespace GitHub.ViewModels.GitHubPane
             this.editorService = editorService;
             this.session = session;
             this.model = model;
+
+            Open = ReactiveCommand.CreateAsyncTask(DoOpen);
         }
 
         /// <inheritdoc/>
@@ -41,5 +43,27 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> Open { get; }
+
+        async Task DoOpen(object o)
+        {
+            try
+            {
+                if (thread == null)
+                {
+                    var commit = model.Position.HasValue ? model.CommitId : model.OriginalCommitId;
+                    var file = await session.GetFile(RelativePath, commit);
+                    thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Id == model.Id));
+                }
+
+                if (thread != null && thread.LineNumber != -1)
+                {
+                    await editorService.OpenDiff(session, RelativePath, thread);
+                }
+            }
+            catch (Exception)
+            {
+                // TODO: Show error.
+            }
+        }
     }
 }

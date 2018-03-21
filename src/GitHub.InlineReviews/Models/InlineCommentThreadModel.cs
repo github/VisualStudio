@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.Models
         /// Initializes a new instance of the <see cref="InlineCommentThreadModel"/> class.
         /// </summary>
         /// <param name="relativePath">The relative path to the file that the thread is on.</param>
-        /// <param name="originalCommitSha">The SHA of the commit that the thread was left con.</param>
+        /// <param name="commitSha">The SHA of the commit that the thread appears on.</param>
         /// <param name="originalPosition">
         /// The 1-based line number in the original diff that the thread was left on.
         /// </param>
@@ -28,20 +28,18 @@ namespace GitHub.InlineReviews.Models
         /// </param>
         public InlineCommentThreadModel(
             string relativePath,
-            string originalCommitSha,
-            int originalPosition,
+            string commitSha,
             IList<DiffLine> diffMatch,
             IEnumerable<IPullRequestReviewCommentModel> comments)
         {
             Guard.ArgumentNotNull(relativePath, nameof(relativePath));
-            Guard.ArgumentNotNull(originalCommitSha, nameof(originalCommitSha));
+            Guard.ArgumentNotNull(commitSha, nameof(commitSha));
             Guard.ArgumentNotNull(diffMatch, nameof(diffMatch));
 
             Comments = comments.ToList();
             DiffMatch = diffMatch;
             DiffLineType = diffMatch[0].Type;
-            OriginalCommitSha = originalCommitSha;
-            OriginalPosition = originalPosition;
+            CommitSha = commitSha;
             RelativePath = relativePath;
         }
 
@@ -69,10 +67,7 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public string OriginalCommitSha { get; }
-
-        /// <inheritdoc/>
-        public int OriginalPosition { get; }
+        public string CommitSha { get; }
 
         /// <inheritdoc/>
         public string RelativePath { get; }

@@ -67,21 +67,23 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestSessionFile> GetFile(string relativePath)
+        public async Task<IPullRequestSessionFile> GetFile(
+            string relativePath,
+            string commitSha = "HEAD")
         {
             await getFilesLock.WaitAsync();
 
             try
             {
                 PullRequestSessionFile file;
+                var normalizedPath = relativePath.Replace("\\", "/");
+                var key = normalizedPath + '@' + commitSha;
 
-                relativePath = relativePath.Replace("\\", "/");
-
-                if (!fileIndex.TryGetValue(relativePath, out file))
+                if (!fileIndex.TryGetValue(key, out file))
                 {
-                    file = new PullRequestSessionFile(relativePath);
+                    file = new PullRequestSessionFile(normalizedPath, commitSha);
                     await UpdateFile(file);
-                    fileIndex.Add(relativePath, file);
+                    fileIndex.Add(key, file);
                 }
 
                 return file;
@@ -174,9 +176,9 @@ namespace GitHub.InlineReviews.Services
         {
             var mergeBaseSha = await GetMergeBase();
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = PullRequest.Head.Sha;
+            file.CommitSha = file.IsTrackingHead ? PullRequest.Head.Sha : file.CommitSha;
             file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
-            file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff);
+            file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff, file.CommitSha);
         }
 
         async Task<IReadOnlyList<IPullRequestSessionFile>> CreateAllFiles()
