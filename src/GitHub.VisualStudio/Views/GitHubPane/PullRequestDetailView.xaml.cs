@@ -251,8 +251,10 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
             EnableNavigateToEditor(view, file);
 
+            var statusMessage = ViewModel.IsCheckedOut ?
+                UI.Resources.NavigateToEditorStatusMessage : UI.Resources.NavigateToEditorNotCheckedOutStatusMessage;
             textView.GotAggregateFocus += (s, e) =>
-                StatusBarNotificationService.ShowMessage(UI.Resources.NavigateToEditorStatusMessage);
+                StatusBarNotificationService.ShowMessage(statusMessage);
 
             textView.LostAggregateFocus += (s, e) =>
                 StatusBarNotificationService.ShowMessage(string.Empty);

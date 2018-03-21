@@ -484,6 +484,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checkout PR branch and press Enter to navigate to Editor.
+        /// </summary>
+        public static string NavigateToEditorNotCheckedOutStatusMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorNotCheckedOutStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Press Enter to navigate to Editor.
         /// </summary>
         public static string NavigateToEditorStatusMessage {
