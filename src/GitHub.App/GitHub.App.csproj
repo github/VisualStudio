@@ -212,6 +212,7 @@
     <Compile Include="Models\PullRequestDetailArgument.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewFileCommentViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="ViewModels\GitHubPane\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestReviewAuthoringViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewFileCommentViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewSummaryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewViewModel.cs" />

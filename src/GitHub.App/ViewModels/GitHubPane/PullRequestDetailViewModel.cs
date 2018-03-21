@@ -620,7 +620,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (review.State == PullRequestReviewState.Pending)
             {
-                throw new NotImplementedException();
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
             }
             else
             {
