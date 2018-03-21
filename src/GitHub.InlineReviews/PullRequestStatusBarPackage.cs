@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
-using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace GitHub.InlineReviews
 {
@@ -27,9 +27,9 @@ namespace GitHub.InlineReviews
 
         async Task InitializeStatusBar()
         {
-            var usageTracker = (IUsageTracker)await GetServiceAsync(typeof(IUsageTracker));
-            var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
-            var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var exports = componentModel.DefaultExportProvider;
+            var barManager = exports.GetExportedValue<PullRequestStatusBarManager>();
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             barManager.StartShowingStatus();
