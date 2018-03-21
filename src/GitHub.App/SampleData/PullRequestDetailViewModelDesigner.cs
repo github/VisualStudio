@@ -125,11 +125,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
-        public Task<string> ExtractFile(IPullRequestFileNode file, bool head)
-        {
-            return null;
-        }
-
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
             return null;
