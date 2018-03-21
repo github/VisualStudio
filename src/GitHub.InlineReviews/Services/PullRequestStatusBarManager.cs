@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
@@ -9,6 +10,7 @@ using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.Models;
 using GitHub.Logging;
+using GitHub.Extensions;
 using Serilog;
 using ReactiveUI;
 
@@ -69,10 +71,15 @@ namespace GitHub.InlineReviews.Services
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestModel pullRequest)
         {
-            var pullRequestStatusViewModel = new PullRequestStatusViewModel(showCurrentPullRequestCommand);
+            var trackingCommand = new UsageTrackingCommand(showCurrentPullRequestCommand, usageTracker);
+            var pullRequestStatusViewModel = new PullRequestStatusViewModel(trackingCommand);
             pullRequestStatusViewModel.Number = pullRequest.Number;
             pullRequestStatusViewModel.Title = pullRequest.Title;
             return pullRequestStatusViewModel;
+        }
+
+        void IncrementNumberOfShowCurrentPullRequest()
+        {
         }
 
         void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
@@ -112,6 +119,42 @@ namespace GitHub.InlineReviews.Services
         {
             var contentControl = mainWindow?.Template?.FindName(StatusBarPartName, mainWindow) as ContentControl;
             return contentControl?.Content as StatusBar;
+        }
+
+        class UsageTrackingCommand : ICommand
+        {
+            readonly ICommand command;
+            readonly IUsageTracker usageTracker;
+
+            internal UsageTrackingCommand(ICommand command, IUsageTracker usageTracker)
+            {
+                this.command = command;
+                this.usageTracker = usageTracker;
+            }
+
+            public event EventHandler CanExecuteChanged
+            {
+                add
+                {
+                    command.CanExecuteChanged += value;
+                }
+
+                remove
+                {
+                    command.CanExecuteChanged -= value;
+                }
+            }
+
+            public bool CanExecute(object parameter)
+            {
+                return command.CanExecute(parameter);
+            }
+
+            public void Execute(object parameter)
+            {
+                command.Execute(parameter);
+                usageTracker.IncrementCounter(x => x.NumberOfShowCurrentPullRequest).Forget();
+            }
         }
     }
 }
