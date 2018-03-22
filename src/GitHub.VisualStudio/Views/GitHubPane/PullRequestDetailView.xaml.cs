@@ -76,6 +76,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }
 
         [Import]
+        IStatusBarNotificationService StatusBarNotificationService { get; set; }
+
+        [Import]
         IPackageSettings PackageSettings { get; set; }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
@@ -137,7 +140,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             {
                 if (!ViewModel.IsCheckedOut)
                 {
-                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    ShowInfoMessage(UI.Resources.NavigateToEditorNotCheckedOutInfoMessage);
                     return;
                 }
 
@@ -254,6 +257,14 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
             EnableNavigateToEditor(view, file);
+
+            var statusMessage = ViewModel.IsCheckedOut ?
+                UI.Resources.NavigateToEditorStatusMessage : UI.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+            textView.GotAggregateFocus += (s, e) =>
+                StatusBarNotificationService.ShowMessage(statusMessage);
+
+            textView.LostAggregateFocus += (s, e) =>
+                StatusBarNotificationService.ShowMessage(string.Empty);
         }
 
         void EnableNavigateToEditor(IVsTextView textView, IPullRequestFileNode file)
