@@ -4,15 +4,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
+using GitHub.Helpers;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.ComponentModelHost;
 using ReactiveUI;
+using Task = System.Threading.Tasks.Task;
+using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -34,16 +38,17 @@ namespace GitHub.VisualStudio.UI
         bool initialized = false;
         IDisposable viewSubscription;
         IGitHubPaneViewModel viewModel;
+        ContentControl contentControl;
 
-        FrameworkElement View
+        public FrameworkElement View
         {
-            get { return Content as FrameworkElement; }
+            get { return contentControl.Content as FrameworkElement; }
             set
             {
                 viewSubscription?.Dispose();
                 viewSubscription = null;
 
-                Content = value;
+                contentControl.Content = value;
 
                 viewSubscription = value.WhenAnyValue(x => x.DataContext)
                     .SelectMany(x =>
@@ -61,6 +66,7 @@ namespace GitHub.VisualStudio.UI
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
+            Content = contentControl = new ContentControl();
 
             BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
             {
@@ -83,17 +89,28 @@ namespace GitHub.VisualStudio.UI
         {
             if (!initialized)
             {
-                var provider = VisualStudio.Services.GitHubServiceProvider;
-                var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
-                teServiceHolder.ServiceProvider = serviceProvider;
-
-                var factory = provider.GetService<IViewViewModelFactory>();
-                viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
-                viewModel.InitializeAsync(this).Forget();
-
-                View = factory.CreateView<IGitHubPaneViewModel>();
-                View.DataContext = viewModel;
+                InitializeAsync(serviceProvider).Forget();
             }
+        }
+
+        async Task InitializeAsync(IServiceProvider serviceProvider)
+        {
+            // Allow MEF to refresh its cache on a background thread so it isn't counted against us.
+            var asyncServiceProvider = (IAsyncServiceProvider)GetService(typeof(SAsyncServiceProvider));
+            await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel));
+
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
+            var provider = VisualStudio.Services.GitHubServiceProvider;
+            var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
+            teServiceHolder.ServiceProvider = serviceProvider;
+
+            var factory = provider.GetService<IViewViewModelFactory>();
+            viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
+            viewModel.InitializeAsync(this).Forget();
+
+            View = factory.CreateView<IGitHubPaneViewModel>();
+            View.DataContext = viewModel;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "WTF CA, I'm overriding!")]

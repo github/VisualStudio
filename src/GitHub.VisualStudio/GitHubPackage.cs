@@ -136,7 +136,8 @@ namespace GitHub.VisualStudio
                 ErrorHandler.Failed(frame.Show());
             }
 
-            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
+            var gitHubPane = (GitHubPane)pane;
+            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)gitHubPane.View).DataContext;
             await viewModel.InitializeAsync(pane);
             return viewModel;
         }
