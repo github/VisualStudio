@@ -315,6 +315,7 @@
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\OpenPullRequestsCommand.cs" />
     <Compile Include="GitContextPackage.cs" />
+    <Compile Include="InitializeMefPackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Commands\AddConnectionCommand.cs" />
