@@ -4,7 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             ToolTipService.ShowDuration="600000" ToolTipService.HasDropShadow="True"
              mc:Ignorable="d">
+
+    <UserControl.ToolTip>
+        <ToolTip x:Name="CommentToolTip" />
+    </UserControl.ToolTip>
 
     <Grid>
         <Border Background="{DynamicResource GitHubGlyphMarginCommentableBackground}" BorderThickness="0,0,1,0" />
