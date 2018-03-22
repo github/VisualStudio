@@ -2,12 +2,10 @@
 using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ComponentModel.Design;
 using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Exports;
 using GitHub.Logging;
@@ -15,6 +13,7 @@ using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.UI;
+using GitHub.Services.Vssdk;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
@@ -31,36 +30,18 @@ namespace GitHub.VisualStudio
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
-    public class GitHubPackage : AsyncPackage
+    public class GitHubPackage : AsyncMenuPackage
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
 
-        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected async override Task InitializeMenusAsync(OleMenuCommandService menuService)
         {
             LogVersionInformation();
-            await base.InitializeAsync(cancellationToken, progress);
             await GetServiceAsync(typeof(IUsageTracker));
 
-            // Avoid delays when there is ongoing UI activity.
-            // See: https://github.com/github/VisualStudio/issues/1537
-            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
-        }
-
-        void LogVersionInformation()
-        {
-            var packageVersion = ApplicationInfo.GetPackageVersion(this);
-            var hostVersionInfo = ApplicationInfo.GetHostVersionInfo();
-            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
-                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
-        }
-
-        async Task InitializeMenus()
-        {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
             menuService.AddCommands(
                 exports.GetExportedValue<IAddConnectionCommand>(),
                 exports.GetExportedValue<IBlameLinkCommand>(),
@@ -70,6 +51,14 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
                 exports.GetExportedValue<IShowGitHubPaneCommand>());
+        }
+
+        void LogVersionInformation()
+        {
+            var packageVersion = ApplicationInfo.GetPackageVersion(this);
+            var hostVersionInfo = ApplicationInfo.GetHostVersionInfo();
+            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
+                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
@@ -147,7 +136,8 @@ namespace GitHub.VisualStudio
                 ErrorHandler.Failed(frame.Show());
             }
 
-            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
+            var gitHubPane = (GitHubPane)pane;
+            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)gitHubPane.View).DataContext;
             await viewModel.InitializeAsync(pane);
             return viewModel;
         }

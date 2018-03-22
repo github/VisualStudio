@@ -4,10 +4,10 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
+using GitHub.Commands;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
-using GitHub.VisualStudio;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Extensions;
@@ -19,21 +19,28 @@ namespace GitHub.InlineReviews.Services
     /// <summary>
     /// Manage the UI that shows the PR for the current branch.
     /// </summary>
+    [Export(typeof(PullRequestStatusBarManager))]
     public class PullRequestStatusBarManager
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
         readonly IUsageTracker usageTracker;
-        readonly IGitHubServiceProvider serviceProvider;
+        readonly IShowCurrentPullRequestCommand showCurrentPullRequestCommand;
 
-        IPullRequestSessionManager pullRequestSessionManager;
+        // More the moment this must be constructed on the main thread.
+        // TeamExplorerContext needs to retrieve DTE using GetService.
+        readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
 
         [ImportingConstructor]
-        public PullRequestStatusBarManager(IUsageTracker usageTracker, IGitHubServiceProvider serviceProvider)
+        public PullRequestStatusBarManager(
+            IUsageTracker usageTracker,
+            IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
+            Lazy<IPullRequestSessionManager> pullRequestSessionManager)
         {
             this.usageTracker = usageTracker;
-            this.serviceProvider = serviceProvider;
+            this.showCurrentPullRequestCommand = showCurrentPullRequestCommand;
+            this.pullRequestSessionManager = pullRequestSessionManager;
         }
 
         /// <summary>
@@ -46,8 +53,7 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                pullRequestSessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
-                pullRequestSessionManager.WhenAnyValue(x => x.CurrentSession)
+                pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
                     .Subscribe(x => RefreshCurrentSession());
             }
             catch (Exception e)
@@ -58,19 +64,22 @@ namespace GitHub.InlineReviews.Services
 
         void RefreshCurrentSession()
         {
-            var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
+            var pullRequest = pullRequestSessionManager.Value.CurrentSession?.PullRequest;
             var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(pullRequest) : null;
             ShowStatus(viewModel);
         }
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestModel pullRequest)
         {
-            var dte = serviceProvider.TryGetService<EnvDTE.DTE>();
-            var command = new RaisePullRequestCommand(dte, usageTracker);
-            var pullRequestStatusViewModel = new PullRequestStatusViewModel(command);
+            var trackingCommand = new UsageTrackingCommand(showCurrentPullRequestCommand, usageTracker);
+            var pullRequestStatusViewModel = new PullRequestStatusViewModel(trackingCommand);
             pullRequestStatusViewModel.Number = pullRequest.Number;
             pullRequestStatusViewModel.Title = pullRequest.Title;
             return pullRequestStatusViewModel;
+        }
+
+        void IncrementNumberOfShowCurrentPullRequest()
+        {
         }
 
         void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
@@ -112,42 +121,39 @@ namespace GitHub.InlineReviews.Services
             return contentControl?.Content as StatusBar;
         }
 
-        class RaisePullRequestCommand : ICommand
+        class UsageTrackingCommand : ICommand
         {
-            readonly string guid = Guids.guidGitHubCmdSetString;
-            readonly int id = PkgCmdIDList.showCurrentPullRequestCommand;
-
-            readonly EnvDTE.DTE dte;
+            readonly ICommand command;
             readonly IUsageTracker usageTracker;
 
-            internal RaisePullRequestCommand(EnvDTE.DTE dte, IUsageTracker usageTracker)
+            internal UsageTrackingCommand(ICommand command, IUsageTracker usageTracker)
             {
-                this.dte = dte;
+                this.command = command;
                 this.usageTracker = usageTracker;
-            }
-
-            public bool CanExecute(object parameter) => true;
-
-            public void Execute(object parameter)
-            {
-                try
-                {
-                    object customIn = null;
-                    object customOut = null;
-                    dte?.Commands.Raise(guid, id, ref customIn, ref customOut);
-                }
-                catch (Exception e)
-                {
-                    log.Error(e, "Couldn't raise {Guid}:{ID}", guid, id);
-                }
-
-                usageTracker.IncrementCounter(x => x.NumberOfShowCurrentPullRequest).Forget();
             }
 
             public event EventHandler CanExecuteChanged
             {
-                add { }
-                remove { }
+                add
+                {
+                    command.CanExecuteChanged += value;
+                }
+
+                remove
+                {
+                    command.CanExecuteChanged -= value;
+                }
+            }
+
+            public bool CanExecute(object parameter)
+            {
+                return command.CanExecute(parameter);
+            }
+
+            public void Execute(object parameter)
+            {
+                command.Execute(parameter);
+                usageTracker.IncrementCounter(x => x.NumberOfShowCurrentPullRequest).Forget();
             }
         }
     }

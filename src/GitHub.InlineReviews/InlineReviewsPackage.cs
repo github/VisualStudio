@@ -1,14 +1,12 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
-using System.Threading;
 using GitHub.Commands;
 using GitHub.InlineReviews.Views;
+using GitHub.Services.Vssdk;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
@@ -18,28 +16,13 @@ namespace GitHub.InlineReviews
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(PullRequestCommentsPane), DocumentLikeTool = true)]
-    public class InlineReviewsPackage : AsyncPackage
+    public class InlineReviewsPackage : AsyncMenuPackage
     {
-        protected override async Task InitializeAsync(
-            CancellationToken cancellationToken,
-            IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeMenusAsync(OleMenuCommandService menuService)
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
-            // Avoid delays when there is ongoing UI activity.
-            // See: https://github.com/github/VisualStudio/issues/1537
-            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
-        }
-
-        async Task InitializeMenus()
-        {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            var exports = componentModel.DefaultExportProvider;
-
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
             menuService.AddCommands(
                 exports.GetExportedValue<INextInlineCommentCommand>(),
                 exports.GetExportedValue<IPreviousInlineCommentCommand>());
