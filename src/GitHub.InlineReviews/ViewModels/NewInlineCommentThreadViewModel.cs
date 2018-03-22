@@ -110,6 +110,7 @@ namespace GitHub.InlineReviews.ViewModels
                 body,
                 File.CommitSha,
                 File.RelativePath.Replace("\\", "/"),
+                File.Diff,
                 diffPosition.DiffLineNumber);
 
             return model;

@@ -297,6 +297,7 @@ Line 4";
                 Substitute.For<IGitClient>(),
                 diffService,
                 Substitute.For<IApiClientFactory>(),
+                Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IUsageTracker>());
         }
 

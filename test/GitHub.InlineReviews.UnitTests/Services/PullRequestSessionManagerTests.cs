@@ -676,6 +676,7 @@ Line 4";
                     Substitute.For<IGitClient>(),
                     diff,
                     Substitute.For<IApiClientFactory>(),
+                    Substitute.For<IGraphQLClientFactory>(),
                     Substitute.For<IUsageTracker>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())

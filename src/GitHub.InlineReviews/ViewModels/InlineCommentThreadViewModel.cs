@@ -65,7 +65,8 @@ namespace GitHub.InlineReviews.ViewModels
 
             var body = (string)parameter;
             var replyId = Comments[0].Id;
-            return await Session.PostReviewComment(body, replyId);
+            var nodeId = Comments[0].NodeId;
+            return await Session.PostReviewComment(body, replyId, nodeId);
         }
     }
 }

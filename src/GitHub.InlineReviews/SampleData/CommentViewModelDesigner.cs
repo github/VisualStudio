@@ -18,6 +18,7 @@ namespace GitHub.InlineReviews.SampleData
         }
 
         public int Id { get; set; }
+        public string NodeId { get; set; }
         public string Body { get; set; }
         public string ErrorMessage { get; set; }
         public CommentEditState EditState { get; set; }

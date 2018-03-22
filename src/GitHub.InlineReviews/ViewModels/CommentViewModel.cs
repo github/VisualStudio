@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -7,8 +6,6 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
-using GitHub.UI;
-using Octokit;
 using ReactiveUI;
 using Serilog;
 
@@ -33,6 +30,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentId">The ID of the comment.</param>
+        /// <param name="commentNodeId">The GraphQL ID of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
         /// <param name="user">The author of the comment.</param>
@@ -41,6 +39,7 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             int commentId,
+            string commentNodeId,
             string body,
             CommentEditState state,
             IAccount user,
@@ -54,6 +53,7 @@ namespace GitHub.InlineReviews.ViewModels
             Thread = thread;
             CurrentUser = currentUser;
             Id = commentId;
+            NodeId = commentNodeId;
             Body = body;
             EditState = state;
             User = user;
@@ -93,7 +93,7 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             ICommentModel model)
-            : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
+            : this(thread, currentUser, model.Id, model.NodeId, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
         }
 
@@ -111,13 +111,14 @@ namespace GitHub.InlineReviews.ViewModels
                 thread,
                 currentUser,
                 0,
+                null,
                 string.Empty,
                 CommentEditState.Placeholder,
                 currentUser,
                 DateTimeOffset.MinValue);
         }
 
-        void AddErrorHandler<T>(ReactiveCommand<T> command)
+        protected void AddErrorHandler<T>(ReactiveCommand<T> command)
         {
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
         }
@@ -147,30 +148,26 @@ namespace GitHub.InlineReviews.ViewModels
             try
             {
                 ErrorMessage = null;
-                Id = (await Thread.PostComment.ExecuteAsyncTask(Body)).Id;
+
+                var model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                Id = model.Id;
+                NodeId = model.NodeId;
                 EditState = CommentEditState.None;
                 UpdatedAt = DateTimeOffset.Now;
             }
             catch (Exception e)
             {
                 var message = e.Message;
-
-                if (e is ApiValidationException)
-                {
-                    // HACK: If the user has pending review comments on the server then we can't
-                    // post new comments. The correct way to test for this would be to make a
-                    // request to /repos/:owner/:repo/pulls/:number/reviews and check for comments
-                    // with a PENDING state. For the moment however we'll just display a message.
-                    message += ". Do you have pending review comments?";
-                }
-
                 ErrorMessage = message;
-                log.Error(e, "Error posting inline comment");
+                log.Error(e, "Error posting comment");
             }
         }
 
         /// <inheritdoc/>
         public int Id { get; private set; }
+
+        /// <inheritdoc/>
+        public string NodeId { get; private set; }
 
         /// <inheritdoc/>
         public string Body
@@ -207,14 +204,10 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref updatedAt, value); }
         }
 
-        /// <summary>
-        /// Gets the current user.
-        /// </summary>
+        /// <inheritdoc/>
         public IAccount CurrentUser { get; }
 
-        /// <summary>
-        /// Gets the thread that the comment is a part of.
-        /// </summary>
+        /// <inheritdoc/>
         public ICommentThreadViewModel Thread { get; }
 
         /// <inheritdoc/>
