@@ -183,6 +183,67 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             Assert.That(target.FileComments, Has.Count.EqualTo(1));
         }
 
+        [Test]
+        public async Task Updates_Model_Id_From_PendingReviewId_When_Session_PullRequestChanged()
+        {
+            var model = CreatePullRequest();
+            var session = CreateSession(
+                "grokys",
+                CreateSessionFile(
+                    CreateInlineCommentThread(
+                        CreateReviewComment(11)),
+                    CreateInlineCommentThread(
+                        CreateReviewComment(12),
+                        CreateReviewComment(12))));
+
+            var target = CreateTarget(model, session);
+
+            await Initialize(target);
+
+            Assert.That(target.Model.Id, Is.EqualTo(0));
+
+            session.PendingReviewId.Returns(123);
+            RaisePullRequestChanged(session, model);
+
+            Assert.That(target.Model.Id, Is.EqualTo(123));
+        }
+
+        [Test]
+        public async Task Submit_Calls_Session_PostReview()
+        {
+            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+
+            var target = CreateTarget(model, session);
+
+            await Initialize(target);
+
+            target.Body = "Post review";
+            target.Submit.Execute(Octokit.PullRequestReviewEvent.Approve);
+
+            await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Approve);
+        }
+
+        [Test]
+        public async Task Submit_Closes_Page()
+        {
+            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+            var closed = false;
+
+            var target = CreateTarget(model, session);
+
+            await Initialize(target);
+            target.Body = "Post review";
+
+            target.CloseRequested.Subscribe(_ => closed = true);
+            target.Submit.Execute(Octokit.PullRequestReviewEvent.Approve);
+
+            Assert.True(closed);
+        }
+
         static PullRequestReviewAuthoringViewModel CreateTarget(
             IPullRequestModel model,
             IPullRequestSession session = null)

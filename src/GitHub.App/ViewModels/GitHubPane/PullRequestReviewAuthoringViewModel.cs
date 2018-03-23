@@ -209,10 +209,10 @@ namespace GitHub.ViewModels.GitHubPane
         {
             var result = new List<PullRequestReviewFileCommentViewModel>();
 
-            //if (Model.Id == 0 && session.PendingReviewId != 0)
-            //{
-            //    ((PullRequestReviewModel)Model).Id = session.PendingReviewId;
-            //}
+            if (Model.Id == 0 && session.PendingReviewId != 0)
+            {
+                ((PullRequestReviewModel)Model).Id = session.PendingReviewId;
+            }
 
             foreach (var file in await session.GetAllFiles())
             {

@@ -272,6 +272,18 @@ namespace GitHub.InlineReviews.Services
                 .Where(x => x.NodeId != review.NodeId)
                 .Concat(new[] { review })
                 .ToList();
+
+            if (review.State != PullRequestReviewState.Pending)
+            {
+                foreach (var comment in PullRequest.ReviewComments)
+                {
+                    if (comment.PullRequestReviewId == review.Id)
+                    {
+                        comment.IsPending = false;
+                    }
+                }
+            }
+
             await Update(PullRequest);
         }
 

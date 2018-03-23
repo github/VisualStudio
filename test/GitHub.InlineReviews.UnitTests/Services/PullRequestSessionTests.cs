@@ -343,20 +343,37 @@ Line 4";
 
                 var target = CreateTarget(service, "fork", "owner", true);
 
+                Assert.That(
+                    target.PullRequest.Reviews.Where(x => x.State == PullRequestReviewState.Pending).Count(),
+                    Is.EqualTo(1));
+
                 var submittedReview = CreatePullRequestReview(target.User, PullRequestReviewState.Approved);
                 submittedReview.NodeId.Returns("pendingReviewId");
                 service.SubmitPendingReview(null, null, null, null, Octokit.PullRequestReviewEvent.Approve)
                     .ReturnsForAnyArgs(submittedReview);
-
-                Assert.That(
-                    target.PullRequest.Reviews.Where(x => x.State == PullRequestReviewState.Pending).Count(),
-                    Is.EqualTo(1));
 
                 var model = await target.PostReview("New Review", Octokit.PullRequestReviewEvent.Approve);
 
                 Assert.That(
                     target.PullRequest.Reviews.Where(x => x.State == PullRequestReviewState.Pending).Count(),
                     Is.Zero);
+            }
+
+            [Test]
+            public async Task MarksAssociatedCommentsAsNonPending()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+                var target = CreateTarget(service, "fork", "owner", true);
+
+                Assert.That(target.PullRequest.ReviewComments[0].IsPending, Is.True);
+
+                var submittedReview = CreatePullRequestReview(target.User, PullRequestReviewState.Approved);
+                submittedReview.NodeId.Returns("pendingReviewId");
+                service.SubmitPendingReview(null, null, null, null, Octokit.PullRequestReviewEvent.Approve)
+                    .ReturnsForAnyArgs(submittedReview);
+                var model = await target.PostReview("New Review", Octokit.PullRequestReviewEvent.RequestChanges);
+
+                target.PullRequest.ReviewComments[0].Received(1).IsPending = false;
             }
 
             PullRequestSession CreateTarget(
@@ -376,6 +393,10 @@ Line 4";
 
                 if (hasPendingReview)
                 {
+                    var reviewComment = Substitute.For<IPullRequestReviewCommentModel>();
+                    reviewComment.IsPending.Returns(true);
+                    pr.ReviewComments.Returns(new[] { reviewComment });
+
                     var review = CreatePullRequestReview(user, PullRequestReviewState.Pending);
                     review.NodeId.Returns("pendingReviewId");
                     pr.Reviews.Returns(new[] { review });
