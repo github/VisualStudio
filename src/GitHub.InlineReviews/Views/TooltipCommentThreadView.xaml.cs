@@ -1,7 +1,7 @@
 ﻿using System;
-using GitHub.UI;
 using GitHub.InlineReviews.ViewModels;
 using System.Windows.Controls;
+using System.Globalization;
 
 namespace GitHub.InlineReviews.Views
 {
@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.Views
 
                 var viewModel = (ICommentThreadViewModel)DataContext;
                 var messageFormat = InlineReviews.Resources.CommentTooltipStatusOverflowMessage;
-                var message = string.Format(messageFormat, viewModel.Comments.Count);
+                var message = string.Format(CultureInfo.CurrentCulture, messageFormat, viewModel.Comments.Count);
                 StatusTextBlock.Text = message;
                 CommentScrollViewer.LayoutUpdated -= WatchForScrollBarVisible;
             }
