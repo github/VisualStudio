@@ -191,7 +191,7 @@
           <ButtonText>Blame</ButtonText>
         </Strings>
       </Button>
-      
+
       <Button guid="guidContextMenuSet" id="openFileInSolutionCommand" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -268,7 +268,11 @@
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="helpCommand" priority="0x111">
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="helpCommand" priority="0x112">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidTeamExplorerCmdSet" id="viewTfsTeamExplorerCommand" priority="0x111">
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup"/>
     </CommandPlacement>
 
@@ -287,6 +291,12 @@
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidGitHubPkg" value="{c3d3dc68-c977-411f-b3e8-03b0dccf7dfc}" />
+
+    <!-- Team Explorer command set -->
+    <GuidSymbol name="guidTeamExplorerCmdSet" value="{e234e66e-ba64-4d71-b304-16f0a4c793f5}">
+      <!-- View.TfsTeamExplorer -->
+      <IDSymbol name="viewTfsTeamExplorerCommand" value="0x4010"/>
+    </GuidSymbol>
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidGitHubCmdSet" value="{c4c91892-8881-4588-a5d9-b41e8f540f5a}">
