@@ -104,7 +104,9 @@
     <Compile Include="ViewModels\ICommentThreadViewModel.cs" />
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>

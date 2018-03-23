@@ -246,8 +246,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (Enum.TryParse(arg.ToString(), out e))
                 {
-                    await Task.Delay(1);
-                    //await session.PostReview(Body, e);
+                    await session.PostReview(Body, e);
                     Close();
                 }
             }

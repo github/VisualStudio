@@ -13,6 +13,9 @@ namespace GitHub.InlineReviews.ViewModels
         Placeholder,
     }
 
+	/// <summary>
+    /// View model for an issue or pull request comment.
+    /// </summary>
     public interface ICommentViewModel : IViewModel
     {
         /// <summary>

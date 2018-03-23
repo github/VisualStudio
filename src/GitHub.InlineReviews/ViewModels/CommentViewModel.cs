@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="state">The comment edit state.</param>
         /// <param name="user">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
-        public CommentViewModel(
+        protected CommentViewModel(
             ICommentThreadViewModel thread,
             IAccount currentUser,
             int commentId,
@@ -89,33 +89,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="model">The comment model.</param>
-        public CommentViewModel(
+        protected CommentViewModel(
             ICommentThreadViewModel thread,
             IAccount currentUser,
             ICommentModel model)
             : this(thread, currentUser, model.Id, model.NodeId, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
-        }
-
-        /// <summary>
-        /// Creates a placeholder comment which can be used to add a new comment to a thread.
-        /// </summary>
-        /// <param name="thread">The comment thread.</param>
-        /// <param name="currentUser">The current user.</param>
-        /// <returns>THe placeholder comment.</returns>
-        public static CommentViewModel CreatePlaceholder(
-            ICommentThreadViewModel thread,
-            IAccount currentUser)
-        {
-            return new CommentViewModel(
-                thread,
-                currentUser,
-                0,
-                null,
-                string.Empty,
-                CommentEditState.Placeholder,
-                currentUser,
-                DateTimeOffset.MinValue);
         }
 
         protected void AddErrorHandler<T>(ReactiveCommand<T> command)

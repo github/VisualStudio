@@ -410,4 +410,10 @@
   <data name="Reviewers" xml:space="preserve">
     <value>Reviewers</value>
   </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>Add review comment</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>Add a single comment</value>
+  </data>
 </root>
