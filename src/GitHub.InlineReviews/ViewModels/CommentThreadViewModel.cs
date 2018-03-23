@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="currentUser">The current user on null if not required.</param>
         /// <param name="commentModels">The thread comments.</param>
-        public CommentThreadViewModel(IAccount currentUser = null)
+        protected CommentThreadViewModel(IAccount currentUser = null)
         {
             Comments = new ObservableCollection<ICommentViewModel>();
             CurrentUser = currentUser;
