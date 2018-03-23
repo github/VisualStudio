@@ -53,6 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool active;
         bool refreshOnActivate;
         Uri webUrl;
+        IDisposable sessionSubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -440,6 +441,11 @@ namespace GitHub.ViewModels.GitHubPane
                     CheckoutState = new CheckoutCommandState(caption, disabled);
                     UpdateState = null;
                 }
+
+                sessionSubscription?.Dispose();
+                sessionSubscription = Session.WhenAnyValue(x => x.HasPendingReview)
+                    .Skip(1)
+                    .Subscribe(x => Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, Session.PullRequest).ToList());
 
                 if (firstLoad)
                 {
