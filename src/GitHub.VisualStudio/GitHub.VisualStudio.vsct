@@ -49,6 +49,9 @@
         <Parent guid="guidContextMenuSet" id="idGitHubContextMenu"/>
       </Group>
 
+      <Group guid="guidGitHubToolbarCmdSet" id="idTeamExplorerToolbarMenuGroup" priority="0x0300">
+        <Parent guid="guidTfsPackageGrpSet" id="itbrTeamExplorer" />
+      </Group>
     </Groups>
 
     <Menus>
@@ -281,6 +284,11 @@
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
     </CommandPlacement>
 
+    <CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand"  priority="0x0200">
+      <!--<Parent guid="guidTfsPackageGrpSet" id="icmdTeamExplorerTBRefresh"/>-->
+      <Parent guid="guidGitHubToolbarCmdSet" id="idTeamExplorerToolbarMenuGroup"/>
+    </CommandPlacement>
+
     <!-- Add Connection (Team Explorer) command -->
     <CommandPlacement guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100">
       <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup"/>
@@ -296,6 +304,13 @@
     <GuidSymbol name="guidTeamExplorerCmdSet" value="{e234e66e-ba64-4d71-b304-16f0a4c793f5}">
       <!-- View.TfsTeamExplorer -->
       <IDSymbol name="viewTfsTeamExplorerCommand" value="0x4010"/>
+    </GuidSymbol>
+
+    <!-- Team Explorer command set -->
+    <GuidSymbol name="guidTfsPackageGrpSet" value="{0a014553-a0aa-46dd-8d6b-b8e3178ca435}">
+      <!-- CommandBar -->
+      <IDSymbol name="itbrTeamExplorer" value="0x1100"/>
+      <IDSymbol name="icmdTeamExplorerTBRefresh" value="0x4014" />
     </GuidSymbol>
 
     <!-- This is the guid used to group the menu commands together -->
@@ -328,6 +343,7 @@
       <IDSymbol name="idGitHubToolbarMenuGroup" value="0x1110" />
       <IDSymbol name="idGitHubToolbarMenuGroup1" value="0x1111" />
       <IDSymbol name="idGitHubToolbarHelpMenuGroup" value="0x1112" />
+      <IDSymbol name="idTeamExplorerToolbarMenuGroup" value="0x1113" />
       <IDSymbol name="idGitHubToolbar" value="0x1120" />
       <IDSymbol name="backCommand" value="0x300" />
       <IDSymbol name="forwardCommand" value="0x301" />
