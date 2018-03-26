@@ -55,7 +55,6 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <c:AccountAvatar Grid.Column="0" VerticalAlignment="Top" Margin="2" Account="{Binding User}"/>
@@ -76,14 +75,6 @@
                                          Content="{x:Static prop:Resources.ContinueYourReview}"
                                          Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Pending}}"/>
                 </Grid>
-
-                <TextBlock Grid.ColumnSpan="3" Grid.Row="1"
-                       Margin="1 0"
-                       Foreground="{DynamicResource GitHubVsGrayText}">
-                <Run Text="{Binding StateDisplay, Mode=OneWay}"/>
-                <Run>|</Run>
-                <Run Text="{Binding FileCommentCount, Mode=OneWay, StringFormat={}{0} file comments}"/>
-                </TextBlock>
             </Grid>
         </Border>
 
