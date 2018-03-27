@@ -72,6 +72,8 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
+    <Compile Include="CommentsMargin.cs" />
+    <Compile Include="CommentsMarginProvider.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
@@ -115,6 +117,9 @@
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
+    <Compile Include="Views\CommentsMarginView.xaml.cs">
+      <DependentUpon>CommentsMarginView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DiffCommentThreadView.xaml.cs">
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
@@ -422,6 +427,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+    </Page>
+    <Page Include="Views\CommentsMarginView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DiffCommentThreadView.xaml">
       <SubType>Designer</SubType>
