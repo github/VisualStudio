@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.InlineReviews.Commands;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
@@ -16,6 +17,14 @@ namespace GitHub.InlineReviews
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
     {
+        readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
+
+        [ImportingConstructor]
+        public CommentsMarginFactory(IEnableInlineCommentsCommand enableInlineCommentsCommand)
+        {
+            this.enableInlineCommentsCommand = enableInlineCommentsCommand;
+        }
+
         /// <summary>
         /// Creates an <see cref="IWpfTextViewMargin"/> for the given <see cref="IWpfTextViewHost"/>.
         /// </summary>
@@ -26,7 +35,7 @@ namespace GitHub.InlineReviews
         /// </returns>
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
         {
-            return new CommentsMargin(wpfTextViewHost.TextView);
+            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand);
         }
     }
 }

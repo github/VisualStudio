@@ -18,7 +18,11 @@
 
     <Grid>
         <TextBlock VerticalAlignment="Center" Margin="4 0">
-            <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
+            <Button Command="{Binding EnableInlineComments}">
+                <Button.Content>
+                   <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
+                </Button.Content>
+            </Button>
             <Hyperlink>
                 <Run Text="{Binding CommentsInFile, Mode=OneWay}"/>
             </Hyperlink>
