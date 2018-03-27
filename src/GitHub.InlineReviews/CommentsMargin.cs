@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
-using GitHub.UI;
 using GitHub.InlineReviews.Views;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews
 {
     /// <summary>
     /// Margin's canvas and visual definition including both size and content
     /// </summary>
-    internal class CommentsMargin : Canvas, IWpfTextViewMargin
+    internal class CommentsMargin : IWpfTextViewMargin
     {
         /// <summary>
         /// Margin name.
@@ -31,7 +29,8 @@ namespace GitHub.InlineReviews
         /// <param name="textView">The <see cref="IWpfTextView"/> to attach the margin to.</param>
         public CommentsMargin(IWpfTextView textView)
         {
-            visualElement = new CommentsMarginView { Width = 30, ClipToBounds = true };
+            var viewModel = new CommentsMarginViewModel();
+            visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
         }
 
         /// <summary>

@@ -20,7 +20,7 @@
         <TextBlock VerticalAlignment="Center" Margin="4 0">
             <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
             <Hyperlink>
-                <Run Text="1"/>
+                <Run Text="{Binding CommentsInFile, Mode=OneWay}"/>
             </Hyperlink>
         </TextBlock>
     </Grid>
