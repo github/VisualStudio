@@ -344,7 +344,9 @@ namespace GitHub.InlineReviews.Services
                     User = user,
                 });
 
-            return await graphql.Run(addReview);
+            var result = await graphql.Run(addReview);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentStartReview);
+            return result;
         }
 
         /// <inheritdoc/>
@@ -367,6 +369,8 @@ namespace GitHub.InlineReviews.Services
                 commitId,
                 body,
                 e);
+
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts);
 
             return new PullRequestReviewModel
             {
@@ -407,7 +411,9 @@ namespace GitHub.InlineReviews.Services
                     User = user,
                 });
 
-            return await graphql.Run(mutation);
+            var result = await graphql.Run(mutation);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts);
+            return result;
         }
 
         /// <inheritdoc/>
@@ -451,7 +457,9 @@ namespace GitHub.InlineReviews.Services
                     IsPending = true,
                 });
 
-            return await graphql.Run(addComment);
+            var result = await graphql.Run(addComment);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
+            return result;
         }
 
         /// <inheritdoc/>
@@ -491,7 +499,9 @@ namespace GitHub.InlineReviews.Services
                     IsPending = true,
                 });
 
-            return await graphql.Run(addComment);
+            var result = await graphql.Run(addComment);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
+            return result;
         }
 
         /// <inheritdoc/>

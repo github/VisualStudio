@@ -42,6 +42,8 @@ namespace GitHub.Models
         public int NumberOfPRDetailsNavigateToEditor { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
         public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
+        public int NumberOfPRReviewDiffViewInlineCommentStartReview { get; set; }
+        public int NumberOfPRReviewPosts { get; set; }
         public int NumberOfShowCurrentPullRequest { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
