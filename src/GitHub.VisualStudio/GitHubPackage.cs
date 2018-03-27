@@ -28,7 +28,6 @@ namespace GitHub.VisualStudio
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
-    [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncMenuPackage
     {
@@ -137,7 +136,7 @@ namespace GitHub.VisualStudio
             }
 
             var gitHubPane = (GitHubPane)pane;
-            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)gitHubPane.View).DataContext;
+            var viewModel = (IGitHubPaneViewModel)(gitHubPane.View).DataContext;
             await viewModel.InitializeAsync(pane);
             return viewModel;
         }
