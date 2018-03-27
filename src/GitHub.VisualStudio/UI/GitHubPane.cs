@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using GitHub.Helpers;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Services;
@@ -38,17 +37,17 @@ namespace GitHub.VisualStudio.UI
         bool initialized = false;
         IDisposable viewSubscription;
         IGitHubPaneViewModel viewModel;
-        ContentControl contentControl;
+        ContentPresenter contentPresenter;
 
         public FrameworkElement View
         {
-            get { return contentControl.Content as FrameworkElement; }
+            get { return contentPresenter.Content as FrameworkElement; }
             set
             {
                 viewSubscription?.Dispose();
                 viewSubscription = null;
 
-                contentControl.Content = value;
+                contentPresenter.Content = value;
 
                 viewSubscription = value.WhenAnyValue(x => x.DataContext)
                     .SelectMany(x =>
@@ -66,7 +65,7 @@ namespace GitHub.VisualStudio.UI
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
-            Content = contentControl = new ContentControl();
+            Content = contentPresenter = new ContentPresenter();
 
             BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
             {
@@ -95,11 +94,9 @@ namespace GitHub.VisualStudio.UI
 
         async Task InitializeAsync(IServiceProvider serviceProvider)
         {
-            // Allow MEF to refresh its cache on a background thread so it isn't counted against us.
+            // Allow MEF to initialize its cache asynchronously
             var asyncServiceProvider = (IAsyncServiceProvider)GetService(typeof(SAsyncServiceProvider));
             await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel));
-
-            await ThreadingHelper.SwitchToMainThreadAsync();
 
             var provider = VisualStudio.Services.GitHubServiceProvider;
             var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
