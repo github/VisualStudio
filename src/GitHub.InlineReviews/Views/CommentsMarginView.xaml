@@ -24,7 +24,7 @@
                 </Button.Content>
             </Button>
             <Hyperlink>
-                <Run Text="{Binding CommentsInFile, Mode=OneWay}"/>
+                <Run Text="{Binding CommentsInFile}"/>
             </Hyperlink>
         </TextBlock>
     </Grid>

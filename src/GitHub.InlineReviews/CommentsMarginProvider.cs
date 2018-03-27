@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.InlineReviews.Commands;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
+using GitHub.Services;
+using GitHub.InlineReviews.Commands;
 
 namespace GitHub.InlineReviews
 {
@@ -18,11 +19,13 @@ namespace GitHub.InlineReviews
     internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
     {
         readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
+        readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
-        public CommentsMarginFactory(IEnableInlineCommentsCommand enableInlineCommentsCommand)
+        public CommentsMarginFactory(IEnableInlineCommentsCommand enableInlineCommentsCommand, IPullRequestSessionManager sessionManager)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
+            this.sessionManager = sessionManager;
         }
 
         /// <summary>
@@ -35,7 +38,7 @@ namespace GitHub.InlineReviews
         /// </returns>
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
         {
-            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand);
+            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, sessionManager);
         }
     }
 }

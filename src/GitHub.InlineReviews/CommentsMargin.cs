@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows;
+using GitHub.Services;
 using Microsoft.VisualStudio.Text.Editor;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.InlineReviews.Commands;
-using System.Windows.Input;
 
 namespace GitHub.InlineReviews
 {
@@ -29,9 +29,10 @@ namespace GitHub.InlineReviews
         /// Initializes a new instance of the <see cref="ToggleCommentsMargin"/> class for a given <paramref name="textView"/>.
         /// </summary>
         /// <param name="textView">The <see cref="IWpfTextView"/> to attach the margin to.</param>
-        public CommentsMargin(IWpfTextView textView, IEnableInlineCommentsCommand enableInlineCommentsCommand)
+        public CommentsMargin(IWpfTextView textView, IEnableInlineCommentsCommand enableInlineCommentsCommand,
+            IPullRequestSessionManager sessionManager)
         {
-            var viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand);
+            var viewModel = new CommentsMarginViewModel(sessionManager, textView.TextBuffer, enableInlineCommentsCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
         }
 
