@@ -88,13 +88,14 @@ namespace GitHub.VisualStudio.UI
         {
             if (!initialized)
             {
-                InitializeAsync(serviceProvider).Forget();
+                InitializeAsync(serviceProvider).Catch(ShowError).Forget();
             }
         }
 
         async Task InitializeAsync(IServiceProvider serviceProvider)
         {
             // Allow MEF to initialize its cache asynchronously
+            ShowInitializing();
             var asyncServiceProvider = (IAsyncServiceProvider)GetService(typeof(SAsyncServiceProvider));
             await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel));
 
@@ -104,7 +105,7 @@ namespace GitHub.VisualStudio.UI
 
             var factory = provider.GetService<IViewViewModelFactory>();
             viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
-            viewModel.InitializeAsync(this).Forget();
+            viewModel.InitializeAsync(this).Catch(ShowError).Forget();
 
             View = factory.CreateView<IGitHubPaneViewModel>();
             View.DataContext = viewModel;
@@ -143,6 +144,16 @@ namespace GitHub.VisualStudio.UI
 
             var pane = View?.DataContext as IGitHubPaneViewModel;
             UpdateSearchHost(pane?.IsSearchEnabled ?? false, pane?.SearchQuery);
+        }
+
+        void ShowInitializing()
+        {
+            View = new Label { Content = "Initializing MEF" };
+        }
+
+        void ShowError(Exception e)
+        {
+            View = new TextBox { Text = e.ToString() };
         }
 
         void UpdateSearchHost(bool enabled, string query)
