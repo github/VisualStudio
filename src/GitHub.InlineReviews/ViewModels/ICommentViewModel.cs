@@ -49,6 +49,12 @@ namespace GitHub.InlineReviews.ViewModels
         bool IsReadOnly { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether the comment is currently in the process of being
+        /// submitted.
+        /// </summary>
+        bool IsSubmitting { get; }
+
+        /// <summary>
         /// Gets the modified date of the comment.
         /// </summary>
         DateTimeOffset UpdatedAt { get; }

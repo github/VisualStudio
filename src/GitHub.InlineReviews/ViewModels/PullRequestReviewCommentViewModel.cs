@@ -120,8 +120,17 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task DoStartReview(object unused)
         {
-            await session.StartReview();
-            await CommitEdit.ExecuteAsync(null);
+            IsSubmitting = true;
+
+            try
+            {
+                await session.StartReview();
+                await CommitEdit.ExecuteAsync(null);
+            }
+            finally
+            {
+                IsSubmitting = false;
+            }
         }
     }
 }

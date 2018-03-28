@@ -20,6 +20,7 @@ namespace GitHub.InlineReviews.ViewModels
         string body;
         string errorMessage;
         bool isReadOnly;
+        bool isSubmitting;
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
@@ -127,6 +128,7 @@ namespace GitHub.InlineReviews.ViewModels
             try
             {
                 ErrorMessage = null;
+                IsSubmitting = true;
 
                 var model = await Thread.PostComment.ExecuteAsyncTask(Body);
                 Id = model.Id;
@@ -139,6 +141,10 @@ namespace GitHub.InlineReviews.ViewModels
                 var message = e.Message;
                 ErrorMessage = message;
                 log.Error(e, "Error posting comment");
+            }
+            finally
+            {
+                IsSubmitting = false;
             }
         }
 
@@ -174,6 +180,13 @@ namespace GitHub.InlineReviews.ViewModels
         {
             get { return isReadOnly; }
             set { this.RaiseAndSetIfChanged(ref isReadOnly, value); }
+        }
+
+        /// <inheritdoc/>
+        public bool IsSubmitting
+        {
+            get { return isSubmitting; }
+            protected set { this.RaiseAndSetIfChanged(ref isSubmitting, value); }
         }
 
         /// <inheritdoc/>
