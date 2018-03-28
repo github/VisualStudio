@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel.Design;
 using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using GitHub.Api;
@@ -13,7 +14,6 @@ using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.UI;
-using GitHub.Services.Vssdk;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
@@ -29,15 +29,35 @@ namespace GitHub.VisualStudio
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
-    public class GitHubPackage : AsyncMenuPackage
+    public class GitHubPackage : AsyncPackage
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
 
-        protected async override Task InitializeMenusAsync(OleMenuCommandService menuService)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             LogVersionInformation();
+            await base.InitializeAsync(cancellationToken, progress);
             await GetServiceAsync(typeof(IUsageTracker));
+            await InitializeMenus();
+        }
 
+        // The IDesignerHost and ISelectionService services are requested by MenuCommandService.EnsureVerbs().
+        // When called from a non-Main thread this would throw despite the fact these services don't exist.
+        // This override allows IMenuCommandService.AddCommands to be called form a background thread.
+        protected override object GetService(Type serviceType)
+            => (serviceType == typeof(ISelectionService) || serviceType == typeof(IDesignerHost)) ? null : base.GetService(serviceType);
+
+        void LogVersionInformation()
+        {
+            var packageVersion = ApplicationInfo.GetPackageVersion(this);
+            var hostVersionInfo = ApplicationInfo.GetHostVersionInfo();
+            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
+                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
+        }
+
+        async Task InitializeMenus()
+        {
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
 
@@ -50,14 +70,6 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
                 exports.GetExportedValue<IShowGitHubPaneCommand>());
-        }
-
-        void LogVersionInformation()
-        {
-            var packageVersion = ApplicationInfo.GetPackageVersion(this);
-            var hostVersionInfo = ApplicationInfo.GetHostVersionInfo();
-            log.Information("Initializing GitHub Extension v{PackageVersion} in {$FileDescription} ({$ProductVersion})",
-                packageVersion, hostVersionInfo.FileDescription, hostVersionInfo.ProductVersion);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)

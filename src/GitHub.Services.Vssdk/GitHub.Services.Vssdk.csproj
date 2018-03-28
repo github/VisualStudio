@@ -139,7 +139,6 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="AsyncMenuPackage.cs" />
     <Compile Include="Commands\MenuCommandServiceExtensions.cs" />
     <Compile Include="Commands\VsCommand.cs" />
     <Compile Include="Commands\VsCommandBase.cs" />
