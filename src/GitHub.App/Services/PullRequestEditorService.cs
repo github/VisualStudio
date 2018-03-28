@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using GitHub.Models;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
-using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -29,7 +30,7 @@ namespace GitHub.Services
             ErrorHandler.ThrowOnFailure(sourceView.GetCaretPos(out line, out column));
             var text1 = GetText(sourceView);
 
-            var view = OpenDocument(targetFile);
+            var view = OpenDocument(targetFile, true);
             var text2 = VsShellUtilities.GetRunningDocumentContents(serviceProvider, targetFile);
 
             var fromLines = ReadLines(text1);
@@ -169,15 +170,38 @@ namespace GitHub.Services
             return text;
         }
 
-        IVsTextView OpenDocument(string fullPath)
+        IVsTextView OpenDocument(string fullPath, bool closeFirst)
         {
             var logicalView = VSConstants.LOGVIEWID.TextView_guid;
+
+            if (closeFirst)
+            {
+                CloseDocument(fullPath, logicalView, __FRAMECLOSE.FRAMECLOSE_SaveIfDirty);
+            }
+
+            return OpenDocument(fullPath, logicalView);
+        }
+
+        IVsTextView OpenDocument(string fullPath, Guid logicalView)
+        {
             IVsUIHierarchy hierarchy;
             uint itemID;
             IVsWindowFrame windowFrame;
             IVsTextView view;
             VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
             return view;
+        }
+
+        void CloseDocument(string fullPath, Guid logicalView, __FRAMECLOSE frameClose)
+        {
+            IVsUIHierarchy hierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+            VsShellUtilities.IsDocumentOpen(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame);
+            if (windowFrame != null)
+            {
+                ErrorHandler.ThrowOnFailure(windowFrame.CloseFrame((uint)frameClose));
+            }
         }
 
         static IList<string> ReadLines(string text)
