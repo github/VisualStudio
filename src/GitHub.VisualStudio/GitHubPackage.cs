@@ -38,14 +38,11 @@ namespace GitHub.VisualStudio
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
             await GetServiceAsync(typeof(IUsageTracker));
-            await InitializeMenus();
-        }
 
-        // The IDesignerHost and ISelectionService services are requested by MenuCommandService.EnsureVerbs().
-        // When called from a non-Main thread this would throw despite the fact these services don't exist.
-        // This override allows IMenuCommandService.AddCommands to be called form a background thread.
-        protected override object GetService(Type serviceType)
-            => (serviceType == typeof(ISelectionService) || serviceType == typeof(IDesignerHost)) ? null : base.GetService(serviceType);
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
+        }
 
         void LogVersionInformation()
         {
@@ -60,8 +57,8 @@ namespace GitHub.VisualStudio
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
-
-            menuService.AddCommands(
+            var commands = new IVsCommandBase[]
+            {
                 exports.GetExportedValue<IAddConnectionCommand>(),
                 exports.GetExportedValue<IBlameLinkCommand>(),
                 exports.GetExportedValue<ICopyLinkCommand>(),
@@ -69,7 +66,11 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenLinkCommand>(),
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>());
+                exports.GetExportedValue<IShowGitHubPaneCommand>()
+            };
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
