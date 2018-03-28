@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,6 +16,7 @@ namespace GitHub.Factories
     public sealed class ModelServiceFactory : IModelServiceFactory, IDisposable
     {
         readonly IApiClientFactory apiClientFactory;
+        readonly IGraphQLClientFactory graphQLClientFactory;
         readonly IHostCacheFactory hostCacheFactory;
         readonly IAvatarProvider avatarProvider;
         readonly Dictionary<IConnection, ModelService> cache = new Dictionary<IConnection, ModelService>();
@@ -23,10 +25,12 @@ namespace GitHub.Factories
         [ImportingConstructor]
         public ModelServiceFactory(
             IApiClientFactory apiClientFactory,
+            IGraphQLClientFactory graphQLClientFactory,
             IHostCacheFactory hostCacheFactory,
             IAvatarProvider avatarProvider)
         {
             this.apiClientFactory = apiClientFactory;
+            this.graphQLClientFactory = graphQLClientFactory;
             this.hostCacheFactory = hostCacheFactory;
             this.avatarProvider = avatarProvider;
         }
@@ -43,6 +47,7 @@ namespace GitHub.Factories
                 {
                     result = new ModelService(
                         await apiClientFactory.Create(connection.HostAddress),
+                        await graphQLClientFactory.CreateConnection(connection.HostAddress),
                         await hostCacheFactory.Create(connection.HostAddress),
                         avatarProvider);
                     result.InsertUser(AccountCacheItem.Create(connection.User));

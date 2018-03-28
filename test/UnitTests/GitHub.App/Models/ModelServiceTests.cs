@@ -29,10 +29,9 @@ public class ModelServiceTests
         [Test]
         public async Task RetrievesCurrentUser()
         {
-            var apiClient = Substitute.For<IApiClient>();
             var cache = new InMemoryBlobCache();
             await cache.InsertObject<AccountCacheItem>("user", new AccountCacheItem(CreateOctokitUser("octocat")));
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(hostCache: cache);
 
             var user = await modelService.GetCurrentUser();
 
@@ -45,9 +44,8 @@ public class ModelServiceTests
         [Test]
         public async Task AddsUserToCache()
         {
-            var apiClient = Substitute.For<IApiClient>();
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(hostCache: cache);
 
             var user = await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
 
@@ -65,7 +63,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetGitIgnoreTemplates().Returns(data.ToObservable());
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
 
             var fetched = await modelService.GetGitIgnoreTemplates().ToList();
 
@@ -97,7 +95,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses().Returns(data.ToObservable());
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
 
             var fetched = await modelService.GetLicenses().ToList();
 
@@ -120,8 +118,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses()
                 .Returns(Observable.Throw<LicenseMetadata>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
-            var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient);
 
             var fetched = await modelService.GetLicenses().ToList();
 
@@ -135,7 +132,7 @@ public class ModelServiceTests
             var cache = Substitute.For<IBlobCache>();
             cache.Get(Args.String)
                 .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
 
             var fetched = await modelService.GetLicenses().ToList();
 
@@ -157,7 +154,7 @@ public class ModelServiceTests
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("snoopy")));
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             await modelService.InsertUser(new AccountCacheItem { Login = "snoopy" });
 
             var fetched = await modelService.GetAccounts();
@@ -185,7 +182,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
 
             var fetched = await modelService.GetAccounts();
@@ -214,8 +211,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetUser().Returns(users.ToObservable());
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
-            var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient);
 
             var fetched = await modelService.GetAccounts();
 
@@ -263,7 +259,7 @@ public class ModelServiceTests
             apiClient.GetRepositoriesForOrganization("github").Returns(githubRepos.ToObservable());
             apiClient.GetRepositoriesForOrganization("octokit").Returns(octokitRepos.ToObservable());
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             await modelService.InsertUser(new AccountCacheItem { Login = "opus" });
 
             var fetched = await modelService.GetRepositories().ToList();
@@ -318,7 +314,7 @@ public class ModelServiceTests
         public async Task WhenNotLoggedInReturnsEmptyCollection()
         {
             var apiClient = Substitute.For<IApiClient>();
-            var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient);
 
             var repos = await modelService.GetRepositories();
 
@@ -329,7 +325,7 @@ public class ModelServiceTests
         public async Task WhenLoggedInDoesNotBlowUpOnUnexpectedNetworkProblems()
         {
             var apiClient = Substitute.For<IApiClient>();
-            var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient);
             apiClient.GetOrganizations()
                 .Returns(Observable.Throw<Organization>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
 
@@ -346,7 +342,7 @@ public class ModelServiceTests
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             var user = await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
             //Assert.Single((await cache.GetAllObjects<AccountCacheItem>()));
 
@@ -367,7 +363,7 @@ public class ModelServiceTests
                 received = true;
                 return Observable.Return(Unit.Default);
             });
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
 
             await modelService.InvalidateAll();
             Assert.True(received);
@@ -387,7 +383,7 @@ public class ModelServiceTests
 
             var cache = new InMemoryBlobCache();
             var apiClient = Substitute.For<IApiClient>();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             var user = CreateOctokitUser(username);
             apiClient.GetUser().Returns(Observable.Return(user));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
@@ -438,7 +434,7 @@ public class ModelServiceTests
 
             var cache = new InMemoryBlobCache();
             var apiClient = Substitute.For<IApiClient>();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             var user = CreateOctokitUser(username);
             apiClient.GetUser().Returns(Observable.Return(user));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
@@ -506,7 +502,7 @@ public class ModelServiceTests
 
             var cache = new InMemoryBlobCache();
             var apiClient = Substitute.For<IApiClient>();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var modelService = CreateTarget(apiClient: apiClient, hostCache: cache);
             var user = CreateOctokitUser(username);
             apiClient.GetUser().Returns(Observable.Return(user));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
@@ -573,5 +569,18 @@ public class ModelServiceTests
                 t => { Assert.StartsWith("Live", t.Title); Assert.Equal(9, t.Number); }
             );*/
         }
+    }
+
+    static ModelService CreateTarget(
+        IApiClient apiClient = null,
+        Octokit.GraphQL.IConnection graphql = null,
+        IBlobCache hostCache = null,
+        IAvatarProvider avatarProvider = null)
+    {
+        return new ModelService(
+            apiClient ?? Substitute.For<IApiClient>(),
+            graphql ?? Substitute.For<Octokit.GraphQL.IConnection>(),
+            hostCache ?? new InMemoryBlobCache(),
+            Substitute.For<IAvatarProvider>());
     }
 }
