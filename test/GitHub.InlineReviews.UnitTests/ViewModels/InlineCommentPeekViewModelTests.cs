@@ -195,7 +195,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Test]
-        public async Task DoesntRetainSubmittedCommentInPlaceholderAfterPost()
+        public async Task CommittingEditDoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
@@ -227,6 +227,43 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             placeholder.CommitEdit.Execute(null);
 
             placeholder = target.Thread.Comments.Last();
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(placeholder.EditState));
+            Assert.That(string.Empty, Is.EqualTo(placeholder.Body));
+        }
+
+        [Test]
+        public async Task StartingReviewDoesntRetainSubmittedCommentInPlaceholderAfterPost()
+        {
+            var sessionManager = CreateSessionManager();
+            var peekSession = CreatePeekSession();
+            var target = new InlineCommentPeekViewModel(
+                CreatePeekService(lineNumber: 10),
+                peekSession,
+                sessionManager,
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
+
+            await target.Initialize();
+
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
+
+            sessionManager.CurrentSession.StartReview()
+                .ReturnsForAnyArgs(async x =>
+                {
+                    var file = await sessionManager.GetLiveFile(
+                        RelativePath,
+                        peekSession.TextView,
+                        peekSession.TextView.TextBuffer);
+                    RaiseLinesChanged(file, Tuple.Create(10, DiffSide.Right));
+                    return Substitute.For<IPullRequestReviewModel>();
+                });
+
+            var placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
+            placeholder.BeginEdit.Execute(null);
+            placeholder.Body = "Comment being edited";
+            placeholder.StartReview.Execute(null);
+
+            placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
             Assert.That(CommentEditState.Placeholder, Is.EqualTo(placeholder.EditState));
             Assert.That(string.Empty, Is.EqualTo(placeholder.Body));
         }

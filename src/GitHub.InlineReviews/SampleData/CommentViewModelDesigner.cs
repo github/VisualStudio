@@ -23,6 +23,7 @@ namespace GitHub.InlineReviews.SampleData
         public string ErrorMessage { get; set; }
         public CommentEditState EditState { get; set; }
         public bool IsReadOnly { get; set; }
+        public bool IsSubmitting { get; set; }
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }
