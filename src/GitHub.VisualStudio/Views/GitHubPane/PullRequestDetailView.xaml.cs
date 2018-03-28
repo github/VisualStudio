@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using GitHub.Settings;
 using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Extensions;
@@ -74,6 +75,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         [Import]
         IVsEditorAdaptersFactoryService EditorAdaptersFactoryService { get; set; }
 
+        [Import]
+        IStatusBarNotificationService StatusBarNotificationService { get; set; }
+
+        [Import]
+        IPackageSettings PackageSettings { get; set; }
+
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
@@ -101,14 +108,14 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 var fileName = workingDirectory ? fullPath : await ViewModel.ExtractFile(file, true);
 
                 using (workingDirectory ? null : OpenInProvisionalTab())
+                using (workingDirectory ? EnableEditorComments() : null)
                 {
-                    var window = GitHub.VisualStudio.Services.Dte.ItemOperations.OpenFile(fileName);
+                    var window = Services.Dte.ItemOperations.OpenFile(fileName);
                     window.Document.ReadOnly = !workingDirectory;
-
-                    var buffer = GetBufferAt(fileName);
 
                     if (!workingDirectory)
                     {
+                        var buffer = GetBufferAt(fileName);
                         AddBufferTag(buffer, ViewModel.Session, fullPath, null);
 
                         var textView = NavigationService.FindActiveView();
@@ -133,7 +140,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             {
                 if (!ViewModel.IsCheckedOut)
                 {
-                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    ShowInfoMessage(UI.Resources.NavigateToEditorNotCheckedOutInfoMessage);
                     return;
                 }
 
@@ -146,7 +153,10 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     return;
                 }
 
-                NavigationService.NavigateToEquivalentPosition(activeView, fullPath);
+                using (EnableEditorComments())
+                {
+                    NavigationService.NavigateToEquivalentPosition(activeView, fullPath);
+                }
 
                 await UsageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
             }
@@ -247,6 +257,14 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             var view = EditorAdaptersFactoryService.GetViewAdapter(textView);
             EnableNavigateToEditor(view, file);
+
+            var statusMessage = ViewModel.IsCheckedOut ?
+                UI.Resources.NavigateToEditorStatusMessage : UI.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+            textView.GotAggregateFocus += (s, e) =>
+                StatusBarNotificationService.ShowMessage(statusMessage);
+
+            textView.LostAggregateFocus += (s, e) =>
+                StatusBarNotificationService.ShowMessage(string.Empty);
         }
 
         void EnableNavigateToEditor(IVsTextView textView, IPullRequestFileNode file)
@@ -417,6 +435,28 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             return new NewDocumentStateScope
                 (__VSNEWDOCUMENTSTATE.NDS_Provisional,
                 VSConstants.NewDocumentStateReason.SolutionExplorer);
+        }
+
+        IDisposable EnableEditorComments() => new EnableEditorCommentsContext(PackageSettings);
+
+        // Editor comments will be enabled when a file is opened from inside this context.
+        class EnableEditorCommentsContext : IDisposable
+        {
+            readonly IPackageSettings settings;
+            bool editorComments;
+
+            internal EnableEditorCommentsContext(IPackageSettings settings)
+            {
+                this.settings = settings;
+
+                editorComments = settings.EditorComments;
+                settings.EditorComments = true;
+            }
+
+            public void Dispose()
+            {
+                settings.EditorComments = editorComments;
+            }
         }
     }
 }
