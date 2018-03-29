@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -34,9 +35,12 @@ namespace GitHub.VisualStudio.UI
     public class GitHubPane : ToolWindowPane, IServiceProviderAware
     {
         public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
+
+        readonly TaskCompletionSource<IGitHubPaneViewModel> viewModelSource =
+            new TaskCompletionSource<IGitHubPaneViewModel>();
+
         bool initialized = false;
         IDisposable viewSubscription;
-        IGitHubPaneViewModel viewModel;
         ContentPresenter contentPresenter;
 
         public FrameworkElement View
@@ -92,6 +96,8 @@ namespace GitHub.VisualStudio.UI
             }
         }
 
+        public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelSource.Task;
+
         async Task InitializeAsync(IServiceProvider serviceProvider)
         {
             // Allow MEF to initialize its cache asynchronously
@@ -104,11 +110,13 @@ namespace GitHub.VisualStudio.UI
             teServiceHolder.ServiceProvider = serviceProvider;
 
             var factory = provider.GetService<IViewViewModelFactory>();
-            viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
+            var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
             viewModel.InitializeAsync(this).Catch(ShowError).Forget();
 
             View = factory.CreateView<IGitHubPaneViewModel>();
             View.DataContext = viewModel;
+
+            viewModelSource.SetResult(viewModel);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "WTF CA, I'm overriding!")]

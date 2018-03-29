@@ -149,7 +149,7 @@ namespace GitHub.VisualStudio
             }
 
             var gitHubPane = (GitHubPane)pane;
-            var viewModel = (IGitHubPaneViewModel)(gitHubPane.View).DataContext;
+            var viewModel = await gitHubPane.GetViewModelAsync();
             await viewModel.InitializeAsync(pane);
             return viewModel;
         }
