@@ -32,14 +32,13 @@ namespace GitHub.VisualStudio.UI
     /// </para>
     /// </remarks>
     [Guid(GitHubPaneGuid)]
-    public class GitHubPane : ToolWindowPane, IServiceProviderAware
+    public class GitHubPane : ToolWindowPane
     {
         public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
 
         readonly TaskCompletionSource<IGitHubPaneViewModel> viewModelSource =
             new TaskCompletionSource<IGitHubPaneViewModel>();
 
-        bool initialized = false;
         IDisposable viewSubscription;
         ContentPresenter contentPresenter;
 
@@ -84,21 +83,12 @@ namespace GitHub.VisualStudio.UI
 
         protected override void Initialize()
         {
-            base.Initialize();
-            Initialize(this);
-        }
-
-        public void Initialize(IServiceProvider serviceProvider)
-        {
-            if (!initialized)
-            {
-                InitializeAsync(serviceProvider).Catch(ShowError).Forget();
-            }
+            InitializeAsync().Catch(ShowError).Forget();
         }
 
         public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelSource.Task;
 
-        async Task InitializeAsync(IServiceProvider serviceProvider)
+        async Task InitializeAsync()
         {
             // Allow MEF to initialize its cache asynchronously
             ShowInitializing();
@@ -107,7 +97,7 @@ namespace GitHub.VisualStudio.UI
 
             var provider = VisualStudio.Services.GitHubServiceProvider;
             var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
-            teServiceHolder.ServiceProvider = serviceProvider;
+            teServiceHolder.ServiceProvider = this;
 
             var factory = provider.GetService<IViewViewModelFactory>();
             var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
