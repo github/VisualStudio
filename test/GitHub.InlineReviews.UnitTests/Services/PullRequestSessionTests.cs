@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public void IsFalseWithNoPendingReview()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -49,7 +49,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 pr.Reviews.Returns(new[] { review });
 
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     currentUser,
                     pr,
                     Substitute.For<ILocalRepositoryModel>(),
@@ -68,7 +68,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 pr.Reviews.Returns(new[] { review });
 
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     currentUser,
                     pr,
                     Substitute.For<ILocalRepositoryModel>(),
@@ -87,7 +87,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 pr.Reviews.Returns(new[] { review });
 
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     currentUser,
                     pr,
                     Substitute.For<ILocalRepositoryModel>(),
@@ -102,7 +102,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             {
                 var currentUser = Substitute.For<IAccount>();
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     currentUser,
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -141,6 +141,29 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 Assert.That(target.HasPendingReview, Is.True);
             }
+
+            [Test]
+            public async Task IsFalseWhenReviewCancelled()
+            {
+                var currentUser = Substitute.For<IAccount>();
+                var pr = CreatePullRequest();
+                var review = CreatePullRequestReview(currentUser, PullRequestReviewState.Pending);
+                pr.Reviews.Returns(new[] { review });
+
+                var target = new PullRequestSession(
+                    Substitute.For<IPullRequestSessionService>(),
+                    currentUser,
+                    pr,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+
+                Assert.That(target.HasPendingReview, Is.True);
+
+                await target.CancelReview();
+
+                Assert.That(target.HasPendingReview, Is.False);
+            }
         }
 
         public class TheGetFileMethod
@@ -149,7 +172,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task BaseShaIsSet()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -164,7 +187,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task HeadCommitShaIsSet()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -180,7 +203,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task PinnedCommitShaIsSet()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -196,7 +219,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public async Task DiffShaIsSet()
             {
                 var diff = new List<DiffChunk>();
-                var sessionService = CreateSessionService();
+                var sessionService = CreateRealSessionService();
 
                 sessionService.Diff(
                     Arg.Any<ILocalRepositoryModel>(),
@@ -237,7 +260,7 @@ Line 4";
                 using (var diffService = new FakeDiffService())
                 {
                     var pullRequest = CreatePullRequest(comment);
-                    var service = CreateSessionService(diffService);
+                    var service = CreateRealSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
                     diffService.AddFile(FilePath, headContents, "HEAD_SHA");
@@ -260,7 +283,7 @@ Line 4";
             public async Task SameNonHeadCommitShasReturnSameFiles()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -276,7 +299,7 @@ Line 4";
             public async Task DifferentCommitShasReturnDifferentFiles()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -286,6 +309,79 @@ Line 4";
                 var file2 = await target.GetFile(FilePath, "456");
 
                 Assert.That(file1, Is.Not.SameAs(file2));
+            }
+        }
+
+        public class TheCancelReviewMethod
+        {
+            [Test]
+            public void ThrowsWithNoPendingReview()
+            {
+                var target = new PullRequestSession(
+                    CreateRealSessionService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+
+                Assert.ThrowsAsync<InvalidOperationException>(async () => await target.CancelReview());
+            }
+
+            [Test]
+            public async Task CallsServiceWithNodeId()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+                var target = CreateTargetWithPendingReview(service);
+
+                await target.CancelReview();
+
+                await service.Received(1).CancelPendingReview(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    "nodeId1");
+            }
+
+            [Test]
+            public async Task RemovesReviewFromModel()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+                var target = CreateTargetWithPendingReview(service);
+
+                await target.CancelReview();
+
+                Assert.IsEmpty(target.PullRequest.Reviews);
+            }
+
+            [Test]
+            public async Task RemovesCommentsFromModel()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+                var target = CreateTargetWithPendingReview(service);
+
+                await target.CancelReview();
+
+                Assert.IsEmpty(target.PullRequest.ReviewComments);
+            }
+
+            public static PullRequestSession CreateTargetWithPendingReview(
+                IPullRequestSessionService service)
+            {
+                var currentUser = Substitute.For<IAccount>();
+                var pr = CreatePullRequest();
+                var review = CreatePullRequestReview(currentUser, PullRequestReviewState.Pending);
+                var comment = Substitute.For<IPullRequestReviewCommentModel>();
+
+                comment.PullRequestReviewId.Returns(1);
+                pr.Reviews.Returns(new[] { review });
+                pr.ReviewComments.Returns(new[] { comment });
+
+                return new PullRequestSession(
+                    service,
+                    currentUser,
+                    pr,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
             }
         }
 
@@ -394,6 +490,7 @@ Line 4";
                 if (hasPendingReview)
                 {
                     var reviewComment = Substitute.For<IPullRequestReviewCommentModel>();
+                    reviewComment.PullRequestReviewId.Returns(1);
                     reviewComment.IsPending.Returns(true);
                     pr.ReviewComments.Returns(new[] { reviewComment });
 
@@ -522,7 +619,7 @@ Line 4";
             public async Task UpdatesThePullRequestModel()
             {
                 var target = new PullRequestSession(
-                    CreateSessionService(),
+                    CreateRealSessionService(),
                     Substitute.For<IAccount>(),
                     CreatePullRequest(),
                     Substitute.For<ILocalRepositoryModel>(),
@@ -563,7 +660,7 @@ Line 4";
                 using (var diffService = new FakeDiffService())
                 {
                     var pullRequest = CreatePullRequest(comment1);
-                    var service = CreateSessionService(diffService);
+                    var service = CreateRealSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
                     diffService.AddFile(FilePath, headContents, "HEAD_SHA");
@@ -615,7 +712,7 @@ Line 4";
                 using (var diffService = new FakeDiffService())
                 {
                     var pullRequest = CreatePullRequest(comment1);
-                    var service = CreateSessionService(diffService);
+                    var service = CreateRealSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
                     diffService.AddFile(FilePath, headContents, "123");
@@ -653,7 +750,7 @@ Line 4";
                 using (var diffService = new FakeDiffService())
                 {
                     var pullRequest = CreatePullRequest(comment);
-                    var service = CreateSessionService(diffService);
+                    var service = CreateRealSessionService(diffService);
 
                     var target = new PullRequestSession(
                         service,
@@ -722,9 +819,12 @@ Line 4";
 
         static IPullRequestReviewModel CreatePullRequestReview(
             IAccount author,
-            PullRequestReviewState state)
+            PullRequestReviewState state,
+            long id = 1)
         {
             var result = Substitute.For<IPullRequestReviewModel>();
+            result.Id.Returns(id);
+            result.NodeId.Returns("nodeId" + id);
             result.User.Returns(author);
             result.State.Returns(state);
             return result;
@@ -748,7 +848,7 @@ Line 4";
             return result;
         }
 
-        static IPullRequestSessionService CreateSessionService(IDiffService diffService = null)
+        static IPullRequestSessionService CreateRealSessionService(IDiffService diffService = null)
         {
             var result = Substitute.ForPartsOf<PullRequestSessionService>(
                 Substitute.For<IGitService>(),

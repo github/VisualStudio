@@ -244,6 +244,41 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             Assert.True(closed);
         }
 
+        [Test]
+        public async Task Cancel_Calls_Session_CancelReview_And_Closes_When_Has_Pending_Review()
+        {
+            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+            var closed = false;
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+
+            target.CloseRequested.Subscribe(_ => closed = true);
+            target.Cancel.Execute(null);
+
+            await session.Received(1).CancelReview();
+            Assert.True(closed);
+        }
+
+        [Test]
+        public async Task Cancel_Just_Closes_When_Has_No_Pending_Review()
+        {
+            var model = CreatePullRequest("shana");
+            var session = CreateSession();
+            var closed = false;
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+
+            target.CloseRequested.Subscribe(_ => closed = true);
+            target.Cancel.Execute(null);
+
+            await session.Received(0).CancelReview();
+            Assert.True(closed);
+        }
+
         static PullRequestReviewAuthoringViewModel CreateTarget(
             IPullRequestModel model,
             IPullRequestSession session = null)

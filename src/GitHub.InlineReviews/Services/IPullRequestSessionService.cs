@@ -182,6 +182,14 @@ namespace GitHub.InlineReviews.Services
             string pullRequestId);
 
         /// <summary>
+        /// Cancels a pending review on the server.
+        /// </summary>
+        /// <param name="reviewId">The GraphQL ID of the review.</param>
+        Task CancelPendingReview(
+            ILocalRepositoryModel localRepository,
+            string reviewId);
+
+        /// <summary>
         /// Posts PR review with no comments.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>

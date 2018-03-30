@@ -73,6 +73,11 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit> Submit { get; }
 
         /// <summary>
+        /// Gets a command which cancels the review.
+        /// </summary>
+        ReactiveCommand<Unit> Cancel { get; }
+
+        /// <summary>
         /// Initializes the view model for creating a new review.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
