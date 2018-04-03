@@ -35,7 +35,7 @@ namespace GitHub.Api
         {
             var credentials = new GraphQLKeychainCredentialStore(keychain, address);
             var header = new ProductHeaderValue(program.ProductHeader.Name, program.ProductHeader.Version);
-            return Task.FromResult<Octokit.GraphQL.IConnection>(new Connection(header, credentials));
+            return Task.FromResult<Octokit.GraphQL.IConnection>(new Connection(header, address.GraphQLUri, credentials));
         }
     }
 }
