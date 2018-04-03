@@ -58,5 +58,24 @@ public class ImageDownloaderTests
 
             Assert.ThrowsAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
         }
+
+        [Test]
+        public void NotFoundTwiceForSameHost_ThrowsCachedHttpRequestException()
+        {
+
+            var host = "flaky404.githubusercontent.com";
+            var url = new Uri("https://" + host + "/u/00000000?v=4");
+            var expectMessage = ImageDownloader.CachedExceptionMessage(host);
+            var httpClient = Substitute.For<IHttpClient>();
+            var response = Substitute.For<IResponse>();
+            response.StatusCode.Returns(HttpStatusCode.NotFound);
+            httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
+            var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
+
+            Assert.ThrowsAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+            var ex = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+
+            Assert.That(ex.Message, Is.EqualTo(expectMessage));
+        }
     }
 }

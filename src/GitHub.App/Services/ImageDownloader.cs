@@ -1,14 +1,15 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using GitHub.Logging;
 using Octokit;
 using Octokit.Internal;
+using System.Collections.Generic;
 
 namespace GitHub.Services
 {
@@ -17,14 +18,44 @@ namespace GitHub.Services
     public class ImageDownloader : IImageDownloader
     {
         readonly Lazy<IHttpClient> httpClient;
+        readonly IDictionary<string, Exception> exceptionCache;
 
         [ImportingConstructor]
         public ImageDownloader(Lazy<IHttpClient> httpClient)
         {
             this.httpClient = httpClient;
+            exceptionCache = new Dictionary<string, Exception>();
         }
 
         public IObservable<byte[]> DownloadImageBytes(Uri imageUri)
+        {
+            return ExceptionCachingDownloadImageBytesAsync(imageUri).ToObservable();
+        }
+
+        public static string CachedExceptionMessage(string host) => "Throwing cached exception for host: " + host;
+
+        async Task<byte[]> ExceptionCachingDownloadImageBytesAsync(Uri imageUri)
+        {
+            var host = imageUri.Host;
+
+            Exception exception;
+            if (exceptionCache.TryGetValue(host, out exception))
+            {
+                throw new HttpRequestException(CachedExceptionMessage(host), exception);
+            }
+
+            try
+            {
+                return await DownloadImageBytesAsync(imageUri);
+            }
+            catch (Exception e)
+            {
+                exceptionCache[host] = e;
+                throw;
+            }
+        }
+
+        async Task<byte[]> DownloadImageBytesAsync(Uri imageUri)
         {
             var request = new Request
             {
@@ -33,9 +64,8 @@ namespace GitHub.Services
                 Method = HttpMethod.Get,
             };
 
-            return HttpClient.Send(request)
-                .ToObservable()
-                .Select(response => GetSuccessfulBytes(imageUri, response));
+            var response = await HttpClient.Send(request);
+            return GetSuccessfulBytes(imageUri, response);
         }
 
         static byte[] GetSuccessfulBytes(Uri imageUri, IResponse response)
