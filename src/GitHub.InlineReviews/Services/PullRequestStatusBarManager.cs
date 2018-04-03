@@ -28,7 +28,7 @@ namespace GitHub.InlineReviews.Services
         readonly IUsageTracker usageTracker;
         readonly IShowCurrentPullRequestCommand showCurrentPullRequestCommand;
 
-        // More the moment this must be constructed on the main thread.
+        // At the moment this must be constructed on the main thread.
         // TeamExplorerContext needs to retrieve DTE using GetService.
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
 
