@@ -27,12 +27,15 @@ namespace GitHub.Services
             exceptionCache = new Dictionary<string, Exception>();
         }
 
+        public static string CachedExceptionMessage(string host) =>
+            "Throwing cached exception for host: " + host;
+        public static string CouldNotDownloadExceptionMessage(Uri imageUri) =>
+            string.Format(CultureInfo.InvariantCulture, "Could not download image from {0}", imageUri);
+
         public IObservable<byte[]> DownloadImageBytes(Uri imageUri)
         {
             return ExceptionCachingDownloadImageBytesAsync(imageUri).ToObservable();
         }
-
-        public static string CachedExceptionMessage(string host) => "Throwing cached exception for host: " + host;
 
         async Task<byte[]> ExceptionCachingDownloadImageBytesAsync(Uri imageUri)
         {
@@ -75,7 +78,7 @@ namespace GitHub.Services
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new HttpRequestException(string.Format(CultureInfo.InvariantCulture, "Could not download image from {0}", imageUri));
+                throw new HttpRequestException(CouldNotDownloadExceptionMessage(imageUri));
             }
 
             if (response.ContentType == null || !response.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
