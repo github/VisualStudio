@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Logging;
@@ -106,14 +108,15 @@ namespace GitHub.Services
         IHttpClient HttpClient { get { return httpClient.Value; } }
     }
 
+    [Serializable]
     public class NonImageContentException : HttpRequestException
     {
-        public NonImageContentException(string message) : base(message)
-        {
-        }
+        public NonImageContentException() { }
+        public NonImageContentException(string message) : base(message) { }
+        public NonImageContentException(string message, Exception inner) : base(message, inner) { }
 
-        public NonImageContentException(string message, Exception inner) : base(message, inner)
-        {
-        }
+        [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes",
+            Justification = "HttpRequestException doesn't have required constructor")]
+        protected NonImageContentException(SerializationInfo info, StreamingContext context) { }
     }
 }
