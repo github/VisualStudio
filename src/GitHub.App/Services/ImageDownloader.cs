@@ -18,13 +18,13 @@ namespace GitHub.Services
     public class ImageDownloader : IImageDownloader
     {
         readonly Lazy<IHttpClient> httpClient;
-        readonly IDictionary<string, Exception> exceptionCache;
+        readonly IDictionary<string, NonImageContentException> exceptionCache;
 
         [ImportingConstructor]
         public ImageDownloader(Lazy<IHttpClient> httpClient)
         {
             this.httpClient = httpClient;
-            exceptionCache = new Dictionary<string, Exception>();
+            exceptionCache = new Dictionary<string, NonImageContentException>();
         }
 
         public static string CachedExceptionMessage(string host) =>
@@ -43,17 +43,17 @@ namespace GitHub.Services
         {
             var host = imageUri.Host;
 
-            Exception exception;
+            NonImageContentException exception;
             if (exceptionCache.TryGetValue(host, out exception))
             {
-                throw new HttpRequestException(CachedExceptionMessage(host), exception);
+                throw new NonImageContentException(CachedExceptionMessage(host), exception);
             }
 
             try
             {
                 return await DownloadImageBytesAsync(imageUri);
             }
-            catch (Exception e)
+            catch (NonImageContentException e)
             {
                 exceptionCache[host] = e;
                 throw;
@@ -85,12 +85,23 @@ namespace GitHub.Services
 
             if (response.ContentType == null || !response.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             {
-                throw new HttpRequestException(NonImageContentExceptionMessage(response.ContentType));
+                throw new NonImageContentException(NonImageContentExceptionMessage(response.ContentType));
             }
 
             return response.Body as byte[];
         }
 
         IHttpClient HttpClient { get { return httpClient.Value; } }
+    }
+
+    public class NonImageContentException : HttpRequestException
+    {
+        public NonImageContentException(string message) : base(message)
+        {
+        }
+
+        public NonImageContentException(string message, Exception inner) : base(message, inner)
+        {
+        }
     }
 }

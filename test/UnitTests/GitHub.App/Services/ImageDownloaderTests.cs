@@ -43,7 +43,7 @@ public class ImageDownloaderTests
             httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
             var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
 
-            Assert.ThrowsAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+            Assert.ThrowsAsync<NonImageContentException>(async () => await target.DownloadImageBytes(url));
         }
 
         [Test]
@@ -60,41 +60,22 @@ public class ImageDownloaderTests
         }
 
         [Test]
-        public void NotFoundTwiceForSameHost_ThrowsCachedHttpRequestException()
+        public void NotFoundTwiceForSameHost_CouldNotDownloadExceptionMessage()
         {
             var host = "flaky404.githubusercontent.com";
             var url = new Uri("https://" + host + "/u/00000000?v=4");
-            var expectMessage = ImageDownloader.CachedExceptionMessage(host);
+            var expectMessage = ImageDownloader.CouldNotDownloadExceptionMessage(url);
             var httpClient = Substitute.For<IHttpClient>();
             var response = Substitute.For<IResponse>();
             response.StatusCode.Returns(HttpStatusCode.NotFound);
             httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
             var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
 
-            Assert.ThrowsAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
-            var ex = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+            var ex1 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+            var ex2 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
 
-            Assert.That(ex.Message, Is.EqualTo(expectMessage));
-        }
-
-        [Test]
-        public void NotFoundTwiceForDifferentHosts_DoesNotThrowCachedHttpRequestException()
-        {
-            var url1 = new Uri("https://host1/u/00000000?v=4");
-            var url2 = new Uri("https://host2/u/00000000?v=4");
-            var expectMessage1 = ImageDownloader.CouldNotDownloadExceptionMessage(url1);
-            var expectMessage2 = ImageDownloader.CouldNotDownloadExceptionMessage(url2);
-            var httpClient = Substitute.For<IHttpClient>();
-            var response = Substitute.For<IResponse>();
-            response.StatusCode.Returns(HttpStatusCode.NotFound);
-            httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
-            var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
-
-            var ex1 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url1));
-            var ex2 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url2));
-
-            Assert.That(ex1?.Message, Is.EqualTo(expectMessage1));
-            Assert.That(ex2?.Message, Is.EqualTo(expectMessage2));
+            Assert.That(ex1?.Message, Is.EqualTo(expectMessage));
+            Assert.That(ex2?.Message, Is.EqualTo(expectMessage));
         }
 
         [Test]
