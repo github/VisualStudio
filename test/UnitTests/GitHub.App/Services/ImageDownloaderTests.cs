@@ -62,7 +62,6 @@ public class ImageDownloaderTests
         [Test]
         public void NotFoundTwiceForSameHost_ThrowsCachedHttpRequestException()
         {
-
             var host = "flaky404.githubusercontent.com";
             var url = new Uri("https://" + host + "/u/00000000?v=4");
             var expectMessage = ImageDownloader.CachedExceptionMessage(host);
@@ -88,6 +87,50 @@ public class ImageDownloaderTests
             var httpClient = Substitute.For<IHttpClient>();
             var response = Substitute.For<IResponse>();
             response.StatusCode.Returns(HttpStatusCode.NotFound);
+            httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
+            var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
+
+            var ex1 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url1));
+            var ex2 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url2));
+
+            Assert.That(ex1?.Message, Is.EqualTo(expectMessage1));
+            Assert.That(ex2?.Message, Is.EqualTo(expectMessage2));
+        }
+
+        [Test]
+        public void NonImageContentForSameHost_ThrowsCachedHttpRequestException()
+        {
+            var host = "host";
+            var url = new Uri("https://" + host + "/image");
+            var contentType = "text/html";
+            var expectMessage1 = ImageDownloader.NonImageContentExceptionMessage(contentType);
+            var expectMessage2 = ImageDownloader.CachedExceptionMessage(host);
+            var httpClient = Substitute.For<IHttpClient>();
+            var response = Substitute.For<IResponse>();
+            response.StatusCode.Returns(HttpStatusCode.OK);
+            response.ContentType.Returns(contentType);
+            httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
+            var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
+
+            var ex1 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+            var ex2 = Assert.CatchAsync<HttpRequestException>(async () => await target.DownloadImageBytes(url));
+
+            Assert.That(ex1?.Message, Is.EqualTo(expectMessage1));
+            Assert.That(ex2?.Message, Is.EqualTo(expectMessage2));
+        }
+
+        [Test]
+        public void NonImageContentForDifferentHosts_DoesNotThrowCachedHttpRequestException()
+        {
+            var url1 = new Uri("https://host1/image");
+            var url2 = new Uri("https://host2/image");
+            var contentType = "text/html";
+            var expectMessage1 = ImageDownloader.NonImageContentExceptionMessage(contentType);
+            var expectMessage2 = ImageDownloader.NonImageContentExceptionMessage(contentType);
+            var httpClient = Substitute.For<IHttpClient>();
+            var response = Substitute.For<IResponse>();
+            response.StatusCode.Returns(HttpStatusCode.OK);
+            response.ContentType.Returns(contentType);
             httpClient.Send(null, default(CancellationToken)).ReturnsForAnyArgs(Task.FromResult(response));
             var target = new ImageDownloader(new Lazy<IHttpClient>(() => httpClient));
 

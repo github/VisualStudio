@@ -5,11 +5,11 @@ using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Logging;
 using Octokit;
 using Octokit.Internal;
-using System.Collections.Generic;
 
 namespace GitHub.Services
 {
@@ -31,6 +31,8 @@ namespace GitHub.Services
             "Throwing cached exception for host: " + host;
         public static string CouldNotDownloadExceptionMessage(Uri imageUri) =>
             string.Format(CultureInfo.InvariantCulture, "Could not download image from {0}", imageUri);
+        public static string NonImageContentExceptionMessage(string contentType) =>
+            string.Format(CultureInfo.InvariantCulture, "Server responded with a non-image content type: {0}", contentType);
 
         public IObservable<byte[]> DownloadImageBytes(Uri imageUri)
         {
@@ -83,9 +85,7 @@ namespace GitHub.Services
 
             if (response.ContentType == null || !response.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             {
-                throw new HttpRequestException(
-                    string.Format(CultureInfo.InvariantCulture,
-                        "Server responded with a non-image content type: {0}", response.ContentType));
+                throw new HttpRequestException(NonImageContentExceptionMessage(response.ContentType));
             }
 
             return response.Body as byte[];
