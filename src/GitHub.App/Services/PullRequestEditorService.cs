@@ -182,6 +182,9 @@ namespace GitHub.Services
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, file.CommitSha, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
+                    EnableNavigateToEditor(diffViewer.RightView, session, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
                 }
 
                 if (workingDirectory)
