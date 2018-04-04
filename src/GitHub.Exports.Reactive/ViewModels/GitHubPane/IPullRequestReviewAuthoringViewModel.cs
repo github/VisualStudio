@@ -68,9 +68,19 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<object> NavigateToPullRequest { get; }
 
         /// <summary>
-        /// Gets a command which submits the review.
+        /// Gets a command which submits the review as an approval.
         /// </summary>
-        ReactiveCommand<Unit> Submit { get; }
+        ReactiveCommand<Unit> Approve { get; }
+
+        /// <summary>
+        /// Gets a command which submits the review as a comment.
+        /// </summary>
+        ReactiveCommand<Unit> Comment { get; }
+
+        /// <summary>
+        /// Gets a command which submits the review requesting changes.
+        /// </summary>
+        ReactiveCommand<Unit> RequestChanges { get; }
 
         /// <summary>
         /// Gets a command which cancels the review.

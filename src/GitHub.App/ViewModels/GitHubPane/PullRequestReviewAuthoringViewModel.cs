@@ -57,7 +57,16 @@ namespace GitHub.ViewModels.GitHubPane
                 .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
-            Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
+            Approve = ReactiveCommand.CreateAsyncTask(_ => DoSubmit(Octokit.PullRequestReviewEvent.Approve));
+            Comment = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(
+                    x => x.Body,
+                    x => x.FileComments.Count,
+                    (body, comments) => !string.IsNullOrWhiteSpace(body) || comments > 0),
+                _ => DoSubmit(Octokit.PullRequestReviewEvent.Comment));
+            RequestChanges = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.Body, body => !string.IsNullOrWhiteSpace(body)),
+                _ => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges));
             Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
         }
 
@@ -112,7 +121,9 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         public ReactiveCommand<object> NavigateToPullRequest { get; }
-        public ReactiveCommand<Unit> Submit { get; }
+        public ReactiveCommand<Unit> Approve { get; }
+        public ReactiveCommand<Unit> Comment { get; }
+        public ReactiveCommand<Unit> RequestChanges { get; }
         public ReactiveCommand<Unit> Cancel { get; }
 
         public async Task InitializeAsync(
@@ -237,20 +248,15 @@ namespace GitHub.ViewModels.GitHubPane
             await Files.InitializeAsync(session, FilterComments);
         }
 
-        async Task DoSubmit(object arg)
+        async Task DoSubmit(Octokit.PullRequestReviewEvent e)
         {
             OperationError = null;
             IsBusy = true;
 
             try
             {
-                Octokit.PullRequestReviewEvent e;
-
-                if (Enum.TryParse(arg.ToString(), out e))
-                {
-                    await session.PostReview(Body, e);
-                    Close();
-                }
+                await session.PostReview(Body, e);
+                Close();
             }
             catch (Exception ex)
             {

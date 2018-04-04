@@ -209,24 +209,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Submit_Calls_Session_PostReview()
-        {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
-            var model = CreatePullRequest("shana", review);
-            var session = CreateSession();
-
-            var target = CreateTarget(model, session);
-
-            await Initialize(target);
-
-            target.Body = "Post review";
-            target.Submit.Execute(Octokit.PullRequestReviewEvent.Approve);
-
-            await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Approve);
-        }
-
-        [Test]
-        public async Task Submit_Closes_Page()
+        public async Task Approve_Calls_Session_PostReview_And_Closes()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -237,10 +220,125 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             await Initialize(target);
             target.Body = "Post review";
-
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Submit.Execute(Octokit.PullRequestReviewEvent.Approve);
+            target.Approve.Execute(null);
 
+            await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Approve);
+            Assert.True(closed);
+        }
+
+        [Test]
+        public async Task Comment_Is_Disabled_When_Has_Empty_Body_And_No_File_Comments()
+        {
+            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+
+            Assert.IsFalse(target.Comment.CanExecute(null));
+        }
+
+        [Test]
+        public async Task Comment_Is_Enabled_When_Has_Body()
+        {
+            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+            target.Body = "Review body";
+
+            Assert.IsTrue(target.Comment.CanExecute(null));
+        }
+
+        [Test]
+        public async Task Comment_Is_Enabled_When_Has_File_Comments()
+        {
+            var comment = CreateReviewComment(12);
+            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest(
+                authorLogin: "shana",
+                reviews: new[] { review },
+                reviewComments: new[] { comment });
+            var session = CreateSession();
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+            target.Body = "Review body";
+
+            Assert.IsTrue(target.Comment.CanExecute(null));
+        }
+
+        [Test]
+        public async Task Comment_Calls_Session_PostReview_And_Closes()
+        {
+            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+            var closed = false;
+
+            var target = CreateTarget(model, session);
+
+            await Initialize(target);
+            target.Body = "Post review";
+            target.CloseRequested.Subscribe(_ => closed = true);
+            target.Comment.Execute(null);
+
+            await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Comment);
+            Assert.True(closed);
+        }
+
+        [Test]
+        public async Task RequestChanges_Is_Disabled_When_Has_Empty_Body()
+        {
+            var comment = CreateReviewComment(12);
+            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest(
+                authorLogin: "shana",
+                reviews: new[] { review },
+                reviewComments: new[] { comment });
+            var session = CreateSession();
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+            target.Body = "";
+
+            Assert.IsFalse(target.RequestChanges.CanExecute(null));
+        }
+
+        [Test]
+        public async Task RequestChanges_Is_Enabled_When_Has_Body()
+        {
+            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
+            target.Body = "Request Changes";
+
+            Assert.IsTrue(target.RequestChanges.CanExecute(null));
+        }
+
+        [Test]
+        public async Task RequestChanges_Calls_Session_PostReview_And_Closes()
+        {
+            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession();
+            var closed = false;
+
+            var target = CreateTarget(model, session);
+
+            await Initialize(target);
+            target.Body = "Post review";
+            target.CloseRequested.Subscribe(_ => closed = true);
+            target.RequestChanges.Execute(null);
+
+            await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.RequestChanges);
             Assert.True(closed);
         }
 
@@ -346,6 +444,27 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 author,
                 DateTimeOffset.Now);
             result.Reviews = reviews.ToList();
+            return result;
+        }
+
+        static PullRequestModel CreatePullRequest(
+            string authorLogin = "grokys",
+            IEnumerable<IPullRequestReviewModel> reviews = null,
+            IEnumerable<IPullRequestReviewCommentModel> reviewComments = null)
+        {
+            reviews = reviews ?? new IPullRequestReviewModel[0];
+            reviewComments = reviewComments ?? new IPullRequestReviewCommentModel[0];
+
+            var author = Substitute.For<IAccount>();
+            author.Login.Returns(authorLogin);
+
+            var result = new PullRequestModel(
+                5,
+                "Pull Request",
+                author,
+                DateTimeOffset.Now);
+            result.Reviews = reviews.ToList();
+            result.ReviewComments = reviewComments.ToList();
             return result;
         }
 
