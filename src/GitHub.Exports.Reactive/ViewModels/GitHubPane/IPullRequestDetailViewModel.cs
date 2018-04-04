@@ -126,6 +126,11 @@ namespace GitHub.ViewModels.GitHubPane
         string Body { get; }
 
         /// <summary>
+        /// Gets the latest pull request review for each user.
+        /// </summary>
+        IReadOnlyList<IPullRequestReviewSummaryViewModel> Reviews { get; }
+
+        /// <summary>
         /// Gets the pull request's changed files.
         /// </summary>
         IPullRequestFilesViewModel Files { get; }
@@ -164,6 +169,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Gets a command that navigates to a pull request review.
+        /// </summary>
+        ReactiveCommand<object> ShowReview { get; }
 
         /// <summary>
         /// Initializes the view model.

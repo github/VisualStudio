@@ -294,4 +294,16 @@
 Please install Git for Windows from:
 https://git-scm.com/download/win</value>
   </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>Changes Requested</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>Commented</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>InProgress</value>
+  </data>
 </root>

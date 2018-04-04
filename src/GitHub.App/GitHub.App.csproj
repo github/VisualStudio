@@ -148,6 +148,10 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.14.3.25407\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Utilities, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.14.3.25407\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
@@ -236,6 +240,7 @@
     <Compile Include="ViewModels\GitHubPane\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestReviewSummaryViewModel.cs" />
     <Compile Include="ViewModels\RepositoryFormViewModel.cs" />
     <Compile Include="ViewModels\TeamExplorer\RepositoryPublishViewModel.cs" />
     <Compile Include="Caches\CacheIndex.cs" />

@@ -92,6 +92,7 @@
     <Compile Include="Converters\EqualityConverter.cs" />
     <Compile Include="Converters\EqualsToVisibilityConverter.cs" />
     <Compile Include="Converters\MultiBooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\NotEqualsToVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\BranchNameConverter.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />

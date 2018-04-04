@@ -401,4 +401,13 @@
   <data name="TokenPrompt" xml:space="preserve">
     <value>Token</value>
   </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>Continue your review</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>Add your review</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>Reviewers</value>
+  </data>
 </root>

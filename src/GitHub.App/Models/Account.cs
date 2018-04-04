@@ -88,7 +88,7 @@ namespace GitHub.Models
             set { avatar = value; this.RaisePropertyChanged(); }
         }
 
-#region Equality things
+        #region Equality things
         public void CopyFrom(IAccount other)
         {
             if (!Equals(other))

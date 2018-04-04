@@ -197,6 +197,7 @@
     <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestReviewSummaryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\ISearchablePageViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestDetailViewModel.cs" />
