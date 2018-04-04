@@ -151,12 +151,7 @@ namespace GitHub.VisualStudio.UI
 
         void ShowInitializing()
         {
-            View = new TextBlock
-            {
-                Text = "Initializing...",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
+            // This page is intentionally left blank.
         }
 
         void ShowError(Exception e)
