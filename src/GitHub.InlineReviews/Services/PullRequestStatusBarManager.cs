@@ -78,10 +78,6 @@ namespace GitHub.InlineReviews.Services
             return pullRequestStatusViewModel;
         }
 
-        void IncrementNumberOfShowCurrentPullRequest()
-        {
-        }
-
         void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
         {
             var statusBar = FindSccStatusBar(Application.Current.MainWindow);
