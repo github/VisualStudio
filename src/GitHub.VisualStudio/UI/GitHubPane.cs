@@ -151,7 +151,11 @@ namespace GitHub.VisualStudio.UI
 
         void ShowError(Exception e)
         {
-            View = new TextBox { Text = e.ToString() };
+            View = new TextBox
+            {
+                Text = e.ToString(),
+                IsReadOnly = true,
+            };
         }
 
         void UpdateSearchHost(bool enabled, string query)
