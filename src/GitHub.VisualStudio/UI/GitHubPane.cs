@@ -1,22 +1,20 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.ComponentModel.Design;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Services;
-using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
-using Task = System.Threading.Tasks.Task;
 using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
-using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -36,8 +34,7 @@ namespace GitHub.VisualStudio.UI
     {
         public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
 
-        readonly TaskCompletionSource<IGitHubPaneViewModel> viewModelSource =
-            new TaskCompletionSource<IGitHubPaneViewModel>();
+        JoinableTask<IGitHubPaneViewModel> viewModelTask;
 
         IDisposable viewSubscription;
         ContentPresenter contentPresenter;
@@ -83,30 +80,38 @@ namespace GitHub.VisualStudio.UI
 
         protected override void Initialize()
         {
-            InitializeAsync().Catch(ShowError).Forget();
+            viewModelTask = ThreadHelper.JoinableTaskFactory.RunAsync(InitializeAsync);
         }
 
-        public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelSource.Task;
+        public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelTask.JoinAsync();
 
-        async Task InitializeAsync()
+        async Task<IGitHubPaneViewModel> InitializeAsync()
         {
-            // Allow MEF to initialize its cache asynchronously
-            ShowInitializing();
-            var asyncServiceProvider = (IAsyncServiceProvider)GetService(typeof(SAsyncServiceProvider));
-            await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel));
+            try
+            {
+                // Allow MEF to initialize its cache asynchronously
+                ShowInitializing();
+                var asyncServiceProvider = (IAsyncServiceProvider)GetService(typeof(SAsyncServiceProvider));
+                await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel));
 
-            var provider = VisualStudio.Services.GitHubServiceProvider;
-            var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
-            teServiceHolder.ServiceProvider = this;
+                var provider = VisualStudio.Services.GitHubServiceProvider;
+                var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
+                teServiceHolder.ServiceProvider = this;
 
-            var factory = provider.GetService<IViewViewModelFactory>();
-            var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
-            await viewModel.InitializeAsync(this);
+                var factory = provider.GetService<IViewViewModelFactory>();
+                var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
+                await viewModel.InitializeAsync(this);
 
-            View = factory.CreateView<IGitHubPaneViewModel>();
-            View.DataContext = viewModel;
+                View = factory.CreateView<IGitHubPaneViewModel>();
+                View.DataContext = viewModel;
 
-            viewModelSource.SetResult(viewModel);
+                return viewModel;
+            }
+            catch (Exception e)
+            {
+                ShowError(e);
+                throw;
+            }
         }
 
         [SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "WTF CA, I'm overriding!")]
