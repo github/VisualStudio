@@ -102,6 +102,10 @@ namespace GitHub.Services
                     if (!workingDirectory)
                     {
                         AddBufferTag(buffer, session, fullPath, commitSha, null);
+
+                        var textView = FindActiveView();
+                        var file = await session.GetFile(relativePath);
+                        EnableNavigateToEditor(textView, session, file);
                     }
                 }
 
