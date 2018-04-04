@@ -516,7 +516,9 @@ namespace GitHub.Services
 
         static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)
         {
-            return Path.Combine(session.LocalRepository.LocalPath, file.RelativePath);
+            var localPath = session.LocalRepository.LocalPath;
+            var relativePath = file.RelativePath.Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(localPath, relativePath);
         }
 
         static IDisposable OpenInProvisionalTab()
