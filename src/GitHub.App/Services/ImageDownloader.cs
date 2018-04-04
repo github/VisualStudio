@@ -30,7 +30,7 @@ namespace GitHub.Services
         }
 
         public static string CachedExceptionMessage(string host) =>
-            string.Format(CultureInfo.InvariantCulture, "Host '{0}' previously returned a non-image content type ", host);
+            string.Format(CultureInfo.InvariantCulture, "Host '{0}' previously returned a non-image content type", host);
         public static string CouldNotDownloadExceptionMessage(Uri imageUri) =>
             string.Format(CultureInfo.InvariantCulture, "Could not download image from '{0}'", imageUri);
         public static string NonImageContentExceptionMessage(string contentType) =>
@@ -42,7 +42,7 @@ namespace GitHub.Services
         /// <remarks>
         /// If a host returns a non-image content type, this will be remembered and subsequent download requests
         /// to the same host will automatically throw a <see cref="NonImageContentException"/>. This prevents a
-        /// barrage of download requests when authentication is required but not supported.
+        /// barrage of download requests when authentication is required (but not currently supported).
         /// </remarks>
         /// <param name="imageUri">The URI of an image.</param>
         /// <returns>The bytes for a given image URI.</returns>
