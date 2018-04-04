@@ -149,9 +149,7 @@ namespace GitHub.VisualStudio
             }
 
             var gitHubPane = (GitHubPane)pane;
-            var viewModel = await gitHubPane.GetViewModelAsync();
-            await viewModel.InitializeAsync(pane);
-            return viewModel;
+            return await gitHubPane.GetViewModelAsync();
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)

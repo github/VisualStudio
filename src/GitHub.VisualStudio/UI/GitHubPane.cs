@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio.UI
 
             var factory = provider.GetService<IViewViewModelFactory>();
             var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
-            viewModel.InitializeAsync(this).Catch(ShowError).Forget();
+            await viewModel.InitializeAsync(this);
 
             View = factory.CreateView<IGitHubPaneViewModel>();
             View.DataContext = viewModel;
