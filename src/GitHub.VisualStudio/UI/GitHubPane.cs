@@ -146,7 +146,12 @@ namespace GitHub.VisualStudio.UI
 
         void ShowInitializing()
         {
-            View = new Label { Content = "Initializing MEF" };
+            View = new TextBlock
+            {
+                Text = "Initializing...",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
         }
 
         void ShowError(Exception e)
