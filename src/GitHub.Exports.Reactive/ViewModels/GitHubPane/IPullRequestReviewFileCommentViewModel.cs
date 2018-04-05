@@ -20,7 +20,7 @@ namespace GitHub.ViewModels.GitHubPane
         string RelativePath { get; }
 
         /// <summary>
-        /// Gets a comment which opens the comment in a diff view.
+        /// Gets a command which opens the comment in a diff view.
         /// </summary>
         ReactiveCommand<Unit> Open { get; }
     }
