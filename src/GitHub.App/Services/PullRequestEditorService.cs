@@ -420,8 +420,7 @@ namespace GitHub.Services
                         leftBufferInfo.Session.PullRequest.Number == session.PullRequest.Number &&
                         leftBufferInfo.CommitSha == mergeBase)
                     {
-                        windowFrame.Show();
-                        return true;
+                        return ErrorHandler.Succeeded(windowFrame.Show());
                     }
                 }
             }
@@ -563,8 +562,13 @@ namespace GitHub.Services
         static IDifferenceViewer GetDiffViewer(IVsWindowFrame frame)
         {
             object docView;
-            frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
-            return (docView as IVsDifferenceCodeWindow)?.DifferenceViewer;
+
+            if (ErrorHandler.Succeeded(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
+                return (docView as IVsDifferenceCodeWindow)?.DifferenceViewer;
+            }
+
+            return null;
         }
 
         static IDisposable OpenInProvisionalTab()

@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using LibGit2Sharp;
 using GitHub.Logging;
 using GitHub.Extensions;
+using static System.FormattableString;
 
 namespace GitHub.Services
 {
@@ -680,7 +681,7 @@ namespace GitHub.Services
             var key = relativeDir + '|' + encoding.WebName;
             var relativePathHash = key.GetSha256Hash();
             var tempDir = Path.Combine(Path.GetTempPath(), "GitHubVisualStudio", "FileContents", relativePathHash);
-            var tempFileName = $"{Path.GetFileNameWithoutExtension(relativePath)}@{commitSha}{Path.GetExtension(relativePath)}";
+            var tempFileName = Invariant($"{Path.GetFileNameWithoutExtension(relativePath)}@{commitSha}{Path.GetExtension(relativePath)}");
             return Path.Combine(tempDir, tempFileName);
         }
 
