@@ -149,30 +149,10 @@ namespace GitHub.Api
 
         public HostAddress HostAddress { get; }
 
-        static string GetSha256Hash(string input)
-        {
-            Guard.ArgumentNotEmptyString(input, nameof(input));
-
-            try
-            {
-                using (var sha256 = SHA256.Create())
-                {
-                    var bytes = Encoding.UTF8.GetBytes(input);
-                    var hash = sha256.ComputeHash(bytes);
-
-                    return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception");
-                return null;
-            }
-        }
-
         static string GetFingerprint()
         {
-            return GetSha256Hash(ProductName + ":" + GetMachineIdentifier());
+            var fingerprint = ProductName + ":" + GetMachineIdentifier();
+            return fingerprint.GetSha256Hash();
         }
 
         static string GetMachineNameSafe()

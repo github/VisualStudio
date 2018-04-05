@@ -16,9 +16,7 @@ using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
 using GitHub.Logging;
-using System.Security.Cryptography;
 using GitHub.Extensions;
-using Serilog;
 
 namespace GitHub.Services
 {
@@ -26,7 +24,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
-        static readonly ILogger log = LogManager.ForContext<PullRequestService>();
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
         const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
 
@@ -413,7 +410,7 @@ namespace GitHub.Services
                 {
                     var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                    log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
+                    Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found");
 
                     if (branchName != null)
                     {
@@ -681,7 +678,7 @@ namespace GitHub.Services
             // The combination of relative path, commit SHA and encoding should be sufficient to uniquely identify a file.
             var relativeDir = Path.GetDirectoryName(relativePath) ?? string.Empty;
             var key = relativeDir + '|' + encoding.WebName;
-            var relativePathHash = GetSha256Hash(key);
+            var relativePathHash = key.GetSha256Hash();
             var tempDir = Path.Combine(Path.GetTempPath(), "GitHubVisualStudio", "FileContents", relativePathHash);
             var tempFileName = $"{Path.GetFileNameWithoutExtension(relativePath)}@{commitSha}{Path.GetExtension(relativePath)}";
             return Path.Combine(tempDir, tempFileName);
@@ -712,27 +709,6 @@ namespace GitHub.Services
             }
 
             return null;
-        }
-
-        static string GetSha256Hash(string input)
-        {
-            Guard.ArgumentNotNull(input, nameof(input));
-
-            try
-            {
-                using (var sha256 = SHA256.Create())
-                {
-                    var bytes = Encoding.UTF8.GetBytes(input);
-                    var hash = sha256.ComputeHash(bytes);
-
-                    return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception");
-                return null;
-            }
         }
     }
 }
