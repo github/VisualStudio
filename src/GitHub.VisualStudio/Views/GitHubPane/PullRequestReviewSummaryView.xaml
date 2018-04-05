@@ -57,7 +57,13 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <c:AccountAvatar Grid.Column="0" VerticalAlignment="Top" Margin="2" Account="{Binding User}"/>
+                <c:AccountAvatar Grid.Column="0"
+                                 VerticalAlignment="Top"
+                                 Margin="2"
+                                 Account="{Binding User}"
+                                 Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                                 CommandParameter="{Binding}"
+                                 Cursor="Hand"/>
                 <ui:GitHubActionLink Grid.Column="1" FontWeight="SemiBold" Margin="2 1 2 0"
                                      Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                                      CommandParameter="{Binding}"
