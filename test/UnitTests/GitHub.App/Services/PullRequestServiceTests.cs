@@ -593,7 +593,14 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(fileContent));
             var file = await target.ExtractToTempFile(repository, pr, "filename", "123", Encoding.UTF8);
 
-            Assert.That(File.ReadAllText(file), Is.EqualTo(fileContent));
+            try
+            {
+                Assert.That(File.ReadAllText(file), Is.EqualTo(fileContent));
+            }
+            finally
+            {
+                File.Delete(file);
+            }
         }
 
         [Test]
@@ -607,7 +614,14 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(null));
             var file = await target.ExtractToTempFile(repository, pr, "filename", "123", Encoding.UTF8);
 
-            Assert.That(File.ReadAllText(file), Is.EqualTo(string.Empty));
+            try
+            {
+                Assert.That(File.ReadAllText(file), Is.EqualTo(string.Empty));
+            }
+            finally
+            {
+                File.Delete(file);
+            }
         }
 
         // https://github.com/github/VisualStudio/issues/1010
@@ -631,8 +645,15 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(fileContent));
             var file = await target.ExtractToTempFile(repository, pr, "filename", "123", encoding);
 
-            Assert.That(File.ReadAllText(expectedPath), Is.EqualTo(File.ReadAllText(file)));
-            Assert.That(File.ReadAllBytes(expectedPath), Is.EqualTo(File.ReadAllBytes(file)));
+            try
+            {
+                Assert.That(File.ReadAllText(expectedPath), Is.EqualTo(File.ReadAllText(file)));
+                Assert.That(File.ReadAllBytes(expectedPath), Is.EqualTo(File.ReadAllBytes(file)));
+            }
+            finally
+            {
+                File.Delete(file);
+            }
         }
 
         static IPullRequestModel CreatePullRequest()

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using EnvDTE;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -16,6 +17,7 @@ using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -128,8 +130,6 @@ namespace GitHub.Services
                 var file = await session.GetFile(relativePath, headSha ?? "HEAD");
                 var mergeBase = await pullRequestService.GetMergeBase(session.LocalRepository, session.PullRequest);
                 var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath);
-                var rightPath = file.RelativePath;
-                var leftPath = await GetBaseFileName(session, file);
                 var rightFile = workingDirectory ?
                     Path.Combine(session.LocalRepository.LocalPath, relativePath) :
                     await pullRequestService.ExtractToTempFile(
@@ -138,12 +138,20 @@ namespace GitHub.Services
                         relativePath,
                         file.CommitSha,
                         encoding);
+
+                if (FocusExistingDiffViewer(session, mergeBase, rightFile))
+                {
+                    return;
+                }
+
                 var leftFile = await pullRequestService.ExtractToTempFile(
                     session.LocalRepository,
                     session.PullRequest,
                     relativePath,
                     mergeBase,
                     encoding);
+                var leftPath = await GetBaseFileName(session, file);
+                var rightPath = file.RelativePath;
                 var leftLabel = $"{leftPath};{session.GetBaseBranchDisplay()}";
                 var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {session.PullRequest.Number}";
                 var caption = $"Diff - {Path.GetFileName(file.RelativePath)}";
@@ -173,9 +181,7 @@ namespace GitHub.Services
                         (uint)options);
                 }
 
-                object docView;
-                frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
-                var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
+                var diffViewer = GetDiffViewer(frame);
 
                 AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, mergeBase, DiffSide.Left);
 
@@ -384,6 +390,45 @@ namespace GitHub.Services
             return view;
         }
 
+        bool FocusExistingDiffViewer(
+            IPullRequestSession session,
+            string mergeBase,
+            string rightPath)
+        {
+            IVsUIHierarchy uiHierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+
+            // Diff documents are indexed by the path on the right hand side of the comparison.
+            if (VsShellUtilities.IsDocumentOpen(
+                    serviceProvider,
+                    rightPath,
+                    Guid.Empty,
+                    out uiHierarchy,
+                    out itemID,
+                    out windowFrame))
+            {
+                var diffViewer = GetDiffViewer(windowFrame);
+
+                if (diffViewer != null)
+                {
+                    PullRequestTextBufferInfo leftBufferInfo;
+
+                    if (diffViewer.LeftView.TextBuffer.Properties.TryGetProperty(
+                            typeof(PullRequestTextBufferInfo),
+                            out leftBufferInfo) &&
+                        leftBufferInfo.Session.PullRequest.Number == session.PullRequest.Number &&
+                        leftBufferInfo.CommitSha == mergeBase)
+                    {
+                        windowFrame.Show();
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         void ShowErrorInStatusBar(string message)
         {
             statusBar.ShowMessage(message);
@@ -416,7 +461,7 @@ namespace GitHub.Services
             }
         }
 
-        void EnableNavigateToEditor(IWpfTextView textView, IPullRequestSession session, IPullRequestSessionFile file)
+        void EnableNavigateToEditor(ITextView textView, IPullRequestSession session, IPullRequestSessionFile file)
         {
             var view = vsEditorAdaptersFactory.GetViewAdapter(textView);
             EnableNavigateToEditor(view, session, file);
@@ -513,6 +558,13 @@ namespace GitHub.Services
         static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)
         {
             return Path.Combine(session.LocalRepository.LocalPath, file.RelativePath);
+        }
+
+        static IDifferenceViewer GetDiffViewer(IVsWindowFrame frame)
+        {
+            object docView;
+            frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
+            return (docView as IVsDifferenceCodeWindow)?.DifferenceViewer;
         }
 
         static IDisposable OpenInProvisionalTab()
