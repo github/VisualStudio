@@ -57,15 +57,18 @@ namespace GitHub.ViewModels.GitHubPane
                 .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
+
+            var hasBodyOrComments = this.WhenAnyValue(
+                x => x.Body,
+                x => x.FileComments.Count,
+                (body, comments) => !string.IsNullOrWhiteSpace(body) || comments > 0);
+
             Approve = ReactiveCommand.CreateAsyncTask(_ => DoSubmit(Octokit.PullRequestReviewEvent.Approve));
             Comment = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(
-                    x => x.Body,
-                    x => x.FileComments.Count,
-                    (body, comments) => !string.IsNullOrWhiteSpace(body) || comments > 0),
+                hasBodyOrComments,
                 _ => DoSubmit(Octokit.PullRequestReviewEvent.Comment));
             RequestChanges = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.Body, body => !string.IsNullOrWhiteSpace(body)),
+                hasBodyOrComments,
                 _ => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges));
             Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
         }

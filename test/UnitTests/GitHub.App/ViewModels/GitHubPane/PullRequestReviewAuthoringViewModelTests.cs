@@ -257,17 +257,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Comment_Is_Enabled_When_Has_File_Comments()
         {
-            var comment = CreateReviewComment(12);
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
-            var model = CreatePullRequest(
-                authorLogin: "shana",
-                reviews: new[] { review },
-                reviewComments: new[] { comment });
-            var session = CreateSession();
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession(
+                "grokys",
+                CreateSessionFile(
+                    CreateInlineCommentThread(CreateReviewComment(12))));
 
             var target = CreateTarget(model, session);
             await Initialize(target);
-            target.Body = "Review body";
 
             Assert.IsTrue(target.Comment.CanExecute(null));
         }
@@ -292,19 +290,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task RequestChanges_Is_Disabled_When_Has_Empty_Body()
+        public async Task RequestChanges_Is_Disabled_When_Has_Empty_Body_And_No_File_RequestChangess()
         {
-            var comment = CreateReviewComment(12);
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
-            var model = CreatePullRequest(
-                authorLogin: "shana",
-                reviews: new[] { review },
-                reviewComments: new[] { comment });
+            var model = CreatePullRequest("shana", review);
             var session = CreateSession();
 
             var target = CreateTarget(model, session);
             await Initialize(target);
-            target.Body = "";
 
             Assert.IsFalse(target.RequestChanges.CanExecute(null));
         }
@@ -318,7 +311,23 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
             await Initialize(target);
-            target.Body = "Request Changes";
+            target.Body = "Review body";
+
+            Assert.IsTrue(target.RequestChanges.CanExecute(null));
+        }
+
+        [Test]
+        public async Task RequestChanges_Is_Enabled_When_Has_File_Comments()
+        {
+            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession(
+                "grokys",
+                CreateSessionFile(
+                    CreateInlineCommentThread(CreateReviewComment(12))));
+
+            var target = CreateTarget(model, session);
+            await Initialize(target);
 
             Assert.IsTrue(target.RequestChanges.CanExecute(null));
         }
