@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;

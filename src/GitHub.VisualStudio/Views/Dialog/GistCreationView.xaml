@@ -4,27 +4,24 @@
                                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
-                               xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                               xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
-                               xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-                               xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
+                               xmlns:ghfvs="https://github.com/github/VisualStudio"
                                mc:Ignorable="d"
                                d:DesignWidth="414"
                                d:DesignHeight="440"
-                               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistCreationControlCustom}">
+                               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistCreationControlCustom}">
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
     <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
-        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,10,0,-10" Panel.ZIndex="100" DockPanel.Dock="Top" />
+        <ghfvs:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,10,0,-10" Panel.ZIndex="100" DockPanel.Dock="Top" />
 
-        <ui:OcticonCircleButton
+        <ghfvs:OcticonCircleButton
             DockPanel.Dock="Bottom"
             IsDefault="True"
             Margin="0"
@@ -32,10 +29,10 @@
             HorizontalAlignment="Center"
             Icon="check">
             <TextBlock Text="{x:Static prop:Resources.CreateLink}"/>
-        </ui:OcticonCircleButton>
+        </ghfvs:OcticonCircleButton>
 
         <StackPanel>
-            <ui:HorizontalShadowDivider />
+            <ghfvs:HorizontalShadowDivider />
             <Grid
                 FocusManager.IsFocusScope="True"
                 Margin="30,-10,30,10"
@@ -51,7 +48,7 @@
                         <Setter Property="Padding" Value="0" />
                     </Style>
 
-                    <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
+                    <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                         <Setter Property="Margin" Value="0,5" />
                     </Style>
 
@@ -74,10 +71,10 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static prop:Resources.fileNameText}"/>
-                <ui:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistFileNameTextBox}" />
+                <ghfvs:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistFileNameTextBox}" />
 
                 <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.Description}"/>
-                <ui:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistDescriptionTextBlock}"/>
+                <ghfvs:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistDescriptionTextBlock}"/>
 
                 <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
                     <Image
@@ -96,16 +93,16 @@
                     Content="{x:Static prop:Resources.makePrivateGist}"
                     Style="{DynamicResource BlueRoundedCheckBox}"
                     Padding="8,4,0,4" 
-                    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PrivateGistCheckBox}" />
+                    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateGistCheckBox}" />
 
-                <uirx:ErrorMessageDisplay
+                <ghfvs:ErrorMessageDisplay
                     x:Name="errorMessage"
                     Grid.ColumnSpan="2"
                     Grid.Row="4"
                     Margin="0,10"
                     Message="{x:Static prop:Resources.gistCreationFailedMessage}">
                     <TextBlock x:Name="errorMessageText" TextWrapping="Wrap" Text="{x:Static prop:Resources.gistCreationFailedMessage}"/>
-                </uirx:ErrorMessageDisplay>
+                </ghfvs:ErrorMessageDisplay>
             </Grid>
         </StackPanel>
     </DockPanel>

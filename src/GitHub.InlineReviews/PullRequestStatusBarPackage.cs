@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
-using GitHub.Helpers;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.InlineReviews
 {
@@ -20,13 +20,19 @@ namespace GitHub.InlineReviews
         /// </summary>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeStatusBar);
+        }
+
+        async Task InitializeStatusBar()
+        {
             var usageTracker = (IUsageTracker)await GetServiceAsync(typeof(IUsageTracker));
             var serviceProvider = (IGitHubServiceProvider)await GetServiceAsync(typeof(IGitHubServiceProvider));
             var barManager = new PullRequestStatusBarManager(usageTracker, serviceProvider);
 
-            // await ThreadingHelper.SwitchToMainThreadAsync() won't return until after a solution
-            // has been loaded. We're using the following instead as a workaround.
-            await ThreadingHelper.MainThreadDispatcher.InvokeAsync(() => barManager.StartShowingStatus());
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            barManager.StartShowingStatus();
         }
     }
 }

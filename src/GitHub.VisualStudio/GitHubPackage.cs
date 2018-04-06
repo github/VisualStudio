@@ -1,20 +1,24 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using System.ComponentModel.Design;
+using System.ComponentModel.Composition;
+using System.Runtime.InteropServices;
 using GitHub.Api;
-using GitHub.Extensions;
+using GitHub.Commands;
 using GitHub.Helpers;
 using GitHub.Info;
+using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
-using GitHub.VisualStudio.Menus;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
@@ -26,25 +30,12 @@ namespace GitHub.VisualStudio
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version, IconResourceID = 400)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    // Only initialize when we're in the context of a Git repository.
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPackage>();
-
-        readonly IServiceProvider serviceProvider;
-
-        public GitHubPackage()
-        {
-            serviceProvider = this;
-        }
-
-        public GitHubPackage(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
@@ -63,11 +54,11 @@ namespace GitHub.VisualStudio
                     }
                 };
             }
-
             await GetServiceAsync(typeof(IUsageTracker));
 
-            // This package might be loaded on demand so we must await initialization of menus.
-            await InitializeMenus();
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
         }
 
         void LogVersionInformation()
@@ -80,21 +71,20 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
-            if (menus == null)
-            {
-                // Ignore if null because Expression Blend doesn't support custom services or menu extensibility.
-                return;
-            }
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var exports = componentModel.DefaultExportProvider;
 
-            // IMenuCommandService.AddCommand uses IServiceProvider.GetService and must be called on Main thread.
-            await ThreadingHelper.SwitchToMainThreadAsync();
-
-            foreach (var menu in menus.Menus)
-                serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
-
-            foreach (var menu in menus.DynamicMenus)
-                serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            menuService.AddCommands(
+                exports.GetExportedValue<IAddConnectionCommand>(),
+                exports.GetExportedValue<IBlameLinkCommand>(),
+                exports.GetExportedValue<ICopyLinkCommand>(),
+                exports.GetExportedValue<ICreateGistCommand>(),
+                exports.GetExportedValue<IOpenLinkCommand>(),
+                exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                exports.GetExportedValue<IShowGitHubPaneCommand>());
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
@@ -108,9 +98,37 @@ namespace GitHub.VisualStudio
         }
     }
 
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class ServiceProviderExports
+    {
+        // Only export services for the Visual Studio process (they don't work in Expression Blend).
+        const string ProcessName = "devenv";
+
+        readonly IServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public ServiceProviderExports([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        [ExportForProcess(typeof(ILoginManager), ProcessName)]
+        public ILoginManager LoginManager => GetService<ILoginManager>();
+
+        [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
+        public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
+
+        [ExportForProcess(typeof(IUsageTracker), ProcessName)]
+        public IUsageTracker UsageTracker => GetService<IUsageTracker>();
+
+        [ExportForProcess(typeof(IVSGitExt), ProcessName)]
+        public IVSGitExt VSGitExt => GetService<IVSGitExt>();
+
+        T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
+    }
+
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideService(typeof(IPackageSettings), IsAsyncQueryable = true)]
@@ -130,7 +148,6 @@ namespace GitHub.VisualStudio
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IUsageService), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
-            AddService(typeof(IMenuProvider), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             AddService(typeof(IPackageSettings), CreateService, true);
             return Task.CompletedTask;
@@ -219,11 +236,6 @@ namespace GitHub.VisualStudio
                     ApiClientConfiguration.AuthorizationNote,
                     ApiClientConfiguration.MachineFingerprint);
             }
-            else if (serviceType == typeof(IMenuProvider))
-            {
-                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new MenuProvider(serviceProvider);
-            }
             else if (serviceType == typeof(IUsageService))
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
@@ -239,7 +251,7 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IVSGitExt))
             {
                 var vsVersion = ApplicationInfo.GetHostVersionInfo().FileMajorPart;
-                return VSGitExtFactory.Create(vsVersion, this);
+                return new VSGitExtFactory(vsVersion, this).Create();
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GitHub.InlineReviews.Commands
+namespace GitHub.Commands
 {
     /// <summary>
     /// Supplies parameters to <see cref="INextInlineCommentCommand"/> and
