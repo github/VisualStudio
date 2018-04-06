@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace GitHub.InlineReviews.Commands
+namespace GitHub.Commands
 {
     /// <summary>
     /// Represents a Visual Studio command that does not accept a parameter.

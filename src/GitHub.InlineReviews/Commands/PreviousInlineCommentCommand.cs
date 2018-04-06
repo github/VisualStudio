@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text.Tagging;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
+using GitHub.Commands;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.Commands
 {
     /// <summary>
     /// Navigates to and opens the the previous inline comment thread in the currently active text view.
     /// </summary>
-    [ExportCommand(typeof(InlineReviewsPackage))]
     [Export(typeof(IPreviousInlineCommentCommand))]
     class PreviousInlineCommentCommand : InlineCommentNavigationCommand, IPreviousInlineCommentCommand
     {
@@ -28,13 +29,15 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="PreviousInlineCommentCommand"/> class.
         /// </summary>
+        /// <param name="serviceProvider">The GitHub service provider.</param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         [ImportingConstructor]
-        public PreviousInlineCommentCommand(
+        protected PreviousInlineCommentCommand(
+            IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService)
-            : base(tagAggregatorFactory, peekService, CommandSet, CommandId)
+            : base(serviceProvider, tagAggregatorFactory, peekService, CommandSet, CommandId)
         {
         }
 

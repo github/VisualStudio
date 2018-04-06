@@ -8,14 +8,13 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Commands;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.UI.Helpers;
-using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.UI.Helpers;
 using Microsoft.VisualStudio;
@@ -372,16 +371,6 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 node?.Focus();
                 e.Handled = true;
             }
-        }
-
-        void ViewCommentsClick(object sender, RoutedEventArgs e)
-        {
-            var model = (object)ViewModel.Model;
-            GitHub.VisualStudio.Services.Dte.Commands.Raise(
-                Guids.CommandSetString,
-                PkgCmdIDList.ShowPullRequestCommentsId,
-                ref model,
-                null);
         }
 
         async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
