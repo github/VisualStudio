@@ -80,7 +80,10 @@ namespace GitHub.VisualStudio.UI
 
         protected override void Initialize()
         {
-            viewModelTask = ThreadHelper.JoinableTaskFactory.RunAsync(InitializeAsync);
+            // Using JoinableTaskFactory from parent AsyncPackage. That way if VS shuts down before this
+            // work is done, we won't risk crashing due to arbitrary work going on in background threads.
+            var asyncPackage = (AsyncPackage)Package;
+            viewModelTask = asyncPackage.JoinableTaskFactory.RunAsync(InitializeAsync);
         }
 
         public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelTask.JoinAsync();
