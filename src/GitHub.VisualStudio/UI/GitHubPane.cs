@@ -83,21 +83,20 @@ namespace GitHub.VisualStudio.UI
             // Using JoinableTaskFactory from parent AsyncPackage. That way if VS shuts down before this
             // work is done, we won't risk crashing due to arbitrary work going on in background threads.
             var asyncPackage = (AsyncPackage)Package;
-            viewModelTask = asyncPackage.JoinableTaskFactory.RunAsync(InitializeAsync);
+            viewModelTask = asyncPackage.JoinableTaskFactory.RunAsync(() => InitializeAsync(asyncPackage));
         }
 
         public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelTask.JoinAsync();
 
-        async Task<IGitHubPaneViewModel> InitializeAsync()
+        async Task<IGitHubPaneViewModel> InitializeAsync(AsyncPackage asyncPackage)
         {
             try
             {
-                // Allow MEF to initialize its cache asynchronously
                 ShowInitializing();
-                var asyncServiceProvider = (IAsyncServiceProvider)GetService(typeof(SAsyncServiceProvider));
-                await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel));
 
-                var provider = VisualStudio.Services.GitHubServiceProvider;
+                // Allow MEF to initialize its cache asynchronously
+                var provider = (IGitHubServiceProvider)await asyncPackage.GetServiceAsync(typeof(IGitHubServiceProvider));
+
                 var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
                 teServiceHolder.ServiceProvider = this;
 
