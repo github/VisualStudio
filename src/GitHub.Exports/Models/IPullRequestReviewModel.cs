@@ -67,5 +67,10 @@ namespace GitHub.Models
         /// Gets the SHA of the commit that the review was submitted on.
         /// </summary>
         string CommitId { get; }
+
+        /// <summary>
+        /// Gets the date/time that the review was submitted.
+        /// </summary>
+        DateTimeOffset? SubmittedAt { get; }
     }
 }

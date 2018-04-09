@@ -88,6 +88,11 @@ namespace GitHub.Api
             return gitHubClient.User.Current();
         }
 
+        public IObservable<User> GetUser(string login)
+        {
+            return gitHubClient.User.Get(login);
+        }
+
         public IObservable<Organization> GetOrganizations()
         {
             // Organization.GetAllForCurrent doesn't return all of the information we need (we 

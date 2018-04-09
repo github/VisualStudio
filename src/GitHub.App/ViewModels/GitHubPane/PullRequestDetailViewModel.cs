@@ -18,6 +18,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -636,7 +637,16 @@ namespace GitHub.ViewModels.GitHubPane
 
         void DoShowReview(object item)
         {
-            // TODO
+            var review = (PullRequestReviewSummaryViewModel)item;
+
+            if (review.State == PullRequestReviewState.Pending)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/reviews/{review.User.Login}"));
+            }
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

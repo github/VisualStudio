@@ -90,5 +90,14 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The repository name.</param>
         /// <param name="number">The pull rqeuest number.</param>
         Task ShowPullRequest(string owner, string repo, int number);
+
+        /// <summary>
+        /// Shows the pull requests reviews authored by a user.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="repo">The repository name.</param>
+        /// <param name="number">The pull rqeuest number.</param>
+        /// <param name="login">The user login.</param>
+        Task ShowPullRequestReviews(string owner, string repo, int number, string login);
     }
 }
