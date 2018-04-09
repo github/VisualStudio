@@ -40,6 +40,16 @@ namespace GitHub.VisualStudio
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
             
+            await InitializeLoggingAsync();
+            await GetServiceAsync(typeof(IUsageTracker));
+
+            // Avoid delays when there is ongoing UI activity.
+            // See: https://github.com/github/VisualStudio/issues/1537
+            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
+        }
+
+        async Task InitializeLoggingAsync()
+        {
             var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
             LogManager.EnableTraceLogging(packageSettings?.EnableTraceLogging ?? false);
             if (packageSettings != null)
@@ -52,11 +62,6 @@ namespace GitHub.VisualStudio
                     }
                 };
             }
-            await GetServiceAsync(typeof(IUsageTracker));
-
-            // Avoid delays when there is ongoing UI activity.
-            // See: https://github.com/github/VisualStudio/issues/1537
-            await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
         }
 
         void LogVersionInformation()
