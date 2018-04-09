@@ -92,9 +92,7 @@
             <Run Text="{x:Static prop:Resources.Options_DebuggingTitle}" />
       </GroupBox.Header>
       <DockPanel>
-        <WrapPanel DockPanel.Dock="Top">
-            <CheckBox x:Name="chkEnableTraceLogging" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EnableTraceLoggingText}" />
-        </WrapPanel>
+        <CheckBox x:Name="chkEnableTraceLogging" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EnableTraceLoggingText}" />
       </DockPanel>
     </GroupBox>
     <GroupBox
