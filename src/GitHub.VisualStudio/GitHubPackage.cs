@@ -7,7 +7,6 @@ using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Exports;
 using GitHub.Logging;
@@ -31,7 +30,6 @@ namespace GitHub.VisualStudio
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
-    [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
@@ -71,12 +69,10 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
-
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
-            menuService.AddCommands(
+            var commands = new IVsCommandBase[]
+            {
                 exports.GetExportedValue<IAddConnectionCommand>(),
                 exports.GetExportedValue<IBlameLinkCommand>(),
                 exports.GetExportedValue<ICopyLinkCommand>(),
@@ -84,7 +80,12 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenLinkCommand>(),
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>());
+                exports.GetExportedValue<IShowGitHubPaneCommand>()
+            };
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
@@ -164,9 +165,8 @@ namespace GitHub.VisualStudio
                 ErrorHandler.Failed(frame.Show());
             }
 
-            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
-            await viewModel.InitializeAsync(pane);
-            return viewModel;
+            var gitHubPane = (GitHubPane)pane;
+            return await gitHubPane.GetViewModelAsync();
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
