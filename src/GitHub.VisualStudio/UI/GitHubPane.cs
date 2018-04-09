@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.ComponentModel.Design;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
-using GitHub.Extensions;
+using System.Windows.Controls;
 using GitHub.Factories;
-using GitHub.Models;
 using GitHub.Services;
-using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
+using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -28,22 +30,24 @@ namespace GitHub.VisualStudio.UI
     /// </para>
     /// </remarks>
     [Guid(GitHubPaneGuid)]
-    public class GitHubPane : ToolWindowPane, IServiceProviderAware
+    public class GitHubPane : ToolWindowPane
     {
         public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
-        bool initialized = false;
-        IDisposable viewSubscription;
-        IGitHubPaneViewModel viewModel;
 
-        FrameworkElement View
+        JoinableTask<IGitHubPaneViewModel> viewModelTask;
+
+        IDisposable viewSubscription;
+        ContentPresenter contentPresenter;
+
+        public FrameworkElement View
         {
-            get { return Content as FrameworkElement; }
+            get { return contentPresenter.Content as FrameworkElement; }
             set
             {
                 viewSubscription?.Dispose();
                 viewSubscription = null;
 
-                Content = value;
+                contentPresenter.Content = value;
 
                 viewSubscription = value.WhenAnyValue(x => x.DataContext)
                     .SelectMany(x =>
@@ -61,6 +65,7 @@ namespace GitHub.VisualStudio.UI
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
+            Content = contentPresenter = new ContentPresenter();
 
             BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
             {
@@ -75,24 +80,39 @@ namespace GitHub.VisualStudio.UI
 
         protected override void Initialize()
         {
-            base.Initialize();
-            Initialize(this);
+            // Using JoinableTaskFactory from parent AsyncPackage. That way if VS shuts down before this
+            // work is done, we won't risk crashing due to arbitrary work going on in background threads.
+            var asyncPackage = (AsyncPackage)Package;
+            viewModelTask = asyncPackage.JoinableTaskFactory.RunAsync(() => InitializeAsync(asyncPackage));
         }
 
-        public void Initialize(IServiceProvider serviceProvider)
+        public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelTask.JoinAsync();
+
+        async Task<IGitHubPaneViewModel> InitializeAsync(AsyncPackage asyncPackage)
         {
-            if (!initialized)
+            try
             {
-                var provider = VisualStudio.Services.GitHubServiceProvider;
+                ShowInitializing();
+
+                // Allow MEF to initialize its cache asynchronously
+                var provider = (IGitHubServiceProvider)await asyncPackage.GetServiceAsync(typeof(IGitHubServiceProvider));
+
                 var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
-                teServiceHolder.ServiceProvider = serviceProvider;
+                teServiceHolder.ServiceProvider = this;
 
                 var factory = provider.GetService<IViewViewModelFactory>();
-                viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
-                viewModel.InitializeAsync(this).Forget();
+                var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
+                await viewModel.InitializeAsync(this);
 
                 View = factory.CreateView<IGitHubPaneViewModel>();
                 View.DataContext = viewModel;
+
+                return viewModel;
+            }
+            catch (Exception e)
+            {
+                ShowError(e);
+                throw;
             }
         }
 
@@ -129,6 +149,20 @@ namespace GitHub.VisualStudio.UI
 
             var pane = View?.DataContext as IGitHubPaneViewModel;
             UpdateSearchHost(pane?.IsSearchEnabled ?? false, pane?.SearchQuery);
+        }
+
+        void ShowInitializing()
+        {
+            // This page is intentionally left blank.
+        }
+
+        void ShowError(Exception e)
+        {
+            View = new TextBox
+            {
+                Text = e.ToString(),
+                IsReadOnly = true,
+            };
         }
 
         void UpdateSearchHost(bool enabled, string query)

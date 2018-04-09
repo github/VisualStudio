@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GitHub.Commands;
 using GitHub.Logging;
 using GitHub.Services;
+using GitHub.Extensions;
 using GitHub.Services.Vssdk.Commands;
 using Serilog;
 
@@ -20,12 +21,14 @@ namespace GitHub.VisualStudio.Commands
     {
         static readonly ILogger log = LogManager.ForContext<ShowCurrentPullRequestCommand>();
         readonly IGitHubServiceProvider serviceProvider;
+        readonly Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
-        protected ShowCurrentPullRequestCommand(IGitHubServiceProvider serviceProvider)
+        protected ShowCurrentPullRequestCommand(IGitHubServiceProvider serviceProvider, Lazy<IUsageTracker> usageTracker)
             : base(CommandSet, CommandId)
         {
             this.serviceProvider = serviceProvider;
+            this.usageTracker = usageTracker;
         }
 
         /// <summary>
@@ -58,6 +61,8 @@ namespace GitHub.VisualStudio.Commands
                 var manager = serviceProvider.TryGetService<IGitHubToolWindowManager>();
                 var host = await manager.ShowGitHubPane();
                 await host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number);
+
+                usageTracker.Value.IncrementCounter(x => x.NumberOfShowCurrentPullRequest).Forget();
             }
             catch (Exception ex)
             {
