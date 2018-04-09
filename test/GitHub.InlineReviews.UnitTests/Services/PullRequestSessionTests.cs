@@ -40,7 +40,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
 
             [Test]
-            public async Task CommitShaIsSet()
+            public async Task HeadCommitShaIsSet()
             {
                 var target = new PullRequestSession(
                     CreateSessionService(),
@@ -52,6 +52,23 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var file = await target.GetFile(FilePath);
 
                 Assert.That("HEAD_SHA", Is.SameAs(file.CommitSha));
+                Assert.That(file.IsTrackingHead, Is.True);
+            }
+
+            [Test]
+            public async Task PinnedCommitShaIsSet()
+            {
+                var target = new PullRequestSession(
+                    CreateSessionService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+                var file = await target.GetFile(FilePath, "123");
+
+                Assert.That("123", Is.SameAs(file.CommitSha));
+                Assert.That(file.IsTrackingHead, Is.False);
             }
 
             [Test]
@@ -116,6 +133,38 @@ Line 4";
                     var thread = file.InlineCommentThreads.First();
                     Assert.That(2, Is.EqualTo(thread.LineNumber));
                 }
+            }
+            
+            [Test]
+            public async Task SameNonHeadCommitShasReturnSameFiles()
+            {
+                var target = new PullRequestSession(
+                    CreateSessionService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+                var file1 = await target.GetFile(FilePath, "123");
+                var file2 = await target.GetFile(FilePath, "123");
+
+                Assert.That(file1, Is.SameAs(file2));
+            }
+
+            [Test]
+            public async Task DifferentCommitShasReturnDifferentFiles()
+            {
+                var target = new PullRequestSession(
+                    CreateSessionService(),
+                    Substitute.For<IAccount>(),
+                    CreatePullRequest(),
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+                var file1 = await target.GetFile(FilePath, "123");
+                var file2 = await target.GetFile(FilePath, "456");
+
+                Assert.That(file1, Is.Not.SameAs(file2));
             }
         }
 
@@ -201,7 +250,7 @@ Line 4";
             }
 
             [Test]
-            public async Task AddsNewReviewCommentToThread()
+            public async Task AddsNewReviewCommentToThreadOnHeadFile()
             {
                 var baseContents = @"Line 1
 Line 2
@@ -211,7 +260,6 @@ Line 4";
 Line 2
 Line 3 with comment
 Line 4";
-
                 var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
@@ -239,14 +287,68 @@ Line 4";
                         "owner",
                         true);
 
-                    var file = await target.GetFile(FilePath);
+                    var file = await target.GetFile(FilePath, "HEAD");
 
-                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
+                    Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(1));
+                    Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
 
                     pullRequest = CreatePullRequest(comment1, comment2);
                     await target.Update(pullRequest);
 
-                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
+                    Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(2));
+                    Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
+                }
+            }
+
+            [Test]
+            public async Task AddsNewReviewCommentToThreadNonHeadFile()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment1");
+                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment2");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest(comment1);
+                    var service = CreateSessionService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
+                    diffService.AddFile(FilePath, headContents, "123");
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        "owner",
+                        true);
+
+                    var file = await target.GetFile(FilePath, "123");
+
+                    Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(1));
+                    Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
+
+                    pullRequest = CreatePullRequest(comment1, comment2);
+                    await target.Update(pullRequest);
+
+                    Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(2));
+                    Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
                 }
             }
 

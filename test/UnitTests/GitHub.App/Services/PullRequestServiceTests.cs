@@ -579,203 +579,66 @@ public class PullRequestServiceTests : TestBaseClass
 
     static Signature Author => new Signature("foo", "foo@bar.com", DateTimeOffset.Now);
 
-    public class TheExtractFileMethod
+    public class TheExtractToTempFileMethod
     {
         [Test]
-        public async Task ExtractHead()
+        public async Task ExtractsExistingFile()
         {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = "headFileContent";
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var head = true;
+            var gitClient = MockGitClient();
+            var target = CreateTarget(gitClient);
+            var repository = Substitute.For<ILocalRepositoryModel>();
+            var fileContent = "file content";
+            var pr = CreatePullRequest();
 
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, head, Encoding.UTF8);
+            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(fileContent));
+            var file = await target.ExtractToTempFile(repository, pr, "filename", "123", Encoding.UTF8);
 
-            Assert.That(headFileContent, Is.EqualTo(File.ReadAllText(file)));
+            Assert.That(File.ReadAllText(file), Is.EqualTo(fileContent));
         }
 
         [Test]
-        public async Task ExtractBase_MergeBaseAvailable_UseMergeBaseSha()
+        public async Task CreatesEmptyFileForNonExistentFile()
         {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = "headFileContent";
-            var mergeBaseFileContent = "mergeBaseFileContent";
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var mergeBaseSha = "mergeBaseSha";
-            var head = false;
+            var gitClient = MockGitClient();
+            var target = CreateTarget(gitClient);
+            var repository = Substitute.For<ILocalRepositoryModel>();
+            var pr = CreatePullRequest();
 
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                fileName, head, Encoding.UTF8);
+            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(null));
+            var file = await target.ExtractToTempFile(repository, pr, "filename", "123", Encoding.UTF8);
 
-            Assert.That(mergeBaseFileContent, Is.EqualTo(File.ReadAllText(file)));
-        }
-
-        [Test]
-        public void MergeBaseNotAvailable_ThrowsNotFoundException()
-        {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = "headFileContent";
-            var mergeBaseFileContent = null as string;
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var mergeBaseSha = null as string;
-            var head = false;
-            var mergeBaseException = new NotFoundException();
-
-            var ex = Assert.ThrowsAsync<NotFoundException>(() => ExtractFile(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                                fileName, head, Encoding.UTF8, mergeBaseException: mergeBaseException));
-        }
-
-        [Test]
-        public async Task FileAdded_BaseFileEmpty()
-        {
-            var baseFileContent = null as string;
-            var headFileContent = "headFileContent";
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var head = false;
-
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, head, Encoding.UTF8);
-
-            Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
-        }
-
-        [Test]
-        public async Task FileDeleted_HeadFileEmpty()
-        {
-            var baseFileContent = "baseFileContent";
-            var headFileContent = null as string;
-            var fileName = "fileName";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-            var head = true;
-
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                fileName, head, Encoding.UTF8);
-
-            Assert.That(string.Empty, Is.EqualTo(File.ReadAllText(file)));
+            Assert.That(File.ReadAllText(file), Is.EqualTo(string.Empty));
         }
 
         // https://github.com/github/VisualStudio/issues/1010
         [TestCase("utf-8")]        // Unicode (UTF-8)
         [TestCase("Windows-1252")] // Western European (Windows)        
-        public async Task ChangeEncoding(string encodingName)
+        public async Task CanChangeEncoding(string encodingName)
         {
             var encoding = Encoding.GetEncoding(encodingName);
             var repoDir = Path.GetTempPath();
-            var baseFileContent = "baseFileContent";
-            var headFileContent = null as string;
             var fileName = "fileName.txt";
-            var baseSha = "baseSha";
-            var headSha = "headSha";
-            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var head = false;
-
-            var file = await ExtractFile(baseSha, baseFileContent, headSha, headFileContent,
-                baseSha, baseFileContent, fileName, head, encoding, repoDir);
+            var fileContent = "file content";
+            var gitClient = MockGitClient();
+            var target = CreateTarget(gitClient);
+            var repository = Substitute.For<ILocalRepositoryModel>();
+            var pr = CreatePullRequest();
 
             var expectedPath = Path.Combine(repoDir, fileName);
-            var expectedContent = baseFileContent;
+            var expectedContent = fileContent;
             File.WriteAllText(expectedPath, expectedContent, encoding);
+
+            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(fileContent));
+            var file = await target.ExtractToTempFile(repository, pr, "filename", "123", encoding);
 
             Assert.That(File.ReadAllText(expectedPath), Is.EqualTo(File.ReadAllText(file)));
             Assert.That(File.ReadAllBytes(expectedPath), Is.EqualTo(File.ReadAllBytes(file)));
         }
 
-        static bool HasPreamble(string file, Encoding encoding)
+        static IPullRequestModel CreatePullRequest()
         {
-            using (var stream = File.OpenRead(file))
-            {
-                foreach (var b in encoding.GetPreamble())
-                {
-                    if (b != stream.ReadByte())
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        static async Task<string> ExtractFile(
-            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
-            string fileName, bool head, Encoding encoding, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef", string headRef = "headRef",
-            Exception mergeBaseException = null)
-        {
-            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
-            repositoryModel.LocalPath.Returns(repoDir);
-
-            var pullRequest = Substitute.For<IPullRequestModel>();
-            pullRequest.Number.Returns(1);
-
-            pullRequest.Base.Returns(new GitReferenceModel(baseRef, "label", baseSha, "uri"));
-            pullRequest.Head.Returns(new GitReferenceModel("ref", "label", headSha, "uri"));
-
-            var serviceProvider = Substitutes.ServiceProvider;
-            var gitClient = MockGitClient();
-            var gitService = serviceProvider.GetGitService();
-            var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
-
-            if (mergeBaseException == null)
-            {
-                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
-            }
-            else
-            {
-                gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<UriString>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromException<string>(mergeBaseException));
-            }
-
-            gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
-            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
-            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
-
-            return await service.ExtractFile(repositoryModel, pullRequest, fileName, head, encoding);
-        }
-
-        static IObservable<string> GetFileObservable(object fileOrException)
-        {
-            if (fileOrException is string)
-            {
-                return Observable.Return((string)fileOrException);
-            }
-
-            if (fileOrException is Exception)
-            {
-                return Observable.Throw<string>((Exception)fileOrException);
-            }
-
-            return Observable.Throw<string>(new FileNotFoundException());
-        }
-
-        static Task<string> GetFileTask(object content)
-        {
-            if (content is string)
-            {
-                return Task.FromResult((string)content);
-            }
-
-            if (content is Exception)
-            {
-                return Task.FromException<string>((Exception)content);
-            }
-
-            if (content == null)
-            {
-                return Task.FromResult<string>(null);
-            }
-
-            throw new ArgumentException("Unsupported content type: " + content);
+            var result = Substitute.For<IPullRequestModel>();
+            return result;
         }
     }
 
@@ -1105,6 +968,24 @@ public class PullRequestServiceTests : TestBaseClass
         }
     }
 
+    static PullRequestService CreateTarget(
+        IGitClient gitClient = null,
+        IGitService gitService = null,
+        IOperatingSystem os = null,
+        IUsageTracker usageTracker = null)
+    {
+        gitClient = gitClient ?? Substitute.For<IGitClient>();
+        gitService = gitService ?? Substitute.For<IGitService>();
+        os = os ?? Substitute.For<IOperatingSystem>();
+        usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
+
+        return new PullRequestService(
+            gitClient,
+            gitService,
+            os,
+            usageTracker);
+    }
+
     static BranchCollection MockBranches(params string[] names)
     {
         var result = Substitute.For<BranchCollection>();
@@ -1137,5 +1018,25 @@ public class PullRequestServiceTests : TestBaseClass
         var result = Substitute.For<IGitService>();
         result.GetRepository(Arg.Any<string>()).Returns(repository);
         return result;
+    }
+
+    static Task<string> GetFileTask(object content)
+    {
+        if (content is string)
+        {
+            return Task.FromResult((string)content);
+        }
+
+        if (content is Exception)
+        {
+            return Task.FromException<string>((Exception)content);
+        }
+
+        if (content == null)
+        {
+            return Task.FromResult<string>(null);
+        }
+
+        throw new ArgumentException("Unsupported content type: " + content);
     }
 }

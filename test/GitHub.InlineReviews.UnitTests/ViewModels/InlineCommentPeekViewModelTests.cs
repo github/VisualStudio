@@ -68,6 +68,34 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Test]
+        public async Task ShouldGetRelativePathFromTextBufferInfoIfPresent()
+        {
+            var session = CreateSession();
+            var bufferInfo = new PullRequestTextBufferInfo(session, RelativePath, "123", DiffSide.Right);
+            var sessionManager = CreateSessionManager(
+                relativePath: "ShouldNotUseThis",
+                session: session,
+                textBufferInfo: bufferInfo);
+
+            // There is an existing comment thread at line 10.
+            var target = new InlineCommentPeekViewModel(
+                CreatePeekService(lineNumber: 10),
+                CreatePeekSession(),
+                sessionManager,
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
+
+            await target.Initialize();
+
+            // There should be an existing comment and a reply placeholder.
+            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
+            Assert.That("Existing comment", Is.EqualTo(target.Thread.Comments[0].Body));
+            Assert.That(string.Empty, Is.EqualTo(target.Thread.Comments[1].Body));
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(target.Thread.Comments[1].EditState));
+        }
+
+        [Test]
         public async Task SwitchesFromNewThreadToExistingThreadWhenCommentPosted()
         {
             var sessionManager = CreateSessionManager();
@@ -259,7 +287,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IPullRequestSessionManager CreateSessionManager(string commitSha = "COMMIT")
+        IPullRequestSession CreateSession()
+        {
+            var result = Substitute.For<IPullRequestSession>();
+            result.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
+            return result;
+        }
+
+        IPullRequestSessionManager CreateSessionManager(
+            string commitSha = "COMMIT",
+            string relativePath = RelativePath,
+            IPullRequestSession session = null,
+            PullRequestTextBufferInfo textBufferInfo = null)
         {
             var thread = CreateThread(10, "Existing comment");
 
@@ -286,13 +325,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             file.InlineCommentThreads.Returns(new[] { thread });
             file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
 
-            var session = Substitute.For<IPullRequestSession>();
-            session.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
+            session = session ?? CreateSession();
+
+            if (textBufferInfo != null)
+            {
+                session.GetFile(textBufferInfo.RelativePath, textBufferInfo.CommitSha).Returns(file);
+            }
 
             var result = Substitute.For<IPullRequestSessionManager>();
             result.CurrentSession.Returns(session);
-            result.GetLiveFile(RelativePath, Arg.Any<ITextView>(), Arg.Any<ITextBuffer>()).Returns(file);
-            result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(RelativePath);
+            result.GetLiveFile(relativePath, Arg.Any<ITextView>(), Arg.Any<ITextBuffer>()).Returns(file);
+            result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(relativePath);
+            result.GetTextBufferInfo(Arg.Any<ITextBuffer>()).Returns(textBufferInfo);
 
             return result;
         }

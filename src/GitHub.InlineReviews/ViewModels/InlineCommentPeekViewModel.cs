@@ -114,9 +114,10 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (info != null)
             {
+                var commitSha = info.Side == DiffSide.Left ? "HEAD" : info.CommitSha;
                 relativePath = info.RelativePath;
                 side = info.Side ?? DiffSide.Right;
-                file = await info.Session.GetFile(relativePath);
+                file = await info.Session.GetFile(relativePath, commitSha);
                 session = info.Session;
                 await UpdateThread();
             }

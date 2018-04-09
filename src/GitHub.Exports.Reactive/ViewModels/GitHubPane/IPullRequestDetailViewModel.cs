@@ -191,16 +191,6 @@ namespace GitHub.ViewModels.GitHubPane
             int number);
 
         /// <summary>
-        /// Gets a file as it appears in the pull request.
-        /// </summary>
-        /// <param name="file">The changed file.</param>
-        /// <param name="head">
-        /// If true, gets the file at the PR head, otherwise gets the file at the PR merge base.
-        /// </param>
-        /// <returns>The path to a temporary file.</returns>
-        Task<string> ExtractFile(IPullRequestFileNode file, bool head);
-
-        /// <summary>
         /// Gets the full path to a file in the working directory.
         /// </summary>
         /// <param name="file">The file.</param>
