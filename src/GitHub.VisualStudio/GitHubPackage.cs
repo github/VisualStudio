@@ -125,6 +125,9 @@ namespace GitHub.VisualStudio
         [ExportForProcess(typeof(IVSGitExt), ProcessName)]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
+        [ExportForProcess(typeof(IPackageSettings), ProcessName)]
+        public IPackageSettings PackageSettings => GetService<IPackageSettings>();
+
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
     }
 
