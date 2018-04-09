@@ -48,6 +48,27 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<PullRequestReview> PostPullRequestReview(
+            string owner,
+            string name,
+            int number,
+            string commitId,
+            string body,
+            PullRequestReviewEvent e)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
+            var review = new PullRequestReviewCreate
+            {
+                Body = body,
+                CommitId = commitId,
+                Event = e,
+            };
+
+            return gitHubClient.PullRequest.Review.Create(owner, name, number, review);
+        }
+
         public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
             string owner,
             string name,

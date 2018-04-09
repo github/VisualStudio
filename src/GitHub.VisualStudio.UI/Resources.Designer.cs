@@ -61,6 +61,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add review comment.
+        /// </summary>
+        public static string AddReviewComment {
+            get {
+                return ResourceManager.GetString("AddReviewComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a single comment.
+        /// </summary>
+        public static string AddSingleComment {
+            get {
+                return ResourceManager.GetString("AddSingleComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add your review.
         /// </summary>
         public static string AddYourReview {

@@ -33,6 +33,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPaneViewModel>();
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
+        static readonly Regex pullNewReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/new");
         static readonly Regex pullUserReviewsUri = CreateRoute("/:owner/:repo/pull/:number/reviews/:login");
 
         readonly IViewViewModelFactory viewModelFactory;
@@ -244,6 +245,13 @@ namespace GitHub.ViewModels.GitHubPane
                 var number = int.Parse(match.Groups["number"].Value);
                 await ShowPullRequest(owner, repo, number);
             }
+            else if ((match = pullNewReviewUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                await ShowPullRequestReviewAuthoring(owner, repo, number);
+            }
             else if ((match = pullUserReviewsUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
@@ -303,6 +311,19 @@ namespace GitHub.ViewModels.GitHubPane
                      x.LocalRepository.Name == repo &&
                      x.PullRequestNumber == number &&
                      x.User.Login == login);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowPullRequestReviewAuthoring(string owner, string repo, int number)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            return NavigateTo<IPullRequestReviewAuthoringViewModel>(
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestModel.Number == number);
         }
 
         async Task CreateInitializeTask(IServiceProvider paneServiceProvider)

@@ -47,6 +47,6 @@ namespace GitHub.Models
         /// <summary>
         /// Gets a value indicating whether the comment is part of a pending review.
         /// </summary>
-        bool IsPending { get; }
+        bool IsPending { get; set; }
     }
 }

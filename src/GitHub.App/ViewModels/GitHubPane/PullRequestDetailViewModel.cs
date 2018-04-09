@@ -53,6 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool active;
         bool refreshOnActivate;
         Uri webUrl;
+        IDisposable sessionSubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -441,6 +442,11 @@ namespace GitHub.ViewModels.GitHubPane
                     UpdateState = null;
                 }
 
+                sessionSubscription?.Dispose();
+                sessionSubscription = Session.WhenAnyValue(x => x.HasPendingReview)
+                    .Skip(1)
+                    .Subscribe(x => Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, Session.PullRequest).ToList());
+
                 if (firstLoad)
                 {
                     usageTracker.IncrementCounter(x => x.NumberOfPullRequestsOpened).Forget();
@@ -620,7 +626,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (review.State == PullRequestReviewState.Pending)
             {
-                throw new NotImplementedException();
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
             }
             else
             {
