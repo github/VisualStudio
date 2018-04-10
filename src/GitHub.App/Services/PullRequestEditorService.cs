@@ -468,6 +468,12 @@ namespace GitHub.Services
         {
             var view = vsEditorAdaptersFactory.GetViewAdapter(textView);
             EnableNavigateToEditor(view, session, file);
+
+            textView.GotAggregateFocus += (s, e) =>
+                statusBar.ShowMessage(VisualStudio.UI.Resources.NavigateToEditorStatusMessage);
+
+            textView.LostAggregateFocus += (s, e) =>
+                statusBar.ShowMessage(string.Empty);
         }
 
         void EnableNavigateToEditor(IVsTextView textView, IPullRequestSession session, IPullRequestSessionFile file)
