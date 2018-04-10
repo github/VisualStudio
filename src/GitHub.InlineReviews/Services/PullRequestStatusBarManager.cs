@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 using GitHub.Commands;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
@@ -26,19 +27,24 @@ namespace GitHub.InlineReviews.Services
         readonly IOpenPullRequestsCommand openPullRequestsCommand;
         readonly IShowCurrentPullRequestCommand showCurrentPullRequestCommand;
 
-        // At the moment this must be constructed on the main thread.
+        // At the moment these must be constructed on the main thread.
         // TeamExplorerContext needs to retrieve DTE using GetService.
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
+        readonly Lazy<ITeamExplorerContext> teamExplorerContext;
+
+        IDisposable currentSessionSubscription;
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(
             IOpenPullRequestsCommand openPullRequestsCommand,
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
-            Lazy<IPullRequestSessionManager> pullRequestSessionManager)
+            Lazy<IPullRequestSessionManager> pullRequestSessionManager,
+            Lazy<ITeamExplorerContext> teamExplorerContext)
         {
             this.openPullRequestsCommand = openPullRequestsCommand;
             this.showCurrentPullRequestCommand = showCurrentPullRequestCommand;
             this.pullRequestSessionManager = pullRequestSessionManager;
+            this.teamExplorerContext = teamExplorerContext;
         }
 
         /// <summary>
@@ -51,8 +57,9 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
-                    .Subscribe(x => RefreshCurrentSession());
+                teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => RefreshActiveRepository(x));
             }
             catch (Exception e)
             {
@@ -60,18 +67,34 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        void RefreshCurrentSession()
+        void RefreshActiveRepository(ILocalRepositoryModel repository)
         {
-            var pullRequest = pullRequestSessionManager.Value.CurrentSession?.PullRequest;
-            var viewModel = pullRequest != null ? CreatePullRequestStatusViewModel(pullRequest) : null;
-            ShowStatus(viewModel);
+            currentSessionSubscription?.Dispose();
+            currentSessionSubscription = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
+                .Subscribe(x => RefreshCurrentSession(repository, x));
         }
 
-        PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestModel pullRequest)
+        void RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
+        {
+            var cloneUrl = repository?.CloneUrl;
+            if (cloneUrl != null)
+            {
+                // Only show PR status bar if repo has remote
+                var viewModel = CreatePullRequestStatusViewModel(session);
+                ShowStatus(viewModel);
+            }
+            else
+            {
+                ShowStatus(null);
+            }
+        }
+
+        PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestSession session)
         {
             var pullRequestStatusViewModel = new PullRequestStatusViewModel(openPullRequestsCommand, showCurrentPullRequestCommand);
-            pullRequestStatusViewModel.Number = pullRequest.Number;
-            pullRequestStatusViewModel.Title = pullRequest.Title;
+            var pullRequest = session?.PullRequest;
+            pullRequestStatusViewModel.Number = pullRequest?.Number;
+            pullRequestStatusViewModel.Title = pullRequest?.Title;
             return pullRequestStatusViewModel;
         }
 
