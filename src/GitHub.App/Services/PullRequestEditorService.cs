@@ -102,6 +102,10 @@ namespace GitHub.Services
                     if (!workingDirectory)
                     {
                         AddBufferTag(buffer, session, fullPath, commitSha, null);
+
+                        var textView = FindActiveView();
+                        var file = await session.GetFile(relativePath);
+                        EnableNavigateToEditor(textView, session, file);
                     }
                 }
 
@@ -182,6 +186,9 @@ namespace GitHub.Services
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, file.CommitSha, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
+                    EnableNavigateToEditor(diffViewer.RightView, session, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
                 }
 
                 if (workingDirectory)
@@ -509,7 +516,9 @@ namespace GitHub.Services
 
         static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)
         {
-            return Path.Combine(session.LocalRepository.LocalPath, file.RelativePath);
+            var localPath = session.LocalRepository.LocalPath;
+            var relativePath = file.RelativePath.Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(localPath, relativePath);
         }
 
         static IDisposable OpenInProvisionalTab()
