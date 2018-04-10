@@ -123,6 +123,14 @@ namespace GitHub.Services
         Task<IPullRequestReviewModel> StartReview();
 
         /// <summary>
+        /// Cancels the currently pending review.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// There is no pending review.
+        /// </exception>
+        Task CancelReview();
+
+        /// <summary>
         /// Posts the currently pending review.
         /// </summary>
         /// <param name="body">The review body.</param>

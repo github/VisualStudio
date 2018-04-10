@@ -48,6 +48,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public IPullRequestModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public ReactiveCommand<Unit> Submit { get; }
+        public ReactiveCommand<Unit> Cancel { get; }
 
         public Task InitializeAsync(
             ILocalRepositoryModel localRepository,

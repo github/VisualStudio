@@ -350,6 +350,26 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task CancelPendingReview(
+            ILocalRepositoryModel localRepository,
+            string reviewId)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var delete = new DeletePullRequestReviewInput
+            {
+                PullRequestReviewId = reviewId,
+            };
+
+            var deleteReview = new Mutation()
+                .DeletePullRequestReview(delete)
+                .Select(x => x.ClientMutationId);
+
+            await graphql.Run(deleteReview);
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewModel> PostReview(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,

@@ -214,6 +214,26 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task CancelReview()
+        {
+            if (!HasPendingReview)
+            {
+                throw new InvalidOperationException("There is no pending review to cancel.");
+            }
+
+            await service.CancelPendingReview(LocalRepository, pendingReviewNodeId);
+
+            PullRequest.Reviews = PullRequest.Reviews
+                .Where(x => x.NodeId != pendingReviewNodeId)
+                .ToList();
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Where(x => x.PullRequestReviewId != PendingReviewId)
+                .ToList();
+
+            await Update(PullRequest);
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewModel> PostReview(string body, Octokit.PullRequestReviewEvent e)
         {
             IPullRequestReviewModel model;

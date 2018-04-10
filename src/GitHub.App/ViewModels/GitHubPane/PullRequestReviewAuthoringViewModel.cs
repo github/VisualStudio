@@ -58,6 +58,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             Files = files;
             Submit = ReactiveCommand.CreateAsyncTask(DoSubmit);
+            Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
         }
 
         /// <inheritdoc/>
@@ -112,6 +113,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public ReactiveCommand<Unit> Submit { get; }
+        public ReactiveCommand<Unit> Cancel { get; }
 
         public async Task InitializeAsync(
             ILocalRepositoryModel localRepository,
@@ -249,6 +251,30 @@ namespace GitHub.ViewModels.GitHubPane
                     await session.PostReview(Body, e);
                     Close();
                 }
+            }
+            catch (Exception ex)
+            {
+                OperationError = ex.Message;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        async Task DoCancel(object arg)
+        {
+            OperationError = null;
+            IsBusy = true;
+
+            try
+            {
+                if (Model?.Id != 0)
+                {
+                    await session.CancelReview();
+                }
+
+                Close();
             }
             catch (Exception ex)
             {
