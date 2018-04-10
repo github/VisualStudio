@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace GitHub.UI
 {
     /// <summary>
-    /// An <see cref="IValueConverter"/> that trims newlines from a string and replaces them
+    /// An <see cref="IValueConverter"/> that trims newlines and tabs from a string and replaces them
     /// with spaces.
     /// </summary>
     public class TrimNewlinesConverter : ValueConverterMarkupExtension<TrimNewlinesConverter>
