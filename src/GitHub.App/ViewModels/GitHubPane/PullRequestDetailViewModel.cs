@@ -316,15 +316,15 @@ namespace GitHub.ViewModels.GitHubPane
             string repo,
             int number)
         {
-            if (repo != localRepository.Name)
-            {
-                throw new NotSupportedException();
-            }
-
             IsLoading = true;
 
             try
             {
+                if (!string.Equals(repo, localRepository.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new NotSupportedException("Showing pull requests from other repositories not yet supported.");
+                }
+
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 Number = number;
@@ -333,6 +333,10 @@ namespace GitHub.ViewModels.GitHubPane
 
                 await Refresh();
                 teamExplorerContext.StatusChanged += RefreshIfActive;
+            }
+            catch (Exception ex)
+            {
+                Error = ex;
             }
             finally
             {
