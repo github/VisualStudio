@@ -89,6 +89,20 @@
             Padding="6 8 6 8"
             Style="{DynamicResource GroupBoxFlat}">
       <GroupBox.Header>
+            <Run Text="{x:Static prop:Resources.Options_DebuggingTitle}" />
+      </GroupBox.Header>
+      <DockPanel>
+        <CheckBox x:Name="chkEnableTraceLogging" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EnableTraceLoggingText}" />
+      </DockPanel>
+    </GroupBox>
+    <GroupBox
+            Margin="8,0,8,0"
+            VerticalAlignment="Top"
+            BorderBrush="LightGray"
+            BorderThickness="1"
+            Padding="6 8 6 8"
+            Style="{DynamicResource GroupBoxFlat}">
+      <GroupBox.Header>
         <Run Text="{x:Static prop:Resources.Options_ExperimentalTitle}" />
       </GroupBox.Header>
       <DockPanel>

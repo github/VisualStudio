@@ -97,16 +97,23 @@ namespace GitHub.VisualStudio
 
         public object TryGetService(Type serviceType)
         {
-            string contract = AttributedModelServices.GetContractName(serviceType);
+            var contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
             var sp = initialized ? syncServiceProvider : asyncServiceProvider;
 
-            instance = sp.GetService(serviceType);
-            if (instance != null)
-                return instance;
+            try
+            {
+                instance = sp.GetService(serviceType);
+                if (instance != null)
+                    return instance;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error loading {ServiceType}", serviceType);
+            }
 
             instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
 
