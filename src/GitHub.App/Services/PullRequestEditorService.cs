@@ -470,9 +470,9 @@ namespace GitHub.Services
             EnableNavigateToEditor(view, session, file);
 
             var statusMessage = session.IsCheckedOut ?
-                UI.Resources.NavigateToEditorStatusMessage : UI.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+                App.Resources.NavigateToEditorStatusMessage : App.Resources.NavigateToEditorNotCheckedOutStatusMessage;
             textView.GotAggregateFocus += (s, e) =>
-                StatusBarNotificationService.ShowMessage(statusMessage);
+                statusBar.ShowMessage(statusMessage);
 
             textView.LostAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(string.Empty);
@@ -497,7 +497,7 @@ namespace GitHub.Services
             {
                 if (!session.IsCheckedOut)
                 {
-                    ShowInfoMessage(UI.Resources.NavigateToEditorNotCheckedOutInfoMessage);
+                    ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
                     return;
                 }
 

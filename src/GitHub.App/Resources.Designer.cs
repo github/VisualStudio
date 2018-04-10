@@ -271,6 +271,33 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checkout PR branch before navigating to Editor.
+        /// </summary>
+        internal static string NavigateToEditorNotCheckedOutInfoMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorNotCheckedOutInfoMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checkout PR branch and press Enter to navigate to Editor.
+        /// </summary>
+        internal static string NavigateToEditorNotCheckedOutStatusMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorNotCheckedOutStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press Enter to navigate to Editor.
+        /// </summary>
+        internal static string NavigateToEditorStatusMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No commits to pull.
         /// </summary>
         internal static string NoCommitsToPull {
