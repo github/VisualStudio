@@ -466,29 +466,37 @@ namespace GitHub.Services
 
         void EnableNavigateToEditor(ITextView textView, IPullRequestSession session, IPullRequestSessionFile file)
         {
-            var view = vsEditorAdaptersFactory.GetViewAdapter(textView);
-            EnableNavigateToEditor(view, session, file);
+            var vsTextView = vsEditorAdaptersFactory.GetViewAdapter(textView);
+            EnableNavigateToEditor(vsTextView, session, file);
+        }
+
+        void EnableNavigateToEditor(IVsTextView vsTextView, IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
+            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
+            new TextViewCommandDispatcher(vsTextView, commandGroup, commandId).Exec +=
+                async (s, e) => await DoNavigateToEditor(session, file);
+
+            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
+            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
+            new TextViewCommandDispatcher(vsTextView, contextMenuCommandGroup, goToCommandId).Exec +=
+                async (s, e) => await DoNavigateToEditor(session, file);
+
+            EnableNavigateStatusBarMessage(vsTextView, session);
+        }
+
+        void EnableNavigateStatusBarMessage(IVsTextView vsTextView, IPullRequestSession session)
+        {
+            var textView = vsEditorAdaptersFactory.GetWpfTextView(vsTextView);
 
             var statusMessage = session.IsCheckedOut ?
                 App.Resources.NavigateToEditorStatusMessage : App.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+
             textView.GotAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(statusMessage);
 
             textView.LostAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(string.Empty);
-        }
-
-        void EnableNavigateToEditor(IVsTextView textView, IPullRequestSession session, IPullRequestSessionFile file)
-        {
-            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
-            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            new TextViewCommandDispatcher(textView, commandGroup, commandId).Exec +=
-                async (s, e) => await DoNavigateToEditor(session, file);
-
-            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
-            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
-            new TextViewCommandDispatcher(textView, contextMenuCommandGroup, goToCommandId).Exec +=
-                async (s, e) => await DoNavigateToEditor(session, file);
         }
 
         async Task DoNavigateToEditor(IPullRequestSession session, IPullRequestSessionFile file)
