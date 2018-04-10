@@ -47,7 +47,9 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public string OperationError { get; set; }
         public IPullRequestModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
-        public ReactiveCommand<Unit> Submit { get; }
+        public ReactiveCommand<Unit> Approve { get; }
+        public ReactiveCommand<Unit> Comment { get; }
+        public ReactiveCommand<Unit> RequestChanges { get; }
         public ReactiveCommand<Unit> Cancel { get; }
 
         public Task InitializeAsync(

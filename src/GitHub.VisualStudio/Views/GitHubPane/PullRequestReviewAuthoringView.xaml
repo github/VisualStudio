@@ -56,15 +56,13 @@
                                 BorderThickness="1"
                                 Padding="4">
                             <StackPanel Background="{DynamicResource GitHubVsToolWindowBackground}">
-                                <ui:GitHubActionLink Command="{Binding Submit}" CommandParameter="Comment" Margin="4">Comment only</ui:GitHubActionLink>
-                                <ui:GitHubActionLink Command="{Binding Submit}"
-                                                     CommandParameter="Approve"
+                                <ui:GitHubActionLink Command="{Binding Comment}" Margin="4">Comment only</ui:GitHubActionLink>
+                                <ui:GitHubActionLink Command="{Binding Approve}"
                                                      Visibility="{Binding CanApproveRequestChanges, Converter={ui:BooleanToVisibilityConverter}}"
                                                      Margin="4">
                                     Approve
                                 </ui:GitHubActionLink>
-                                <ui:GitHubActionLink Command="{Binding Submit}"
-                                                     CommandParameter="RequestChanges"
+                                <ui:GitHubActionLink Command="{Binding RequestChanges}"
                                                      Visibility="{Binding CanApproveRequestChanges, Converter={ui:BooleanToVisibilityConverter}}"
                                                      Margin="4">
                                     Request changes
