@@ -280,7 +280,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Checkout PR branch and press Enter to navigate to Editor.
+        ///   Looks up a localized string similar to Press Enter to navigate to Editor (PR branch must be checked out).
         /// </summary>
         internal static string NavigateToEditorNotCheckedOutStatusMessage {
             get {

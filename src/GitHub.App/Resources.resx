@@ -313,6 +313,6 @@ https://git-scm.com/download/win</value>
     <value>Checkout PR branch before navigating to Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>Checkout PR branch and press Enter to navigate to Editor</value>
+    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
   </data>
 </root>
