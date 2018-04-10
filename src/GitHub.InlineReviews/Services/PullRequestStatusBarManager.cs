@@ -23,6 +23,7 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestStatusBarManager>();
         const string StatusBarPartName = "PART_SccStatusBarHost";
 
+        readonly IOpenPullRequestsCommand openPullRequestsCommand;
         readonly IShowCurrentPullRequestCommand showCurrentPullRequestCommand;
 
         // At the moment this must be constructed on the main thread.
@@ -31,9 +32,11 @@ namespace GitHub.InlineReviews.Services
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(
+            IOpenPullRequestsCommand openPullRequestsCommand,
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
             Lazy<IPullRequestSessionManager> pullRequestSessionManager)
         {
+            this.openPullRequestsCommand = openPullRequestsCommand;
             this.showCurrentPullRequestCommand = showCurrentPullRequestCommand;
             this.pullRequestSessionManager = pullRequestSessionManager;
         }
@@ -66,7 +69,7 @@ namespace GitHub.InlineReviews.Services
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestModel pullRequest)
         {
-            var pullRequestStatusViewModel = new PullRequestStatusViewModel(showCurrentPullRequestCommand);
+            var pullRequestStatusViewModel = new PullRequestStatusViewModel(openPullRequestsCommand, showCurrentPullRequestCommand);
             pullRequestStatusViewModel.Number = pullRequest.Number;
             pullRequestStatusViewModel.Title = pullRequest.Title;
             return pullRequestStatusViewModel;

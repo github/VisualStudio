@@ -35,29 +35,35 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
+    <StackPanel Orientation="Horizontal">
         <Button
             Foreground="{DynamicResource VsBrush.StatusBarText}"
             BorderThickness="0"
             Padding="4 0"
-            Command="{Binding ShowCurrentPullRequestCommand}">
+            Command="{Binding OpenPullRequestsCommand}">
 
-            <StackPanel Orientation="Horizontal">
-                <ui:OcticonPath
-                    Fill="White"
-                    VerticalAlignment="Bottom"
-                    Margin="0 0 4 0 "
-                    Icon="git_pull_request" />
-                <TextBlock
-                    VerticalAlignment="Center">
-                    #<Run Text="{Binding Number}" />
-                </TextBlock>
-            </StackPanel>
+            <ui:OcticonPath ToolTip="Open or Create Pull Requests"
+                Fill="White"
+                VerticalAlignment="Bottom"
+                Margin="0 0 0 0"
+                Icon="git_pull_request" />
         </Button>
-        <Grid.ToolTip>
-            <TextBlock VerticalAlignment="Center">
-                    #<Run Text="{Binding Number}" /> - <Run Text="{Binding Title}" />
+        <Button
+            Foreground="{DynamicResource VsBrush.StatusBarText}"
+            BorderThickness="0"
+            Padding="4 0"
+            Command="{Binding ShowCurrentPullRequestCommand}"
+            Visibility="{Binding Number, TargetNullValue=Collapsed}">
+
+            <TextBlock
+                VerticalAlignment="Center">
+                #<Run Text="{Binding Number}" />
             </TextBlock>
-        </Grid.ToolTip>
-    </Grid>
+            <Button.ToolTip>
+                <TextBlock VerticalAlignment="Center">
+                    #<Run Text="{Binding Number}" /> - <Run Text="{Binding Title}" />
+                </TextBlock>
+            </Button.ToolTip>
+        </Button>
+    </StackPanel>
 </UserControl>
