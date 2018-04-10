@@ -419,6 +419,9 @@
   <data name="NavigateToEditorStatusMessage" xml:space="preserve">
     <value>Press Enter to navigate to Editor</value>
   </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>Checkout PR branch before navigating to Editor</value>
+  </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
     <value>Checkout PR branch and press Enter to navigate to Editor</value>
   </data>

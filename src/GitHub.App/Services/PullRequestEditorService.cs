@@ -497,7 +497,7 @@ namespace GitHub.Services
             {
                 if (!session.IsCheckedOut)
                 {
-                    ShowInfoMessage("Checkout PR branch before opening file in solution.");
+                    ShowInfoMessage(UI.Resources.NavigateToEditorNotCheckedOutInfoMessage);
                     return;
                 }
 
