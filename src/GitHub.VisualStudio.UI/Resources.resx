@@ -415,5 +415,10 @@
   </data>
   <data name="AddSingleComment" xml:space="preserve">
     <value>Add a single comment</value>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>Debugging</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>Enable Trace Logging</value>
   </data>
 </root>

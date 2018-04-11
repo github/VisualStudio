@@ -619,11 +619,29 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Debugging.
+        /// </summary>
+        public static string Options_DebuggingTitle {
+            get {
+                return ResourceManager.GetString("Options_DebuggingTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show PR comments on editor margin.
         /// </summary>
         public static string Options_EditorCommentsLabel {
             get {
                 return ResourceManager.GetString("Options_EditorCommentsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Trace Logging.
+        /// </summary>
+        public static string Options_EnableTraceLoggingText {
+            get {
+                return ResourceManager.GetString("Options_EnableTraceLoggingText", resourceCulture);
             }
         }
         
