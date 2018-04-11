@@ -109,6 +109,16 @@ namespace GitHub.InlineReviews
             router.Add(host.HostControl, marginElement);
         }
 
+        bool IsMarginVisible(ITextView textView)
+        {
+            if (!textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName))
+            {
+                return false;
+            }
+
+            return IsMarginVisible(textView.TextBuffer);
+        }
+
         bool IsMarginVisible(ITextBuffer buffer)
         {
             if (SessionManager.GetTextBufferInfo(buffer) != null)

@@ -26,7 +26,7 @@ namespace GitHub.InlineReviews.Glyph
         IWpfTextView textView;
         string marginName;
         GlyphMarginVisualManager<TGlyphTag> visualManager;
-        Func<ITextBuffer, bool> isMarginVisible;
+        Func<ITextView, bool> isMarginVisible;
 
         public GlyphMargin(
             IWpfTextViewHost wpfTextViewHost,
@@ -34,7 +34,7 @@ namespace GitHub.InlineReviews.Glyph
             Func<Grid> gridFactory,
             ITagAggregator<TGlyphTag> tagAggregator,
             IEditorFormatMap editorFormatMap,
-            Func<ITextBuffer, bool> isMarginVisible,
+            Func<ITextView, bool> isMarginVisible,
             string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
         {
             textView = wpfTextViewHost.TextView;
@@ -51,6 +51,8 @@ namespace GitHub.InlineReviews.Glyph
 
             // Do on Loaded to give diff view a chance to initialize.
             marginVisual.Loaded += OnLoaded;
+
+            textView.Options.OptionChanged += OnOptionChanged;
         }
 
         public void Dispose()
@@ -93,6 +95,11 @@ namespace GitHub.InlineReviews.Glyph
                 ThrowIfDisposed();
                 return marginVisual;
             }
+        }
+
+        void OnOptionChanged(object sender, EditorOptionChangedEventArgs e)
+        {
+            RefreshMarginVisibility();
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -196,7 +203,7 @@ namespace GitHub.InlineReviews.Glyph
 
         void RefreshMarginVisibility()
         {
-            marginVisual.Visibility = isMarginVisible(textView.TextBuffer) ? Visibility.Visible : Visibility.Collapsed;
+            marginVisual.Visibility = isMarginVisible(textView) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void ThrowIfDisposed()

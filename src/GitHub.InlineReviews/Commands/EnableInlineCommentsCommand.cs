@@ -23,8 +23,6 @@ namespace GitHub.InlineReviews.Commands
         /// </summary>
         public const int CommandId = PkgCmdIDList.EnableInlineCommentsId;
 
-        const string optionName = "TextViewHost/GlyphMargin";
-
         readonly Lazy<IVsTextManager> textManager;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
 
@@ -44,8 +42,8 @@ namespace GitHub.InlineReviews.Commands
             {
                 var wpfTextView = editorAdapter.Value.GetWpfTextView(activeView);
                 var options = wpfTextView.Options;
-                var enabled = options.GetOptionValue<bool>(optionName);
-                options.SetOptionValue(optionName, !enabled);
+                var enabled = options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName);
+                options.SetOptionValue(InlineCommentMarginEnabled.OptionName, !enabled);
             }
 
             return Task.CompletedTask;
