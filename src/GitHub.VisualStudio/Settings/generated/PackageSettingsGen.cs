@@ -1,29 +1,34 @@
 ﻿// This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
 /* settings.json content:
 {
-    "settings": [
+  "settings": [
     {
-        "name": "CollectMetrics",
-        "type": "bool",
-        "default": "true"
+      "name": "CollectMetrics",
+      "type": "bool",
+      "default": 'true'
     },
     {
-        "name": "EditorComments",
-        "type": "bool",
-        "default": "false"
+      "name": "EditorComments",
+      "type": "bool",
+      "default": "false"
     },
     {
-        "name": "UIState",
-        "type": "object",
-        "typename": "UIState",
-        "default": "null"
+      "name": "UIState",
+      "type": "object",
+      "typename": "UIState",
+      "default": "null"
     },
-	{
-		"name": "HideTeamExplorerWelcomeMessage",
-		"type": "bool",
-		"default": "false"
-	}
-    ]
+    {
+      "name": "HideTeamExplorerWelcomeMessage",
+      "type": "bool",
+      "default": "false"
+    },
+    {
+      "name": "EnableTraceLogging",
+      "type": "bool",
+      "default": "false"
+    }
+  ]
 }
 */
 
@@ -64,6 +69,13 @@ namespace GitHub.VisualStudio.Settings {
             set { hideTeamExplorerWelcomeMessage  = value; this.RaisePropertyChange(); }
         }
 
+        bool enableTraceLogging;
+        public bool EnableTraceLogging
+        {
+            get { return enableTraceLogging; }
+            set { enableTraceLogging  = value; this.RaisePropertyChange(); }
+        }
+
 
         void LoadSettings()
         {
@@ -71,6 +83,7 @@ namespace GitHub.VisualStudio.Settings {
             EditorComments = (bool)settingsStore.Read("EditorComments", false);
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
             HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
+            EnableTraceLogging = (bool)settingsStore.Read("EnableTraceLogging", false);
         }
 
         void SaveSettings()
@@ -79,6 +92,7 @@ namespace GitHub.VisualStudio.Settings {
             settingsStore.Write("EditorComments", EditorComments);
             settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
             settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
+            settingsStore.Write("EnableTraceLogging", EnableTraceLogging);
         }
 
     }
