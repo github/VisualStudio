@@ -79,6 +79,7 @@
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
     <Compile Include="Glyph\IGlyphFactory.cs" />
+    <Compile Include="InlineCommentMarginFactory.cs" />
     <Compile Include="InlineCommentMarginEnabled.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
