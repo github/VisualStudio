@@ -121,7 +121,7 @@
           </Grid.ColumnDefinitions>
           <Button x:Name="prHashtagLink"
                   Grid.Column="0"
-                  Command="{Binding OpenPROnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+                  Command="{Binding DataContext.OpenPullRequestOnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
                   CommandParameter="{Binding Number}"
                   Content="{Binding Number}"
                   ToolTip="{x:Static prop:Resources.OpenPROnGitHubToolTip}"

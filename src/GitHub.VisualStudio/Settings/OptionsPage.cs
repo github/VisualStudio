@@ -32,12 +32,14 @@ namespace GitHub.VisualStudio
         {
             child.CollectMetrics = packageSettings.CollectMetrics;
             child.EditorComments = packageSettings.EditorComments;
+            child.EnableTraceLogging = packageSettings.EnableTraceLogging;
         }
 
         void SaveSettings()
         {
             packageSettings.CollectMetrics = child.CollectMetrics;
             packageSettings.EditorComments = child.EditorComments;
+            packageSettings.EnableTraceLogging = child.EnableTraceLogging;
             packageSettings.Save();
         }
 
