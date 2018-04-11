@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.Text.Classification;
 
 namespace GitHub.InlineReviews
 {
-    public class InlineCommentMarginFactory
+    public class InlineCommentMargin : IWpfTextViewMargin
     {
         public const string MarginName = "InlineComment";
         const string MarginPropertiesName = "Indicator Margin"; // Same background color as Glyph margin 
@@ -26,8 +26,9 @@ namespace GitHub.InlineReviews
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IPackageSettings packageSettings;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
+        readonly Lazy<IWpfTextViewMargin> margin;
 
-        public InlineCommentMarginFactory(
+        public InlineCommentMargin(
             IWpfTextViewHost wpfTextViewHost,
             IInlineCommentPeekService peekService,
             IEditorFormatMapService editorFormatMapService,
@@ -41,15 +42,22 @@ namespace GitHub.InlineReviews
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.packageSettings = packageSettings;
             this.sessionManager = sessionManager;
+
+            margin = new Lazy<IWpfTextViewMargin>(() => Create());
         }
+
+        public ITextViewMargin GetTextViewMargin(string marginName) => margin.Value.GetTextViewMargin(marginName);
+
+        public void Dispose() => margin.Value.Dispose();
+
+        public FrameworkElement VisualElement => margin.Value.VisualElement;
+
+        public double MarginSize => margin.Value.MarginSize;
+
+        public bool Enabled => margin.Value.Enabled;
 
         public IWpfTextViewMargin Create()
         {
-            if (IsMarginDisabled(wpfTextViewHost))
-            {
-                return null;
-            }
-
             var textView = wpfTextViewHost.TextView;
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
 
@@ -73,7 +81,7 @@ namespace GitHub.InlineReviews
             return margin;
         }
 
-        bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView(textViewHost);
+        public bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView(textViewHost);
 
         bool IsDiffView(IWpfTextViewHost host)
         {

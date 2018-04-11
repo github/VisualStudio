@@ -11,7 +11,7 @@ using GitHub.Settings;
 namespace GitHub.InlineReviews
 {
     [Export(typeof(IWpfTextViewMarginProvider))]
-    [Name(InlineCommentMarginFactory.MarginName)]
+    [Name(InlineCommentMargin.MarginName)]
     [Order(After = PredefinedMarginNames.Glyph)]
     [MarginContainer(PredefinedMarginNames.Left)]
     [ContentType("text")]
@@ -43,8 +43,15 @@ namespace GitHub.InlineReviews
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
-            return new InlineCommentMarginFactory(wpfTextViewHost, peekService, editorFormatMapService,
-                tagAggregatorFactory, packageSettings, sessionManager).Create();
+            var margin = new InlineCommentMargin(
+                wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, packageSettings, sessionManager);
+
+            if (margin.IsMarginDisabled(wpfTextViewHost))
+            {
+                return null;
+            }
+
+            return margin;
         }
     }
 }
