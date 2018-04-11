@@ -35,14 +35,17 @@ namespace GitHub.InlineReviews
 
         async Task InitializeMenus()
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
+            var commands = new IVsCommandBase[]
+            {
+                exports.GetExportedValue<INextInlineCommentCommand>(),
+                exports.GetExportedValue<IPreviousInlineCommentCommand>()
+            };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            menuService.AddCommands(
-                exports.GetExportedValue<INextInlineCommentCommand>(),
-                exports.GetExportedValue<IPreviousInlineCommentCommand>());
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            menuService.AddCommands(commands);
         }
     }
 }

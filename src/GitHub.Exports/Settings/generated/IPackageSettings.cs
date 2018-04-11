@@ -1,24 +1,34 @@
 ﻿// This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
 /* settings.json content:
 {
-    "settings": [
+  "settings": [
     {
-        "name": "CollectMetrics",
-        "type": "bool",
-        "default": 'true'
+      "name": "CollectMetrics",
+      "type": "bool",
+      "default": 'true'
     },
     {
-        "name": "UIState",
-        "type": "object",
-        "typename": "UIState",
-        "default": 'null'
+      "name": "EditorComments",
+      "type": "bool",
+      "default": "false"
     },
-	{
-		"name": "HideTeamExplorerWelcomeMessage",
-		"type": "bool",
-		"default": 'false'
-	}
-    ]
+    {
+      "name": "UIState",
+      "type": "object",
+      "typename": "UIState",
+      "default": "null"
+    },
+    {
+      "name": "HideTeamExplorerWelcomeMessage",
+      "type": "bool",
+      "default": "false"
+    },
+    {
+      "name": "EnableTraceLogging",
+      "type": "bool",
+      "default": "false"
+    }
+  ]
 }
 */
 
@@ -33,5 +43,6 @@ namespace GitHub.Settings
         bool EditorComments { get; set; }
         UIState UIState { get; set; }
         bool HideTeamExplorerWelcomeMessage { get; set; }
+        bool EnableTraceLogging { get; set; }
     }
 }

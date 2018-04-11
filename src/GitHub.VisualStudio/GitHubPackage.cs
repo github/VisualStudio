@@ -7,13 +7,14 @@ using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
+using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -29,7 +30,6 @@ namespace GitHub.VisualStudio
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
-    [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
@@ -39,11 +39,29 @@ namespace GitHub.VisualStudio
         {
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
+            
+            await InitializeLoggingAsync();
             await GetServiceAsync(typeof(IUsageTracker));
 
             // Avoid delays when there is ongoing UI activity.
             // See: https://github.com/github/VisualStudio/issues/1537
             await JoinableTaskFactory.RunAsync(VsTaskRunContext.UIThreadNormalPriority, InitializeMenus);
+        }
+
+        async Task InitializeLoggingAsync()
+        {
+            var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+            LogManager.EnableTraceLogging(packageSettings?.EnableTraceLogging ?? false);
+            if (packageSettings != null)
+            {
+                packageSettings.PropertyChanged += (sender, args) =>
+                {
+                    if (args.PropertyName == "EnableTraceLogging")
+                    {
+                        LogManager.EnableTraceLogging(packageSettings.EnableTraceLogging);
+                    }
+                };
+            }
         }
 
         void LogVersionInformation()
@@ -56,12 +74,10 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
-
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
-            menuService.AddCommands(
+            var commands = new IVsCommandBase[]
+            {
                 exports.GetExportedValue<IAddConnectionCommand>(),
                 exports.GetExportedValue<IBlameLinkCommand>(),
                 exports.GetExportedValue<ICopyLinkCommand>(),
@@ -69,7 +85,12 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenLinkCommand>(),
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>());
+                exports.GetExportedValue<IShowGitHubPaneCommand>()
+            };
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
@@ -109,6 +130,9 @@ namespace GitHub.VisualStudio
         [ExportForProcess(typeof(IVSGitExt), ProcessName)]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
+        [ExportForProcess(typeof(IPackageSettings), ProcessName)]
+        public IPackageSettings PackageSettings => GetService<IPackageSettings>();
+
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
     }
 
@@ -116,6 +140,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(ILoginManager), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IPackageSettings), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
@@ -133,6 +158,7 @@ namespace GitHub.VisualStudio
             AddService(typeof(IUsageService), CreateService, true);
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
+            AddService(typeof(IPackageSettings), CreateService, true);
             return Task.CompletedTask;
         }
 
@@ -147,9 +173,8 @@ namespace GitHub.VisualStudio
                 ErrorHandler.Failed(frame.Show());
             }
 
-            var viewModel = (IGitHubPaneViewModel)((FrameworkElement)pane.Content).DataContext;
-            await viewModel.InitializeAsync(pane);
-            return viewModel;
+            var gitHubPane = (GitHubPane)pane;
+            return await gitHubPane.GetViewModelAsync();
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
@@ -239,6 +264,12 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
                 return this;
+            }
+            else if (serviceType == typeof(IPackageSettings))
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
+                return new PackageSettings(sp);
             }
             // go the mef route
             else
