@@ -75,7 +75,7 @@ namespace GitHub.InlineReviews.Glyph
             get
             {
                 ThrowIfDisposed();
-                return true;
+                return isMarginVisible(textView);
             }
         }
 
@@ -203,7 +203,7 @@ namespace GitHub.InlineReviews.Glyph
 
         void RefreshMarginVisibility()
         {
-            marginVisual.Visibility = isMarginVisible(textView) ? Visibility.Visible : Visibility.Collapsed;
+            marginVisual.Visibility = Enabled ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void ThrowIfDisposed()
