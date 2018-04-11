@@ -23,7 +23,6 @@ namespace GitHub.VisualStudio
         public const int blameCommand = 0x500;
 
         // IDs defined in InlineReviewsPackage.vsct
-        public const int ShowPullRequestCommentsId = 0x1000;
         public const int NextInlineCommentId = 0x1001;
         public const int PreviousInlineCommentId = 0x1002;
     };

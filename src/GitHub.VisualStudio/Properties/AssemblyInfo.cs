@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Markup;
 using Microsoft.VisualStudio.Shell;
 
 [assembly: AssemblyTitle("GitHub.VisualStudio")]
@@ -27,3 +28,7 @@ using Microsoft.VisualStudio.Shell;
 [assembly: ProvideCodeBase(AssemblyName = "Serilog.Sinks.File", CodeBase = @"$PackageFolder$\Serilog.Sinks.File.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig", CodeBase = @"$PackageFolder$\Markdig.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Markdig.Wpf", CodeBase = @"$PackageFolder$\Markdig.Wpf.dll")]
+
+[assembly: XmlnsDefinition("https://github.com/github/VisualStudio", "GitHub.VisualStudio.Views")]
+[assembly: XmlnsDefinition("https://github.com/github/VisualStudio", "GitHub.VisualStudio.Views.Dialog")]
+[assembly: XmlnsDefinition("https://github.com/github/VisualStudio", "GitHub.VisualStudio.Views.GitHubPane")]

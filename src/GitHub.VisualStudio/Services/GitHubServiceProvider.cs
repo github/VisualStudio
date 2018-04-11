@@ -22,58 +22,6 @@ using Log = GitHub.Logging.Log;
 namespace GitHub.VisualStudio
 {
     /// <summary>
-    /// This is a thin MEF wrapper around the GitHubServiceProvider
-    /// which is registered as a global VS service. This class just
-    /// redirects every request to the actual service, and can be
-    /// thrown away as soon as the caller is done (no state is kept)
-    /// </summary>
-    [ExportForProcess(typeof(IGitHubServiceProvider), "devenv")]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GitHubProviderDispatcher : IGitHubServiceProvider
-    {
-        readonly IGitHubServiceProvider theRealProvider;
-
-        [ImportingConstructor]
-        public GitHubProviderDispatcher([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-        {
-            theRealProvider = serviceProvider.GetService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-        }
-
-        public ExportProvider ExportProvider => theRealProvider.ExportProvider;
-
-        public IServiceProvider GitServiceProvider
-        {
-            get
-            {
-                return theRealProvider.GitServiceProvider;
-            }
-
-            set
-            {
-                theRealProvider.GitServiceProvider = value;
-            }
-        }
-
-        public void AddService(Type t, object owner, object instance) => theRealProvider.AddService(t, owner, instance);
-
-        public void AddService<T>(object owner, T instance) where T : class => theRealProvider.AddService(owner, instance);
-
-        public T GetService<T>() where T : class => theRealProvider.GetService<T>();
-
-        public object GetService(Type serviceType) => theRealProvider.GetService(serviceType);
-
-        public Ret GetService<T, Ret>() where T : class where Ret : class => theRealProvider.GetService<T, Ret>();
-
-        public void RemoveService(Type t, object owner) => theRealProvider.RemoveService(t, owner);
-
-        public object TryGetService(string typename) => theRealProvider.TryGetService(typename);
-
-        public object TryGetService(Type t) => theRealProvider.TryGetService(t);
-
-        public T TryGetService<T>() where T : class => theRealProvider.TryGetService<T>();
-    }
-
-    /// <summary>
     /// This is a globally registered service (see `GitHubPackage`).
     /// If you need to access this service via MEF, use the `IGitHubServiceProvider` type
     /// </summary>
@@ -149,16 +97,23 @@ namespace GitHub.VisualStudio
 
         public object TryGetService(Type serviceType)
         {
-            string contract = AttributedModelServices.GetContractName(serviceType);
+            var contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
             var sp = initialized ? syncServiceProvider : asyncServiceProvider;
 
-            instance = sp.GetService(serviceType);
-            if (instance != null)
-                return instance;
+            try
+            {
+                instance = sp.GetService(serviceType);
+                if (instance != null)
+                    return instance;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error loading {ServiceType}", serviceType);
+            }
 
             instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
 

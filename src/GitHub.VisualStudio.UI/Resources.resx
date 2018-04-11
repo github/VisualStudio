@@ -404,4 +404,10 @@
   <data name="ForkNavigationItemText" xml:space="preserve">
     <value>Fork</value>
   </data>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>Debugging</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>Enable Trace Logging</value>
+  </data>
 </root>
