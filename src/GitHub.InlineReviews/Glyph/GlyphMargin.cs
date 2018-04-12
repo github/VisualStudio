@@ -18,7 +18,6 @@ namespace GitHub.InlineReviews.Glyph
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
     public sealed class GlyphMargin<TGlyphTag> : IDisposable where TGlyphTag : ITag
     {
-        bool handleZoom;
         Grid marginVisual;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
@@ -33,11 +32,10 @@ namespace GitHub.InlineReviews.Glyph
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IEditorFormatMap editorFormatMap,
             Func<bool> isMarginVisible,
-            string marginPropertiesName, bool handleZoom = true)
+            string marginPropertiesName)
         {
             textView = wpfTextViewHost.TextView;
             this.isMarginVisible = isMarginVisible;
-            this.handleZoom = handleZoom;
 
             marginVisual = marginGrid;
 
@@ -67,10 +65,7 @@ namespace GitHub.InlineReviews.Glyph
 
             tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
             textView.LayoutChanged += OnLayoutChanged;
-            if (handleZoom)
-            {
-                textView.ZoomLevelChanged += OnZoomLevelChanged;
-            }
+            textView.ZoomLevelChanged += OnZoomLevelChanged;
 
             if (textView.InLayout)
             {
@@ -84,11 +79,8 @@ namespace GitHub.InlineReviews.Glyph
                 }
             }
 
-            if (handleZoom)
-            {
-                marginVisual.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
-                marginVisual.LayoutTransform.Freeze();
-            }
+            marginVisual.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
+            marginVisual.LayoutTransform.Freeze();
         }
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)

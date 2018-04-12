@@ -70,7 +70,7 @@ namespace GitHub.InlineReviews
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
 
             glyphMargin = new GlyphMargin<InlineCommentTag>(wpfTextViewHost, glyphFactory, marginGrid, tagAggregatorFactory,
-                editorFormatMap, IsMarginVisible, MarginPropertiesName, true);
+                editorFormatMap, IsMarginVisible, MarginPropertiesName);
 
             if (IsDiffView(wpfTextViewHost))
             {
