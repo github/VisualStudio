@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Windows;
+using System.Threading.Tasks;
+using System.Reactive.Linq;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.InlineReviews.Commands;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
@@ -24,66 +27,73 @@ namespace GitHub.InlineReviews
         readonly IWpfTextView textView;
         readonly CommentsMarginViewModel viewModel;
         readonly CommentsMarginView visualElement;
+        readonly IPullRequestSessionManager sessionManager;
 
         /// <summary>
         /// A value indicating whether the object is disposed.
         /// </summary>
         bool isDisposed;
 
-        bool enabled;
+        IDisposable currentSessionSubscription;
+        IDisposable optionChangedSubscription;
+        IDisposable visibilitySubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleCommentsMargin"/> class for a given <paramref name="textView"/>.
         /// </summary>
         /// <param name="textView">The <see cref="IWpfTextView"/> to attach the margin to.</param>
-        public CommentsMargin(IWpfTextView textView, IEnableInlineCommentsCommand enableInlineCommentsCommand,
-            IPullRequestSessionManager sessionManager)
+        public CommentsMargin(IWpfTextView textView, IEnableInlineCommentsCommand enableInlineCommentsCommand, IPullRequestSessionManager sessionManager)
         {
             this.textView = textView;
+            this.sessionManager = sessionManager;
 
             viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
 
-            enabled = false;
-            RefreshVisibility();
+            visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>
+            {
+                visualElement.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+            });
 
-            RefreshMarginEnabled();
-            textView.Options.OptionChanged += (s, e) => RefreshMarginEnabled();
+            optionChangedSubscription = Observable.FromEventPattern(textView.Options, nameof(textView.Options.OptionChanged)).Subscribe(_ =>
+            {
+                viewModel.MarginEnabled = textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName);
+            });
 
-            InitializeAsync(sessionManager, textView.TextBuffer).Forget();
+            currentSessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
+                .Subscribe(x => RefreshCurrentSession().Forget());
         }
 
-        async Task InitializeAsync(IPullRequestSessionManager sessionManager, ITextBuffer textBuffer)
+        async Task RefreshCurrentSession()
         {
-            await sessionManager.EnsureInitialized();
-            var relativePath = sessionManager.GetRelativePath(textBuffer);
-            if (relativePath != null)
+            var sessionFile = await FindSessionFile();
+            if (sessionFile != null)
             {
-                var sessionFile = await sessionManager.CurrentSession.GetFile(relativePath);
-                if (sessionFile != null)
-                {
-                    var commentsInFile = sessionFile.InlineCommentThreads?.Count ?? -1;
-                    viewModel.CommentsInFile = commentsInFile;
+                viewModel.CommentsInFile = sessionFile.InlineCommentThreads?.Count ?? -1;
+                viewModel.Enabled = sessionFile.Diff.Count > 0;
+            }
+            else
+            {
+                viewModel.CommentsInFile = 0;
+                viewModel.Enabled = false;
+            }
+        }
 
-                    // Only enable if there are changes in PR file
-                    if (sessionFile.Diff.Count > 0)
-                    {
-                        enabled = true;
-                        RefreshVisibility();
-                    }
-                }
+        async Task<IPullRequestSessionFile> FindSessionFile()
+        {
+            var session = sessionManager.CurrentSession;
+            if (session == null)
+            {
+                return null;
             }
 
-        }
+            var relativePath = sessionManager.GetRelativePath(textView.TextBuffer);
+            if (relativePath == null)
+            {
+                return null;
+            }
 
-        private void RefreshVisibility()
-        {
-            visualElement.Visibility = Enabled ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        void RefreshMarginEnabled()
-        {
-            viewModel.MarginEnabled = textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName);
+            return await session.GetFile(relativePath);
         }
 
         /// <summary>
@@ -133,7 +143,7 @@ namespace GitHub.InlineReviews
             {
                 ThrowIfDisposed();
 
-                return enabled;
+                return viewModel.Enabled;
             }
         }
 
@@ -159,6 +169,10 @@ namespace GitHub.InlineReviews
         {
             if (!isDisposed)
             {
+                currentSessionSubscription.Dispose();
+                optionChangedSubscription.Dispose();
+                visibilitySubscription.Dispose();
+
                 GC.SuppressFinalize(this);
                 isDisposed = true;
             }

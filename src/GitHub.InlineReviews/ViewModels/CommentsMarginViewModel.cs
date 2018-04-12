@@ -5,12 +5,19 @@ namespace GitHub.InlineReviews.ViewModels
 {
     public class CommentsMarginViewModel : ReactiveObject
     {
+        bool enabled;
         int commentsInFile;
         bool marginEnabled;
 
         public CommentsMarginViewModel(ICommand enableInlineComments)
         {
             EnableInlineComments = enableInlineComments;
+        }
+
+        public bool Enabled
+        {
+            get { return enabled; }
+            set { this.RaiseAndSetIfChanged(ref enabled, value); }
         }
 
         public int CommentsInFile
