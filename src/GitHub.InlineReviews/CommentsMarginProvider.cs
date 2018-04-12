@@ -38,7 +38,15 @@ namespace GitHub.InlineReviews
         /// </returns>
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
         {
+            // Never show on diff views
+            if (IsDiffView(wpfTextViewHost.TextView))
+            {
+                return null;
+            }
+
             return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, sessionManager);
         }
+
+        bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");
     }
 }
