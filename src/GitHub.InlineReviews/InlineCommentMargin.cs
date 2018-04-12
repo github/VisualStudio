@@ -26,7 +26,9 @@ namespace GitHub.InlineReviews
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IPackageSettings packageSettings;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
-        readonly Lazy<IWpfTextViewMargin> margin;
+        readonly Lazy<Grid> marginGrid;
+
+        GlyphMargin<InlineCommentTag> glyphMargin;
 
         public InlineCommentMargin(
             IWpfTextViewHost wpfTextViewHost,
@@ -43,42 +45,39 @@ namespace GitHub.InlineReviews
             this.packageSettings = packageSettings;
             this.sessionManager = sessionManager;
 
-            margin = new Lazy<IWpfTextViewMargin>(() => Create());
+            marginGrid = new Lazy<Grid>(() => CreateMarginGrid());
         }
 
-        public ITextViewMargin GetTextViewMargin(string marginName) => margin.Value.GetTextViewMargin(marginName);
-
-        public void Dispose() => margin.Value.Dispose();
-
-        public FrameworkElement VisualElement => margin.Value.VisualElement;
-
-        public double MarginSize => margin.Value.MarginSize;
-
-        public bool Enabled => margin.Value.Enabled;
-
-        public IWpfTextViewMargin Create()
+        public ITextViewMargin GetTextViewMargin(string name)
         {
+            return (name == MarginName) ? this : null;
+        }
+
+        public void Dispose() => glyphMargin?.Dispose();
+
+        public FrameworkElement VisualElement => marginGrid.Value;
+
+        public double MarginSize => marginGrid.Value.Width;
+
+        public bool Enabled => IsMarginVisible();
+
+        Grid CreateMarginGrid()
+        {
+            var marginGrid = new GlyphMarginGrid();
+
             var textView = wpfTextViewHost.TextView;
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
-
-            Func<Grid> gridFactory = () => new GlyphMarginGrid();
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
-            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, editorFormatMap);
-        }
 
-        IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
-            IWpfTextViewHost wpfTextViewHost, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
-        {
-            var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            var margin = new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
-                IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
+            glyphMargin = new GlyphMargin<InlineCommentTag>(wpfTextViewHost, glyphFactory, marginGrid, tagAggregatorFactory,
+                editorFormatMap, IsMarginVisible, MarginPropertiesName, true, 17.0);
 
             if (IsDiffView(wpfTextViewHost))
             {
-                TrackCommentGlyph(wpfTextViewHost, margin.VisualElement);
+                TrackCommentGlyph(wpfTextViewHost, marginGrid);
             }
 
-            return margin;
+            return marginGrid;
         }
 
         public bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView(textViewHost);
@@ -95,8 +94,9 @@ namespace GitHub.InlineReviews
             router.Add(host.HostControl, marginElement);
         }
 
-        bool IsMarginVisible(ITextView textView)
+        bool IsMarginVisible()
         {
+            var textView = wpfTextViewHost.TextView;
             if (!textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName))
             {
                 return false;

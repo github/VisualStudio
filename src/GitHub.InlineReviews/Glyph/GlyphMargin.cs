@@ -16,36 +16,33 @@ namespace GitHub.InlineReviews.Glyph
     /// Responsibe for updating the margin when tags change.
     /// </summary>
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
-    public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag : ITag
+    public sealed class GlyphMargin<TGlyphTag> : IDisposable where TGlyphTag : ITag
     {
         bool handleZoom;
-        bool isDisposed;
         Grid marginVisual;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
         IWpfTextView textView;
-        string marginName;
         GlyphMarginVisualManager<TGlyphTag> visualManager;
-        Func<ITextView, bool> isMarginVisible;
+        Func<bool> isMarginVisible;
 
         public GlyphMargin(
             IWpfTextViewHost wpfTextViewHost,
             IGlyphFactory<TGlyphTag> glyphFactory,
-            Func<Grid> gridFactory,
-            ITagAggregator<TGlyphTag> tagAggregator,
+            Grid marginGrid,
+            IViewTagAggregatorFactoryService tagAggregatorFactory,
             IEditorFormatMap editorFormatMap,
-            Func<ITextView, bool> isMarginVisible,
-            string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
+            Func<bool> isMarginVisible,
+            string marginPropertiesName, bool handleZoom = true, double marginWidth = 17.0)
         {
             textView = wpfTextViewHost.TextView;
-            this.tagAggregator = tagAggregator;
             this.isMarginVisible = isMarginVisible;
-            this.marginName = marginName;
             this.handleZoom = handleZoom;
 
-            marginVisual = gridFactory();
+            marginVisual = marginGrid;
             marginVisual.Width = marginWidth;
 
+            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
                 editorFormatMap, marginPropertiesName);
 
@@ -57,44 +54,7 @@ namespace GitHub.InlineReviews.Glyph
 
         public void Dispose()
         {
-            if (!isDisposed)
-            {
-                tagAggregator.Dispose();
-                marginVisual = null;
-                isDisposed = true;
-            }
-        }
-
-        public ITextViewMargin GetTextViewMargin(string name)
-        {
-            return (name == marginName) ? this : null;
-        }
-
-        public bool Enabled
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return isMarginVisible(textView);
-            }
-        }
-
-        public double MarginSize
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual.Width;
-            }
-        }
-
-        public FrameworkElement VisualElement
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual;
-            }
+            tagAggregator.Dispose();
         }
 
         void OnOptionChanged(object sender, EditorOptionChangedEventArgs e)
@@ -203,15 +163,7 @@ namespace GitHub.InlineReviews.Glyph
 
         void RefreshMarginVisibility()
         {
-            marginVisual.Visibility = Enabled ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        void ThrowIfDisposed()
-        {
-            if (isDisposed)
-            {
-                throw new ObjectDisposedException(marginName);
-            }
+            marginVisual.Visibility = isMarginVisible() ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }
