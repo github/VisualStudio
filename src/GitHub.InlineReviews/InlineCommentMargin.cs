@@ -46,6 +46,11 @@ namespace GitHub.InlineReviews
             this.sessionManager = sessionManager;
 
             marginGrid = new Lazy<Grid>(() => CreateMarginGrid(wpfTextViewHost));
+
+            if (IsMarginDisabledDefault())
+            {
+                textView.Options.SetOptionValue(InlineCommentMarginEnabled.OptionName, false);
+            }
         }
 
         public ITextViewMargin GetTextViewMargin(string name)
@@ -79,7 +84,7 @@ namespace GitHub.InlineReviews
             return marginGrid;
         }
 
-        bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView();
+        bool IsMarginDisabledDefault() => !packageSettings.EditorComments && !IsDiffView();
 
         bool IsDiffView() => textView.Roles.Contains("DIFF");
 

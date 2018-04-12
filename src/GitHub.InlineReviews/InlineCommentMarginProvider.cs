@@ -43,15 +43,8 @@ namespace GitHub.InlineReviews
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
-            var margin = new InlineCommentMargin(
+            return new InlineCommentMargin(
                 wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, packageSettings, sessionManager);
-
-            if (margin.IsMarginDisabled(wpfTextViewHost))
-            {
-                return null;
-            }
-
-            return margin;
         }
     }
 }
