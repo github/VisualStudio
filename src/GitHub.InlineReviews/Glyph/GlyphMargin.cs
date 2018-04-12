@@ -33,14 +33,13 @@ namespace GitHub.InlineReviews.Glyph
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IEditorFormatMap editorFormatMap,
             Func<bool> isMarginVisible,
-            string marginPropertiesName, bool handleZoom = true, double marginWidth = 17.0)
+            string marginPropertiesName, bool handleZoom = true)
         {
             textView = wpfTextViewHost.TextView;
             this.isMarginVisible = isMarginVisible;
             this.handleZoom = handleZoom;
 
             marginVisual = marginGrid;
-            marginVisual.Width = marginWidth;
 
             tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,

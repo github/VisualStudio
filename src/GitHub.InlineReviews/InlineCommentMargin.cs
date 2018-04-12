@@ -63,14 +63,14 @@ namespace GitHub.InlineReviews
 
         Grid CreateMarginGrid()
         {
-            var marginGrid = new GlyphMarginGrid();
+            var marginGrid = new GlyphMarginGrid { Width = 17.0 };
 
             var textView = wpfTextViewHost.TextView;
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
 
             glyphMargin = new GlyphMargin<InlineCommentTag>(wpfTextViewHost, glyphFactory, marginGrid, tagAggregatorFactory,
-                editorFormatMap, IsMarginVisible, MarginPropertiesName, true, 17.0);
+                editorFormatMap, IsMarginVisible, MarginPropertiesName, true);
 
             if (IsDiffView(wpfTextViewHost))
             {
