@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Windows;
 using GitHub.Services;
-using Microsoft.VisualStudio.Text.Editor;
+using GitHub.Extensions;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.InlineReviews.Commands;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews
 {
@@ -25,7 +28,9 @@ namespace GitHub.InlineReviews
         /// <summary>
         /// A value indicating whether the object is disposed.
         /// </summary>
-        private bool isDisposed;
+        bool isDisposed;
+
+        bool enabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleCommentsMargin"/> class for a given <paramref name="textView"/>.
@@ -36,11 +41,44 @@ namespace GitHub.InlineReviews
         {
             this.textView = textView;
 
-            viewModel = new CommentsMarginViewModel(sessionManager, textView.TextBuffer, enableInlineCommentsCommand);
+            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
+
+            enabled = false;
+            RefreshVisibility();
 
             RefreshMarginEnabled();
             textView.Options.OptionChanged += (s, e) => RefreshMarginEnabled();
+
+            InitializeAsync(sessionManager, textView.TextBuffer).Forget();
+        }
+
+        async Task InitializeAsync(IPullRequestSessionManager sessionManager, ITextBuffer textBuffer)
+        {
+            await sessionManager.EnsureInitialized();
+            var relativePath = sessionManager.GetRelativePath(textBuffer);
+            if (relativePath != null)
+            {
+                var sessionFile = await sessionManager.CurrentSession.GetFile(relativePath);
+                if (sessionFile != null)
+                {
+                    var commentsInFile = sessionFile.InlineCommentThreads?.Count ?? -1;
+                    viewModel.CommentsInFile = commentsInFile;
+
+                    // Only enable if there are changes in PR file
+                    if (sessionFile.Diff.Count > 0)
+                    {
+                        enabled = true;
+                        RefreshVisibility();
+                    }
+                }
+            }
+
+        }
+
+        private void RefreshVisibility()
+        {
+            visualElement.Visibility = Enabled ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void RefreshMarginEnabled()
@@ -95,8 +133,7 @@ namespace GitHub.InlineReviews
             {
                 ThrowIfDisposed();
 
-                // The margin should always be enabled
-                return true;
+                return enabled;
             }
         }
 
