@@ -18,7 +18,9 @@ namespace GitHub.InlineReviews
         /// </summary>
         public const string MarginName = "CommentsMargin";
 
-        readonly FrameworkElement visualElement;
+        readonly IWpfTextView textView;
+        readonly CommentsMarginViewModel viewModel;
+        readonly CommentsMarginView visualElement;
 
         /// <summary>
         /// A value indicating whether the object is disposed.
@@ -32,8 +34,18 @@ namespace GitHub.InlineReviews
         public CommentsMargin(IWpfTextView textView, IEnableInlineCommentsCommand enableInlineCommentsCommand,
             IPullRequestSessionManager sessionManager)
         {
-            var viewModel = new CommentsMarginViewModel(sessionManager, textView.TextBuffer, enableInlineCommentsCommand);
+            this.textView = textView;
+
+            viewModel = new CommentsMarginViewModel(sessionManager, textView.TextBuffer, enableInlineCommentsCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
+
+            RefreshMarginEnabled();
+            textView.Options.OptionChanged += (s, e) => RefreshMarginEnabled();
+        }
+
+        void RefreshMarginEnabled()
+        {
+            viewModel.MarginEnabled = textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName);
         }
 
         /// <summary>

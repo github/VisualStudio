@@ -13,6 +13,7 @@ namespace GitHub.InlineReviews.ViewModels
         readonly ITextBuffer textBuffer;
 
         int commentsInFile;
+        bool marginEnabled;
 
         public CommentsMarginViewModel(IPullRequestSessionManager sessionManager, ITextBuffer textBuffer, ICommand enableInlineComments)
         {
@@ -38,6 +39,12 @@ namespace GitHub.InlineReviews.ViewModels
         {
             get { return commentsInFile; }
             private set { this.RaiseAndSetIfChanged(ref commentsInFile, value); }
+        }
+
+        public bool MarginEnabled
+        {
+            get { return marginEnabled; }
+            set { this.RaiseAndSetIfChanged(ref marginEnabled, value); }
         }
 
         public ICommand EnableInlineComments { get; }
