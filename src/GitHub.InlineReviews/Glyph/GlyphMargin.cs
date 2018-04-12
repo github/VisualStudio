@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews.Glyph
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
     public sealed class GlyphMargin<TGlyphTag> : IDisposable where TGlyphTag : ITag
     {
-        Grid marginVisual;
+        Grid marginGrid;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
         IWpfTextView textView;
@@ -26,7 +26,7 @@ namespace GitHub.InlineReviews.Glyph
         Func<bool> isMarginVisible;
 
         public GlyphMargin(
-            IWpfTextViewHost wpfTextViewHost,
+            IWpfTextView textView,
             IGlyphFactory<TGlyphTag> glyphFactory,
             Grid marginGrid,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
@@ -34,17 +34,16 @@ namespace GitHub.InlineReviews.Glyph
             Func<bool> isMarginVisible,
             string marginPropertiesName)
         {
-            textView = wpfTextViewHost.TextView;
+            this.textView = textView;
             this.isMarginVisible = isMarginVisible;
+            this.marginGrid = marginGrid;
 
-            marginVisual = marginGrid;
-
-            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
+            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
+            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, this.marginGrid,
                 editorFormatMap, marginPropertiesName);
 
             // Do on Loaded to give diff view a chance to initialize.
-            marginVisual.Loaded += OnLoaded;
+            this.marginGrid.Loaded += OnLoaded;
 
             textView.Options.OptionChanged += OnOptionChanged;
         }
@@ -79,8 +78,8 @@ namespace GitHub.InlineReviews.Glyph
                 }
             }
 
-            marginVisual.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
-            marginVisual.LayoutTransform.Freeze();
+            marginGrid.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
+            marginGrid.LayoutTransform.Freeze();
         }
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
@@ -136,7 +135,7 @@ namespace GitHub.InlineReviews.Glyph
         void OnZoomLevelChanged(object sender, ZoomLevelChangedEventArgs e)
         {
             refreshAllGlyphs = true;
-            marginVisual.LayoutTransform = e.ZoomTransform;
+            marginGrid.LayoutTransform = e.ZoomTransform;
         }
 
         void RefreshGlyphsOver(ITextViewLine textViewLine)
@@ -154,7 +153,7 @@ namespace GitHub.InlineReviews.Glyph
 
         void RefreshMarginVisibility()
         {
-            marginVisual.Visibility = isMarginVisible() ? Visibility.Visible : Visibility.Collapsed;
+            marginGrid.Visibility = isMarginVisible() ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }
