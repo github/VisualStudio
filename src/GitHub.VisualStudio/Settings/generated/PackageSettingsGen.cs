@@ -79,20 +79,20 @@ namespace GitHub.VisualStudio.Settings {
 
         void LoadSettings()
         {
-            CollectMetrics = (bool)settingsStore.Read("CollectMetrics", true);
-            EditorComments = (bool)settingsStore.Read("EditorComments", false);
-            UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
-            HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
-            EnableTraceLogging = (bool)settingsStore.Read("EnableTraceLogging", false);
+            CollectMetrics = (bool)SettingsStore.Read("CollectMetrics", true);
+            EditorComments = (bool)SettingsStore.Read("EditorComments", false);
+            UIState = SimpleJson.DeserializeObject<UIState>((string)SettingsStore.Read("UIState", "{}"));
+            HideTeamExplorerWelcomeMessage = (bool)SettingsStore.Read("HideTeamExplorerWelcomeMessage", false);
+            EnableTraceLogging = (bool)SettingsStore.Read("EnableTraceLogging", false);
         }
 
         void SaveSettings()
         {
-            settingsStore.Write("CollectMetrics", CollectMetrics);
-            settingsStore.Write("EditorComments", EditorComments);
-            settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
-            settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
-            settingsStore.Write("EnableTraceLogging", EnableTraceLogging);
+            SettingsStore.Write("CollectMetrics", CollectMetrics);
+            SettingsStore.Write("EditorComments", EditorComments);
+            SettingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
+            SettingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
+            SettingsStore.Write("EnableTraceLogging", EnableTraceLogging);
         }
 
     }

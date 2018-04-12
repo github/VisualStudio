@@ -12,13 +12,25 @@ namespace GitHub.VisualStudio.Settings
 {
     public partial class PackageSettings : NotificationAwareObject, IPackageSettings
     {
-        readonly SettingsStore settingsStore;
+        readonly IServiceProvider serviceProvider;
+        SettingsStore settingsStore;
+        public SettingsStore SettingsStore
+        {
+            get
+            {
+                if (settingsStore == null)
+                {
+                    var sm = new ShellSettingsManager(serviceProvider);
+                    settingsStore = new SettingsStore(sm.GetWritableSettingsStore(SettingsScope.UserSettings), Info.ApplicationInfo.ApplicationSafeName);
+                    LoadSettings();
+                }
+                return settingsStore;
+            }
+        }
 
         public PackageSettings(IServiceProvider serviceProvider)
         {
-            var sm = new ShellSettingsManager(serviceProvider);
-            settingsStore = new SettingsStore(sm.GetWritableSettingsStore(SettingsScope.UserSettings), Info.ApplicationInfo.ApplicationSafeName);
-            LoadSettings();
+            this.serviceProvider = serviceProvider;
         }
 
         public void Save()

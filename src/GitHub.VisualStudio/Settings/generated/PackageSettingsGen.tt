@@ -49,13 +49,13 @@ foreach (var j in json.Children().Children().Children()) {
     if (j["type"].ToString() == "object")
     {
 #>
-            <#= j["name"] #> = SimpleJson.DeserializeObject<<#= j["typename"] #>>((string)settingsStore.Read("<#= j["name"] #>", "{}"));
+            <#= j["name"] #> = SimpleJson.DeserializeObject<<#= j["typename"] #>>((string)SettingsStore.Read("<#= j["name"] #>", "{}"));
 <#
     }
     else
     {
 #>
-            <#= j["name"] #> = (<#= j["type"] #>)settingsStore.Read("<#= j["name"] #>", <#= j["default"] #>);
+            <#= j["name"] #> = (<#= j["type"] #>)SettingsStore.Read("<#= j["name"] #>", <#= j["default"] #>);
 <#
     }
 }
@@ -69,13 +69,13 @@ foreach (var j in json.Children().Children().Children()) {
     if (j["type"].ToString() == "object")
     {
 #>
-            settingsStore.Write("<#= j["name"] #>", SimpleJson.SerializeObject(<#= j["name"] #>));
+            SettingsStore.Write("<#= j["name"] #>", SimpleJson.SerializeObject(<#= j["name"] #>));
 <#
     }
     else
     {
 #>
-            settingsStore.Write("<#= j["name"] #>", <#= j["name"] #>);
+            SettingsStore.Write("<#= j["name"] #>", <#= j["name"] #>);
 <#
     }
 }

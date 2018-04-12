@@ -22,6 +22,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {
@@ -133,7 +134,7 @@ namespace GitHub.VisualStudio
         [ExportForProcess(typeof(IPackageSettings), ProcessName)]
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
-        T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
+        T GetService<T>() => (T)serviceProvider.GetServiceSafe(typeof(T));
     }
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -216,11 +217,13 @@ namespace GitHub.VisualStudio
                 await result.Initialize();
                 return result;
             }
-            else if (serviceType == typeof(ILoginManager))
+
+            var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+
+            if (serviceType == typeof(ILoginManager))
             {
                 // These services are got through MEF and we will take a performance hit if ILoginManager is requested during 
                 // InitializeAsync. TODO: We can probably make LoginManager a normal MEF component rather than a service.
-                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var keychain = serviceProvider.GetService<IKeychain>();
                 var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
 
@@ -234,7 +237,7 @@ namespace GitHub.VisualStudio
                         return serviceProvider.GetService<ITwoFactorChallengeHandler>();
                     }));
 
-                return new LoginManager(
+                var service = new LoginManager(
                     keychain,
                     lazy2Fa,
                     oauthListener,
@@ -243,39 +246,46 @@ namespace GitHub.VisualStudio
                     ApiClientConfiguration.RequiredScopes,
                     ApiClientConfiguration.AuthorizationNote,
                     ApiClientConfiguration.MachineFingerprint);
+                serviceProvider.AddService<ILoginManager>(serviceProvider, service);
+                return service;
             }
             else if (serviceType == typeof(IUsageService))
             {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var environment = new Rothko.Environment();
-                return new UsageService(sp, environment);
+                var service = new UsageService(serviceProvider, environment);
+                serviceProvider.AddService<IUsageService>(serviceProvider, service);
+                return service;
             }
             else if (serviceType == typeof(IUsageTracker))
             {
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
-                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UsageTracker(serviceProvider, usageService);
+                var service = new UsageTracker(serviceProvider, usageService);
+                serviceProvider.AddService<IUsageTracker>(serviceProvider, service);
+                return service;
             }
             else if (serviceType == typeof(IVSGitExt))
             {
                 var vsVersion = ApplicationInfo.GetHostVersionInfo().FileMajorPart;
-                return new VSGitExtFactory(vsVersion, this).Create();
+                var service = new VSGitExtFactory(vsVersion, this).Create();
+                serviceProvider.AddService<IVSGitExt>(serviceProvider, service);
+                return service;
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
+                serviceProvider.AddService<IGitHubToolWindowManager>(serviceProvider, this);
                 return this;
             }
             else if (serviceType == typeof(IPackageSettings))
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
-                return new PackageSettings(sp);
+                var service = new PackageSettings(serviceProvider);
+                serviceProvider.AddService<IPackageSettings>(serviceProvider, service);
+                return service;
             }
             // go the mef route
             else
             {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return sp.TryGetService(serviceType);
+                return serviceProvider.TryGetService(serviceType);
             }
         }
     }
