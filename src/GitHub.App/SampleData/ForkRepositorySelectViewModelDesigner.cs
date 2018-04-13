@@ -38,7 +38,9 @@ namespace GitHub.SampleData
 
         public string Title => null;
 
-        public ReactiveCommand<object> Selected => null;
+        public ReactiveCommand<object> SelectedAccount => null;
+
+        public ReactiveCommand<object> CloneRepository => null;
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {

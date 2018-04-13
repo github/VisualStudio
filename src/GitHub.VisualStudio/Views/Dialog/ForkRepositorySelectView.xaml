@@ -73,7 +73,8 @@
         <LineBreak/>
         <Run>You have existing forks of this repository:</Run>
       </TextBlock>
-      <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding ExistingForks}" MaxHeight="120">
+      <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding ExistingForks}" MaxHeight="120"
+               SelectionChanged="existingForksListBox_SelectionChanged">
         <ListBox.ItemTemplate>
           <DataTemplate>
             <StackPanel Orientation="Horizontal">

@@ -22,6 +22,7 @@ namespace GitHub.ViewModels.Dialog
         {
             this.selectPage = selectPage;
             this.executePage = executePage;
+            selectPage.CloneRepository.Subscribe(x => ShowCloneRepositoryPage((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
         }
 
@@ -39,6 +40,10 @@ namespace GitHub.ViewModels.Dialog
         {
             await executePage.InitializeAsync(repository, connection, account);
             Content = executePage;
+        }
+
+        void ShowCloneRepositoryPage(IRemoteRepositoryModel remoteRepository)
+        {
         }
     }
 }

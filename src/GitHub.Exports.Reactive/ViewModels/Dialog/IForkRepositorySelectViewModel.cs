@@ -29,7 +29,12 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="Accounts"/>.
         /// </summary>
-        ReactiveCommand<object> Selected { get; }
+        ReactiveCommand<object> SelectedAccount { get; }
+
+        /// <summary>
+        /// Gets a command that is executed when the user selects an item in <see cref="ExistingForks"/>.
+        /// </summary>
+        ReactiveCommand<object> CloneRepository { get; }
 
         /// <summary>
         /// Initializes the view model.

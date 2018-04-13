@@ -28,7 +28,8 @@ namespace GitHub.ViewModels.Dialog
         public ForkRepositorySelectViewModel(IModelServiceFactory modelServiceFactory)
         {
             this.modelServiceFactory = modelServiceFactory;
-            Selected = ReactiveCommand.Create();
+            SelectedAccount = ReactiveCommand.Create();
+            CloneRepository = ReactiveCommand.Create();
         }
 
         public string Title => Resources.ForkRepositoryTitle;
@@ -51,9 +52,11 @@ namespace GitHub.ViewModels.Dialog
             private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
-        public ReactiveCommand<object> Selected { get; }
+        public ReactiveCommand<object> SelectedAccount { get; }
 
-        public IObservable<object> Done => Selected;
+        public ReactiveCommand<object> CloneRepository { get; }
+
+        public IObservable<object> Done => SelectedAccount;
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {

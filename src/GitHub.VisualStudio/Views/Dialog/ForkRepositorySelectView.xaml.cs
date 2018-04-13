@@ -24,7 +24,16 @@ namespace GitHub.VisualStudio.Views.Dialog
 
             if (account != null)
             {
-                ((IForkRepositorySelectViewModel)DataContext).Selected.Execute(account);
+                ((IForkRepositorySelectViewModel)DataContext).SelectedAccount.Execute(account);
+            }
+        }
+
+        private void existingForksListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var repository = e.AddedItems.OfType<IRemoteRepositoryModel>().FirstOrDefault();
+            if (repository != null)
+            {
+                
             }
         }
     }
