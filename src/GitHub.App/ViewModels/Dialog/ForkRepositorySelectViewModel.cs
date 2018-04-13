@@ -17,7 +17,7 @@ namespace GitHub.ViewModels.Dialog
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ForkRepositorySelectViewModel : ViewModelBase, IForkRepositorySelectViewModel
     {
-        static readonly ILogger log = LogManager.ForContext<ForkRepositoryViewModel>();
+        static readonly ILogger log = LogManager.ForContext<ForkRepositorySelectViewModel>();
 
         readonly IModelServiceFactory modelServiceFactory;
         IReadOnlyList<IAccount> accounts;

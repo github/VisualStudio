@@ -14,7 +14,7 @@ namespace GitHub.ViewModels.Dialog
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ForkRepositoryExecuteViewModel : ViewModelBase, IForkRepositoryExecuteViewModel
     {
-        static readonly ILogger log = LogManager.ForContext<ForkRepositoryViewModel>();
+        static readonly ILogger log = LogManager.ForContext<ForkRepositoryExecuteViewModel>();
 
         public ForkRepositoryExecuteViewModel()
         {
