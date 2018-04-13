@@ -48,12 +48,7 @@ namespace GitHub.ViewModels.Dialog
         UriString CreateForkUri(UriString url, string login)
         {
             var original = url.ToRepositoryUrl();
-            return new UriString(
-                string.Format("{0}://{1}/{2}/{3}",
-                    original.Scheme,
-                    original.Authority,
-                    login,
-                    url.RepositoryName));
+            return new UriString($"{original.Scheme}://{original.Authority}/{login}/{url.RepositoryName}");
         }
     }
 }
