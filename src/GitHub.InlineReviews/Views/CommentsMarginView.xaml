@@ -17,8 +17,11 @@
     </UserControl.Resources>
 
     <TextBlock VerticalAlignment="Center" Margin="4 0">
-        <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
-        <Run Text="{Binding CommentsInFile}"/>
         <CheckBox Command="{Binding EnableInlineComments}" IsChecked="{Binding MarginEnabled, Mode=OneWay}" />
+        <Run Text="{Binding FileName}"/>
+        <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
+        <Hyperlink Command="{Binding NextInlineComment}">
+            <Run Text="{Binding CommentsInFile}"/>
+        </Hyperlink>
     </TextBlock>
 </UserControl>

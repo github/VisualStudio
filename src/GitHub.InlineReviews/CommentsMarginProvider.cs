@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
+using GitHub.Commands;
 using GitHub.Services;
 using GitHub.InlineReviews.Commands;
 
@@ -19,12 +20,14 @@ namespace GitHub.InlineReviews
     internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
     {
         readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
+        readonly INextInlineCommentCommand nextInlineCommentCommand;
         readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
-        public CommentsMarginFactory(IEnableInlineCommentsCommand enableInlineCommentsCommand, IPullRequestSessionManager sessionManager)
+        public CommentsMarginFactory(IEnableInlineCommentsCommand enableInlineCommentsCommand, INextInlineCommentCommand nextInlineCommentCommand, IPullRequestSessionManager sessionManager)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
+            this.nextInlineCommentCommand = nextInlineCommentCommand;
             this.sessionManager = sessionManager;
         }
 
@@ -44,7 +47,7 @@ namespace GitHub.InlineReviews
                 return null;
             }
 
-            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, sessionManager);
+            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, nextInlineCommentCommand, sessionManager);
         }
 
         bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");

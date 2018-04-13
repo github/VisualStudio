@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using GitHub.Models;
+using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Views;
@@ -42,12 +44,16 @@ namespace GitHub.InlineReviews
         /// Initializes a new instance of the <see cref="ToggleCommentsMargin"/> class for a given <paramref name="textView"/>.
         /// </summary>
         /// <param name="textView">The <see cref="IWpfTextView"/> to attach the margin to.</param>
-        public CommentsMargin(IWpfTextView textView, IEnableInlineCommentsCommand enableInlineCommentsCommand, IPullRequestSessionManager sessionManager)
+        public CommentsMargin(
+            IWpfTextView textView,
+            IEnableInlineCommentsCommand enableInlineCommentsCommand,
+            INextInlineCommentCommand nextInlineCommentCommand,
+            IPullRequestSessionManager sessionManager)
         {
             this.textView = textView;
             this.sessionManager = sessionManager;
 
-            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand);
+            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, nextInlineCommentCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>
@@ -69,6 +75,7 @@ namespace GitHub.InlineReviews
             var sessionFile = await FindSessionFile();
             if (sessionFile != null)
             {
+                viewModel.FileName = Path.GetFileName(sessionFile.RelativePath);
                 viewModel.CommentsInFile = sessionFile.InlineCommentThreads?.Count ?? -1;
                 viewModel.Enabled = sessionFile.Diff.Count > 0;
             }
