@@ -28,14 +28,15 @@ namespace GitHub.Services
         IDisposable timer;
         bool firstTick = true;
 
-        [ImportingConstructor]
         public UsageTracker(
             IGitHubServiceProvider gitHubServiceProvider,
-            IUsageService service)
+            IUsageService service,
+            IPackageSettings settings)
         {
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
-            timer = StartTimer();            
+            this.userSettings = settings;
+            timer = StartTimer();
         }
 
         public void Dispose()
@@ -71,7 +72,6 @@ namespace GitHub.Services
 
                 client = gitHubServiceProvider.TryGetService<IMetricsService>();
                 connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
-                userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
                 vsservices = gitHubServiceProvider.GetService<IVSServices>();
                 initialized = true;
             }

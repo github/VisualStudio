@@ -23,7 +23,7 @@ namespace MetricsTests
         public void ShouldStartTimer()
         {
             var service = Substitute.For<IUsageService>();
-            var target = new UsageTracker(CreateServiceProvider(), service);
+            var target = new UsageTracker(CreateServiceProvider(), service, CreatePackageSettings());
 
             service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
         }
@@ -147,7 +147,8 @@ namespace MetricsTests
             var usageService = CreateUsageService(model);
             var target = new UsageTracker(
                 CreateServiceProvider(),
-                usageService);
+                usageService,
+                CreatePackageSettings());
 
             await target.IncrementCounter(x => x.NumberOfClones);
             UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
@@ -162,7 +163,8 @@ namespace MetricsTests
 
             var target = new UsageTracker(
                 CreateServiceProvider(),
-                service);
+                service,
+                CreatePackageSettings());
 
             await target.IncrementCounter(x => x.NumberOfClones);
             await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data => 
@@ -196,7 +198,8 @@ namespace MetricsTests
 
             var target = new UsageTracker(
                 CreateServiceProvider(),
-                service);
+                service,
+                CreatePackageSettings());
 
             await target.IncrementCounter(x => x.NumberOfClones);
             await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data =>
@@ -218,7 +221,7 @@ namespace MetricsTests
             service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
                 .Do(x => tick = x.ArgAt<Func<Task>>(0));
 
-            var target = new UsageTracker(serviceProvider, service);
+            var target = new UsageTracker(serviceProvider, service, CreatePackageSettings());
 
             return Tuple.Create(target, tick);
         }
@@ -228,17 +231,21 @@ namespace MetricsTests
             var result = Substitute.For<IGitHubServiceProvider>();
             var connectionManager = Substitute.For<IConnectionManager>();
             var metricsService = Substitute.For<IMetricsService>();
-            var packageSettings = Substitute.For<IPackageSettings>();
             var vsservices = Substitute.For<IVSServices>();
 
             connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>());
-            packageSettings.CollectMetrics.Returns(true);
 
             result.GetService<IConnectionManager>().Returns(connectionManager);
-            result.GetService<IPackageSettings>().Returns(packageSettings);
             result.GetService<IVSServices>().Returns(vsservices);
             result.TryGetService<IMetricsService>().Returns(hasMetricsService ? metricsService : null);
 
+            return result;
+        }
+
+        static IPackageSettings CreatePackageSettings()
+        {
+            var result = Substitute.For<IPackageSettings>();
+            result.CollectMetrics.Returns(true);
             return result;
         }
 
