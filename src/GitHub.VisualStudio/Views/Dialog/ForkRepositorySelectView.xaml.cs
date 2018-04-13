@@ -33,7 +33,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             var repository = e.AddedItems.OfType<IRemoteRepositoryModel>().FirstOrDefault();
             if (repository != null)
             {
-                
+                ((IForkRepositorySelectViewModel)DataContext).CloneRepository.Execute(repository);
             }
         }
     }
