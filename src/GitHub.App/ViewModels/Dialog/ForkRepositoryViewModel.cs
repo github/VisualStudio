@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -22,11 +23,17 @@ namespace GitHub.ViewModels.Dialog
         {
             this.selectPage = selectPage;
             this.executePage = executePage;
+
+            Completed = ReactiveCommand.Create();
+
             selectPage.CloneRepository.Subscribe(x => ShowCloneRepositoryPage((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
+            executePage.Done.Subscribe(ExecuteForkOperation);
         }
 
-        public override IObservable<object> Done => null;
+        private ReactiveCommand<object> Completed { get; }
+
+        public override IObservable<object> Done => Completed;
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
@@ -44,6 +51,11 @@ namespace GitHub.ViewModels.Dialog
 
         void ShowCloneRepositoryPage(IRemoteRepositoryModel remoteRepository)
         {
+        }
+
+        private void ExecuteForkOperation(object o)
+        {
+            Completed.Execute(o);
         }
     }
 }

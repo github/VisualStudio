@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Windows;
 using System.Windows.Controls;
 using GitHub.Exports;
 using GitHub.ViewModels.Dialog;
@@ -12,6 +13,11 @@ namespace GitHub.VisualStudio.Views.Dialog
         public ForkRepositoryExecuteView()
         {
             InitializeComponent();
+        }
+
+        private void repoForkButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            ((IForkRepositoryExecuteViewModel)DataContext).Start.Execute(new object());
         }
     }
 }

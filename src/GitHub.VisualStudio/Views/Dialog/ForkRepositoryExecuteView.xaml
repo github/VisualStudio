@@ -71,6 +71,9 @@
           </TextBlock>
         </DockPanel>
       </Border>
+      <Border Style="{StaticResource ItemBorder}">
+        <Button Click="repoForkButton_OnClick">Fork Repo</Button>
+      </Border>
     </ItemsControl>
   </StackPanel>
 </UserControl>
