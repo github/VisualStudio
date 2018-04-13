@@ -221,7 +221,7 @@ namespace MetricsTests
             service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
                 .Do(x => tick = x.ArgAt<Func<Task>>(0));
 
-            var target = new UsageTracker(serviceProvider, service);
+            var target = new UsageTracker(serviceProvider, service, CreatePackageSettings());
 
             return Tuple.Create(target, tick);
         }
