@@ -13,7 +13,7 @@ namespace GitHub.InlineReviews
     /// </summary>
     [Export(typeof(IWpfTextViewMarginProvider))]
     [Name(CommentsMargin.MarginName)]
-    [Order(Before = PredefinedMarginNames.ZoomControl)]  // Ensure that the margin occurs below the horizontal scrollbar
+    [Order(After = PredefinedMarginNames.ZoomControl)]
     [MarginContainer(PredefinedMarginNames.BottomControl)]             // Set the container to the bottom of the editor window
     [ContentType("text")]                                       // Show this margin for all text-based types
     [TextViewRole(PredefinedTextViewRoles.Editable)]
