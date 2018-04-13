@@ -42,7 +42,7 @@ namespace GitHub.VisualStudio.Commands
         {
             try
             {
-                var host = await serviceProvider.TryGetService<IGitHubToolWindowManager>().ShowGitHubPane();
+                var host = await serviceProvider.TryGetMEFComponent<IGitHubToolWindowManager>().ShowGitHubPane();
                 await host.ShowPullRequests();
             }
             catch (Exception ex)

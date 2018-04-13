@@ -28,8 +28,8 @@ namespace GitHub.VisualStudio.Commands
             : base(commandSet, commandId)
         {
             ServiceProvider = serviceProvider;
-            apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
-            usageTracker = new Lazy<IUsageTracker>(() => serviceProvider.TryGetService<IUsageTracker>());
+            apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetMEFComponent<ISimpleApiClientFactory>());
+            usageTracker = new Lazy<IUsageTracker>(() => serviceProvider.TryGetMEFComponent<IUsageTracker>());
         }
 
         protected ILocalRepositoryModel ActiveRepo { get; private set; }
@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.Commands
             {
                 if (!string.IsNullOrEmpty(path))
                 {
-                    var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
+                    var repo = ServiceProvider.TryGetMEFComponent<IGitService>().GetRepository(path);
                     return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
                 }
             }
@@ -59,11 +59,11 @@ namespace GitHub.VisualStudio.Commands
 
         protected ILocalRepositoryModel GetActiveRepo()
         {
-            var activeRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
+            var activeRepo = ServiceProvider.TryGetMEFComponent<ITeamExplorerServiceHolder>()?.ActiveRepo;
             // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
             if (activeRepo == null)
             {
-                var path = ServiceProvider.TryGetService<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
+                var path = ServiceProvider.TryGetMEFComponent<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
                     activeRepo = !string.IsNullOrEmpty(path) ? new LocalRepositoryModel(path) : null;
@@ -78,11 +78,11 @@ namespace GitHub.VisualStudio.Commands
 
         void RefreshRepo()
         {
-            ActiveRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>().ActiveRepo;
+            ActiveRepo = ServiceProvider.TryGetMEFComponent<ITeamExplorerServiceHolder>().ActiveRepo;
 
             if (ActiveRepo == null)
             {
-                var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
+                var vsGitServices = ServiceProvider.TryGetMEFComponent<IVSGitServices>();
                 string path = vsGitServices?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
@@ -120,7 +120,7 @@ namespace GitHub.VisualStudio.Commands
             if (!await IsGitHubRepo())
                 return false;
 
-            var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();
+            var activeDocument = ServiceProvider.TryGetMEFComponent<IActiveDocumentSnapshot>();
 
             return activeDocument != null &&
                 IsFileDescendantOfDirectory(activeDocument.Name, ActiveRepo.LocalPath);
@@ -128,7 +128,7 @@ namespace GitHub.VisualStudio.Commands
 
         protected Task<UriString> GenerateLink(LinkType linkType)
         {
-            var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();
+            var activeDocument = ServiceProvider.TryGetMEFComponent<IActiveDocumentSnapshot>();
             if (activeDocument == null)
                 return null;
 

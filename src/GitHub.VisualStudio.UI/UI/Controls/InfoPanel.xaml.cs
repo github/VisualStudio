@@ -63,7 +63,7 @@ namespace GitHub.VisualStudio.UI.Controls
             get
             {
                 if (browser == null)
-                    browser = Services.GitHubServiceProvider.TryGetService<IVisualStudioBrowser>();
+                    browser = Services.GitHubServiceProvider.TryGetMEFComponent<IVisualStudioBrowser>();
                 return browser;
             }
         }

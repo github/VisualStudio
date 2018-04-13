@@ -5,6 +5,7 @@ using NUnit.Framework;
 using NSubstitute;
 using EnvDTE;
 using GitHub.Models;
+using UnitTests;
 
 namespace GitHub.App.UnitTests.Services
 {
@@ -214,9 +215,7 @@ namespace GitHub.App.UnitTests.Services
         static TeamExplorerContext CreateTeamExplorerContext(IVSGitExt gitExt, DTE dte = null)
         {
             dte = dte ?? Substitute.For<DTE>();
-            var sp = Substitute.For<IGitHubServiceProvider>();
-            sp.GetService<DTE>().Returns(dte);
-            return new TeamExplorerContext(gitExt, sp);
+            return new TeamExplorerContext(gitExt, dte);
         }
 
         static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)

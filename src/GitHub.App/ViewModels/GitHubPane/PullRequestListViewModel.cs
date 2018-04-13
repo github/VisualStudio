@@ -26,10 +26,11 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestListViewModel>();
 
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IModelServiceFactory modelServiceFactory;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
-        readonly IPackageSettings settings;
+        IPackageSettings settings;
         readonly IVisualStudioBrowser visualStudioBrowser;
         readonly bool constructing;
         PullRequestListUIState listSettings;
@@ -39,19 +40,19 @@ namespace GitHub.ViewModels.GitHubPane
 
         [ImportingConstructor]
         public PullRequestListViewModel(
+            IGitHubServiceProvider serviceProvider,
             IModelServiceFactory modelServiceFactory,
-            IPackageSettings settings,
             IPullRequestSessionManager sessionManager,
             IVisualStudioBrowser visualStudioBrowser)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
-            Guard.ArgumentNotNull(settings, nameof(settings));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
 
             constructing = true;
+            this.serviceProvider = serviceProvider;
             this.modelServiceFactory = modelServiceFactory;
-            this.settings = settings;
             this.visualStudioBrowser = visualStudioBrowser;
 
             Title = Resources.PullRequestsNavigationItemText;
@@ -121,6 +122,7 @@ namespace GitHub.ViewModels.GitHubPane
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
             IsLoading = true;
+            settings = await serviceProvider.TryGetServiceAsync<IPackageSettings>();
 
             try
             {

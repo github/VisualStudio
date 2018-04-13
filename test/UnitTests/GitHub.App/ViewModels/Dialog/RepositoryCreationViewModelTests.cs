@@ -23,7 +23,7 @@ public class RepositoryCreationViewModelTests
     static object DefaultInstance = new object();
 
     static IRepositoryCreationViewModel GetMeAViewModel(
-        IServiceProvider provider = null,
+        IGitHubServiceProvider provider = null,
         IRepositoryCreationService creationService = null,
         IModelService modelService = null)
     {

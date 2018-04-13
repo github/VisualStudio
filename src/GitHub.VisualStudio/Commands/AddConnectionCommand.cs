@@ -19,7 +19,7 @@ namespace GitHub.VisualStudio.Commands
         protected AddConnectionCommand(IGitHubServiceProvider serviceProvider)
             : base(CommandSet, CommandId)
         {
-            dialogService = new Lazy<IDialogService>(() => serviceProvider.TryGetService<IDialogService>());
+            dialogService = new Lazy<IDialogService>(() => serviceProvider.TryGetMEFComponent<IDialogService>());
         }
 
         /// <summary>

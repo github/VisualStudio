@@ -2,10 +2,12 @@
 using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Logging;
 using Serilog;
 using EnvDTE;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.Services
 {
@@ -26,8 +28,10 @@ namespace GitHub.Services
     {
         static ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
+        //readonly AsyncLazy<DTE> dte;
         readonly DTE dte;
         readonly IVSGitExt gitExt;
+        //readonly IGitHubServiceProvider serviceProvider;
 
         string solutionPath;
         string repositoryPath;
@@ -38,18 +42,10 @@ namespace GitHub.Services
         ILocalRepositoryModel repositoryModel;
 
         [ImportingConstructor]
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(gitExt, serviceProvider)
-        {
-        }
-
-        public TeamExplorerContext(IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(IVSGitExt gitExt, DTE dte)
         {
             this.gitExt = gitExt;
-
-            // This is a standard service which should always be available.
-            dte = serviceProvider.GetService<DTE>();
-
+            this.dte = dte;
             Refresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
         }

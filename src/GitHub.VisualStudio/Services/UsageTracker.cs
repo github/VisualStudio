@@ -9,6 +9,7 @@ using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -17,25 +18,25 @@ namespace GitHub.Services
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<UsageTracker>();
-        readonly IGitHubServiceProvider gitHubServiceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         bool initialized;
         IMetricsService client;
-        IUsageService service;
+        readonly IUsageService usageService;
+        readonly IPackageSettings packageSettings;
         IConnectionManager connectionManager;
         IPackageSettings userSettings;
         IVSServices vsservices;
         IDisposable timer;
         bool firstTick = true;
 
-        [ImportingConstructor]
-        public UsageTracker(
-            IGitHubServiceProvider gitHubServiceProvider,
-            IUsageService service)
+        public UsageTracker(IGitHubServiceProvider serviceProvider,
+            IUsageService usageService, IPackageSettings packageSettings)
         {
-            this.gitHubServiceProvider = gitHubServiceProvider;
-            this.service = service;
-            timer = StartTimer();            
+            this.serviceProvider = serviceProvider;
+            this.usageService = usageService;
+            this.packageSettings = packageSettings;
+            timer = StartTimer();
         }
 
         public void Dispose()
@@ -46,19 +47,19 @@ namespace GitHub.Services
         public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
             await Initialize();
-            var data = await service.ReadLocalData();
+            var data = await usageService.ReadLocalData();
             var usage = await GetCurrentReport(data);
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
             log.Verbose("Increment counter {Name}", propertyInfo.Name);
             var value = (int)propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
-            await service.WriteLocalData(data);
+            await usageService.WriteLocalData(data);
         }
 
         IDisposable StartTimer()
         {
-            return service.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
+            return usageService.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
         }
 
         async Task Initialize()
@@ -69,10 +70,10 @@ namespace GitHub.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = gitHubServiceProvider.TryGetService<IMetricsService>();
-                connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
-                userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
-                vsservices = gitHubServiceProvider.GetService<IVSServices>();
+                client = serviceProvider.TryGetMEFComponent<IMetricsService>();
+                connectionManager = serviceProvider.GetMEFComponent<IConnectionManager>();
+                userSettings = serviceProvider.GetMEFComponent<IPackageSettings>();
+                vsservices = serviceProvider.GetMEFComponent<IVSServices>();
                 initialized = true;
             }
         }
@@ -88,7 +89,7 @@ namespace GitHub.Services
                 return;
             }
 
-            var data = await service.ReadLocalData();
+            var data = await usageService.ReadLocalData();
             var changed = false;
 
             if (firstTick)
@@ -118,7 +119,7 @@ namespace GitHub.Services
 
             if (changed)
             {
-                await service.WriteLocalData(data);
+                await usageService.WriteLocalData(data);
             }
         }
 
@@ -128,7 +129,7 @@ namespace GitHub.Services
 
             if (current == null)
             {
-                var guid = await service.GetUserGuid();
+                var guid = await usageService.GetUserGuid();
                 current = UsageModel.Create(guid);
                 data.Reports.Add(current);
             }

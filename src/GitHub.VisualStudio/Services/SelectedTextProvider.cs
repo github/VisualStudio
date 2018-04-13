@@ -5,6 +5,7 @@ using GitHub.Extensions;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
@@ -12,17 +13,16 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class SelectedTextProvider : ISelectedTextProvider
     {
-        readonly IGitHubServiceProvider serviceProvider;
+        readonly IVsTextManager textManager;
 
         [ImportingConstructor]
-        public SelectedTextProvider(IGitHubServiceProvider serviceProvider)
+        public SelectedTextProvider([Import(typeof(SVsTextManager))] IVsTextManager textManager)
         {
-            this.serviceProvider = serviceProvider;
+            this.textManager = textManager;
         }
 
         public string GetSelectedText()
         {
-            IVsTextManager textManager = serviceProvider.GetService<SVsTextManager, IVsTextManager>();
             string selectedText;
             IVsTextView activeView;
 

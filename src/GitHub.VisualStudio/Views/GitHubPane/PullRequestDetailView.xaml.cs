@@ -111,7 +111,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     {
                         AddBufferTag(buffer, ViewModel.Session, fullPath, null);
 
-                        var textView = NavigationService.FindActiveView();
+                        var textView = await NavigationService.FindActiveView();
                         EnableNavigateToEditor(textView, file);
                     }
                 }
@@ -139,7 +139,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
                 var fullPath = ViewModel.GetLocalFilePath(file);
 
-                var activeView = NavigationService.FindActiveView();
+                var activeView = await NavigationService.FindActiveView();
                 if (activeView == null)
                 {
                     ShowErrorInStatusBar("Couldn't find active view");

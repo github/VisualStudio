@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Api;
-using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -14,6 +14,8 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.Threading;
+using TaskExtensions = GitHub.Extensions.TaskExtensions;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -27,17 +29,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         readonly IVisualStudioBrowser visualStudioBrowser;
         readonly ITeamExplorerServices teamExplorerServices;
-        readonly IPackageSettings settings;
-        readonly IUsageTracker usageTracker;
+        AsyncLazy<IPackageSettings> settings;
+        AsyncLazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
         public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IVisualStudioBrowser visualStudioBrowser,
-            ITeamExplorerServices teamExplorerServices,
-            IPackageSettings settings,
-            IUsageTracker usageTracker)
+            ITeamExplorerServices teamExplorerServices)
             : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
@@ -45,8 +45,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             View.DataContext = this;
             this.visualStudioBrowser = visualStudioBrowser;
             this.teamExplorerServices = teamExplorerServices;
-            this.settings = settings;
-            this.usageTracker = usageTracker;
+            this.settings = new AsyncLazy<IPackageSettings>(async () => await serviceProvider.TryGetServiceAsync<IPackageSettings>());
+            this.usageTracker = new AsyncLazy<IUsageTracker>(async () => await serviceProvider.TryGetServiceAsync<IUsageTracker>());
 
             var openOnGitHub = new RelayCommand(_ => DoOpenOnGitHub());
             OpenOnGitHub = openOnGitHub;
@@ -74,7 +74,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
                 // We want to display a welcome message but only if Team Explorer isn't
                 // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
-                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
+                var hideTeamExplorerWelcomeMessage = (await settings.GetValueAsync()).HideTeamExplorerWelcomeMessage;
+                if (!hideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
                 {
                     ShowWelcomeMessage();
                 }
@@ -109,10 +110,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 : isFork ? Octicon.repo_forked : Octicon.repo;
         }
 
-        public void Login()
+        public async Task Login()
         {
-            var dialogService = ServiceProvider.GetService<IDialogService>();
-            dialogService.ShowLoginDialog();
+            var dialogService = await ServiceProvider.TryGetServiceAsync<IDialogService>();
+            await dialogService.ShowLoginDialog();
         }
 
         void DoOpenOnGitHub()
@@ -124,7 +125,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         {
             teamExplorerServices.ShowMessage(
                 Resources.TeamExplorerWelcomeMessage,
-                new RelayCommand(o =>
+                new RelayCommand(async o =>
                 {
                     var str = o.ToString();
 
@@ -132,16 +133,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                     {
                         case "show-training":
                             visualStudioBrowser.OpenUrl(new Uri(TrainingUrl));
-                            usageTracker.IncrementCounter(x => x.NumberOfWelcomeTrainingClicks).Forget();
+                            await (await usageTracker.GetValueAsync()).IncrementCounter(x => x.NumberOfWelcomeTrainingClicks);
                             break;
                         case "show-docs":
                             visualStudioBrowser.OpenUrl(new Uri(GitHubUrls.Documentation));
-                            usageTracker.IncrementCounter(x => x.NumberOfWelcomeDocsClicks).Forget();
+                            await (await usageTracker.GetValueAsync()).IncrementCounter(x => x.NumberOfWelcomeDocsClicks);
                             break;
                         case "dont-show-again":
                             teamExplorerServices.HideNotification(welcomeMessageGuid);
-                            settings.HideTeamExplorerWelcomeMessage = true;
-                            settings.Save();
+                            (await settings.GetValueAsync()).HideTeamExplorerWelcomeMessage = true;
+                            (await settings.GetValueAsync()).Save();
                             break;
                     }
                 }),

@@ -30,7 +30,7 @@ namespace GitHub.Services
 
         public void ShowPublishSection()
         {
-            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            var te = serviceProvider.GetMEFComponent<ITeamExplorer>();
             var foo = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
             var publish = foo?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
             publish?.Connect();
@@ -38,13 +38,13 @@ namespace GitHub.Services
 
         public void ShowMessage(string message)
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
         }
 
         public void ShowMessage(string message, ICommand command, bool showToolTips = true, Guid guid = default(Guid))
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(
                 message,
                 NotificationType.Information,
@@ -55,31 +55,31 @@ namespace GitHub.Services
 
         public void ShowWarning(string message)
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
         }
 
         public void ShowError(string message)
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
         }
 
         public void HideNotification(Guid guid)
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.HideNotification(guid);
         }
 
         public void ClearNotifications()
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ClearNotifications();
         }
 
         public bool IsNotificationVisible(Guid guid)
         {
-            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager = serviceProvider.GetMEFComponent<ITeamExplorer, ITeamExplorerNotificationManager>();
             return manager?.IsNotificationVisible(guid) ?? false;
         }
     }

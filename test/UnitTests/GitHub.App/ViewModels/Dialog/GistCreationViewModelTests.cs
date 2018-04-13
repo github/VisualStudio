@@ -15,7 +15,7 @@ using NUnit.Framework;
 
 public class GistCreationViewModelTests
 {
-    static IGistCreationViewModel CreateViewModel(IServiceProvider provider, string selectedText = "", string fileName = "", bool isPrivate = false)
+    static IGistCreationViewModel CreateViewModel(IGitHubServiceProvider provider, string selectedText = "", string fileName = "", bool isPrivate = false)
     {
         var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
         selectedTextProvider.GetSelectedText().Returns(selectedText);
@@ -31,7 +31,7 @@ public class GistCreationViewModelTests
         var gistPublishService = provider.GetGistPublishService();
         var notificationService = Substitute.For<INotificationService>();
 
-        return new GistCreationViewModel(modelServiceFactory, selectedTextProvider, gistPublishService, notificationService, Substitute.For<IUsageTracker>())
+        return new GistCreationViewModel(provider, modelServiceFactory, selectedTextProvider, gistPublishService, notificationService)
         {
             FileName = fileName,
             IsPrivate = isPrivate

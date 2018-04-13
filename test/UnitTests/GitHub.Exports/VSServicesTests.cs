@@ -98,8 +98,8 @@ public class VSServicesTests
             }
 
             var provider = Substitute.For<IGitHubServiceProvider>();
-            provider.TryGetService<DTE>().Returns(dte);
-            provider.TryGetService<IOperatingSystem>().Returns(os);
+            provider.TryGetMEFComponent<DTE>().Returns(dte);
+            provider.TryGetMEFComponent<IOperatingSystem>().Returns(os);
             return new VSServices(provider, log);
         }
     }

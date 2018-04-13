@@ -5,6 +5,7 @@ using GitHub.Commands;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.VisualStudio.Commands
 {
@@ -14,11 +15,11 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(ICreateGistCommand))]
     public class CreateGistCommand : VsCommand, ICreateGistCommand
     {
-        readonly Lazy<IDialogService> dialogService;
-        readonly Lazy<ISelectedTextProvider> selectedTextProvider;
+        readonly IDialogService dialogService;
+        readonly ISelectedTextProvider selectedTextProvider;
 
         [ImportingConstructor]
-        protected CreateGistCommand(Lazy<IDialogService> dialogService, Lazy<ISelectedTextProvider> selectedTextProvider)
+        protected CreateGistCommand(IDialogService dialogService, ISelectedTextProvider selectedTextProvider)
             : base(CommandSet, CommandId)
         {
             this.dialogService = dialogService;
@@ -35,20 +36,17 @@ namespace GitHub.VisualStudio.Commands
         /// </summary>
         public const int CommandId = PkgCmdIDList.createGistCommand;
 
-        ISelectedTextProvider SelectedTextProvider => selectedTextProvider.Value;
-
         /// <summary>
         /// Shows the Create Gist dialog.
         /// </summary>
         public override Task Execute()
         {
-            return dialogService.Value.ShowCreateGist();
+            return dialogService.ShowCreateGist();
         }
 
         protected override void QueryStatus()
         {
-            Log.Assert(SelectedTextProvider != null, "Could not get an instance of ISelectedTextProvider");
-            Visible = !string.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText());
+            Visible = !string.IsNullOrWhiteSpace(selectedTextProvider.GetSelectedText());
         }
     }
 }

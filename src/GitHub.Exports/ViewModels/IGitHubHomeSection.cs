@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Threading.Tasks;
+using System.Windows.Input;
 using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
@@ -33,6 +34,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         /// <summary>
         /// Start the login flow.
         /// </summary>
-        void Login();
+        Task Login();
     }
 }

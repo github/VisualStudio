@@ -17,6 +17,6 @@ namespace GitHub.App.Services
             this.serviceProvider = serviceProvider;
         }
 
-        public IConnection Get() => serviceProvider.TryGetService<IConnection>();
+        public IConnection Get() => serviceProvider.TryGetMEFComponent<IConnection>();
     }
 }

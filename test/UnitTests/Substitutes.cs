@@ -8,7 +8,9 @@ using Rothko;
 using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.Threading.Tasks;
 using GitHub.Factories;
+using GitHub.Settings;
 
 namespace UnitTests
 {
@@ -65,6 +67,10 @@ namespace UnitTests
         public static IDelegatingTwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<IDelegatingTwoFactorChallengeHandler>(); } }
         public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
         public static IPullRequestService PullRequestService { get { return Substitute.For<IPullRequestService>(); } }
+        public static IPackageSettings PackageSettings { get { return Substitute.For<IPackageSettings>(); } }
+        public static IUsageTracker UsageTracker { get { return Substitute.For<IUsageTracker>(); } }
+        public static IUsageService UsageService { get { return Substitute.For<IUsageService>(); } }
+        public static IVSServices VSServices { get { return Substitute.For<IVSServices>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -110,24 +116,45 @@ namespace UnitTests
 
             var os = OperatingSystem;
             var vsgit = IVSGitServices;
-            var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<IUsageTracker>());
-            var create = creationService ?? new RepositoryCreationService(clone);
+            cloneService = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<IUsageTracker>());
+            creationService = creationService ?? new RepositoryCreationService(cloneService);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             //ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
-            ret.GetService(typeof(IGitService)).Returns(gitservice);
-            ret.GetService(typeof(IVSServices)).Returns(Substitute.For<IVSServices>());
-            ret.GetService(typeof(IVSGitServices)).Returns(vsgit);
-            ret.GetService(typeof(IOperatingSystem)).Returns(os);
-            ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
-            ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
-            ret.GetService(typeof(IViewViewModelFactory)).Returns(ViewViewModelFactory);
-            ret.GetService(typeof(IConnection)).Returns(Connection);
-            ret.GetService(typeof(IConnectionManager)).Returns(ConnectionManager);
-            ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
-            ret.GetService(typeof(IDelegatingTwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
-            ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
-            ret.GetService(typeof(IPullRequestService)).Returns(PullRequestService);
+            ret.SetupMEF(gitservice);
+            ret.SetupMEF(Substitute.For<IVSServices>());
+            ret.SetupMEF(vsgit);
+            ret.SetupMEF(os);
+            ret.SetupMEF(cloneService);
+            ret.SetupMEF(creationService);
+            ret.SetupMEF(ViewViewModelFactory);
+            ret.SetupMEF(Connection);
+            ret.SetupMEF(ConnectionManager);
+            ret.SetupMEF(avatarProvider);
+            ret.SetupMEF(TwoFactorChallengeHandler);
+            ret.SetupMEF(GistPublishService);
+            ret.SetupMEF(PullRequestService);
+            ret.SetupMEF(VSServices);
+
+            ret.SetupService(PackageSettings);
+            ret.SetupService(UsageTracker);
+            ret.SetupService(UsageService);
             return ret;
+        }
+
+        public static void SetupMEF<T>(this IGitHubServiceProvider provider, T instance)
+            where T : class
+        {
+            provider.TryGetMEFComponent<T>().Returns(instance);
+            provider.TryGetMEFComponent(typeof(T)).Returns(instance);
+            provider.GetMEFComponent<T>().Returns(instance);
+        }
+
+        public static void SetupService<T>(this IGitHubServiceProvider provider, T instance)
+            where T : class
+        {
+            provider.TryGetServiceAsync<T>().Returns(Task.FromResult(instance));
+            provider.TryGetServiceSync<T>().Returns(instance);
+            provider.GetService(typeof(T)).Returns(instance);
         }
 
         //public static IGitRepositoriesExt GetGitExt(this IServiceProvider provider)
@@ -135,69 +162,69 @@ namespace UnitTests
         //    return provider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
         //}
 
-        public static IVSServices GetVSServices(this IServiceProvider provider)
+        public static IVSServices GetVSServices(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IVSServices)) as IVSServices;
+            return provider.TryGetMEFComponent(typeof(IVSServices)) as IVSServices;
         }
 
-        public static IVSGitServices GetVSGitServices(this IServiceProvider provider)
+        public static IVSGitServices GetVSGitServices(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IVSGitServices)) as IVSGitServices;
+            return provider.TryGetMEFComponent(typeof(IVSGitServices)) as IVSGitServices;
         }
 
-        public static IGitService GetGitService(this IServiceProvider provider)
+        public static IGitService GetGitService(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IGitService)) as IGitService;
+            return provider.TryGetMEFComponent(typeof(IGitService)) as IGitService;
         }
 
-        public static IOperatingSystem GetOperatingSystem(this IServiceProvider provider)
+        public static IOperatingSystem GetOperatingSystem(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IOperatingSystem)) as IOperatingSystem;
+            return provider.TryGetMEFComponent(typeof(IOperatingSystem)) as IOperatingSystem;
         }
 
-        public static IRepositoryCloneService GetRepositoryCloneService(this IServiceProvider provider)
+        public static IRepositoryCloneService GetRepositoryCloneService(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IRepositoryCloneService)) as IRepositoryCloneService;
+            return provider.TryGetMEFComponent(typeof(IRepositoryCloneService)) as IRepositoryCloneService;
         }
 
-        public static IRepositoryCreationService GetRepositoryCreationService(this IServiceProvider provider)
+        public static IRepositoryCreationService GetRepositoryCreationService(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IRepositoryCreationService)) as IRepositoryCreationService;
+            return provider.TryGetMEFComponent(typeof(IRepositoryCreationService)) as IRepositoryCreationService;
         }
 
-        public static IViewViewModelFactory GetExportFactoryProvider(this IServiceProvider provider)
+        public static IViewViewModelFactory GetExportFactoryProvider(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IViewViewModelFactory)) as IViewViewModelFactory;
+            return provider.TryGetMEFComponent(typeof(IViewViewModelFactory)) as IViewViewModelFactory;
         }
 
-        public static IConnection GetConnection(this IServiceProvider provider)
+        public static IConnection GetConnection(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IConnection)) as IConnection;
+            return provider.TryGetMEFComponent(typeof(IConnection)) as IConnection;
         }
 
-        public static IConnectionManager GetConnectionManager(this IServiceProvider provider)
+        public static IConnectionManager GetConnectionManager(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IConnectionManager)) as IConnectionManager;
+            return provider.TryGetMEFComponent(typeof(IConnectionManager)) as IConnectionManager;
         }
 
-        public static IAvatarProvider GetAvatarProvider(this IServiceProvider provider)
+        public static IAvatarProvider GetAvatarProvider(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IAvatarProvider)) as IAvatarProvider;
+            return provider.TryGetMEFComponent(typeof(IAvatarProvider)) as IAvatarProvider;
         }
 
-        public static IDelegatingTwoFactorChallengeHandler GetTwoFactorChallengeHandler(this IServiceProvider provider)
+        public static IDelegatingTwoFactorChallengeHandler GetTwoFactorChallengeHandler(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IDelegatingTwoFactorChallengeHandler)) as IDelegatingTwoFactorChallengeHandler;
+            return provider.TryGetMEFComponent(typeof(IDelegatingTwoFactorChallengeHandler)) as IDelegatingTwoFactorChallengeHandler;
         }
 
-        public static IGistPublishService GetGistPublishService(this IServiceProvider provider)
+        public static IGistPublishService GetGistPublishService(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IGistPublishService)) as IGistPublishService;
+            return provider.TryGetMEFComponent(typeof(IGistPublishService)) as IGistPublishService;
         }
 
-        public static IPullRequestService GetPullRequestsService(this IServiceProvider provider)
+        public static IPullRequestService GetPullRequestsService(this IGitHubServiceProvider provider)
         {
-            return provider.GetService(typeof(IPullRequestService)) as IPullRequestService;
+            return provider.TryGetMEFComponent(typeof(IPullRequestService)) as IPullRequestService;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace GitHub.VisualStudio.Commands
             var link = await GenerateLink(LinkType.Blob);
             if (link == null)
                 return;
-            var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
+            var browser = ServiceProvider.TryGetMEFComponent<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
 
             await UsageTracker.IncrementCounter(x => x.NumberOfOpenInGitHub);

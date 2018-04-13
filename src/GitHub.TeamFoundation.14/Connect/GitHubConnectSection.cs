@@ -21,15 +21,17 @@ using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
 using Serilog;
+using TaskExtensions = GitHub.Extensions.TaskExtensions;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
-        readonly IPackageSettings packageSettings;
+        AsyncLazy<IPackageSettings> lazyPackageSettings;
         readonly IVSServices vsServices;
         readonly int sectionIndex;
         readonly ILocalRepositories localRepositories;
@@ -96,7 +98,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
-            IPackageSettings packageSettings,
             IVSServices vsServices,
             ILocalRepositories localRepositories,
             int index)
@@ -105,7 +106,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(manager, nameof(manager));
-            Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
             Guard.ArgumentNotNull(vsServices, nameof(vsServices));
             Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
 
@@ -115,9 +115,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             LoggedIn = false;
             sectionIndex = index;
 
-            this.packageSettings = packageSettings;
             this.vsServices = vsServices;
             this.localRepositories = localRepositories;
+            this.lazyPackageSettings = new AsyncLazy<IPackageSettings>(async () => await serviceProvider.TryGetServiceAsync<IPackageSettings>());
 
             Clone = CreateAsyncCommandHack(DoClone);
 
@@ -128,7 +128,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         async Task DoClone()
         {
-            var dialogService = ServiceProvider.GetService<IDialogService>();
+            var dialogService = ServiceProvider.GetMEFComponent<IDialogService>();
             var result = await dialogService.ShowCloneDialog(SectionConnection);
 
             if (result != null)
@@ -136,7 +136,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 try
                 {
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
-                    var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
+                    var cloneService = ServiceProvider.GetMEFComponent<IRepositoryCloneService>();
                     await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
                         result.Repository.Name,
@@ -144,7 +144,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 }
                 catch (Exception e)
                 {
-                    var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+                    var teServices = ServiceProvider.TryGetMEFComponent<ITeamExplorerServices>();
                     teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Repository.Name));
                 }
             }
@@ -166,7 +166,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        protected void Refresh(IConnection connection)
+        protected async void Refresh(IConnection connection)
         {
             if (connection == null || !connection.IsLoggedIn)
             {
@@ -201,11 +201,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
                     LoggedIn = true;
+                    var packageSettings = await lazyPackageSettings.GetValueAsync();
                     settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
+                    packageSettings.Save();
                     IsExpanded = settings.IsExpanded;
                 }
                 if (TEServiceProvider != null)
-                    RefreshRepositories().Forget();
+                    await RefreshRepositories();
             }
         }
 
@@ -330,7 +332,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
-            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+            var teServices = ServiceProvider.TryGetMEFComponent<ITeamExplorerServices>();
 
             teServices.ClearNotifications();
             teServices.ShowMessage(
@@ -345,18 +347,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     */
                     var prefix = str.Substring(0, 2);
                     if (prefix == "u:")
-                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                        OpenInBrowser(ServiceProvider.TryGetMEFComponent<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
                     else if (prefix == "o:")
                     {
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
-                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                            ServiceProvider.TryGetMEFComponent<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     }
                     else if (prefix == "c:")
                     {
-                        var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
+                        var vsGitServices = ServiceProvider.TryGetMEFComponent<IVSGitServices>();
                         vsGitServices.SetDefaultProjectPath(newrepo.LocalPath);
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
-                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                            ServiceProvider.TryGetMEFComponent<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     }
                 })
             );
@@ -374,7 +376,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public void DoCreate()
         {
             ServiceProvider.GitServiceProvider = TEServiceProvider;
-            var dialogService = ServiceProvider.GetService<IDialogService>();
+            var dialogService = ServiceProvider.GetMEFComponent<IDialogService>();
             dialogService.ShowCreateRepositoryDialog(SectionConnection);
         }
 
@@ -385,7 +387,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void Login()
         {
-            var dialogService = ServiceProvider.GetService<IDialogService>();
+            var dialogService = ServiceProvider.GetMEFComponent<IDialogService>();
             dialogService.ShowLoginDialog();
         }
 
@@ -407,7 +409,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
 
             // Navigate away when we're on the correct source control contexts.
-            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+            ServiceProvider.TryGetMEFComponent<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             return true;
         }
 
@@ -422,7 +424,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     if (Repositories != null)
                         Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;
-                    packageSettings.Save();
                 }
             }
             base.Dispose(disposing);

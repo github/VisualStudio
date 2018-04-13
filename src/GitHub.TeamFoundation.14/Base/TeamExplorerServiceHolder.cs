@@ -148,23 +148,5 @@ namespace GitHub.VisualStudio.Base
             if (e.PropertyName == "CloneUrl")
                 ActiveRepo = sender as ILocalRepositoryModel;
         }
-
-        public IGitAwareItem HomeSection
-        {
-            get
-            {
-                if (ServiceProvider == null)
-                    return null;
-                var page = PageService;
-                if (page == null)
-                    return null;
-                return page.GetSection(new Guid(TeamExplorer.Home.GitHubHomeSection.GitHubHomeSectionId)) as IGitAwareItem;
-            }
-        }
-
-        ITeamExplorerPage PageService
-        {
-            get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
-        }
     }
 }

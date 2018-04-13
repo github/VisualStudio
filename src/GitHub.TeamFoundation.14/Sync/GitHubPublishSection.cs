@@ -106,14 +106,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         public void ShowPublish()
         {
-            var factory = ServiceProvider.GetService<IViewViewModelFactory>();
-            var viewModel = ServiceProvider.GetService<IRepositoryPublishViewModel>();
+            var factory = ServiceProvider.GetMEFComponent<IViewViewModelFactory>();
+            var viewModel = ServiceProvider.GetMEFComponent<IRepositoryPublishViewModel>();
             var busy = viewModel.WhenAnyValue(x => x.IsBusy).Subscribe(x => IsBusy = x);
             var completed = viewModel.PublishRepository
                 .Where(x => x == ProgressState.Success)
                 .Subscribe(_ =>
                 {
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    ServiceProvider.TryGetMEFComponent<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     HandleCreatedRepo(ActiveRepo);
                 });
 
@@ -141,7 +141,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         private void ShowNotification(ILocalRepositoryModel newrepo, string msg)
         {
-            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+            var teServices = ServiceProvider.TryGetMEFComponent<ITeamExplorerServices>();
 
             teServices.ClearNotifications();
             teServices.ShowMessage(
@@ -156,18 +156,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                     */
                     var prefix = str.Substring(0, 2);
                     if (prefix == "u:")
-                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                        OpenInBrowser(ServiceProvider.TryGetMEFComponent<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
                     else if (prefix == "o:")
                     {
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
-                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                            ServiceProvider.TryGetMEFComponent<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     }
                     else if (prefix == "c:")
                     {
-                        var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
+                        var vsGitServices = ServiceProvider.TryGetMEFComponent<IVSGitServices>();
                         vsGitServices.SetDefaultProjectPath(newrepo.LocalPath);
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
-                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                            ServiceProvider.TryGetMEFComponent<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     }
                 })
             );

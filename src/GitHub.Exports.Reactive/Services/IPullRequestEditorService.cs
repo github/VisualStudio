@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TextManager.Interop;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.Services
 {
@@ -8,7 +9,7 @@ namespace GitHub.Services
         /// Find the active text view.
         /// </summary>
         /// <returns>The active view or null if view can't be found.</returns>
-        IVsTextView FindActiveView();
+        Task<IVsTextView> FindActiveView();
 
         /// <summary>
         /// Navigate to and place the caret at the best guess equivalent position in <see cref="targetFile"/>.

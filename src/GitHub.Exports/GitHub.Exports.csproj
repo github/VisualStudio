@@ -239,7 +239,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\ServiceProviderExtensions.cs" />
+    <None Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
       <AutoGen>True</AutoGen>

@@ -19,13 +19,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public void SelectingAssigneeShouldTriggerFilter()
         {
-            var connection = Substitute.For<IConnection>();
+            var serviceProvider = Substitutes.ServiceProvider;
+            var connection = serviceProvider.GetConnection();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
-            var settings = CreateSettings();
+            var settings = serviceProvider.TryGetServiceSync<IPackageSettings>();
+            settings.UIState.Returns(new UIState());
             var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
+            var prViewModel = new PullRequestListViewModel(serviceProvider, factory, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -37,13 +39,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public void ResettingAssigneeToNoneShouldNotTriggerFilter()
         {
-            var connection = Substitute.For<IConnection>();
+            var serviceProvider = Substitutes.ServiceProvider;
+            var connection = serviceProvider.GetConnection();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
-            var settings = CreateSettings();
+            var settings = serviceProvider.TryGetServiceSync<IPackageSettings>();
+            settings.UIState.Returns(new UIState());
             var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
+            var prViewModel = new PullRequestListViewModel(serviceProvider, factory, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -61,13 +65,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public void SelectingAuthorShouldTriggerFilter()
         {
-            var connection = Substitute.For<IConnection>();
+            var serviceProvider = Substitutes.ServiceProvider;
+            var connection = serviceProvider.GetConnection();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
-            var settings = CreateSettings();
+            var settings = serviceProvider.TryGetServiceSync<IPackageSettings>();
+            settings.UIState.Returns(new UIState());
             var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
+            var prViewModel = new PullRequestListViewModel(serviceProvider, factory, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -79,13 +85,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public void ResettingAuthorToNoneShouldNotTriggerFilter()
         {
-            var connection = Substitute.For<IConnection>();
+            var serviceProvider = Substitutes.ServiceProvider;
+            var connection = serviceProvider.GetConnection();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
-            var settings = CreateSettings();
+            var settings = serviceProvider.TryGetServiceSync<IPackageSettings>();
+            settings.UIState.Returns(new UIState());
             var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
+            var prViewModel = new PullRequestListViewModel(serviceProvider, factory, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -103,13 +111,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [TestCase("https://github.com/owner/repo", 666, "https://github.com/owner/repo/pull/666")]
         public void OpenPullRequestOnGitHubShouldOpenBrowser(string cloneUrl, int pullNumber, string expectUrl)
         {
-            var connection = Substitute.For<IConnection>();
+            var serviceProvider = Substitutes.ServiceProvider;
+            var connection = serviceProvider.GetConnection();
             var factory = CreateModelServiceFactory();
             var repository = Substitute.For<ILocalRepositoryModel>();
-            var settings = CreateSettings();
+            var settings = serviceProvider.TryGetServiceSync<IPackageSettings>();
+            settings.UIState.Returns(new UIState());
             var sessionManager = Substitute.For<IPullRequestSessionManager>();
             var browser = Substitute.For<IVisualStudioBrowser>();
-            var prViewModel = new PullRequestListViewModel(factory, settings, sessionManager, browser);
+            var prViewModel = new PullRequestListViewModel(serviceProvider, factory, sessionManager, browser);
 
             prViewModel.InitializeAsync(repository, connection).Wait();
             prViewModel.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
@@ -147,13 +157,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             result.CreateAsync(null).ReturnsForAnyArgs(modelService);
             result.CreateBlocking(null).ReturnsForAnyArgs(modelService);
             return result;
-        }
-
-        IPackageSettings CreateSettings()
-        {
-            var settings = Substitute.For<IPackageSettings>();
-            settings.UIState.Returns(new UIState());
-            return settings;
         }
     }
 }

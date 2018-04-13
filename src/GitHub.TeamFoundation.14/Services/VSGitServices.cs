@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System.Threading;
 #endif
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 
 namespace GitHub.Services
@@ -35,7 +36,7 @@ namespace GitHub.Services
         static readonly ILogger log = LogManager.ForContext<VSGitServices>();
         readonly IGitHubServiceProvider serviceProvider;
 #if TEAMEXPLORER15
-        readonly IVsStatusbar statusBar;
+        AsyncLazy<IVsStatusbar> statusBar;
 #endif
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace GitHub.Services
         {
             this.serviceProvider = serviceProvider;
 #if TEAMEXPLORER15
-            this.statusBar = serviceProvider.GetService<IVsStatusbar>();
+            this.statusBar = new AsyncLazy<IVsStatusbar>(async () => await serviceProvider.TryGetServiceMainThread<IVsStatusbar>());
 #endif
         }
 
@@ -82,19 +83,19 @@ namespace GitHub.Services
             object progress = null)
         {
 #if TEAMEXPLORER14
-            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
+            var gitExt = await serviceProvider.TryGetServiceAsync<IGitRepositoriesExt>();
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
 
             // The operation will have completed when CanClone goes false and then true again.
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1);
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
 #else
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
+            var gitExt = await serviceProvider.TryGetServiceAsync<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
 
             await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
-                typedProgress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
+                typedProgress.ProgressChanged += async (s, e) => (await statusBar.GetValueAsync()).SetText(e.ProgressText);
                 await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
 #endif
@@ -102,7 +103,7 @@ namespace GitHub.Services
 
         IGitRepositoryInfo GetRepoFromVS()
         {
-            gitExtService = serviceProvider.GetService<IGitExt>();
+            gitExtService = serviceProvider.TryGetServiceSync<IGitExt>();
             return gitExtService.ActiveRepositories.FirstOrDefault();
         }
 
@@ -110,7 +111,7 @@ namespace GitHub.Services
         {
             var repo = GetRepoFromVS();
             return repo != null
-                ? serviceProvider.GetService<IGitService>().GetRepository(repo.RepositoryPath)
+                ? serviceProvider.TryGetMEFComponent<IGitService>().GetRepository(repo.RepositoryPath)
                 : serviceProvider.GetSolution().GetRepositoryFromSolution();
         }
 

@@ -41,7 +41,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
 
     struct TestData
     {
-        public IServiceProvider ServiceProvider;
+        public IGitHubServiceProvider ServiceProvider;
         public ILocalRepositoryModel ActiveRepo;
         public LibGit2Sharp.IRepository L2Repo;
         public IRepositoryModel SourceRepo;

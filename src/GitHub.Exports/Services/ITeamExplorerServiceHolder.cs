@@ -40,8 +40,6 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="who">The instance/key that previously subscribed to notifications</param>
         void Unsubscribe(object who);
-
-        IGitAwareItem HomeSection { get; }
     }
 
     public interface IGitAwareItem

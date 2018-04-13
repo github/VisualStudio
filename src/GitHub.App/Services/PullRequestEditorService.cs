@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using GitHub.Models;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -48,9 +49,9 @@ namespace GitHub.Services
             return view;
         }
 
-        public IVsTextView FindActiveView()
+        public async Task<IVsTextView> FindActiveView()
         {
-            var textManager = serviceProvider.GetService<SVsTextManager, IVsTextManager2>();
+            var textManager = await serviceProvider.TryGetServiceAsync<SVsTextManager, IVsTextManager2>();
             IVsTextView view;
             var hresult = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
             return hresult == VSConstants.S_OK ? view : null;

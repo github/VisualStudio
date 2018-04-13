@@ -117,8 +117,8 @@ namespace GitHub.StartPage
             IProgress<ServiceProgressData> progress,
             IRepositoryModel repository = null)
         {
-            var dialogService = gitHubServiceProvider.GetService<IDialogService>();
-            var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();
+            var dialogService = gitHubServiceProvider.TryGetMEFComponent<IDialogService>();
+            var cloneService = gitHubServiceProvider.TryGetMEFComponent<IRepositoryCloneService>();
             CloneDialogResult result = null;
             
             if (repository == null)
@@ -147,7 +147,7 @@ namespace GitHub.StartPage
                 }
                 catch
                 {
-                    var teServices = gitHubServiceProvider.TryGetService<ITeamExplorerServices>();
+                    var teServices = gitHubServiceProvider.TryGetMEFComponent<ITeamExplorerServices>();
                     teServices.ShowError($"Failed to clone the repository '{result.Repository.Name}'");
                     result = null;
                 }

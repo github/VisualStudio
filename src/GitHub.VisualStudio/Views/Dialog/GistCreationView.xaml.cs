@@ -43,10 +43,10 @@ namespace GitHub.VisualStudio.Views.Dialog
                     .Where(x => x != null)
                     .Subscribe(gist =>
                     {
-                        var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
+                        var browser = serviceProvider.TryGetMEFComponent<IVisualStudioBrowser>();
                         browser?.OpenUrl(new Uri(gist.HtmlUrl));
 
-                        var ns = serviceProvider.TryGetService<IStatusBarNotificationService>();
+                        var ns = serviceProvider.TryGetMEFComponent<IStatusBarNotificationService>();
                         ns?.ShowMessage(UI.Resources.gistCreatedMessage);
                     });
 

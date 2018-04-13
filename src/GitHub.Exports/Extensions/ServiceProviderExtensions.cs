@@ -43,7 +43,7 @@ namespace GitHub.Extensions
                 Debug.Print(ex.ToString());
                 log.Error(ex, "GetServiceSafe: Could not obtain instance of '{Type}'", type);
             }
-            return ui?.TryGetService(type);
+            return ui?.TryGetMEFComponent(type);
         }
 
         /// <summary>

@@ -129,7 +129,7 @@ namespace GitHub.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                var program = serviceProvider.GetService<IProgram>();
+                var program = serviceProvider.TryGetMEFComponent<IProgram>();
 
                 var localApplicationDataPath = environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 

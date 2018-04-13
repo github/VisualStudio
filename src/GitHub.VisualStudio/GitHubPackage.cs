@@ -23,6 +23,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
+using Microsoft.VisualStudio.Threading;
+using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
+using System.Collections.Generic;
 
 namespace GitHub.VisualStudio
 {
@@ -75,21 +78,19 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            var exports = componentModel.DefaultExportProvider;
+            var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
             var commands = new IVsCommandBase[]
             {
-                exports.GetExportedValue<IAddConnectionCommand>(),
-                exports.GetExportedValue<IBlameLinkCommand>(),
-                exports.GetExportedValue<ICopyLinkCommand>(),
-                exports.GetExportedValue<ICreateGistCommand>(),
-                exports.GetExportedValue<IOpenLinkCommand>(),
-                exports.GetExportedValue<IOpenPullRequestsCommand>(),
-                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>()
+                serviceProvider.GetMEFComponent<IAddConnectionCommand>(),
+                serviceProvider.GetMEFComponent<IBlameLinkCommand>(),
+                serviceProvider.GetMEFComponent<ICopyLinkCommand>(),
+                serviceProvider.GetMEFComponent<ICreateGistCommand>(),
+                serviceProvider.GetMEFComponent<IOpenLinkCommand>(),
+                serviceProvider.GetMEFComponent<IOpenPullRequestsCommand>(),
+                serviceProvider.GetMEFComponent<IShowCurrentPullRequestCommand>(),
+                serviceProvider.GetMEFComponent<IShowGitHubPaneCommand>()
             };
 
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             menuService.AddCommands(commands);
         }
@@ -111,30 +112,27 @@ namespace GitHub.VisualStudio
         // Only export services for the Visual Studio process (they don't work in Expression Blend).
         const string ProcessName = "devenv";
 
-        readonly IServiceProvider serviceProvider;
+        readonly IAsyncServiceProvider serviceProvider;
+        readonly Dictionary<Type, object> lazyConstructors = new Dictionary<Type, object>();
 
         [ImportingConstructor]
-        public ServiceProviderExports([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public ServiceProviderExports(IAsyncServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-        [ExportForProcess(typeof(ILoginManager), ProcessName)]
-        public ILoginManager LoginManager => GetService<ILoginManager>();
-
         [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
         public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
-
-        [ExportForProcess(typeof(IUsageTracker), ProcessName)]
-        public IUsageTracker UsageTracker => GetService<IUsageTracker>();
 
         [ExportForProcess(typeof(IVSGitExt), ProcessName)]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
-        [ExportForProcess(typeof(IPackageSettings), ProcessName)]
-        public IPackageSettings PackageSettings => GetService<IPackageSettings>();
-
-        T GetService<T>() => (T)serviceProvider.GetServiceSafe(typeof(T));
+        T GetService<T>()
+        {
+            if (!lazyConstructors.ContainsKey(typeof(T)))
+                lazyConstructors.Add(typeof(T), new AsyncLazy<T>(async () => (T) await serviceProvider.GetServiceAsync(typeof(T)).ConfigureAwait(false)));
+            return ((AsyncLazy<T>)lazyConstructors[typeof(T)]).GetValueAsync().Result;
+        }
     }
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -207,14 +205,9 @@ namespace GitHub.VisualStudio
             if (serviceType == null)
                 return null;
 
-            if (container != this)
-                return null;
-
             if (serviceType == typeof(IGitHubServiceProvider))
             {
-                //var sp = await GetServiceAsync(typeof(SVsServiceProvider)) as IServiceProvider;
-                var result = new GitHubServiceProvider(this, this);
-                await result.Initialize();
+                var result = new GitHubServiceProvider(this);
                 return result;
             }
 
@@ -224,8 +217,8 @@ namespace GitHub.VisualStudio
             {
                 // These services are got through MEF and we will take a performance hit if ILoginManager is requested during 
                 // InitializeAsync. TODO: We can probably make LoginManager a normal MEF component rather than a service.
-                var keychain = serviceProvider.GetService<IKeychain>();
-                var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
+                var keychain = serviceProvider.GetMEFComponent<IKeychain>();
+                var oauthListener = serviceProvider.GetMEFComponent<IOAuthCallbackListener>();
 
                 // HACK: We need to make sure this is run on the main thread. We really
                 // shouldn't be injecting a view model concern into LoginManager - this
@@ -234,7 +227,7 @@ namespace GitHub.VisualStudio
                     ThreadHelper.JoinableTaskFactory.Run(async () =>
                     {
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                        return serviceProvider.GetService<ITwoFactorChallengeHandler>();
+                        return serviceProvider.GetMEFComponent<ITwoFactorChallengeHandler>();
                     }));
 
                 var service = new LoginManager(
@@ -259,7 +252,8 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IUsageTracker))
             {
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
-                var service = new UsageTracker(serviceProvider, usageService);
+                var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+                var service = new UsageTracker(serviceProvider, usageService, packageSettings);
                 serviceProvider.AddService<IUsageTracker>(serviceProvider, service);
                 return service;
             }
@@ -277,7 +271,6 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IPackageSettings))
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 var service = new PackageSettings(serviceProvider);
                 serviceProvider.AddService<IPackageSettings>(serviceProvider, service);
                 return service;
@@ -285,7 +278,7 @@ namespace GitHub.VisualStudio
             // go the mef route
             else
             {
-                return serviceProvider.TryGetService(serviceType);
+                return serviceProvider.TryGetMEFComponent(serviceType);
             }
         }
     }

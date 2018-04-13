@@ -3,8 +3,9 @@ using System.Windows.Input;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.UI;
-using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
+using System.Threading.Tasks;
+using AsyncServiceProvider = Microsoft.VisualStudio.Shell.AsyncServiceProvider;
 
 namespace GitHub.InlineReviews.Views
 {
@@ -19,19 +20,20 @@ namespace GitHub.InlineReviews.Views
 
             this.WhenActivated(d =>
             {
-                d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
+                d(ViewModel.OpenOnGitHub.Subscribe(async _ => await DoOpenOnGitHub()));
             });
         }
 
-        IVisualStudioBrowser GetBrowser()
-        {
-            var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
-            return serviceProvider.GetService<IVisualStudioBrowser>();
+        async Task<IVisualStudioBrowser> GetBrowser()
+        {            
+            var serviceProvider = (IGitHubServiceProvider) await AsyncServiceProvider.GlobalProvider.GetServiceAsync(typeof(IGitHubServiceProvider));
+            return serviceProvider.TryGetMEFComponent<IVisualStudioBrowser>();
         }
 
-        void DoOpenOnGitHub()
+        async Task DoOpenOnGitHub()
         {
-            GetBrowser().OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
+            var browser = await GetBrowser();
+            browser.OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
         }
 
         private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -61,13 +63,15 @@ namespace GitHub.InlineReviews.Views
             }
         }
 
-        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        // https://docs.microsoft.com/en-us/previous-versions/windows/apps/hh758286(v=win.10)#event-handlers-that-use-the-async-pattern
+        async void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
         {
             Uri uri;
 
             if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
             {
-                GetBrowser().OpenUrl(uri);
+                var browser = await GetBrowser();
+                browser.OpenUrl(uri);
             }
         }
     }

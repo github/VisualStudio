@@ -56,7 +56,7 @@ namespace GitHub.VisualStudio.UI.Services
 
         IGitHubDialogWindowViewModel CreateViewModel()
         {
-            return serviceProvider.GetService<IGitHubDialogWindowViewModel>();
+            return serviceProvider.TryGetMEFComponent<IGitHubDialogWindowViewModel>();
         }
     }
 }

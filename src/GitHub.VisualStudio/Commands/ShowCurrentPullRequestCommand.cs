@@ -58,7 +58,7 @@ namespace GitHub.VisualStudio.Commands
                 }
 
                 var pullRequest = session.PullRequest;
-                var manager = serviceProvider.TryGetService<IGitHubToolWindowManager>();
+                var manager = serviceProvider.TryGetMEFComponent<IGitHubToolWindowManager>();
                 var host = await manager.ShowGitHubPane();
                 await host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number);
 

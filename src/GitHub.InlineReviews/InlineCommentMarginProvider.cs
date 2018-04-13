@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -14,6 +15,7 @@ using GitHub.InlineReviews.Views;
 using GitHub.Services;
 using GitHub.Settings;
 using Microsoft.VisualStudio.Text.Projection;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.InlineReviews
 {
@@ -32,38 +34,25 @@ namespace GitHub.InlineReviews
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
-        readonly IPackageSettings packageSettings;
-        IPullRequestSessionManager sessionManager;
+        Lazy<IPackageSettings> packageSettings;
+        Lazy<IPullRequestSessionManager> sessionManager;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IGitHubServiceProvider serviceProvider,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService,
-            IPackageSettings packageSettings)
+            IInlineCommentPeekService peekService)
         {
             this.serviceProvider = serviceProvider;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            this.packageSettings = packageSettings;
+            this.packageSettings = new Lazy<IPackageSettings>(() => serviceProvider.TryGetServiceSync<IPackageSettings>());
+            this.sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.TryGetMEFComponent<IPullRequestSessionManager>());
         }
 
-        IPullRequestSessionManager SessionManager
-        {
-            get
-            {
-                // Lazily load the pull request session manager to prevent all of our assemblies
-                // being loaded on VS startup.
-                if (sessionManager == null)
-                {
-                    sessionManager = serviceProvider.GetService<IPullRequestSessionManager>();
-                }
-
-                return sessionManager;
-            }
-        }
+        IPullRequestSessionManager SessionManager => sessionManager.Value;
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
@@ -95,7 +84,11 @@ namespace GitHub.InlineReviews
             return margin;
         }
 
-        bool IsMarginDisabled(IWpfTextViewHost textViewHost) => !packageSettings.EditorComments && !IsDiffView(textViewHost);
+        bool IsMarginDisabled(IWpfTextViewHost textViewHost)
+        {
+            var settings = packageSettings.Value;
+            return !settings.EditorComments && !IsDiffView(textViewHost);
+        }
 
         bool IsDiffView(IWpfTextViewHost host)
         {

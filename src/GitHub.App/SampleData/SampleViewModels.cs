@@ -383,9 +383,9 @@ namespace GitHub.SampleData
             set;
         }
 
-        public void Login()
+        public Task Login()
         {
-
+            return null;
         }
 
         public ICommand OpenOnGitHub { get; }

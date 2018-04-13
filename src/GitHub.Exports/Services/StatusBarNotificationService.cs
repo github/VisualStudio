@@ -12,10 +12,10 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class StatusBarNotificationService : IStatusBarNotificationService
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         [ImportingConstructor]
-        public StatusBarNotificationService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public StatusBarNotificationService(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -31,29 +31,29 @@ namespace GitHub.Services
             return false;
         }
 
-        public void ShowError(string message)
+        public async void ShowError(string message)
         {
-            ShowText(message);
+            await ShowText(message);
         }
 
-        public void ShowMessage(string message)
+        public async void ShowMessage(string message)
         {
-            ShowText(message);
+            await ShowText(message);
         }
 
-        public void ShowMessage(string message, ICommand command, bool showToolTips = true, Guid guid = default(Guid))
+        public async void ShowMessage(string message, ICommand command, bool showToolTips = true, Guid guid = default(Guid))
         {
-            ShowText(message);
+            await ShowText(message);
         }
 
-        public void ShowWarning(string message)
+        public async void ShowWarning(string message)
         {
-            ShowText(message);
+            await ShowText(message);
         }
 
-        void ShowText(string text)
+        async System.Threading.Tasks.Task ShowText(string text)
         {
-            var statusBar = serviceProvider.GetServiceSafe<IVsStatusbar>();
+            var statusBar = await serviceProvider.TryGetServiceMainThread<IVsStatusbar>();
             int frozen;
             if (!ErrorHandler.Succeeded(statusBar.IsFrozen(out frozen)))
                 return;

@@ -27,8 +27,6 @@ namespace GitHub.VisualStudio
     /// </summary>
     public class GitHubServiceProvider : IGitHubServiceProvider, IDisposable
     {
-        public static IGitHubServiceProvider Instance => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-
         class OwnedComposablePart
         {
             public object Owner { get; set; }
@@ -37,7 +35,6 @@ namespace GitHub.VisualStudio
 
         static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
         readonly IServiceProviderPackage asyncServiceProvider;
-        readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         readonly Version currentVersion;
         List<IDisposable> disposables = new List<IDisposable>();
@@ -63,20 +60,21 @@ namespace GitHub.VisualStudio
 
         public IServiceProvider GitServiceProvider { get; set; }
 
-        public GitHubServiceProvider(IServiceProviderPackage asyncServiceProvider, IServiceProvider syncServiceProvider)
+        public GitHubServiceProvider(IServiceProviderPackage asyncServiceProvider)
         {
             Guard.ArgumentNotNull(asyncServiceProvider, nameof(asyncServiceProvider));
-            Guard.ArgumentNotNull(syncServiceProvider, nameof(syncServiceProvider));
 
             this.currentVersion = this.GetType().Assembly.GetName().Version;
             this.asyncServiceProvider = asyncServiceProvider;
-            this.syncServiceProvider = syncServiceProvider;
 
             tempParts = new Dictionary<string, OwnedComposablePart>();
         }
 
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
+            if (initialized)
+                return;
+
             IComponentModel componentModel = await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
 
             Log.Assert(componentModel != null, "Service of type SComponentModel not found");
@@ -94,19 +92,40 @@ namespace GitHub.VisualStudio
             initialized = true;
         }
 
-
-        public object TryGetService(Type serviceType)
+        void InitializeSync()
         {
+            if (initialized)
+                return;
+
+            IComponentModel componentModel = asyncServiceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+
+            Log.Assert(componentModel != null, "Service of type SComponentModel not found");
+            if (componentModel == null)
+            {
+                log.Error("Service of type SComponentModel not found");
+                return;
+            }
+
+            ExportProvider = componentModel.DefaultExportProvider;
+            if (ExportProvider == null)
+            {
+                log.Error("DefaultExportProvider could not be obtained");
+            }
+            initialized = true;
+        }
+
+        private object TryGetServiceSync(Type serviceType)
+        {
+            InitializeSync();
+
             var contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
-            var sp = initialized ? syncServiceProvider : asyncServiceProvider;
-
             try
             {
-                instance = sp.GetService(serviceType);
+                instance = asyncServiceProvider.GetService(serviceType);
                 if (instance != null)
                     return instance;
             }
@@ -115,11 +134,6 @@ namespace GitHub.VisualStudio
                 log.Error(ex, "Error loading {ServiceType}", serviceType);
             }
 
-            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
-
-            if (instance != null)
-                return instance;
-
             instance = GitServiceProvider?.GetService(serviceType);
             if (instance != null)
                 return instance;
@@ -127,42 +141,129 @@ namespace GitHub.VisualStudio
             return null;
         }
 
-        public object TryGetService(string typename)
+        public async Task<T> TryGetServiceAsync<T>() where T : class
         {
-            Guard.ArgumentNotEmptyString(typename, nameof(typename));
+            await InitializeAsync();
 
-            var type = Type.GetType(typename, false, true);
-            return TryGetService(type);
+            var serviceType = typeof(T);
+
+            var contract = AttributedModelServices.GetContractName(serviceType);
+            var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
+            if (instance != null)
+                return (T)instance;
+
+            try
+            {
+                instance = await asyncServiceProvider.GetServiceAsync(serviceType);
+                if (instance != null)
+                    return (T)instance;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error loading {ServiceType}", serviceType);
+            }
+
+            instance = GitServiceProvider?.GetService(serviceType);
+            if (instance != null)
+                return (T)instance;
+
+            return null;
         }
 
-        public object GetService(Type serviceType)
+        public async Task<T> TryGetServiceMainThread<T>() where T : class
+        {
+            await InitializeAsync();
+
+            var serviceType = typeof(T);
+
+            var contract = AttributedModelServices.GetContractName(serviceType);
+            var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
+            if (instance != null)
+                return (T)instance;
+
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                instance = await asyncServiceProvider.GetServiceAsync(serviceType);
+                if (instance != null)
+                    return (T)instance;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error loading {ServiceType}", serviceType);
+            }
+
+            instance = GitServiceProvider?.GetService(serviceType);
+            if (instance != null)
+                return (T)instance;
+
+            return null;
+        }
+
+        public object TryGetMEFComponent(Type serviceType)
         {
             Guard.ArgumentNotNull(serviceType, nameof(serviceType));
 
-            var instance = TryGetService(serviceType);
+            InitializeSync();
+
+            var contract = AttributedModelServices.GetContractName(serviceType);
+            var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
-            string contract = AttributedModelServices.GetContractName(serviceType);
+            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
+
+            if (instance != null)
+                return instance;
+
+            return null;
+        }
+
+        object IServiceProvider.GetService(Type serviceType)
+        {
+            return TryGetServiceSync(serviceType);
+        }
+
+        public T TryGetServiceSync<T>() where T : class
+        {
+            return (T)TryGetServiceSync(typeof(T));
+        }
+
+        public async Task<T1> TryGetServiceAsync<T, T1>() where T : class where T1 : class
+        {
+            T ret = await TryGetServiceAsync<T>();
+            return ret as T1;
+        }
+
+        public T TryGetMEFComponent<T>() where T : class
+        {
+            return (T)TryGetMEFComponent(typeof(T));
+        }
+
+        public T1 TryGetMEFComponent<T, T1>() where T : class where T1 : class
+        {
+            return TryGetMEFComponent(typeof(T)) as T1;
+        }
+
+        public T GetMEFComponent<T>() where T : class
+        {
+            T instance = TryGetMEFComponent<T>();
+            if (instance != null)
+                return instance;
+
+            string contract = AttributedModelServices.GetContractName(typeof(T));
             throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
                 "Could not locate any instances of contract {0}.", contract));
         }
 
-        public T GetService<T>() where T : class
+        public T1 GetMEFComponent<T, T1>() where T : class where T1 : class
         {
-            return (T)GetService(typeof(T));
-        }
+            var instance = TryGetMEFComponent<T, T1>();
+            if (instance != null)
+                return instance;
 
-        public T TryGetService<T>() where T : class
-        {
-            return TryGetService(typeof(T)) as T;
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        public Ret GetService<T, Ret>() where T : class
-                                        where Ret : class
-        {
-            return TryGetService(typeof(T)) as Ret;
+            throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                "Could not locate any instances of <{0}, {1}>.", typeof(T), typeof(T1)));
         }
 
         public void AddService<T>(object owner, T instance) where T : class

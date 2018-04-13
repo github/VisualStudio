@@ -13,6 +13,7 @@ using GitHub.Settings;
 using NSubstitute;
 using NUnit.Framework;
 using Rothko;
+using UnitTests;
 using Environment = System.Environment;
 
 namespace MetricsTests
@@ -22,10 +23,12 @@ namespace MetricsTests
         [Test]
         public void ShouldStartTimer()
         {
-            var service = Substitute.For<IUsageService>();
-            var target = new UsageTracker(CreateServiceProvider(), service);
+            var serviceProvider = CreateServiceProvider();
+            var usageService = serviceProvider.TryGetServiceSync<IUsageService>();
+            var target = new UsageTracker(serviceProvider, usageService,
+                serviceProvider.TryGetServiceSync<IPackageSettings>());
 
-            service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
+            usageService.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
         }
 
         [Test]
@@ -39,7 +42,7 @@ namespace MetricsTests
                 },
                 Measures = new UsageModel.MeasuresModel()
             });
-            var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
+            var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(service), service);
 
             await targetAndTick.Item2();
 
@@ -57,7 +60,7 @@ namespace MetricsTests
                 },
                 Measures = new UsageModel.MeasuresModel()
             });
-            var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
+            var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(service), service);
 
             await targetAndTick.Item2();
             service.ClearReceivedCalls();
@@ -82,7 +85,7 @@ namespace MetricsTests
             service.StartTimer(null, new TimeSpan(), new TimeSpan()).ReturnsForAnyArgs(disposable);
 
             var targetAndTick = CreateTargetAndGetTick(
-                CreateServiceProvider(hasMetricsService: false),
+                CreateServiceProvider(service, hasMetricsService: false),
                 service);
 
             await targetAndTick.Item2();
@@ -93,42 +96,41 @@ namespace MetricsTests
         [Test]
         public async Task TickShouldNotSendDataIfSameDay()
         {
-            var serviceProvider = CreateServiceProvider();
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(new UsageModel
+            var usageService = CreateUsageService(new UsageModel
+            {
+                Dimensions = new UsageModel.DimensionsModel
                 {
-                    Dimensions = new UsageModel.DimensionsModel
-                    {
-                        Date = DateTimeOffset.Now
-                    },
-                    Measures = new UsageModel.MeasuresModel()
-                }));
+                    Date = DateTimeOffset.Now
+                },
+                Measures = new UsageModel.MeasuresModel()
+            });
+            var serviceProvider = CreateServiceProvider(usageService);
+            var targetAndTick = CreateTargetAndGetTick(serviceProvider, usageService);
 
             await targetAndTick.Item2();
 
-            var metricsService = serviceProvider.TryGetService<IMetricsService>();
+            var metricsService = serviceProvider.TryGetMEFComponent<IMetricsService>();
             await metricsService.DidNotReceive().PostUsage(Arg.Any<UsageModel>());
         }
 
         [Test]
         public async Task TickShouldSendDataIfDifferentDay()
         {
-            var serviceProvider = CreateServiceProvider();
-            var targetAndTick = CreateTargetAndGetTick(
-                serviceProvider,
-                CreateUsageService(new UsageModel
+            var usageService = CreateUsageService(new UsageModel
+            {
+                Dimensions = new UsageModel.DimensionsModel
                 {
-                    Dimensions = new UsageModel.DimensionsModel
-                    {
-                        Date = DateTimeOffset.Now.AddDays(-2)
-                    },
-                    Measures = new UsageModel.MeasuresModel()
-                }));
+                    Date = DateTimeOffset.Now.AddDays(-2)
+                },
+                Measures = new UsageModel.MeasuresModel()
+            });
+
+            var serviceProvider = CreateServiceProvider(usageService);
+            var targetAndTick = CreateTargetAndGetTick(serviceProvider, usageService);
 
             await targetAndTick.Item2();
 
-            var metricsService = serviceProvider.TryGetService<IMetricsService>();
+            var metricsService = serviceProvider.TryGetMEFComponent<IMetricsService>();
             await metricsService.Received(1).PostUsage(Arg.Any<UsageModel>());
         }
 
@@ -145,9 +147,9 @@ namespace MetricsTests
                 }
             };
             var usageService = CreateUsageService(model);
-            var target = new UsageTracker(
-                CreateServiceProvider(),
-                usageService);
+            var serviceProvider = CreateServiceProvider(usageService);
+            var target = new UsageTracker(serviceProvider, usageService,
+                serviceProvider.TryGetServiceSync<IPackageSettings>());
 
             await target.IncrementCounter(x => x.NumberOfClones);
             UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
@@ -158,14 +160,15 @@ namespace MetricsTests
         [Test]
         public async Task ShouldWriteData()
         {
-            var service = CreateUsageService();
+            var usageService = CreateUsageService();
+            var serviceProvider = CreateServiceProvider(usageService);
 
             var target = new UsageTracker(
-                CreateServiceProvider(),
-                service);
+                serviceProvider, usageService,
+                serviceProvider.TryGetServiceSync<IPackageSettings>());
 
             await target.IncrementCounter(x => x.NumberOfClones);
-            await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data => 
+            await usageService.Received(1).WriteLocalData(Arg.Is<UsageData>(data => 
                 data.Reports.Count == 1 &&
                 data.Reports[0].Dimensions.Date.Date == DateTimeOffset.Now.Date &&
                 data.Reports[0].Dimensions.AppVersion == AssemblyVersionInformation.Version &&
@@ -179,7 +182,7 @@ namespace MetricsTests
         public async Task ShouldWriteUpdatedData()
         {
             var date = DateTimeOffset.Now;
-            var service = CreateUsageService(new UsageModel
+            var usageService = CreateUsageService(new UsageModel
             {
                 Dimensions = new UsageModel.DimensionsModel
                 {
@@ -193,13 +196,14 @@ namespace MetricsTests
                     NumberOfClones = 1
                 }
             });
+            var serviceProvider = CreateServiceProvider(usageService);
 
             var target = new UsageTracker(
-                CreateServiceProvider(),
-                service);
+                serviceProvider, usageService,
+                serviceProvider.TryGetServiceSync<IPackageSettings>());
 
             await target.IncrementCounter(x => x.NumberOfClones);
-            await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data =>
+            await usageService.Received(1).WriteLocalData(Arg.Is<UsageData>(data =>
                 data.Reports.Count == 1 &&
                 data.Reports[0].Dimensions.Date.Date == DateTimeOffset.Now.Date &&
                 data.Reports[0].Dimensions.AppVersion == AssemblyVersionInformation.Version &&
@@ -211,33 +215,34 @@ namespace MetricsTests
 
         static Tuple<UsageTracker, Func<Task>> CreateTargetAndGetTick(
             IGitHubServiceProvider serviceProvider,
-            IUsageService service)
+            IUsageService usageService)
         {
             Func<Task> tick = null;
-
-            service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
+            usageService.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
                 .Do(x => tick = x.ArgAt<Func<Task>>(0));
 
-            var target = new UsageTracker(serviceProvider, service);
+            var target = new UsageTracker(serviceProvider,
+                usageService,
+                serviceProvider.TryGetServiceSync<IPackageSettings>());
 
             return Tuple.Create(target, tick);
         }
 
-        static IGitHubServiceProvider CreateServiceProvider(bool hasMetricsService = true)
+        static IGitHubServiceProvider CreateServiceProvider(
+            IUsageService usageService = null,
+            bool hasMetricsService = true)
         {
-            var result = Substitute.For<IGitHubServiceProvider>();
-            var connectionManager = Substitute.For<IConnectionManager>();
-            var metricsService = Substitute.For<IMetricsService>();
-            var packageSettings = Substitute.For<IPackageSettings>();
-            var vsservices = Substitute.For<IVSServices>();
+            var result = Substitutes.ServiceProvider;
 
+            var metricsService = hasMetricsService ? Substitute.For<IMetricsService>() : null;
+            result.SetupMEF(metricsService);
+            result.SetupService(usageService);
+
+            var connectionManager = result.TryGetMEFComponent<IConnectionManager>();
             connectionManager.Connections.Returns(new ObservableCollectionEx<IConnection>());
-            packageSettings.CollectMetrics.Returns(true);
 
-            result.GetService<IConnectionManager>().Returns(connectionManager);
-            result.GetService<IPackageSettings>().Returns(packageSettings);
-            result.GetService<IVSServices>().Returns(vsservices);
-            result.TryGetService<IMetricsService>().Returns(hasMetricsService ? metricsService : null);
+            var packageSettings = result.TryGetServiceSync<IPackageSettings>();
+            packageSettings.CollectMetrics.Returns(true);
 
             return result;
         }

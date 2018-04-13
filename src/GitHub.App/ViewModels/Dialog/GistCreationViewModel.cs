@@ -23,29 +23,32 @@ namespace GitHub.ViewModels.Dialog
     {
         static readonly ILogger log = LogManager.ForContext<GistCreationViewModel>();
 
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IModelServiceFactory modelServiceFactory;
+        readonly ISelectedTextProvider selectedTextProvider;
         readonly IGistPublishService gistPublishService;
         readonly INotificationService notificationService;
-        readonly IUsageTracker usageTracker;
+        IUsageTracker usageTracker;
         IApiClient apiClient;
         ObservableAsPropertyHelper<IAccount> account;
 
         [ImportingConstructor]
         public GistCreationViewModel(
+            IGitHubServiceProvider serviceProvider,
             IModelServiceFactory modelServiceFactory,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
-            INotificationService notificationService,
-            IUsageTracker usageTracker)
+            INotificationService notificationService)
         {
             Guard.ArgumentNotNull(selectedTextProvider, nameof(selectedTextProvider));
             Guard.ArgumentNotNull(gistPublishService, nameof(gistPublishService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
+            this.serviceProvider = serviceProvider;
             this.modelServiceFactory = modelServiceFactory;
+            this.selectedTextProvider = selectedTextProvider;
             this.gistPublishService = gistPublishService;
             this.notificationService = notificationService;
-            this.usageTracker = usageTracker;
 
             FileName = VisualStudio.Services.GetFileNameFromActiveDocument() ?? Resources.DefaultGistFileName;
             SelectedText = selectedTextProvider.GetSelectedText();
@@ -68,6 +71,7 @@ namespace GitHub.ViewModels.Dialog
                 .Select(a => a.First())
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Account);
+            usageTracker = await serviceProvider.TryGetServiceAsync<IUsageTracker>();
         }
 
         IObservable<Gist> OnCreateGist(object unused)

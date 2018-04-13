@@ -47,13 +47,13 @@ namespace GitHub.VisualStudio.Commands
             try
             {
                 Clipboard.SetText(link);
-                var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
+                var ns = ServiceProvider.TryGetMEFComponent<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
                 await UsageTracker.IncrementCounter(x => x.NumberOfLinkToGitHub);
             }
             catch
             {
-                var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
+                var ns = ServiceProvider.TryGetMEFComponent<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.Error_FailedToCopyToClipboard);
             }
         }

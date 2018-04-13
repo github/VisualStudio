@@ -60,14 +60,14 @@ namespace GitHub.Services
         /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
         public bool TryOpenRepository(string repoPath)
         {
-            var os = serviceProvider.TryGetService<IOperatingSystem>();
+            var os = serviceProvider.TryGetMEFComponent<IOperatingSystem>();
             if (os == null)
             {
                 log.Error("TryOpenRepository couldn't find IOperatingSystem service");
                 return false;
             }
 
-            var dte = serviceProvider.TryGetService<DTE>();
+            var dte = serviceProvider.TryGetMEFComponent<DTE>();
             if (dte == null)
             {
                 log.Error("TryOpenRepository couldn't find DTE service");

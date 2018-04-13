@@ -77,7 +77,7 @@ namespace GitHub.VisualStudio.Views
             {
                 if (factoryProvider == null)
                 {
-                    factoryProvider = Services.GitHubServiceProvider.TryGetService<IViewViewModelFactory>();
+                    factoryProvider = Services.GitHubServiceProvider.TryGetMEFComponent<IViewViewModelFactory>();
                 }
 
                 return factoryProvider;
