@@ -14,6 +14,7 @@ using GitHub.Extensions;
 using GitHub.Logging;
 using Serilog;
 using System.Collections.Specialized;
+using GitHub.Settings;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -32,7 +33,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public ForkNavigationItem(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IPackageSettings packageSettings)
             : base(serviceProvider, apiFactory, holder, Octicon.repo_forked)
         {
             this.dialogService = dialogService;
@@ -40,6 +42,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             Text = Resources.ForkNavigationItemText;
             ArgbColor = Colors.PurpleNavigationItem.ToInt32();
             ConnectionManager.Connections.CollectionChanged += ConnectionsChanged;
+
+            IsVisible = packageSettings?.ForkButton ?? false;
+            packageSettings.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(packageSettings.ForkButton))
+                {
+                    IsVisible = packageSettings.ForkButton;
+                }
+            };
         }
 
         IConnectionManager ConnectionManager

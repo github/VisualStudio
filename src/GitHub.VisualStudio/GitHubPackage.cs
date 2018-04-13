@@ -56,7 +56,7 @@ namespace GitHub.VisualStudio
             {
                 packageSettings.PropertyChanged += (sender, args) =>
                 {
-                    if (args.PropertyName == "EnableTraceLogging")
+                    if (args.PropertyName == nameof(packageSettings.EnableTraceLogging))
                     {
                         LogManager.EnableTraceLogging(packageSettings.EnableTraceLogging);
                     }

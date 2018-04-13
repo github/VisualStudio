@@ -673,6 +673,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show Fork button in Team Explorer.
+        /// </summary>
+        public static string Options_ForkButtonLabel {
+            get {
+                return ResourceManager.GetString("Options_ForkButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
         /// </summary>
         public static string Options_MetricsLabel {
