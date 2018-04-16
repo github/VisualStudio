@@ -25,7 +25,7 @@ namespace MetricsTests
             var service = Substitute.For<IUsageService>();
             var target = new UsageTracker(CreateServiceProvider(), service, CreatePackageSettings());
 
-            service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
+            service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromDays(1));
         }
 
         [Test]

@@ -7,7 +7,8 @@ namespace GitHub.Models
         public DimensionsModel Dimensions { get; set; } = new DimensionsModel();
         public MeasuresModel Measures { get; set; } = new MeasuresModel();
 
-        protected UsageModel() { }
+        // this should never be called by our code but it's required to be public by the serialization code
+        public UsageModel() { }
 
         public static UsageModel Create(Guid guid)
         {
