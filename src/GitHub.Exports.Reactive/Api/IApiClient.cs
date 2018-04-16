@@ -14,6 +14,7 @@ namespace GitHub.Api
         IGitHubClient GitHubClient { get; }
 
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
+        IObservable<Repository> ForkRepository(string owner, string name, NewRepositoryFork repository);
         IObservable<Gist> CreateGist(NewGist newGist);
         IObservable<User> GetUser();
         IObservable<User> GetUser(string login);

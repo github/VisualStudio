@@ -179,6 +179,7 @@
     <Compile Include="Services\IPullRequestSession.cs" />
     <Compile Include="Services\IPullRequestService.cs" />
     <Compile Include="Services\IPullRequestSessionManager.cs" />
+    <Compile Include="Services\IRepositoryForkService.cs" />
     <Compile Include="Services\IShowDialogService.cs" />
     <Compile Include="Services\LocalRepositoriesExtensions.cs" />
     <Compile Include="Services\ModelServiceExtensions.cs" />

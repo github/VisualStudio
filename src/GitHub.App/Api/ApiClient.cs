@@ -48,6 +48,16 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<Repository> ForkRepository(string owner, string name, NewRepositoryFork repository)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
+            var client = gitHubClient.Repository.Forks;
+
+            return client.Create(owner, name, repository);
+        }
+
         public IObservable<PullRequestReview> PostPullRequestReview(
             string owner,
             string name,
