@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows;
+using System.Reactive.Linq;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using GitHub.InlineReviews.Glyph.Implementation;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Glyph
 {
@@ -24,6 +25,7 @@ namespace GitHub.InlineReviews.Glyph
         IWpfTextView textView;
         GlyphMarginVisualManager<TGlyphTag> visualManager;
         Func<bool> isMarginVisible;
+        bool loaded;
 
         public GlyphMargin(
             IWpfTextView textView,
@@ -42,10 +44,7 @@ namespace GitHub.InlineReviews.Glyph
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, this.marginGrid,
                 editorFormatMap, marginPropertiesName);
 
-            // Do on Loaded to give diff view a chance to initialize.
-            this.marginGrid.Loaded += OnLoaded;
-
-            textView.Options.OptionChanged += OnOptionChanged;
+            marginGrid.WhenAnyValue(x => x.IsVisible).Subscribe(IsVisibleChanged);
         }
 
         public void Dispose()
@@ -53,14 +52,18 @@ namespace GitHub.InlineReviews.Glyph
             tagAggregator.Dispose();
         }
 
-        void OnOptionChanged(object sender, EditorOptionChangedEventArgs e)
+        void IsVisibleChanged(bool isVisible)
         {
-            RefreshMarginVisibility();
+            if (isVisible)
+            {
+                OnLoaded();
+            }
         }
 
-        void OnLoaded(object sender, RoutedEventArgs e)
+        void OnLoaded()
         {
-            RefreshMarginVisibility();
+            if (loaded) return;
+            loaded = true;
 
             tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
             textView.LayoutChanged += OnLayoutChanged;
@@ -84,8 +87,6 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             if (!textView.IsClosed)
             {
                 var list = new List<SnapshotSpan>();
@@ -118,8 +119,6 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             visualManager.SetSnapshotAndUpdate(textView.TextSnapshot, e.NewOrReformattedLines, e.VerticalTranslation ? (IList<ITextViewLine>)textView.TextViewLines : e.TranslatedLines);
 
             var lines = refreshAllGlyphs ? (IList<ITextViewLine>)textView.TextViewLines : e.NewOrReformattedLines;
@@ -149,11 +148,6 @@ namespace GitHub.InlineReviews.Glyph
                     visualManager.AddGlyph(span.Tag, spans[0]);
                 }
             }
-        }
-
-        void RefreshMarginVisibility()
-        {
-            marginGrid.Visibility = isMarginVisible() ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

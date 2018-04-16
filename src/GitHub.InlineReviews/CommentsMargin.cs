@@ -88,6 +88,8 @@ namespace GitHub.InlineReviews
 
         async Task<IPullRequestSessionFile> FindSessionFile()
         {
+            await sessionManager.EnsureInitialized();
+
             var session = sessionManager.CurrentSession;
             if (session == null)
             {

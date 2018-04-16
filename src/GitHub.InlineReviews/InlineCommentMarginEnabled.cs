@@ -11,7 +11,7 @@ namespace GitHub.InlineReviews
     {
         public const string OptionName = "TextViewHost/InlineCommentMargin";
 
-        public override bool Default => true;
+        public override bool Default => false;
 
         public override EditorOptionKey<bool> Key => new EditorOptionKey<bool>(OptionName);
     }

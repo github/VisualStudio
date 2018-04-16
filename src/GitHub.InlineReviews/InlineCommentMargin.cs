@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Threading.Tasks;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.Extensions;
 using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.Glyph;
 using GitHub.InlineReviews.Services;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Classification;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews
 {
@@ -25,10 +27,13 @@ namespace GitHub.InlineReviews
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IPackageSettings packageSettings;
-        readonly Lazy<IPullRequestSessionManager> sessionManager;
-        readonly Lazy<Grid> marginGrid;
+        readonly IPullRequestSessionManager sessionManager;
+        readonly Grid marginGrid;
 
         GlyphMargin<InlineCommentTag> glyphMargin;
+        IDisposable currentSessionSubscription;
+        bool hasChanges;
+        bool hasInfo;
 
         public InlineCommentMargin(
             IWpfTextViewHost wpfTextViewHost,
@@ -43,33 +48,11 @@ namespace GitHub.InlineReviews
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.packageSettings = packageSettings;
-            this.sessionManager = sessionManager;
+            this.sessionManager = sessionManager.Value;
 
-            marginGrid = new Lazy<Grid>(() => CreateMarginGrid(wpfTextViewHost));
+            textView.Options.SetOptionValue(InlineCommentMarginEnabled.OptionName, packageSettings.EditorComments);
 
-            if (IsMarginDisabledDefault())
-            {
-                textView.Options.SetOptionValue(InlineCommentMarginEnabled.OptionName, false);
-            }
-        }
-
-        public ITextViewMargin GetTextViewMargin(string name)
-        {
-            return (name == MarginName) ? this : null;
-        }
-
-        public void Dispose() => glyphMargin?.Dispose();
-
-        public FrameworkElement VisualElement => marginGrid.Value;
-
-        public double MarginSize => marginGrid.Value.Width;
-
-        public bool Enabled => IsMarginVisible();
-
-        Grid CreateMarginGrid(IWpfTextViewHost wpfTextViewHost)
-        {
-            var marginGrid = new GlyphMarginGrid { Width = 17.0 };
-
+            marginGrid = new GlyphMarginGrid { Width = 17.0 };
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
 
@@ -81,10 +64,55 @@ namespace GitHub.InlineReviews
                 TrackCommentGlyph(wpfTextViewHost, marginGrid);
             }
 
-            return marginGrid;
+            currentSessionSubscription = this.sessionManager.WhenAnyValue(x => x.CurrentSession)
+                .Subscribe(x => RefreshCurrentSession().Forget());
+
+            textView.Options.OptionChanged += (s, e) => RefreshMarginVisibility();
         }
 
-        bool IsMarginDisabledDefault() => !packageSettings.EditorComments && !IsDiffView();
+        async Task RefreshCurrentSession()
+        {
+            var sessionFile = await FindSessionFile();
+            hasChanges = sessionFile?.Diff != null && sessionFile.Diff.Count > 0;
+
+            await Task.Yield(); // HACK: Give diff view a chance to initialize.
+            var info = sessionManager.GetTextBufferInfo(textView.TextBuffer);
+            hasInfo = info != null;
+
+            RefreshMarginVisibility();
+        }
+
+        public ITextViewMargin GetTextViewMargin(string name)
+        {
+            return (name == MarginName) ? this : null;
+        }
+
+        public void Dispose() => glyphMargin?.Dispose();
+
+        public FrameworkElement VisualElement => marginGrid;
+
+        public double MarginSize => marginGrid.Width;
+
+        public bool Enabled => IsMarginVisible();
+
+        async Task<IPullRequestSessionFile> FindSessionFile()
+        {
+            await sessionManager.EnsureInitialized();
+
+            var session = sessionManager.CurrentSession;
+            if (session == null)
+            {
+                return null;
+            }
+
+            var relativePath = sessionManager.GetRelativePath(textView.TextBuffer);
+            if (relativePath == null)
+            {
+                return null;
+            }
+
+            return await session.GetFile(relativePath);
+        }
 
         bool IsDiffView() => textView.Roles.Contains("DIFF");
 
@@ -94,45 +122,15 @@ namespace GitHub.InlineReviews
             router.Add(host.HostControl, marginElement);
         }
 
-        bool IsMarginVisible()
+        void RefreshMarginVisibility()
         {
-            if (!textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName))
-            {
-                return false;
-            }
-
-            return IsMarginVisible(textView.TextBuffer);
+            marginGrid.Visibility = IsMarginVisible() ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        bool IsMarginVisible(ITextBuffer buffer)
+        bool IsMarginVisible()
         {
-            if (sessionManager.Value.GetTextBufferInfo(buffer) != null)
-            {
-                return true;
-            }
-
-            InlineCommentTagger inlineCommentTagger;
-            if (buffer.Properties.TryGetProperty(typeof(InlineCommentTagger), out inlineCommentTagger))
-            {
-                if (inlineCommentTagger.ShowMargin)
-                {
-                    return true;
-                }
-            }
-
-            var projection = buffer as IProjectionBuffer;
-            if (projection != null)
-            {
-                foreach (var source in projection.SourceBuffers)
-                {
-                    if (IsMarginVisible(source))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            var enabled = textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName);
+            return hasInfo || (enabled && hasChanges);
         }
     }
 }
