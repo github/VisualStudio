@@ -73,7 +73,7 @@ namespace GitHub.ViewModels.Dialog
                     .Finally(() => IsLoading = false)
                     .Subscribe(x =>
                     {
-                        Accounts = BuildAccounts(x.Accounts, x.Forks);
+                        Accounts = BuildAccounts(x.Accounts, x.Forks, repository.Owner);
                         ExistingForks = BuildExistingForks(x.Accounts, x.Forks);
 
                         log.Verbose("Loaded Data Accounts:{Accounts} Forks:{Forks}", Accounts.Count, ExistingForks.Count);
@@ -87,10 +87,12 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accounts, IList<IRemoteRepositoryModel> forks)
+        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accounts, IList<IRemoteRepositoryModel> forks, string currentRepositoryOwner)
         {
             var forksByOwner = forks.ToDictionary(x => x.Owner, x => x);
-            return accounts.Where(x => !forksByOwner.ContainsKey(x.Login)).ToList();
+            return accounts
+                .Where(x => x.Login != currentRepositoryOwner)
+                .Where(x => !forksByOwner.ContainsKey(x.Login)).ToList();
         }
 
         IReadOnlyList<IRemoteRepositoryModel> BuildExistingForks(IReadOnlyList<IAccount> accounts, IList<IRemoteRepositoryModel> forks)
