@@ -42,12 +42,14 @@ namespace MetricsServerApp
                   .Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri(uri, "/api/usage/visualstudio"));
 
+            var model = UsageModel.Create(Guid.NewGuid());
+            model.Dimensions.AppVersion = "9.9.9";
+            model.Dimensions.Lang = "en-us";
+            model.Dimensions.VSVersion = "14";
+            model.Measures.NumberOfStartups = 1;
+
             var data = new UsageData();
-            var model = data.Model;
-            model.AppVersion = "9.9.9";
-            model.Lang = "en-us";
-            model.VSVersion = "14";
-            model.NumberOfStartups = 1;
+            data.Reports = new List<UsageModel> { model };
 
             request.Content = SerializeRequest(model);
 
@@ -55,7 +57,6 @@ namespace MetricsServerApp
             try
             {
                 response = await client.SendAsync(request);
-
             }
             catch (Exception ex)
             {

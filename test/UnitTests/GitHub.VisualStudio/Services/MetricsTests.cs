@@ -31,14 +31,7 @@ namespace MetricsTests
         [Test]
         public async Task FirstTickShouldIncrementLaunchCount()
         {
-            var service = CreateUsageService(new UsageModel
-            {
-                Dimensions = new UsageModel.DimensionsModel
-                {
-                    Date = DateTimeOffset.Now
-                },
-                Measures = new UsageModel.MeasuresModel()
-            });
+            var service = CreateUsageService(UsageModel.Create(Guid.NewGuid()));
             var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
 
             await targetAndTick.Item2();
@@ -49,14 +42,7 @@ namespace MetricsTests
         [Test]
         public async Task SubsequentTickShouldNotIncrementLaunchCount()
         {
-            var service = CreateUsageService(new UsageModel
-            {
-                Dimensions = new UsageModel.DimensionsModel
-                {
-                    Date = DateTimeOffset.Now
-                },
-                Measures = new UsageModel.MeasuresModel()
-            });
+            var service = CreateUsageService(UsageModel.Create(Guid.NewGuid()));
             var targetAndTick = CreateTargetAndGetTick(CreateServiceProvider(), service);
 
             await targetAndTick.Item2();
@@ -69,14 +55,7 @@ namespace MetricsTests
         [Test]
         public async Task ShouldDisposeTimerIfMetricsServiceNotFound()
         {
-            var service = CreateUsageService(new UsageModel
-            {
-                Dimensions = new UsageModel.DimensionsModel
-                {
-                    Date = DateTimeOffset.Now
-                },
-                Measures = new UsageModel.MeasuresModel()
-            });
+            var service = CreateUsageService(UsageModel.Create(Guid.NewGuid()));
             var disposed = false;
             var disposable = Disposable.Create(() => disposed = true);
             service.StartTimer(null, new TimeSpan(), new TimeSpan()).ReturnsForAnyArgs(disposable);
@@ -96,14 +75,7 @@ namespace MetricsTests
             var serviceProvider = CreateServiceProvider();
             var targetAndTick = CreateTargetAndGetTick(
                 serviceProvider,
-                CreateUsageService(new UsageModel
-                {
-                    Dimensions = new UsageModel.DimensionsModel
-                    {
-                        Date = DateTimeOffset.Now
-                    },
-                    Measures = new UsageModel.MeasuresModel()
-                }));
+                CreateUsageService(UsageModel.Create(Guid.NewGuid())));
 
             await targetAndTick.Item2();
 
@@ -114,17 +86,13 @@ namespace MetricsTests
         [Test]
         public async Task TickShouldSendDataIfDifferentDay()
         {
+            var model = UsageModel.Create(Guid.NewGuid());
+            model.Dimensions.Date = DateTimeOffset.Now.AddDays(-2);
+
             var serviceProvider = CreateServiceProvider();
             var targetAndTick = CreateTargetAndGetTick(
                 serviceProvider,
-                CreateUsageService(new UsageModel
-                {
-                    Dimensions = new UsageModel.DimensionsModel
-                    {
-                        Date = DateTimeOffset.Now.AddDays(-2)
-                    },
-                    Measures = new UsageModel.MeasuresModel()
-                }));
+                CreateUsageService(model));
 
             await targetAndTick.Item2();
 
@@ -135,15 +103,8 @@ namespace MetricsTests
         [Test]
         public async Task ShouldIncrementCounter()
         {
-            var model = new UsageModel {
-                Dimensions = new UsageModel.DimensionsModel {
-                    Date = DateTimeOffset.Now
-                },
-                Measures = new UsageModel.MeasuresModel
-                {
-                    NumberOfClones = 4
-                }
-            };
+            var model = UsageModel.Create(Guid.NewGuid());
+            model.Measures.NumberOfClones = 4;
             var usageService = CreateUsageService(model);
             var target = new UsageTracker(
                 CreateServiceProvider(),
@@ -180,21 +141,12 @@ namespace MetricsTests
         [Test]
         public async Task ShouldWriteUpdatedData()
         {
-            var date = DateTimeOffset.Now;
-            var service = CreateUsageService(new UsageModel
-            {
-                Dimensions = new UsageModel.DimensionsModel
-                {
-                    AppVersion = AssemblyVersionInformation.Version,
-                    Lang = CultureInfo.InstalledUICulture.IetfLanguageTag,
-                    CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag,
-                    Date = date
-                },
-                Measures = new UsageModel.MeasuresModel
-                {
-                    NumberOfClones = 1
-                }
-            });
+            var model = UsageModel.Create(Guid.NewGuid());
+            model.Dimensions.AppVersion = AssemblyVersionInformation.Version;
+            model.Dimensions.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
+            model.Dimensions.CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag;
+            model.Measures.NumberOfClones = 1;
+            var service = CreateUsageService(model);
 
             var target = new UsageTracker(
                 CreateServiceProvider(),

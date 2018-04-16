@@ -10,7 +10,7 @@ using GitHub.Services;
 using Octokit;
 using Octokit.Internal;
 
-namespace GitHub.App
+namespace GitHub.Services
 {
     [Export(typeof(IMetricsService))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
@@ -99,7 +99,7 @@ namespace GitHub.App
              */
         }
 
-        static StringContent SerializeRequest(UsageModel model)
+        internal static StringContent SerializeRequest(UsageModel model)
         {
             var serializer = new SimpleJsonSerializer();
             var dictionary = new Dictionary<string, object>

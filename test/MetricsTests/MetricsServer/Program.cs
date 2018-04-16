@@ -5,10 +5,6 @@ using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Threading;
-using Nancy.Extensions;
 
 namespace MetricsServer
 {
@@ -42,21 +38,25 @@ namespace MetricsServer
         {
             Post["/api/usage/visualstudio"] = p =>
             {
-                Console.WriteLine(Request.Body.AsString());
                 var errors = new List<string>();
                 var usage = this.Bind<UsageModel>();
-                if (String.IsNullOrEmpty(usage.AppVersion))
+                if (String.IsNullOrEmpty(usage.Dimensions.AppVersion))
                     errors.Add("Empty appVersion");
-                if (String.IsNullOrEmpty(usage.Lang))
+                Version result = null;
+                if (!Version.TryParse(usage.Dimensions.AppVersion, out result))
+                    errors.Add("Invalid appVersion");
+                if (String.IsNullOrEmpty(usage.Dimensions.Lang))
                     errors.Add("Empty lang");
-                if (String.IsNullOrEmpty(usage.VSVersion))
+                if (String.IsNullOrEmpty(usage.Dimensions.VSVersion))
                     errors.Add("Empty vSVersion");
-                if (usage.NumberOfStartups == 0)
+                if (usage.Dimensions.Date == DateTimeOffset.MinValue)
+                    errors.Add("Empty date");
+                if (usage.Measures.NumberOfStartups == 0)
                     errors.Add("Startups is 0");
                 if (errors.Count > 0)
                 {
                     return Negotiate
-                        .WithStatusCode(HttpStatusCode.BadRequest)
+                        .WithStatusCode(HttpStatusCode.InternalServerError)
                         .WithAllowedMediaRange(MediaRange.FromString("application/json"))
                         .WithMediaRangeModel(
                               MediaRange.FromString("application/json"),
