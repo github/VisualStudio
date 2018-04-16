@@ -59,27 +59,33 @@ namespace GitHub.Services
 
         IDisposable StartTimer()
         {
-            return service.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
+            return service.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromDays(1));
         }
 
         async Task Initialize()
         {
+            if (initialized)
+                return;
+
             // The services needed by the usage tracker are loaded when they are first needed to
             // improve the startup time of the extension.
-            if (!initialized)
-            {
-                await ThreadingHelper.SwitchToMainThreadAsync();
+            await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = gitHubServiceProvider.TryGetService<IMetricsService>();
-                connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
-                vsservices = gitHubServiceProvider.GetService<IVSServices>();
-                initialized = true;
-            }
+            client = gitHubServiceProvider.TryGetService<IMetricsService>();
+            connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
+            vsservices = gitHubServiceProvider.GetService<IVSServices>();
+            initialized = true;
         }
 
         async Task TimerTick()
         {
             await Initialize();
+
+            if (firstTick)
+            {
+                await IncrementCounter(x => x.NumberOfStartups);
+                firstTick = false;
+            }
 
             if (client == null || !userSettings.CollectMetrics)
             {
@@ -89,16 +95,8 @@ namespace GitHub.Services
             }
 
             var data = await service.ReadLocalData();
+
             var changed = false;
-
-            if (firstTick)
-            {
-                var current = await GetCurrentReport(data);
-                current.Measures.NumberOfStartups++;
-                changed = true;
-                firstTick = false;
-            }
-
             for (var i = data.Reports.Count - 1; i >= 0; --i)
             {
                 if (data.Reports[i].Dimensions.Date.Date != DateTimeOffset.Now.Date)
@@ -138,16 +136,8 @@ namespace GitHub.Services
             current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
             current.Dimensions.VSVersion = vsservices.VSVersion;
 
-            if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
-            {
-                current.Dimensions.IsGitHubUser = true;
-            }
-
-            if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
-            {
-                current.Dimensions.IsEnterpriseUser = true;
-            }
-
+            current.Dimensions.IsGitHubUser = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
+            current.Dimensions.IsEnterpriseUser = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
             return current;
         }
     }
