@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -15,7 +17,7 @@ using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
-    public class PullRequestDetailViewModelTests : TestBaseClass
+    public class PullRequestDetailViewModelTests
     {
         static readonly Uri Uri = new Uri("http://foo");
 
@@ -26,19 +28,19 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
 
-                await target.Load(CreatePullRequest(body: string.Empty));
+                await target.Load(CreatePullRequestModel(body: string.Empty));
 
                 Assert.That("*No description provided.*", Is.EqualTo(target.Body));
             }
         }
 
-        public class TheHeadProperty
+        public class TheHeadProperty : TestBaseClass
         {
             [Test]
             public async Task ShouldAcceptNullHead()
             {
                 var target = CreateTarget();
-                var model = CreatePullRequest();
+                var model = CreatePullRequestModel();
 
                 // PullRequest.Head can be null for example if a user deletes the repository after creating the PR.
                 model.Head = null;
@@ -49,103 +51,112 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
         }
 
-        public class TheChangedFilesTreeProperty
+        public class TheReviewsProperty : TestBaseClass
         {
             [Test]
-            public async Task ShouldCreateChangesTree()
+            public async Task ShouldShowLatestAcceptedOrChangesRequestedReview()
             {
                 var target = CreateTarget();
-                var pr = CreatePullRequest();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.ChangesRequested),
+                    CreatePullRequestReviewModel(2, "shana", PullRequestReviewState.ChangesRequested),
+                    CreatePullRequestReviewModel(3, "grokys", PullRequestReviewState.Approved),
+                    CreatePullRequestReviewModel(4, "grokys", PullRequestReviewState.Commented));
 
-                pr.ChangedFiles = new[]
-                {
-                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
-                };
+                await target.Load(model);
 
-                await target.Load(pr);
-
-                Assert.That(3, Is.EqualTo(target.ChangedFilesTree.Count));
-
-                var dir1 = (PullRequestDirectoryNode)target.ChangedFilesTree[0];
-                Assert.That("dir1", Is.EqualTo(dir1.DirectoryName));
-                Assert.That(2, Is.EqualTo(dir1.Files.Count));
-                Assert.That(1, Is.EqualTo(dir1.Directories.Count));
-                Assert.That("f1.cs", Is.EqualTo(dir1.Files[0].FileName));
-                Assert.That("f2.cs", Is.EqualTo(dir1.Files[1].FileName));
-                Assert.That("dir1", Is.EqualTo(dir1.Files[0].DirectoryPath));
-                Assert.That("dir1", Is.EqualTo(dir1.Files[1].DirectoryPath));
-
-                var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
-                Assert.That("dir1a", Is.EqualTo(dir1a.DirectoryName));
-                Assert.That(1, Is.EqualTo(dir1a.Files.Count));
-                Assert.That(0, Is.EqualTo(dir1a.Directories.Count));
-
-                var dir2 = (PullRequestDirectoryNode)target.ChangedFilesTree[1];
-                Assert.That("dir2", Is.EqualTo(dir2.DirectoryName));
-                Assert.That(1, Is.EqualTo(dir2.Files.Count));
-                Assert.That(0, Is.EqualTo(dir2.Directories.Count));
-
-                var readme = (PullRequestFileNode)target.ChangedFilesTree[2];
-                Assert.That("readme.md", Is.EqualTo(readme.FileName));
+                Assert.That(target.Reviews, Has.Count.EqualTo(3));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[1].User.Login, Is.EqualTo("shana"));
+                Assert.That(target.Reviews[2].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo(3));
+                Assert.That(target.Reviews[1].Id, Is.EqualTo(2));
+                Assert.That(target.Reviews[2].Id, Is.EqualTo(0));
             }
 
             [Test]
-            public async Task FileCommentCountShouldTrackSessionInlineComments()
+            public async Task ShouldShowLatestCommentedReviewIfNothingElsePresent()
             {
-                var pr = CreatePullRequest();
-                var file = Substitute.For<IPullRequestSessionFile>();
-                var thread1 = CreateThread(5);
-                var thread2 = CreateThread(6);
-                var outdatedThread = CreateThread(-1);
-                var session = Substitute.For<IPullRequestSession>();
-                var sessionManager = Substitute.For<IPullRequestSessionManager>();
+                var target = CreateTarget();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel(1, "shana", PullRequestReviewState.Commented),
+                    CreatePullRequestReviewModel(2, "shana", PullRequestReviewState.Commented));
 
-                file.InlineCommentThreads.Returns(new[] { thread1 });
-                session.GetFile("readme.md").Returns(Task.FromResult(file));
-                sessionManager.GetSession(pr).Returns(Task.FromResult(session));
+                await target.Load(model);
 
-                var target = CreateTarget(sessionManager: sessionManager);
+                Assert.That(target.Reviews, Has.Count.EqualTo(2));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("shana"));
+                Assert.That(target.Reviews[1].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo(2));
+            }
 
-                pr.ChangedFiles = new[]
+            [Test]
+            public async Task ShouldNotShowStartNewReviewWhenHasPendingReview()
+            {
+                var target = CreateTarget();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.Pending));
+
+                await target.Load(model);
+
+                Assert.That(target.Reviews, Has.Count.EqualTo(1));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo(1));
+            }
+
+            [Test]
+            public async Task ShouldShowPendingReviewOverApproved()
+            {
+                var target = CreateTarget();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.Approved),
+                    CreatePullRequestReviewModel(2, "grokys", PullRequestReviewState.Pending));
+
+                await target.Load(model);
+
+                Assert.That(target.Reviews, Has.Count.EqualTo(1));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo(2));
+            }
+
+            [Test]
+            public async Task ShouldNotShowPendingReviewForOtherUser()
+            {
+                var target = CreateTarget();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel(1, "shana", PullRequestReviewState.Pending));
+
+                await target.Load(model);
+
+                Assert.That(target.Reviews, Has.Count.EqualTo(1));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo(0));
+            }
+
+            static PullRequestModel CreatePullRequestModel(
+                params IPullRequestReviewModel[] reviews)
+            {
+                return PullRequestDetailViewModelTests.CreatePullRequestModel(reviews: reviews);
+            }
+
+            static PullRequestReviewModel CreatePullRequestReviewModel(
+                long id,
+                string login,
+                PullRequestReviewState state)
+            {
+                var account = Substitute.For<IAccount>();
+                account.Login.Returns(login);
+
+                return new PullRequestReviewModel
                 {
-                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
+                    Id = id,
+                    User = account,
+                    State = state,
                 };
-
-                await target.Load(pr);
-                Assert.That(1, Is.EqualTo(((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount));
-
-                file.InlineCommentThreads.Returns(new[] { thread1, thread2 });
-                RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-                Assert.That(2, Is.EqualTo(((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount));
-
-                // Outdated comment is not included in the count.
-                file.InlineCommentThreads.Returns(new[] { thread1, thread2, outdatedThread });
-                RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-                Assert.That(2, Is.EqualTo(((IPullRequestFileNode)target.ChangedFilesTree[0]).CommentCount));
-
-                file.Received(1).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
             }
-
-            IInlineCommentThreadModel CreateThread(int lineNumber)
-            {
-                var result = Substitute.For<IInlineCommentThreadModel>();
-                result.LineNumber.Returns(lineNumber);
-                return result;
-            }
-
-            void RaisePropertyChanged<T>(T o, string propertyName)
-                where T : INotifyPropertyChanged
-            {
-                o.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(new PropertyChangedEventArgs(propertyName));
-            }
-
         }
 
-        public class TheCheckoutCommand
+        public class TheCheckoutCommand : TestBaseClass
         {
             [Test]
             public async Task CheckedOutAndUpToDate()
@@ -154,7 +165,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Checkout.CanExecute(null));
                 Assert.That(target.CheckoutState, Is.Null);
@@ -167,7 +178,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.True(target.CheckoutState.IsEnabled);
@@ -182,7 +193,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     existingPrBranch: "pr/123",
                     dirty: true);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Checkout.CanExecute(null));
                 Assert.That("Cannot checkout as your working directory has uncommitted changes.", Is.EqualTo(target.CheckoutState.ToolTip));
@@ -195,7 +206,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest(number: 123));
+                await target.Load(CreatePullRequestModel(number: 123));
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.That("Checkout pr/123", Is.EqualTo(target.CheckoutState.Caption));
@@ -207,7 +218,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 var target = CreateTarget(
                     currentBranch: "master");
 
-                await target.Load(CreatePullRequest(number: 123));
+                await target.Load(CreatePullRequestModel(number: 123));
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.That("Checkout to pr/123", Is.EqualTo(target.CheckoutState.Caption));
@@ -219,7 +230,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
-                var pr = CreatePullRequest();
+                var pr = CreatePullRequestModel();
 
                 pr.Head = new GitReferenceModel("source", null, "sha", (string)null);
 
@@ -236,7 +247,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Checkout.CanExecute(null));
 
@@ -252,7 +263,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
@@ -269,7 +280,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Checkout.CanExecute(null));
                 Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
@@ -280,7 +291,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
         }
 
-        public class ThePullCommand
+        public class ThePullCommand : TestBaseClass
         {
             [Test]
             public async Task NotCheckedOut()
@@ -289,7 +300,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Pull.CanExecute(null));
                 Assert.That(target.UpdateState, Is.Null);
@@ -302,7 +313,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Pull.CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -318,7 +329,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     existingPrBranch: "pr/123",
                     behindBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -335,7 +346,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     aheadBy: 3,
                     behindBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.That(3, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -352,7 +363,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     prFromFork: true,
                     behindBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -367,14 +378,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
                 Assert.That("Pull threw", Is.EqualTo(target.OperationError));
             }
         }
 
-        public class ThePushCommand
+        public class ThePushCommand : TestBaseClass
         {
             [Test]
             public async Task NotCheckedOut()
@@ -383,7 +394,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.That(target.UpdateState, Is.Null);
@@ -396,7 +407,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "pr/123",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -412,7 +423,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     existingPrBranch: "pr/123",
                     aheadBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Push.CanExecute(null));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -428,7 +439,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     existingPrBranch: "pr/123",
                     behindBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -445,7 +456,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     aheadBy: 3,
                     behindBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.False(target.Push.CanExecute(null));
                 Assert.That(3, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -462,7 +473,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     prFromFork: true,
                     aheadBy: 2);
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.True(target.Push.CanExecute(null));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsAhead));
@@ -477,7 +488,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
 
-                await target.Load(CreatePullRequest());
+                await target.Load(CreatePullRequestModel());
 
                 Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
                 Assert.That("Push threw", Is.EqualTo(target.OperationError));
@@ -550,21 +561,37 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())
                 .Returns(Observable.Return(divergence));
 
+            if (sessionManager == null)
+            {
+                var currentSession = Substitute.For<IPullRequestSession>();
+                currentSession.User.Login.Returns("grokys");
+
+                sessionManager = Substitute.For<IPullRequestSessionManager>();
+                sessionManager.CurrentSession.Returns(currentSession);
+                sessionManager.GetSession(null).ReturnsForAnyArgs(currentSession);
+            }
+
             var vm = new PullRequestDetailViewModel(
                 pullRequestService,
-                sessionManager ?? Substitute.For<IPullRequestSessionManager>(),
+                sessionManager,
                 Substitute.For<IModelServiceFactory>(),
                 Substitute.For<IUsageTracker>(),
                 Substitute.For<ITeamExplorerContext>(),
-                Substitute.For<IStatusBarNotificationService>());
+                Substitute.For<IStatusBarNotificationService>(),
+                Substitute.For<IPullRequestFilesViewModel>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
         }
 
-        static PullRequestModel CreatePullRequest(int number = 1, string body = "PR Body")
+        static PullRequestModel CreatePullRequestModel(
+            int number = 1,
+            string body = "PR Body",
+            IEnumerable<IPullRequestReviewModel> reviews = null)
         {
             var author = Substitute.For<IAccount>();
+
+            reviews = reviews ?? new IPullRequestReviewModel[0];
 
             return new PullRequestModel(number, "PR 1", author, DateTimeOffset.Now)
             {
@@ -572,6 +599,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Body = string.Empty,
                 Head = new GitReferenceModel("source", "foo:baz", "sha", "https://github.com/foo/bar.git"),
                 Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
+                Reviews = reviews.ToList(),
             };
         }
 

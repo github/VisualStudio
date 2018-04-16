@@ -16,6 +16,8 @@ using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
 using GitHub.Logging;
+using GitHub.Extensions;
+using static System.FormattableString;
 
 namespace GitHub.Services
 {
@@ -326,6 +328,20 @@ namespace GitHub.Services
             });
         }
 
+        public async Task<string> GetMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        {
+            using (var repo = gitService.GetRepository(repository.LocalPath))
+            {
+                return await gitClient.GetPullRequestMergeBase(
+                    repo,
+                    pullRequest.Base.RepositoryCloneUrl,
+                    pullRequest.Base.Sha,
+                    pullRequest.Head.Sha,
+                    pullRequest.Base.Ref,
+                    pullRequest.Number);
+            }
+        }
+
         public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             return Observable.Defer(async () =>
@@ -446,46 +462,25 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> ExtractFile(
+        public async Task<string> ExtractToTempFile(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
-            string fileName,
-            bool head,
+            string relativePath,
+            string commitSha,
             Encoding encoding)
         {
-            return Observable.Defer(async () =>
+            var tempFilePath = CalculateTempFileName(relativePath, commitSha, encoding);
+
+            if (!File.Exists(tempFilePath))
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    string sha;
-
-                    if (head)
-                    {
-                        sha = pullRequest.Head.Sha;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            sha = await gitClient.GetPullRequestMergeBase(
-                                repo,
-                                pullRequest.Base.RepositoryCloneUrl,
-                                pullRequest.Base.Sha,
-                                pullRequest.Head.Sha,
-                                pullRequest.Base.Ref,
-                                pullRequest.Number);
-                        }
-                        catch (NotFoundException ex)
-                        {
-                            throw new NotFoundException($"The Pull Request file failed to load. Please check your network connection and click refresh to try again. If this issue persists, please let us know at support@github.com", ex);
-                        }
-                    }
-
-                    var file = await ExtractToTempFile(repo, pullRequest.Number, sha, fileName, encoding);
-                    return Observable.Return(file);
+                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding, tempFilePath);
                 }
-            });
+            }
+
+            return tempFilePath;
         }
 
         public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
@@ -576,39 +571,30 @@ namespace GitHub.Services
             return uniqueName;
         }
 
-        async Task<string> ExtractToTempFile(
+        async Task ExtractToTempFile(
             IRepository repo,
             int pullRequestNumber,
             string commitSha,
-            string fileName,
-            Encoding encoding)
+            string relativePath,
+            Encoding encoding,
+            string tempFilePath)
         {
             string contents;
-
+            
             try
             {
-                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
             }
             catch (FileNotFoundException)
             {
                 var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
                 await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
-                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
             }
 
-            return CreateTempFile(fileName, commitSha, contents, encoding);
-        }
-
-        static string CreateTempFile(string fileName, string commitSha, string contents, Encoding encoding)
-        {
-            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
-            var tempFile = Path.Combine(tempDir, tempFileName);
-
-            Directory.CreateDirectory(tempDir);
-            File.WriteAllText(tempFile, contents, encoding);
-            return tempFile;
+            Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));
+            File.WriteAllText(tempFilePath, contents, encoding);
         }
 
         IEnumerable<string> GetLocalBranchesInternal(
@@ -686,6 +672,17 @@ namespace GitHub.Services
 
                 before = after;
             }
+        }
+
+        static string CalculateTempFileName(string relativePath, string commitSha, Encoding encoding)
+        {
+            // The combination of relative path, commit SHA and encoding should be sufficient to uniquely identify a file.
+            var relativeDir = Path.GetDirectoryName(relativePath) ?? string.Empty;
+            var key = relativeDir + '|' + encoding.WebName;
+            var relativePathHash = key.GetSha256Hash();
+            var tempDir = Path.Combine(Path.GetTempPath(), "GitHubVisualStudio", "FileContents", relativePathHash);
+            var tempFileName = Invariant($"{Path.GetFileNameWithoutExtension(relativePath)}@{commitSha}{Path.GetExtension(relativePath)}");
+            return Path.Combine(tempDir, tempFileName);
         }
 
         static string BuildGHfVSConfigKeyValue(IPullRequestModel pullRequest)

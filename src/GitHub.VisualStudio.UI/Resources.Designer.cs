@@ -61,6 +61,33 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add review comment.
+        /// </summary>
+        public static string AddReviewComment {
+            get {
+                return ResourceManager.GetString("AddReviewComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a single comment.
+        /// </summary>
+        public static string AddSingleComment {
+            get {
+                return ResourceManager.GetString("AddSingleComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add your review.
+        /// </summary>
+        public static string AddYourReview {
+            get {
+                return ResourceManager.GetString("AddYourReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid authentication code.
         /// </summary>
         public static string authenticationFailedLabelContent {
@@ -147,6 +174,15 @@ namespace GitHub.VisualStudio.UI {
         public static string CompareFileAsDefaultAction {
             get {
                 return ResourceManager.GetString("CompareFileAsDefaultAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Continue your review.
+        /// </summary>
+        public static string ContinueYourReview {
+            get {
+                return ResourceManager.GetString("ContinueYourReview", resourceCulture);
             }
         }
         
@@ -777,6 +813,15 @@ namespace GitHub.VisualStudio.UI {
         public static string resendCodeButtonToolTip {
             get {
                 return ResourceManager.GetString("resendCodeButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reviewers.
+        /// </summary>
+        public static string Reviewers {
+            get {
+                return ResourceManager.GetString("Reviewers", resourceCulture);
             }
         }
         

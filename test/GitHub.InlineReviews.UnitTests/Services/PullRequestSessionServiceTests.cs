@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Factories;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
@@ -46,7 +47,8 @@ Line 4";
                     var result = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     var thread = result.Single();
                     Assert.That(2, Is.EqualTo(thread.LineNumber));
@@ -70,7 +72,8 @@ Line 4";
                     var result = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     Assert.That(result, Is.Empty);
                 }
@@ -105,7 +108,8 @@ Line 4";
                     var result = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     var thread = result.Single();
                     Assert.That(4, Is.EqualTo(thread.LineNumber));
@@ -145,7 +149,8 @@ Line 4";
                     var result = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     Assert.That(2, Is.EqualTo(result.Count));
                     Assert.That(-1, Is.EqualTo(result[1].LineNumber));
@@ -184,7 +189,8 @@ Line 4";
                     var result = target.BuildCommentThreads(
                         pullRequest,
                         winFilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     var thread = result.First();
                     Assert.That(4, Is.EqualTo(thread.LineNumber));
@@ -226,7 +232,8 @@ Line 4";
                     var threads = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     Assert.That(2, Is.EqualTo(threads[0].LineNumber));
 
@@ -271,7 +278,8 @@ Line 4";
                     var threads = target.BuildCommentThreads(
                         pullRequest,
                         FilePath,
-                        diff);
+                        diff,
+                        "HEAD_SHA");
 
                     threads[0].IsStale = true;
                     var changedLines = target.UpdateCommentThreads(threads, diff);
@@ -289,6 +297,7 @@ Line 4";
                 Substitute.For<IGitClient>(),
                 diffService,
                 Substitute.For<IApiClientFactory>(),
+                Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IUsageTracker>());
         }
 

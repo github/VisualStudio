@@ -48,6 +48,27 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<PullRequestReview> PostPullRequestReview(
+            string owner,
+            string name,
+            int number,
+            string commitId,
+            string body,
+            PullRequestReviewEvent e)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+
+            var review = new PullRequestReviewCreate
+            {
+                Body = body,
+                CommitId = commitId,
+                Event = e,
+            };
+
+            return gitHubClient.PullRequest.Review.Create(owner, name, number, review);
+        }
+
         public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
             string owner,
             string name,
@@ -93,6 +114,11 @@ namespace GitHub.Api
             return gitHubClient.User.Current();
         }
 
+        public IObservable<User> GetUser(string login)
+        {
+            return gitHubClient.User.Get(login);
+        }
+
         public IObservable<Organization> GetOrganizations()
         {
             // Organization.GetAllForCurrent doesn't return all of the information we need (we 
@@ -128,30 +154,10 @@ namespace GitHub.Api
 
         public HostAddress HostAddress { get; }
 
-        static string GetSha256Hash(string input)
-        {
-            Guard.ArgumentNotEmptyString(input, nameof(input));
-
-            try
-            {
-                using (var sha256 = SHA256.Create())
-                {
-                    var bytes = Encoding.UTF8.GetBytes(input);
-                    var hash = sha256.ComputeHash(bytes);
-
-                    return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception");
-                return null;
-            }
-        }
-
         static string GetFingerprint()
         {
-            return GetSha256Hash(ProductName + ":" + GetMachineIdentifier());
+            var fingerprint = ProductName + ":" + GetMachineIdentifier();
+            return fingerprint.GetSha256Hash();
         }
 
         static string GetMachineNameSafe()
@@ -274,11 +280,7 @@ namespace GitHub.Api
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
             Guard.ArgumentNotEmptyString(repo, nameof(repo));
 
-#pragma warning disable 618
-            // GetAllBranches is obsolete, but don't want to introduce the change to fix the
-            // warning in the PR, so disabling for now.
-            return gitHubClient.Repository.GetAllBranches(owner, repo);
-#pragma warning restore
+            return gitHubClient.Repository.Branch.GetAll(owner, repo);
         }
 
         public IObservable<Repository> GetRepository(string owner, string repo)

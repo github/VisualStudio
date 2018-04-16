@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews.Models
     /// <seealso cref="PullRequestSession"/>
     /// <seealso cref="PullRequestSessionManager"/>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification = "linesChanged is sharred and shouldn't be disposed")]
+        Justification = "linesChanged is shared and shouldn't be disposed")]
     public class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
         readonly Subject<IReadOnlyList<Tuple<int, DiffSide>>> linesChanged = new Subject<IReadOnlyList<Tuple<int, DiffSide>>>();
@@ -32,9 +32,14 @@ namespace GitHub.InlineReviews.Models
         /// <param name="relativePath">
         /// The relative path to the file in the repository.
         /// </param>
-        public PullRequestSessionFile(string relativePath)
+        /// <param name="commitSha">
+        /// The commit to pin the file to, or "HEAD" to follow the pull request head.
+        /// </param>
+        public PullRequestSessionFile(string relativePath, string commitSha = "HEAD")
         {
             RelativePath = relativePath;
+            this.commitSha = commitSha;
+            IsTrackingHead = commitSha == "HEAD";
         }
 
         /// <inheritdoc/>
@@ -54,8 +59,23 @@ namespace GitHub.InlineReviews.Models
         public string CommitSha
         {
             get { return commitSha; }
-            internal set { this.RaiseAndSetIfChanged(ref commitSha, value); }
+            internal set
+            {
+                if (value != commitSha)
+                {
+                    if (!IsTrackingHead)
+                    {
+                        throw new GitHubLogicException(
+                            "Cannot change the CommitSha of a PullRequestSessionFile that is not tracking HEAD.");
+                    }
+
+                    this.RaiseAndSetIfChanged(ref commitSha, value);
+                }
+            }
         }
+
+        /// <inheritdoc/>
+        public bool IsTrackingHead { get; }
 
         /// <inheritdoc/>
         public IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
@@ -69,7 +89,9 @@ namespace GitHub.InlineReviews.Models
                     .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();
+                this.RaisePropertyChanging();
                 inlineCommentThreads = value;
+                this.RaisePropertyChanged();
                 NotifyLinesChanged(lines);
             }
         }

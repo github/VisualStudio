@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestReviewSummaryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:vm="clr-namespace:GitHub.ViewModels.GitHubPane;assembly=GitHub.App"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             mc:Ignorable="d" d:DesignWidth="300"
+             Name="root">
+
+    <d:DesignData.DataContext>
+        <vm:PullRequestReviewSummaryViewModel Id="1" State="Pending" FileCommentCount="2">
+            <vm:PullRequestReviewSummaryViewModel.User>
+                <sampleData:AccountDesigner Login="meaghanlewis"/>
+            </vm:PullRequestReviewSummaryViewModel.User>
+        </vm:PullRequestReviewSummaryViewModel>
+    </d:DesignData.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Views/GitHubPane/PullRequestListItem.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+    
+    <Grid>
+        <Border CornerRadius="2"
+                Visibility="{Binding Id, Converter={ui:NotEqualsToVisibilityConverter 0}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Padding" Value="0 5"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding State}" Value="Pending">
+                            <Setter Property="Background" Value="{DynamicResource GitHubPendingReviewBackground}"/>
+                            <Setter Property="Padding" Value="6 2 6 4"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <c:AccountAvatar Grid.Column="0"
+                                 VerticalAlignment="Top"
+                                 Margin="2"
+                                 Account="{Binding User}"
+                                 Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                                 CommandParameter="{Binding}"
+                                 Cursor="Hand"/>
+                <ui:GitHubActionLink Grid.Column="1" FontWeight="SemiBold" Margin="2 1 2 0"
+                                     Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                                     CommandParameter="{Binding}"
+                                     Content="{Binding User.Login}"
+                                     Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+
+                <Grid Grid.Column="2">
+                    <ui:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Approved}}"/>
+                    <ui:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter ChangesRequested}}"/>
+                    <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Commented}}"/>
+                    <ui:OcticonImage Icon="comment" Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Dismissed}}"/>
+                    <ui:GitHubActionLink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                                         CommandParameter="{Binding}"
+                                         Margin="2 1 2 0"
+                                         Content="{x:Static prop:Resources.ContinueYourReview}"
+                                         Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Pending}}"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <ui:GitHubActionLink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                             CommandParameter="{Binding}"
+                             Visibility="{Binding Id, Converter={ui:EqualsToVisibilityConverter 0}}"
+                             Content="{x:Static prop:Resources.AddYourReview}"/>
+
+    </Grid>
+</UserControl>

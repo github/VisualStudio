@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -63,12 +64,14 @@ namespace UnitTests.GitHub.App.Factories
             IHostCacheFactory hostCacheFactory = null)
         {
             var apiClientFactory = Substitute.For<IApiClientFactory>();
+            var graphQLClientFactory = Substitute.For<IGraphQLClientFactory>();
             var avatarProvider = Substitute.For<IAvatarProvider>();
 
             hostCacheFactory = hostCacheFactory ?? Substitute.For<IHostCacheFactory>();
 
             return new ModelServiceFactory(
                 apiClientFactory,
+                graphQLClientFactory,
                 hostCacheFactory,
                 avatarProvider);
         }

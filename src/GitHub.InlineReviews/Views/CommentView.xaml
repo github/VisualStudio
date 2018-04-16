@@ -60,6 +60,14 @@
                                      Command="{Binding OpenOnGitHub}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
                                      Opacity="0.75" />
+                <Border Background="{DynamicResource VsBrush.InfoBackground}"
+                        BorderBrush="{DynamicResource VsBrush.AccentPale}"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="2 1"
+                        Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                    <TextBlock FontSize="10">Pending</TextBlock>
+                </Border>
             </StackPanel>
 
 
@@ -168,7 +176,12 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}">Comment</Button>
+                <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
+                <Button Margin="4 0 0 0"
+                        Command="{Binding StartReview}"
+                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}">
+                    Start a review
+                </Button>
                 <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
             </StackPanel>
         </Grid>

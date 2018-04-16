@@ -294,6 +294,27 @@
 Please install Git for Windows from:
 https://git-scm.com/download/win</value>
   </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>Changes Requested</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>Commented</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>InProgress</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>Press Enter to navigate to Editor</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>Checkout PR branch before navigating to Editor</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
+  </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
     <value>Fork Repository</value>
   </data>

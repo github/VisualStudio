@@ -18,10 +18,12 @@ namespace GitHub.InlineReviews.SampleData
         }
 
         public int Id { get; set; }
+        public string NodeId { get; set; }
         public string Body { get; set; }
         public string ErrorMessage { get; set; }
         public CommentEditState EditState { get; set; }
         public bool IsReadOnly { get; set; }
+        public bool IsSubmitting { get; set; }
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }

@@ -70,6 +70,21 @@ namespace GitHub.Services
                 .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(apiAccount)));
         }
 
+        public IObservable<BitmapSource> GetAvatar(string url)
+        {
+            if (url == null)
+            {
+                return Observable.Return(DefaultUserBitmapImage);
+            }
+
+            Uri avatarUrl;
+            Uri.TryCreate(url, UriKind.Absolute, out avatarUrl);
+            Log.Assert(avatarUrl != null, "Cannot have a null avatar url");
+
+            return imageCache.GetImage(avatarUrl)
+                .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultUserBitmapImage));
+        }
+
         public IObservable<Unit> InvalidateAvatar(IAvatarContainer apiAccount)
         {
             return String.IsNullOrWhiteSpace(apiAccount?.Login)

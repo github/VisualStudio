@@ -182,6 +182,7 @@
     <Compile Include="Services\IShowDialogService.cs" />
     <Compile Include="Services\LocalRepositoriesExtensions.cs" />
     <Compile Include="Services\ModelServiceExtensions.cs" />
+    <Compile Include="Services\PullRequestSessionExtensions.cs" />
     <Compile Include="ViewModels\Dialog\IDialogContentViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IForkRepositoryExecuteViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IForkRepositoryViewModel.cs" />
@@ -197,7 +198,13 @@
     <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestReviewAuthoringViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestReviewFileCommentViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestReviewSummaryViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestReviewViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestUserReviewsViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\ISearchablePageViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestDetailViewModel.cs" />

@@ -70,6 +70,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Approved.
+        /// </summary>
+        internal static string Approved {
+            get {
+                return ResourceManager.GetString("Approved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select a containing folder for your new repository..
         /// </summary>
         internal static string BrowseForDirectory {
@@ -79,11 +88,29 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Changes Requested.
+        /// </summary>
+        internal static string ChangesRequested {
+            get {
+                return ResourceManager.GetString("ChangesRequested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone a {0} Repository.
         /// </summary>
         internal static string CloneTitle {
             get {
                 return ResourceManager.GetString("CloneTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Commented.
+        /// </summary>
+        internal static string Commented {
+            get {
+                return ResourceManager.GetString("Commented", resourceCulture);
             }
         }
         
@@ -181,6 +208,16 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to InProgress.
+        /// </summary>
+        internal static string InProgress {
+            get {
+                return ResourceManager.GetString("InProgress", resourceCulture);
+            }
+        }
+        
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fork Repository.
         /// </summary>
         internal static string ForkRepositoryTitle {
@@ -240,6 +277,33 @@ namespace GitHub.App {
         internal static string MustPullBeforePush {
             get {
                 return ResourceManager.GetString("MustPullBeforePush", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checkout PR branch before navigating to Editor.
+        /// </summary>
+        internal static string NavigateToEditorNotCheckedOutInfoMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorNotCheckedOutInfoMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press Enter to navigate to Editor (PR branch must be checked out).
+        /// </summary>
+        internal static string NavigateToEditorNotCheckedOutStatusMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorNotCheckedOutStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press Enter to navigate to Editor.
+        /// </summary>
+        internal static string NavigateToEditorStatusMessage {
+            get {
+                return ResourceManager.GetString("NavigateToEditorStatusMessage", resourceCulture);
             }
         }
         
