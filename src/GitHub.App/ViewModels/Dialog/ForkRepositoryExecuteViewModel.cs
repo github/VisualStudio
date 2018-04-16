@@ -91,7 +91,7 @@ namespace GitHub.ViewModels.Dialog
                 {
                     if (!ex.IsCriticalException())
                     {
-                        log.Error(ex, "Error Creating Gist");
+                        log.Error(ex, "Error Creating Fork");
                         var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.RepoForkFailed);
                         notificationService.ShowError(error);
                     }

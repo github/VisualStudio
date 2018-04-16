@@ -52,8 +52,6 @@ namespace GitHub.ViewModels.Dialog
 
         async Task ShowExecutePage(IAccount account)
         {
-            log.Verbose("ShowExecutePage {Login}", account.Login);
-
             await executePage.InitializeAsync(repository, account, connection);
             Content = executePage;
         }
