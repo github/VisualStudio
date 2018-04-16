@@ -19,13 +19,14 @@ namespace GitHub.InlineReviews.Glyph
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
     public sealed class GlyphMargin<TGlyphTag> : IDisposable where TGlyphTag : ITag
     {
-        Grid marginGrid;
+        readonly IWpfTextView textView;
+        readonly Grid marginGrid;
+        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
+        readonly GlyphMarginVisualManager<TGlyphTag> visualManager;
+
+        bool initialized;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
-        IWpfTextView textView;
-        GlyphMarginVisualManager<TGlyphTag> visualManager;
-        Func<bool> isMarginVisible;
-        bool loaded;
 
         public GlyphMargin(
             IWpfTextView textView,
@@ -33,56 +34,71 @@ namespace GitHub.InlineReviews.Glyph
             Grid marginGrid,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IEditorFormatMap editorFormatMap,
-            Func<bool> isMarginVisible,
             string marginPropertiesName)
         {
             this.textView = textView;
-            this.isMarginVisible = isMarginVisible;
             this.marginGrid = marginGrid;
-
-            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
-            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, this.marginGrid,
-                editorFormatMap, marginPropertiesName);
+            this.tagAggregatorFactory = tagAggregatorFactory;
+            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginGrid, editorFormatMap, marginPropertiesName);
 
             marginGrid.WhenAnyValue(x => x.IsVisible).Subscribe(IsVisibleChanged);
         }
 
         public void Dispose()
         {
-            tagAggregator.Dispose();
+            TryUninitialize();
         }
 
         void IsVisibleChanged(bool isVisible)
         {
             if (isVisible)
             {
-                OnLoaded();
-            }
-        }
-
-        void OnLoaded()
-        {
-            if (loaded) return;
-            loaded = true;
-
-            tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
-            textView.LayoutChanged += OnLayoutChanged;
-            textView.ZoomLevelChanged += OnZoomLevelChanged;
-
-            if (textView.InLayout)
-            {
-                refreshAllGlyphs = true;
+                TryInitialize();
             }
             else
             {
-                foreach (var line in textView.TextViewLines)
-                {
-                    RefreshGlyphsOver(line);
-                }
+                TryUninitialize();
             }
+        }
 
-            marginGrid.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
-            marginGrid.LayoutTransform.Freeze();
+        void TryInitialize()
+        {
+            if (!initialized)
+            {
+                initialized = true;
+                tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
+                tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
+                textView.LayoutChanged += OnLayoutChanged;
+                textView.ZoomLevelChanged += OnZoomLevelChanged;
+
+                if (textView.InLayout)
+                {
+                    refreshAllGlyphs = true;
+                }
+                else
+                {
+                    foreach (var line in textView.TextViewLines)
+                    {
+                        RefreshGlyphsOver(line);
+                    }
+                }
+
+                marginGrid.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
+                marginGrid.LayoutTransform.Freeze();
+            }
+        }
+
+        void TryUninitialize()
+        {
+            if (initialized)
+            {
+                initialized = false;
+                tagAggregator.BatchedTagsChanged -= OnBatchedTagsChanged;
+                textView.LayoutChanged -= OnLayoutChanged;
+                textView.ZoomLevelChanged -= OnZoomLevelChanged;
+                tagAggregator.Dispose();
+                tagAggregator = null;
+            }
         }
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
