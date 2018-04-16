@@ -104,6 +104,11 @@ namespace GitHub.Api
             return gitHubClient.Gist.Create(newGist);
         }
 
+        public IObservable<Repository> GetForks(string owner, string name)
+        {
+            return gitHubClient.Repository.Forks.GetAll(owner, name);
+        }
+
         public IObservable<User> GetUser()
         {
             return gitHubClient.User.Current();

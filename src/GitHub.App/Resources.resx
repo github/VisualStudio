@@ -315,4 +315,7 @@ https://git-scm.com/download/win</value>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
     <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
   </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>Fork Repository</value>
+  </data>
 </root>

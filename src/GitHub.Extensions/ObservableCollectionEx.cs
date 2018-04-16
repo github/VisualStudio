@@ -38,5 +38,14 @@ namespace GitHub.Extensions
             : base(collection)
         {
         }
+
+        /// <summary>
+        /// Adds the elements of the specified collection to the end of the list.
+        /// </summary>
+        /// <param name="items">The items to add.</param>
+        public void AddRange(IEnumerable<T> items)
+        {
+            foreach (var item in items) Add(item);
+        }
     }
 }

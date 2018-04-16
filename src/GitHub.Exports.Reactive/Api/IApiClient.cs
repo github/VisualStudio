@@ -29,6 +29,7 @@ namespace GitHub.Api
         /// <returns></returns>
         IObservable<Repository> GetRepositoriesForOrganization(string organization);
 
+        IObservable<Repository> GetForks(string owner, string name);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);

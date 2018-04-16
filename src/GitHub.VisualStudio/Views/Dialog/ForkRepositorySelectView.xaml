@@ -1,0 +1,90 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.Dialog.ForkRepositorySelectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             Margin="8"
+             mc:Ignorable="d" 
+             d:DesignHeight="414" d:DesignWidth="440">
+
+  <Control.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Control.Resources>
+
+  <d:DesignProperties.DataContext>
+    <sampleData:ForkRepositorySelectViewModelDesigner IsLoading="True"/>
+  </d:DesignProperties.DataContext>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="2*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <DockPanel Grid.Row="0">
+      <TextBlock DockPanel.Dock="Top" FontSize="16" Margin="0 8">
+      Where should we fork this repository?
+      </TextBlock>
+
+      <ui:GitHubProgressBar DockPanel.Dock="Top"
+                          Foreground="{DynamicResource GitHubAccentBrush}"
+                          IsIndeterminate="True"
+                          Style="{DynamicResource GitHubProgressBar}"
+                          Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+
+      <ListBox Name="accountsListBox"
+               ItemsSource="{Binding Accounts}"
+               Padding="8"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+               SelectionChanged="accountsListBox_SelectionChanged">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel IsItemsHost="True"/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <DockPanel Width="100">
+              <TextBlock DockPanel.Dock="Bottom"
+                       Text="{Binding Login, StringFormat=@{0}}"
+                       TextAlignment="Center"
+                       TextTrimming="CharacterEllipsis"/>
+              <Image Margin="0,4"
+                   Source="{Binding Avatar}"
+                   Width="32"/>
+            </DockPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <DockPanel Grid.Row="1" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
+      <TextBlock DockPanel.Dock="Top" Margin="0 8">
+        <Run FontSize="16">Can't find what you're looking for?</Run>
+        <LineBreak/>
+        <Run>You have existing forks of this repository:</Run>
+      </TextBlock>
+      <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding ExistingForks}" MaxHeight="120">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+              <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
+              <TextBlock Text="{Binding Owner, Mode=OneWay}"/>
+              <TextBlock Text="/"/>
+              <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </Grid>
+</UserControl>

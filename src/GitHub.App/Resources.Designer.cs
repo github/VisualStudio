@@ -216,6 +216,16 @@ namespace GitHub.App {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fork Repository.
+        /// </summary>
+        internal static string ForkRepositoryTitle {
+            get {
+                return ResourceManager.GetString("ForkRepositoryTitle", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to [invalid].
         /// </summary>
