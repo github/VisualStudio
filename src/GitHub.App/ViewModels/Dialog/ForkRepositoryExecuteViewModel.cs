@@ -82,7 +82,7 @@ namespace GitHub.ViewModels.Dialog
         {
             var newRepositoryFork = new NewRepositoryFork
             {
-                Organization = !DestinationAccount.IsUser ? DestinationRepository.Name : null
+                Organization = !DestinationAccount.IsUser ? DestinationAccount.Login : null
             };
 
             IRepositoryModel sourceRepository = SourceRepository;
