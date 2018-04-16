@@ -52,6 +52,7 @@ namespace GitHub.Api
         {
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
             Guard.ArgumentNotEmptyString(name, nameof(name));
+            Guard.ArgumentNotNull(repository, nameof(repository));
 
             var client = gitHubClient.Repository.Forks;
 
