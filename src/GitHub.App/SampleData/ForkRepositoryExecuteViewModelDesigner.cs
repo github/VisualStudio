@@ -35,6 +35,12 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<object> Start => null;
 
+        public bool ResetMasterTracking { get; set; } = true;
+
+        public bool AddUpstream { get; set; } = true;
+
+        public bool UpdateOrigin { get; set; } = true;
+
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
             return Task.CompletedTask;

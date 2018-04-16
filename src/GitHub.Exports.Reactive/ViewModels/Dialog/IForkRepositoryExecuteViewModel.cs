@@ -19,6 +19,12 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         ReactiveCommand<object> Start { get; }
 
+        bool ResetMasterTracking { get; set; }
+
+        bool AddUpstream { get; set; }
+
+        bool UpdateOrigin { get; set; }
+
         /// <summary>
         /// Initializes the view model.
         /// </summary>

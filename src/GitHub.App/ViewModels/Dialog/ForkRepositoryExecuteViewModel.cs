@@ -50,5 +50,26 @@ namespace GitHub.ViewModels.Dialog
             var original = url.ToRepositoryUrl();
             return new UriString($"{original.Scheme}://{original.Authority}/{login}/{url.RepositoryName}");
         }
+
+        bool resetMasterTracking = true;
+        public bool ResetMasterTracking
+        {
+            get { return resetMasterTracking; }
+            set { this.RaiseAndSetIfChanged(ref resetMasterTracking, value); }
+        }
+
+        bool addUpstream = true;
+        public bool AddUpstream
+        {
+            get { return addUpstream; }
+            set { this.RaiseAndSetIfChanged(ref addUpstream, value); }
+        }
+
+        bool updateOrigin = true;
+        public bool UpdateOrigin
+        {
+            get { return updateOrigin; }
+            set { this.RaiseAndSetIfChanged(ref updateOrigin, value); }
+        }
     }
 }
