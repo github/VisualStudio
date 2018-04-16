@@ -2,8 +2,10 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -11,6 +13,8 @@ namespace GitHub.ViewModels.Dialog
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ForkRepositoryViewModel : PagedDialogViewModelBase, IForkRepositoryViewModel
     {
+        static readonly ILogger log = LogManager.ForContext<ForkRepositoryViewModel>();
+
         readonly IForkRepositorySelectViewModel selectPage;
         readonly IForkRepositoryExecuteViewModel executePage;
         ILocalRepositoryModel repository;
@@ -45,16 +49,25 @@ namespace GitHub.ViewModels.Dialog
 
         async Task ShowExecutePage(IAccount account)
         {
+            log.Verbose("ShowExecutePage {Login}", account.Login);
+
             await executePage.InitializeAsync(repository, connection, account);
             Content = executePage;
         }
 
         void ShowCloneRepositoryPage(IRemoteRepositoryModel remoteRepository)
         {
+            log.Verbose("ShowCloneRepositoryPage {Owner}/{Name}", remoteRepository.Owner, remoteRepository.Name);
         }
 
         private void ExecuteForkOperation(object o)
         {
+            log.Verbose("Fork {Source} to {Destination}", executePage.SourceRepository.ToString(), executePage.DestinationRepository.ToString());
+
+            log.Verbose("Fork AddUpstream {AddUpstream}", executePage.AddUpstream);
+            log.Verbose("Fork ResetMasterTracking {ResetMasterTracking}", executePage.ResetMasterTracking);
+            log.Verbose("Fork UpdateOrigin {UpdateOrigin}", executePage.UpdateOrigin);
+
             Completed.Execute(o);
         }
     }

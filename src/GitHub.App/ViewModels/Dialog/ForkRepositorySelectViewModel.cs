@@ -75,6 +75,8 @@ namespace GitHub.ViewModels.Dialog
                     {
                         Accounts = BuildAccounts(x.Accounts, x.Forks);
                         ExistingForks = BuildExistingForks(x.Accounts, x.Forks);
+
+                        log.Verbose("Loaded Data Accounts:{Accounts} Forks:{Forks}", Accounts.Count, ExistingForks.Count);
                     });
 
             }
