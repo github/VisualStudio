@@ -27,6 +27,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public const string ForkNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA6";
 
         readonly IDialogService dialogService;
+        readonly IPackageSettings packageSettings;
         IConnectionManager connectionManager;
 
         [ImportingConstructor]
@@ -38,12 +39,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             : base(serviceProvider, apiFactory, holder, Octicon.repo_forked)
         {
             this.dialogService = dialogService;
+            this.packageSettings = packageSettings;
 
             Text = Resources.ForkNavigationItemText;
             ArgbColor = Colors.PurpleNavigationItem.ToInt32();
             ConnectionManager.Connections.CollectionChanged += ConnectionsChanged;
 
-            IsVisible = packageSettings?.ForkButton ?? false;
             packageSettings.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(packageSettings.ForkButton))
@@ -90,8 +91,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             try
             {
                 IsVisible = false;
-
-                if (await IsAGitHubRepo())
+                
+                if (packageSettings.ForkButton && await IsAGitHubRepo())
                 {
                     var connection = await ConnectionManager.GetConnection(ActiveRepo);
                     IsVisible = connection?.IsLoggedIn ?? false;
