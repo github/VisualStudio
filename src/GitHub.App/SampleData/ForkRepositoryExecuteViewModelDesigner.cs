@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
+using Octokit;
 using ReactiveUI;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.SampleData
 {
@@ -33,7 +35,7 @@ namespace GitHub.SampleData
 
         public IRepositoryModel DestinationRepository { get; set; }
 
-        public ReactiveCommand<object> Start => null;
+        public IReactiveCommand<Repository> CreateFork => null;
 
         public bool ResetMasterTracking { get; set; } = true;
 
@@ -41,12 +43,12 @@ namespace GitHub.SampleData
 
         public bool UpdateOrigin { get; set; } = true;
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IConnection connection)
         {
             return Task.CompletedTask;
         }
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection, IAccount account)
+        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             throw new NotImplementedException();
         }

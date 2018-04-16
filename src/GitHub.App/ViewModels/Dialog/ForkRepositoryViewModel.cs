@@ -32,12 +32,11 @@ namespace GitHub.ViewModels.Dialog
 
             selectPage.CloneRepository.Subscribe(x => ShowCloneRepositoryPage((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
-            executePage.Done.Subscribe(ExecuteForkOperation);
         }
 
         private ReactiveCommand<object> Completed { get; }
 
-        public override IObservable<object> Done => Completed;
+        public override IObservable<object> Done => executePage.Done;
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
@@ -51,24 +50,13 @@ namespace GitHub.ViewModels.Dialog
         {
             log.Verbose("ShowExecutePage {Login}", account.Login);
 
-            await executePage.InitializeAsync(repository, connection, account);
+            await executePage.InitializeAsync(repository, account, connection);
             Content = executePage;
         }
 
         void ShowCloneRepositoryPage(IRemoteRepositoryModel remoteRepository)
         {
             log.Verbose("ShowCloneRepositoryPage {Owner}/{Name}", remoteRepository.Owner, remoteRepository.Name);
-        }
-
-        private void ExecuteForkOperation(object o)
-        {
-            log.Verbose("Fork {Source} to {Destination}", executePage.SourceRepository.ToString(), executePage.DestinationRepository.ToString());
-
-            log.Verbose("Fork AddUpstream {AddUpstream}", executePage.AddUpstream);
-            log.Verbose("Fork ResetMasterTracking {ResetMasterTracking}", executePage.ResetMasterTracking);
-            log.Verbose("Fork UpdateOrigin {UpdateOrigin}", executePage.UpdateOrigin);
-
-            Completed.Execute(o);
         }
     }
 }

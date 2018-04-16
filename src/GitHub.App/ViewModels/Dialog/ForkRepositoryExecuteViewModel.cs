@@ -1,12 +1,15 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
+using Octokit;
 using ReactiveUI;
 using Serilog;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -18,29 +21,31 @@ namespace GitHub.ViewModels.Dialog
 
         public ForkRepositoryExecuteViewModel()
         {
-            Start = ReactiveCommand.Create();
         }
 
         public IRepositoryModel SourceRepository { get; private set; }
 
+        public IAccount DestinationAccount { get; private set; }
         public IRepositoryModel DestinationRepository { get; private set; }
 
-        public ReactiveCommand<object> Start { get; }
+        public IReactiveCommand<Repository> CreateFork { get; }
 
         public string Title => Resources.ForkRepositoryTitle;
 
-        public IObservable<object> Done => Start;
+        public IObservable<object> Done => CreateFork.Where(repository => repository != null);
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection, IAccount account)
+        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
-            SourceRepository = repository;
+            DestinationAccount = destinationAccount;
+
+            SourceRepository = sourceRepository;
             DestinationRepository = new RemoteRepositoryModel(
                 0,
-                repository.Name,
-                CreateForkUri(repository.CloneUrl, account.Login),
+                sourceRepository.Name,
+                CreateForkUri(sourceRepository.CloneUrl, destinationAccount.Login),
                 false,
                 true,
-                account,
+                destinationAccount,
                 null);
             return Task.CompletedTask;
         }

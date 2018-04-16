@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Octokit;
 using ReactiveUI;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -17,7 +19,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user clicks the "Fork" button.
         /// </summary>
-        ReactiveCommand<object> Start { get; }
+        IReactiveCommand<Repository> CreateFork { get; }
 
         bool ResetMasterTracking { get; set; }
 
@@ -28,12 +30,12 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Initializes the view model.
         /// </summary>
-        /// <param name="repository">The repository to fork.</param>
+        /// <param name="sourceRepository">The repository to fork.</param>
+        /// <param name="destinationAccount">The account to fork to.</param>
         /// <param name="connection">The connection to use.</param>
-        /// <param name="account">The account to fork to.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel repository,
-            IConnection connection,
-            IAccount account);
+            ILocalRepositoryModel sourceRepository, 
+            IAccount destinationAccount, 
+            IConnection connection);
     }
 }
