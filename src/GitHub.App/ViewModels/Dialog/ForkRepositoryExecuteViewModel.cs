@@ -2,10 +2,14 @@
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.App;
+using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 using Octokit;
 using ReactiveUI;
 using Serilog;
@@ -19,8 +23,24 @@ namespace GitHub.ViewModels.Dialog
     {
         static readonly ILogger log = LogManager.ForContext<ForkRepositoryExecuteViewModel>();
 
-        public ForkRepositoryExecuteViewModel()
+        readonly IModelServiceFactory modelServiceFactory;
+        readonly INotificationService notificationService;
+        readonly IRepositoryForkService repositoryForkService;
+
+        IApiClient apiClient;
+
+        [ImportingConstructor]
+        public ForkRepositoryExecuteViewModel(
+            IModelServiceFactory modelServiceFactory,
+            INotificationService notificationService,
+            IRepositoryForkService repositoryForkService
+            )
         {
+            this.modelServiceFactory = modelServiceFactory;
+            this.notificationService = notificationService;
+            this.repositoryForkService = repositoryForkService;
+
+            CreateFork = ReactiveCommand.CreateAsyncObservable(OnCreateFork);
         }
 
         public IRepositoryModel SourceRepository { get; private set; }
@@ -34,8 +54,11 @@ namespace GitHub.ViewModels.Dialog
 
         public IObservable<object> Done => CreateFork.Where(repository => repository != null);
 
-        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
+        public async Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
+            var modelService = await modelServiceFactory.CreateAsync(connection);
+            apiClient = modelService.ApiClient;
+
             DestinationAccount = destinationAccount;
 
             SourceRepository = sourceRepository;
@@ -47,13 +70,34 @@ namespace GitHub.ViewModels.Dialog
                 true,
                 destinationAccount,
                 null);
-            return Task.CompletedTask;
         }
 
         UriString CreateForkUri(UriString url, string login)
         {
             var original = url.ToRepositoryUrl();
             return new UriString($"{original.Scheme}://{original.Authority}/{login}/{url.RepositoryName}");
+        }
+
+        IObservable<Repository> OnCreateFork(object o)
+        {
+            var newRepositoryFork = new NewRepositoryFork
+            {
+                Organization = !DestinationAccount.IsUser ? DestinationRepository.Name : null
+            };
+
+            IRepositoryModel sourceRepository = SourceRepository;
+            return repositoryForkService.ForkRepository(apiClient, sourceRepository, newRepositoryFork, ResetMasterTracking, AddUpstream, UpdateOrigin)
+                .Catch<Repository, Exception>(ex =>
+                {
+                    if (!ex.IsCriticalException())
+                    {
+                        log.Error(ex, "Error Creating Gist");
+                        var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.RepoForkFailed);
+                        notificationService.ShowError(error);
+                    }
+
+                    return Observable.Return<Repository>(null);
+                });
         }
 
         bool resetMasterTracking = true;

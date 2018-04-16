@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 using Serilog;
 
@@ -17,16 +18,19 @@ namespace GitHub.ViewModels.Dialog
 
         readonly IForkRepositorySelectViewModel selectPage;
         readonly IForkRepositoryExecuteViewModel executePage;
+        private readonly IRepositoryForkService repositoryForkService;
         ILocalRepositoryModel repository;
         IConnection connection;
 
         [ImportingConstructor]
         public ForkRepositoryViewModel(
             IForkRepositorySelectViewModel selectPage,
-            IForkRepositoryExecuteViewModel executePage)
+            IForkRepositoryExecuteViewModel executePage,
+            IRepositoryForkService repositoryForkService)
         {
             this.selectPage = selectPage;
             this.executePage = executePage;
+            this.repositoryForkService = repositoryForkService;
 
             Completed = ReactiveCommand.Create();
 
