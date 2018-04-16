@@ -106,6 +106,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Logging", "src\GitHu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Services.Vssdk", "src\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj", "{2D3D2834-33BE-45CA-B3CC-12F853557D7B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metrics", "Metrics", "{C2D88962-BD6B-4F11-B914-535B38377962}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsServer", "test\MetricsTests\MetricsServer\MetricsServer.csproj", "{14FDEE91-7301-4247-846C-049647BF8E99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsTests", "test\MetricsTests\MetricsTests\MetricsTests.csproj", "{09313E65-7ADB-48C1-AD3A-572020C5BDCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -415,6 +421,26 @@ Global
 		{2D3D2834-33BE-45CA-B3CC-12F853557D7B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D3D2834-33BE-45CA-B3CC-12F853557D7B}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{2D3D2834-33BE-45CA-B3CC-12F853557D7B}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{14FDEE91-7301-4247-846C-049647BF8E99}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -438,6 +464,9 @@ Global
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{110B206F-8554-4B51-BF86-94DAA32F5E26} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{17EB676B-BB91-48B5-AA59-C67695C647C2} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
+		{C2D88962-BD6B-4F11-B914-535B38377962} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
+		{14FDEE91-7301-4247-846C-049647BF8E99} = {C2D88962-BD6B-4F11-B914-535B38377962}
+		{09313E65-7ADB-48C1-AD3A-572020C5BDCB} = {C2D88962-BD6B-4F11-B914-535B38377962}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {556014CF-5B35-4CE5-B3EF-6AB0007001AC}

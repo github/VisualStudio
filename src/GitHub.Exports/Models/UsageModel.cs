@@ -4,8 +4,11 @@ namespace GitHub.Models
 {
     public class UsageModel
     {
-        public DimensionsModel Dimensions { get; set; }
-        public MeasuresModel Measures { get; set; }
+        public DimensionsModel Dimensions { get; set; } = new DimensionsModel();
+        public MeasuresModel Measures { get; set; } = new MeasuresModel();
+
+        // this should never be called by our code but it's required to be public by the serialization code
+        public UsageModel() { }
 
         public static UsageModel Create(Guid guid)
         {
@@ -14,9 +17,8 @@ namespace GitHub.Models
                 Dimensions = new DimensionsModel
                 {
                     Guid = guid,
-                    Date = DateTime.Now,
-                },
-                Measures = new MeasuresModel(),
+                    Date = DateTimeOffset.Now,
+                }
             };
         }
 
