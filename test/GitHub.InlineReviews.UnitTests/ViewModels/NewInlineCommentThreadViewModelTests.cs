@@ -8,6 +8,7 @@ using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
@@ -87,6 +88,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
+                Arg.Any<IReadOnlyList<DiffChunk>>(),
                 5);
         }
 
@@ -116,6 +118,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "New Comment",
                 "COMMIT_SHA",
                 "file.cs",
+                Arg.Any<IReadOnlyList<DiffChunk>>(),
                 7);
         }
 

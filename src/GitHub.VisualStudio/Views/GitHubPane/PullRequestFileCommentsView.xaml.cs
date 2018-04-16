@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GitHub.InlineReviews.Views
+namespace GitHub.VisualStudio.Views.GitHubPane
 {
     /// <summary>
-    /// Interaction logic for DiffCommentThreadView.xaml
+    /// Interaction logic for PullRequestFileCommentsView.xaml
     /// </summary>
-    public partial class DiffCommentThreadView : UserControl
+    public partial class PullRequestFileCommentsView : UserControl
     {
-        public DiffCommentThreadView()
+        public PullRequestFileCommentsView()
         {
             InitializeComponent();
         }

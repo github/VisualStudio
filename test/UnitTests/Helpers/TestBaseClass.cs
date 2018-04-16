@@ -27,7 +27,7 @@ public class TestBaseClass : IEntryExitDecorator
     protected static User CreateOctokitUser(string login = "login", string url = "https://url")
     {
         return new User("https://url", "bio", "blog", 1, "GitHub",
-            DateTimeOffset.UtcNow, 0, "email", 100, 100, true, url,
+            DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0, "email", 100, 100, true, url,
             10, 42, "location", login, "name", 1, new Plan(),
             1, 1, 1, "https://url", new RepositoryPermissions(true, true, true),
             false, null, null);
@@ -46,7 +46,7 @@ public class TestBaseClass : IEntryExitDecorator
             id, CreateOctokitUser(owner),
             name, "fullname", "description", notCloneUrl, "c#", false, parent != null, 0, 0, "master",
             0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow,
-            new RepositoryPermissions(), parent, null, true, false, false, false, 0, 0, null, null, null);
+            new RepositoryPermissions(), parent, null, null, true, false, false, false, 0, 0, null, null, null);
     }
 
     protected static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
@@ -58,18 +58,18 @@ public class TestBaseClass : IEntryExitDecorator
             1, user, "Repo", "Repo", string.Empty, string.Empty, string.Empty,
             false, false, 0, 0, "master",
             0, null, createdAt, updatedAt,
-            null, null, null,
+            null, null, null, null,
             false, false, false,
             false, 0, 0,
             null, null, null);
-        return new PullRequest(0, uri, uri, uri, uri, uri, uri,
+        return new PullRequest(0, uris, uris, uris, uris, uris, uris,
             id, state, title, "", createdAt, updatedAt,
             null, null,
             new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
             new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
-            user, null, null, false, null,
-            commentCount, reviewCommentCount, 0, 0, 0, 0,
-            null, false);
+            user, null, null, false, null, null, null,
+            commentCount, 0, 0, 0, 0,
+            null, false, null);
     }
 
     protected class TempDirectory : IDisposable

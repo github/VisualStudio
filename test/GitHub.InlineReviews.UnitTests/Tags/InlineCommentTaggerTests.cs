@@ -140,6 +140,48 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 Assert.True(raised);
             }
 
+            [Test]
+            public void ShouldCallSessionGetFileWithCorrectCommitSha()
+            {
+                var sessionManager = CreateSessionManager(
+                    CreateSessionFile(),
+                    DiffSide.Right,
+                    "123");
+                var session = sessionManager.CurrentSession;
+                var target = new InlineCommentTagger(
+                    Substitute.For<ITextView>(),
+                    Substitute.For<ITextBuffer>(),
+                    sessionManager);
+
+                // Line 11 has an add diff entry.
+                var span = CreateSpan(11);
+                var firstPass = target.GetTags(span);
+                var result = target.GetTags(span).ToList();
+
+                session.Received(1).GetFile("file.cs", "123");
+            }
+
+            [Test]
+            public void ShouldAlwaysCallSessionGetFileWithHeadCommitShaForLeftHandSide()
+            {
+                var sessionManager = CreateSessionManager(
+                    CreateSessionFile(),
+                    DiffSide.Left,
+                    "123");
+                var session = sessionManager.CurrentSession;
+                var target = new InlineCommentTagger(
+                    Substitute.For<ITextView>(),
+                    Substitute.For<ITextBuffer>(),
+                    sessionManager);
+
+                // Line 11 has an add diff entry.
+                var span = CreateSpan(11);
+                var firstPass = target.GetTags(span);
+                var result = target.GetTags(span).ToList();
+
+                session.Received(1).GetFile("file.cs", "HEAD");
+            }
+
             static IPullRequestSessionFile CreateSessionFile()
             {
                 var diffChunk = new DiffChunk
@@ -182,13 +224,15 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
             static IPullRequestSessionManager CreateSessionManager(
                 IPullRequestSessionFile file,
-                DiffSide side)
+                DiffSide side,
+                string bufferInfoCommitSha = "HEAD")
             {
                 var session = Substitute.For<IPullRequestSession>();
-                session.GetFile("file.cs").Returns(file);
+                session.GetFile("file.cs", bufferInfoCommitSha).Returns(file);
 
-                var info = new PullRequestTextBufferInfo(session, "file.cs", side);
+                var info = new PullRequestTextBufferInfo(session, "file.cs", bufferInfoCommitSha, side);
                 var result = Substitute.For<IPullRequestSessionManager>();
+                result.CurrentSession.Returns(session);
                 result.GetTextBufferInfo(null).ReturnsForAnyArgs(info);
                 return result;
             }

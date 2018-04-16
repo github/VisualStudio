@@ -13,12 +13,20 @@ namespace GitHub.InlineReviews.ViewModels
         Placeholder,
     }
 
+	/// <summary>
+    /// View model for an issue or pull request comment.
+    /// </summary>
     public interface ICommentViewModel : IViewModel
     {
         /// <summary>
         /// Gets the ID of the comment.
         /// </summary>
         int Id { get; }
+
+        /// <summary>
+        /// Gets the GraphQL ID of the comment.
+        /// </summary>
+        string NodeId { get; }
 
         /// <summary>
         /// Gets or sets the body of the comment.
@@ -39,6 +47,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets or sets a value indicating whether the comment is read-only.
         /// </summary>
         bool IsReadOnly { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the comment is currently in the process of being
+        /// submitted.
+        /// </summary>
+        bool IsSubmitting { get; }
 
         /// <summary>
         /// Gets the modified date of the comment.

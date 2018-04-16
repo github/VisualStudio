@@ -401,6 +401,21 @@
   <data name="TokenPrompt" xml:space="preserve">
     <value>Token</value>
   </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>Continue your review</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>Add your review</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>Reviewers</value>
+  </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>Add review comment</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>Add a single comment</value>
+  </data>
   <data name="Options_DebuggingTitle" xml:space="preserve">
     <value>Debugging</value>
   </data>

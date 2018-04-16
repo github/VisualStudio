@@ -17,6 +17,7 @@ namespace GitHub.Services
         IApiClient ApiClient { get; }
 
         IObservable<IAccount> GetCurrentUser();
+        IObservable<IAccount> GetUser(string login);
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
         IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo);
