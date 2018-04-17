@@ -37,7 +37,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public override void Execute()
         {
             openPullRequests.Execute();
-            usageTracker.IncrementCounter(x => x.NumberOfTeamExplorerOpenPullRequestList).Forget();
+            usageTracker.IncrementCounter(x => x.NumberOfTeamExplorerHomeOpenPullRequestList).Forget();
         }
     }
 }

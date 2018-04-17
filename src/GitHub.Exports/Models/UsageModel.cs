@@ -68,7 +68,7 @@ namespace GitHub.Models
             public int NumberOfPRReviewDiffViewInlineCommentStartReview { get; set; }
             public int NumberOfPRReviewPosts { get; set; }
             public int NumberOfShowCurrentPullRequest { get; set; }
-            public int NumberOfTeamExplorerOpenPullRequestList { get; set; }
+            public int NumberOfTeamExplorerHomeOpenPullRequestList { get; set; }
         }
     }
 }
