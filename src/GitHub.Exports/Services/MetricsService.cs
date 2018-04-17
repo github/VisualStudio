@@ -102,11 +102,7 @@ namespace GitHub.Services
         internal static StringContent SerializeRequest(UsageModel model)
         {
             var serializer = new SimpleJsonSerializer();
-            var dictionary = new Dictionary<string, object>
-            {
-                {ToJsonPropertyName("Dimensions"), ToModelDictionary(model.Dimensions) },
-                {ToJsonPropertyName("Measures"), ToModelDictionary(model.Measures) }
-            };
+            var dictionary = ToModelDictionary(model);
             return new StringContent(serializer.Serialize(dictionary), Encoding.UTF8, "application/json");
         }
 
