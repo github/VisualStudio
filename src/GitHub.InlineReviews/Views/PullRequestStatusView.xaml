@@ -36,7 +36,7 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
-        <Grid>
+        <Grid Visibility="{Binding Number, Converter={ui:EqualsToVisibilityConverter {x:Null}}}">
             <Button
             Foreground="{DynamicResource VsBrush.StatusBarText}"
             BorderThickness="0"
@@ -54,17 +54,6 @@
                     </TextBlock>
                 </StackPanel>
             </Button>
-            <Grid.Style>
-                <Style>
-                    <Setter Property="Control.Visibility" Value="Collapsed" />
-                    <Style.Triggers>
-                        <!-- Visible when Number is Null -->
-                        <DataTrigger Binding="{Binding Number}" Value="{x:Null}">
-                            <Setter Property="Control.Visibility" Value="Visible" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
             <Grid.ToolTip>
                 <TextBlock VerticalAlignment="Center">
                     Open or Create a Pull request
@@ -72,7 +61,7 @@
             </Grid.ToolTip>
         </Grid>
 
-        <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
+        <Grid Visibility="{Binding Number, Converter={ui:NotEqualsToVisibilityConverter {x:Null}}}">
             <Button
                 Foreground="{DynamicResource VsBrush.StatusBarText}"
                 BorderThickness="0"
