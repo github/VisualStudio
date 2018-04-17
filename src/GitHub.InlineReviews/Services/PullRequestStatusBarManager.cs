@@ -46,7 +46,7 @@ namespace GitHub.InlineReviews.Services
             Lazy<ITeamExplorerContext> teamExplorerContext)
         {
             this.openPullRequestsCommand = new UsageTrackingCommand(openPullRequestsCommand,
-                usageTracker, x => x.NumberOfOpenPullRequests);
+                usageTracker, x => x.NumberOfStatusBarOpenPullRequestList);
             this.showCurrentPullRequestCommand = new UsageTrackingCommand(showCurrentPullRequestCommand,
                 usageTracker, x => x.NumberOfShowCurrentPullRequest);
 
