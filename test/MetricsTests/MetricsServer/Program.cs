@@ -22,6 +22,7 @@ namespace MetricsServer
         public void Start()
         {
             var conf = new HostConfiguration { RewriteLocalhost = false };
+            conf.UrlReservations.CreateAutomatically = false;
             server = new NancyHost(conf, new Uri($"http://{host}:{port}"));
             server.Start();
         }
