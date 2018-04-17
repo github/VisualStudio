@@ -1,25 +1,239 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using EnvDTE;
+using GitHub.Commands;
+using GitHub.Extensions;
+using GitHub.Models;
+using GitHub.ViewModels.GitHubPane;
+using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Differencing;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
-using GitHub.Models;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
+    /// <summary>
+    /// Services for opening views of pull request files in Visual Studio.
+    /// </summary>
     [Export(typeof(IPullRequestEditorService))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestEditorService : IPullRequestEditorService
     {
-        readonly IGitHubServiceProvider serviceProvider;
-
         // If the target line doesn't have a unique match, search this number of lines above looking for a match.
         public const int MatchLinesAboveTarget = 4;
 
+        readonly IGitHubServiceProvider serviceProvider;
+        readonly IPullRequestService pullRequestService;
+        readonly IVsEditorAdaptersFactoryService vsEditorAdaptersFactory;
+        readonly IStatusBarNotificationService statusBar;
+        readonly IUsageTracker usageTracker;
+
         [ImportingConstructor]
-        public PullRequestEditorService(IGitHubServiceProvider serviceProvider)
+        public PullRequestEditorService(
+            IGitHubServiceProvider serviceProvider,
+            IPullRequestService pullRequestService,
+            IVsEditorAdaptersFactoryService vsEditorAdaptersFactory,
+            IStatusBarNotificationService statusBar,
+            IUsageTracker usageTracker)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+            Guard.ArgumentNotNull(pullRequestService, nameof(pullRequestService));
+            Guard.ArgumentNotNull(vsEditorAdaptersFactory, nameof(vsEditorAdaptersFactory));
+            Guard.ArgumentNotNull(statusBar, nameof(statusBar));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+
             this.serviceProvider = serviceProvider;
+            this.pullRequestService = pullRequestService;
+            this.vsEditorAdaptersFactory = vsEditorAdaptersFactory;
+            this.statusBar = statusBar;
+            this.usageTracker = usageTracker;
+        }
+
+        /// <inheritdoc/>
+        public async Task OpenFile(
+            IPullRequestSession session,
+            string relativePath,
+            bool workingDirectory)
+        {
+            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
+
+            try
+            {
+                var fullPath = Path.Combine(session.LocalRepository.LocalPath, relativePath);
+                string fileName;
+                string commitSha;
+
+                if (workingDirectory)
+                {
+                    fileName = fullPath;
+                    commitSha = null;
+                }
+                else
+                {
+                    var file = await session.GetFile(relativePath);
+                    fileName = await pullRequestService.ExtractToTempFile(
+                        session.LocalRepository,
+                        session.PullRequest,
+                        file.RelativePath,
+                        file.CommitSha,
+                        pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath));
+                    commitSha = file.CommitSha;
+                }
+
+                using (workingDirectory ? null : OpenInProvisionalTab())
+                {
+                    var window = VisualStudio.Services.Dte.ItemOperations.OpenFile(fileName);
+                    window.Document.ReadOnly = !workingDirectory;
+
+                    var buffer = GetBufferAt(fileName);
+
+                    if (!workingDirectory)
+                    {
+                        AddBufferTag(buffer, session, fullPath, commitSha, null);
+
+                        var textView = FindActiveView();
+                        var file = await session.GetFile(relativePath);
+                        EnableNavigateToEditor(textView, session, file);
+                    }
+                }
+
+                if (workingDirectory)
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
+                else
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error opening file", e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task OpenDiff(IPullRequestSession session, string relativePath, string headSha)
+        {
+            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
+
+            try
+            {
+                var workingDirectory = headSha == null;
+                var file = await session.GetFile(relativePath, headSha ?? "HEAD");
+                var mergeBase = await pullRequestService.GetMergeBase(session.LocalRepository, session.PullRequest);
+                var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath);
+                var rightFile = workingDirectory ?
+                    Path.Combine(session.LocalRepository.LocalPath, relativePath) :
+                    await pullRequestService.ExtractToTempFile(
+                        session.LocalRepository,
+                        session.PullRequest,
+                        relativePath,
+                        file.CommitSha,
+                        encoding);
+
+                if (FocusExistingDiffViewer(session, mergeBase, rightFile))
+                {
+                    return;
+                }
+
+                var leftFile = await pullRequestService.ExtractToTempFile(
+                    session.LocalRepository,
+                    session.PullRequest,
+                    relativePath,
+                    mergeBase,
+                    encoding);
+                var leftPath = await GetBaseFileName(session, file);
+                var rightPath = file.RelativePath;
+                var leftLabel = $"{leftPath};{session.GetBaseBranchDisplay()}";
+                var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {session.PullRequest.Number}";
+                var caption = $"Diff - {Path.GetFileName(file.RelativePath)}";
+                var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
+                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
+
+                if (!workingDirectory)
+                {
+                    options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
+
+                IVsWindowFrame frame;
+                using (OpenInProvisionalTab())
+                {
+                    var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
+
+                    // Diff window will open in provisional (right hand) tab until document is touched.
+                    frame = VisualStudio.Services.DifferenceService.OpenComparisonWindow2(
+                        leftFile,
+                        rightFile,
+                        caption,
+                        tooltip,
+                        leftLabel,
+                        rightLabel,
+                        string.Empty,
+                        string.Empty,
+                        (uint)options);
+                }
+
+                var diffViewer = GetDiffViewer(frame);
+
+                AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, mergeBase, DiffSide.Left);
+
+                if (!workingDirectory)
+                {
+                    AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, file.CommitSha, DiffSide.Right);
+                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
+                    EnableNavigateToEditor(diffViewer.RightView, session, file);
+                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
+                }
+
+                if (workingDirectory)
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution);
+                else
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error opening file", e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task OpenDiff(
+            IPullRequestSession session,
+            string relativePath,
+            IInlineCommentThreadModel thread)
+        {
+            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
+            Guard.ArgumentNotNull(thread, nameof(thread));
+
+            await OpenDiff(session, relativePath, thread.CommitSha);
+
+            // HACK: We need to wait here for the diff view to set itself up and move its cursor
+            // to the first changed line. There must be a better way of doing this.
+            await Task.Delay(1500);
+
+            var param = (object)new InlineCommentNavigationParams
+            {
+                FromLine = thread.LineNumber - 1,
+            };
+
+            VisualStudio.Services.Dte.Commands.Raise(
+                Guids.CommandSetString,
+                PkgCmdIDList.NextInlineCommentId,
+                ref param,
+                null);
         }
 
         public IVsTextView NavigateToEquivalentPosition(IVsTextView sourceView, string targetFile)
@@ -178,6 +392,212 @@ namespace GitHub.Services
             IVsTextView view;
             VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
             return view;
+        }
+
+        bool FocusExistingDiffViewer(
+            IPullRequestSession session,
+            string mergeBase,
+            string rightPath)
+        {
+            IVsUIHierarchy uiHierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+
+            // Diff documents are indexed by the path on the right hand side of the comparison.
+            if (VsShellUtilities.IsDocumentOpen(
+                    serviceProvider,
+                    rightPath,
+                    Guid.Empty,
+                    out uiHierarchy,
+                    out itemID,
+                    out windowFrame))
+            {
+                var diffViewer = GetDiffViewer(windowFrame);
+
+                if (diffViewer != null)
+                {
+                    PullRequestTextBufferInfo leftBufferInfo;
+
+                    if (diffViewer.LeftView.TextBuffer.Properties.TryGetProperty(
+                            typeof(PullRequestTextBufferInfo),
+                            out leftBufferInfo) &&
+                        leftBufferInfo.Session.PullRequest.Number == session.PullRequest.Number &&
+                        leftBufferInfo.CommitSha == mergeBase)
+                    {
+                        return ErrorHandler.Succeeded(windowFrame.Show());
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        void ShowErrorInStatusBar(string message)
+        {
+            statusBar.ShowMessage(message);
+        }
+
+        void ShowErrorInStatusBar(string message, Exception e)
+        {
+            statusBar.ShowMessage(message + ": " + e.Message);
+        }
+
+        void AddBufferTag(
+            ITextBuffer buffer,
+            IPullRequestSession session,
+            string path,
+            string commitSha,
+            DiffSide? side)
+        {
+            buffer.Properties.GetOrCreateSingletonProperty(
+                typeof(PullRequestTextBufferInfo),
+                () => new PullRequestTextBufferInfo(session, path, commitSha, side));
+
+            var projection = buffer as IProjectionBuffer;
+
+            if (projection != null)
+            {
+                foreach (var source in projection.SourceBuffers)
+                {
+                    AddBufferTag(source, session, path, commitSha, side);
+                }
+            }
+        }
+
+        void EnableNavigateToEditor(ITextView textView, IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            var vsTextView = vsEditorAdaptersFactory.GetViewAdapter(textView);
+            EnableNavigateToEditor(vsTextView, session, file);
+        }
+
+        void EnableNavigateToEditor(IVsTextView vsTextView, IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
+            var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
+            new TextViewCommandDispatcher(vsTextView, commandGroup, commandId).Exec +=
+                async (s, e) => await DoNavigateToEditor(session, file);
+
+            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
+            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
+            new TextViewCommandDispatcher(vsTextView, contextMenuCommandGroup, goToCommandId).Exec +=
+                async (s, e) => await DoNavigateToEditor(session, file);
+
+            EnableNavigateStatusBarMessage(vsTextView, session);
+        }
+
+        void EnableNavigateStatusBarMessage(IVsTextView vsTextView, IPullRequestSession session)
+        {
+            var textView = vsEditorAdaptersFactory.GetWpfTextView(vsTextView);
+
+            var statusMessage = session.IsCheckedOut ?
+                App.Resources.NavigateToEditorStatusMessage : App.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+
+            textView.GotAggregateFocus += (s, e) =>
+                statusBar.ShowMessage(statusMessage);
+
+            textView.LostAggregateFocus += (s, e) =>
+                statusBar.ShowMessage(string.Empty);
+        }
+
+        async Task DoNavigateToEditor(IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            try
+            {
+                if (!session.IsCheckedOut)
+                {
+                    ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
+                    return;
+                }
+
+                var fullPath = GetAbsolutePath(session, file);
+
+                var activeView = FindActiveView();
+                if (activeView == null)
+                {
+                    ShowErrorInStatusBar("Couldn't find active view");
+                    return;
+                }
+
+                NavigateToEquivalentPosition(activeView, fullPath);
+
+                await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error navigating to editor", e);
+            }
+        }
+
+        ITextBuffer GetBufferAt(string filePath)
+        {
+            IVsUIHierarchy uiHierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+
+            if (VsShellUtilities.IsDocumentOpen(
+                    serviceProvider,
+                    filePath,
+                    Guid.Empty,
+                    out uiHierarchy,
+                    out itemID,
+                    out windowFrame))
+            {
+                IVsTextView view = VsShellUtilities.GetTextView(windowFrame);
+                IVsTextLines lines;
+                if (view.GetBuffer(out lines) == 0)
+                {
+                    var buffer = lines as IVsTextBuffer;
+                    if (buffer != null)
+                        return vsEditorAdaptersFactory.GetDataBuffer(buffer);
+                }
+            }
+
+            return null;
+        }
+
+        async Task<string> GetBaseFileName(IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            using (var changes = await pullRequestService.GetTreeChanges(
+                session.LocalRepository,
+                session.PullRequest))
+            {
+                var fileChange = changes.FirstOrDefault(x => x.Path == file.RelativePath);
+                return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
+                    fileChange.OldPath : file.RelativePath;
+            }
+        }
+
+        void ShowInfoMessage(string message)
+        {
+            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
+                serviceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
+        }
+
+        static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)
+        {
+            var localPath = session.LocalRepository.LocalPath;
+            var relativePath = file.RelativePath.Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(localPath, relativePath);
+        }
+
+        static IDifferenceViewer GetDiffViewer(IVsWindowFrame frame)
+        {
+            object docView;
+
+            if (ErrorHandler.Succeeded(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
+                return (docView as IVsDifferenceCodeWindow)?.DifferenceViewer;
+            }
+
+            return null;
+        }
+
+        static IDisposable OpenInProvisionalTab()
+        {
+            return new NewDocumentStateScope(
+                __VSNEWDOCUMENTSTATE.NDS_Provisional,
+                VSConstants.NewDocumentStateReason.SolutionExplorer);
         }
 
         static IList<string> ReadLines(string text)

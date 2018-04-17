@@ -4,19 +4,21 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using GitHub.Extensions;
 using GitHub.Helpers;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<UsageTracker>();
         readonly IGitHubServiceProvider gitHubServiceProvider;
+
         bool initialized;
         IMetricsService client;
         IUsageService service;
@@ -26,14 +28,15 @@ namespace GitHub.Services
         IDisposable timer;
         bool firstTick = true;
 
-        [ImportingConstructor]
         public UsageTracker(
             IGitHubServiceProvider gitHubServiceProvider,
-            IUsageService service)
+            IUsageService service,
+            IPackageSettings settings)
         {
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
-            timer = StartTimer();            
+            this.userSettings = settings;
+            timer = StartTimer();
         }
 
         public void Dispose()
@@ -41,69 +44,46 @@ namespace GitHub.Services
             timer?.Dispose();
         }
 
-        public async Task IncrementCounter(Expression<Func<UsageModel, int>> counter)
+        public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
-            var usage = await LoadUsage();
-            // because Model is a struct, it needs to be boxed in order for reflection to work
-            object model = usage.Model;
+            await Initialize();
+            var data = await service.ReadLocalData();
+            var usage = await GetCurrentReport(data);
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            var value = (int)propertyInfo.GetValue(model);
-            propertyInfo.SetValue(model, value + 1);
-            usage.Model = (UsageModel)model;
-            await service.WriteLocalData(usage);
+            log.Verbose("Increment counter {Name}", propertyInfo.Name);
+            var value = (int)propertyInfo.GetValue(usage.Measures);
+            propertyInfo.SetValue(usage.Measures, value + 1);
+            await service.WriteLocalData(data);
         }
 
         IDisposable StartTimer()
         {
-            return service.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromHours(8));
+            return service.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromDays(1));
         }
 
         async Task Initialize()
         {
+            if (initialized)
+                return;
+
             // The services needed by the usage tracker are loaded when they are first needed to
             // improve the startup time of the extension.
-            if (!initialized)
-            {
-                await ThreadingHelper.SwitchToMainThreadAsync();
+            await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = gitHubServiceProvider.TryGetService<IMetricsService>();
-                connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
-                userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
-                vsservices = gitHubServiceProvider.GetService<IVSServices>();
-                initialized = true;
-            }
-        }
-
-        async Task IncrementLaunchCount()
-        {
-            var usage = await LoadUsage();
-            var model = usage.Model;
-            model.NumberOfStartups++;
-            model.NumberOfStartupsWeek++;
-            model.NumberOfStartupsMonth++;
-            usage.Model = model;
-            await service.WriteLocalData(usage);
-        }
-
-        async Task<UsageData> LoadUsage()
-        {
-            await Initialize();
-
-            var usage = await service.ReadLocalData();
-            var model = usage.Model;
-            model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
-            model.AppVersion = AssemblyVersionInformation.Version;
-            model.VSVersion = vsservices.VSVersion;
-            usage.Model = model;
-            return usage;
+            client = gitHubServiceProvider.TryGetService<IMetricsService>();
+            connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
+            vsservices = gitHubServiceProvider.GetService<IVSServices>();
+            initialized = true;
         }
 
         async Task TimerTick()
         {
+            await Initialize();
+
             if (firstTick)
             {
-                await IncrementLaunchCount();
+                await IncrementCounter(x => x.NumberOfStartups);
                 firstTick = false;
             }
 
@@ -114,55 +94,51 @@ namespace GitHub.Services
                 return;
             }
 
-            // Every time we increment the launch count we increment both daily and weekly
-            // launch count but we only submit (and clear) the weekly launch count when we've
-            // transitioned into a new week. We've defined a week by the ISO8601 definition,
-            // i.e. week starting on Monday and ending on Sunday.
-            var usage = await LoadUsage();
-            var lastDate = usage.LastUpdated;
-            var currentDate = DateTimeOffset.Now;
-            var includeWeekly = !service.IsSameWeek(usage.LastUpdated);
-            var includeMonthly = !service.IsSameMonth(usage.LastUpdated);
+            var data = await service.ReadLocalData();
 
-            // Only send stats once a day.
-            if (!service.IsSameDay(usage.LastUpdated))
+            var changed = false;
+            for (var i = data.Reports.Count - 1; i >= 0; --i)
             {
-                usage.Model = await UpdateModelUserData(usage.Model);
+                if (data.Reports[i].Dimensions.Date.Date != DateTimeOffset.Now.Date)
+                {
+                    try
+                    {
+                        await client.PostUsage(data.Reports[i]);
+                        data.Reports.RemoveAt(i);
+                        changed = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error(ex, "Failed to send metrics");
+                    }
+                }
+            }
 
-                await SendUsage(usage.Model, includeWeekly, includeMonthly);
-
-                usage.Model = usage.Model.ClearCounters(includeWeekly, includeMonthly);
-                usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
-                await service.WriteLocalData(usage);
+            if (changed)
+            {
+                await service.WriteLocalData(data);
             }
         }
 
-        async Task SendUsage(UsageModel usage, bool includeWeekly, bool includeMonthly)
+        async Task<UsageModel> GetCurrentReport(UsageData data)
         {
-            if (client == null)
+            var current = data.Reports.FirstOrDefault(x => x.Dimensions.Date.Date == DateTimeOffset.Now.Date);
+
+            if (current == null)
             {
-                throw new GitHubLogicException("SendUsage should not be called when there is no IMetricsService");
+                var guid = await service.GetUserGuid();
+                current = UsageModel.Create(guid);
+                data.Reports.Add(current);
             }
 
-            var model = usage.Clone(includeWeekly, includeMonthly);
-            await client.PostUsage(model);
-        }
+            current.Dimensions.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
+            current.Dimensions.CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag;
+            current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
+            current.Dimensions.VSVersion = vsservices.VSVersion;
 
-        async Task<UsageModel> UpdateModelUserData(UsageModel model)
-        {
-            model.Guid = await service.GetUserGuid();
-
-            if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
-            {
-                model.IsGitHubUser = true;
-            }
-
-            if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
-            {
-                model.IsEnterpriseUser = true;
-            }
-
-            return model;
+            current.Dimensions.IsGitHubUser = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
+            current.Dimensions.IsEnterpriseUser = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
+            return current;
         }
     }
 }

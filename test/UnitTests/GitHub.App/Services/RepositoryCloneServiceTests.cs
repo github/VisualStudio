@@ -36,11 +36,11 @@ public class RepositoryCloneServiceTests
             var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, usageTracker);
 
             await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
-            var model = new UsageModel();
+            var model = UsageModel.Create(Guid.NewGuid());
 
             await usageTracker.Received().IncrementCounter(
-                Arg.Is<Expression<Func<UsageModel, int>>>(x => 
-                    ((MemberExpression)x.Body).Member.Name == nameof(model.NumberOfClones)));
+                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x => 
+                    ((MemberExpression)x.Body).Member.Name == nameof(model.Measures.NumberOfClones)));
         }
     }
 }

@@ -37,10 +37,10 @@ namespace GitHub.InlineReviews.ViewModels
 
             foreach (var comment in comments)
             {
-                Comments.Add(new CommentViewModel(this, CurrentUser, comment));
+                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment));
             }
 
-            Comments.Add(CommentViewModel.CreatePlaceholder(this, CurrentUser));
+            Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
         }
 
         /// <summary>
@@ -65,7 +65,8 @@ namespace GitHub.InlineReviews.ViewModels
 
             var body = (string)parameter;
             var replyId = Comments[0].Id;
-            return await Session.PostReviewComment(body, replyId);
+            var nodeId = Comments[0].NodeId;
+            return await Session.PostReviewComment(body, replyId, nodeId);
         }
     }
 }

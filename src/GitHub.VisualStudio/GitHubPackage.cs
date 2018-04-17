@@ -254,7 +254,8 @@ namespace GitHub.VisualStudio
             {
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                return new UsageTracker(serviceProvider, usageService);
+                var settings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+                return new UsageTracker(serviceProvider, usageService, settings);
             }
             else if (serviceType == typeof(IVSGitExt))
             {

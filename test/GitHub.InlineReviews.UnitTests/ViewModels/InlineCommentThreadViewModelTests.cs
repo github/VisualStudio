@@ -65,7 +65,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             target.Comments[2].Body = "New Comment";
             target.Comments[2].CommitEdit.Execute(null);
 
-            session.Received(1).PostReviewComment("New Comment", 1);
+            session.Received(1).PostReviewComment("New Comment", 1, "node1");
         }
 
         IApiClient CreateApiClient()
@@ -81,6 +81,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var comment = Substitute.For<IPullRequestReviewCommentModel>();
             comment.Body.Returns(body);
             comment.Id.Returns(id);
+            comment.NodeId.Returns("node" + id);
             return comment;
         }
 

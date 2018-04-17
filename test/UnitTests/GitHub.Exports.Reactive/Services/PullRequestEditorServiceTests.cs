@@ -2,6 +2,7 @@
 using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
+using Microsoft.VisualStudio.Editor;
 
 public class PullRequestEditorServiceTests
 {
@@ -48,6 +49,15 @@ public class PullRequestEditorServiceTests
     static PullRequestEditorService CreateNavigationService()
     {
         var sp = Substitute.For<IGitHubServiceProvider>();
-        return new PullRequestEditorService(sp);
+        var pullRequestService = Substitute.For<IPullRequestService>();
+        var vsEditorAdaptersFactory = Substitute.For<IVsEditorAdaptersFactoryService>();
+        var statusBar = Substitute.For<IStatusBarNotificationService>();
+        var usageTracker = Substitute.For<IUsageTracker>();
+        return new PullRequestEditorService(
+            sp,
+            pullRequestService,
+            vsEditorAdaptersFactory,
+            statusBar,
+            usageTracker);
     }
 }

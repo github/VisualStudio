@@ -1,4 +1,4 @@
-version: '2.4.4.{build}'
+version: '2.4.99.{build}'
 skip_tags: true
 install:
 - ps: |

@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
 using LibGit2Sharp;
-using Octokit;
-using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.Services
 {
@@ -116,6 +114,14 @@ namespace GitHub.Services
         IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
 
         /// <summary>
+        /// Gets the SHA of the merge base for a pull request.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request details.</param>
+        /// <returns></returns>
+        Task<string> GetMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
         /// Gets the changes between the pull request base and head.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -148,19 +154,19 @@ namespace GitHub.Services
         Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath);
 
         /// <summary>
-        /// Gets a file as it appears in a pull request.
+        /// Extracts a file at the specified commit to a temporary file.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
-        /// <param name="fileName">The filename relative to the repository root.</param>
-        /// <param name="head">If true, gets the file at the PR head, otherwise gets the file at the PR base.</param>
+        /// <param name="relativePath">The path to the file, relative to the repository root.</param>
+        /// <param name="commitSha">The SHA of the commit.</param>
         /// <param name="encoding">The encoding to use.</param>
-        /// <returns>The paths of the left and right files for the diff.</returns>
-        IObservable<string> ExtractFile(
+        /// <returns>The path to the temporary file.</returns>
+        Task<string> ExtractToTempFile(
             ILocalRepositoryModel repository,
             IPullRequestModel pullRequest,
-            string fileName,
-            bool head,
+            string relativePath,
+            string commitSha,
             Encoding encoding);
 
         /// <summary>
