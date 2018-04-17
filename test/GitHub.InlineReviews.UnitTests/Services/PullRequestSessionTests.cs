@@ -259,7 +259,7 @@ Line 4";
 
                 using (var diffService = new FakeDiffService())
                 {
-                    var pullRequest = CreatePullRequest(comment);
+                    var pullRequest = CreatePullRequest(CreateReview(comment));
                     var service = CreateRealSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
@@ -352,17 +352,6 @@ Line 4";
                 Assert.IsEmpty(target.PullRequest.Reviews);
             }
 
-            [Test]
-            public async Task RemovesCommentsFromModel()
-            {
-                var service = Substitute.For<IPullRequestSessionService>();
-                var target = CreateTargetWithPendingReview(service);
-
-                await target.CancelReview();
-
-                Assert.IsEmpty(target.PullRequest.ReviewComments);
-            }
-
             public static PullRequestSession CreateTargetWithPendingReview(
                 IPullRequestSessionService service)
             {
@@ -372,8 +361,8 @@ Line 4";
                 var comment = Substitute.For<IPullRequestReviewCommentModel>();
 
                 comment.PullRequestReviewId.Returns(1);
+                review.Comments.Returns(new[] { comment });
                 pr.Reviews.Returns(new[] { review });
-                pr.ReviewComments.Returns(new[] { comment });
 
                 return new PullRequestSession(
                     service,
@@ -455,23 +444,6 @@ Line 4";
                     Is.Zero);
             }
 
-            [Test]
-            public async Task MarksAssociatedCommentsAsNonPending()
-            {
-                var service = Substitute.For<IPullRequestSessionService>();
-                var target = CreateTarget(service, "fork", "owner", true);
-
-                Assert.That(target.PullRequest.ReviewComments[0].IsPending, Is.True);
-
-                var submittedReview = CreatePullRequestReview(target.User, PullRequestReviewState.Approved);
-                submittedReview.NodeId.Returns("pendingReviewId");
-                service.SubmitPendingReview(null, null, null, null, Octokit.PullRequestReviewEvent.Approve)
-                    .ReturnsForAnyArgs(submittedReview);
-                var model = await target.PostReview("New Review", Octokit.PullRequestReviewEvent.RequestChanges);
-
-                target.PullRequest.ReviewComments[0].Received(1).IsPending = false;
-            }
-
             PullRequestSession CreateTarget(
                 IPullRequestSessionService service,
                 string localRepositoryOwner,
@@ -492,10 +464,10 @@ Line 4";
                     var reviewComment = Substitute.For<IPullRequestReviewCommentModel>();
                     reviewComment.PullRequestReviewId.Returns(1);
                     reviewComment.IsPending.Returns(true);
-                    pr.ReviewComments.Returns(new[] { reviewComment });
 
                     var review = CreatePullRequestReview(user, PullRequestReviewState.Pending);
                     review.NodeId.Returns("pendingReviewId");
+                    review.Comments.Returns(new[] { reviewComment });
                     pr.Reviews.Returns(new[] { review });
                 }
 
@@ -598,8 +570,13 @@ Line 4";
 
                 if (hasPendingReview)
                 {
-                    var review = CreatePullRequestReview(user, PullRequestReviewState.Pending);
-                    review.NodeId.Returns("pendingReviewId");
+                    var review = new PullRequestReviewModel
+                    {
+                        NodeId = "pendingReviewId",
+                        State = PullRequestReviewState.Pending,
+                        User = user,
+                    };
+
                     pr.Reviews.Returns(new[] { review });
                 }
 
@@ -659,7 +636,7 @@ Line 4";
 
                 using (var diffService = new FakeDiffService())
                 {
-                    var pullRequest = CreatePullRequest(comment1);
+                    var pullRequest = CreatePullRequest(CreateReview(comment1));
                     var service = CreateRealSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
@@ -678,7 +655,7 @@ Line 4";
                     Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(1));
                     Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
 
-                    pullRequest = CreatePullRequest(comment1, comment2);
+                    pullRequest = CreatePullRequest(CreateReview(comment1, comment2));
                     await target.Update(pullRequest);
 
                     Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(2));
@@ -711,7 +688,7 @@ Line 4";
 
                 using (var diffService = new FakeDiffService())
                 {
-                    var pullRequest = CreatePullRequest(comment1);
+                    var pullRequest = CreatePullRequest(CreateReview(comment1));
                     var service = CreateRealSessionService(diffService);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
@@ -730,7 +707,7 @@ Line 4";
                     Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(1));
                     Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
 
-                    pullRequest = CreatePullRequest(comment1, comment2);
+                    pullRequest = CreatePullRequest(CreateReview(comment1, comment2));
                     await target.Update(pullRequest);
 
                     Assert.That(file.InlineCommentThreads[0].Comments, Has.Count.EqualTo(2));
@@ -749,7 +726,7 @@ Line 4";
 
                 using (var diffService = new FakeDiffService())
                 {
-                    var pullRequest = CreatePullRequest(comment);
+                    var pullRequest = CreatePullRequest(CreateReview(comment));
                     var service = CreateRealSessionService(diffService);
 
                     var target = new PullRequestSession(
@@ -790,7 +767,14 @@ Line 4";
             return result;
         }
 
-        static IPullRequestModel CreatePullRequest(params IPullRequestReviewCommentModel[] comments)
+        static IPullRequestReviewModel CreateReview(params IPullRequestReviewCommentModel[] comments)
+        {
+            var result = Substitute.For<IPullRequestReviewModel>();
+            result.Comments.Returns(comments);
+            return result;
+        }
+
+        static IPullRequestModel CreatePullRequest(params IPullRequestReviewModel[] reviews)
         {
             var changedFile1 = Substitute.For<IPullRequestFileModel>();
             changedFile1.FileName.Returns("test.cs");
@@ -802,7 +786,7 @@ Line 4";
             result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
             result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
             result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
-            result.ReviewComments.Returns(comments);
+            result.Reviews.Returns(reviews);
 
             result.Equals(null).ReturnsForAnyArgs(x =>
             {
@@ -856,7 +840,8 @@ Line 4";
                 diffService ?? Substitute.For<IDiffService>(),
                 Substitute.For<IApiClientFactory>(),
                 Substitute.For<IGraphQLClientFactory>(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IAvatarProvider>());
 
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
             result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())

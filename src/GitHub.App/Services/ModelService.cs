@@ -217,21 +217,18 @@ namespace GitHub.Services
                             ApiClient.GetPullRequestFiles(owner, name, number).ToList(),
                             ApiClient.GetIssueComments(owner, name, number).ToList(),
                             GetPullRequestReviews(owner, name, number).ToObservable(),
-                            GetPullRequestReviewComments(owner, name, number).ToObservable(),
-                            (pr, files, comments, reviews, reviewComments) => new
+                            (pr, files, comments, reviews) => new
                             {
                                 PullRequest = pr,
                                 Files = files,
                                 Comments = comments,
                                 Reviews = reviews,
-                                ReviewComments = reviewComments
                             })
                             .Select(x => PullRequestCacheItem.Create(
                                 x.PullRequest, 
                                 (IReadOnlyList<PullRequestFile>)x.Files,
                                 (IReadOnlyList<IssueComment>)x.Comments,
-                                (IReadOnlyList<IPullRequestReviewModel>)x.Reviews,
-                                (IReadOnlyList<IPullRequestReviewCommentModel>)x.ReviewComments)),
+                                (IReadOnlyList<IPullRequestReviewModel>)x.Reviews)),
                         TimeSpan.Zero,
                         TimeSpan.FromDays(7))
                     .Select(Create);
@@ -390,24 +387,44 @@ namespace GitHub.Services
 
             while (true)
             {
+                // TODO: We're only reading the first 100 reviews and comments here. Add paging.
                 var query = new Query()
                     .Repository(owner, name)
                     .PullRequest(number)
-                    .Reviews(first: 30, after: cursor)
-                    .Select(x => new
+                    .Reviews(first: 100, after: cursor)
+                    .Select(reviewConnection => new Page<PullRequestReviewModel>
                     {
-                        x.PageInfo.HasNextPage,
-                        x.PageInfo.EndCursor,
-                        Items = x.Nodes.Select(y => new PullRequestReviewModel
+                        HasNextPage = reviewConnection.PageInfo.HasNextPage,
+                        EndCursor = reviewConnection.PageInfo.EndCursor,
+                        Items = reviewConnection.Nodes.Select(review => new PullRequestReviewModel
                         {
-                            Id = y.DatabaseId.Value,
-                            NodeId = y.Id,
-                            Body = y.Body,
-                            CommitId = y.Commit.Oid,
-                            State = FromGraphQL(y.State),
-                            SubmittedAt = y.SubmittedAt,
-                            User = Create(y.Author.Login, y.Author.AvatarUrl(null))
-                        }).ToList()
+                            Id = review.DatabaseId.Value,
+                            NodeId = review.Id,
+                            Body = review.Body,
+                            CommitId = review.Commit.Oid,
+                            State = FromGraphQL(review.State),
+                            SubmittedAt = review.SubmittedAt,
+                            User = Create(review.Author.Login, review.Author.AvatarUrl(null)),
+                            Comments = review.Comments(100, null, null, null).Select(commentConnection => new Page<PullRequestReviewCommentModel>
+                            {
+                                Items = commentConnection.Nodes.Select(comment => new PullRequestReviewCommentModel
+                                {
+                                    Id = comment.DatabaseId.Value,
+                                    NodeId = comment.Id,
+                                    Body = comment.Body,
+                                    CommitId = comment.Commit.Oid,
+                                    CreatedAt = comment.CreatedAt.Value,
+                                    DiffHunk = comment.DiffHunk,
+                                    OriginalCommitId = comment.OriginalCommit.Oid,
+                                    OriginalPosition = comment.OriginalPosition,
+                                    Path = comment.Path,
+                                    Position = comment.Position,
+                                    PullRequestReviewId = review.DatabaseId.Value,
+                                    User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
+                                    IsPending = review.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
+                                }).ToList(),
+                            }).Single(),
+                        }).ToList(),
                     });
 
                 var page = await graphql.Run(query);
@@ -415,120 +432,6 @@ namespace GitHub.Services
 
                 if (page.HasNextPage)
                     cursor = page.EndCursor;
-                else
-                    return result;
-            }
-        }
-
-        async Task<IList<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string owner, string name, int number)
-        {
-            var result = new List<IPullRequestReviewCommentModel>();
-
-            // Reads a single page of reviews and for each review the first page of review comments.
-            var query = new Query()
-                .Repository(owner, name)
-                .PullRequest(number)
-                .Reviews(first: 100, after: Var("cursor"))
-                .Select(x => new
-                {
-                    x.PageInfo.HasNextPage,
-                    x.PageInfo.EndCursor,
-                    Reviews = x.Nodes.Select(y => new
-                    {
-                        y.Id,
-                        CommentPage = y.Comments(100, null, null, null).Select(z => new
-                        {
-                            z.PageInfo.HasNextPage,
-                            z.PageInfo.EndCursor,
-                            Items = z.Nodes.Select(a => new PullRequestReviewCommentModel
-                            {
-                                Id = a.DatabaseId.Value,
-                                NodeId = a.Id,
-                                Body = a.Body,
-                                CommitId = a.Commit.Oid,
-                                CreatedAt = a.CreatedAt.Value,
-                                DiffHunk = a.DiffHunk,
-                                OriginalCommitId = a.OriginalCommit.Oid,
-                                OriginalPosition = a.OriginalPosition,
-                                Path = a.Path,
-                                Position = a.Position,
-                                PullRequestReviewId = y.DatabaseId.Value,
-                                User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
-                                IsPending = y.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
-                            }).ToList(),
-                        }).Single()
-                    }).ToList()
-                }).Compile();
-
-            var vars = new Dictionary<string, object>
-            {
-                { "cursor", null }
-            };
-
-            // Read all pages of reviews.
-            while (true)
-            {
-                var reviewPage = await graphql.Run(query, vars);
-
-                foreach (var review in reviewPage.Reviews)
-                {
-                    result.AddRange(review.CommentPage.Items);
-
-                    // The the review has >1 page of review comments, read the remaining pages.
-                    if (review.CommentPage.HasNextPage)
-                    {
-                        result.AddRange(await GetPullRequestReviewComments(review.Id, review.CommentPage.EndCursor));
-                    }
-                }
-
-                if (reviewPage.HasNextPage)
-                    vars["cursor"] = reviewPage.EndCursor;
-                else
-                    return result;
-            }
-        }
-
-        private async Task<IEnumerable<IPullRequestReviewCommentModel>> GetPullRequestReviewComments(string reviewId, string commentCursor)
-        {
-            var result = new List<IPullRequestReviewCommentModel>();
-            var query = new Query()
-                .Node(reviewId)
-                .Cast<Octokit.GraphQL.Model.PullRequestReview>()
-                .Select(x => new
-                {
-                    CommentPage = x.Comments(100, Var("cursor"), null, null).Select(z => new
-                    {
-                        z.PageInfo.HasNextPage,
-                        z.PageInfo.EndCursor,
-                        Items = z.Nodes.Select(a => new PullRequestReviewCommentModel
-                        {
-                            Id = a.DatabaseId.Value,
-                            NodeId = a.Id,
-                            Body = a.Body,
-                            CommitId = a.Commit.Oid,
-                            CreatedAt = a.CreatedAt.Value,
-                            DiffHunk = a.DiffHunk,
-                            OriginalCommitId = a.OriginalCommit.Oid,
-                            OriginalPosition = a.OriginalPosition,
-                            Path = a.Path,
-                            Position = a.Position,
-                            PullRequestReviewId = x.DatabaseId.Value,
-                            User = Create(a.Author.Login, a.Author.AvatarUrl(null)),
-                        }).ToList(),
-                    }).Single()
-                }).Compile();
-            var vars = new Dictionary<string, object>
-            {
-                { "cursor", commentCursor }
-            };
-
-            while (true)
-            {
-                var page = await graphql.Run(query, vars);
-                result.AddRange(page.CommentPage.Items);
-
-                if (page.CommentPage.HasNextPage)
-                    vars["cursor"] = page.CommentPage.EndCursor;
                 else
                     return result;
             }
@@ -632,23 +535,23 @@ namespace GitHub.Services
                         State = x.State,
                         CommitId = x.CommitId,
                         SubmittedAt = x.SubmittedAt,
-                    }).ToList(),
-                ReviewComments = prCacheItem.ReviewComments.Select(x =>
-                    (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
-                    {
-                        Id = x.Id,
-                        NodeId = x.NodeId,
-                        PullRequestReviewId = x.PullRequestReviewId,
-                        Path = x.Path,
-                        Position = x.Position,
-                        OriginalPosition = x.OriginalPosition,
-                        CommitId = x.CommitId,
-                        OriginalCommitId = x.OriginalCommitId,
-                        DiffHunk = x.DiffHunk,
-                        User = Create(x.User),
-                        Body = x.Body,
-                        CreatedAt = x.CreatedAt,
-                        IsPending = x.IsPending,
+                        Comments = x.Comments.Select(y =>
+                            (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
+                            {
+                                Id = y.Id,
+                                NodeId = y.NodeId,
+                                PullRequestReviewId = y.PullRequestReviewId,
+                                Path = y.Path,
+                                Position = y.Position,
+                                OriginalPosition = y.OriginalPosition,
+                                CommitId = y.CommitId,
+                                OriginalCommitId = y.OriginalCommitId,
+                                DiffHunk = y.DiffHunk,
+                                User = Create(y.User),
+                                Body = y.Body,
+                                CreatedAt = y.CreatedAt,
+                                IsPending = y.IsPending,
+                            }).ToList(),
                     }).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
@@ -744,24 +647,22 @@ namespace GitHub.Services
                     pr,
                     new PullRequestFile[0],
                     new IssueComment[0],
-                    new IPullRequestReviewModel[0],
-                    new IPullRequestReviewCommentModel[0]);
+                    new IPullRequestReviewModel[0]);
             }
 
             public static PullRequestCacheItem Create(
                 PullRequest pr,
                 IReadOnlyList<PullRequestFile> files,
                 IReadOnlyList<IssueComment> comments,
-                IReadOnlyList<IPullRequestReviewModel> reviews,
-                IReadOnlyList<IPullRequestReviewCommentModel> reviewComments)
+                IReadOnlyList<IPullRequestReviewModel> reviews)
             {
-                return new PullRequestCacheItem(pr, files, comments, reviews, reviewComments);
+                return new PullRequestCacheItem(pr, files, comments, reviews);
             }
 
             public PullRequestCacheItem() {}
 
             public PullRequestCacheItem(PullRequest pr)
-                : this(pr, new PullRequestFile[0], new IssueComment[0], new IPullRequestReviewModel[0], new IPullRequestReviewCommentModel[0])
+                : this(pr, new PullRequestFile[0], new IssueComment[0], new IPullRequestReviewModel[0])
             {
             }
 
@@ -769,8 +670,7 @@ namespace GitHub.Services
                 PullRequest pr,
                 IReadOnlyList<PullRequestFile> files,
                 IReadOnlyList<IssueComment> comments,
-                IReadOnlyList<IPullRequestReviewModel> reviews,
-                IReadOnlyList<IPullRequestReviewCommentModel> reviewComments)
+                IReadOnlyList<IPullRequestReviewModel> reviews)
             {
                 Title = pr.Title;
                 Number = pr.Number;
@@ -798,7 +698,6 @@ namespace GitHub.Services
                 ChangedFiles = files.Select(x => new PullRequestFileCacheItem(x)).ToList();
                 Comments = comments.Select(x => new IssueCommentCacheItem(x)).ToList();
                 Reviews = reviews.Select(x => new PullRequestReviewCacheItem(x)).ToList();
-                ReviewComments = reviewComments.Select(x => new PullRequestReviewCommentCacheItem(x)).ToList();
                 State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
                 Merged = pr.Merged;
@@ -820,8 +719,7 @@ namespace GitHub.Services
             public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
             public IList<IssueCommentCacheItem> Comments { get; set; } = new IssueCommentCacheItem[0];
             public IList<PullRequestReviewCacheItem> Reviews { get; set; } = new PullRequestReviewCacheItem[0];
-            public IList<PullRequestReviewCommentCacheItem> ReviewComments { get; set; } = new PullRequestReviewCommentCacheItem[0];
-
+            
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
 
@@ -902,6 +800,7 @@ namespace GitHub.Services
                 Body = review.Body;
                 State = review.State;
                 SubmittedAt = review.SubmittedAt;
+                Comments = review.Comments.Select(x => new PullRequestReviewCommentCacheItem(x)).ToList();
             }
 
             public long Id { get; set; }
@@ -911,6 +810,7 @@ namespace GitHub.Services
             public GitHub.Models.PullRequestReviewState State { get; set; }
             public string CommitId { get; set; }
             public DateTimeOffset? SubmittedAt { get; set; }
+            public IList<PullRequestReviewCommentCacheItem> Comments { get; set; } = new PullRequestReviewCommentCacheItem[0];
         }
 
         public class PullRequestReviewCommentCacheItem

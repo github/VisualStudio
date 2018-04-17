@@ -69,7 +69,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                         State = PullRequestReviewState.Pending,
                     },
                 },
-                ReviewComments = new IPullRequestReviewCommentModel[0],
             };
 
             var modelSerivce = Substitute.For<IModelService>();
@@ -115,7 +114,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                         SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(1),
                     },
                 },
-                ReviewComments = new IPullRequestReviewCommentModel[0],
             };
 
             var modelSerivce = Substitute.For<IModelService>();
@@ -162,7 +160,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                         State = PullRequestReviewState.Dismissed,
                     },
                 },
-                ReviewComments = new IPullRequestReviewCommentModel[0],
             };
 
             var modelSerivce = Substitute.For<IModelService>();

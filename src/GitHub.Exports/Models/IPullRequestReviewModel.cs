@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GitHub.Models
 {
@@ -72,5 +73,10 @@ namespace GitHub.Models
         /// Gets the date/time that the review was submitted.
         /// </summary>
         DateTimeOffset? SubmittedAt { get; }
+
+        /// <summary>
+        /// Gets the comments for the review.
+        /// </summary>
+        IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
     }
 }

@@ -54,15 +54,12 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (reviewPriority >= previousPriority)
                 {
-                    var count = pullRequest.ReviewComments
-                        .Where(x => x.PullRequestReviewId == review.Id)
-                        .Count();
                     existing[review.User.Login] = new PullRequestReviewSummaryViewModel
                     {
                         Id = review.Id,
                         User = review.User,
                         State = review.State,
-                        FileCommentCount = count
+                        FileCommentCount = review.Comments.Count,
                     };
                 }
             }

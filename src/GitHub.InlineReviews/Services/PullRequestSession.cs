@@ -134,11 +134,9 @@ namespace GitHub.InlineReviews.Services
             IReadOnlyList<DiffChunk> diff,
             int position)
         {
-            IPullRequestReviewCommentModel model;
-
             if (!HasPendingReview)
             {
-                model = await service.PostStandaloneReviewComment(
+                var model = await service.PostStandaloneReviewComment(
                     LocalRepository,
                     RepositoryOwner,
                     User,
@@ -147,10 +145,12 @@ namespace GitHub.InlineReviews.Services
                     commitId,
                     path,
                     position);
+                await AddReview(model);
+                return model.Comments[0];
             }
             else
             {
-                model = await service.PostPendingReviewComment(
+                var model = await service.PostPendingReviewComment(
                     LocalRepository,
                     User,
                     pendingReviewNodeId,
@@ -158,10 +158,9 @@ namespace GitHub.InlineReviews.Services
                     commitId,
                     path,
                     position);
+                await AddComment(model);
+                return model;
             }
-
-            await AddComment(model);
-            return model;
         }
 
         /// <inheritdoc/>
@@ -170,30 +169,29 @@ namespace GitHub.InlineReviews.Services
             int inReplyTo,
             string inReplyToNodeId)
         {
-            IPullRequestReviewCommentModel model;
-
             if (!HasPendingReview)
             {
-                model = await service.PostStandaloneReviewCommentRepy(
+                var model = await service.PostStandaloneReviewCommentRepy(
                     LocalRepository,
                     RepositoryOwner,
                     User,
                     PullRequest.Number,
                     body,
                     inReplyTo);
+                await AddReview(model);
+                return model.Comments[0];
             }
             else
             {
-                model = await service.PostPendingReviewCommentReply(
+                var model = await service.PostPendingReviewCommentReply(
                     LocalRepository,
                     User,
                     pendingReviewNodeId,
                     body,
                     inReplyToNodeId);
+                await AddComment(model);
+                return model;
             }
-
-            await AddComment(model);
-            return model;
         }
 
         /// <inheritdoc/>
@@ -225,9 +223,6 @@ namespace GitHub.InlineReviews.Services
 
             PullRequest.Reviews = PullRequest.Reviews
                 .Where(x => x.NodeId != pendingReviewNodeId)
-                .ToList();
-            PullRequest.ReviewComments = PullRequest.ReviewComments
-                .Where(x => x.PullRequestReviewId != PendingReviewId)
                 .ToList();
 
             await Update(PullRequest);
@@ -280,7 +275,15 @@ namespace GitHub.InlineReviews.Services
 
         async Task AddComment(IPullRequestReviewCommentModel comment)
         {
-            PullRequest.ReviewComments = PullRequest.ReviewComments
+            var review = (PullRequestReviewModel)PullRequest.Reviews
+                .FirstOrDefault(x => x.Id == PendingReviewId);
+
+            if (review == null)
+            {
+                throw new KeyNotFoundException("Could not find pending review.");
+            }
+
+            review.Comments = review.Comments
                 .Concat(new[] { comment })
                 .ToList();
             await Update(PullRequest);
@@ -292,17 +295,6 @@ namespace GitHub.InlineReviews.Services
                 .Where(x => x.NodeId != review.NodeId)
                 .Concat(new[] { review })
                 .ToList();
-
-            if (review.State != PullRequestReviewState.Pending)
-            {
-                foreach (var comment in PullRequest.ReviewComments)
-                {
-                    if (comment.PullRequestReviewId == review.Id)
-                    {
-                        comment.IsPending = false;
-                    }
-                }
-            }
 
             await Update(PullRequest);
         }
