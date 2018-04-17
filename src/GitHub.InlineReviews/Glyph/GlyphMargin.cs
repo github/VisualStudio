@@ -55,10 +55,6 @@ namespace GitHub.InlineReviews.Glyph
             {
                 TryInitialize();
             }
-            else
-            {
-                TryUninitialize();
-            }
         }
 
         void TryInitialize()

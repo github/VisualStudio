@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -33,6 +34,7 @@ namespace GitHub.InlineReviews.Tags
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
         IDisposable sessionManagerSubscription;
+        IDisposable enabledSubscription;
 
         public InlineCommentTagger(
             ITextView view,
@@ -57,6 +59,8 @@ namespace GitHub.InlineReviews.Tags
             sessionManagerSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
+            enabledSubscription?.Dispose();
+            enabledSubscription = null;
         }
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -162,9 +166,14 @@ namespace GitHub.InlineReviews.Tags
 
             if (relativePath != null)
             {
-                var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
-                fileSubscription = liveFile.LinesChanged.Subscribe(LinesChanged);
-                file = liveFile;
+                file = await sessionManager.GetLiveFile(relativePath, view, buffer);
+
+                enabledSubscription =
+                    Observable.FromEventPattern<EditorOptionChangedEventArgs>(view.Options, nameof(view.Options.OptionChanged))
+                    .Select(_ => Unit.Default)
+                    .StartWith(Unit.Default)
+                    .Select(x => view.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName))
+                    .Subscribe(EnabledChanged);
             }
             else
             {
@@ -172,6 +181,19 @@ namespace GitHub.InlineReviews.Tags
             }
 
             NotifyTagsChanged();
+        }
+
+        void EnabledChanged(bool enabled)
+        {
+            if (enabled)
+            {
+                fileSubscription = fileSubscription ?? file.LinesChanged.Subscribe(LinesChanged);
+            }
+            else if (!enabled)
+            {
+                fileSubscription?.Dispose();
+                fileSubscription = null;
+            }
         }
 
         static void ForgetWithLogging(Task task)
