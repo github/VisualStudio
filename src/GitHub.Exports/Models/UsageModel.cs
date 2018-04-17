@@ -69,6 +69,7 @@ namespace GitHub.Models
             public int NumberOfPRReviewPosts { get; set; }
             public int NumberOfShowCurrentPullRequest { get; set; }
             public int NumberOfStatusBarOpenPullRequestList { get; set; }
+            public int NumberOfTeamExplorerHomeOpenPullRequestList { get; set; }
         }
     }
 }
