@@ -158,6 +158,7 @@
     <Compile Include="Commands\IVsCommandBase.cs" />
     <Compile Include="Exports\ExportForProcess.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
+    <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />

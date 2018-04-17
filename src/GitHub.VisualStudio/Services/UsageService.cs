@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
@@ -28,7 +29,7 @@ namespace GitHub.Services
 
         string storePath;
         string userStorePath;
-        Guid? userGuid;
+        UserData userData;
 
         [ImportingConstructor]
         public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment)
@@ -37,44 +38,16 @@ namespace GitHub.Services
             this.environment = environment;
         }
 
-        public async Task<Guid> GetUserGuid()
+        public async Task<UserData> GetUserData()
         {
             await Initialize();
 
-            if (!userGuid.HasValue)
+            if (userData == null)
             {
-                try
-                {
-                    if (File.Exists(userStorePath))
-                    {
-                        var json = await ReadAllTextAsync(userStorePath);
-                        var data = SimpleJson.DeserializeObject<UserData>(json);
-                        userGuid = data.UserGuid;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex, "Failed reading user metrics GUID");
-                }
+                userData = await ReadUserData();
             }
 
-            if (!userGuid.HasValue || userGuid.Value == Guid.Empty)
-            {
-                userGuid = Guid.NewGuid();
-
-                try
-                {
-                    var data = new UserData { UserGuid = userGuid.Value };
-                    var json = SimpleJson.SerializeObject(data);
-                    await WriteAllTextAsync(userStorePath, json);
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex, "Failed writing user metrics GUID");
-                }
-            }
-
-            return userGuid.Value;
+            return userData;
         }
 
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)
@@ -90,7 +63,7 @@ namespace GitHub.Services
                 period);
         }
 
-        public async Task<UsageData> ReadLocalData()
+        public async Task<UsageData> ReadUsageData()
         {
             await Initialize();
 
@@ -98,9 +71,7 @@ namespace GitHub.Services
 
             try
             {
-                return json != null ?
-                    SimpleJson.DeserializeObject<UsageData>(json) :
-                    new UsageData { Reports = new List<UsageModel>() };
+                return json?.FromJson<UsageData>() ?? new UsageData { Reports = new List<UsageModel>() };
             }
             catch(Exception ex)
             {
@@ -109,18 +80,61 @@ namespace GitHub.Services
             }
         }
 
-        public async Task WriteLocalData(UsageData data)
+        public async Task WriteUsageData(UsageData data)
         {
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(storePath));
-                var json = SimpleJson.SerializeObject(data);
+                var json = data.ToJson();
                 await WriteAllTextAsync(storePath, json);
             }
             catch (Exception ex)
             {
                 log.Error(ex,"Failed to write usage data");
             }
+        }
+
+        public async Task<UserData> ReadUserData()
+        {
+            await Initialize();
+
+            var json = File.Exists(userStorePath) ? await ReadAllTextAsync(userStorePath) : null;
+
+            UserData ret = null;
+            if (json != null)
+            {
+                try
+                {
+                    ret = json?.FromJson<UserData>();
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Error deserializing user data");
+                }
+            }
+
+            if (ret == null)
+            {
+                ret = new UserData { UserGuid = Guid.NewGuid() };
+                await WriteUserData(ret);
+            }
+            return ret;
+        }
+
+        public async Task<bool> WriteUserData(UserData data)
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(userStorePath));
+                var json = data.ToJson();
+                await WriteAllTextAsync(storePath, json);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex,"Failed to write user data");
+                return false;
+            }
+            return true;
         }
 
         async Task Initialize()
@@ -154,11 +168,6 @@ namespace GitHub.Services
             {
                 await w.WriteAsync(text);
             }
-        }
-
-        class UserData
-        {
-            public Guid UserGuid { get; set; }
         }
     }
 }

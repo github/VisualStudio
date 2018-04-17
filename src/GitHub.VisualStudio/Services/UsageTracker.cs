@@ -20,10 +20,10 @@ namespace GitHub.Services
         readonly IGitHubServiceProvider gitHubServiceProvider;
 
         bool initialized;
-        IMetricsService client;
-        IUsageService service;
+        IMetricsService metricsService;
+        IUsageService dataService;
         IConnectionManager connectionManager;
-        IPackageSettings userSettings;
+        IPackageSettings packageSettings;
         IVSServices vsservices;
         IDisposable timer;
         bool firstTick = true;
@@ -34,8 +34,8 @@ namespace GitHub.Services
             IPackageSettings settings)
         {
             this.gitHubServiceProvider = gitHubServiceProvider;
-            this.service = service;
-            this.userSettings = settings;
+            this.dataService = service;
+            this.packageSettings = settings;
             timer = StartTimer();
         }
 
@@ -47,19 +47,19 @@ namespace GitHub.Services
         public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
             await Initialize();
-            var data = await service.ReadLocalData();
+            var data = await dataService.ReadUsageData();
             var usage = await GetCurrentReport(data);
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
             log.Verbose("Increment counter {Name}", propertyInfo.Name);
             var value = (int)propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
-            await service.WriteLocalData(data);
+            await dataService.WriteUsageData(data);
         }
 
         IDisposable StartTimer()
         {
-            return service.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromDays(1));
+            return dataService.StartTimer(TimerTick, TimeSpan.FromMinutes(3), TimeSpan.FromDays(1));
         }
 
         async Task Initialize()
@@ -71,7 +71,7 @@ namespace GitHub.Services
             // improve the startup time of the extension.
             await ThreadingHelper.SwitchToMainThreadAsync();
 
-            client = gitHubServiceProvider.TryGetService<IMetricsService>();
+            metricsService = gitHubServiceProvider.TryGetService<IMetricsService>();
             connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
             vsservices = gitHubServiceProvider.GetService<IVSServices>();
             initialized = true;
@@ -87,36 +87,51 @@ namespace GitHub.Services
                 firstTick = false;
             }
 
-            if (client == null || !userSettings.CollectMetrics)
+            var user = await dataService.ReadUserData();
+            if (!user.SentOptIn)
             {
-                timer.Dispose();
-                timer = null;
+                try
+                {
+                    await metricsService.PostOptIn(packageSettings.CollectMetrics);
+                    user.SentOptIn = true;
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed to ping");
+                }
+                await dataService.WriteUserData(user);
+            }
+
+            if (!packageSettings.CollectMetrics)
+            {
                 return;
             }
 
-            var data = await service.ReadLocalData();
+            var data = await dataService.ReadUsageData();
 
             var changed = false;
             for (var i = data.Reports.Count - 1; i >= 0; --i)
             {
-                if (data.Reports[i].Dimensions.Date.Date != DateTimeOffset.Now.Date)
+                var report = data.Reports[i];
+                if (report.Dimensions.Date.Date != DateTimeOffset.Now.Date)
                 {
                     try
                     {
-                        await client.PostUsage(data.Reports[i]);
+                        await metricsService.PostUsage(report);
                         data.Reports.RemoveAt(i);
                         changed = true;
                     }
                     catch (Exception ex)
                     {
-                        log.Error(ex, "Failed to send metrics");
+                        var date = report.Dimensions.Date.Date;
+                        log.Error(ex, "Failed to send report for {Date}", date);
                     }
                 }
             }
 
             if (changed)
             {
-                await service.WriteLocalData(data);
+                await dataService.WriteUsageData(data);
             }
         }
 
@@ -126,8 +141,8 @@ namespace GitHub.Services
 
             if (current == null)
             {
-                var guid = await service.GetUserGuid();
-                current = UsageModel.Create(guid);
+                var user = await dataService.ReadUserData();
+                current = UsageModel.Create(user.UserGuid);
                 data.Reports.Add(current);
             }
 

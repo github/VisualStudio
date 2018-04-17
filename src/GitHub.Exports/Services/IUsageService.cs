@@ -4,16 +4,17 @@ using GitHub.Models;
 
 namespace GitHub.Services
 {
+    public class UserData
+    {
+        public Guid UserGuid { get; set; }
+        public bool SentOptIn { get; set; }
+    }
+
     /// <summary>
     /// Provides services for <see cref="IUsageTracker"/>.
     /// </summary>
     public interface IUsageService
     {
-        /// <summary>
-        /// Gets a GUID that anonymously represents the user.
-        /// </summary>
-        Task<Guid> GetUserGuid();
-
         /// <summary>
         /// Starts a timer.
         /// </summary>
@@ -27,11 +28,14 @@ namespace GitHub.Services
         /// Reads the local usage data from disk.
         /// </summary>
         /// <returns>A task returning a <see cref="UsageData"/> object.</returns>
-        Task<UsageData> ReadLocalData();
+        Task<UsageData> ReadUsageData();
 
         /// <summary>
         /// Writes the local usage data to disk.
         /// </summary>
-        Task WriteLocalData(UsageData data);
+        Task WriteUsageData(UsageData data);
+
+        Task<UserData> ReadUserData();
+        Task<bool> WriteUserData(UserData data);
     }
 }

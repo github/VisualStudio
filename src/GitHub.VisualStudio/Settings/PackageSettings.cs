@@ -1,8 +1,5 @@
 using System;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Settings;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
 using SettingsStore = GitHub.Helpers.SettingsStore;
 using GitHub.Settings;

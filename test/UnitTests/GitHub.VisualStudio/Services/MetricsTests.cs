@@ -36,7 +36,7 @@ namespace MetricsTests
 
             await targetAndTick.Item2();
 
-            await service.Received(1).WriteLocalData(Arg.Any<UsageData>());
+            await service.Received(1).WriteUsageData(Arg.Any<UsageData>());
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace MetricsTests
             service.ClearReceivedCalls();
             await targetAndTick.Item2();
 
-            await service.DidNotReceiveWithAnyArgs().WriteLocalData(null);
+            await service.DidNotReceiveWithAnyArgs().WriteUsageData(null);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace MetricsTests
                 CreatePackageSettings());
 
             await target.IncrementCounter(x => x.NumberOfClones);
-            await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data => 
+            await service.Received(1).WriteUsageData(Arg.Is<UsageData>(data => 
                 data.Reports.Count == 1 &&
                 data.Reports[0].Dimensions.Date.Date == DateTimeOffset.Now.Date &&
                 data.Reports[0].Dimensions.AppVersion == AssemblyVersionInformation.Version &&
@@ -154,7 +154,7 @@ namespace MetricsTests
                 CreatePackageSettings());
 
             await target.IncrementCounter(x => x.NumberOfClones);
-            await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data =>
+            await service.Received(1).WriteUsageData(Arg.Is<UsageData>(data =>
                 data.Reports.Count == 1 &&
                 data.Reports[0].Dimensions.Date.Date == DateTimeOffset.Now.Date &&
                 data.Reports[0].Dimensions.AppVersion == AssemblyVersionInformation.Version &&
@@ -213,7 +213,7 @@ namespace MetricsTests
         static IUsageService CreateUsageService(UsageData data)
         {
             var result = Substitute.For<IUsageService>();
-            result.ReadLocalData().Returns(data);
+            result.ReadUsageData().Returns(data);
             return result;
         }
     }
@@ -221,7 +221,7 @@ namespace MetricsTests
     public class UsageServiceTests : TestBaseClass
     {
         static readonly Guid UserGuid = Guid.NewGuid();
-        static readonly string DefaultUserStoreContent = @"{""UserGuid"":""" + UserGuid + @"""}";
+        static readonly string DefaultUserStoreContent = new { UserGuid = UserGuid, SentOptIn = true }.ToJson();
 
         static readonly string DefaultUsageContent = @"{""Reports"":[{""Dimensions"":{""Guid"":""26fa0c25-653f-4fa5-ad83-7438ad526b0a"",""Date"":""2018-03-13T18:45:19.0453424Z"",""IsGitHubUser"":false,""IsEnterpriseUser"":false,""AppVersion"":null,""VSVersion"":null,""Lang"":null,""CurrentLang"":null},""Measures"":{""NumberOfStartups"":0,""NumberOfUpstreamPullRequests"":0,""NumberOfClones"":1,""NumberOfReposCreated"":0,""NumberOfReposPublished"":2,""NumberOfGists"":0,""NumberOfOpenInGitHub"":0,""NumberOfLinkToGitHub"":0,""NumberOfLogins"":0,""NumberOfOAuthLogins"":0,""NumberOfTokenLogins"":0,""NumberOfPullRequestsOpened"":3,""NumberOfLocalPullRequestsCheckedOut"":0,""NumberOfLocalPullRequestPulls"":0,""NumberOfLocalPullRequestPushes"":0,""NumberOfForkPullRequestsCheckedOut"":0,""NumberOfForkPullRequestPulls"":0,""NumberOfForkPullRequestPushes"":0,""NumberOfSyncSubmodules"":0,""NumberOfWelcomeDocsClicks"":0,""NumberOfWelcomeTrainingClicks"":0,""NumberOfGitHubPaneHelpClicks"":0,""NumberOfPRDetailsViewChanges"":0,""NumberOfPRDetailsViewFile"":0,""NumberOfPRDetailsCompareWithSolution"":0,""NumberOfPRDetailsOpenFileInSolution"":0,""NumberOfPRDetailsNavigateToEditor"":0,""NumberOfPRReviewDiffViewInlineCommentOpen"":0,""NumberOfPRReviewDiffViewInlineCommentPost"":0,""NumberOfShowCurrentPullRequest"":0}}]}";
 
@@ -272,7 +272,8 @@ namespace MetricsTests
         public async Task GetUserGuidWorks()
         {
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
-            var guid = await usageService.GetUserGuid();
+            var user = await usageService.GetUserData();
+            var guid = user.UserGuid;
             Assert.IsTrue(guid.Equals(UserGuid));
         }
 
@@ -282,15 +283,25 @@ namespace MetricsTests
             File.Delete(userFileName);
 
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
-            var guid = await usageService.GetUserGuid();
+            var user = await usageService.GetUserData();
+            var guid = user.UserGuid;
             Assert.AreNotEqual(guid, Guid.Empty);
+        }
+
+        [Test]
+        public async Task GetUserDataWorks()
+        {
+            var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
+            var user = await usageService.GetUserData();
+            Assert.IsTrue(user.UserGuid.Equals(UserGuid));
+            Assert.IsTrue(user.SentOptIn);
         }
 
         [Test]
         public async Task ReadUsageDataWorks()
         {
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
-            var usageData = await usageService.ReadLocalData();
+            var usageData = await usageService.ReadUsageData();
 
             Assert.IsNotNull(usageData);
             Assert.IsNotNull(usageData.Reports);
@@ -306,7 +317,7 @@ namespace MetricsTests
             File.Delete(usageFileName);
 
             var usageService = new UsageService(Substitute.For<IGitHubServiceProvider>(), environment);
-            var usageData = await usageService.ReadLocalData();
+            var usageData = await usageService.ReadUsageData();
 
             Assert.IsNotNull(usageData);
             Assert.IsNotNull(usageData.Reports);

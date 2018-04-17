@@ -1,10 +1,12 @@
-﻿using System;
+﻿#define SEND_DEBUG_METRICS
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using Octokit;
@@ -53,7 +55,31 @@ namespace GitHub.Services
 
             request.Headers.Add("User-Agent", productHeader.ToString());
 
-            request.Body = SerializeRequest(model);
+            request.Body = model.SerializeForRequest();
+            request.ContentType = "application/json";
+
+            await httpClient.Value.Send(request);
+        }
+#endif
+
+#if DEBUG && !SEND_DEBUG_METRICS
+        public Task PostOptIn(bool optIn)
+        {
+            return Task.CompletedTask;
+        }
+#else
+        public async Task PostOptIn(bool optIn)
+        {
+            var request = new Request
+            {
+                Method = HttpMethod.Post,
+                BaseAddress = centralUri,
+                Endpoint = new Uri("api/usage/visualstudio", UriKind.Relative),
+            };
+
+            request.Headers.Add("User-Agent", productHeader.ToString());
+
+            request.Body = new { EventType = "ping", OptIn = optIn }.SerializeForRequest();
             request.ContentType = "application/json";
 
             await httpClient.Value.Send(request);
@@ -97,57 +123,6 @@ namespace GitHub.Services
             return Observable.FromAsync(cancellationToken => httpClient.Value.Send((IRequest)request, cancellationToken))
                 .AsCompletion();
              */
-        }
-
-        internal static StringContent SerializeRequest(UsageModel model)
-        {
-            var serializer = new SimpleJsonSerializer();
-            var dictionary = ToModelDictionary(model);
-            return new StringContent(serializer.Serialize(dictionary), Encoding.UTF8, "application/json");
-        }
-
-        static Dictionary<string, object> ToModelDictionary(object model)
-        {
-            var dict = new Dictionary<string, object>();
-            var type = model.GetType();
-
-            foreach (var prop in type.GetProperties())
-            {
-                if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
-                {
-                    dict.Add(ToJsonPropertyName(prop.Name), prop.GetValue(model));
-                }
-                else
-                {
-                    var value = prop.GetValue(model);
-
-                    if (value == null)
-                    {
-                        dict.Add(ToJsonPropertyName(prop.Name), value);
-                    }
-                    else
-                    {
-                        dict.Add(ToJsonPropertyName(prop.Name), ToModelDictionary(value));
-                    }
-                }
-            }
-
-            return dict;
-        }
-
-
-        /// <summary>
-        /// Convert from PascalCase to camelCase.
-        /// </summary>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
-        static string ToJsonPropertyName(string propertyName)
-        {
-            if (propertyName.Length < 2)
-            {
-                return propertyName.ToLowerInvariant();
-            }
-
-            return propertyName.Substring(0, 1).ToLowerInvariant() + propertyName.Substring(1);
         }
     }
 }

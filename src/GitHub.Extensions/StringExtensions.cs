@@ -243,5 +243,29 @@ namespace GitHub.Extensions
                 return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
             }
         }
+
+        public static IEnumerable<string> SplitUpperCase(this string source)
+        {
+            Guard.ArgumentNotEmptyString(source, nameof(source));
+
+            int wordStartIndex = 0;
+            var letters = source.ToCharArray();
+            var previousChar = char.MinValue;
+
+            // Skip the first letter. we don't care what case it is.
+            for (int i = 1; i < letters.Length; i++)
+            {
+                if (char.IsUpper(letters[i]) && !char.IsWhiteSpace(previousChar))
+                {
+                    //Grab everything before the current character.
+                    yield return new string(letters, wordStartIndex, i - wordStartIndex);
+                    wordStartIndex = i;
+                }
+                previousChar = letters[i];
+            }
+
+            //We need to have the last word.
+            yield return new string(letters, wordStartIndex, letters.Length - wordStartIndex);
+        }
     }
 }

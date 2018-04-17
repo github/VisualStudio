@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using GitHub.Models;
 using System.Threading.Tasks;
 using System.Net;
+using GitHub.Extensions;
 
 namespace MetricsTests
 {
@@ -51,7 +52,7 @@ namespace MetricsTests
             model.Dimensions.VSVersion = "14";
             model.Measures.NumberOfStartups = 1;
 
-            request.Content = GitHub.Services.MetricsService.SerializeRequest(model);
+            request.Content = model.SerializeForRequest();
 
             HttpResponseMessage response = null;
             Assert.DoesNotThrowAsync(async () => response = await client.SendAsync(request));
@@ -71,7 +72,7 @@ namespace MetricsTests
             model.Dimensions.VSVersion = "14";
             model.Measures.NumberOfStartups = 1;
 
-            request.Content = GitHub.Services.MetricsService.SerializeRequest(model);
+            request.Content = model.SerializeForRequest();
 
             HttpResponseMessage response = null;
             Assert.DoesNotThrowAsync(async () => response = await client.SendAsync(request));

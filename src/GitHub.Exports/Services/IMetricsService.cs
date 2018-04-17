@@ -22,5 +22,7 @@ namespace GitHub.Services
         /// usage tracking.
         /// </summary>
         Task SendOptIn();
+
+        Task PostOptIn(bool optIn);
     }
 }
