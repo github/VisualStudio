@@ -18,19 +18,26 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
 
         readonly IOpenPullRequestsCommand openPullRequests;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public PullRequestsNavigationItem(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
-            IOpenPullRequestsCommand openPullRequests)
+            IOpenPullRequestsCommand openPullRequests,
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder, Octicon.git_pull_request)
         {
             this.openPullRequests = openPullRequests;
+            this.usageTracker = usageTracker;
             Text = Resources.PullRequestsNavigationItemText;
             ArgbColor = Colors.RedNavigationItem.ToInt32();
         }
 
-        public override void Execute() => openPullRequests.Execute();
+        public override void Execute()
+        {
+            openPullRequests.Execute();
+            usageTracker.IncrementCounter(x => x.NumberOfTeamExplorerHomeOpenPullRequestList).Forget();
+        }
     }
 }
