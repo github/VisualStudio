@@ -3,7 +3,6 @@ using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
 using GitHub.Commands;
-using GitHub.InlineReviews.Views;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -17,7 +16,6 @@ namespace GitHub.InlineReviews
     [Guid(Guids.InlineReviewsPackageId)]
     [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(PullRequestCommentsPane), DocumentLikeTool = true)]
     public class InlineReviewsPackage : AsyncPackage
     {
         protected override async Task InitializeAsync(
@@ -35,14 +33,17 @@ namespace GitHub.InlineReviews
 
         async Task InitializeMenus()
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
+            var commands = new IVsCommandBase[]
+            {
+                exports.GetExportedValue<INextInlineCommentCommand>(),
+                exports.GetExportedValue<IPreviousInlineCommentCommand>()
+            };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            menuService.AddCommands(
-                exports.GetExportedValue<INextInlineCommentCommand>(),
-                exports.GetExportedValue<IPreviousInlineCommentCommand>());
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            menuService.AddCommands(commands);
         }
     }
 }

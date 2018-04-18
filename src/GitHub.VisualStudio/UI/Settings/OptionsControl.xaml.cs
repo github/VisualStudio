@@ -19,6 +19,12 @@ namespace GitHub.VisualStudio.UI
             set { chkMetrics.IsChecked = value; }
         }
 
+        public bool EnableTraceLogging
+        {
+            get { return chkEnableTraceLogging.IsChecked ?? false; }
+            set { chkEnableTraceLogging.IsChecked = value; }
+        }
+
         public bool EditorComments
         {
             get { return chkEditorComments.IsChecked ?? false; }

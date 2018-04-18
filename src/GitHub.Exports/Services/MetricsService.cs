@@ -10,7 +10,7 @@ using GitHub.Services;
 using Octokit;
 using Octokit.Internal;
 
-namespace GitHub.App
+namespace GitHub.Services
 {
     [Export(typeof(IMetricsService))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
@@ -99,10 +99,14 @@ namespace GitHub.App
              */
         }
 
-        static StringContent SerializeRequest(UsageModel model)
+        internal static StringContent SerializeRequest(UsageModel model)
         {
             var serializer = new SimpleJsonSerializer();
-            var dictionary = ToModelDictionary(model);
+            var dictionary = new Dictionary<string, object>
+            {
+                {ToJsonPropertyName("Dimensions"), ToModelDictionary(model.Dimensions) },
+                {ToJsonPropertyName("Measures"), ToModelDictionary(model.Measures) }
+            };
             return new StringContent(serializer.Serialize(dictionary), Encoding.UTF8, "application/json");
         }
 
@@ -134,6 +138,7 @@ namespace GitHub.App
 
             return dict;
         }
+
 
         /// <summary>
         /// Convert from PascalCase to camelCase.

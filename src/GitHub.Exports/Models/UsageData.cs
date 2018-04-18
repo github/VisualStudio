@@ -1,20 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GitHub.Models
 {
     /// <summary>
-    /// Wraps a <see cref="UsageModel"/> with a <see cref="LastUpdated"/> field.
+    /// Holds a collection of <see cref="UsageModel"/> daily usage reports.
     /// </summary>
     public class UsageData
     {
         /// <summary>
-        /// Gets or sets the last update time.
+        /// Gets a list of unsent daily usage reports.
         /// </summary>
-        public DateTimeOffset LastUpdated { get; set; }
-
-        /// <summary>
-        /// Gets the model containing the current usage data.
-        /// </summary>
-        public UsageModel Model { get; set; }
+        public List<UsageModel> Reports { get; set; }
     }
 }

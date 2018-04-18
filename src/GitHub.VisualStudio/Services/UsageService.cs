@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
@@ -8,8 +9,8 @@ using System.Threading.Tasks;
 using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
-using Rothko;
 using Serilog;
+using Rothko;
 using Environment = System.Environment;
 using Task = System.Threading.Tasks.Task;
 
@@ -18,11 +19,9 @@ namespace GitHub.Services
     [Export(typeof(IUsageService))]
     public class UsageService : IUsageService
     {
-        const string StoreFileName = "ghfvs.usage";
+        const string StoreFileName = "metrics.json";
         const string UserStoreFileName = "user.json";
-
         static readonly ILogger log = LogManager.ForContext<UsageService>();
-        static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
         readonly IGitHubServiceProvider serviceProvider;
         readonly IEnvironment environment;
@@ -78,21 +77,6 @@ namespace GitHub.Services
             return userGuid.Value;
         }
 
-        public bool IsSameDay(DateTimeOffset lastUpdated)
-        {
-            return lastUpdated.Date == DateTimeOffset.Now.Date;
-        }
-
-        public bool IsSameWeek(DateTimeOffset lastUpdated)
-        {
-            return GetIso8601WeekOfYear(lastUpdated) == GetIso8601WeekOfYear(DateTimeOffset.Now) && lastUpdated.Year == DateTimeOffset.Now.Year;
-        }
-
-        public bool IsSameMonth(DateTimeOffset lastUpdated)
-        {
-            return lastUpdated.Month == DateTimeOffset.Now.Month && lastUpdated.Year == DateTimeOffset.Now.Year;
-        }
-
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)
         {
             return new Timer(
@@ -116,16 +100,12 @@ namespace GitHub.Services
             {
                 return json != null ?
                     SimpleJson.DeserializeObject<UsageData>(json) :
-                    new UsageData
-                    {
-                        Model = new UsageModel() ,
-                        LastUpdated = DateTimeOffset.Now.UtcDateTime
-                    };
+                    new UsageData { Reports = new List<UsageModel>() };
             }
             catch(Exception ex)
             {
                 log.Error(ex, "Error deserializing usage");
-                return new UsageData { Model = new UsageModel() };
+                return new UsageData { Reports = new List<UsageModel>() };
             }
         }
 
@@ -174,22 +154,6 @@ namespace GitHub.Services
             {
                 await w.WriteAsync(text);
             }
-        }
-
-        // http://blogs.msdn.com/b/shawnste/archive/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net.aspx
-        static int GetIso8601WeekOfYear(DateTimeOffset time)
-        {
-            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
-            // be the same week# as whatever Thursday, Friday or Saturday are,
-            // and we always get those right
-            DayOfWeek day = cal.GetDayOfWeek(time.UtcDateTime);
-            if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
-            {
-                time = time.AddDays(3);
-            }
-
-            // Return the week of our adjusted day
-            return cal.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
 
         class UserData

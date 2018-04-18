@@ -34,6 +34,12 @@ namespace GitHub.Models
         string CommitSha { get; }
 
         /// <summary>
+        /// Gets a value indicating whether <see cref="CommitSha"/> is tracking the related pull
+        /// request HEAD or whether it is pinned at a particular commit.
+        /// </summary>
+        bool IsTrackingHead { get; }
+
+        /// <summary>
         /// Gets the path to the file relative to the repository.
         /// </summary>
         string RelativePath { get; }

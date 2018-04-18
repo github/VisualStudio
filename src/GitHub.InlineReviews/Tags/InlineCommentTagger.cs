@@ -140,9 +140,10 @@ namespace GitHub.InlineReviews.Tags
 
             if (bufferInfo != null)
             {
+                var commitSha = bufferInfo.Side == DiffSide.Left ? "HEAD" : bufferInfo.CommitSha;
                 session = bufferInfo.Session;
                 relativePath = bufferInfo.RelativePath;
-                file = await session.GetFile(relativePath);
+                file = await session.GetFile(relativePath, commitSha);
                 fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
                 side = bufferInfo.Side ?? DiffSide.Right;
                 NotifyTagsChanged();

@@ -237,7 +237,7 @@ public class SimpleApiClientTests
     {
         return new Repository("", "", "", "", "", "", "",
             id, new User(), "", "", "", "", "", false, false, 0, 0, "",
-            0, null, DateTimeOffset.Now, DateTimeOffset.Now, new RepositoryPermissions(), null, null, false,
+            0, null, DateTimeOffset.Now, DateTimeOffset.Now, new RepositoryPermissions(), null, null, null, false,
             hasWiki, false, false, 0, 0, null, null, null);
     }
 }

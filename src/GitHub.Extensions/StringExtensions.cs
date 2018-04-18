@@ -4,8 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using GitHub.Logging;
+using Splat;
 
 namespace GitHub.Extensions
 {
@@ -221,6 +224,24 @@ namespace GitHub.Extensions
             var result = matches.Cast<Match>().Select(match => match.Value.ToLower(CultureInfo.InvariantCulture));
             var combined = String.Join(" ", result);
             return Char.ToUpper(combined[0], CultureInfo.InvariantCulture) + combined.Substring(1);
+        }
+
+        /// <summary>
+        /// Generates a SHA256 hash for a string.
+        /// </summary>
+        /// <param name="input">The input string.</param>
+        /// <returns>The SHA256 hash.</returns>
+        public static string GetSha256Hash(this string input)
+        {
+            Guard.ArgumentNotNull(input, nameof(input));
+
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(input);
+                var hash = sha256.ComputeHash(bytes);
+
+                return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
+            }
         }
     }
 }

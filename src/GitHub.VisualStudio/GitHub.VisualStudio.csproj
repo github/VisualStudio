@@ -235,8 +235,16 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.14.1.111\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Octokit.GraphQL, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
@@ -315,6 +323,7 @@
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\OpenPullRequestsCommand.cs" />
     <Compile Include="GitContextPackage.cs" />
+    <Compile Include="GitHubPanePackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Commands\AddConnectionCommand.cs" />
@@ -374,6 +383,18 @@
     <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestFileCommentsView.xaml.cs">
+      <DependentUpon>PullRequestFileCommentsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestReviewAuthoringView.xaml.cs">
+      <DependentUpon>PullRequestReviewAuthoringView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestReviewSummaryView.xaml.cs">
+      <DependentUpon>PullRequestReviewSummaryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestFilesView.xaml.cs">
+      <DependentUpon>PullRequestFilesView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\PullRequestListView.xaml.cs">
       <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
@@ -389,7 +410,9 @@
     <Compile Include="Views\GitHubPane\NotAGitRepositoryView.xaml.cs">
       <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\GitHubPane\TextViewCommandDispatcher.cs" />
+    <Compile Include="Views\GitHubPane\PullRequestUserReviewsView.xaml.cs">
+      <DependentUpon>PullRequestUserReviewsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
       <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
     </Compile>
@@ -527,6 +550,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\GitHubPane\PullRequestFileCommentsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestReviewAuthoringView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestReviewSummaryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestFilesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\GitHubPane\PullRequestListView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -548,6 +587,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GitHubPane\PullRequestListItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestUserReviewsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

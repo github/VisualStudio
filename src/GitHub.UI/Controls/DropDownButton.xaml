@@ -1,0 +1,24 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:GitHub.UI">
+    <Style TargetType="local:DropDownButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DropDownButton">
+                    <StackPanel>
+                        <local:GitHubActionLink x:Name="PART_Button"
+                                                Content="{TemplateBinding Content}"
+                                                HasDropDown="True"/>
+                        <Popup Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsOpen}"
+                               Placement="Bottom"
+                               PlacementTarget="{Binding ElementName=PART_Button}"
+                               StaysOpen="False">
+                            <ContentControl Content="{TemplateBinding DropDownContent}"/>
+                        </Popup>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
