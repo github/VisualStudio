@@ -46,6 +46,7 @@ namespace GitHub.ViewModels.Dialog
         public IRepositoryModel SourceRepository { get; private set; }
 
         public IAccount DestinationAccount { get; private set; }
+
         public IRepositoryModel DestinationRepository { get; private set; }
 
         public IReactiveCommand<Repository> CreateFork { get; }

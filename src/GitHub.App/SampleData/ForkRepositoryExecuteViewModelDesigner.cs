@@ -25,6 +25,7 @@ namespace GitHub.SampleData
                 Name = "VisualStudio",
                 CloneUrl = "https://github.com/user/VisualStudio",
             };
+            DestinationAccount = new AccountDesigner();
         }
 
         public IObservable<object> Done => null;
@@ -34,6 +35,8 @@ namespace GitHub.SampleData
         public IRepositoryModel SourceRepository { get; set; }
 
         public IRepositoryModel DestinationRepository { get; set; }
+
+        public IAccount DestinationAccount { get; }
 
         public IReactiveCommand<Repository> CreateFork => null;
 

@@ -16,6 +16,8 @@ namespace GitHub.ViewModels.Dialog
 
         IRepositoryModel DestinationRepository { get; }
 
+        IAccount DestinationAccount { get; }
+      
         /// <summary>
         /// Gets a command that is executed when the user clicks the "Fork" button.
         /// </summary>
