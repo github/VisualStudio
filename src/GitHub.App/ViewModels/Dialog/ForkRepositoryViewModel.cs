@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
@@ -17,20 +18,21 @@ namespace GitHub.ViewModels.Dialog
         static readonly ILogger log = LogManager.ForContext<ForkRepositoryViewModel>();
 
         readonly IForkRepositorySelectViewModel selectPage;
+        readonly IForkRepositorySwitchViewModel switchPage;
         readonly IForkRepositoryExecuteViewModel executePage;
-        private readonly IRepositoryForkService repositoryForkService;
+
         ILocalRepositoryModel repository;
         IConnection connection;
 
         [ImportingConstructor]
         public ForkRepositoryViewModel(
             IForkRepositorySelectViewModel selectPage,
-            IForkRepositoryExecuteViewModel executePage,
-            IRepositoryForkService repositoryForkService)
+            IForkRepositorySwitchViewModel switchPage,
+            IForkRepositoryExecuteViewModel executePage)
         {
             this.selectPage = selectPage;
             this.executePage = executePage;
-            this.repositoryForkService = repositoryForkService;
+            this.switchPage = switchPage;
 
             Completed = ReactiveCommand.Create();
 
@@ -40,7 +42,7 @@ namespace GitHub.ViewModels.Dialog
 
         private ReactiveCommand<object> Completed { get; }
 
-        public override IObservable<object> Done => executePage.Done;
+        public override IObservable<object> Done => Observable.SelectMany(executePage.Done, switchPage.Done);
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
@@ -58,6 +60,8 @@ namespace GitHub.ViewModels.Dialog
 
         void ShowSwitchRepositoryPath(IRemoteRepositoryModel remoteRepository)
         {
+            switchPage.Initialize(repository, remoteRepository);
+            Content = switchPage;
         }
     }
 }

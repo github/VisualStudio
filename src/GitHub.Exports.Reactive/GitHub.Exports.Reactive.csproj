@@ -186,6 +186,7 @@
     <Compile Include="Services\PullRequestSessionExtensions.cs" />
     <Compile Include="ViewModels\Dialog\IDialogContentViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IForkRepositoryExecuteViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\IForkRepositorySwitchViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IForkRepositoryViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IForkRepositorySelectViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IGitHubDialogWindowViewModel.cs" />

@@ -213,6 +213,7 @@
     <Compile Include="SampleData\ForkRepositoryExecuteViewModelDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
+    <Compile Include="SampleData\ForkRepositorySwitchViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewFileCommentViewModelDesigner.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\RepositoryForkService.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositoryExecuteViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ForkRepositorySwitchViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositoryViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositorySelectViewModel.cs" />
     <Compile Include="Services\PullRequestEditorService.cs" />
@@ -401,6 +403,7 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

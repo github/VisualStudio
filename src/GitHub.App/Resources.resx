@@ -318,4 +318,7 @@ https://git-scm.com/download/win</value>
   <data name="ForkRepositoryTitle" xml:space="preserve">
     <value>Fork Repository</value>
   </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>Switch Origin</value>
+  </data>
 </root>
