@@ -86,8 +86,7 @@ namespace GitHub.ViewModels.Dialog
                 Organization = !DestinationAccount.IsUser ? DestinationAccount.Login : null
             };
 
-            IRepositoryModel sourceRepository = SourceRepository;
-            return repositoryForkService.ForkRepository(apiClient, sourceRepository, newRepositoryFork, ResetMasterTracking, AddUpstream, UpdateOrigin)
+            return repositoryForkService.ForkRepository(apiClient, SourceRepository, newRepositoryFork, UpdateOrigin, AddUpstream, ResetMasterTracking)
                 .Catch<Repository, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
