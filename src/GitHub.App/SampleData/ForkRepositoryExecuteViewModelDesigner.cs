@@ -46,14 +46,9 @@ namespace GitHub.SampleData
 
         public bool UpdateOrigin { get; set; } = true;
 
-        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IConnection connection)
-        {
-            return Task.CompletedTask;
-        }
-
         public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }
