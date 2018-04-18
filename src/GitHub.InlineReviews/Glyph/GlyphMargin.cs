@@ -24,9 +24,10 @@ namespace GitHub.InlineReviews.Glyph
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly GlyphMarginVisualManager<TGlyphTag> visualManager;
 
-        bool initialized;
+        IDisposable visibleSubscription;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
+        bool disposed;
 
         public GlyphMargin(
             IWpfTextView textView,
@@ -41,60 +42,48 @@ namespace GitHub.InlineReviews.Glyph
             this.tagAggregatorFactory = tagAggregatorFactory;
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginGrid, editorFormatMap, marginPropertiesName);
 
-            marginGrid.WhenAnyValue(x => x.IsVisible).Subscribe(IsVisibleChanged);
+            // Initialize when first visible
+            visibleSubscription = marginGrid.WhenAnyValue(x => x.IsVisible).Distinct().Where(x => x).Subscribe(_ => Initialize());
         }
 
         public void Dispose()
         {
-            TryUninitialize();
-        }
-
-        void IsVisibleChanged(bool isVisible)
-        {
-            if (isVisible)
+            if (!disposed)
             {
-                TryInitialize();
-            }
-        }
+                disposed = true;
 
-        void TryInitialize()
-        {
-            if (!initialized)
-            {
-                initialized = true;
-                tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
-                tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
-                textView.LayoutChanged += OnLayoutChanged;
-                textView.ZoomLevelChanged += OnZoomLevelChanged;
-
-                if (textView.InLayout)
-                {
-                    refreshAllGlyphs = true;
-                }
-                else
-                {
-                    foreach (var line in textView.TextViewLines)
-                    {
-                        RefreshGlyphsOver(line);
-                    }
-                }
-
-                marginGrid.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
-                marginGrid.LayoutTransform.Freeze();
-            }
-        }
-
-        void TryUninitialize()
-        {
-            if (initialized)
-            {
-                initialized = false;
-                tagAggregator.BatchedTagsChanged -= OnBatchedTagsChanged;
                 textView.LayoutChanged -= OnLayoutChanged;
                 textView.ZoomLevelChanged -= OnZoomLevelChanged;
-                tagAggregator.Dispose();
+
+                tagAggregator?.Dispose();
                 tagAggregator = null;
+
+                visibleSubscription?.Dispose();
+                visibleSubscription = null;
             }
+        }
+
+        void Initialize()
+        {
+            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
+            tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
+            textView.LayoutChanged += OnLayoutChanged;
+            textView.ZoomLevelChanged += OnZoomLevelChanged;
+
+            if (textView.InLayout)
+            {
+                refreshAllGlyphs = true;
+            }
+            else
+            {
+                foreach (var line in textView.TextViewLines)
+                {
+                    RefreshGlyphsOver(line);
+                }
+            }
+
+            marginGrid.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
+            marginGrid.LayoutTransform.Freeze();
         }
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
