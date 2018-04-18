@@ -32,6 +32,7 @@ namespace GitHub.InlineReviews
 
         GlyphMargin<InlineCommentTag> glyphMargin;
         IDisposable currentSessionSubscription;
+        IDisposable visibleSubscription;
         bool hasChanges;
         bool hasInfo;
 
@@ -67,6 +68,9 @@ namespace GitHub.InlineReviews
             currentSessionSubscription = this.sessionManager.WhenAnyValue(x => x.CurrentSession)
                 .Subscribe(x => RefreshCurrentSession().Forget());
 
+            visibleSubscription = marginGrid.WhenAnyValue(x => x.IsVisible)
+                .Subscribe(x => textView.Options.SetOptionValue(InlineCommentMarginVisible.OptionName, x));
+
             textView.Options.OptionChanged += (s, e) => RefreshMarginVisibility();
         }
 
@@ -87,7 +91,17 @@ namespace GitHub.InlineReviews
             return (name == MarginName) ? this : null;
         }
 
-        public void Dispose() => glyphMargin?.Dispose();
+        public void Dispose()
+        {
+            visibleSubscription?.Dispose();
+            visibleSubscription = null;
+
+            currentSessionSubscription?.Dispose();
+            currentSessionSubscription = null;
+
+            glyphMargin?.Dispose();
+            glyphMargin = null;
+        }
 
         public FrameworkElement VisualElement => marginGrid;
 

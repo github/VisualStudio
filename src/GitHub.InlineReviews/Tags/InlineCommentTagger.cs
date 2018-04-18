@@ -34,7 +34,7 @@ namespace GitHub.InlineReviews.Tags
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
         IDisposable sessionManagerSubscription;
-        IDisposable enabledSubscription;
+        IDisposable visibleSubscription;
 
         public InlineCommentTagger(
             ITextView view,
@@ -59,8 +59,8 @@ namespace GitHub.InlineReviews.Tags
             sessionManagerSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
-            enabledSubscription?.Dispose();
-            enabledSubscription = null;
+            visibleSubscription?.Dispose();
+            visibleSubscription = null;
         }
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -168,12 +168,14 @@ namespace GitHub.InlineReviews.Tags
             {
                 file = await sessionManager.GetLiveFile(relativePath, view, buffer);
 
-                enabledSubscription =
-                    Observable.FromEventPattern<EditorOptionChangedEventArgs>(view.Options, nameof(view.Options.OptionChanged))
+                var options = view.Options;
+                visibleSubscription =
+                    Observable.FromEventPattern<EditorOptionChangedEventArgs>(options, nameof(options.OptionChanged))
                     .Select(_ => Unit.Default)
                     .StartWith(Unit.Default)
-                    .Select(x => view.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName))
-                    .Subscribe(EnabledChanged);
+                    .Select(x => options.GetOptionValue<bool>(InlineCommentMarginVisible.OptionName))
+                    .DistinctUntilChanged()
+                    .Subscribe(VisibleChanged);
             }
             else
             {
@@ -183,13 +185,13 @@ namespace GitHub.InlineReviews.Tags
             NotifyTagsChanged();
         }
 
-        void EnabledChanged(bool enabled)
+        void VisibleChanged(bool enabled)
         {
             if (enabled)
             {
                 fileSubscription = fileSubscription ?? file.LinesChanged.Subscribe(LinesChanged);
             }
-            else if (!enabled)
+            else
             {
                 fileSubscription?.Dispose();
                 fileSubscription = null;

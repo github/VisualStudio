@@ -7,9 +7,9 @@ namespace GitHub.InlineReviews
 {
     [Export(typeof(EditorOptionDefinition))]
     [Name(OptionName)]
-    public class InlineCommentMarginEnabled : ViewOptionDefinition<bool>
+    public class InlineCommentMarginVisible : ViewOptionDefinition<bool>
     {
-        public const string OptionName = "TextViewHost/InlineCommentMarginEnabled";
+        public const string OptionName = "TextViewHost/InlineCommentMarginVisible";
 
         public override bool Default => false;
 
