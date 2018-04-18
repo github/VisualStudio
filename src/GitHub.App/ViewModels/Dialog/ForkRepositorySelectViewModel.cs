@@ -68,13 +68,22 @@ namespace GitHub.ViewModels.Dialog
 
                 Observable.CombineLatest(
                     modelService.GetAccounts(),
+                    modelService.GetRepository(repository.Owner, repository.Name),
                     modelService.GetForks(repository).ToList(),
-                    (a, f) => new { Accounts = a, Forks = f })
+                    (a, r, f) => new { Accounts = a, Respoitory = r, Forks = f })
                     .Finally(() => IsLoading = false)
                     .Subscribe(x =>
                     {
-                        Accounts = BuildAccounts(x.Accounts, x.Forks, repository.Owner);
-                        ExistingForks = BuildExistingForks(x.Accounts, x.Forks);
+                        var forksAndParents = new List<IRemoteRepositoryModel>(x.Forks);
+                        var current = x.Respoitory;
+                        while (current.Parent != null)
+                        {
+                            forksAndParents.Add(current.Parent);
+                            current = current.Parent;
+                        }
+
+                        Accounts = BuildAccounts(x.Accounts, forksAndParents, repository.Owner);
+                        ExistingForks = forksAndParents;
 
                         log.Verbose("Loaded Data Accounts:{Accounts} Forks:{Forks}", Accounts.Count, ExistingForks.Count);
                     });
@@ -87,18 +96,12 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accounts, IList<IRemoteRepositoryModel> forks, string currentRepositoryOwner)
+        IReadOnlyList<IAccount> BuildAccounts(IEnumerable<IAccount> accessibleAccounts, IList<IRemoteRepositoryModel> forksAndParents, string currentRepositoryOwner)
         {
-            var forksByOwner = forks.ToDictionary(x => x.Owner, x => x);
-            return accounts
+            var forksByOwner = forksAndParents.ToDictionary(x => x.Owner, x => x);
+            return accessibleAccounts
                 .Where(x => x.Login != currentRepositoryOwner)
                 .Where(x => !forksByOwner.ContainsKey(x.Login)).ToList();
-        }
-
-        IReadOnlyList<IRemoteRepositoryModel> BuildExistingForks(IReadOnlyList<IAccount> accounts, IList<IRemoteRepositoryModel> forks)
-        {
-            var accountsByLogin = accounts.ToDictionary(x => x.Login, x => x);
-            return forks.Where(x => accountsByLogin.ContainsKey(x.Owner)).ToList();
         }
     }
 }
