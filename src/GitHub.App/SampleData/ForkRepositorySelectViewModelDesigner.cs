@@ -40,7 +40,7 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<object> SelectedAccount => null;
 
-        public ReactiveCommand<object> CloneRepository => null;
+        public ReactiveCommand<object> SwitchOrigin => null;
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {

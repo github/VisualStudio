@@ -29,7 +29,7 @@ namespace GitHub.ViewModels.Dialog
         {
             this.modelServiceFactory = modelServiceFactory;
             SelectedAccount = ReactiveCommand.Create();
-            CloneRepository = ReactiveCommand.Create();
+            SwitchOrigin = ReactiveCommand.Create();
         }
 
         public string Title => Resources.ForkRepositoryTitle;
@@ -54,7 +54,7 @@ namespace GitHub.ViewModels.Dialog
 
         public ReactiveCommand<object> SelectedAccount { get; }
 
-        public ReactiveCommand<object> CloneRepository { get; }
+        public ReactiveCommand<object> SwitchOrigin { get; }
 
         public IObservable<object> Done => SelectedAccount;
 

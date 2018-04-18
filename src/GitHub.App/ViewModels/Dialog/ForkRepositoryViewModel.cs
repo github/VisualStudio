@@ -34,7 +34,7 @@ namespace GitHub.ViewModels.Dialog
 
             Completed = ReactiveCommand.Create();
 
-            selectPage.CloneRepository.Subscribe(x => ShowCloneRepositoryPage((IRemoteRepositoryModel)x));
+            selectPage.SwitchOrigin.Subscribe(x => ShowSwitchRepositoryPath((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
         }
 
@@ -56,9 +56,8 @@ namespace GitHub.ViewModels.Dialog
             Content = executePage;
         }
 
-        void ShowCloneRepositoryPage(IRemoteRepositoryModel remoteRepository)
+        void ShowSwitchRepositoryPath(IRemoteRepositoryModel remoteRepository)
         {
-            log.Verbose("ShowCloneRepositoryPage {Owner}/{Name}", remoteRepository.Owner, remoteRepository.Name);
         }
     }
 }
