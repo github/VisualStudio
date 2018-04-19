@@ -64,7 +64,7 @@
       </Border>
       <Border Style="{StaticResource ItemBorder}">
         <DockPanel>
-          <CheckBox IsChecked="{Binding TrackMasterUpstream}"/>
+          <CheckBox IsChecked="{Binding AddUpstream}"/>
           <TextBlock TextWrapping="Wrap">
             Reset the <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">master</Run> branch to 
             <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream/master</Run>
