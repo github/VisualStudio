@@ -17,15 +17,15 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
-        <CheckBox Command="{Binding EnableInlineComments}" IsChecked="{Binding MarginEnabled, Mode=OneWay}" Margin="4 0">
+        <CheckBox Command="{Binding EnableInlineCommentsCommand}" IsChecked="{Binding MarginEnabled, Mode=OneWay}" Margin="4 0">
             <TextBlock VerticalAlignment="Center">
                 <Run Text="{Binding FileName}"/>
                 <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
             </TextBlock>
         </CheckBox>
         <TextBlock VerticalAlignment="Center" Margin="4 0">
-            <Hyperlink Command="{Binding NextInlineComment}">
-                <Run Text="{Binding CommentsInFile}"/>
+            <Hyperlink Command="{Binding ViewChangesCommand}">
+                <Run Text="{Binding CommentsInFile}"/> comments
             </Hyperlink>
         </TextBlock>
     </StackPanel>

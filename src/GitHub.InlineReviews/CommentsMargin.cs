@@ -4,7 +4,6 @@ using System.Windows;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using GitHub.Models;
-using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Views;
@@ -24,6 +23,7 @@ namespace GitHub.InlineReviews
         readonly CommentsMarginViewModel viewModel;
         readonly CommentsMarginView visualElement;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestEditorService pullRequestEditorService;
 
         bool isDisposed;
 
@@ -34,13 +34,15 @@ namespace GitHub.InlineReviews
         public CommentsMargin(
             IWpfTextView textView,
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
-            INextInlineCommentCommand nextInlineCommentCommand,
-            IPullRequestSessionManager sessionManager)
+            IViewChangesCommand viewChangesCommand,
+            IPullRequestSessionManager sessionManager,
+            IPullRequestEditorService pullRequestEditorService)
         {
             this.textView = textView;
             this.sessionManager = sessionManager;
+            this.pullRequestEditorService = pullRequestEditorService;
 
-            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, nextInlineCommentCommand);
+            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, viewChangesCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>

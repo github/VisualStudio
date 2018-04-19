@@ -10,10 +10,10 @@ namespace GitHub.InlineReviews.ViewModels
         int commentsInFile;
         bool marginEnabled;
 
-        public CommentsMarginViewModel(ICommand enableInlineComments, ICommand nextInlineComment)
+        public CommentsMarginViewModel(ICommand enableInlineComments, ICommand viewChangesCommand)
         {
-            EnableInlineComments = enableInlineComments;
-            NextInlineComment = nextInlineComment;
+            EnableInlineCommentsCommand = enableInlineComments;
+            ViewChangesCommand = viewChangesCommand;
         }
 
         public bool Enabled
@@ -40,10 +40,8 @@ namespace GitHub.InlineReviews.ViewModels
             set { this.RaiseAndSetIfChanged(ref marginEnabled, value); }
         }
 
-        public ICommand EnableInlineComments { get; }
+        public ICommand EnableInlineCommentsCommand { get; }
 
-        public ICommand NextInlineComment { get; }
-
-
+        public ICommand ViewChangesCommand { get; }
     }
 }

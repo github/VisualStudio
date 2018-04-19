@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
-using GitHub.Commands;
 using GitHub.Services;
 using GitHub.InlineReviews.Commands;
 
@@ -19,16 +18,22 @@ namespace GitHub.InlineReviews
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
     {
-        readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
-        readonly INextInlineCommentCommand nextInlineCommentCommand;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestEditorService pullRequestEditorService;
+        readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
+        readonly IViewChangesCommand viewChangesCommand;
 
         [ImportingConstructor]
-        public CommentsMarginFactory(IEnableInlineCommentsCommand enableInlineCommentsCommand, INextInlineCommentCommand nextInlineCommentCommand, IPullRequestSessionManager sessionManager)
+        public CommentsMarginFactory(
+            IEnableInlineCommentsCommand enableInlineCommentsCommand,
+            IViewChangesCommand viewChangesCommand,
+            IPullRequestSessionManager sessionManager,
+            IPullRequestEditorService pullRequestEditorService)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
-            this.nextInlineCommentCommand = nextInlineCommentCommand;
+            this.viewChangesCommand = viewChangesCommand;
             this.sessionManager = sessionManager;
+            this.pullRequestEditorService = pullRequestEditorService;
         }
 
         /// <summary>
@@ -47,7 +52,8 @@ namespace GitHub.InlineReviews
                 return null;
             }
 
-            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, nextInlineCommentCommand, sessionManager);
+            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, viewChangesCommand,
+                sessionManager, pullRequestEditorService);
         }
 
         bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");

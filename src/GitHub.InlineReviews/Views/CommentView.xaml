@@ -118,7 +118,8 @@
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
-                              GotFocus="ReplyPlaceholder_GotFocus">
+                              GotFocus="ReplyPlaceholder_GotFocus"
+                              SpellCheck.IsEnabled="true">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
                         <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
@@ -159,7 +160,7 @@
                 <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
-            
+
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
                         Margin="4 8" 
