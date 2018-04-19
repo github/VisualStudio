@@ -275,7 +275,7 @@ namespace GitHub.InlineReviews.Services
                 .PullRequest(number)
                 .Select(x => x.Id);
 
-            return await graphql.Run(query);
+            return (await graphql.Run(query)).Value;
         }
 
         /// <inheritdoc/>
@@ -332,7 +332,7 @@ namespace GitHub.InlineReviews.Services
 
             var review = new AddPullRequestReviewInput
             {
-                PullRequestId = pullRequestId,
+                PullRequestId = new ID(pullRequestId),
             };
 
             var addReview = new Mutation()
@@ -342,7 +342,7 @@ namespace GitHub.InlineReviews.Services
                     Id = x.PullRequestReview.DatabaseId.Value,
                     Body = x.PullRequestReview.Body,
                     CommitId = x.PullRequestReview.Commit.Oid,
-                    NodeId = x.PullRequestReview.Id,
+                    NodeId = x.PullRequestReview.Id.Value,
                     State = FromGraphQL(x.PullRequestReview.State),
                     User = user,
                 });
@@ -362,7 +362,7 @@ namespace GitHub.InlineReviews.Services
 
             var delete = new DeletePullRequestReviewInput
             {
-                PullRequestReviewId = reviewId,
+                PullRequestReviewId = new ID(reviewId),
             };
 
             var deleteReview = new Mutation()
@@ -419,7 +419,7 @@ namespace GitHub.InlineReviews.Services
             {
                 Body = body,
                 Event = ToGraphQl(e),
-                PullRequestReviewId = pendingReviewId,
+                PullRequestReviewId = new ID(pendingReviewId),
             };
 
             // TODO: We're only reading the first 100 comments here. Add paging.
@@ -429,27 +429,24 @@ namespace GitHub.InlineReviews.Services
                 {
                     Body = body,
                     CommitId = review.PullRequestReview.Commit.Oid,
-                    Comments = review.PullRequestReview.Comments(100, null, null, null).Select(commentConnection => new Page<PullRequestReviewCommentModel>
+                    Comments = review.PullRequestReview.Comments(100, null, null, null).Nodes.Select(comment => new PullRequestReviewCommentModel
                     {
-                        Items = commentConnection.Nodes.Select(comment => new PullRequestReviewCommentModel
-                        {
-                            Id = comment.DatabaseId.Value,
-                            NodeId = comment.Id,
-                            Body = comment.Body,
-                            CommitId = comment.Commit.Oid,
-                            CreatedAt = comment.CreatedAt.Value,
-                            DiffHunk = comment.DiffHunk,
-                            OriginalCommitId = comment.OriginalCommit.Oid,
-                            OriginalPosition = comment.OriginalPosition,
-                            Path = comment.Path,
-                            Position = comment.Position,
-                            PullRequestReviewId = review.PullRequestReview.DatabaseId.Value,
-                            User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
-                            IsPending = false,
-                        }).ToList(),
-                    }).Single(),
+                        Id = comment.DatabaseId.Value,
+                        NodeId = comment.Id.Value,
+                        Body = comment.Body,
+                        CommitId = comment.Commit.Oid,
+                        CreatedAt = comment.CreatedAt,
+                        DiffHunk = comment.DiffHunk,
+                        OriginalCommitId = comment.OriginalCommit.Oid,
+                        OriginalPosition = comment.OriginalPosition,
+                        Path = comment.Path,
+                        Position = comment.Position,
+                        PullRequestReviewId = review.PullRequestReview.DatabaseId.Value,
+                        User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
+                        IsPending = false,
+                    }).ToList(),
                     Id = review.PullRequestReview.DatabaseId.Value,
-                    NodeId = review.PullRequestReview.Id,
+                    NodeId = review.PullRequestReview.Id.Value,
                     State = (GitHub.Models.PullRequestReviewState)review.PullRequestReview.State,
                     User = user,
                 });
@@ -478,7 +475,7 @@ namespace GitHub.InlineReviews.Services
                 CommitOID = commitId,
                 Path = path,
                 Position = position,
-                PullRequestReviewId = pendingReviewId,
+                PullRequestReviewId = new ID(pendingReviewId),
             };
 
             var addComment = new Mutation()
@@ -486,12 +483,12 @@ namespace GitHub.InlineReviews.Services
                 .Select(x => new PullRequestReviewCommentModel
                 {
                     Id = x.Comment.DatabaseId.Value,
-                    NodeId = x.Comment.Id,
+                    NodeId = x.Comment.Id.Value,
                     Body = x.Comment.Body,
                     CommitId = x.Comment.Commit.Oid,
                     Path = x.Comment.Path,
                     Position = x.Comment.Position,
-                    CreatedAt = x.Comment.CreatedAt.Value,
+                    CreatedAt = x.Comment.CreatedAt,
                     DiffHunk = x.Comment.DiffHunk,
                     OriginalPosition = x.Comment.OriginalPosition,
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,
@@ -519,8 +516,8 @@ namespace GitHub.InlineReviews.Services
             var comment = new AddPullRequestReviewCommentInput
             {
                 Body = body,
-                InReplyTo = inReplyTo,
-                PullRequestReviewId = pendingReviewId,
+                InReplyTo = new ID(inReplyTo),
+                PullRequestReviewId = new ID(pendingReviewId),
             };
 
             var addComment = new Mutation()
@@ -528,12 +525,12 @@ namespace GitHub.InlineReviews.Services
                 .Select(x => new PullRequestReviewCommentModel
                 {
                     Id = x.Comment.DatabaseId.Value,
-                    NodeId = x.Comment.Id,
+                    NodeId = x.Comment.Id.Value,
                     Body = x.Comment.Body,
                     CommitId = x.Comment.Commit.Oid,
                     Path = x.Comment.Path,
                     Position = x.Comment.Position,
-                    CreatedAt = x.Comment.CreatedAt.Value,
+                    CreatedAt = x.Comment.CreatedAt,
                     DiffHunk = x.Comment.DiffHunk,
                     OriginalPosition = x.Comment.OriginalPosition,
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,

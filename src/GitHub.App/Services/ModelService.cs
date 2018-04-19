@@ -385,56 +385,39 @@ namespace GitHub.Services
             string cursor = null;
             var result = new List<IPullRequestReviewModel>();
 
-            while (true)
-            {
-                // TODO: We're only reading the first 100 reviews and comments here. Add paging.
-                var query = new Query()
-                    .Repository(owner, name)
-                    .PullRequest(number)
-                    .Reviews(first: 100, after: cursor)
-                    .Select(reviewConnection => new Page<PullRequestReviewModel>
+            // TODO: We're only reading the first 100 reviews and comments here. Add paging.
+            var query = new Query()
+                .Repository(owner, name)
+                .PullRequest(number)
+                .Reviews(first: 100, after: cursor).Nodes
+                .Select(review => new PullRequestReviewModel
+                {
+                    Id = review.DatabaseId.Value,
+                    NodeId = review.Id.Value,
+                    Body = review.Body,
+                    CommitId = review.Commit.Oid,
+                    State = FromGraphQL(review.State),
+                    SubmittedAt = review.SubmittedAt,
+                    User = Create(review.Author.Login, review.Author.AvatarUrl(null)),
+                    Comments = review.Comments(100, null, null, null).Nodes.Select(comment => new PullRequestReviewCommentModel
                     {
-                        HasNextPage = reviewConnection.PageInfo.HasNextPage,
-                        EndCursor = reviewConnection.PageInfo.EndCursor,
-                        Items = reviewConnection.Nodes.Select(review => new PullRequestReviewModel
-                        {
-                            Id = review.DatabaseId.Value,
-                            NodeId = review.Id,
-                            Body = review.Body,
-                            CommitId = review.Commit.Oid,
-                            State = FromGraphQL(review.State),
-                            SubmittedAt = review.SubmittedAt,
-                            User = Create(review.Author.Login, review.Author.AvatarUrl(null)),
-                            Comments = review.Comments(100, null, null, null).Select(commentConnection => new Page<PullRequestReviewCommentModel>
-                            {
-                                Items = commentConnection.Nodes.Select(comment => new PullRequestReviewCommentModel
-                                {
-                                    Id = comment.DatabaseId.Value,
-                                    NodeId = comment.Id,
-                                    Body = comment.Body,
-                                    CommitId = comment.Commit.Oid,
-                                    CreatedAt = comment.CreatedAt.Value,
-                                    DiffHunk = comment.DiffHunk,
-                                    OriginalCommitId = comment.OriginalCommit.Oid,
-                                    OriginalPosition = comment.OriginalPosition,
-                                    Path = comment.Path,
-                                    Position = comment.Position,
-                                    PullRequestReviewId = review.DatabaseId.Value,
-                                    User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
-                                    IsPending = review.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
-                                }).ToList(),
-                            }).Single(),
-                        }).ToList(),
-                    });
+                        Id = comment.DatabaseId.Value,
+                        NodeId = comment.Id.Value,
+                        Body = comment.Body,
+                        CommitId = comment.Commit.Oid,
+                        CreatedAt = comment.CreatedAt,
+                        DiffHunk = comment.DiffHunk,
+                        OriginalCommitId = comment.OriginalCommit.Oid,
+                        OriginalPosition = comment.OriginalPosition,
+                        Path = comment.Path,
+                        Position = comment.Position,
+                        PullRequestReviewId = review.DatabaseId.Value,
+                        User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
+                        IsPending = false,
+                    }).ToList(),
+                });
 
-                var page = await graphql.Run(query);
-                result.AddRange(page.Items);
-
-                if (page.HasNextPage)
-                    cursor = page.EndCursor;
-                else
-                    return result;
-            }
+            return (await graphql.Run(query)).ToList<IPullRequestReviewModel>();
         }
 #pragma warning restore CS0618 // Type or member is obsolete
 
