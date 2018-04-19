@@ -4,9 +4,10 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Controls"
              Name="root"
              MinWidth="16" MinHeight="16">
-    <Button Name="btn" Command="{Binding Command, ElementName=root}"
+    <Button Command="{Binding Command, ElementName=root}"
             CommandParameter="{Binding CommandParameter, ElementName=root}"
-            CommandTarget="{Binding CommandTarget, ElementName=root}">
+            CommandTarget="{Binding CommandTarget, ElementName=root}"
+            MinWidth="0">
         <Button.Template>
             <ControlTemplate TargetType="Button">
                 <ContentPresenter/>
