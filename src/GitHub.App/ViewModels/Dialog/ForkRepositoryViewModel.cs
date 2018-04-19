@@ -42,7 +42,7 @@ namespace GitHub.ViewModels.Dialog
 
         private ReactiveCommand<object> Completed { get; }
 
-        public override IObservable<object> Done => Observable.SelectMany(executePage.Done, switchPage.Done);
+        public override IObservable<object> Done => executePage.Done;
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
