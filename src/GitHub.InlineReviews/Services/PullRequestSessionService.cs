@@ -575,6 +575,7 @@ namespace GitHub.InlineReviews.Services
                 CommitId = result.OriginalCommitId,
                 State = GitHub.Models.PullRequestReviewState.Commented,
                 SubmittedAt = DateTimeOffset.Now,
+                User = user,
                 Comments = new[]
                 {
                     new PullRequestReviewCommentModel
@@ -621,6 +622,7 @@ namespace GitHub.InlineReviews.Services
                 CommitId = result.OriginalCommitId,
                 State = GitHub.Models.PullRequestReviewState.Commented,
                 SubmittedAt = DateTimeOffset.Now,
+                User = user,
                 Comments = new[]
                 {
                     new PullRequestReviewCommentModel

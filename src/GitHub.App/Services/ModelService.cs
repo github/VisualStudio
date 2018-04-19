@@ -413,7 +413,7 @@ namespace GitHub.Services
                         Position = comment.Position,
                         PullRequestReviewId = review.DatabaseId.Value,
                         User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
-                        IsPending = false,
+                        IsPending = review.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
                     }).ToList(),
                 });
 

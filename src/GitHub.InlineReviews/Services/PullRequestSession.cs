@@ -292,7 +292,7 @@ namespace GitHub.InlineReviews.Services
         async Task AddReview(IPullRequestReviewModel review)
         {
             PullRequest.Reviews = PullRequest.Reviews
-                .Where(x => x.NodeId != review.NodeId)
+                .Where(x => x.Id != review.Id)
                 .Concat(new[] { review })
                 .ToList();
 
