@@ -69,23 +69,11 @@ namespace GitHub.ViewModels.Dialog
                 Observable.CombineLatest(
                     modelService.GetAccounts(),
                     modelService.GetRepository(repository.Owner, repository.Name),
-                    modelService.GetForks(repository).ToList(),
-                    (a, r, f) => new { Accounts = a, Respoitory = r, Forks = f })
+                    (a, r) => new { Accounts = a, Respoitory = r})
                     .Finally(() => IsLoading = false)
                     .Subscribe(x =>
                     {
-                        var forksAndParents = new List<IRemoteRepositoryModel>(x.Forks);
-                        var current = x.Respoitory;
-                        while (current.Parent != null)
-                        {
-                            forksAndParents.Add(current.Parent);
-                            current = current.Parent;
-                        }
-
-                        Accounts = BuildAccounts(x.Accounts, forksAndParents, repository.Owner);
-                        ExistingForks = forksAndParents;
-
-                        log.Verbose("Loaded Data Accounts:{Accounts} Forks:{Forks}", Accounts.Count, ExistingForks.Count);
+                        Accounts = BuildAccounts(x.Accounts, repository.Owner);
                     });
 
             }
@@ -96,12 +84,10 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        IReadOnlyList<IAccount> BuildAccounts(IEnumerable<IAccount> accessibleAccounts, IList<IRemoteRepositoryModel> forksAndParents, string currentRepositoryOwner)
+        IReadOnlyList<IAccount> BuildAccounts(IEnumerable<IAccount> accessibleAccounts, string currentRepositoryOwner)
         {
-            var forksByOwner = forksAndParents.ToDictionary(x => x.Owner, x => x);
             return accessibleAccounts
-                .Where(x => x.Login != currentRepositoryOwner)
-                .Where(x => !forksByOwner.ContainsKey(x.Login)).ToList();
+                .Where(x => x.Login != currentRepositoryOwner).ToList();
         }
     }
 }
