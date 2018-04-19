@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using LibGit2Sharp;
@@ -21,12 +22,14 @@ namespace GitHub.Services
 
         readonly IGitClient gitClient;
         readonly IVSGitServices vsGitServices;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public RepositoryForkService(IGitClient gitClient, IVSGitServices vsGitServices)
+        public RepositoryForkService(IGitClient gitClient, IVSGitServices vsGitServices, IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.vsGitServices = vsGitServices;
+            this.usageTracker = usageTracker;
         }
 
         public IObservable<Repository> ForkRepository(IApiClient apiClient, IRepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
@@ -43,9 +46,31 @@ namespace GitHub.Services
 
                         await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream);
 
+                        RecordForkRepositoryUsage(updateOrigin, addUpstream, trackMasterUpstream).Forget();
+
                         return repo.RemoteRepo;
                     }
                 });
+        }
+
+        private async Task RecordForkRepositoryUsage(bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
+        {
+            await usageTracker.IncrementCounter(model => model.NumberOfReposForked);
+
+            if (updateOrigin)
+            {
+                await usageTracker.IncrementCounter(model => model.NumberOfOriginsUpdatedWhenForkingRepo);
+            }
+
+            if (addUpstream)
+            {
+                await usageTracker.IncrementCounter(model => model.NumberOfUpstreamsAddedWhenForkingRepo);
+            }
+
+            if (trackMasterUpstream)
+            {
+                await usageTracker.IncrementCounter(model => model.NumberOfTrackMasterUpstreamWhenForkingRepo);
+            }
         }
 
         public IObservable<object> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)

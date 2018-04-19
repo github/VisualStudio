@@ -28,6 +28,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         readonly IDialogService dialogService;
         readonly IPackageSettings packageSettings;
+        readonly IUsageTracker usageTracker;
+
         IConnectionManager connectionManager;
 
         [ImportingConstructor]
@@ -35,11 +37,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IDialogService dialogService,
-            IPackageSettings packageSettings)
+            IPackageSettings packageSettings,
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder, Octicon.repo_forked)
         {
             this.dialogService = dialogService;
             this.packageSettings = packageSettings;
+            this.usageTracker = usageTracker;
 
             Text = Resources.ForkNavigationItemText;
             ArgbColor = Colors.PurpleNavigationItem.ToInt32();
@@ -82,6 +86,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
             if (connection?.IsLoggedIn == true)
             {
+                usageTracker.IncrementCounter(model => model.NumberOfShowRepoForkDialogClicks).Forget();
                 await dialogService.ShowForkDialog(ActiveRepo, connection);
             }
         }
