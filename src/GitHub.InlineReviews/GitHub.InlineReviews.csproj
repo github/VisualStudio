@@ -73,7 +73,6 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
-    <Compile Include="Commands\ViewChangesCommand.cs" />
     <Compile Include="CommentsMargin.cs" />
     <Compile Include="CommentsMarginProvider.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
@@ -83,7 +82,6 @@
     <Compile Include="InlineCommentMargin.cs" />
     <Compile Include="InlineCommentMarginVisible.cs" />
     <Compile Include="InlineCommentMarginEnabled.cs" />
-    <Compile Include="IViewChangesCommand.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />

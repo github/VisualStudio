@@ -3,6 +3,7 @@ using GitHub.Services;
 using NUnit.Framework;
 using NSubstitute;
 using Microsoft.VisualStudio.Editor;
+using GitHub.Commands;
 
 public class PullRequestEditorServiceTests
 {
@@ -52,12 +53,14 @@ public class PullRequestEditorServiceTests
         var pullRequestService = Substitute.For<IPullRequestService>();
         var vsEditorAdaptersFactory = Substitute.For<IVsEditorAdaptersFactoryService>();
         var statusBar = Substitute.For<IStatusBarNotificationService>();
+        var openFileInSolutionCommand = Substitute.For<IOpenFileInSolutionCommand>();
         var usageTracker = Substitute.For<IUsageTracker>();
         return new PullRequestEditorService(
             sp,
             pullRequestService,
             vsEditorAdaptersFactory,
             statusBar,
+            openFileInSolutionCommand,
             usageTracker);
     }
 }

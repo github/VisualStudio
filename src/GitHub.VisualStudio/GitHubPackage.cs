@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
         {
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
-            
+
             await InitializeLoggingAsync();
             await GetServiceAsync(typeof(IUsageTracker));
 
@@ -85,7 +85,8 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenLinkCommand>(),
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>()
+                exports.GetExportedValue<IShowGitHubPaneCommand>(),
+                exports.GetExportedValue<IOpenFileInSolutionCommand>(),
             };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using GitHub.Models;
+using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Views;
@@ -34,7 +35,7 @@ namespace GitHub.InlineReviews
         public CommentsMargin(
             IWpfTextView textView,
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
-            IViewChangesCommand viewChangesCommand,
+            IOpenFileInSolutionCommand openFileInSolutionCommand,
             IPullRequestSessionManager sessionManager,
             IPullRequestEditorService pullRequestEditorService)
         {
@@ -42,7 +43,7 @@ namespace GitHub.InlineReviews
             this.sessionManager = sessionManager;
             this.pullRequestEditorService = pullRequestEditorService;
 
-            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, viewChangesCommand);
+            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, openFileInSolutionCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>

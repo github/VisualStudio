@@ -4,13 +4,10 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using EnvDTE;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
@@ -39,6 +36,7 @@ namespace GitHub.Services
         readonly IPullRequestService pullRequestService;
         readonly IVsEditorAdaptersFactoryService vsEditorAdaptersFactory;
         readonly IStatusBarNotificationService statusBar;
+        readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
@@ -47,18 +45,21 @@ namespace GitHub.Services
             IPullRequestService pullRequestService,
             IVsEditorAdaptersFactoryService vsEditorAdaptersFactory,
             IStatusBarNotificationService statusBar,
+            IOpenFileInSolutionCommand openFileInSolutionCommand,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
             Guard.ArgumentNotNull(pullRequestService, nameof(pullRequestService));
             Guard.ArgumentNotNull(vsEditorAdaptersFactory, nameof(vsEditorAdaptersFactory));
             Guard.ArgumentNotNull(statusBar, nameof(statusBar));
+            Guard.ArgumentNotNull(openFileInSolutionCommand, nameof(openFileInSolutionCommand));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             this.serviceProvider = serviceProvider;
             this.pullRequestService = pullRequestService;
             this.vsEditorAdaptersFactory = vsEditorAdaptersFactory;
             this.statusBar = statusBar;
+            this.openFileInSolutionCommand = openFileInSolutionCommand;
             this.usageTracker = usageTracker;
         }
 
@@ -432,11 +433,6 @@ namespace GitHub.Services
             return false;
         }
 
-        void ShowErrorInStatusBar(string message)
-        {
-            statusBar.ShowMessage(message);
-        }
-
         void ShowErrorInStatusBar(string message, Exception e)
         {
             statusBar.ShowMessage(message + ": " + e.Message);
@@ -474,13 +470,7 @@ namespace GitHub.Services
         {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            new TextViewCommandDispatcher(vsTextView, commandGroup, commandId).Exec +=
-                async (s, e) => await DoNavigateToEditor(session, file);
-
-            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
-            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
-            new TextViewCommandDispatcher(vsTextView, contextMenuCommandGroup, goToCommandId).Exec +=
-                async (s, e) => await DoNavigateToEditor(session, file);
+            new TextViewCommandDispatcher(vsTextView, commandGroup, commandId, openFileInSolutionCommand);
 
             EnableNavigateStatusBarMessage(vsTextView, session);
         }
@@ -497,35 +487,6 @@ namespace GitHub.Services
 
             textView.LostAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(string.Empty);
-        }
-
-        async Task DoNavigateToEditor(IPullRequestSession session, IPullRequestSessionFile file)
-        {
-            try
-            {
-                if (!session.IsCheckedOut)
-                {
-                    ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
-                    return;
-                }
-
-                var fullPath = GetAbsolutePath(session, file);
-
-                var activeView = FindActiveView();
-                if (activeView == null)
-                {
-                    ShowErrorInStatusBar("Couldn't find active view");
-                    return;
-                }
-
-                NavigateToEquivalentPosition(activeView, fullPath);
-
-                await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
-            }
-            catch (Exception e)
-            {
-                ShowErrorInStatusBar("Error navigating to editor", e);
-            }
         }
 
         ITextBuffer GetBufferAt(string filePath)
@@ -565,20 +526,6 @@ namespace GitHub.Services
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
                     fileChange.OldPath : file.RelativePath;
             }
-        }
-
-        void ShowInfoMessage(string message)
-        {
-            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
-                serviceProvider, message, null,
-                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
-        }
-
-        static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)
-        {
-            var localPath = session.LocalRepository.LocalPath;
-            var relativePath = file.RelativePath.Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(localPath, relativePath);
         }
 
         static IDifferenceViewer GetDiffViewer(IVsWindowFrame frame)

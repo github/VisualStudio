@@ -10,10 +10,10 @@ namespace GitHub.InlineReviews.ViewModels
         int commentsInFile;
         bool marginEnabled;
 
-        public CommentsMarginViewModel(ICommand enableInlineComments, ICommand viewChangesCommand)
+        public CommentsMarginViewModel(ICommand enableInlineComments, ICommand openFileInSolutionCommand)
         {
             EnableInlineCommentsCommand = enableInlineComments;
-            ViewChangesCommand = viewChangesCommand;
+            ViewChangesCommand = openFileInSolutionCommand;
         }
 
         public bool Enabled

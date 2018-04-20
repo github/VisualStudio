@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
+using GitHub.Commands;
 using GitHub.Services;
 using GitHub.InlineReviews.Commands;
 
@@ -21,17 +22,17 @@ namespace GitHub.InlineReviews
         readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestEditorService pullRequestEditorService;
         readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
-        readonly IViewChangesCommand viewChangesCommand;
+        readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
 
         [ImportingConstructor]
         public CommentsMarginFactory(
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
-            IViewChangesCommand viewChangesCommand,
+            IOpenFileInSolutionCommand openFileInSolutionCommand,
             IPullRequestSessionManager sessionManager,
             IPullRequestEditorService pullRequestEditorService)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
-            this.viewChangesCommand = viewChangesCommand;
+            this.openFileInSolutionCommand = openFileInSolutionCommand;
             this.sessionManager = sessionManager;
             this.pullRequestEditorService = pullRequestEditorService;
         }
@@ -52,7 +53,7 @@ namespace GitHub.InlineReviews
                 return null;
             }
 
-            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, viewChangesCommand,
+            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, openFileInSolutionCommand,
                 sessionManager, pullRequestEditorService);
         }
 
