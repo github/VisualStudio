@@ -23,9 +23,23 @@
                 <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
             </TextBlock>
         </CheckBox>
-        <TextBlock VerticalAlignment="Center" Margin="4 0">
-            <Hyperlink Command="{Binding ViewChangesCommand}">
-                <Run Text="{Binding CommentsInFile}"/> comments
+        <TextBlock VerticalAlignment="Center" Margin="4 0">            
+            <Hyperlink Command="{Binding ViewChangesCommand}">                
+                <Run>
+                  <Run.Style>
+                    <Style>
+                      <Setter Property="Run.Text" Value="{Binding CommentsInFile, StringFormat=view {0} comments}"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding CommentsInFile}" Value="0">
+                          <Setter Property="Run.Text" Value="add comments"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding CommentsInFile}" Value="1">
+                          <Setter Property="TextBlock.Text" Value="view comment"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Run.Style>                
+                </Run>
             </Hyperlink>
         </TextBlock>
     </StackPanel>
