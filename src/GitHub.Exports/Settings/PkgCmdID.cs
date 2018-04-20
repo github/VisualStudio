@@ -26,6 +26,5 @@ namespace GitHub.VisualStudio
         public const int NextInlineCommentId = 0x1001;
         public const int PreviousInlineCommentId = 0x1002;
         public const int EnableInlineCommentsId = 0x1003; // TODO: Add to .vsct
-        public const int ViewChangesId = 0x1004; // TODO: Add to .vsct
     };
 }
