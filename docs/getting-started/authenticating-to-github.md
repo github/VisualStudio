@@ -2,22 +2,19 @@
 
 ## How to login to GitHub or GitHub Enterprise
 
-- In Visual Studio, select **Team Explorer** from the **View** menu.
-<a href="images/view_team_explorer.png?raw=true" target="_blank"><div><img src="images/view_team_explorer.png" alt="Team Explorer in the view menu" width="500px"/></div></a>
+1. In Visual Studio, select **Team Explorer** from the **View** menu.
+    <a href="images/view_team_explorer.png?raw=true" target="_blank"><div><img src="images/view_team_explorer.png" alt="Team Explorer in the view menu" width="500px"/></div></a>
+1. In the Team Explorer pane, click the **Manage Connectios** toolbar icon.
+    <a href="images/manage_connections.png?raw=true" target="_blank"><div><img src="images/manage_connections.png" alt="Manage connections toolbar icon in the Team Explorer pane" width="500px"/></div></a>
+1. Click the **Connect** link in the GitHub section.
+        <a href="images/sign-in-to-github-provider.png?raw=true" target="_blank"><div><img src="images/sign-in-to-github-provider.png" alt="Connect to GitHub" height="300px"/></div></a>   
 
-- In the Team Explorer pane, click the **Manage Connectios** toolbar icon.
-<a href="images/manage_connections.png?raw=true" target="_blank"><div><img src="images/manage_connections.png" alt="Manage connections toolbar icon in the Team Explorer pane" width="500px"/></div></a>
+   If you're connected to a TFS instance, click on the **Sign in** link instead
+   <a href="images/sign-in-to-github.png?raw=true" target="_blank"><div><img src="images/sign-in-to-github.png" alt="Sign in to GitHub" width="300px"/></div></a>  
 
-- Click the **Connect** link in the GitHub section.
-<a href="images/sign-in-to-github-provider.png?raw=true" target="_blank"><div><img src="images/sign-in-to-github-provider.png" alt="Connect to GitHub" width="500px"/></div></a>
-
-  - If you're connected to a TFS instance, click on the **Sign in** link instead
-<a href="images/sign-in-to-github.png?raw=true" target="_blank"><div><img src="images/sign-in-to-github.png" alt="Sign in to GitHub" width="500px"/></div></a>
-
-  - If you are already connected to a GitHub instance and want to connect to another, this link will not be visible; instead click **Manage Connections** and then **Connect to GitHub**.
-<a href="images/connect_to_github.png?raw=true" target="_blank"><div><img src="images/connect_to_github.png" alt="Connect to GitHub in the manage connections dropdown in the Team Explorer pane" width="500px"/></div></a>
-
-4. In the **Connect to GitHub dialog** choose **GitHub** or **GitHub Enterprise**, depending on which product you're using.
+   If none of these options are visible, click **Manage Connections** and then **Connect to GitHub**.  
+   <a href="images/connect_to_github.png?raw=true" target="_blank"><div><img src="images/connect_to_github.png" alt="Connect to GitHub in the manage connections dropdown in the Team Explorer pane" width="500px"/></div></a>
+1. In the **Connect to GitHub dialog** choose **GitHub** or **GitHub Enterprise**, depending on which product you're using.
 
 **GitHub option**:
 <a href="images/connect-to-github-dialog.png?raw=true" target="_blank"><div><img src="images/connect-to-github-dialog.png" alt="Connect to GitHub dialog view" height="400px"/></div></a>
