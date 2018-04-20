@@ -74,7 +74,7 @@ namespace GitHub.Services
 
             try
             {
-                var fullPath = Path.Combine(session.LocalRepository.LocalPath, relativePath);
+                var fullPath = GetAbsolutePath(session.LocalRepository, relativePath);
                 string fileName;
                 string commitSha;
 
@@ -237,15 +237,13 @@ namespace GitHub.Services
                 null);
         }
 
-        public IVsTextView NavigateToEquivalentPosition(IVsTextView sourceView, string targetFile)
+        public void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView)
         {
             int line;
             int column;
             ErrorHandler.ThrowOnFailure(sourceView.GetCaretPos(out line, out column));
             var text1 = GetText(sourceView);
-
-            var view = OpenDocument(targetFile);
-            var text2 = VsShellUtilities.GetRunningDocumentContents(serviceProvider, targetFile);
+            var text2 = GetText(targetView);
 
             var fromLines = ReadLines(text1);
             var toLines = ReadLines(text2);
@@ -257,10 +255,8 @@ namespace GitHub.Services
                 column = 0;
             }
 
-            ErrorHandler.ThrowOnFailure(view.SetCaretPos(matchingLine, column));
-            ErrorHandler.ThrowOnFailure(view.CenterLines(matchingLine, 1));
-
-            return view;
+            ErrorHandler.ThrowOnFailure(targetView.SetCaretPos(matchingLine, column));
+            ErrorHandler.ThrowOnFailure(targetView.CenterLines(matchingLine, 1));
         }
 
         public IVsTextView FindActiveView()
@@ -368,6 +364,13 @@ namespace GitHub.Services
             }
 
             return matchingLine;
+        }
+
+        static string GetAbsolutePath(ILocalRepositoryModel localRepository, string relativePath)
+        {
+            var localPath = localRepository.LocalPath;
+            relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(localPath, relativePath);
         }
 
         string GetText(IVsTextView textView)

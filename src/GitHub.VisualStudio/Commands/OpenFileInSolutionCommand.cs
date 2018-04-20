@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.ComponentModel.Composition;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.Services.Vssdk.Commands;
@@ -57,14 +55,14 @@ namespace GitHub.Commands
         {
             try
             {
-                IVsTextView activeView = null;
-                if (textManager.Value.GetActiveView(1, null, out activeView) != VSConstants.S_OK)
+                var sourceView = FindActiveView();
+                if (sourceView == null)
                 {
-                    ShowErrorInStatusBar("Couldn't find active view");
+                    ShowErrorInStatusBar("Couldn't find active source view");
                     return;
                 }
 
-                var textView = editorAdapter.Value.GetWpfTextView(activeView);
+                var textView = editorAdapter.Value.GetWpfTextView(sourceView);
 
                 var info = sessionManager.Value.GetTextBufferInfo(textView.TextBuffer);
                 if (info != null)
@@ -76,9 +74,17 @@ namespace GitHub.Commands
                     }
 
                     // Navigate from PR file to solution
-                    var targetFile = GetAbsolutePath(info);
-                    pullRequestEditorService.Value.NavigateToEquivalentPosition(activeView, targetFile);
                     await usageTracker.Value.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
+
+                    await pullRequestEditorService.Value.OpenFile(info.Session, info.RelativePath, true);
+                    var fileView = FindActiveView();
+                    if (fileView == null)
+                    {
+                        ShowErrorInStatusBar("Couldn't find active target view");
+                        return;
+                    }
+
+                    pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, fileView);
                     return;
                 }
 
@@ -96,8 +102,23 @@ namespace GitHub.Commands
                     return;
                 }
 
-                await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD");
+                // Navigate from working file to PR diff
                 // TODO: add metrics
+                // await usageTracker.Value.IncrementCounter(x => x.NumberOf???);
+                await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD");
+
+                // HACK: We need to wait here for the diff view to set itself up before the active view changes.
+                // There must be a better way of doing this.
+                await Task.Delay(1500);
+
+                var diffView = FindActiveView();
+                if (diffView == null)
+                {
+                    ShowErrorInStatusBar("Couldn't find active target view");
+                    return;
+                }
+
+                pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, diffView);
             }
             catch (Exception e)
             {
@@ -105,11 +126,15 @@ namespace GitHub.Commands
             }
         }
 
-        static string GetAbsolutePath(PullRequestTextBufferInfo info)
+        IVsTextView FindActiveView()
         {
-            var localPath = info.Session.LocalRepository.LocalPath;
-            var relativePath = info.RelativePath.Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(localPath, relativePath);
+            IVsTextView activeView = null;
+            if (textManager.Value.GetActiveView(1, null, out activeView) == VSConstants.S_OK)
+            {
+                return activeView;
+            }
+
+            return null;
         }
 
         void ShowInfoMessage(string message)

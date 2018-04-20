@@ -50,11 +50,10 @@ namespace GitHub.Services
         IVsTextView FindActiveView();
 
         /// <summary>
-        /// Navigate to and place the caret at the best guess equivalent position in <see cref="targetFile"/>.
+        /// Place the caret at the best guess equivalent position in <see cref="targetView"/>.
         /// </summary>
         /// <param name="sourceView">The text view to navigate from.</param>
-        /// <param name="targetFile">The text view to open and navigate to.</param>
-        /// <returns>The opened text view.</returns>
-        IVsTextView NavigateToEquivalentPosition(IVsTextView sourceView, string targetFile);
+        /// <param name="targetView">The text view to navigate to.</param>
+        void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView);
     }
 }
