@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using GitHub.Models;
+using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.Services
@@ -31,7 +32,7 @@ namespace GitHub.Services
         /// working directory, or "HEAD" to compare with the HEAD commit of the pull request.
         /// </param>
         /// <returns>A task tracking the operation.</returns>
-        Task OpenDiff(IPullRequestSession session, string relativePath, string headSha = null);
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha = null);
 
         /// <summary>
         /// Opens an diff viewer for a file in a pull request with the specified inline comment
@@ -41,7 +42,7 @@ namespace GitHub.Services
         /// <param name="relativePath">The path to the file, relative to the repository.</param>
         /// <param name="thread">The thread to open</param>
         /// <returns>A task tracking the operation.</returns>
-        Task OpenDiff(IPullRequestSession session, string relativePath, IInlineCommentThreadModel thread);
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, IInlineCommentThreadModel thread);
 
         /// <summary>
         /// Find the active text view.

@@ -124,7 +124,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task OpenDiff(IPullRequestSession session, string relativePath, string headSha)
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
@@ -144,9 +144,10 @@ namespace GitHub.Services
                         file.CommitSha,
                         encoding);
 
-                if (FocusExistingDiffViewer(session, mergeBase, rightFile))
+                var diffViewer = FocusExistingDiffViewer(session, mergeBase, rightFile);
+                if (diffViewer != null)
                 {
-                    return;
+                    return diffViewer;
                 }
 
                 var leftFile = await pullRequestService.ExtractToTempFile(
@@ -186,7 +187,7 @@ namespace GitHub.Services
                         (uint)options);
                 }
 
-                var diffViewer = GetDiffViewer(frame);
+                diffViewer = GetDiffViewer(frame);
 
                 AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, mergeBase, DiffSide.Left);
 
@@ -202,15 +203,18 @@ namespace GitHub.Services
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution);
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
+
+                return diffViewer;
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
+                return null;
             }
         }
 
         /// <inheritdoc/>
-        public async Task OpenDiff(
+        public async Task<IDifferenceViewer> OpenDiff(
             IPullRequestSession session,
             string relativePath,
             IInlineCommentThreadModel thread)
@@ -219,7 +223,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(thread, nameof(thread));
 
-            await OpenDiff(session, relativePath, thread.CommitSha);
+            var diffViewer = await OpenDiff(session, relativePath, thread.CommitSha);
 
             // HACK: We need to wait here for the diff view to set itself up and move its cursor
             // to the first changed line. There must be a better way of doing this.
@@ -235,6 +239,8 @@ namespace GitHub.Services
                 PkgCmdIDList.NextInlineCommentId,
                 ref param,
                 null);
+
+            return diffViewer;
         }
 
         public void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView)
@@ -398,7 +404,7 @@ namespace GitHub.Services
             return view;
         }
 
-        bool FocusExistingDiffViewer(
+        IDifferenceViewer FocusExistingDiffViewer(
             IPullRequestSession session,
             string mergeBase,
             string rightPath)
@@ -428,12 +434,13 @@ namespace GitHub.Services
                         leftBufferInfo.Session.PullRequest.Number == session.PullRequest.Number &&
                         leftBufferInfo.CommitSha == mergeBase)
                     {
-                        return ErrorHandler.Succeeded(windowFrame.Show());
+                        ErrorHandler.ThrowOnFailure(windowFrame.Show());
+                        return diffViewer;
                     }
                 }
             }
 
-            return false;
+            return null;
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
