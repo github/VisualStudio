@@ -46,13 +46,13 @@ namespace GitHub.ViewModels.GitHubPane
             DiffFile = ReactiveCommand.CreateAsyncTask(x =>
                 (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, "HEAD"));
             ViewFile = ReactiveCommand.CreateAsyncTask(x =>
-                editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, false));
+                (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, false));
             DiffFileWithWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
                 x => (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath));
             OpenFileInWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
-                x => editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
+                x => (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
 
             OpenFirstComment = ReactiveCommand.CreateAsyncTask(async x =>
             {

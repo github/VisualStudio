@@ -64,7 +64,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task OpenFile(
+        public async Task<ITextView> OpenFile(
             IPullRequestSession session,
             string relativePath,
             bool workingDirectory)
@@ -95,6 +95,7 @@ namespace GitHub.Services
                     commitSha = file.CommitSha;
                 }
 
+                IVsTextView textView;
                 using (workingDirectory ? null : OpenInProvisionalTab())
                 {
                     var window = VisualStudio.Services.Dte.ItemOperations.OpenFile(fileName);
@@ -102,11 +103,11 @@ namespace GitHub.Services
 
                     var buffer = GetBufferAt(fileName);
 
+                    textView = FindActiveView();
                     if (!workingDirectory)
                     {
                         AddBufferTag(buffer, session, fullPath, commitSha, null);
 
-                        var textView = FindActiveView();
                         var file = await session.GetFile(relativePath);
                         EnableNavigateToEditor(textView, session, file);
                     }
@@ -116,10 +117,13 @@ namespace GitHub.Services
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile);
+
+                return vsEditorAdaptersFactory.GetWpfTextView(textView);
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
+                return null;
             }
         }
 
