@@ -8,6 +8,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Differencing;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Commands
@@ -55,7 +57,7 @@ namespace GitHub.Commands
         {
             try
             {
-                var sourceView = FindActiveView();
+                var sourceView = pullRequestEditorService.Value.FindActiveView();
                 if (sourceView == null)
                 {
                     ShowErrorInStatusBar("Couldn't find active source view");
@@ -76,14 +78,14 @@ namespace GitHub.Commands
                     // Navigate from PR file to solution
                     await usageTracker.Value.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
 
-                    await pullRequestEditorService.Value.OpenFile(info.Session, info.RelativePath, true);
-                    var fileView = FindActiveView();
-                    if (fileView == null)
+                    var fileTextView = await pullRequestEditorService.Value.OpenFile(info.Session, info.RelativePath, true);
+                    if (fileTextView == null)
                     {
                         ShowErrorInStatusBar("Couldn't find active target view");
                         return;
                     }
 
+                    var fileView = editorAdapter.Value.GetViewAdapter(fileTextView);
                     pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, fileView);
                     return;
                 }
@@ -105,19 +107,20 @@ namespace GitHub.Commands
                 // Navigate from working file to PR diff
                 // TODO: add metrics
                 // await usageTracker.Value.IncrementCounter(x => x.NumberOf???);
-                await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD");
 
-                // HACK: We need to wait here for the diff view to set itself up before the active view changes.
-                // There must be a better way of doing this.
-                await Task.Delay(1500);
-
-                var diffView = FindActiveView();
-                if (diffView == null)
+                var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD");
+                if (diffViewer == null)
                 {
-                    ShowErrorInStatusBar("Couldn't find active target view");
+                    ShowErrorInStatusBar("Couldn't find active diff viewer");
                     return;
                 }
 
+                // HACK: We need to wait here for the diff view to set itself up and move its cursor
+                // to the first changed line. There must be a better way of doing this.
+                await Task.Delay(1500);
+
+                var diffTextView = FindActiveTextView(diffViewer);
+                var diffView = editorAdapter.Value.GetViewAdapter(diffTextView);
                 pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, diffView);
             }
             catch (Exception e)
@@ -126,12 +129,16 @@ namespace GitHub.Commands
             }
         }
 
-        IVsTextView FindActiveView()
+        ITextView FindActiveTextView(IDifferenceViewer diffViewer)
         {
-            IVsTextView activeView = null;
-            if (textManager.Value.GetActiveView(1, null, out activeView) == VSConstants.S_OK)
+            switch (diffViewer.ActiveViewType)
             {
-                return activeView;
+                case DifferenceViewType.InlineView:
+                    return diffViewer.InlineView;
+                case DifferenceViewType.LeftView:
+                    return diffViewer.LeftView;
+                case DifferenceViewType.RightView:
+                    return diffViewer.RightView;
             }
 
             return null;
