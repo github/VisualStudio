@@ -96,17 +96,15 @@ namespace GitHub.Services
                 }
 
                 IVsTextView textView;
+                IWpfTextView wpfTextView;
                 using (workingDirectory ? null : OpenInProvisionalTab())
                 {
-                    var window = VisualStudio.Services.Dte.ItemOperations.OpenFile(fileName);
-                    window.Document.ReadOnly = !workingDirectory;
+                    var readOnly = !workingDirectory;
+                    textView = OpenDocument(fileName, readOnly, out wpfTextView);
 
-                    var buffer = GetBufferAt(fileName);
-
-                    textView = FindActiveView();
                     if (!workingDirectory)
                     {
-                        AddBufferTag(buffer, session, fullPath, commitSha, null);
+                        AddBufferTag(wpfTextView.TextBuffer, session, fullPath, commitSha, null);
 
                         var file = await session.GetFile(relativePath);
                         EnableNavigateToEditor(textView, session, file);
@@ -118,7 +116,7 @@ namespace GitHub.Services
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile);
 
-                return vsEditorAdaptersFactory.GetWpfTextView(textView);
+                return wpfTextView;
             }
             catch (Exception e)
             {
@@ -397,7 +395,7 @@ namespace GitHub.Services
             return text;
         }
 
-        IVsTextView OpenDocument(string fullPath)
+        IVsTextView OpenDocument(string fullPath, bool readOnly, out IWpfTextView wpfTextView)
         {
             var logicalView = VSConstants.LOGVIEWID.TextView_guid;
             IVsUIHierarchy hierarchy;
@@ -405,6 +403,10 @@ namespace GitHub.Services
             IVsWindowFrame windowFrame;
             IVsTextView view;
             VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
+
+            wpfTextView = vsEditorAdaptersFactory.GetWpfTextView(view);
+            wpfTextView?.Options?.SetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId, readOnly);
+
             return view;
         }
 
