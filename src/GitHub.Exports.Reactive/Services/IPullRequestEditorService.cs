@@ -32,8 +32,9 @@ namespace GitHub.Services
         /// The commit SHA of the right hand side of the diff. Pass null to compare with the
         /// working directory, or "HEAD" to compare with the HEAD commit of the pull request.
         /// </param>
+        /// <param name="scrollToFirstDiff">True to scroll to first difference in file. Set to false if caret is being moved after opening.</param>
         /// <returns>The opened diff viewer.</returns>
-        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha = null);
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha = null, bool scrollToFirstDiff = true);
 
         /// <summary>
         /// Opens an diff viewer for a file in a pull request with the specified inline comment

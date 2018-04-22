@@ -108,16 +108,12 @@ namespace GitHub.Commands
                 // TODO: add metrics
                 // await usageTracker.Value.IncrementCounter(x => x.NumberOf???);
 
-                var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD");
+                var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD", scrollToFirstDiff: false);
                 if (diffViewer == null)
                 {
                     ShowErrorInStatusBar("Couldn't find active diff viewer");
                     return;
                 }
-
-                // HACK: We need to wait here for the diff view to set itself up and move its cursor
-                // to the first changed line. There must be a better way of doing this.
-                await Task.Delay(1500);
 
                 var diffTextView = FindActiveTextView(diffViewer);
                 var diffView = editorAdapter.Value.GetViewAdapter(diffTextView);

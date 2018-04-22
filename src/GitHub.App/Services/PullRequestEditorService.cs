@@ -37,6 +37,7 @@ namespace GitHub.Services
         readonly IVsEditorAdaptersFactoryService vsEditorAdaptersFactory;
         readonly IStatusBarNotificationService statusBar;
         readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
+        readonly IEditorOptionsFactoryService editorOptionsFactoryService;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
@@ -46,6 +47,7 @@ namespace GitHub.Services
             IVsEditorAdaptersFactoryService vsEditorAdaptersFactory,
             IStatusBarNotificationService statusBar,
             IOpenFileInSolutionCommand openFileInSolutionCommand,
+            IEditorOptionsFactoryService editorOptionsFactoryService,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
@@ -53,6 +55,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(vsEditorAdaptersFactory, nameof(vsEditorAdaptersFactory));
             Guard.ArgumentNotNull(statusBar, nameof(statusBar));
             Guard.ArgumentNotNull(openFileInSolutionCommand, nameof(openFileInSolutionCommand));
+            Guard.ArgumentNotNull(openFileInSolutionCommand, nameof(editorOptionsFactoryService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             this.serviceProvider = serviceProvider;
@@ -60,6 +63,7 @@ namespace GitHub.Services
             this.vsEditorAdaptersFactory = vsEditorAdaptersFactory;
             this.statusBar = statusBar;
             this.openFileInSolutionCommand = openFileInSolutionCommand;
+            this.editorOptionsFactoryService = editorOptionsFactoryService;
             this.usageTracker = usageTracker;
         }
 
@@ -126,7 +130,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha)
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, bool scrollToFirstDiff)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
@@ -172,6 +176,7 @@ namespace GitHub.Services
                 }
 
                 IVsWindowFrame frame;
+                using (OpenWithOption(DifferenceViewerOptions.ScrollToFirstDiffName, scrollToFirstDiff))
                 using (OpenInProvisionalTab())
                 {
                     var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
@@ -225,11 +230,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(thread, nameof(thread));
 
-            var diffViewer = await OpenDiff(session, relativePath, thread.CommitSha);
-
-            // HACK: We need to wait here for the diff view to set itself up and move its cursor
-            // to the first changed line. There must be a better way of doing this.
-            await Task.Delay(1500);
+            var diffViewer = await OpenDiff(session, relativePath, thread.CommitSha, scrollToFirstDiff: false);
 
             var param = (object)new InlineCommentNavigationParams
             {
@@ -561,6 +562,28 @@ namespace GitHub.Services
             return new NewDocumentStateScope(
                 __VSNEWDOCUMENTSTATE.NDS_Provisional,
                 VSConstants.NewDocumentStateReason.SolutionExplorer);
+        }
+
+        IDisposable OpenWithOption(string optionId, object value) => new OpenWithOptionScope(editorOptionsFactoryService, optionId, value);
+
+        class OpenWithOptionScope : IDisposable
+        {
+            readonly IEditorOptionsFactoryService editorOptionsFactoryService;
+            readonly string optionId;
+            readonly object savedValue;
+
+            internal OpenWithOptionScope(IEditorOptionsFactoryService editorOptionsFactoryService, string optionId, object value)
+            {
+                this.editorOptionsFactoryService = editorOptionsFactoryService;
+                this.optionId = optionId;
+                savedValue = editorOptionsFactoryService.GlobalOptions.GetOptionValue(optionId);
+                editorOptionsFactoryService.GlobalOptions.SetOptionValue(optionId, value);
+            }
+
+            public void Dispose()
+            {
+                editorOptionsFactoryService.GlobalOptions.SetOptionValue(optionId, savedValue);
+            }
         }
 
         static IList<string> ReadLines(string text)
