@@ -84,7 +84,8 @@ namespace GitHub.InlineReviews.Services
         void RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
         {
             var cloneUrl = repository?.CloneUrl;
-            if (cloneUrl != null)
+            var host = cloneUrl?.Host;
+            if (host != null && host.Equals("github.com", StringComparison.OrdinalIgnoreCase))
             {
                 // Only show PR status bar if repo has remote
                 var viewModel = CreatePullRequestStatusViewModel(session);
