@@ -191,14 +191,14 @@
           <ButtonText>Blame</ButtonText>
         </Strings>
       </Button>
-      
+
       <Button guid="guidContextMenuSet" id="openFileInSolutionCommand" type="Button">
-        <Icon guid="guidImages" id="logo" />
+        <Icon guid="guidImages" id="pullrequest" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open File in Solution</ButtonText>
+          <ButtonText>Go To Solution/PR File</ButtonText>
         </Strings>
       </Button>
 
