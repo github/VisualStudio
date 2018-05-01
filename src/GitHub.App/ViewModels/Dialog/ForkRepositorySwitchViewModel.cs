@@ -20,8 +20,6 @@ namespace GitHub.ViewModels.Dialog
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ForkRepositorySwitchViewModel : ViewModelBase, IForkRepositorySwitchViewModel
     {
-        static readonly ILogger log = LogManager.ForContext<ForkRepositorySwitchViewModel>();
-
         readonly IRepositoryForkService repositoryForkService;
 
         [ImportingConstructor]

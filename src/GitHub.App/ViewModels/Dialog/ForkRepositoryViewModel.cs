@@ -15,14 +15,9 @@ namespace GitHub.ViewModels.Dialog
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ForkRepositoryViewModel : PagedDialogViewModelBase, IForkRepositoryViewModel
     {
-        static readonly ILogger log = LogManager.ForContext<ForkRepositoryViewModel>();
-
         readonly IForkRepositorySelectViewModel selectPage;
         readonly IForkRepositorySwitchViewModel switchPage;
         readonly IForkRepositoryExecuteViewModel executePage;
-
-        ILocalRepositoryModel repository;
-        IConnection connection;
 
         [ImportingConstructor]
         public ForkRepositoryViewModel(
@@ -40,27 +35,31 @@ namespace GitHub.ViewModels.Dialog
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
         }
 
+        public ILocalRepositoryModel Repository { get; private set; }
+
+        public IConnection Connection { get; private set; }
+
         private ReactiveCommand<object> Completed { get; }
 
         public override IObservable<object> Done => executePage.Done;
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
-            this.repository = repository;
-            this.connection = connection;
+            Repository = repository;
+            Connection = connection;
             await selectPage.InitializeAsync(repository, connection);
             Content = selectPage;
         }
 
         async Task ShowExecutePage(IAccount account)
         {
-            await executePage.InitializeAsync(repository, account, connection);
+            await executePage.InitializeAsync(Repository, account, Connection);
             Content = executePage;
         }
 
         void ShowSwitchRepositoryPath(IRemoteRepositoryModel remoteRepository)
         {
-            switchPage.Initialize(repository, remoteRepository);
+            switchPage.Initialize(Repository, remoteRepository);
             Content = switchPage;
         }
     }
