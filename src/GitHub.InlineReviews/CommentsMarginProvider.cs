@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.Text.Editor;
 using GitHub.Commands;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.InlineReviews.Commands;
+using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews
 {
@@ -23,18 +24,21 @@ namespace GitHub.InlineReviews
         readonly IPullRequestEditorService pullRequestEditorService;
         readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
         readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
+        readonly IPackageSettings packageSettings;
 
         [ImportingConstructor]
         public CommentsMarginFactory(
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
             IOpenFileInSolutionCommand openFileInSolutionCommand,
             IPullRequestSessionManager sessionManager,
-            IPullRequestEditorService pullRequestEditorService)
+            IPullRequestEditorService pullRequestEditorService,
+            IPackageSettings packageSettings)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
             this.openFileInSolutionCommand = openFileInSolutionCommand;
             this.sessionManager = sessionManager;
             this.pullRequestEditorService = pullRequestEditorService;
+            this.packageSettings = packageSettings;
         }
 
         /// <summary>
@@ -47,6 +51,12 @@ namespace GitHub.InlineReviews
         /// </returns>
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
         {
+            // Comments in the editor feature flag
+            if (!packageSettings.EditorComments)
+            {
+                return null;
+            }
+
             // Never show on diff views
             if (IsDiffView(wpfTextViewHost.TextView))
             {

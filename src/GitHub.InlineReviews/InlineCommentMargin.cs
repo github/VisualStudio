@@ -26,7 +26,6 @@ namespace GitHub.InlineReviews
         readonly IInlineCommentPeekService peekService;
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
-        readonly IPackageSettings packageSettings;
         readonly IPullRequestSessionManager sessionManager;
         readonly Grid marginGrid;
 
@@ -48,10 +47,10 @@ namespace GitHub.InlineReviews
             this.peekService = peekService;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
-            this.packageSettings = packageSettings;
             this.sessionManager = sessionManager.Value;
 
-            textView.Options.SetOptionValue(InlineCommentMarginEnabled.OptionName, packageSettings.EditorComments);
+            // Default to not show comment margin
+            textView.Options.SetOptionValue(InlineCommentMarginEnabled.OptionName, false);
 
             marginGrid = new GlyphMarginGrid { Width = 17.0 };
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
