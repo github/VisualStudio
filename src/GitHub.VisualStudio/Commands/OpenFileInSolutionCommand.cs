@@ -110,6 +110,13 @@ namespace GitHub.Commands
                 // TODO: add metrics
                 // await usageTracker.Value.IncrementCounter(x => x.NumberOf???);
 
+                var sessionFile = await session.GetFile(relativePath);
+                if (sessionFile.Diff.Count == 0)
+                {
+                    statusBar.Value.ShowMessage("No changes in PR file: " + relativePath);
+                    return;
+                }
+
                 var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD", scrollToFirstDiff: false);
                 if (diffViewer == null)
                 {
