@@ -24,7 +24,6 @@ namespace GitHub.InlineReviews.Margins
         readonly CommentsMarginViewModel viewModel;
         readonly CommentsMarginView visualElement;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IPullRequestEditorService pullRequestEditorService;
 
         bool isDisposed;
 
@@ -36,12 +35,10 @@ namespace GitHub.InlineReviews.Margins
             IWpfTextView textView,
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
             IOpenFileInSolutionCommand openFileInSolutionCommand,
-            IPullRequestSessionManager sessionManager,
-            IPullRequestEditorService pullRequestEditorService)
+            IPullRequestSessionManager sessionManager)
         {
             this.textView = textView;
             this.sessionManager = sessionManager;
-            this.pullRequestEditorService = pullRequestEditorService;
 
             viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, openFileInSolutionCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };

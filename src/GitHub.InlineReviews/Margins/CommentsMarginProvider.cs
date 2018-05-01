@@ -21,7 +21,6 @@ namespace GitHub.InlineReviews.Margins
     internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
     {
         readonly IPullRequestSessionManager sessionManager;
-        readonly IPullRequestEditorService pullRequestEditorService;
         readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
         readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
         readonly IPackageSettings packageSettings;
@@ -31,13 +30,11 @@ namespace GitHub.InlineReviews.Margins
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
             IOpenFileInSolutionCommand openFileInSolutionCommand,
             IPullRequestSessionManager sessionManager,
-            IPullRequestEditorService pullRequestEditorService,
             IPackageSettings packageSettings)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
             this.openFileInSolutionCommand = openFileInSolutionCommand;
             this.sessionManager = sessionManager;
-            this.pullRequestEditorService = pullRequestEditorService;
             this.packageSettings = packageSettings;
         }
 
@@ -64,7 +61,7 @@ namespace GitHub.InlineReviews.Margins
             }
 
             return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, openFileInSolutionCommand,
-                sessionManager, pullRequestEditorService);
+                sessionManager);
         }
 
         bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");

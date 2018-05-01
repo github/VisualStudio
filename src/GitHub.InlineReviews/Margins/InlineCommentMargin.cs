@@ -17,15 +17,12 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.Margins
 {
-    public class InlineCommentMargin : IWpfTextViewMargin
+    public sealed class InlineCommentMargin : IWpfTextViewMargin
     {
         public const string MarginName = "InlineComment";
         const string MarginPropertiesName = "Indicator Margin"; // Same background color as Glyph margin 
 
         readonly IWpfTextView textView;
-        readonly IInlineCommentPeekService peekService;
-        readonly IEditorFormatMapService editorFormatMapService;
-        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IPullRequestSessionManager sessionManager;
         readonly Grid marginGrid;
 
@@ -40,13 +37,9 @@ namespace GitHub.InlineReviews.Margins
             IInlineCommentPeekService peekService,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IPackageSettings packageSettings,
             Lazy<IPullRequestSessionManager> sessionManager)
         {
             textView = wpfTextViewHost.TextView;
-            this.peekService = peekService;
-            this.editorFormatMapService = editorFormatMapService;
-            this.tagAggregatorFactory = tagAggregatorFactory;
             this.sessionManager = sessionManager.Value;
 
             // Default to not show comment margin

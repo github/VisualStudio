@@ -18,11 +18,9 @@ namespace GitHub.InlineReviews.Margins
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     internal sealed class InlineCommentMarginProvider : IWpfTextViewMarginProvider
     {
-        readonly IGitHubServiceProvider serviceProvider;
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
-        readonly IPackageSettings packageSettings;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
 
         [ImportingConstructor]
@@ -30,21 +28,18 @@ namespace GitHub.InlineReviews.Margins
             IGitHubServiceProvider serviceProvider,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService,
-            IPackageSettings packageSettings)
+            IInlineCommentPeekService peekService)
         {
-            this.serviceProvider = serviceProvider;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            this.packageSettings = packageSettings;
             sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.GetService<IPullRequestSessionManager>());
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
             return new InlineCommentMargin(
-                wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, packageSettings, sessionManager);
+                wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, sessionManager);
         }
     }
 }
