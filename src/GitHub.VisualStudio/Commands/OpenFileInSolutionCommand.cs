@@ -51,6 +51,8 @@ namespace GitHub.Commands
             this.pullRequestEditorService = pullRequestEditorService;
             this.statusBar = statusBar;
             this.usageTracker = usageTracker;
+
+            BeforeQueryStatus += OnBeforeQueryStatus;
         }
 
         public override async Task Execute()
@@ -121,8 +123,55 @@ namespace GitHub.Commands
             }
             catch (Exception e)
             {
-                ShowErrorInStatusBar("Error navigating to editor", e);
+                ShowErrorInStatusBar("Error Navigating", e);
             }
+        }
+
+        void OnBeforeQueryStatus(object sender, EventArgs e)
+        {
+            try
+            {
+                var session = sessionManager.Value.CurrentSession;
+                if (session == null)
+                {
+                    // No active pull request session
+                    Visible = false;
+                    return;
+                }
+
+                var sourceView = pullRequestEditorService.Value.FindActiveView();
+                if (sourceView == null)
+                {
+                    // No active text view
+                    Visible = false;
+                    return;
+                }
+
+                var textView = editorAdapter.Value.GetWpfTextView(sourceView);
+                var info = sessionManager.Value.GetTextBufferInfo(textView.TextBuffer);
+                if (info != null)
+                {
+                    // Active text view is a PR file
+                    Text = "Open File in Solution";
+                    Visible = true;
+                    return;
+                }
+
+                var relativePath = sessionManager.Value.GetRelativePath(textView.TextBuffer);
+                if (relativePath != null)
+                {
+                    // Active text view is part of a repository
+                    Text = "View Changes in #" + session.PullRequest.Number;
+                    Visible = true;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorInStatusBar("Error QueryStatus", ex);
+            }
+
+            Visible = false;
         }
 
         ITextView FindActiveTextView(IDifferenceViewer diffViewer)
