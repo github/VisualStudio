@@ -31,7 +31,7 @@
                       <Setter Property="Run.Text" Value="{Binding CommentsInFile, StringFormat=view {0} comments}"/>
                       <Style.Triggers>
                         <DataTrigger Binding="{Binding CommentsInFile}" Value="0">
-                          <Setter Property="Run.Text" Value="add comments"/>
+                          <Setter Property="Run.Text" Value="view changes"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding CommentsInFile}" Value="1">
                           <Setter Property="TextBlock.Text" Value="view comment"/>
