@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -76,7 +77,8 @@ namespace GitHub.ViewModels.Dialog
         UriString CreateForkUri(UriString url, string login)
         {
             var original = url.ToRepositoryUrl();
-            return new UriString($"{original.Scheme}://{original.Authority}/{login}/{url.RepositoryName}");
+            var forkUri = string.Format(CultureInfo.CurrentCulture, "{0}://{1}/{2}/{3}", original.Scheme, original.Authority, login, url.RepositoryName);
+            return new UriString(forkUri);
         }
 
         IObservable<Repository> OnCreateFork(object o)
