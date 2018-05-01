@@ -237,13 +237,28 @@ namespace GitHub.Services
                 FromLine = thread.LineNumber - 1,
             };
 
-            VisualStudio.Services.Dte.Commands.Raise(
-                Guids.CommandSetString,
-                PkgCmdIDList.NextInlineCommentId,
-                ref param,
-                null);
+            await RaiseWhenAvailable(Guids.CommandSetString, PkgCmdIDList.NextInlineCommentId, param, 1000);
 
             return diffViewer;
+        }
+
+        static async Task<bool> RaiseWhenAvailable(string guid, int id, object param, int millisecondsDelay)
+        {
+            var commands = VisualStudio.Services.Dte.Commands;
+            var command = commands.Item(guid, id);
+
+            if (!command.IsAvailable)
+            {
+                await Task.Delay(millisecondsDelay);
+            }
+
+            if (!command.IsAvailable)
+            {
+                return false;
+            }
+
+            commands.Raise(command.Guid, command.ID, ref param, null);
+            return true;
         }
 
         public void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView)
