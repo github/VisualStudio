@@ -21,6 +21,11 @@ namespace GitHub.Services
         readonly IOleCommandTarget next;
         readonly ICommand targetCommand;
 
+        public static IDisposable AddCommandFilter(IVsTextView textView, Guid commandGroup, int commandId, ICommand targetCommand)
+        {
+            return new TextViewCommandDispatcher(textView, commandGroup, commandId, targetCommand);
+        }
+
         /// <summary>
         /// Add a command filter to <see cref="IVsTextView"/>.
         /// </summary>
@@ -28,7 +33,7 @@ namespace GitHub.Services
         /// <param name="commandGroup">The group of the command to listen for.</param>
         /// <param name="commandId">The ID of the command to listen for.</param>
         /// <param name="targetCommand">The command to dispatch to.</param>
-        public TextViewCommandDispatcher(IVsTextView textView, Guid commandGroup, int commandId, ICommand targetCommand)
+        TextViewCommandDispatcher(IVsTextView textView, Guid commandGroup, int commandId, ICommand targetCommand)
         {
             this.textView = textView;
             this.commandGroup = commandGroup;

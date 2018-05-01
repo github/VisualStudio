@@ -109,9 +109,7 @@ namespace GitHub.Services
                     if (!workingDirectory)
                     {
                         AddBufferTag(wpfTextView.TextBuffer, session, fullPath, commitSha, null);
-
-                        var file = await session.GetFile(relativePath);
-                        EnableNavigateToEditor(textView, session, file);
+                        EnableNavigateToEditor(textView, session);
                     }
                 }
 
@@ -201,9 +199,9 @@ namespace GitHub.Services
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, file.CommitSha, DiffSide.Right);
-                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
-                    EnableNavigateToEditor(diffViewer.RightView, session, file);
-                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
+                    EnableNavigateToEditor(diffViewer.LeftView, session);
+                    EnableNavigateToEditor(diffViewer.RightView, session);
+                    EnableNavigateToEditor(diffViewer.InlineView, session);
                 }
 
                 if (workingDirectory)
@@ -492,17 +490,17 @@ namespace GitHub.Services
             }
         }
 
-        void EnableNavigateToEditor(ITextView textView, IPullRequestSession session, IPullRequestSessionFile file)
+        void EnableNavigateToEditor(ITextView textView, IPullRequestSession session)
         {
             var vsTextView = vsEditorAdaptersFactory.GetViewAdapter(textView);
-            EnableNavigateToEditor(vsTextView, session, file);
+            EnableNavigateToEditor(vsTextView, session);
         }
 
-        void EnableNavigateToEditor(IVsTextView vsTextView, IPullRequestSession session, IPullRequestSessionFile file)
+        void EnableNavigateToEditor(IVsTextView vsTextView, IPullRequestSession session)
         {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            new TextViewCommandDispatcher(vsTextView, commandGroup, commandId, openFileInSolutionCommand);
+            TextViewCommandDispatcher.AddCommandFilter(vsTextView, commandGroup, commandId, openFileInSolutionCommand);
 
             EnableNavigateStatusBarMessage(vsTextView, session);
         }
