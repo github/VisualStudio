@@ -28,7 +28,6 @@ namespace GitHub.Commands
         public const int CommandId = PkgCmdIDList.openFileInSolutionCommand;
 
         readonly IGitHubServiceProvider serviceProvider;
-        readonly Lazy<IVsTextManager> textManager;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
         readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
@@ -44,7 +43,6 @@ namespace GitHub.Commands
             Lazy<IStatusBarNotificationService> statusBar,
             Lazy<IUsageTracker> usageTracker) : base(CommandSet, CommandId)
         {
-            textManager = new Lazy<IVsTextManager>(() => serviceProvider.GetService<SVsTextManager, IVsTextManager>());
             this.serviceProvider = serviceProvider;
             this.editorAdapter = editorAdapter;
             this.sessionManager = sessionManager;
