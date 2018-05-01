@@ -18,8 +18,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryForkService : IRepositoryForkService
     {
-        static readonly ILogger log = LogManager.ForContext<RepositoryForkService>();
-
         readonly IGitClient gitClient;
         readonly IVSGitServices vsGitServices;
         readonly IUsageTracker usageTracker;
