@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 
-namespace GitHub.InlineReviews
+namespace GitHub.InlineReviews.Margins
 {
     internal class CommentsMargin : IWpfTextViewMargin
     {

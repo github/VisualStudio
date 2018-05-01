@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
 using ReactiveUI;
 
-namespace GitHub.InlineReviews
+namespace GitHub.InlineReviews.Margins
 {
     public class InlineCommentMargin : IWpfTextViewMargin
     {

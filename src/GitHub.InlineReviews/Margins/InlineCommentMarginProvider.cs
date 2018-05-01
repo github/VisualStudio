@@ -8,7 +8,7 @@ using GitHub.InlineReviews.Services;
 using GitHub.Services;
 using GitHub.Settings;
 
-namespace GitHub.InlineReviews
+namespace GitHub.InlineReviews.Margins
 {
     [Export(typeof(IWpfTextViewMarginProvider))]
     [Name(InlineCommentMargin.MarginName)]

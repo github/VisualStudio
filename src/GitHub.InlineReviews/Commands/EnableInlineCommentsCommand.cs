@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GitHub.VisualStudio;
-using GitHub.Services.Vssdk.Commands;
 using System.ComponentModel.Composition;
+using GitHub.VisualStudio;
+using GitHub.InlineReviews.Margins;
+using GitHub.Services.Vssdk.Commands;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;

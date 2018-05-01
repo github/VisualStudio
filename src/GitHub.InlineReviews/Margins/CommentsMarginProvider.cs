@@ -7,7 +7,7 @@ using GitHub.InlineReviews.Commands;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace GitHub.InlineReviews
+namespace GitHub.InlineReviews.Margins
 {
     /// <summary>
     /// Export a <see cref="IWpfTextViewMarginProvider"/>, which returns an instance of the margin for the editor to use.

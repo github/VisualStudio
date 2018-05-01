@@ -73,15 +73,15 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
-    <Compile Include="CommentsMargin.cs" />
-    <Compile Include="CommentsMarginProvider.cs" />
+    <Compile Include="Margins\CommentsMargin.cs" />
+    <Compile Include="Margins\CommentsMarginProvider.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
     <Compile Include="Glyph\IGlyphFactory.cs" />
-    <Compile Include="InlineCommentMargin.cs" />
-    <Compile Include="InlineCommentMarginVisible.cs" />
-    <Compile Include="InlineCommentMarginEnabled.cs" />
+    <Compile Include="Margins\InlineCommentMargin.cs" />
+    <Compile Include="Margins\InlineCommentMarginVisible.cs" />
+    <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="Services\InlineCommentPeekService.cs" />
     <Compile Include="Services\PullRequestSession.cs" />
     <Compile Include="Services\PullRequestSessionManager.cs" />
-    <Compile Include="InlineCommentMarginProvider.cs" />
+    <Compile Include="Margins\InlineCommentMarginProvider.cs" />
     <Compile Include="Services\PullRequestSessionService.cs" />
     <Compile Include="ViewModels\CommentsMarginViewModel.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
@@ -471,6 +471,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != '' And '$(NCrunch)' != '1'" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

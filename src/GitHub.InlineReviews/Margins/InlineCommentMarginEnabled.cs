@@ -3,7 +3,7 @@ using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace GitHub.InlineReviews
+namespace GitHub.InlineReviews.Margins
 {
     [Export(typeof(EditorOptionDefinition))]
     [Name(OptionName)]
