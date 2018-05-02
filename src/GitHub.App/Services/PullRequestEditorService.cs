@@ -235,28 +235,26 @@ namespace GitHub.Services
                 FromLine = thread.LineNumber - 1,
             };
 
-            await RaiseWhenAvailable(Guids.CommandSetString, PkgCmdIDList.NextInlineCommentId, param, 1000);
+            // HACK: We need to wait here for the inline comment tags to initialize so we can find the next inline comment.
+            // There must be a better way of doing this.
+            await Task.Delay(1500);
+            RaiseWhenAvailable(Guids.CommandSetString, PkgCmdIDList.NextInlineCommentId, param);
 
             return diffViewer;
         }
 
-        static async Task<bool> RaiseWhenAvailable(string guid, int id, object param, int millisecondsDelay)
+        static bool RaiseWhenAvailable(string guid, int id, object param)
         {
             var commands = VisualStudio.Services.Dte.Commands;
             var command = commands.Item(guid, id);
 
-            if (!command.IsAvailable)
+            if (command.IsAvailable)
             {
-                await Task.Delay(millisecondsDelay);
+                commands.Raise(command.Guid, command.ID, ref param, null);
+                return true;
             }
 
-            if (!command.IsAvailable)
-            {
-                return false;
-            }
-
-            commands.Raise(command.Guid, command.ID, ref param, null);
-            return true;
+            return false;
         }
 
         public void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView)
