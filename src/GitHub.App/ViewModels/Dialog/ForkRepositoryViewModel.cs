@@ -18,15 +18,18 @@ namespace GitHub.ViewModels.Dialog
         readonly IForkRepositorySelectViewModel selectPage;
         readonly IForkRepositorySwitchViewModel switchPage;
         readonly IForkRepositoryExecuteViewModel executePage;
+        readonly IRepositoryForkService repositoryForkService;
 
         [ImportingConstructor]
         public ForkRepositoryViewModel(
             IForkRepositorySelectViewModel selectPage,
             IForkRepositorySwitchViewModel switchPage,
-            IForkRepositoryExecuteViewModel executePage)
+            IForkRepositoryExecuteViewModel executePage,
+            IRepositoryForkService repositoryForkService)
         {
             this.selectPage = selectPage;
             this.executePage = executePage;
+            this.repositoryForkService = repositoryForkService;
             this.switchPage = switchPage;
 
             Completed = ReactiveCommand.Create();

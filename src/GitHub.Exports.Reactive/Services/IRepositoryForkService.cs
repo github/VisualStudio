@@ -10,5 +10,6 @@ namespace GitHub.Services
     {
         IObservable<Repository> ForkRepository(IApiClient apiClient, IRepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream);
         IObservable<object> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream);
+        IObservable<bool> IsCurrentBranchTrackingAndAhead();
     }
 }

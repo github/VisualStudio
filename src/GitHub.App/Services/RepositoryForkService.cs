@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -32,21 +33,37 @@ namespace GitHub.Services
 
         public IObservable<Repository> ForkRepository(IApiClient apiClient, IRepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
         {
-            return Observable.Defer(() => apiClient.ForkRepository(sourceRepository.Owner, sourceRepository.Name, repositoryFork)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(remoteRepo => new { RemoteRepo = remoteRepo, ActiveRepo = vsGitServices.GetActiveRepo() }))
-                .SelectMany(async repo =>
+//            return Observable.Defer(() => apiClient.ForkRepository(sourceRepository.Owner, sourceRepository.Name, repositoryFork)
+//                    .ObserveOn(RxApp.MainThreadScheduler)
+//                    .Select(remoteRepo => new { RemoteRepo = remoteRepo, ActiveRepo = vsGitServices.GetActiveRepo() }))
+//                .SelectMany(async repo =>
+//                {
+//                    using (repo.ActiveRepo)
+//                    {
+//                        var originUri = repo.RemoteRepo != null ? new Uri(repo.RemoteRepo.CloneUrl) : null;
+//                        var upstreamUri = addUpstream ? sourceRepository.CloneUrl.ToUri() : null;
+//
+//                        await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream);
+//
+//                        RecordForkRepositoryUsage(updateOrigin, addUpstream, trackMasterUpstream).Forget();
+//
+//                        return repo.RemoteRepo;
+//                    }
+//                });
+
+            return Observable.Return<Repository>(null);
+        }
+
+        public IObservable<bool> IsCurrentBranchTrackingAndAhead()
+        {
+            return Observable.Defer(() => Observable.Return<object>(null))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Select(o =>
                 {
-                    using (repo.ActiveRepo)
+                    var activeRepo = vsGitServices.GetActiveRepo();
+                    using (activeRepo)
                     {
-                        var originUri = repo.RemoteRepo != null ? new Uri(repo.RemoteRepo.CloneUrl) : null;
-                        var upstreamUri = addUpstream ? sourceRepository.CloneUrl.ToUri() : null;
-
-                        await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream);
-
-                        RecordForkRepositoryUsage(updateOrigin, addUpstream, trackMasterUpstream).Forget();
-
-                        return repo.RemoteRepo;
+                        return activeRepo.Head.IsTracking && activeRepo.Head.TrackingDetails.AheadBy > 0;
                     }
                 });
         }

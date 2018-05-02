@@ -46,6 +46,8 @@ namespace GitHub.ViewModels.Dialog
 
         public IRepositoryModel SourceRepository { get; private set; }
 
+        public bool IsCurrentBranchAhead { get; private set; }
+
         public IAccount DestinationAccount { get; private set; }
 
         public IRepositoryModel DestinationRepository { get; private set; }
@@ -60,6 +62,8 @@ namespace GitHub.ViewModels.Dialog
         {
             var modelService = await modelServiceFactory.CreateAsync(connection);
             apiClient = modelService.ApiClient;
+
+            IsCurrentBranchAhead = await repositoryForkService.IsCurrentBranchTrackingAndAhead();
 
             DestinationAccount = destinationAccount;
 
