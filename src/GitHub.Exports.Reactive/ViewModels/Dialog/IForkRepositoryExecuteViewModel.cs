@@ -29,6 +29,10 @@ namespace GitHub.ViewModels.Dialog
 
         bool UpdateOrigin { get; set; }
 
+        bool CanAddUpstream { get; }
+
+        bool CanResetMasterTracking { get; }
+
         /// <summary>
         /// Initializes the view model.
         /// </summary>

@@ -46,6 +46,10 @@ namespace GitHub.SampleData
 
         public bool UpdateOrigin { get; set; } = true;
 
+        public bool CanAddUpstream => UpdateOrigin;
+
+        public bool CanResetMasterTracking => UpdateOrigin && AddUpstream;
+
         public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             return Task.CompletedTask;

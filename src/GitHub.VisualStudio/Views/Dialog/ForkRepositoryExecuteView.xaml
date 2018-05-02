@@ -55,7 +55,7 @@
       </Border>
       <Border Style="{StaticResource ItemBorder}">
         <DockPanel>
-          <CheckBox IsChecked="{Binding AddUpstream}"/>
+          <CheckBox IsChecked="{Binding AddUpstream}" IsEnabled="{Binding CanAddUpstream}" />
           <TextBlock TextWrapping="Wrap">
             Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
           <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
@@ -64,7 +64,7 @@
       </Border>
       <Border Style="{StaticResource ItemBorder}">
         <DockPanel>
-          <CheckBox IsChecked="{Binding ResetMasterTracking}"/>
+          <CheckBox IsChecked="{Binding ResetMasterTracking}" IsEnabled="{Binding CanResetMasterTracking}" />
           <TextBlock TextWrapping="Wrap">
             Set the <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">master</Run> branch to track
             <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream/master</Run>
