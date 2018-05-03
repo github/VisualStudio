@@ -77,6 +77,8 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>&amp;Connect to GitHub</ButtonText>
+          <CanonicalName>.GitHub.ConnectToGitHub</CanonicalName>
+          <LocCanonicalName>.GitHub.ConnectToGitHub</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -85,6 +87,8 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>GitHub</ButtonText>
+          <CanonicalName>.GitHub.ShowGitHubPane</CanonicalName>
+          <LocCanonicalName>.GitHub.ShowGitHubPane</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -93,8 +97,8 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Show Current Pull Request</ButtonText>
-          <CanonicalName>GitHub.ShowCurrentPullRequest</CanonicalName>
-          <LocCanonicalName>GitHub.ShowCurrentPullRequest</LocCanonicalName>
+          <CanonicalName>.GitHub.ShowCurrentPullRequest</CanonicalName>
+          <LocCanonicalName>.GitHub.ShowCurrentPullRequest</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -105,6 +109,8 @@
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText>Back</ButtonText>
+          <CanonicalName>.GitHub.Back</CanonicalName>
+          <LocCanonicalName>.GitHub.Back</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -114,6 +120,8 @@
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText>Forward</ButtonText>
+          <CanonicalName>.GitHub.Forward</CanonicalName>
+          <LocCanonicalName>.GitHub.Forward</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -123,6 +131,8 @@
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText>Pull Requests</ButtonText>
+          <CanonicalName>.GitHub.PullRequests</CanonicalName>
+          <LocCanonicalName>.GitHub.PullRequests</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -132,6 +142,8 @@
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText>Refresh</ButtonText>
+          <CanonicalName>.GitHub.Refresh</CanonicalName>
+          <LocCanonicalName>.GitHub.Refresh</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -141,6 +153,8 @@
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText>View on GitHub</ButtonText>
+          <CanonicalName>.GitHub.ViewOnGitHub</CanonicalName>
+          <LocCanonicalName>.GitHub.ViewOnGitHub</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -149,6 +163,8 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Help</ButtonText>
+          <CanonicalName>.GitHub.Help</CanonicalName>
+          <LocCanonicalName>.GitHub.Help</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -159,6 +175,8 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Create a GitHub Gist</ButtonText>
+          <CanonicalName>.GitHub.CreateGist</CanonicalName>
+          <LocCanonicalName>.GitHub.CreateGist</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -169,6 +187,8 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Open on GitHub</ButtonText>
+          <CanonicalName>.GitHub.OpenLink</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenLink</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -179,6 +199,8 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Copy link to clipboard</ButtonText>
+          <CanonicalName>.GitHub.CopyLink</CanonicalName>
+          <LocCanonicalName>.GitHub.CopyLink</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -189,9 +211,11 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Blame</ButtonText>
+          <CanonicalName>.GitHub.Blame</CanonicalName>
+          <LocCanonicalName>.GitHub.Blame</LocCanonicalName>
         </Strings>
       </Button>
-      
+
       <Button guid="guidContextMenuSet" id="openFileInSolutionCommand" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -199,6 +223,8 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Open File in Solution</ButtonText>
+          <CanonicalName>.GitHub.OpenFileInSolution</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFileInSolution</LocCanonicalName>
         </Strings>
       </Button>
 
