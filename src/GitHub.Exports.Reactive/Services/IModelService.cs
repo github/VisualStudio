@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
@@ -33,5 +34,6 @@ namespace GitHub.Services
         IObservable<IBranch> GetBranches(IRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
         IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
+        Task<IList<IOrganizationDetailsModel>> GetCurrentUserOrganizationDetails();
     }
 }

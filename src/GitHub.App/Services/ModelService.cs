@@ -388,6 +388,45 @@ namespace GitHub.Services
                     });
         }
 
+        public async Task<IList<IOrganizationDetailsModel>> GetCurrentUserOrganizationDetails()
+        {
+            try
+            {
+                string cursor = null;
+                var result = new List<IOrganizationDetailsModel>();
+
+                while (true)
+                {
+                    var query = new Query()
+                        .Viewer
+                        .Organizations(first: 30, after: cursor)
+                        .Select(x => new
+                        {
+                            x.PageInfo.HasNextPage,
+                            x.PageInfo.EndCursor,
+                            Items = x.Nodes.Select(y => new OrganizationDetailsModel()
+                            {
+                                Name = y.Name,
+                                ViewerCanCreateProjects = y.ViewerCanCreateProjects
+                            }).ToList()
+                        });
+
+                    var page = await graphql.Run(query);
+                    result.AddRange(page.Items);
+
+                    if (page.HasNextPage)
+                        cursor = page.EndCursor;
+                    else
+                        return result;
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error");
+                throw;
+            }
+        }
+
 #pragma warning disable CS0618 // DatabaseId is marked obsolete by GraphQL but we need it
         async Task<IList<IPullRequestReviewModel>> GetPullRequestReviews(string owner, string name, int number)
         {

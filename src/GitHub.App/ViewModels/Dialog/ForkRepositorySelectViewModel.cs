@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Factories;
@@ -65,6 +66,7 @@ namespace GitHub.ViewModels.Dialog
             try
             {
                 var modelService = await modelServiceFactory.CreateAsync(connection);
+                var organizationDetails = await modelService.GetCurrentUserOrganizationDetails();
 
                 Observable.CombineLatest(
                     modelService.GetAccounts(),
@@ -84,7 +86,7 @@ namespace GitHub.ViewModels.Dialog
                             current = current.Parent;
                         }
 
-                        Accounts = BuildAccounts(x.Accounts, repository, forks, parents);
+                        Accounts = BuildAccounts(x.Accounts, organizationDetails, repository, forks, parents);
                     });
 
             }
@@ -95,15 +97,17 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
+        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, IList<IOrganizationDetailsModel> organizations, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
         {
             log.Verbose("BuildAccounts: {AccessibleAccounts} accessibleAccounts, {Forks} forks, {Parents} parents", accessibleAccounts.Count, forks.Count, parents.Count);
 
             var existingForksAndParents = forks.Union(parents).ToDictionary(model => model.Owner);
+            var organizationDictionary = organizations.ToDictionary(model => model.Name);
 
             return accessibleAccounts
                 .Where(x => x.Login != currentRepository.Owner)
                 .Where(x => !existingForksAndParents.ContainsKey(x.Login))
+                .Where(x => x.IsUser || organizationDictionary.ContainsKey(x.Login) && organizationDictionary[x.Login].ViewerCanCreateProjects)
                 .ToList();
         }
     }

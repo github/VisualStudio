@@ -166,8 +166,10 @@
     <Compile Include="Models\DiffUtilities.cs" />
     <Compile Include="Models\ICommentModel.cs" />
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
+    <Compile Include="Models\IOrganizationForkTargetModel.cs" />
     <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
     <Compile Include="Models\IPullRequestReviewModel.cs" />
+    <Compile Include="Models\OrganizationForkTargetModel.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
