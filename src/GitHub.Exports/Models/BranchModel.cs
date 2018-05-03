@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -31,7 +32,7 @@ namespace GitHub.Models
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
             Name = DisplayName = branch.FriendlyName;
 #pragma warning disable 0618 // TODO: Replace `Branch.Remote` with `Repository.Network.Remotes[branch.RemoteName]`.
-            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url) : repo;
+            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url, GitService.GitServiceHelper) : repo;
 #pragma warning restore 0618
             IsTracking = branch.IsTracking;
             Sha = branch.Tip?.Sha;

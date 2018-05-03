@@ -211,6 +211,7 @@
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
+    <Compile Include="SampleData\GitServiceDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewFileCommentViewModelDesigner.cs" />
