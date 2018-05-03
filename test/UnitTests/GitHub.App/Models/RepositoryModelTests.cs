@@ -57,12 +57,11 @@ public class RepositoryModelTests
         {
             using (var temp = new TempDirectory())
             {
-                var provider = Substitutes.ServiceProvider;
-                var gitservice = provider.GetGitService();
+                var gitService = Substitute.For<IGitService>();
                 var repo = Substitute.For<IRepository>();
                 var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitservice.GetUri(path.FullName).Returns((UriString)null);
-                var model = new LocalRepositoryModel(path.FullName);
+                gitService.GetUri(path.FullName).Returns((UriString)null);
+                var model = new LocalRepositoryModel(path.FullName, gitService);
                 Assert.That("repo-name", Is.EqualTo(model.Name));
             }
         }
@@ -72,12 +71,11 @@ public class RepositoryModelTests
         {
             using (var temp = new TempDirectory())
             {
-                var provider = Substitutes.ServiceProvider;
-                var gitservice = provider.GetGitService();
+                var gitService = Substitute.For<IGitService>();
                 var repo = Substitute.For<IRepository>();
                 var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-                var model = new LocalRepositoryModel(path.FullName);
+                gitService.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
+                var model = new LocalRepositoryModel(path.FullName, gitService);
                 Assert.That("repo-name", Is.EqualTo(model.Name));
                 Assert.That("user", Is.EqualTo(model.Owner));
             }
