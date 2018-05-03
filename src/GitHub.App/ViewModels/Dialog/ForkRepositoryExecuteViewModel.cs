@@ -98,12 +98,10 @@ namespace GitHub.ViewModels.Dialog
                 .ForkRepository(apiClient, SourceRepository, newRepositoryFork, UpdateOrigin, CanAddUpstream && AddUpstream, CanResetMasterTracking && ResetMasterTracking)
                 .Catch<Repository, Exception>(ex =>
                 {
-                    if (!ex.IsCriticalException())
-                    {
-                        log.Error(ex, "Error Creating Fork");
-                        var error = ex.GetUserFriendlyErrorMessage(ErrorType.RepoForkFailed);
-                        notificationService.ShowError(error);
-                    }
+                    log.Error(ex, "Error Creating Fork");
+
+                    var apiEx = ex as ApiException;
+                    Error = apiEx != null ? apiEx.Message : "An unexpected error occurred.";
 
                     return Observable.Return<Repository>(null);
                 });
@@ -142,6 +140,13 @@ namespace GitHub.ViewModels.Dialog
         {
             get { return resetMasterTracking; }
             set { this.RaiseAndSetIfChanged(ref resetMasterTracking, value); }
+        }
+
+        string error = null;
+        public string Error
+        {
+            get { return error; }
+            private set { this.RaiseAndSetIfChanged(ref error, value); }
         }
     }
 }

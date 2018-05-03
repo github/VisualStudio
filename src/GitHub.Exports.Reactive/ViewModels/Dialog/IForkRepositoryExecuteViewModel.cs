@@ -33,6 +33,8 @@ namespace GitHub.ViewModels.Dialog
 
         bool CanResetMasterTracking { get; }
 
+        string Error { get; }
+
         /// <summary>
         /// Initializes the view model.
         /// </summary>

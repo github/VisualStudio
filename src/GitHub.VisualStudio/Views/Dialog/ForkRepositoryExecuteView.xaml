@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:ui="https://github.com/github/VisualStudio"
              Margin="8"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignWidth="300" Height="315.179">
 
   <d:DesignProperties.DataContext>
     <sampleData:ForkRepositoryExecuteViewModelDesigner/>
@@ -72,7 +72,14 @@
         </DockPanel>
       </Border>
       <Border Style="{StaticResource ItemBorder}">
-        <Button Click="repoForkButton_OnClick">Fork Repo</Button>
+        <StackPanel >
+          <Button Click="repoForkButton_OnClick">Fork Repo</Button>
+          <TextBlock TextWrapping="Wrap"
+                     Foreground="Red" 
+                     Text="{Binding Error, Mode=OneWay}"
+                     HorizontalAlignment="Center"
+                     Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}"/>
+        </StackPanel>
       </Border>
     </ItemsControl>
   </StackPanel>

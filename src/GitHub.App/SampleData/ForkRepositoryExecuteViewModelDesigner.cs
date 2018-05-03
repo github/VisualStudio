@@ -50,6 +50,8 @@ namespace GitHub.SampleData
 
         public bool CanResetMasterTracking => UpdateOrigin && AddUpstream;
 
+        public string Error { get; } = "I AM ERROR";
+
         public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             return Task.CompletedTask;
