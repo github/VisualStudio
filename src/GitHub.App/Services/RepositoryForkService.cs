@@ -7,6 +7,7 @@ using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.ViewModels.Dialog;
 using LibGit2Sharp;
 using Octokit;
 using ReactiveUI;
@@ -19,6 +20,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryForkService : IRepositoryForkService
     {
+        static readonly ILogger log = LogManager.ForContext<RepositoryForkService>();
+
         readonly IGitClient gitClient;
         readonly IVSGitServices vsGitServices;
         readonly IUsageTracker usageTracker;
@@ -33,24 +36,29 @@ namespace GitHub.Services
 
         public IObservable<Repository> ForkRepository(IApiClient apiClient, IRepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
         {
-//            return Observable.Defer(() => apiClient.ForkRepository(sourceRepository.Owner, sourceRepository.Name, repositoryFork)
-//                    .ObserveOn(RxApp.MainThreadScheduler)
-//                    .Select(remoteRepo => new { RemoteRepo = remoteRepo, ActiveRepo = vsGitServices.GetActiveRepo() }))
-//                .SelectMany(async repo =>
-//                {
-//                    using (repo.ActiveRepo)
-//                    {
-//                        var originUri = repo.RemoteRepo != null ? new Uri(repo.RemoteRepo.CloneUrl) : null;
-//                        var upstreamUri = addUpstream ? sourceRepository.CloneUrl.ToUri() : null;
-//
-//                        await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream);
-//
-//                        RecordForkRepositoryUsage(updateOrigin, addUpstream, trackMasterUpstream).Forget();
-//
-//                        return repo.RemoteRepo;
-//                    }
-//                });
+            log.Verbose("ForkRepository Source:{SourceOwner}/{SourceName} To:{DestinationOwner}", sourceRepository.Owner, sourceRepository.Name, repositoryFork.Organization ?? "[Current User]");
+            log.Verbose("ForkRepository updateOrigin:{UpdateOrigin} addUpstream:{AddUpstream} trackMasterUpstream:{TrackMasterUpstream}", updateOrigin, addUpstream, trackMasterUpstream);
 
+            RecordForkRepositoryUsage(updateOrigin, addUpstream, trackMasterUpstream).Forget();
+/*
+            return Observable.Defer(() => apiClient.ForkRepository(sourceRepository.Owner, sourceRepository.Name, repositoryFork)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(remoteRepo => new { RemoteRepo = remoteRepo, ActiveRepo = updateOrigin ? vsGitServices.GetActiveRepo() : null }))
+                .SelectMany(async repo =>
+                {
+                    if (repo.ActiveRepo != null)
+                    {
+                        using (repo.ActiveRepo)
+                        {
+                            var originUri = repo.RemoteRepo != null ? new Uri(repo.RemoteRepo.CloneUrl) : null;
+                            var upstreamUri = addUpstream ? sourceRepository.CloneUrl.ToUri() : null;
+
+                            await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream);
+                        }
+                    }
+
+                    return repo.RemoteRepo;
+*/
             return Observable.Return<Repository>(null);
         }
 
@@ -113,25 +121,27 @@ namespace GitHub.Services
                 });
         }
 
-        private async Task SwitchRemotes(IRepository repository, Uri originUri = null, Uri upstreamUri = null, bool trackMasterUpstream = false)
+        private async Task SwitchRemotes(IRepository repository, Uri originUri, Uri upstreamUri = null, bool trackMasterUpstream = false)
         {
-            if (originUri != null || upstreamUri != null)
+            Guard.ArgumentNotNull(originUri, nameof(originUri));
+
+            log.Verbose("Set remote origin to {OriginUri}", originUri);
+
+            await gitClient.SetRemote(repository, "origin", originUri);
+
+            if (upstreamUri != null)
             {
-                if (originUri != null)
+                log.Verbose("Set remote upstream to {UpstreamUri}", upstreamUri);
+
+                await gitClient.SetRemote(repository, "upstream", upstreamUri);
+
+                await gitClient.Fetch(repository, "upstream");
+
+                if (trackMasterUpstream)
                 {
-                    await gitClient.SetRemote(repository, "origin", originUri);
-                }
+                    log.Verbose("set master tracking to upstream");
 
-                if (upstreamUri != null)
-                {
-                    await gitClient.SetRemote(repository, "upstream", upstreamUri);
-
-                    await gitClient.Fetch(repository, "upstream");
-
-                    if (trackMasterUpstream)
-                    {
-                        await gitClient.SetTrackingBranch(repository, "master", "upstream");
-                    }
+                    await gitClient.SetTrackingBranch(repository, "master", "upstream");
                 }
             }
         }

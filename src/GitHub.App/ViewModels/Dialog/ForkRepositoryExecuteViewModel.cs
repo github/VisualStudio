@@ -41,6 +41,12 @@ namespace GitHub.ViewModels.Dialog
             this.notificationService = notificationService;
             this.repositoryForkService = repositoryForkService;
 
+            this.WhenAnyValue(model => model.UpdateOrigin)
+                .Subscribe(value => CanAddUpstream = value);
+
+            this.WhenAnyValue(model => model.UpdateOrigin, model => model.AddUpstream)
+                .Subscribe(tuple => CanResetMasterTracking = tuple.Item1 && tuple.Item2);
+
             CreateFork = ReactiveCommand.CreateAsyncObservable(OnCreateFork);
         }
 
@@ -92,7 +98,8 @@ namespace GitHub.ViewModels.Dialog
                 Organization = !DestinationAccount.IsUser ? DestinationAccount.Login : null
             };
 
-            return repositoryForkService.ForkRepository(apiClient, SourceRepository, newRepositoryFork, UpdateOrigin, AddUpstream, ResetMasterTracking)
+            return repositoryForkService
+                .ForkRepository(apiClient, SourceRepository, newRepositoryFork, UpdateOrigin, CanAddUpstream && AddUpstream, CanResetMasterTracking && ResetMasterTracking)
                 .Catch<Repository, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
@@ -106,11 +113,18 @@ namespace GitHub.ViewModels.Dialog
                 });
         }
 
-        bool resetMasterTracking = true;
-        public bool ResetMasterTracking
+        bool updateOrigin = true;
+        public bool UpdateOrigin
         {
-            get { return resetMasterTracking; }
-            set { this.RaiseAndSetIfChanged(ref resetMasterTracking, value); }
+            get { return updateOrigin; }
+            set { this.RaiseAndSetIfChanged(ref updateOrigin, value); }
+        }
+
+        bool canAddUpstream = true;
+        public bool CanAddUpstream
+        {
+            get { return canAddUpstream; }
+            private set { this.RaiseAndSetIfChanged(ref canAddUpstream, value); }
         }
 
         bool addUpstream = true;
@@ -120,11 +134,18 @@ namespace GitHub.ViewModels.Dialog
             set { this.RaiseAndSetIfChanged(ref addUpstream, value); }
         }
 
-        bool updateOrigin = true;
-        public bool UpdateOrigin
+        bool canResetMasterTracking = true;
+        public bool CanResetMasterTracking
         {
-            get { return updateOrigin; }
-            set { this.RaiseAndSetIfChanged(ref updateOrigin, value); }
+            get { return canResetMasterTracking; }
+            private set { this.RaiseAndSetIfChanged(ref canResetMasterTracking, value); }
+        }
+
+        bool resetMasterTracking = true;
+        public bool ResetMasterTracking
+        {
+            get { return resetMasterTracking; }
+            set { this.RaiseAndSetIfChanged(ref resetMasterTracking, value); }
         }
     }
 }
