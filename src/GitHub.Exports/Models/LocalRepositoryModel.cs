@@ -24,8 +24,8 @@ namespace GitHub.Models
         /// <param name="name">The repository name.</param>
         /// <param name="cloneUrl">The repository's clone URL.</param>
         /// <param name="localPath">The repository's local path.</param>
-        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath)
-            : base(name, cloneUrl)
+        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath, IGitService gitService = null)
+            : base(name, cloneUrl, gitService)
         {
             Guard.ArgumentNotEmptyString(localPath, nameof(localPath));
 
@@ -37,8 +37,8 @@ namespace GitHub.Models
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
         /// </summary>
         /// <param name="path">The repository's local path.</param>
-        public LocalRepositoryModel(string path)
-            : base(path)
+        public LocalRepositoryModel(string path, IGitService gitService = null)
+            : base(path, gitService)
         {
             LocalPath = path;
             Icon = Octicon.repo;
@@ -51,7 +51,7 @@ namespace GitHub.Models
         {
             if (LocalPath == null)
                 return;
-            CloneUrl = GitService.GitServiceHelper.GetUri(LocalPath);
+            CloneUrl = GitService.GetUri(LocalPath);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace GitHub.Models
             if (CloneUrl == null)
                 return null;
 
-            var sha = await GitService.GitServiceHelper.GetLatestPushedSha(path ?? LocalPath);
+            var sha = await GitService.GetLatestPushedSha(path ?? LocalPath);
             // this also incidentally checks whether the repo has a valid LocalPath
             if (String.IsNullOrEmpty(sha))
                 return CloneUrl.ToRepositoryUrl().AbsoluteUri;
@@ -157,7 +157,7 @@ namespace GitHub.Models
         {
             get
             {
-                using (var repo = GitService.GitServiceHelper.GetRepository(LocalPath))
+                using (var repo = GitService.GetRepository(LocalPath))
                 {
                     return repo?.Commits.FirstOrDefault()?.Sha ?? string.Empty;
                 }
@@ -172,7 +172,7 @@ namespace GitHub.Models
             get
             {
                 // BranchModel doesn't keep a reference to Repository
-                using (var repo = GitService.GitServiceHelper.GetRepository(LocalPath))
+                using (var repo = GitService.GetRepository(LocalPath))
                 {
                     return new BranchModel(repo?.Head, this);
                 }

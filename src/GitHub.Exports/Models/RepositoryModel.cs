@@ -24,7 +24,8 @@ namespace GitHub.Models
         /// <param name="cloneUrl">The repository's clone URL.</param>
         public RepositoryModel(
             string name,
-            UriString cloneUrl)
+            UriString cloneUrl,
+            IGitService gitService = null) : this(gitService)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
             Guard.ArgumentNotNull(cloneUrl, nameof(cloneUrl));
@@ -40,16 +41,21 @@ namespace GitHub.Models
         /// The path to the local repository from which repository name and clone URL will be
         /// extracted.
         /// </param>
-        protected RepositoryModel(string path)
+        protected RepositoryModel(string path, IGitService gitService = null) : this(gitService)
         {
             Guard.ArgumentNotNull(path, nameof(path));
 
             var dir = new DirectoryInfo(path);
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = GitService.GitServiceHelper.GetUri(path);
+            var uri = gitService.GetUri(path);
             Name = uri?.RepositoryName ?? dir.Name;
-            CloneUrl = GitService.GitServiceHelper.GetUri(path);
+            CloneUrl = gitService.GetUri(path);
+        }
+
+        RepositoryModel(IGitService gitService = null)
+        {
+            GitService = gitService ?? Services.GitService.GitServiceHelper;
         }
 
         /// <summary>
@@ -107,5 +113,7 @@ namespace GitHub.Models
                     ? Octicon.repo_forked
                     : Octicon.repo;
         }
+
+        protected IGitService GitService { get; }
     }
 }
