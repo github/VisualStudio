@@ -74,7 +74,13 @@ namespace GitHub.Services
                 ?.Url;
         }
 
-        public static IGitService GitServiceHelper => VisualStudio.Services.DefaultExportProvider.GetExportedValueOrDefault<IGitService>() ?? new GitService();
+        /// <summary>
+        /// Get a new instance of <see cref="GitService"/>. 
+        /// </summary>
+        /// <remarks>
+        /// This is equivalent to creating it via MEF with <see cref="CreationPolicy.NonShared"/>
+        /// </remarks>
+        public static IGitService GitServiceHelper => new GitService();
 
         /// <summary>
         /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
