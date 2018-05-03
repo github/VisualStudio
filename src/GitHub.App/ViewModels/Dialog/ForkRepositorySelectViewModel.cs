@@ -69,11 +69,22 @@ namespace GitHub.ViewModels.Dialog
                 Observable.CombineLatest(
                     modelService.GetAccounts(),
                     modelService.GetRepository(repository.Owner, repository.Name),
-                    (a, r) => new { Accounts = a, Respoitory = r})
+                    modelService.GetForks(repository).ToList(),
+                    (a, r, f) => new { Accounts = a, Respoitory = r, Forks = f })
                     .Finally(() => IsLoading = false)
                     .Subscribe(x =>
                     {
-                        Accounts = BuildAccounts(x.Accounts, repository.Owner);
+                        var forks = x.Forks;
+
+                        var parents = new List<IRemoteRepositoryModel>();
+                        var current = x.Respoitory;
+                        while (current.Parent != null)
+                        {
+                            parents.Add(current.Parent);
+                            current = current.Parent;
+                        }
+
+                        Accounts = BuildAccounts(x.Accounts, repository, forks, parents);
                     });
 
             }
@@ -84,10 +95,16 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        IReadOnlyList<IAccount> BuildAccounts(IEnumerable<IAccount> accessibleAccounts, string currentRepositoryOwner)
+        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
         {
+            log.Verbose("BuildAccounts: {AccessibleAccounts} accessibleAccounts, {Forks} forks, {Parents} parents", accessibleAccounts.Count, forks.Count, parents.Count);
+
+            var existingForksAndParents = forks.Union(parents).ToDictionary(model => model.Owner);
+
             return accessibleAccounts
-                .Where(x => x.Login != currentRepositoryOwner).ToList();
+                .Where(x => x.Login != currentRepository.Owner)
+                .Where(x => !existingForksAndParents.ContainsKey(x.Login))
+                .ToList();
         }
     }
 }
