@@ -25,7 +25,6 @@ namespace GitHub.ViewModels.Dialog
         static readonly ILogger log = LogManager.ForContext<ForkRepositoryExecuteViewModel>();
 
         readonly IModelServiceFactory modelServiceFactory;
-        readonly INotificationService notificationService;
         readonly IRepositoryForkService repositoryForkService;
 
         IApiClient apiClient;
@@ -33,12 +32,10 @@ namespace GitHub.ViewModels.Dialog
         [ImportingConstructor]
         public ForkRepositoryExecuteViewModel(
             IModelServiceFactory modelServiceFactory,
-            INotificationService notificationService,
             IRepositoryForkService repositoryForkService
             )
         {
             this.modelServiceFactory = modelServiceFactory;
-            this.notificationService = notificationService;
             this.repositoryForkService = repositoryForkService;
 
             this.WhenAnyValue(model => model.UpdateOrigin)
