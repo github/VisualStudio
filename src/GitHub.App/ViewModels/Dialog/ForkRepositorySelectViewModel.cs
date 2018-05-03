@@ -84,7 +84,7 @@ namespace GitHub.ViewModels.Dialog
                             current = current.Parent;
                         }
 
-                        Accounts = BuildAccounts(x.Accounts, repository, forks, parents);
+                        BuildAccounts(x.Accounts, repository, forks, parents);
                     });
 
             }
@@ -95,16 +95,19 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        IReadOnlyList<IAccount> BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
+        void BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
         {
             log.Verbose("BuildAccounts: {AccessibleAccounts} accessibleAccounts, {Forks} forks, {Parents} parents", accessibleAccounts.Count, forks.Count, parents.Count);
 
             var existingForksAndParents = forks.Union(parents).ToDictionary(model => model.Owner);
 
-            return accessibleAccounts
-                .Where(x => x.Login != currentRepository.Owner)
-                .Where(x => !existingForksAndParents.ContainsKey(x.Login))
-                .ToList();
+            var readOnlyList = accessibleAccounts
+                .Where(account => account.Login != currentRepository.Owner)
+                .Select(account => new {Account = account, Fork = existingForksAndParents.ContainsKey(account.Login) ? existingForksAndParents[account.Login] : null })
+                .ToArray();
+
+            Accounts = readOnlyList.Where(arg => arg.Fork == null).Select(arg => arg.Account).ToList();
+            ExistingForks = readOnlyList.Where(arg => arg.Fork != null).Select(arg => arg.Fork).ToList();
         }
     }
 }
