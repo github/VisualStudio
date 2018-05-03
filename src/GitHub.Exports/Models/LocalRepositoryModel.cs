@@ -26,6 +26,7 @@ namespace GitHub.Models
         /// <param name="name">The repository name.</param>
         /// <param name="cloneUrl">The repository's clone URL.</param>
         /// <param name="localPath">The repository's local path.</param>
+        /// <param name="gitService">The service used to refresh the repository's URL.</param>
         public LocalRepositoryModel(string name, UriString cloneUrl, string localPath, IGitService gitService)
             : base(name, cloneUrl)
         {
@@ -41,6 +42,7 @@ namespace GitHub.Models
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
         /// </summary>
         /// <param name="path">The repository's local path.</param>
+        /// <param name="gitService">The service used to find the repository's URL.</param>
         public LocalRepositoryModel(string path, IGitService gitService)
             : base(path, gitService)
         {

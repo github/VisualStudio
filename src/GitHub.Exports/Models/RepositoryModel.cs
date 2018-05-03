@@ -40,6 +40,7 @@ namespace GitHub.Models
         /// The path to the local repository from which repository name and clone URL will be
         /// extracted.
         /// </param>
+        /// <param name="gitService">The service used to find the repository's <see cref="Name"/> and <see cref="CloneUrl"/>.</param>
         protected RepositoryModel(string path, IGitService gitService)
         {
             Guard.ArgumentNotNull(path, nameof(path));
