@@ -259,6 +259,7 @@ namespace GitHub.Services
                     }).ToList(),
                     Title = pr.Title,
                     State = (PullRequestStateEnum)pr.State,
+                    UpdatedAt = pr.UpdatedAt,
                 }).Compile();
 
             var vars = new Dictionary<string, object>
@@ -268,7 +269,19 @@ namespace GitHub.Services
                 { nameof(number), number },
             };
 
-            return graphql.Run(query, vars).ToObservable();
+            return graphql.Run(query, vars)
+                .ToObservable()
+                .SelectMany(async pr =>
+                {
+                    var files = await ApiClient.GetPullRequestFiles(owner, name, number).ToList();
+                    pr.ChangedFiles = files.Select(file =>
+                        new PullRequestFileModel(
+                            file.FileName,
+                            file.Sha,
+                            (PullRequestFileStatus)Enum.Parse(typeof(PullRequestFileStatus), file.Status, true)))
+                        .ToList();
+                    return pr;
+                });
         }
 #pragma warning restore CS0618 // Type or member is obsolete
 
