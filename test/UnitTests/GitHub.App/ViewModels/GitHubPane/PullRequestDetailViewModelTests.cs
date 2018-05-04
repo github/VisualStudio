@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Commands;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using LibGit2Sharp;
@@ -577,8 +577,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<IModelServiceFactory>(),
                 Substitute.For<IUsageTracker>(),
                 Substitute.For<ITeamExplorerContext>(),
-                Substitute.For<IStatusBarNotificationService>(),
-                Substitute.For<IPullRequestFilesViewModel>());
+                Substitute.For<IPullRequestFilesViewModel>(),
+                Substitute.For<ISyncSubmodulesCommand>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
