@@ -207,33 +207,70 @@ namespace GitHub.Services
             return collection;
         }
 
+#pragma warning disable CS0618 // DatabaseId is marked obsolete by GraphQL but we need it
         public IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number)
         {
-            return Observable.Defer(() =>
+            var query = new Query()
+                .Repository(Var("owner"), Var("name"))
+                .PullRequest(Var("number"))
+                .Select(pr => new PullRequestModel
+                {
+                    Author = Create(pr.Author.Login, pr.Author.AvatarUrl(null)),
+                    Base = pr.BaseRef != null ? 
+                        new GitReferenceModel(
+                            pr.BaseRef.Name,
+                            pr.BaseRef.Repository.Owner.Login + ':' + pr.BaseRef.Name,
+                            pr.BaseRef.Target.Oid,
+                            pr.BaseRef.Repository.Url) : null,
+                    Body = pr.Body,
+                    CreatedAt = pr.CreatedAt,
+                    Head = pr.HeadRef != null ?
+                        new GitReferenceModel(
+                            pr.HeadRef.Name,
+                            pr.HeadRef.Repository.Owner.Login + ':' + pr.HeadRef.Name,
+                            pr.HeadRef.Target.Oid,
+                            pr.HeadRef.Repository.Url) : null,
+                    Number = pr.Number,
+                    Reviews = pr.Reviews(100, null, null, null, null, null).Nodes.Select(review => new PullRequestReviewModel
+                    {
+                        Id = review.DatabaseId.Value,
+                        NodeId = review.Id.Value,
+                        Body = review.Body,
+                        CommitId = review.Commit.Oid,
+                        State = FromGraphQL(review.State),
+                        SubmittedAt = review.SubmittedAt,
+                        User = Create(review.Author.Login, review.Author.AvatarUrl(null)),
+                        Comments = review.Comments(100, null, null, null).Nodes.Select(comment => new PullRequestReviewCommentModel
+                        {
+                            Id = comment.DatabaseId.Value,
+                            NodeId = comment.Id.Value,
+                            Body = comment.Body,
+                            CommitId = comment.Commit.Oid,
+                            CreatedAt = comment.CreatedAt,
+                            DiffHunk = comment.DiffHunk,
+                            OriginalCommitId = comment.OriginalCommit.Oid,
+                            OriginalPosition = comment.OriginalPosition,
+                            Path = comment.Path,
+                            Position = comment.Position,
+                            PullRequestReviewId = review.DatabaseId.Value,
+                            User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
+                            IsPending = review.State == Octokit.GraphQL.Model.PullRequestReviewState.Pending,
+                        }).ToList(),
+                    }).ToList(),
+                    Title = pr.Title,
+                    State = (PullRequestStateEnum)pr.State,
+                }).Compile();
+
+            var vars = new Dictionary<string, object>
             {
-                return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
-                        Observable.CombineLatest(
-                            ApiClient.GetPullRequest(owner, name, number),
-                            ApiClient.GetPullRequestFiles(owner, name, number).ToList(),
-                            ApiClient.GetIssueComments(owner, name, number).ToList(),
-                            GetPullRequestReviews(owner, name, number).ToObservable(),
-                            (pr, files, comments, reviews) => new
-                            {
-                                PullRequest = pr,
-                                Files = files,
-                                Comments = comments,
-                                Reviews = reviews,
-                            })
-                            .Select(x => PullRequestCacheItem.Create(
-                                x.PullRequest, 
-                                (IReadOnlyList<PullRequestFile>)x.Files,
-                                (IReadOnlyList<IssueComment>)x.Comments,
-                                (IReadOnlyList<IPullRequestReviewModel>)x.Reviews)),
-                        TimeSpan.Zero,
-                        TimeSpan.FromDays(7))
-                    .Select(Create);
-            });
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(number), number },
+            };
+
+            return graphql.Run(query, vars).ToObservable();
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo)
         {

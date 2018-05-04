@@ -9,8 +9,8 @@ namespace GitHub.Models
     public enum PullRequestStateEnum
     {
         Open,
-        Merged,
         Closed,
+        Merged,
     }
 
     public interface IPullRequestModel : ICopyable<IPullRequestModel>,
