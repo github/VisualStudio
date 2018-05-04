@@ -102,6 +102,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubCmdSet" id="syncSubmodulesCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Sync Submodules</ButtonText>
+          <CanonicalName>.GitHub.SyncSubmodules</CanonicalName>
+          <LocCanonicalName>.GitHub.SyncSubmodules</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
         <Icon guid="guidImages" id="arrow_left" />
@@ -321,6 +331,7 @@
       <IDSymbol name="addConnectionCommand" value="0x110"/>
       <IDSymbol name="showGitHubPaneCommand" value="0x200"/>
       <IDSymbol name="showCurrentPullRequestCommand" value="0x202"/>
+      <IDSymbol name="syncSubmodulesCommand" value="0x0203" />
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->
