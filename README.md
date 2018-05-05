@@ -12,6 +12,8 @@ If you have an existing clone, make sure to run `git submodule sync` to update y
 
 ## About
 
+Official Documentation: https://docs.google.com/document/d/1-ldILWoCydQKVkLlHCSeyO6pvboPGkdVLticKRe5pnE/edit?usp=sharing
+
 The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015.
 Most of the extension UI lives in the Team Explorer pane, which is available from the View menu.
 
