@@ -35,7 +35,10 @@ namespace GitHub.VisualStudio.Base
             syncContext = SynchronizationContext.Current;
 
             UpdateActiveRepo();
-            gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
+            if (gitService != null)
+            {
+                gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
+            }
         }
 
 
