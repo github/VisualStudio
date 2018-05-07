@@ -596,7 +596,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewModel> PostStandaloneReviewCommentRepy(
+        public async Task<IPullRequestReviewModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
