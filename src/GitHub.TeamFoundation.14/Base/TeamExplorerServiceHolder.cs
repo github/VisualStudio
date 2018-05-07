@@ -35,7 +35,10 @@ namespace GitHub.VisualStudio.Base
             syncContext = SynchronizationContext.Current;
 
             UpdateActiveRepo();
-            gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
+            if (gitService != null)
+            {
+                gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
+            }
         }
 
 
@@ -135,7 +138,9 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateActiveRepo()
         {
-            var repo = gitService.ActiveRepositories.FirstOrDefault();
+            // NOTE: gitService will be null in Expression Blend or Safe Mode
+            var repo = gitService?.ActiveRepositories.FirstOrDefault();
+
             if (!Equals(repo, ActiveRepo))
                 // so annoying that this is on the wrong thread
                 syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
