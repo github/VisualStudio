@@ -23,13 +23,15 @@ namespace GitHub.Services
 
         readonly IGitClient gitClient;
         readonly IVSGitServices vsGitServices;
+        readonly IVSGitExt vsGitExt;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public RepositoryForkService(IGitClient gitClient, IVSGitServices vsGitServices, IUsageTracker usageTracker)
+        public RepositoryForkService(IGitClient gitClient, IVSGitServices vsGitServices, IVSGitExt vsGitExt, IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.vsGitServices = vsGitServices;
+            this.vsGitExt = vsGitExt;
             this.usageTracker = usageTracker;
         }
 
@@ -99,6 +101,11 @@ namespace GitHub.Services
 
                         await SwitchRemotes(activeRepo, updateOrigin ? destinationRepository.CloneUrl.ToUri() : null,
                             currentOrigin, trackMasterUpstream);
+
+                        if (updateOrigin)
+                        {
+                            vsGitExt.RefreshActiveRepositories();
+                        }
 
                         return new object();
                     }
