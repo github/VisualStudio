@@ -109,7 +109,7 @@ namespace GitHub.VisualStudio
     public class ServiceProviderExports
     {
         // Only export services for the Visual Studio process (they don't work in Expression Blend).
-        const string ProcessName = "devenv";
+        public const string VisualStudioProcessName = "devenv";
 
         readonly IServiceProvider serviceProvider;
 
@@ -119,19 +119,19 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        [ExportForProcess(ProcessName)]
+        [ExportForProcess(VisualStudioProcessName)]
         public ILoginManager LoginManager => GetService<ILoginManager>();
 
-        [ExportForProcess(ProcessName)]
+        [ExportForProcess(VisualStudioProcessName)]
         public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
 
-        [ExportForProcess(ProcessName)]
+        [ExportForProcess(VisualStudioProcessName)]
         public IUsageTracker UsageTracker => GetService<IUsageTracker>();
 
-        [ExportForProcess(ProcessName)]
+        [ExportForProcess(VisualStudioProcessName)]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
-        [ExportForProcess(ProcessName)]
+        [ExportForProcess(VisualStudioProcessName)]
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
