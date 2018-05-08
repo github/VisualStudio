@@ -119,19 +119,19 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        [ExportForProcess(typeof(ILoginManager), ProcessName)]
+        [ExportForProcess(ProcessName)]
         public ILoginManager LoginManager => GetService<ILoginManager>();
 
-        [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
+        [ExportForProcess(ProcessName)]
         public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
 
-        [ExportForProcess(typeof(IUsageTracker), ProcessName)]
+        [ExportForProcess(ProcessName)]
         public IUsageTracker UsageTracker => GetService<IUsageTracker>();
 
-        [ExportForProcess(typeof(IVSGitExt), ProcessName)]
+        [ExportForProcess(ProcessName)]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
-        [ExportForProcess(typeof(IPackageSettings), ProcessName)]
+        [ExportForProcess(ProcessName)]
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));

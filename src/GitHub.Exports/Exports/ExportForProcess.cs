@@ -20,15 +20,15 @@ namespace GitHub.Exports
         /// <summary>
         /// Define an export that is only exposed in a specific named process.
         /// </summary>
-        /// <param name="contractType">The contract type to expose.</param>
         /// <param name="processName">Name of the process to expose export from (e.g. 'devenv').</param>
-        public ExportForProcessAttribute(Type contractType, string processName) :
-            base(ContractNameForProcess(contractType, processName), contractType)
+        /// <param name="contractType">The contract type to expose.</param>
+        public ExportForProcessAttribute(string processName, Type contractType = null) :
+            base(ContractNameForProcess(processName), contractType)
         {
             ProcessName = processName;
         }
 
-        static string ContractNameForProcess(Type contractType, string processName)
+        static string ContractNameForProcess(string processName)
         {
             var enabled = Process.GetCurrentProcess().ProcessName == processName;
             return enabled ? null : DisabledContractName;
