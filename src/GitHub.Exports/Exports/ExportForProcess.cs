@@ -14,19 +14,24 @@ namespace GitHub.Exports
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public sealed class ExportForProcessAttribute : ExportAttribute
     {
+        // Unique name for exports that have been disabled
+        const string DisabledContractName = "GitHub.Disabled";
+
         /// <summary>
         /// Define an export that is only exposed in a specific named process.
         /// </summary>
         /// <param name="contractType">The contract type to expose.</param>
         /// <param name="processName">Name of the process to expose export from (e.g. 'devenv').</param>
-        public ExportForProcessAttribute(Type contractType, string processName) : base(ExportForProcess(contractType, processName))
+        public ExportForProcessAttribute(Type contractType, string processName) :
+            base(ContractNameForProcess(contractType, processName), contractType)
         {
             ProcessName = processName;
         }
 
-        static Type ExportForProcess(Type contractType, string processName)
+        static string ContractNameForProcess(Type contractType, string processName)
         {
-            return Process.GetCurrentProcess().ProcessName == processName ? contractType : null;
+            var enabled = Process.GetCurrentProcess().ProcessName == processName;
+            return enabled ? null : DisabledContractName;
         }
 
         /// <summary>
