@@ -12,7 +12,7 @@ namespace GitHub.Exports
     /// See: https://github.com/github/VisualStudio/pull/1055
     /// </remarks>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class ExportForProcessAttribute : ExportAttribute
+    public class ExportForProcessAttribute : ExportAttribute
     {
         // Unique name for exports that have been disabled
         const string DisabledContractName = "GitHub.Disabled";
@@ -30,9 +30,11 @@ namespace GitHub.Exports
 
         static string ContractNameForProcess(string processName)
         {
-            var enabled = Process.GetCurrentProcess().ProcessName == processName;
+            var enabled = IsProcess(processName);
             return enabled ? null : DisabledContractName;
         }
+
+        public static bool IsProcess(string processName) => Process.GetCurrentProcess().ProcessName == processName;
 
         /// <summary>
         /// The process name export will be exposed in.

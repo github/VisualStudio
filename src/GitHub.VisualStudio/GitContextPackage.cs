@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
+using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
@@ -24,10 +24,9 @@ namespace GitHub.VisualStudio
 
         protected async override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            var processName = Process.GetCurrentProcess().ProcessName;
-            if (processName != ServiceProviderExports.VisualStudioProcessName)
+            if (!ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
-                log.Warning("Don't activate `UIContext_Git` for non-Visual Studio process `{ProcessName}`", processName);
+                log.Warning("Don't activate 'UIContext_Git' for non-Visual Studio process");
                 return;
             }
 
