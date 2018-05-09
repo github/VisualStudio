@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -101,14 +102,18 @@ namespace GitHub.Services
 
                         await SwitchRemotes(activeRepo, updateOrigin ? destinationRepository.CloneUrl.ToUri() : null,
                             currentOrigin, trackMasterUpstream);
-
-                        if (updateOrigin)
-                        {
-                            vsGitExt.RefreshActiveRepositories();
-                        }
-
-                        return new object();
                     }
+
+                    if (updateOrigin)
+                    {
+                        vsGitExt.RefreshActiveRepositories();
+
+                        var updatedRepository = vsGitExt.ActiveRepositories.FirstOrDefault();
+                        log.Assert(updatedRepository.CloneUrl == destinationRepository.CloneUrl,
+                            "CloneUrl is {UpdatedRepository} not {DestinationRepository}", updatedRepository.CloneUrl, destinationRepository.CloneUrl);
+                    }
+
+                    return new object();
                 });
         }
 
