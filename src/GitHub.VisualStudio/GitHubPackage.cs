@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Design;
@@ -74,6 +73,12 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
+            if (!ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
+            {
+                log.Warning("Don't initialize menus for non-Visual Studio process");
+                return;
+            }
+
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
             var commands = new IVsCommandBase[]
@@ -108,9 +113,6 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ServiceProviderExports
     {
-        // Only export services for the Visual Studio process (they don't work in Expression Blend).
-        public const string VisualStudioProcessName = "devenv";
-
         readonly IServiceProvider serviceProvider;
 
         [ImportingConstructor]
@@ -119,19 +121,19 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        [ExportForProcess(VisualStudioProcessName)]
+        [ExportForVisualStudioProcess]
         public ILoginManager LoginManager => GetService<ILoginManager>();
 
-        [ExportForProcess(VisualStudioProcessName)]
+        [ExportForVisualStudioProcess]
         public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
 
-        [ExportForProcess(VisualStudioProcessName)]
+        [ExportForVisualStudioProcess]
         public IUsageTracker UsageTracker => GetService<IUsageTracker>();
 
-        [ExportForProcess(VisualStudioProcessName)]
+        [ExportForVisualStudioProcess]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
-        [ExportForProcess(VisualStudioProcessName)]
+        [ExportForVisualStudioProcess]
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
