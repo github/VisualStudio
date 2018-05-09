@@ -87,6 +87,7 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
                 exports.GetExportedValue<IShowGitHubPaneCommand>(),
                 exports.GetExportedValue<IOpenFileInSolutionCommand>(),
+                exports.GetExportedValue<ISyncSubmodulesCommand>()
             };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();

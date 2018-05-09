@@ -194,6 +194,17 @@ namespace GitHub.Services
 
                 diffViewer = GetDiffViewer(frame);
 
+                if (diffViewer.LeftView.TextBuffer.CurrentSnapshot.GetText() == string.Empty)
+                {
+                    // Don't show LeftView when empty.
+                    diffViewer.ViewMode = DifferenceViewMode.RightViewOnly;
+                }
+                else if (diffViewer.RightView.TextBuffer.CurrentSnapshot.GetText() == string.Empty)
+                {
+                    // Don't show RightView when empty.
+                    diffViewer.ViewMode = DifferenceViewMode.LeftViewOnly;
+                }
+
                 AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, mergeBase, DiffSide.Left);
 
                 if (!workingDirectory)

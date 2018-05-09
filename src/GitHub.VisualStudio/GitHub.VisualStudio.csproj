@@ -319,6 +319,7 @@
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
     <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\SyncSubmodulesCommand.cs" />
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\OpenPullRequestsCommand.cs" />
