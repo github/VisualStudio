@@ -9,6 +9,7 @@ namespace GitHub.Exports
     /// This attribute is used to mark exports that mustn't be loaded into Blend.
     /// See: https://github.com/github/VisualStudio/pull/1055
     /// </remarks>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public sealed class ExportForVisualStudioProcessAttribute : ExportForProcessAttribute
     {
         const string VisualStudioProcessName = "devenv";

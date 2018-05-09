@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
 
 namespace GitHub.Exports
@@ -11,6 +12,7 @@ namespace GitHub.Exports
     /// This attribute is used to mark exports that mustn't be loaded into Blend.
     /// See: https://github.com/github/VisualStudio/pull/1055
     /// </remarks>
+    [SuppressMessage("Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Justification = "Extended by ExportForVisualStudioProcessAttribute")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class ExportForProcessAttribute : ExportAttribute
     {
