@@ -13,12 +13,12 @@ namespace GitHub.InlineReviews.Margins
     /// Export a <see cref="IWpfTextViewMarginProvider"/>, which returns an instance of the margin for the editor to use.
     /// </summary>
     [Export(typeof(IWpfTextViewMarginProvider))]
-    [Name(CommentsMargin.MarginName)]
+    [Name(PullRequestFileMargin.MarginName)]
     [Order(After = PredefinedMarginNames.ZoomControl)]
     [MarginContainer(PredefinedMarginNames.BottomControl)]             // Set the container to the bottom of the editor window
     [ContentType("text")]                                       // Show this margin for all text-based types
     [TextViewRole(PredefinedTextViewRoles.Editable)]
-    internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
+    internal sealed class PullRequestFileMarginProvider : IWpfTextViewMarginProvider
     {
         readonly IPullRequestSessionManager sessionManager;
         readonly IToggleInlineCommentMarginCommand enableInlineCommentsCommand;
@@ -26,7 +26,7 @@ namespace GitHub.InlineReviews.Margins
         readonly IPackageSettings packageSettings;
 
         [ImportingConstructor]
-        public CommentsMarginFactory(
+        public PullRequestFileMarginProvider(
             IToggleInlineCommentMarginCommand enableInlineCommentsCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager,
@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand,
+            return new PullRequestFileMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand,
                 sessionManager);
         }
 

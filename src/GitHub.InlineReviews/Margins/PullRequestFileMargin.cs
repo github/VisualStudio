@@ -16,9 +16,12 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews.Margins
 {
-    internal class CommentsMargin : IWpfTextViewMargin
+    /// <summary>
+    /// This margin appears on solution files that have a corresponding PR file (file with changes in current PR).
+    /// </summary>
+    internal class PullRequestFileMargin : IWpfTextViewMargin
     {
-        public const string MarginName = "CommentsMargin";
+        public const string MarginName = "PullRequestFileMargin";
 
         readonly IWpfTextView textView;
         readonly CommentsMarginViewModel viewModel;
@@ -31,7 +34,7 @@ namespace GitHub.InlineReviews.Margins
         IDisposable optionChangedSubscription;
         IDisposable visibilitySubscription;
 
-        public CommentsMargin(
+        public PullRequestFileMargin(
             IWpfTextView textView,
             IToggleInlineCommentMarginCommand toggleInlineCommentMarginCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
