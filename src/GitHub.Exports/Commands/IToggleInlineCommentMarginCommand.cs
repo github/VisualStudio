@@ -2,7 +2,7 @@
 
 namespace GitHub.InlineReviews.Commands
 {
-    public interface IEnableInlineCommentsCommand : IVsCommand
+    public interface IToggleInlineCommentMarginCommand : IVsCommand
     {
     }
 }

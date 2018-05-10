@@ -21,13 +21,13 @@ namespace GitHub.InlineReviews.Margins
     internal sealed class CommentsMarginFactory : IWpfTextViewMarginProvider
     {
         readonly IPullRequestSessionManager sessionManager;
-        readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
+        readonly IToggleInlineCommentMarginCommand enableInlineCommentsCommand;
         readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
         readonly IPackageSettings packageSettings;
 
         [ImportingConstructor]
         public CommentsMarginFactory(
-            IEnableInlineCommentsCommand enableInlineCommentsCommand,
+            IToggleInlineCommentMarginCommand enableInlineCommentsCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager,
             IPackageSettings packageSettings)

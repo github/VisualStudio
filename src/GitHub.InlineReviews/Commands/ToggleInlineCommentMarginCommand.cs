@@ -11,8 +11,8 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Commands
 {
-    [Export(typeof(IEnableInlineCommentsCommand))]
-    public class EnableInlineCommentsCommand : VsCommand, IEnableInlineCommentsCommand
+    [Export(typeof(IToggleInlineCommentMarginCommand))]
+    public class ToggleInlineCommentMarginCommand : VsCommand, IToggleInlineCommentMarginCommand
     {
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -22,13 +22,13 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the numeric identifier of the command.
         /// </summary>
-        public const int CommandId = PkgCmdIDList.EnableInlineCommentsId;
+        public const int CommandId = PkgCmdIDList.toggleInlineCommentMarginCommand;
 
         readonly Lazy<IVsTextManager> textManager;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
 
         [ImportingConstructor]
-        public EnableInlineCommentsCommand(
+        public ToggleInlineCommentMarginCommand(
             IGitHubServiceProvider serviceProvider,
             Lazy<IVsEditorAdaptersFactoryService> editorAdapter) : base(CommandSet, CommandId)
         {

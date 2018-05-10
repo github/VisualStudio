@@ -17,7 +17,7 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
-        <CheckBox Command="{Binding EnableInlineCommentsCommand}" IsChecked="{Binding MarginEnabled, Mode=OneWay}" Margin="4 0">
+        <CheckBox Command="{Binding ToggleInlineCommentMarginCommand}" IsChecked="{Binding MarginEnabled, Mode=OneWay}" Margin="4 0">
             <TextBlock VerticalAlignment="Center">
                 <Run Text="{Binding FileName}"/>
                 <ghfvs:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0" />
