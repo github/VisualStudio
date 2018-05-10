@@ -323,7 +323,7 @@
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\OpenPullRequestsCommand.cs" />
-    <Compile Include="Commands\OpenFileInSolutionCommand.cs" />
+    <Compile Include="Commands\GoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="GitContextPackage.cs" />
     <Compile Include="GitHubPanePackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />

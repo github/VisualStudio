@@ -34,13 +34,13 @@ namespace GitHub.InlineReviews.Margins
         public CommentsMargin(
             IWpfTextView textView,
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
-            IOpenFileInSolutionCommand openFileInSolutionCommand,
+            IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager)
         {
             this.textView = textView;
             this.sessionManager = sessionManager;
 
-            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, openFileInSolutionCommand);
+            viewModel = new CommentsMarginViewModel(enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand);
             visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>

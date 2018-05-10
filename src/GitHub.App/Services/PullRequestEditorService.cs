@@ -36,7 +36,7 @@ namespace GitHub.Services
         readonly IPullRequestService pullRequestService;
         readonly IVsEditorAdaptersFactoryService vsEditorAdaptersFactory;
         readonly IStatusBarNotificationService statusBar;
-        readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
+        readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
         readonly IEditorOptionsFactoryService editorOptionsFactoryService;
         readonly IUsageTracker usageTracker;
 
@@ -46,7 +46,7 @@ namespace GitHub.Services
             IPullRequestService pullRequestService,
             IVsEditorAdaptersFactoryService vsEditorAdaptersFactory,
             IStatusBarNotificationService statusBar,
-            IOpenFileInSolutionCommand openFileInSolutionCommand,
+            IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IEditorOptionsFactoryService editorOptionsFactoryService,
             IUsageTracker usageTracker)
         {
@@ -54,15 +54,15 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(pullRequestService, nameof(pullRequestService));
             Guard.ArgumentNotNull(vsEditorAdaptersFactory, nameof(vsEditorAdaptersFactory));
             Guard.ArgumentNotNull(statusBar, nameof(statusBar));
-            Guard.ArgumentNotNull(openFileInSolutionCommand, nameof(openFileInSolutionCommand));
-            Guard.ArgumentNotNull(openFileInSolutionCommand, nameof(editorOptionsFactoryService));
+            Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(goToSolutionOrPullRequestFileCommand));
+            Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(editorOptionsFactoryService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             this.serviceProvider = serviceProvider;
             this.pullRequestService = pullRequestService;
             this.vsEditorAdaptersFactory = vsEditorAdaptersFactory;
             this.statusBar = statusBar;
-            this.openFileInSolutionCommand = openFileInSolutionCommand;
+            this.goToSolutionOrPullRequestFileCommand = goToSolutionOrPullRequestFileCommand;
             this.editorOptionsFactoryService = editorOptionsFactoryService;
             this.usageTracker = usageTracker;
         }
@@ -516,7 +516,7 @@ namespace GitHub.Services
         {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            TextViewCommandDispatcher.AddCommandFilter(vsTextView, commandGroup, commandId, openFileInSolutionCommand);
+            TextViewCommandDispatcher.AddCommandFilter(vsTextView, commandGroup, commandId, goToSolutionOrPullRequestFileCommand);
 
             EnableNavigateStatusBarMessage(vsTextView, session);
         }

@@ -14,8 +14,8 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Commands
 {
-    [Export(typeof(IOpenFileInSolutionCommand))]
-    public class OpenFileInSolutionCommand : VsCommand, IOpenFileInSolutionCommand
+    [Export(typeof(IGoToSolutionOrPullRequestFileCommand))]
+    public class GoToSolutionOrPullRequestFileCommand : VsCommand, IGoToSolutionOrPullRequestFileCommand
     {
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -25,7 +25,7 @@ namespace GitHub.Commands
         /// <summary>
         /// Gets the numeric identifier of the command.
         /// </summary>
-        public const int CommandId = PkgCmdIDList.openFileInSolutionCommand;
+        public const int CommandId = PkgCmdIDList.goToSolutionOrPullRequestFileCommand;
 
         readonly IGitHubServiceProvider serviceProvider;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
@@ -35,7 +35,7 @@ namespace GitHub.Commands
         readonly Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
-        public OpenFileInSolutionCommand(
+        public GoToSolutionOrPullRequestFileCommand(
             IGitHubServiceProvider serviceProvider,
             Lazy<IVsEditorAdaptersFactoryService> editorAdapter,
             Lazy<IPullRequestSessionManager> sessionManager,

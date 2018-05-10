@@ -156,7 +156,7 @@
     <Compile Include="Commands\INextInlineCommentCommand.cs" />
     <Compile Include="Commands\InlineCommentNavigationParams.cs" />
     <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
-    <Compile Include="Commands\IOpenFileInSolutionCommand.cs" />
+    <Compile Include="Commands\IGoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="Commands\IVsCommand.cs" />
     <Compile Include="Commands\IVsCommandBase.cs" />
     <Compile Include="Exports\ExportForProcess.cs" />

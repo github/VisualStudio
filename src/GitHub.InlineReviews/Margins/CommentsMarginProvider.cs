@@ -22,18 +22,18 @@ namespace GitHub.InlineReviews.Margins
     {
         readonly IPullRequestSessionManager sessionManager;
         readonly IEnableInlineCommentsCommand enableInlineCommentsCommand;
-        readonly IOpenFileInSolutionCommand openFileInSolutionCommand;
+        readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
         readonly IPackageSettings packageSettings;
 
         [ImportingConstructor]
         public CommentsMarginFactory(
             IEnableInlineCommentsCommand enableInlineCommentsCommand,
-            IOpenFileInSolutionCommand openFileInSolutionCommand,
+            IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager,
             IPackageSettings packageSettings)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
-            this.openFileInSolutionCommand = openFileInSolutionCommand;
+            this.goToSolutionOrPullRequestFileCommand = goToSolutionOrPullRequestFileCommand;
             this.sessionManager = sessionManager;
             this.packageSettings = packageSettings;
         }
@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, openFileInSolutionCommand,
+            return new CommentsMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand,
                 sessionManager);
         }
 

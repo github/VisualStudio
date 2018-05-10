@@ -54,7 +54,7 @@ public class PullRequestEditorServiceTests
         var pullRequestService = Substitute.For<IPullRequestService>();
         var vsEditorAdaptersFactory = Substitute.For<IVsEditorAdaptersFactoryService>();
         var statusBar = Substitute.For<IStatusBarNotificationService>();
-        var openFileInSolutionCommand = Substitute.For<IOpenFileInSolutionCommand>();
+        var openFileInSolutionCommand = Substitute.For<IGoToSolutionOrPullRequestFileCommand>();
         var editorOptionsFactoryService = Substitute.For<IEditorOptionsFactoryService>();
         var usageTracker = Substitute.For<IUsageTracker>();
         return new PullRequestEditorService(
