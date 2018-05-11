@@ -70,6 +70,8 @@ namespace GitHub.Models
             public int NumberOfShowCurrentPullRequest { get; set; }
             public int NumberOfStatusBarOpenPullRequestList { get; set; }
             public int NumberOfTeamExplorerHomeOpenPullRequestList { get; set; }
+            public int NumberOfStartPageClones { get; set; }
+            public int NumberOfGitHubConnectSectionClones { get; set; }
         }
     }
 }
