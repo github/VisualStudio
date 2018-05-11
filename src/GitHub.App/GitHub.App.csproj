@@ -205,6 +205,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\UsageTrackingCommand.cs" />
     <Compile Include="Factories\ViewViewModelFactory.cs" />
     <Compile Include="Factories\ModelServiceFactory.cs" />
     <Compile Include="Models\IssueCommentModel.cs" />
