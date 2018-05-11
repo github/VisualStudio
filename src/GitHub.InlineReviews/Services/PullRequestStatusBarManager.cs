@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.Services
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(
-            IUsageTracker usageTracker,
+            Lazy<IUsageTracker> usageTracker,
             IOpenPullRequestsCommand openPullRequestsCommand,
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
             Lazy<IPullRequestSessionManager> pullRequestSessionManager,
@@ -147,10 +147,10 @@ namespace GitHub.InlineReviews.Services
         class UsageTrackingCommand : ICommand
         {
             readonly ICommand command;
-            readonly IUsageTracker usageTracker;
+            readonly Lazy<IUsageTracker> usageTracker;
             readonly Expression<Func<UsageModel.MeasuresModel, int>> counter;
 
-            internal UsageTrackingCommand(ICommand command, IUsageTracker usageTracker,
+            internal UsageTrackingCommand(ICommand command, Lazy<IUsageTracker> usageTracker,
                 Expression<Func<UsageModel.MeasuresModel, int>> counter)
             {
                 this.command = command;
@@ -172,7 +172,7 @@ namespace GitHub.InlineReviews.Services
             public void Execute(object parameter)
             {
                 command.Execute(parameter);
-                usageTracker.IncrementCounter(counter).Forget();
+                usageTracker.Value.IncrementCounter(counter).Forget();
             }
         }
     }
