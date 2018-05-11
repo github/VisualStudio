@@ -3,14 +3,14 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
-    public class CommentsMarginViewModel : ReactiveObject
+    public class PullRequestFileMarginViewModel : ReactiveObject
     {
         bool enabled;
         string fileName;
         int commentsInFile;
         bool marginEnabled;
 
-        public CommentsMarginViewModel(ICommand toggleInlineCommentMarginCommand, ICommand viewChangesCommand)
+        public PullRequestFileMarginViewModel(ICommand toggleInlineCommentMarginCommand, ICommand viewChangesCommand)
         {
             ToggleInlineCommentMarginCommand = toggleInlineCommentMarginCommand;
             ViewChangesCommand = viewChangesCommand;

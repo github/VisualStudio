@@ -106,7 +106,7 @@
     <Compile Include="Services\PullRequestSessionManager.cs" />
     <Compile Include="Margins\InlineCommentMarginProvider.cs" />
     <Compile Include="Services\PullRequestSessionService.cs" />
-    <Compile Include="ViewModels\CommentsMarginViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestFileMarginViewModel.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="ViewModels\ICommentThreadViewModel.cs" />
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
@@ -115,8 +115,8 @@
     <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
-    <Compile Include="Views\CommentsMarginView.xaml.cs">
-      <DependentUpon>CommentsMarginView.xaml</DependentUpon>
+    <Compile Include="Views\PullRequestFileMarginView.xaml.cs">
+      <DependentUpon>PullRequestFileMarginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
@@ -430,7 +430,7 @@
       <SubType>Designer</SubType>
       <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
     </Page>
-    <Page Include="Views\CommentsMarginView.xaml">
+    <Page Include="Views\PullRequestFileMarginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

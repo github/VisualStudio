@@ -24,8 +24,8 @@ namespace GitHub.InlineReviews.Margins
         public const string MarginName = "PullRequestFileMargin";
 
         readonly IWpfTextView textView;
-        readonly CommentsMarginViewModel viewModel;
-        readonly CommentsMarginView visualElement;
+        readonly PullRequestFileMarginViewModel viewModel;
+        readonly PullRequestFileMarginView visualElement;
         readonly IPullRequestSessionManager sessionManager;
 
         bool isDisposed;
@@ -43,8 +43,8 @@ namespace GitHub.InlineReviews.Margins
             this.textView = textView;
             this.sessionManager = sessionManager;
 
-            viewModel = new CommentsMarginViewModel(toggleInlineCommentMarginCommand, goToSolutionOrPullRequestFileCommand);
-            visualElement = new CommentsMarginView { DataContext = viewModel, ClipToBounds = true };
+            viewModel = new PullRequestFileMarginViewModel(toggleInlineCommentMarginCommand, goToSolutionOrPullRequestFileCommand);
+            visualElement = new PullRequestFileMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>
             {
