@@ -27,18 +27,23 @@ namespace GitHub.InlineReviews.Commands
 
         readonly Lazy<IVsTextManager> textManager;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
+        readonly Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
         public ToggleInlineCommentMarginCommand(
             IGitHubServiceProvider serviceProvider,
-            Lazy<IVsEditorAdaptersFactoryService> editorAdapter) : base(CommandSet, CommandId)
+            Lazy<IVsEditorAdaptersFactoryService> editorAdapter,
+            Lazy<IUsageTracker> usageTracker) : base(CommandSet, CommandId)
         {
             textManager = new Lazy<IVsTextManager>(() => serviceProvider.GetService<SVsTextManager, IVsTextManager>());
             this.editorAdapter = editorAdapter;
+            this.usageTracker = usageTracker;
         }
 
         public override Task Execute()
         {
+            usageTracker.Value.IncrementCounter(x => x.ExecuteToggleInlineCommentMarginCommand);
+
             IVsTextView activeView = null;
             if (textManager.Value.GetActiveView(1, null, out activeView) == VSConstants.S_OK)
             {
