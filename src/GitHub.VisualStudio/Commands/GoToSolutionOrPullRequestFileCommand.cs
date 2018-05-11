@@ -104,10 +104,8 @@ namespace GitHub.Commands
                     return;
                 }
 
-                // Navigate from working file to PR diff
-                // TODO: add metrics
-                // await usageTracker.Value.IncrementCounter(x => x.NumberOf???);
-
+                // Navigate from solution file to PR diff file
+                await usageTracker.Value.IncrementCounter(x => x.NumberOfNavigateToPullRequestFileDiff);
 
                 var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD", scrollToFirstDiff: false);
                 if (diffViewer == null)
