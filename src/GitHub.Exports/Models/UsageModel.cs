@@ -72,6 +72,8 @@ namespace GitHub.Models
             public int NumberOfTeamExplorerHomeOpenPullRequestList { get; set; }
             public int NumberOfNavigateToPullRequestFileDiff { get; set; }
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
+            public int NumberOfPullRequestFileMarginToggleInlineCommentMargin { get; set; }
+            public int NumberOfPullRequestFileMarginViewChanges { get; set; }
         }
     }
 }

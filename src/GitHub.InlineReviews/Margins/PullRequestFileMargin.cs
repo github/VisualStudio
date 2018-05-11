@@ -9,7 +9,6 @@ using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
-using GitHub.InlineReviews.Commands;
 using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
@@ -38,12 +37,13 @@ namespace GitHub.InlineReviews.Margins
             IWpfTextView textView,
             IToggleInlineCommentMarginCommand toggleInlineCommentMarginCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            Lazy<IUsageTracker> usageTracker)
         {
             this.textView = textView;
             this.sessionManager = sessionManager;
 
-            viewModel = new PullRequestFileMarginViewModel(toggleInlineCommentMarginCommand, goToSolutionOrPullRequestFileCommand);
+            viewModel = new PullRequestFileMarginViewModel(toggleInlineCommentMarginCommand, goToSolutionOrPullRequestFileCommand, usageTracker);
             visualElement = new PullRequestFileMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>

@@ -3,7 +3,6 @@ using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Settings;
-using GitHub.InlineReviews.Commands;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
@@ -24,18 +23,21 @@ namespace GitHub.InlineReviews.Margins
         readonly IToggleInlineCommentMarginCommand enableInlineCommentsCommand;
         readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
         readonly IPackageSettings packageSettings;
+        readonly Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
         public PullRequestFileMarginProvider(
             IToggleInlineCommentMarginCommand enableInlineCommentsCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager,
-            IPackageSettings packageSettings)
+            IPackageSettings packageSettings,
+            Lazy<IUsageTracker> usageTracker)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
             this.goToSolutionOrPullRequestFileCommand = goToSolutionOrPullRequestFileCommand;
             this.sessionManager = sessionManager;
             this.packageSettings = packageSettings;
+            this.usageTracker = usageTracker;
         }
 
         /// <summary>
@@ -60,8 +62,8 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            return new PullRequestFileMargin(wpfTextViewHost.TextView, enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand,
-                sessionManager);
+            return new PullRequestFileMargin(
+                wpfTextViewHost.TextView, enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand, sessionManager, usageTracker);
         }
 
         bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");

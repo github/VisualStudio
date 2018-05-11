@@ -1,4 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
+using GitHub.Commands;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -10,10 +13,13 @@ namespace GitHub.InlineReviews.ViewModels
         int commentsInFile;
         bool marginEnabled;
 
-        public PullRequestFileMarginViewModel(ICommand toggleInlineCommentMarginCommand, ICommand viewChangesCommand)
+        public PullRequestFileMarginViewModel(ICommand toggleInlineCommentMarginCommand, ICommand viewChangesCommand,
+            Lazy<IUsageTracker> usageTracker)
         {
-            ToggleInlineCommentMarginCommand = toggleInlineCommentMarginCommand;
-            ViewChangesCommand = viewChangesCommand;
+            ToggleInlineCommentMarginCommand = toggleInlineCommentMarginCommand = new UsageTrackingCommand(
+                usageTracker, x => x.NumberOfPullRequestFileMarginToggleInlineCommentMargin, toggleInlineCommentMarginCommand);
+            ViewChangesCommand = viewChangesCommand = new UsageTrackingCommand(
+                usageTracker, x => x.NumberOfPullRequestFileMarginViewChanges, viewChangesCommand);
         }
 
         public bool Enabled
