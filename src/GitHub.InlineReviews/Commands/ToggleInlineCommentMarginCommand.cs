@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
+using GitHub.Commands;
+using GitHub.Services;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Margins;
 using GitHub.Services.Vssdk.Commands;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
-using GitHub.Services;
 
 namespace GitHub.InlineReviews.Commands
 {
@@ -22,7 +23,7 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the numeric identifier of the command.
         /// </summary>
-        public const int CommandId = PkgCmdIDList.toggleInlineCommentMarginCommand;
+        public const int CommandId = PkgCmdIDList.ToggleInlineCommentMarginId;
 
         readonly Lazy<IVsTextManager> textManager;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;

@@ -1,6 +1,4 @@
-﻿using GitHub.Commands;
-
-namespace GitHub.InlineReviews.Commands
+﻿namespace GitHub.Commands
 {
     public interface IToggleInlineCommentMarginCommand : IVsCommand
     {

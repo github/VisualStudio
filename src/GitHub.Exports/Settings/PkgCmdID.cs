@@ -26,6 +26,6 @@ namespace GitHub.VisualStudio
         // IDs defined in InlineReviewsPackage.vsct
         public const int NextInlineCommentId = 0x1001;
         public const int PreviousInlineCommentId = 0x1002;
-        public const int toggleInlineCommentMarginCommand = 0x1003; // TODO: Add to .vsct
+        public const int ToggleInlineCommentMarginId = 0x1003;
     };
 }
