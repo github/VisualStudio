@@ -109,8 +109,8 @@ namespace GitHub.Services
                         vsGitExt.RefreshActiveRepositories();
 
                         var updatedRepository = vsGitExt.ActiveRepositories.FirstOrDefault();
-                        log.Assert(updatedRepository.CloneUrl == destinationRepository.CloneUrl,
-                            "CloneUrl is {UpdatedRepository} not {DestinationRepository}", updatedRepository.CloneUrl, destinationRepository.CloneUrl);
+                        log.Assert(updatedRepository?.CloneUrl == destinationRepository.CloneUrl,
+                            "CloneUrl is {UpdatedRepository} not {DestinationRepository}", updatedRepository?.CloneUrl ?? "[NULL]", destinationRepository.CloneUrl);
                     }
 
                     return new object();
