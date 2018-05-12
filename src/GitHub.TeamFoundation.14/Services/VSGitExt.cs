@@ -74,7 +74,7 @@ namespace GitHub.VisualStudio.Base
             }, TaskScheduler.Default);
         }
 
-        void RefreshActiveRepositories()
+        public void RefreshActiveRepositories()
         {
             try
             {

@@ -57,5 +57,12 @@ namespace GitHub.Services
         /// unsuccessful.
         /// </returns>
         Task<IConnection> ShowLoginDialog();
+
+        /// <summary>
+        /// Shows the Fork Repository dialog.
+        /// </summary>
+        /// <param name="repository">The repository to fork.</param>
+        /// <param name="connection">The connection to use. May not be null.</param>
+        Task ShowForkDialog(ILocalRepositoryModel repository, IConnection connection);
     }
 }

@@ -32,6 +32,7 @@ namespace GitHub.VisualStudio
         {
             child.CollectMetrics = packageSettings.CollectMetrics;
             child.EditorComments = packageSettings.EditorComments;
+            child.ForkButton = packageSettings.ForkButton;
             child.EnableTraceLogging = packageSettings.EnableTraceLogging;
         }
 
@@ -39,6 +40,7 @@ namespace GitHub.VisualStudio
         {
             packageSettings.CollectMetrics = child.CollectMetrics;
             packageSettings.EditorComments = child.EditorComments;
+            packageSettings.ForkButton = child.ForkButton;
             packageSettings.EnableTraceLogging = child.EnableTraceLogging;
             packageSettings.Save();
         }
