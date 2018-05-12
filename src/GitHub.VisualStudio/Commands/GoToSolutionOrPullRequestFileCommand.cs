@@ -65,6 +65,14 @@ namespace GitHub.Commands
 
                 var textView = editorAdapter.Value.GetWpfTextView(sourceView);
 
+                bool isEditableDiff = pullRequestEditorService.Value.IsEditableDiff(textView);
+                if (isEditableDiff)
+                {
+                    // Open active document in Code View
+                    pullRequestEditorService.Value.OpenActiveDocumentInCodeView(sourceView);
+                    return;
+                }
+
                 var info = sessionManager.Value.GetTextBufferInfo(textView.TextBuffer);
                 if (info != null)
                 {
@@ -144,6 +152,15 @@ namespace GitHub.Commands
                 }
 
                 var textView = editorAdapter.Value.GetWpfTextView(sourceView);
+
+                if (pullRequestEditorService.Value.IsEditableDiff(textView))
+                {
+                    // Active text view is editable diff
+                    Text = "Open File in Code View";
+                    Visible = true;
+                    return;
+                }
+
                 var info = sessionManager.Value.GetTextBufferInfo(textView.TextBuffer);
                 if (info != null)
                 {

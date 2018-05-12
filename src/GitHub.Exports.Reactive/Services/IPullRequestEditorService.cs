@@ -58,5 +58,21 @@ namespace GitHub.Services
         /// <param name="sourceView">The text view to navigate from.</param>
         /// <param name="targetView">The text view to navigate to.</param>
         void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView);
+
+        /// <summary>
+        /// Check to see if text view is an ediatable document.
+        /// </summary>
+        /// <param name="textView">The text view to check.</param>
+        /// <returns>True if text view is editable and part of a diff view.</returns>
+        bool IsEditableDiff(ITextView textView);
+
+        /// <summary>
+        /// Open the active document in a new code view.
+        /// </summary>
+        /// <remarks>
+        /// If the active document is part of a diff view, open in a new code view.
+        /// </remarks>
+        /// <param name="sourceView">The source view to use the line and position from.</param>
+        void OpenActiveDocumentInCodeView(IVsTextView sourceView);
     }
 }

@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
+using EnvDTE;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -273,6 +274,25 @@ namespace GitHub.Services
             }
 
             return false;
+        }
+
+        public void OpenActiveDocumentInCodeView(IVsTextView sourceView)
+        {
+            var dte = serviceProvider.GetService<DTE>();
+            // Not sure how to get a file name directly from IVsTextView. Using DTE.ActiveDocument.FullName.
+            var fullPath = dte.ActiveDocument.FullName;
+            // VsShellUtilities.OpenDocument with VSConstants.LOGVIEWID.Code_guid always open a new Code view.
+            // Using DTE.ItemOperations.OpenFile with Constants.vsViewKindCode instead,
+            dte.ItemOperations.OpenFile(fullPath, EnvDTE.Constants.vsViewKindCode);
+            var codeView = FindActiveView();
+            NavigateToEquivalentPosition(sourceView, codeView);
+        }
+
+        public bool IsEditableDiff(ITextView textView)
+        {
+            var readOnly = textView.Options.GetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId);
+            var isDiff = IsDiff(textView);
+            return !readOnly && isDiff;
         }
 
         public void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView)
@@ -573,6 +593,8 @@ namespace GitHub.Services
                     fileChange.OldPath : file.RelativePath;
             }
         }
+
+        static bool IsDiff(ITextView textView) => textView.Roles.Contains("DIFF");
 
         static IDifferenceViewer GetDiffViewer(IVsWindowFrame frame)
         {
