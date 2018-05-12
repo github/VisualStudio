@@ -70,6 +70,11 @@ namespace GitHub.Models
             public int NumberOfShowCurrentPullRequest { get; set; }
             public int NumberOfStatusBarOpenPullRequestList { get; set; }
             public int NumberOfTeamExplorerHomeOpenPullRequestList { get; set; }
+            public int NumberOfShowRepoForkDialogClicks { get; set; }
+            public int NumberOfReposForked { get; set; }
+            public int NumberOfOriginsUpdatedWhenForkingRepo { get; set; }
+            public int NumberOfUpstreamsAddedWhenForkingRepo { get; set; }
+            public int NumberOfTrackMasterUpstreamWhenForkingRepo { get; set; }
             public int NumberOfNavigateToPullRequestFileDiff { get; set; }
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
             public int NumberOfPullRequestFileMarginToggleInlineCommentMargin { get; set; }

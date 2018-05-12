@@ -139,8 +139,8 @@ namespace GitHub.Services
         /// Sets the remote branch that the local branch tracks
         /// </summary>
         /// <param name="repository">The repository to set</param>
-        /// <param name="branchName">The name of the local remote</param>
-        /// <param name="remoteName">The name of the remote branch</param>
+        /// <param name="branchName">The name of the local branch</param>
+        /// <param name="remoteName">The name of the remote</param>
         /// <returns></returns>
         Task SetTrackingBranch(IRepository repository, string branchName, string remoteName);
 
