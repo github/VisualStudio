@@ -68,6 +68,9 @@ namespace GitHub.Commands
                 bool isEditableDiff = pullRequestEditorService.Value.IsEditableDiff(textView);
                 if (isEditableDiff)
                 {
+                    // Navigating from editable diff to code view
+                    await usageTracker.Value.IncrementCounter(x => x.NumberOfNavigateToCodeView);
+
                     // Open active document in Code View
                     pullRequestEditorService.Value.OpenActiveDocumentInCodeView(sourceView);
                     return;
