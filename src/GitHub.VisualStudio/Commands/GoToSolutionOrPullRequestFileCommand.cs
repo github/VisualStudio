@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Services;
+using GitHub.Extensions;
 using GitHub.VisualStudio;
 using GitHub.Services.Vssdk.Commands;
 using Microsoft.VisualStudio;
@@ -54,6 +55,8 @@ namespace GitHub.Commands
 
         public override async Task Execute()
         {
+            usageTracker.Value.IncrementCounter(x => x.ExecuteGoToSolutionOrPullRequestFileCommand).Forget();
+
             try
             {
                 var sourceView = pullRequestEditorService.Value.FindActiveView();

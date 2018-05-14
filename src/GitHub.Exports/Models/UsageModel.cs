@@ -75,6 +75,7 @@ namespace GitHub.Models
             public int NumberOfOriginsUpdatedWhenForkingRepo { get; set; }
             public int NumberOfUpstreamsAddedWhenForkingRepo { get; set; }
             public int NumberOfTrackMasterUpstreamWhenForkingRepo { get; set; }
+            public int ExecuteGoToSolutionOrPullRequestFileCommand { get; set; }
             public int NumberOfNavigateToPullRequestFileDiff { get; set; }
             public int NumberOfNavigateToCodeView { get; set; }
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
