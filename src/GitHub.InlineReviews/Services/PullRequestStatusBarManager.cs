@@ -5,8 +5,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using GitHub.Commands;
+using GitHub.Primitives;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
@@ -34,6 +36,7 @@ namespace GitHub.InlineReviews.Services
         // TeamExplorerContext needs to retrieve DTE using GetService.
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
+        readonly Lazy<IConnectionManager> connectionManager;
 
         IDisposable currentSessionSubscription;
 
@@ -43,7 +46,8 @@ namespace GitHub.InlineReviews.Services
             IOpenPullRequestsCommand openPullRequestsCommand,
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
             Lazy<IPullRequestSessionManager> pullRequestSessionManager,
-            Lazy<ITeamExplorerContext> teamExplorerContext)
+            Lazy<ITeamExplorerContext> teamExplorerContext,
+            Lazy<IConnectionManager> connectionManager)
         {
             this.openPullRequestsCommand = new UsageTrackingCommand(openPullRequestsCommand,
                 usageTracker, x => x.NumberOfStatusBarOpenPullRequestList);
@@ -52,6 +56,7 @@ namespace GitHub.InlineReviews.Services
 
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.teamExplorerContext = teamExplorerContext;
+            this.connectionManager = connectionManager;
         }
 
         /// <summary>
@@ -78,23 +83,53 @@ namespace GitHub.InlineReviews.Services
         {
             currentSessionSubscription?.Dispose();
             currentSessionSubscription = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
-                .Subscribe(x => RefreshCurrentSession(repository, x));
+                .Subscribe(x => RefreshCurrentSession(repository, x).Forget());
         }
 
-        void RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
+        async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
         {
-            var cloneUrl = repository?.CloneUrl;
-            var host = cloneUrl?.Host;
-            if (host != null && host.Equals("github.com", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                // Only show PR status bar if repo has remote
+                var showStatus = await IsDotComOrEnterpriseRepository(repository);
+                if (!showStatus)
+                {
+                    ShowStatus(null);
+                    return;
+                }
+
                 var viewModel = CreatePullRequestStatusViewModel(session);
                 ShowStatus(viewModel);
             }
-            else
+            catch (Exception e)
             {
-                ShowStatus(null);
+                log.Error(e, nameof(RefreshCurrentSession));
             }
+        }
+
+        async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
+        {
+            var cloneUrl = repository?.CloneUrl;
+            if (cloneUrl == null)
+            {
+                // No active repository or remote
+                return false;
+            }
+
+            var isDotCom = HostAddress.IsGitHubDotComUri(cloneUrl.ToRepositoryUrl());
+            if (isDotCom)
+            {
+                // This is a github.com repository
+                return true;
+            }
+
+            var connection = await connectionManager.Value.GetConnection(repository);
+            if (connection != null)
+            {
+                // This is an enterprise repository
+                return true;
+            }
+
+            return false;
         }
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestSession session)
