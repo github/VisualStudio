@@ -46,7 +46,7 @@
       </Border>
       <Border Style="{StaticResource ItemBorder}">
         <DockPanel>
-          <CheckBox IsChecked="{Binding UpdateOrigin}"/>
+          <CheckBox IsChecked="{Binding UpdateOrigin}" IsEnabled="False" />
           <TextBlock TextWrapping="Wrap">
           Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
           <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
@@ -55,7 +55,7 @@
       </Border>
       <Border Style="{StaticResource ItemBorder}">
         <DockPanel>
-          <CheckBox IsChecked="{Binding AddUpstream}" IsEnabled="{Binding CanAddUpstream}" />
+          <CheckBox IsChecked="{Binding AddUpstream}" IsEnabled="False" />
           <TextBlock TextWrapping="Wrap">
             Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
           <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
