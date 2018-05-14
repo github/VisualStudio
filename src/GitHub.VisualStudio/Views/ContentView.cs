@@ -17,6 +17,7 @@ namespace GitHub.VisualStudio.Views
     /// simply add an `[ExportViewFor]` attribute to this class with the type of the view model
     /// interface.
     /// </remarks>
+    [ExportViewFor(typeof(IForkRepositoryViewModel))]
     [ExportViewFor(typeof(ILoginViewModel))]
     [ExportViewFor(typeof(INavigationViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
