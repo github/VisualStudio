@@ -208,6 +208,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fork Repository.
+        /// </summary>
+        internal static string ForkRepositoryTitle {
+            get {
+                return ResourceManager.GetString("ForkRepositoryTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to InProgress.
         /// </summary>
         internal static string InProgress {
@@ -573,6 +582,15 @@ namespace GitHub.App {
         internal static string SourceRepositoryNoLongerAvailable {
             get {
                 return ResourceManager.GetString("SourceRepositoryNoLongerAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switch Origin.
+        /// </summary>
+        internal static string SwitchOriginTitle {
+            get {
+                return ResourceManager.GetString("SwitchOriginTitle", resourceCulture);
             }
         }
         
