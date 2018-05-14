@@ -55,7 +55,7 @@ namespace GitHub.ViewModels.Dialog
         {
             subscription?.Dispose();
             Content = viewModel;
-            subscription = viewModel.Done.Subscribe(done);
+            subscription = viewModel.Done?.Subscribe(done);
         }
 
         /// <inheritdoc/>

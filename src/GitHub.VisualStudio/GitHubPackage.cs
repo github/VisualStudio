@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
         {
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
-            
+
             await InitializeLoggingAsync();
             await GetServiceAsync(typeof(IUsageTracker));
 
@@ -56,7 +56,7 @@ namespace GitHub.VisualStudio
             {
                 packageSettings.PropertyChanged += (sender, args) =>
                 {
-                    if (args.PropertyName == "EnableTraceLogging")
+                    if (args.PropertyName == nameof(packageSettings.EnableTraceLogging))
                     {
                         LogManager.EnableTraceLogging(packageSettings.EnableTraceLogging);
                     }
@@ -85,7 +85,8 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenLinkCommand>(),
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>()
+                exports.GetExportedValue<IShowGitHubPaneCommand>(),
+                exports.GetExportedValue<ISyncSubmodulesCommand>()
             };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();

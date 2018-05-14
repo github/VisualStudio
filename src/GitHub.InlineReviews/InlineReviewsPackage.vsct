@@ -49,6 +49,8 @@
         <Strings>
           <CommandName>GitHub.InlineReviews.NextInlineComment</CommandName>
           <ButtonText>Next Comment</ButtonText>
+          <CanonicalName>.GitHub.NextComment</CanonicalName>
+          <LocCanonicalName>.GitHub.NextComment</LocCanonicalName>
         </Strings>
       </Button>
       <Button guid="guidGitHubCommandSet" id="PreviousInlineCommentId" priority="0x0100" type="Button">
@@ -58,6 +60,8 @@
         <Strings>
           <CommandName>GitHub.InlineReviews.PreviousInlineComment</CommandName>
           <ButtonText>Previous Comment</ButtonText>
+          <CanonicalName>.GitHub.PreviousComment</CanonicalName>
+          <LocCanonicalName>.GitHub.PreviousComment</LocCanonicalName>
         </Strings>
       </Button>
     </Buttons>
