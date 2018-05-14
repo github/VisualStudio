@@ -125,14 +125,14 @@ namespace GitHub.ViewModels.Dialog
             set { this.RaiseAndSetIfChanged(ref addUpstream, value); }
         }
 
-        bool canResetMasterTracking = true;
+        bool canResetMasterTracking;
         public bool CanResetMasterTracking
         {
             get { return canResetMasterTracking; }
             private set { this.RaiseAndSetIfChanged(ref canResetMasterTracking, value); }
         }
 
-        bool resetMasterTracking = true;
+        bool resetMasterTracking;
         public bool ResetMasterTracking
         {
             get { return resetMasterTracking; }

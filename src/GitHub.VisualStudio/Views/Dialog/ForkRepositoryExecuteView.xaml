@@ -63,15 +63,6 @@
         </DockPanel>
       </Border>
       <Border Style="{StaticResource ItemBorder}">
-        <DockPanel>
-          <CheckBox IsChecked="{Binding ResetMasterTracking}" IsEnabled="{Binding CanResetMasterTracking}" />
-          <TextBlock TextWrapping="Wrap">
-            Set the <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">master</Run> branch to track
-            <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream/master</Run>
-          </TextBlock>
-        </DockPanel>
-      </Border>
-      <Border Style="{StaticResource ItemBorder}">
         <StackPanel >
           <Button Click="repoForkButton_OnClick">Fork Repo</Button>
           <TextBlock TextWrapping="Wrap"
