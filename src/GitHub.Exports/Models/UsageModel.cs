@@ -62,7 +62,6 @@ namespace GitHub.Models
             public int NumberOfPRDetailsViewFile { get; set; }
             public int NumberOfPRDetailsCompareWithSolution { get; set; }
             public int NumberOfPRDetailsOpenFileInSolution { get; set; }
-            public int NumberOfPRDetailsNavigateToEditor { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentStartReview { get; set; }
@@ -76,6 +75,7 @@ namespace GitHub.Models
             public int NumberOfUpstreamsAddedWhenForkingRepo { get; set; }
             public int NumberOfTrackMasterUpstreamWhenForkingRepo { get; set; }
             public int ExecuteGoToSolutionOrPullRequestFileCommand { get; set; }
+            public int NumberOfPRDetailsNavigateToEditor { get; set; } // Should rename to NumberOfNavigateToEditor
             public int NumberOfNavigateToPullRequestFileDiff { get; set; }
             public int NumberOfNavigateToCodeView { get; set; }
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
