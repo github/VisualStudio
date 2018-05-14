@@ -43,25 +43,27 @@
 
       <ListBox Name="accountsListBox"
                ItemsSource="{Binding Accounts}"
-               Padding="8"
+               BorderThickness="0"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                SelectionChanged="accountsListBox_SelectionChanged">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
-            <WrapPanel IsItemsHost="True"/>
+            <UniformGrid Columns="3" Background="Red" HorizontalAlignment="Stretch" IsItemsHost="True"/>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
-          <DataTemplate>
-            <DockPanel Width="100">
-              <TextBlock DockPanel.Dock="Bottom"
-                       Text="{Binding Login, StringFormat=@{0}}"
-                       TextAlignment="Center"
-                       TextTrimming="CharacterEllipsis"/>
-              <Image Margin="0,4"
-                   Source="{Binding Avatar}"
-                   Width="32"/>
-            </DockPanel>
+              <DataTemplate>
+                    <Border Background="LightGreen" Padding="4">
+                       <DockPanel>
+                          <TextBlock DockPanel.Dock="Bottom"
+                              Text="{Binding Login, StringFormat=@{0}}"
+                              TextAlignment="Center"
+                              TextTrimming="CharacterEllipsis"/>
+                          <Image Margin="0,4"
+                              MaxWidth="100"
+                              Source="{Binding Avatar}" />
+                        </DockPanel>
+                    </Border>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
