@@ -41,49 +41,54 @@
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
 
-               <!-- ItemsSource="{Binding Accounts}" -->
+       <!--ItemsSource="{Binding Accounts}" -->
       <ListBox Name="accountsListBox"
                BorderThickness="0"
+               ItemsSource="{Binding Accounts}"
+               VerticalContentAlignment="Top"
                HorizontalContentAlignment="Stretch"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                SelectionChanged="accountsListBox_SelectionChanged">
+               <!--
                 <ListBoxItem Margin="4">
                     <Border Background="#fff2f2f2" CornerRadius="3">
-                        <DockPanel HorizontalAlignment="Stretch" Margin="4">
-                          <TextBlock DockPanel.Dock="Bottom"
-                              Text="@donokuda"
-                              TextAlignment="Center"
-                              TextTrimming="CharacterEllipsis"/>
-                          <Image
-                              Margin="4"
-                              MaxWidth="100"
-                              Source="https://s3.amazonaws.com/uifaces/faces/twitter/zeldman/128.jpg" />
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Bottom"
+                                Margin="4,0,4,4"
+                                Text="@donokuda"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis"/>
+                            <Image
+                                Margin="4"
+                                MaxWidth="100"
+                                Source="https://s3.amazonaws.com/uifaces/faces/twitter/zeldman/128.jpg" />
                         </DockPanel>
                     </Border>
                 </ListBoxItem>
+              -->
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <UniformGrid Columns="3" IsItemsHost="True">
             </UniformGrid>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
-        <!--
         <ListBox.ItemTemplate>
               <DataTemplate>
-                <Border Background="LightGreen">
-                    <DockPanel HorizontalAlignment="Stretch" Margin="4">
-                          <TextBlock DockPanel.Dock="Bottom"
-                              Text="{Binding Login, StringFormat=@{0}}"
-                              TextAlignment="Center"
-                              TextTrimming="CharacterEllipsis"/>
+                    <Border Margin="4" Background="#fff2f2f2" CornerRadius="3">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Bottom"
+                                Margin="4,0,4,4"
+                                Text="{Binding Login, StringFormat=@{0}}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis"/>
                           <Image
+                              Margin="4"
                               MaxWidth="100"
                               Source="{Binding Avatar}" />
                         </DockPanel>
                     </Border>
           </DataTemplate>
         </ListBox.ItemTemplate>
-        -->
       </ListBox>
     </StackPanel>
 
