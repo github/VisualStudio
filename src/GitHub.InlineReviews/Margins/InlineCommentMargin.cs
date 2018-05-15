@@ -24,6 +24,7 @@ namespace GitHub.InlineReviews.Margins
 
         readonly IWpfTextView textView;
         readonly IPullRequestSessionManager sessionManager;
+        readonly InlineCommentMarginEnabled inlineCommentMarginEnabled;
         readonly Grid marginGrid;
 
         GlyphMargin<InlineCommentTag> glyphMargin;
@@ -37,13 +38,15 @@ namespace GitHub.InlineReviews.Margins
             IInlineCommentPeekService peekService,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            Lazy<IPullRequestSessionManager> sessionManager)
+            Lazy<IPullRequestSessionManager> sessionManager,
+            InlineCommentMarginEnabled inlineCommentMarginEnabled)
         {
             textView = wpfTextViewHost.TextView;
             this.sessionManager = sessionManager.Value;
+            this.inlineCommentMarginEnabled = inlineCommentMarginEnabled;
 
             // Default to not show comment margin
-            textView.Options.SetOptionValue(InlineCommentMarginEnabled.OptionName, false);
+            textView.Options.SetOptionValue(inlineCommentMarginEnabled.Key, false);
 
             marginGrid = new GlyphMarginGrid { Width = 17.0 };
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
@@ -135,7 +138,7 @@ namespace GitHub.InlineReviews.Margins
 
         bool IsMarginVisible()
         {
-            var enabled = textView.Options.GetOptionValue<bool>(InlineCommentMarginEnabled.OptionName);
+            var enabled = textView.Options.GetOptionValue(inlineCommentMarginEnabled.Key);
             return hasInfo || (enabled && hasChanges);
         }
     }

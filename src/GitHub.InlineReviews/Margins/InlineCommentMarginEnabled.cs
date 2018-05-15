@@ -9,7 +9,7 @@ namespace GitHub.InlineReviews.Margins
     [Name(OptionName)]
     public class InlineCommentMarginEnabled : ViewOptionDefinition<bool>
     {
-        public const string OptionName = "TextViewHost/InlineCommentMarginEnabled";
+        const string OptionName = "TextViewHost/InlineCommentMarginEnabled";
 
         public override bool Default => false;
 
