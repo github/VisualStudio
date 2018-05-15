@@ -72,6 +72,7 @@
 
         <StackPanel Orientation="Vertical" Margin="0 8 0 0">
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+              <Button Margin="0 0 4 0">Back</Button>
               <Button Click="repoForkButton_OnClick">Fork Repo</Button>
             </StackPanel>
 
