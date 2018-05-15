@@ -41,7 +41,6 @@
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
 
-       <!--ItemsSource="{Binding Accounts}" -->
       <ListBox Name="accountsListBox"
                BorderThickness="0"
                ItemsSource="{Binding Accounts}"
@@ -49,23 +48,6 @@
                HorizontalContentAlignment="Stretch"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                SelectionChanged="accountsListBox_SelectionChanged">
-               <!--
-                <ListBoxItem Margin="4">
-                    <Border Background="#fff2f2f2" CornerRadius="3">
-                        <DockPanel>
-                            <TextBlock DockPanel.Dock="Bottom"
-                                Margin="4,0,4,4"
-                                Text="@donokuda"
-                                TextAlignment="Center"
-                                TextTrimming="CharacterEllipsis"/>
-                            <Image
-                                Margin="4"
-                                MaxWidth="100"
-                                Source="https://s3.amazonaws.com/uifaces/faces/twitter/zeldman/128.jpg" />
-                        </DockPanel>
-                    </Border>
-                </ListBoxItem>
-              -->
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <UniformGrid Columns="3" IsItemsHost="True">
@@ -99,7 +81,6 @@
         <Run>You have existing forks of this repository:</Run>
       </TextBlock>
       <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding ExistingForks}" MaxHeight="120">
-        <!-- SelectionChanged="existingForksListBox_SelectionChanged"-->
         <ListBox.ItemTemplate>
           <DataTemplate>
             <StackPanel Orientation="Horizontal">
