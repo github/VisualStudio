@@ -30,7 +30,7 @@
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <DockPanel Grid.Row="0">
+    <StackPanel Grid.Row="0">
       <TextBlock DockPanel.Dock="Top" FontSize="16" Margin="0 8">
       Where should we fork this repository?
       </TextBlock>
@@ -44,24 +44,26 @@
                <!-- ItemsSource="{Binding Accounts}" -->
       <ListBox Name="accountsListBox"
                BorderThickness="0"
+               HorizontalContentAlignment="Stretch"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                SelectionChanged="accountsListBox_SelectionChanged">
-                <ListBoxItem>
-                    <Border Background="LightGreen">
+                <ListBoxItem Margin="4">
+                    <Border Background="#fff2f2f2" CornerRadius="3">
                         <DockPanel HorizontalAlignment="Stretch" Margin="4">
-                              <TextBlock DockPanel.Dock="Bottom"
-                                  Text="@donokuda"
-                                  TextAlignment="Center"
-                                  TextTrimming="CharacterEllipsis"/>
-                              <Image
-                                  MaxWidth="100"
-                                  Source="https://s3.amazonaws.com/uifaces/faces/twitter/zeldman/128.jpg" />
-                            </DockPanel>
-                        </Border>
-                    </ListBoxItem>
+                          <TextBlock DockPanel.Dock="Bottom"
+                              Text="@donokuda"
+                              TextAlignment="Center"
+                              TextTrimming="CharacterEllipsis"/>
+                          <Image
+                              Margin="4"
+                              MaxWidth="100"
+                              Source="https://s3.amazonaws.com/uifaces/faces/twitter/zeldman/128.jpg" />
+                        </DockPanel>
+                    </Border>
+                </ListBoxItem>
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
-            <UniformGrid Columns="3" Background="Red" IsItemsHost="True">
+            <UniformGrid Columns="3" IsItemsHost="True">
             </UniformGrid>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
@@ -83,7 +85,7 @@
         </ListBox.ItemTemplate>
         -->
       </ListBox>
-    </DockPanel>
+    </StackPanel>
 
     <DockPanel Grid.Row="1" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
       <TextBlock DockPanel.Dock="Top" Margin="0 8">
