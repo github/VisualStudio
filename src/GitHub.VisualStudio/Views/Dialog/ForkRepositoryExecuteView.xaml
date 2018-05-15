@@ -7,7 +7,17 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="https://github.com/github/VisualStudio"
              Margin="8"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" d:DesignWidth="300" Height="315.179">
+
+  <Control.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Control.Resources>
 
   <d:DesignProperties.DataContext>
     <sampleData:ForkRepositoryExecuteViewModelDesigner/>
