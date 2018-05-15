@@ -41,17 +41,31 @@
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
 
+               <!-- ItemsSource="{Binding Accounts}" -->
       <ListBox Name="accountsListBox"
-               ItemsSource="{Binding Accounts}"
                BorderThickness="0"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                SelectionChanged="accountsListBox_SelectionChanged">
+                <ListBoxItem>
+                    <Border Background="LightGreen">
+                        <DockPanel HorizontalAlignment="Stretch" Margin="4">
+                              <TextBlock DockPanel.Dock="Bottom"
+                                  Text="@donokuda"
+                                  TextAlignment="Center"
+                                  TextTrimming="CharacterEllipsis"/>
+                              <Image
+                                  MaxWidth="100"
+                                  Source="https://s3.amazonaws.com/uifaces/faces/twitter/zeldman/128.jpg" />
+                            </DockPanel>
+                        </Border>
+                    </ListBoxItem>
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <UniformGrid Columns="3" Background="Red" IsItemsHost="True">
             </UniformGrid>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
+        <!--
         <ListBox.ItemTemplate>
               <DataTemplate>
                 <Border Background="LightGreen">
@@ -67,6 +81,7 @@
                     </Border>
           </DataTemplate>
         </ListBox.ItemTemplate>
+        -->
       </ListBox>
     </DockPanel>
 
