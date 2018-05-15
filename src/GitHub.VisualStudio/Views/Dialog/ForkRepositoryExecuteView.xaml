@@ -83,56 +83,5 @@
                        Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}"/>
         </StackPanel>
     </StackPanel>
-
-    <!--
-    <ItemsControl Margin="8,16,8,8">
-      <ItemsControl.Resources>
-        <Style x:Key="ItemBorder" TargetType="Border">
-          <Setter Property="Background" Value="#10000000"/>
-          <Setter Property="CornerRadius" Value="3"/>
-          <Setter Property="Margin" Value="4"/>
-          <Setter Property="Padding" Value="4,8"/>
-        </Style>
-        <Style TargetType="CheckBox">
-          <Setter Property="Margin" Value="0,1,6,0"/>
-          <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-      </ItemsControl.Resources>
-      <Border Style="{StaticResource ItemBorder}">
-        <DockPanel>
-          <CheckBox IsChecked="True" IsEnabled="False"/>
-          <TextBlock>Fork the repository</TextBlock>
-        </DockPanel>
-      </Border>
-      <Border Style="{StaticResource ItemBorder}">
-        <DockPanel>
-          <CheckBox IsChecked="{Binding UpdateOrigin}" IsEnabled="False" />
-          <TextBlock TextWrapping="Wrap">
-          Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
-          <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
-          </TextBlock>
-        </DockPanel>
-      </Border>
-      <Border Style="{StaticResource ItemBorder}">
-        <DockPanel>
-          <CheckBox IsChecked="{Binding AddUpstream}" IsEnabled="False" />
-          <TextBlock TextWrapping="Wrap">
-            Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
-          <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
-          </TextBlock>
-        </DockPanel>
-      </Border>
-      <Border Style="{StaticResource ItemBorder}">
-        <StackPanel >
-          <Button Click="repoForkButton_OnClick">Fork Repo</Button>
-          <TextBlock TextWrapping="Wrap"
-                     Foreground="Red" 
-                     Text="{Binding Error, Mode=OneWay}"
-                     HorizontalAlignment="Center"
-                     Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}"/>
-        </StackPanel>
-      </Border>
-    </ItemsControl>
-    -->
   </StackPanel>
 </UserControl>
