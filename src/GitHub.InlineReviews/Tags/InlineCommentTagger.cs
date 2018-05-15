@@ -175,7 +175,7 @@ namespace GitHub.InlineReviews.Tags
                     Observable.FromEventPattern<EditorOptionChangedEventArgs>(options, nameof(options.OptionChanged))
                     .Select(_ => Unit.Default)
                     .StartWith(Unit.Default)
-                    .Select(x => options.GetOptionValue<bool>(InlineCommentMarginVisible.OptionName))
+                    .Select(x => options.GetOptionValue(InlineCommentTextViewOptions.MarginVisibleId))
                     .DistinctUntilChanged()
                     .Subscribe(VisibleChanged);
             }

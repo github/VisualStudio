@@ -73,6 +73,7 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
+    <Compile Include="Margins\InlineCommentTextViewOptions.cs" />
     <Compile Include="Margins\PullRequestFileMargin.cs" />
     <Compile Include="Margins\PullRequestFileMarginProvider.cs" />
     <Compile Include="Glyph\GlyphData.cs" />

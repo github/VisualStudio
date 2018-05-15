@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
 using GitHub.InlineReviews.Services;
 using GitHub.Services;
-using GitHub.Settings;
 
 namespace GitHub.InlineReviews.Margins
 {
@@ -22,28 +21,24 @@ namespace GitHub.InlineReviews.Margins
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
-        readonly InlineCommentMarginEnabled inlineCommentMarginEnabled;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
-            Lazy<IPullRequestSessionManager> sessionManager,
+            IGitHubServiceProvider serviceProvider,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService,
-            InlineCommentMarginEnabled inlineCommentMarginEnabled)
+            IInlineCommentPeekService peekService)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            this.sessionManager = sessionManager;
-            this.inlineCommentMarginEnabled = inlineCommentMarginEnabled;
+            sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.GetService<IPullRequestSessionManager>());
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
             return new InlineCommentMargin(
-                wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, sessionManager,
-                inlineCommentMarginEnabled);
+                wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, sessionManager);
         }
     }
 }

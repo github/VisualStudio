@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
 using GitHub.Models;
 using GitHub.Services;
@@ -354,7 +353,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             static ITextView CreateTextView(bool inlineCommentMarginVisible = true)
             {
                 var textView = Substitute.For<ITextView>();
-                textView.Options.GetOptionValue<bool>(InlineCommentMarginVisible.OptionName).Returns(inlineCommentMarginVisible);
+                textView.Options.GetOptionValue(InlineCommentTextViewOptions.MarginVisibleId).Returns(inlineCommentMarginVisible);
                 return textView;
             }
 

@@ -1,18 +1,13 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Utilities;
+﻿using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Margins
 {
-    [Export(typeof(InlineCommentMarginEnabled))]
-    [Export(typeof(EditorOptionDefinition)), Name(OptionName)]
+    [Export(typeof(EditorOptionDefinition))]
     public class InlineCommentMarginEnabled : ViewOptionDefinition<bool>
     {
-        const string OptionName = "TextViewHost/InlineCommentMarginEnabled";
-
         public override bool Default => false;
 
-        public override EditorOptionKey<bool> Key => new EditorOptionKey<bool>(OptionName);
+        public override EditorOptionKey<bool> Key => InlineCommentTextViewOptions.MarginEnabledId;
     }
 }

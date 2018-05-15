@@ -27,19 +27,16 @@ namespace GitHub.InlineReviews.Commands
 
         readonly Lazy<IVsTextManager> textManager;
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
-        readonly Lazy<InlineCommentMarginEnabled> inlineCommentMarginEnabled;
         readonly Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
         public ToggleInlineCommentMarginCommand(
             IGitHubServiceProvider serviceProvider,
             Lazy<IVsEditorAdaptersFactoryService> editorAdapter,
-            Lazy<InlineCommentMarginEnabled> inlineCommentMarginEnabled,
             Lazy<IUsageTracker> usageTracker) : base(CommandSet, CommandId)
         {
             textManager = new Lazy<IVsTextManager>(() => serviceProvider.GetService<SVsTextManager, IVsTextManager>());
             this.editorAdapter = editorAdapter;
-            this.inlineCommentMarginEnabled = inlineCommentMarginEnabled;
             this.usageTracker = usageTracker;
         }
 
@@ -52,8 +49,8 @@ namespace GitHub.InlineReviews.Commands
             {
                 var wpfTextView = editorAdapter.Value.GetWpfTextView(activeView);
                 var options = wpfTextView.Options;
-                var enabled = options.GetOptionValue(inlineCommentMarginEnabled.Value.Key);
-                options.SetOptionValue(inlineCommentMarginEnabled.Value.Key, !enabled);
+                var enabled = options.GetOptionValue(InlineCommentTextViewOptions.MarginEnabledId);
+                options.SetOptionValue(InlineCommentTextViewOptions.MarginEnabledId, !enabled);
             }
 
             return Task.CompletedTask;

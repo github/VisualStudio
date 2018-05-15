@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.Settings;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Views;
@@ -24,7 +23,6 @@ namespace GitHub.InlineReviews.Margins
 
         readonly IWpfTextView textView;
         readonly IPullRequestSessionManager sessionManager;
-        readonly InlineCommentMarginEnabled inlineCommentMarginEnabled;
         readonly Grid marginGrid;
 
         GlyphMargin<InlineCommentTag> glyphMargin;
@@ -38,15 +36,13 @@ namespace GitHub.InlineReviews.Margins
             IInlineCommentPeekService peekService,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            Lazy<IPullRequestSessionManager> sessionManager,
-            InlineCommentMarginEnabled inlineCommentMarginEnabled)
+            Lazy<IPullRequestSessionManager> sessionManager)
         {
             textView = wpfTextViewHost.TextView;
             this.sessionManager = sessionManager.Value;
-            this.inlineCommentMarginEnabled = inlineCommentMarginEnabled;
 
             // Default to not show comment margin
-            textView.Options.SetOptionValue(inlineCommentMarginEnabled.Key, false);
+            textView.Options.SetOptionValue(InlineCommentTextViewOptions.MarginEnabledId, false);
 
             marginGrid = new GlyphMarginGrid { Width = 17.0 };
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
@@ -64,7 +60,7 @@ namespace GitHub.InlineReviews.Margins
                 .Subscribe(x => RefreshCurrentSession().Forget());
 
             visibleSubscription = marginGrid.WhenAnyValue(x => x.IsVisible)
-                .Subscribe(x => textView.Options.SetOptionValue(InlineCommentMarginVisible.OptionName, x));
+                .Subscribe(x => textView.Options.SetOptionValue(InlineCommentTextViewOptions.MarginVisibleId, x));
 
             textView.Options.OptionChanged += (s, e) => RefreshMarginVisibility();
         }
@@ -138,7 +134,7 @@ namespace GitHub.InlineReviews.Margins
 
         bool IsMarginVisible()
         {
-            var enabled = textView.Options.GetOptionValue(inlineCommentMarginEnabled.Key);
+            var enabled = textView.Options.GetOptionValue(InlineCommentTextViewOptions.MarginEnabledId);
             return hasInfo || (enabled && hasChanges);
         }
     }

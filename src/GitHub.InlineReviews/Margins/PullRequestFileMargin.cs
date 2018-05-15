@@ -38,7 +38,6 @@ namespace GitHub.InlineReviews.Margins
             IToggleInlineCommentMarginCommand toggleInlineCommentMarginCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager,
-            InlineCommentMarginEnabled inlineCommentMarginEnabled,
             Lazy<IUsageTracker> usageTracker)
         {
             this.textView = textView;
@@ -54,7 +53,7 @@ namespace GitHub.InlineReviews.Margins
 
             optionChangedSubscription = Observable.FromEventPattern(textView.Options, nameof(textView.Options.OptionChanged)).Subscribe(_ =>
             {
-                viewModel.MarginEnabled = textView.Options.GetOptionValue(inlineCommentMarginEnabled.Key);
+                viewModel.MarginEnabled = textView.Options.GetOptionValue(InlineCommentTextViewOptions.MarginEnabledId);
             });
 
             currentSessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
