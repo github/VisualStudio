@@ -29,30 +29,45 @@
 
     <StackPanel Orientation="Vertical">
         <Border Margin="0 4 0 0" CornerRadius="4" Background="#ffeff1f5" Padding="8">
-                <StackPanel Orientation="Horizontal">
-                    <ui:OcticonImage Icon="repo_forked" Background="Red" Height="16" Width="16" />
-                    <TextBlock>Fork the repo</TextBlock>
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Background="Red" Height="16" Width="16" />
+                    <TextBlock Grid.Column="1" TextWrapping="Wrap">Fork the repo</TextBlock>
+                </Grid>
         </Border>
 
         <Border Margin="0 4 0 0" CornerRadius="4" Background="#ffeff1f5" Padding="8">
-            <StackPanel Orientation="Horizontal">
-                <ui:OcticonImage Icon="repo_forked" Height="16" Width="16" />
-                  <TextBlock TextWrapping="Wrap">
-                      Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
-                      <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
-                  </TextBlock>
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Height="16" Width="16" />
+
+                <TextBlock Grid.Column="1" TextWrapping="Wrap">
+                  Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
+                  <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
+                 </TextBlock>
+                </Grid>
         </Border>
         
         <Border Margin="0 4 0 0" CornerRadius="4" Background="#ffeff1f5" Padding="8">
-            <StackPanel Orientation="Horizontal">
-                <ui:OcticonImage Icon="repo_forked" Height="16" Width="16" />
-                <TextBlock TextWrapping="Wrap">
-                   Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
-                   <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
-                </TextBlock>
-            </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Height="16" Width="16" />
+                    <TextBlock Grid.Column="1" TextWrapping="Wrap">
+                       Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
+                       <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
+                    </TextBlock>
+                </Grid>
         </Border>
 
         <StackPanel Orientation="Vertical" Margin="0 8 0 0">
