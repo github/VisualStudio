@@ -48,18 +48,19 @@
                SelectionChanged="accountsListBox_SelectionChanged">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
-            <UniformGrid Columns="3" Background="Red" HorizontalAlignment="Stretch" IsItemsHost="True"/>
+            <UniformGrid Columns="3" Background="Red" IsItemsHost="True">
+            </UniformGrid>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
               <DataTemplate>
-                    <Border Background="LightGreen" Padding="4">
-                       <DockPanel>
+                <Border Background="LightGreen">
+                    <DockPanel HorizontalAlignment="Stretch" Margin="4">
                           <TextBlock DockPanel.Dock="Bottom"
                               Text="{Binding Login, StringFormat=@{0}}"
                               TextAlignment="Center"
                               TextTrimming="CharacterEllipsis"/>
-                          <Image Margin="0,4"
+                          <Image
                               MaxWidth="100"
                               Source="{Binding Avatar}" />
                         </DockPanel>
