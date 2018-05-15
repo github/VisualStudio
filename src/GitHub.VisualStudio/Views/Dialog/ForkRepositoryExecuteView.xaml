@@ -14,7 +14,7 @@
   </d:DesignProperties.DataContext>
 
   <StackPanel>
-    <TextBlock TextWrapping="Wrap">
+    <TextBlock FontSize="16" TextWrapping="Wrap">
       You're about to fork the 
       <Hyperlink>
         <Run Text="{Binding SourceRepository.Owner, Mode=OneWay}"/>/<Run Text="{Binding SourceRepository.Name, Mode=OneWay}"/>
@@ -22,9 +22,53 @@
       repository to
       <Hyperlink>
         <Run Text="{Binding DestinationRepository.Owner, Mode=OneWay}"/>/<Run Text="{Binding DestinationRepository.Name, Mode=OneWay}"/>
-      </Hyperlink>. This operation will:
+      </Hyperlink>.
     </TextBlock>
 
+    <TextBlock Margin="0 16 0 0" FontSize="14">This operation will:</TextBlock>
+
+    <StackPanel Orientation="Vertical">
+        <Border Margin="0 4 0 0" CornerRadius="4" Background="#ffeff1f5" Padding="8">
+                <StackPanel Orientation="Horizontal">
+                    <ui:OcticonImage Icon="repo_forked" Background="Red" Height="16" Width="16" />
+                    <TextBlock>Fork the repo</TextBlock>
+                </StackPanel>
+        </Border>
+
+        <Border Margin="0 4 0 0" CornerRadius="4" Background="#ffeff1f5" Padding="8">
+            <StackPanel Orientation="Horizontal">
+                <ui:OcticonImage Icon="repo_forked" Height="16" Width="16" />
+                  <TextBlock TextWrapping="Wrap">
+                      Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
+                      <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
+                  </TextBlock>
+                </StackPanel>
+        </Border>
+        
+        <Border Margin="0 4 0 0" CornerRadius="4" Background="#ffeff1f5" Padding="8">
+            <StackPanel Orientation="Horizontal">
+                <ui:OcticonImage Icon="repo_forked" Height="16" Width="16" />
+                <TextBlock TextWrapping="Wrap">
+                   Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
+                   <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Orientation="Vertical" Margin="0 8 0 0">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+              <Button Click="repoForkButton_OnClick">Fork Repo</Button>
+            </StackPanel>
+
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="Red" 
+                       Text="{Binding Error, Mode=OneWay}"
+                       HorizontalAlignment="Center"
+                       Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}"/>
+        </StackPanel>
+    </StackPanel>
+
+    <!--
     <ItemsControl Margin="8,16,8,8">
       <ItemsControl.Resources>
         <Style x:Key="ItemBorder" TargetType="Border">
@@ -73,5 +117,6 @@
         </StackPanel>
       </Border>
     </ItemsControl>
+    -->
   </StackPanel>
 </UserControl>
