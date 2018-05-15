@@ -5,8 +5,8 @@ using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Margins
 {
-    [Export(typeof(EditorOptionDefinition))]
-    [Name(OptionName)]
+    [Export(typeof(InlineCommentMarginEnabled))]
+    [Export(typeof(EditorOptionDefinition)), Name(OptionName)]
     public class InlineCommentMarginEnabled : ViewOptionDefinition<bool>
     {
         const string OptionName = "TextViewHost/InlineCommentMarginEnabled";
