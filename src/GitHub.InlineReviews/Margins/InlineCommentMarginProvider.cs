@@ -26,7 +26,7 @@ namespace GitHub.InlineReviews.Margins
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
-            IGitHubServiceProvider serviceProvider,
+            Lazy<IPullRequestSessionManager> sessionManager,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.Margins
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.GetService<IPullRequestSessionManager>());
+            this.sessionManager = sessionManager;
             this.inlineCommentMarginEnabled = inlineCommentMarginEnabled;
         }
 
