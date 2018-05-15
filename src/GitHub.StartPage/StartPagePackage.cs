@@ -12,6 +12,7 @@ using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.CodeContainerManagement;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 using CodeContainer = Microsoft.VisualStudio.Shell.CodeContainerManagement.CodeContainer;
 using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
@@ -119,8 +120,9 @@ namespace GitHub.StartPage
         {
             var dialogService = gitHubServiceProvider.GetService<IDialogService>();
             var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();
+            var usageTracker = gitHubServiceProvider.GetService<IUsageTracker>();
             CloneDialogResult result = null;
-            
+
             if (repository == null)
             {
                 result = await dialogService.ShowCloneDialog(null);
@@ -134,7 +136,7 @@ namespace GitHub.StartPage
                     result = new CloneDialogResult(basePath, repository);
                 }
             }
-            
+
             if (result != null)
             {
                 try
@@ -144,6 +146,8 @@ namespace GitHub.StartPage
                         result.Repository.Name,
                         result.BasePath,
                         progress);
+
+                    usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
                 }
                 catch
                 {
