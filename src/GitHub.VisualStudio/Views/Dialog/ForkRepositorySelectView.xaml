@@ -25,9 +25,6 @@
 
   <Grid Margin="0 8">
     <Grid.RowDefinitions>
-      <!--
-      <RowDefinition Height="2*"/>
-       -->
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
@@ -76,45 +73,24 @@
         </ListBox.ItemTemplate>
       </ListBox>
 
-        <!-- 
-        <DockPanel Grid.Row="1" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
-          -->
-        <DockPanel DockPanel.Dock="Bottom" Margin="0 16 0 0">
+        <DockPanel DockPanel.Dock="Bottom" Margin="0 16 0 0" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
           <TextBlock DockPanel.Dock="Top" Margin="8 0">
             <Run FontWeight="SemiBold">Can't find what you're looking for?</Run>
             <LineBreak/>
             <Run>You have existing forks of this repository:</Run>
           </TextBlock>
-          <!--
-              ItemsSource="{Binding ExistingForks}" 
-           -->
-          <ItemsControl DockPanel.Dock="Bottom" MaxHeight="120" Padding="8 0" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-              <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
-              <TextBlock Text="donokuda/foo-bar" />
-            </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-              <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
-              <TextBlock Text="donokuda/foo-bar" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-              <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
-              <TextBlock Text="donokuda/foo-bar" />
-            </StackPanel>
-            <!--
+          <ItemsControl ItemsSource="{Binding ExistingForks}" DockPanel.Dock="Bottom" MaxHeight="120" Padding="8 0" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                   <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
                   <TextBlock Text="{Binding Owner, Mode=OneWay}"/>
                   <TextBlock Text="/"/>
                   <TextBlock Text="{Binding Name, Mode=OneWay}"/>
                 </StackPanel>
               </DataTemplate>
-            </ListBox.ItemTemplate>
-              -->
+            </ItemsControl.ItemTemplate>
           </ItemsControl>
         </DockPanel>
     </DockPanel>
