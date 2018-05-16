@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.Composition;
-using GitHub.Models;
+﻿using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.TeamFoundation.Services
 {
@@ -7,7 +7,7 @@ namespace GitHub.TeamFoundation.Services
     {
         public ILocalRepositoryModel Create(string localPath)
         {
-            return new LocalRepositoryModel(localPath);
+            return new LocalRepositoryModel(localPath, GitService.GitServiceHelper);
         }
     }
 }
