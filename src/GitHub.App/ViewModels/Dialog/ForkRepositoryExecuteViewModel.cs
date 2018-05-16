@@ -45,6 +45,7 @@ namespace GitHub.ViewModels.Dialog
                 .Subscribe(tuple => CanResetMasterTracking = tuple.Item1 && tuple.Item2);
 
             CreateFork = ReactiveCommand.CreateAsyncObservable(OnCreateFork);
+            BackCommand = ReactiveCommand.Create();
         }
 
         public IRepositoryModel SourceRepository { get; private set; }
@@ -55,9 +56,13 @@ namespace GitHub.ViewModels.Dialog
 
         public IReactiveCommand<Repository> CreateFork { get; }
 
+        public IReactiveCommand<object> BackCommand { get; }
+
         public string Title => Resources.ForkRepositoryTitle;
 
         public IObservable<object> Done => CreateFork.Where(repository => repository != null);
+
+        public IObservable<object> Back => BackCommand.AsObservable();
 
         public async Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
@@ -140,6 +145,7 @@ namespace GitHub.ViewModels.Dialog
         }
 
         string error = null;
+
         public string Error
         {
             get { return error; }
