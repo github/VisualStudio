@@ -159,7 +159,7 @@
                 <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
-            
+
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
                         Margin="4 8" 

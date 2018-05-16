@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 using GitHub.Models;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.Services
@@ -18,8 +20,8 @@ namespace GitHub.Services
         /// If true opens the file in the working directory, if false opens the file in the HEAD
         /// commit of the pull request.
         /// </param>
-        /// <returns>A task tracking the operation.</returns>
-        Task OpenFile(IPullRequestSession session, string relativePath, bool workingDirectory);
+        /// <returns>The opened file.</returns>
+        Task<ITextView> OpenFile(IPullRequestSession session, string relativePath, bool workingDirectory);
 
         /// <summary>
         /// Opens an diff viewer for a file in a pull request.
@@ -30,8 +32,9 @@ namespace GitHub.Services
         /// The commit SHA of the right hand side of the diff. Pass null to compare with the
         /// working directory, or "HEAD" to compare with the HEAD commit of the pull request.
         /// </param>
-        /// <returns>A task tracking the operation.</returns>
-        Task OpenDiff(IPullRequestSession session, string relativePath, string headSha = null);
+        /// <param name="scrollToFirstDiff">True to scroll to first difference in file. Set to false if caret is being moved after opening.</param>
+        /// <returns>The opened diff viewer.</returns>
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha = null, bool scrollToFirstDiff = true);
 
         /// <summary>
         /// Opens an diff viewer for a file in a pull request with the specified inline comment
@@ -40,8 +43,8 @@ namespace GitHub.Services
         /// <param name="session">The pull request session.</param>
         /// <param name="relativePath">The path to the file, relative to the repository.</param>
         /// <param name="thread">The thread to open</param>
-        /// <returns>A task tracking the operation.</returns>
-        Task OpenDiff(IPullRequestSession session, string relativePath, IInlineCommentThreadModel thread);
+        /// <returns>The opened diff viewer.</returns>
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, IInlineCommentThreadModel thread);
 
         /// <summary>
         /// Find the active text view.
@@ -50,11 +53,26 @@ namespace GitHub.Services
         IVsTextView FindActiveView();
 
         /// <summary>
-        /// Navigate to and place the caret at the best guess equivalent position in <see cref="targetFile"/>.
+        /// Place the caret at the best guess equivalent position in <see cref="targetView"/>.
         /// </summary>
         /// <param name="sourceView">The text view to navigate from.</param>
-        /// <param name="targetFile">The text view to open and navigate to.</param>
-        /// <returns>The opened text view.</returns>
-        IVsTextView NavigateToEquivalentPosition(IVsTextView sourceView, string targetFile);
+        /// <param name="targetView">The text view to navigate to.</param>
+        void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView);
+
+        /// <summary>
+        /// Check to see if text view is an ediatable document.
+        /// </summary>
+        /// <param name="textView">The text view to check.</param>
+        /// <returns>True if text view is editable and part of a diff view.</returns>
+        bool IsEditableDiff(ITextView textView);
+
+        /// <summary>
+        /// Open the active document in a new code view.
+        /// </summary>
+        /// <remarks>
+        /// If the active document is part of a diff view, open in a new code view.
+        /// </remarks>
+        /// <param name="sourceView">The source view to use the line and position from.</param>
+        void OpenActiveDocumentInCodeView(IVsTextView sourceView);
     }
 }

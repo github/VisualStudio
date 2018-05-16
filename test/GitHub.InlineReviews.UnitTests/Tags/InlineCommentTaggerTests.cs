@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
 using GitHub.Models;
 using GitHub.Services;
@@ -11,6 +10,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using NSubstitute;
 using NUnit.Framework;
+using GitHub.InlineReviews.Margins;
 
 namespace GitHub.InlineReviews.UnitTests.Tags
 {
@@ -298,16 +298,17 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var span = CreateSpan(13);
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
-                 Assert.That(result, Is.Empty);
+                Assert.That(result, Is.Empty);
             }
 
-            [Test]
-            public void ShouldRaiseTagsChangedOnFileLinesChanged()
+            [TestCase(true, true)]
+            [TestCase(false, false)]
+            public void ShouldRaiseTagsChangedOnFileLinesChanged(bool inlineCommentMarginVisible, bool expectRaised)
             {
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
                 var target = new InlineCommentTagger(
-                    Substitute.For<ITextView>(),
+                    CreateTextView(inlineCommentMarginVisible),
                     CreateBuffer(),
                     manager);
 
@@ -322,7 +323,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Tuple.Create(14, DiffSide.Right),
                 });
 
-                Assert.True(raised);
+                Assert.That(raised, Is.EqualTo(expectRaised));
             }
 
             [Test]
@@ -347,6 +348,13 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 });
 
                 Assert.False(raised);
+            }
+
+            static ITextView CreateTextView(bool inlineCommentMarginVisible = true)
+            {
+                var textView = Substitute.For<ITextView>();
+                textView.Options.GetOptionValue(InlineCommentTextViewOptions.MarginVisibleId).Returns(inlineCommentMarginVisible);
+                return textView;
             }
 
             static IPullRequestSessionFile CreateSessionFile()
