@@ -28,10 +28,9 @@ namespace GitHub.VisualStudio.Commands
             return Task.CompletedTask;
         }
 
-        void ShowInfoMessage(string message)
+        void ShowInfoMessage(string infoMessage)
         {
-            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
-                serviceProvider, message, null,
+            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(serviceProvider, infoMessage, null,
                 OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
         }
     }
