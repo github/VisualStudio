@@ -16,7 +16,7 @@ using Task = System.Threading.Tasks.Task;
 namespace GitHub.Services
 {
     [Export(typeof(IUsageService))]
-    public class UsageService : IUsageService
+    public sealed class UsageService : IUsageService, IDisposable
     {
         const string StoreFileName = "metrics.json";
         const string UserStoreFileName = "user.json";
@@ -35,6 +35,11 @@ namespace GitHub.Services
         {
             this.serviceProvider = serviceProvider;
             this.environment = environment;
+        }
+
+        public void Dispose()
+        {
+            writeSemaphoreSlim.Dispose();
         }
 
         public async Task<Guid> GetUserGuid()
