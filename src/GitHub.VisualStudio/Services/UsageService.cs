@@ -181,6 +181,8 @@ namespace GitHub.Services
                 if (!disposed)
                 {
                     disposed = true;
+
+                    writeSemaphoreSlim.Dispose();
                 }
             }
         }
