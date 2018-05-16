@@ -316,6 +316,7 @@
     <Compile Include="AssemblyResolverPackage.cs" />
     <Compile Include="Commands\BlameLinkCommand.cs" />
     <Compile Include="Commands\CreateGistCommand.cs" />
+    <Compile Include="Commands\ShowMessageBoxCommand.cs" />
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
     <Compile Include="Commands\OpenLinkCommand.cs" />

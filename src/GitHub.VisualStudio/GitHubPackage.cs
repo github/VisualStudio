@@ -11,6 +11,7 @@ using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.Settings;
@@ -73,27 +74,35 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            if (!ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
+            IVsCommandBase[] commands;
+            if (ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
-                log.Warning("Don't initialize menus for non-Visual Studio process");
-                return;
+                var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+                var exports = componentModel.DefaultExportProvider;
+                commands = new IVsCommandBase[]
+                {
+                    exports.GetExportedValue<IAddConnectionCommand>(),
+                    exports.GetExportedValue<IBlameLinkCommand>(),
+                    exports.GetExportedValue<ICopyLinkCommand>(),
+                    exports.GetExportedValue<ICreateGistCommand>(),
+                    exports.GetExportedValue<IOpenLinkCommand>(),
+                    exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                    exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                    exports.GetExportedValue<IShowGitHubPaneCommand>(),
+                    exports.GetExportedValue<IGoToSolutionOrPullRequestFileCommand>(),
+                    exports.GetExportedValue<ISyncSubmodulesCommand>()
+                };
             }
-
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            var exports = componentModel.DefaultExportProvider;
-            var commands = new IVsCommandBase[]
+            else
             {
-                exports.GetExportedValue<IAddConnectionCommand>(),
-                exports.GetExportedValue<IBlameLinkCommand>(),
-                exports.GetExportedValue<ICopyLinkCommand>(),
-                exports.GetExportedValue<ICreateGistCommand>(),
-                exports.GetExportedValue<IOpenLinkCommand>(),
-                exports.GetExportedValue<IOpenPullRequestsCommand>(),
-                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>(),
-                exports.GetExportedValue<IGoToSolutionOrPullRequestFileCommand>(),
-                exports.GetExportedValue<ISyncSubmodulesCommand>()
-            };
+                // Show info message box when executed in non-Visual Studio process
+                var message = Resources.BlendDialogText;
+                commands = new IVsCommandBase[]
+                {
+                    new ShowMessageBoxCommand(AddConnectionCommand.CommandSet, AddConnectionCommand.CommandId, this, message),
+                    new ShowMessageBoxCommand(ShowGitHubPaneCommand.CommandSet, ShowGitHubPaneCommand.CommandId, this, message)
+                };
+            }
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
