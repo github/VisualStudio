@@ -16,13 +16,13 @@ namespace GitHub.SampleData
         {
             Branches = new List<IBranch>
             {
-                new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo")),
-                new BranchModel("don/stub-ui", new LocalRepositoryModel("http://github.com/user/repo")),
-                new BranchModel("feature/pr/views", new LocalRepositoryModel("http://github.com/user/repo")),
-                new BranchModel("release-1.0.17.0", new LocalRepositoryModel("http://github.com/user/repo")),
+                new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
+                new BranchModel("don/stub-ui", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
+                new BranchModel("feature/pr/views", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
+                new BranchModel("release-1.0.17.0", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
             }.AsReadOnly();
 
-            TargetBranch = new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo"));
+            TargetBranch = new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner()));
             SourceBranch = Branches[2];
 
             SelectedAssignee = "Haacked (Phil Haack)";

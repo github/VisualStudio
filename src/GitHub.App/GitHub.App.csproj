@@ -214,6 +214,7 @@
     <Compile Include="SampleData\ForkRepositoryExecuteViewModelDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
+    <Compile Include="SampleData\GitServiceDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySwitchViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
