@@ -16,7 +16,7 @@ using Task = System.Threading.Tasks.Task;
 namespace GitHub.Services
 {
     [Export(typeof(IUsageService))]
-    public class UsageService : IUsageService
+    public class UsageService : IUsageService, IDisposable
     {
         const string StoreFileName = "metrics.json";
         const string UserStoreFileName = "user.json";
@@ -169,6 +169,26 @@ namespace GitHub.Services
         class UserData
         {
             public Guid UserGuid { get; set; }
+        }
+
+        bool disposed = false;
+        public bool Disposed => disposed;
+
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!disposed)
+                {
+                    disposed = true;
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
