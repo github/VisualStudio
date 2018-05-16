@@ -205,6 +205,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\UsageTrackingCommand.cs" />
     <Compile Include="Factories\ViewViewModelFactory.cs" />
     <Compile Include="Factories\ModelServiceFactory.cs" />
     <Compile Include="Models\IssueCommentModel.cs" />
@@ -402,7 +403,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>

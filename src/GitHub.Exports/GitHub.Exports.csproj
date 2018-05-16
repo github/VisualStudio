@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
     <Compile Include="Commands\IOpenLinkCommand.cs" />
     <Compile Include="Commands\ICreateGistCommand.cs" />
     <Compile Include="Commands\IShowCurrentPullRequestCommand.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Commands\INextInlineCommentCommand.cs" />
     <Compile Include="Commands\InlineCommentNavigationParams.cs" />
     <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
+    <Compile Include="Commands\IGoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="Commands\IVsCommand.cs" />
     <Compile Include="Commands\IVsCommandBase.cs" />
     <Compile Include="Exports\ExportForProcess.cs" />
