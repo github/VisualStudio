@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.InlineReviews
 {
-    public class PullRequestFilterPackageGuids
+    public static class PullRequestFilterPackageGuids
     {
         public const string GuidPullRequestFilterPackageCmdSetString = "7cde2dfc-43c9-41ff-bf2e-bef41cd99e09";
         public const int PullRequestFilterId = 0x0100;
@@ -93,7 +93,7 @@ namespace GitHub.InlineReviews
 
             private static string BuildAbsolutePath(string solutionDirectory, string fileRelativePath)
             {
-                return Path.Combine(solutionDirectory, fileRelativePath.Replace("/", @"\")).ToLower();
+                return Path.Combine(solutionDirectory, fileRelativePath.Replace("/", @"\")).ToUpperInvariant();
             }
         }
     }
