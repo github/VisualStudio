@@ -82,17 +82,18 @@
         </Border>
 
         <StackPanel Orientation="Vertical" Margin="0 16 0 0">
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-              <Button Margin="0 0 4 0">Back</Button>
-              <Button Click="repoForkButton_OnClick">Fork Repo</Button>
+                <Grid>
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="Red" 
+                               Text="{Binding Error, Mode=OneWay}"
+                               Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}" 
+                               HorizontalAlignment="Left" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                      <Button HorizontalAlignment="Right" Margin="0 0 4 0">Back</Button>
+                      <Button HorizontalAlignment="Right" Click="repoForkButton_OnClick">Fork Repo</Button>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
-
-            <TextBlock TextWrapping="Wrap"
-                       Foreground="Red" 
-                       Text="{Binding Error, Mode=OneWay}"
-                       HorizontalAlignment="Center"
-                       Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}"/>
-        </StackPanel>
     </StackPanel>
   </StackPanel>
 </UserControl>
