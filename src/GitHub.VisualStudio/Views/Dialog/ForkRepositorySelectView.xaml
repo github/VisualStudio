@@ -7,7 +7,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             Margin="8"
              mc:Ignorable="d" 
              d:DesignHeight="414" d:DesignWidth="440">
 
@@ -24,14 +23,17 @@
     <sampleData:ForkRepositorySelectViewModelDesigner IsLoading="True"/>
   </d:DesignProperties.DataContext>
 
-  <Grid>
+  <Grid Margin="0 8">
     <Grid.RowDefinitions>
+      <!--
       <RowDefinition Height="2*"/>
+       -->
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <StackPanel Grid.Row="0">
-      <TextBlock DockPanel.Dock="Top" FontSize="16" Margin="0 8">
+    <DockPanel Grid.Row="0">
+      <TextBlock DockPanel.Dock="Top" FontSize="16" Margin="8">
       Where should we fork this repository?
       </TextBlock>
 
@@ -46,12 +48,13 @@
                ItemsSource="{Binding Accounts}"
                VerticalContentAlignment="Top"
                HorizontalContentAlignment="Stretch"
+               Padding="8"
+               DockPanel.Dock="Top"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                SelectionChanged="accountsListBox_SelectionChanged">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
-            <UniformGrid Columns="3" IsItemsHost="True">
-            </UniformGrid>
+            <UniformGrid Columns="3" IsItemsHost="True" />
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
@@ -72,26 +75,48 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-    </StackPanel>
 
-    <DockPanel Grid.Row="1" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
-      <TextBlock DockPanel.Dock="Top" Margin="0 8">
-        <Run FontSize="16">Can't find what you're looking for?</Run>
-        <LineBreak/>
-        <Run>You have existing forks of this repository:</Run>
-      </TextBlock>
-      <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding ExistingForks}" MaxHeight="120">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <StackPanel Orientation="Horizontal">
+        <!-- 
+        <DockPanel Grid.Row="1" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
+          -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="0 16 0 0">
+          <TextBlock DockPanel.Dock="Top" Margin="8 0">
+            <Run FontWeight="SemiBold">Can't find what you're looking for?</Run>
+            <LineBreak/>
+            <Run>You have existing forks of this repository:</Run>
+          </TextBlock>
+          <!--
+              ItemsSource="{Binding ExistingForks}" 
+           -->
+          <ItemsControl DockPanel.Dock="Bottom" MaxHeight="120" Padding="8 0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
               <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
-              <TextBlock Text="{Binding Owner, Mode=OneWay}"/>
-              <TextBlock Text="/"/>
-              <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+              <TextBlock Text="donokuda/foo-bar" />
             </StackPanel>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
+
+            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+              <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
+              <TextBlock Text="donokuda/foo-bar" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+              <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
+              <TextBlock Text="donokuda/foo-bar" />
+            </StackPanel>
+            <!--
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
+                  <TextBlock Text="{Binding Owner, Mode=OneWay}"/>
+                  <TextBlock Text="/"/>
+                  <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+              -->
+          </ItemsControl>
+        </DockPanel>
     </DockPanel>
   </Grid>
 </UserControl>
