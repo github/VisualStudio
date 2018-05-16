@@ -29,9 +29,9 @@ namespace GitHub.InlineReviews
         {
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
             var exports = componentModel.DefaultExportProvider;
-            var barManager = exports.GetExportedValue<PullRequestStatusBarManager>();
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
+            var barManager = exports.GetExportedValue<PullRequestStatusBarManager>();
             barManager.StartShowingStatus();
         }
     }

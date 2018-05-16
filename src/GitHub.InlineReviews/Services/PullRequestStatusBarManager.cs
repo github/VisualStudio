@@ -30,8 +30,8 @@ namespace GitHub.InlineReviews.Services
 
         // At the moment these must be constructed on the main thread.
         // TeamExplorerContext needs to retrieve DTE using GetService.
-        readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
-        readonly Lazy<ITeamExplorerContext> teamExplorerContext;
+        readonly IPullRequestSessionManager pullRequestSessionManager;
+        readonly ITeamExplorerContext teamExplorerContext;
 
         IDisposable currentSessionSubscription;
 
@@ -40,8 +40,8 @@ namespace GitHub.InlineReviews.Services
             Lazy<IUsageTracker> usageTracker,
             IOpenPullRequestsCommand openPullRequestsCommand,
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
-            Lazy<IPullRequestSessionManager> pullRequestSessionManager,
-            Lazy<ITeamExplorerContext> teamExplorerContext)
+            IPullRequestSessionManager pullRequestSessionManager,
+            ITeamExplorerContext teamExplorerContext)
         {
             this.openPullRequestsCommand = new UsageTrackingCommand(usageTracker,
                 x => x.NumberOfStatusBarOpenPullRequestList, openPullRequestsCommand);
@@ -62,7 +62,7 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository)
+                teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => RefreshActiveRepository(x));
             }
@@ -75,7 +75,7 @@ namespace GitHub.InlineReviews.Services
         void RefreshActiveRepository(ILocalRepositoryModel repository)
         {
             currentSessionSubscription?.Dispose();
-            currentSessionSubscription = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
+            currentSessionSubscription = pullRequestSessionManager.WhenAnyValue(x => x.CurrentSession)
                 .Subscribe(x => RefreshCurrentSession(repository, x));
         }
 
