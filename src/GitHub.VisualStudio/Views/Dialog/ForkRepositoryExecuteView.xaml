@@ -81,32 +81,20 @@
                 </Grid>
         </Border>
 
-        <StackPanel Orientation="Vertical" Margin="0 16 0 0">
-                <Grid>
-                    <TextBlock TextWrapping="Wrap"
-                               Foreground="Red" 
+        <StackPanel Orientation="Vertical" Margin="0 8 0 0">
+                               <!--
                                Text="{Binding Error, Mode=OneWay}"
                                Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}" 
+                   -->
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="Red" 
+                               Margin="0 8"
+                               Text="Hello, yes this is fake error message for testing layout and seeing how this wraps."
                                HorizontalAlignment="Left" />
+                <Grid>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <ui:OcticonCircleButton Margin="4 0 0 0"
-                                                HorizontalAlignment="Right"
-                                                Icon="arrow_left"
-                                                IsDefault="True"
-                                                Click="backButton_OnClick">
-                          <TextBlock Text="Back" />
-                        </ui:OcticonCircleButton>
-                          <!--
-                          <Button HorizontalAlignment="Right" Click="repoForkButton_OnClick">Fork Repo</Button>
-                          -->
-
-                        <ui:OcticonCircleButton Margin="4 0 0 0"
-                            HorizontalAlignment="Right"
-                                                Icon="check"
-                                                IsDefault="True"
-                                                Click="repoForkButton_OnClick">
-                          <TextBlock Text="Fork repository" />
-                        </ui:OcticonCircleButton>
+                      <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Click="backButton_OnClick">Back</Button>
+                      <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Click="repoForkButton_OnClick">Fork Repository</Button>
                     </StackPanel>
                 </Grid>
             </StackPanel>
