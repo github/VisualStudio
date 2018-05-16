@@ -19,5 +19,10 @@ namespace GitHub.VisualStudio.Views.Dialog
         {
             ((IForkRepositoryExecuteViewModel)DataContext).CreateFork.Execute(new object());
         }
+
+        private void backButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            ((IForkRepositoryExecuteViewModel)DataContext).BackCommand.Execute(new object());
+        }
     }
 }
