@@ -6,6 +6,7 @@
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="https://github.com/github/VisualStudio"
+             VerticalAlignment="Top"
              Margin="8"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" d:DesignWidth="300" Height="315.179">
