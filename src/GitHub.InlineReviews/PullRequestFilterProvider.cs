@@ -71,7 +71,9 @@ namespace GitHub.InlineReviews
                 var sourceItems = await hierarchyCollectionProvider.GetDescendantsAsync(root.HierarchyIdentity.NestedHierarchy, CancellationToken);
 
                 var vsSolution = githubServiceProvider.GetSolution();
-                vsSolution.GetSolutionInfo(out var solutionDirectory, out _, out _);
+                string solutionDirectory;
+                string _;
+                vsSolution.GetSolutionInfo(out solutionDirectory, out _, out _);
 
                 this.pullRequestSessionFiles = new HashSet<string>();
                 if (SessionManager.CurrentSession != null)
