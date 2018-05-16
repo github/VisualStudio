@@ -12,6 +12,7 @@ using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
 using Serilog;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -71,6 +72,8 @@ namespace GitHub.ViewModels.GitHubPane
                 hasBodyOrComments,
                 _ => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges));
             Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
+            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
+                NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestModel.Number}")));
         }
 
         /// <inheritdoc/>
