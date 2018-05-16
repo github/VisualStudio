@@ -323,6 +323,7 @@
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\OpenPullRequestsCommand.cs" />
+    <Compile Include="Commands\GoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="GitContextPackage.cs" />
     <Compile Include="GitHubPanePackage.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
@@ -357,6 +358,15 @@
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ContentView.cs" />
+    <Compile Include="Views\Dialog\ForkRepositorySwitchView.xaml.cs">
+      <DependentUpon>ForkRepositorySwitchView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ForkRepositoryExecuteView.xaml.cs">
+      <DependentUpon>ForkRepositoryExecuteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ForkRepositorySelectView.xaml.cs">
+      <DependentUpon>ForkRepositorySelectView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialog\GistCreationView.xaml.cs">
       <DependentUpon>GistCreationView.xaml</DependentUpon>
     </Compile>
@@ -514,6 +524,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
+    </Page>
+    <Page Include="Views\Dialog\ForkRepositorySwitchView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\ForkRepositoryExecuteView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ForkRepositorySelectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\GistCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>
