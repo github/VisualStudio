@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -25,6 +24,7 @@ namespace GitHub.Services
 
         readonly IGitHubServiceProvider serviceProvider;
         readonly IEnvironment environment;
+        readonly SemaphoreSlim writeSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         string storePath;
         string userStorePath;
@@ -102,7 +102,7 @@ namespace GitHub.Services
                     SimpleJson.DeserializeObject<UsageData>(json) :
                     new UsageData { Reports = new List<UsageModel>() };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex, "Error deserializing usage");
                 return new UsageData { Reports = new List<UsageModel>() };
@@ -115,11 +115,12 @@ namespace GitHub.Services
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(storePath));
                 var json = SimpleJson.SerializeObject(data);
+
                 await WriteAllTextAsync(storePath, json);
             }
             catch (Exception ex)
             {
-                log.Error(ex,"Failed to write usage data");
+                log.Error(ex, "Failed to write usage data");
             }
         }
 
@@ -149,10 +150,19 @@ namespace GitHub.Services
 
         async Task WriteAllTextAsync(string path, string text)
         {
-            using (var s = new FileStream(path, FileMode.Create))
-            using (var w = new StreamWriter(s, Encoding.UTF8))
+            // Avoid IOException when metrics updated multiple times in quick succession
+            await writeSemaphoreSlim.WaitAsync();
+            try
             {
-                await w.WriteAsync(text);
+                using (var s = new FileStream(path, FileMode.Create))
+                using (var w = new StreamWriter(s, Encoding.UTF8))
+                {
+                    await w.WriteAsync(text);
+                }
+            }
+            finally
+            {
+                writeSemaphoreSlim.Release();
             }
         }
 
