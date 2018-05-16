@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GitHub.Logging;
 using GitHub.Models;
-using GitHub.VisualStudio;
+using GitHub.Services;
 using Microsoft.Win32;
 using Serilog;
 
@@ -34,7 +34,7 @@ namespace GitHub.TeamFoundation
                         {
                             var path = subkey?.GetValue("Path") as string;
                             if (path != null)
-                                return new LocalRepositoryModel(path);
+                                return new LocalRepositoryModel(path, GitService.GitServiceHelper);
                         }
                         catch (Exception)
                         {

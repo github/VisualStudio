@@ -667,6 +667,7 @@ public class PullRequestServiceTests : TestBaseClass
     public void CreatePullRequestAllArgsMandatory()
     {
         var serviceProvider = Substitutes.ServiceProvider;
+        var gitService = serviceProvider.GetGitService();
         var service = new PullRequestService(Substitute.For<IGitClient>(), serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
         IModelService ms = null;
@@ -682,10 +683,10 @@ public class PullRequestServiceTests : TestBaseClass
         ms = Substitute.For<IModelService>();
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 
-        sourceRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path");
+        sourceRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path", gitService);
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 
-        targetRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path");
+        targetRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path", gitService);
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 
         title = "a title";
