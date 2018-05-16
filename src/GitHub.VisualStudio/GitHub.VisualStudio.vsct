@@ -226,15 +226,16 @@
         </Strings>
       </Button>
 
-      <Button guid="guidContextMenuSet" id="openFileInSolutionCommand" type="Button">
-        <Icon guid="guidImages" id="logo" />
+      <Button guid="guidContextMenuSet" id="goToSolutionOrPullRequestFileCommand" type="Button">
+        <Icon guid="guidImages" id="pullrequest" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Open File in Solution</ButtonText>
-          <CanonicalName>.GitHub.OpenFileInSolution</CanonicalName>
-          <LocCanonicalName>.GitHub.OpenFileInSolution</LocCanonicalName>
+          <ButtonText>Go To Solution/PR File</ButtonText>
+          <CanonicalName>.GitHub.GoToSolutionOrPRFile</CanonicalName>
+          <LocCanonicalName>.GitHub.GoToSolutionOrPRFile</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -278,7 +279,7 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="openFileInSolutionCommand" priority="0x1000">
+    <CommandPlacement guid="guidContextMenuSet" id="goToSolutionOrPullRequestFileCommand" priority="0x1000">
       <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
     </CommandPlacement>
 
@@ -370,7 +371,7 @@
       <IDSymbol name="idGitHubContextSubMenuGroup" value="0x1002" />
       <IDSymbol name="openLinkCommand" value="0x100" />
       <IDSymbol name="copyLinkCommand" value="0x101"/>
-      <IDSymbol name="openFileInSolutionCommand" value="0x0102" />
+      <IDSymbol name="goToSolutionOrPullRequestFileCommand" value="0x0102" />
       <IDSymbol name="idCreateGistCommand" value="0x0400" />
       <IDSymbol name="idBlameCommand" value="0x0500" />
     </GuidSymbol>
