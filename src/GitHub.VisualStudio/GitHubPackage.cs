@@ -86,6 +86,7 @@ namespace GitHub.VisualStudio
                 exports.GetExportedValue<IOpenPullRequestsCommand>(),
                 exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
                 exports.GetExportedValue<IShowGitHubPaneCommand>(),
+                exports.GetExportedValue<IGoToSolutionOrPullRequestFileCommand>(),
                 exports.GetExportedValue<ISyncSubmodulesCommand>()
             };
 

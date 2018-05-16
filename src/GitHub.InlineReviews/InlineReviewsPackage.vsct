@@ -73,6 +73,15 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
       </Button>
+      <Button guid="guidGitHubCommandSet" id="ToggleInlineCommentMarginId" type="Button">
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Toggle Comment Margin</ButtonText>
+          <CanonicalName>.GitHub.ToggleInlineCommentMargin</CanonicalName>
+          <LocCanonicalName>.GitHub.ToggleInlineCommentMargin</LocCanonicalName>
+        </Strings>
+      </Button>
     </Buttons>
     <Bitmaps>
       <Bitmap guid="guidImages" href="Resources\PullRequestFilterCommand.png" usedList="pullrequest"/>
@@ -91,6 +100,7 @@
       <IDSymbol name="PullRequestCommentsToolWindowCommandId" value="0x1000" />
       <IDSymbol name="NextInlineCommentId" value="0x1001" />
       <IDSymbol name="PreviousInlineCommentId" value="0x1002" />
+      <IDSymbol name="ToggleInlineCommentMarginId" value="0x1003" />
     </GuidSymbol>
 
     <GuidSymbol name="guidPullRequestFilterCommandPackageCmdSet" value="{7cde2dfc-43c9-41ff-bf2e-bef41cd99e09}">
