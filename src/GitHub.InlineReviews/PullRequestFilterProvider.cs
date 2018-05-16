@@ -88,7 +88,7 @@ namespace GitHub.InlineReviews
             // Returns true if filters hierarchy item name for given filter; otherwise, false</returns>
             private bool ShouldIncludeInFilter(IVsHierarchyItem hierarchyItem)
             {
-                return hierarchyItem?.CanonicalName != null && pullRequestSessionFiles.Contains(hierarchyItem.CanonicalName);
+                return hierarchyItem?.CanonicalName != null && pullRequestSessionFiles.Contains(hierarchyItem.CanonicalName.ToUpperInvariant());
             }
 
             private static string BuildAbsolutePath(string solutionDirectory, string fileRelativePath)
