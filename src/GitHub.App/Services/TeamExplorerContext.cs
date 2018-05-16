@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Logging;
+using GitHub.Primitives;
 using Serilog;
 using EnvDTE;
 
@@ -31,6 +32,7 @@ namespace GitHub.Services
 
         string solutionPath;
         string repositoryPath;
+        UriString cloneUrl;
         string branchName;
         string headSha;
         string trackedSha;
@@ -70,11 +72,17 @@ namespace GitHub.Services
                 else
                 {
                     var newRepositoryPath = repo?.LocalPath;
+                    var newCloneUrl = repo?.CloneUrl;
                     var newBranchName = repo?.CurrentBranch?.Name;
                     var newHeadSha = repo?.CurrentBranch?.Sha;
                     var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
 
                     if (newRepositoryPath != repositoryPath)
+                    {
+                        log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
+                        ActiveRepository = repo;
+                    }
+                    else if (newCloneUrl != cloneUrl)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
                         ActiveRepository = repo;
@@ -96,6 +104,7 @@ namespace GitHub.Services
                     }
 
                     repositoryPath = newRepositoryPath;
+                    cloneUrl = newCloneUrl;
                     branchName = newBranchName;
                     headSha = newHeadSha;
                     solutionPath = newSolutionPath;

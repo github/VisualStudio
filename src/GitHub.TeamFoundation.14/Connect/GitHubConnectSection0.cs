@@ -1,5 +1,4 @@
 ﻿using GitHub.Api;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using Microsoft.TeamFoundation.Controls;
@@ -20,8 +19,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IConnectionManager manager,
             IPackageSettings settings,
             IVSServices vsServices,
-            ILocalRepositories localRepositories)
-            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, localRepositories, 0)
+            ILocalRepositories localRepositories,
+            IUsageTracker usageTracker)
+            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, localRepositories, usageTracker, 0)
         {
         }
     }

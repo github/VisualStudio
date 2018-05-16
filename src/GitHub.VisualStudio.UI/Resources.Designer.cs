@@ -331,6 +331,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fork.
+        /// </summary>
+        public static string ForkNavigationItemText {
+            get {
+                return ResourceManager.GetString("ForkNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Get Started.
         /// </summary>
         public static string GetStartedText {
@@ -660,6 +669,15 @@ namespace GitHub.VisualStudio.UI {
         public static string Options_ExperimentalTitle {
             get {
                 return ResourceManager.GetString("Options_ExperimentalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Fork button in Team Explorer.
+        /// </summary>
+        public static string Options_ForkButtonLabel {
+            get {
+                return ResourceManager.GetString("Options_ForkButtonLabel", resourceCulture);
             }
         }
         

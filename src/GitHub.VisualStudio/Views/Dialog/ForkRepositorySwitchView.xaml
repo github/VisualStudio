@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.Dialog.ForkRepositorySwitchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             Margin="8"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+  <d:DesignProperties.DataContext>
+    <sampleData:ForkRepositorySwitchViewModelDesigner/>
+  </d:DesignProperties.DataContext>
+
+  <StackPanel>
+    <ItemsControl Margin="8,16,8,8">
+      <ItemsControl.Resources>
+        <Style x:Key="ItemBorder" TargetType="Border">
+          <Setter Property="Background" Value="#10000000"/>
+          <Setter Property="CornerRadius" Value="3"/>
+          <Setter Property="Margin" Value="4"/>
+          <Setter Property="Padding" Value="4,8"/>
+        </Style>
+        <Style TargetType="CheckBox">
+          <Setter Property="Margin" Value="0,1,6,0"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+      </ItemsControl.Resources>
+            <Border Style="{StaticResource ItemBorder}">
+        <DockPanel>
+          <CheckBox IsChecked="{Binding UpdateOrigin}"/>
+          <TextBlock TextWrapping="Wrap">
+          Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
+          <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
+          </TextBlock>
+        </DockPanel>
+      </Border>
+      <Border Style="{StaticResource ItemBorder}">
+        <DockPanel>
+            <CheckBox IsChecked="{Binding AddUpstream}"/>
+            <TextBlock TextWrapping="Wrap">
+            Add an <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream</Run> remote pointing to 
+          <Hyperlink><Run Text="{Binding SourceRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
+          </TextBlock>
+        </DockPanel>
+      </Border>
+      <Border Style="{StaticResource ItemBorder}">
+        <DockPanel>
+          <CheckBox IsChecked="{Binding ResetMasterTracking}"/>
+          <TextBlock TextWrapping="Wrap">
+            Reset the <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">master</Run> branch to 
+            <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">upstream/master</Run>
+          </TextBlock>
+        </DockPanel>
+      </Border>
+      <Border Style="{StaticResource ItemBorder}">
+        <Button Click="repoSwitchButton_OnClick">Switch Origin</Button>
+      </Border>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>

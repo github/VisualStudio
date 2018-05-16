@@ -65,6 +65,7 @@ namespace GitHub.Services
         Global,
         RefreshFailed,
         GistCreateFailed,
+        RepoForkFailed
     }
 
     public static class StandardUserErrors
@@ -150,6 +151,7 @@ namespace GitHub.Services
                 ErrorType.RefreshFailed, Map(Defaults("Refresh failed", "Refresh failed unexpectedly. Please email support@github.com if this error persists."),
                     new Translation<HttpRequestException>("Refresh failed", "Could not connect to the remote server. The server or your internect connection could be down")) },
             { ErrorType.GistCreateFailed, Map(Defaults("Failed to create gist", "Creating a gist failed unexpectedly. Try logging back in.")) },
+            { ErrorType.RepoForkFailed, Map(Defaults("Failed to create fork")) },
         }));
 
         public static string GetUserFriendlyErrorMessage(this Exception exception, ErrorType errorType, params object[] messageArgs)
