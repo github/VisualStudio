@@ -124,6 +124,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The GitHub extension is not available inside Blend.
+        /// </summary>
+        public static string BlendDialogText {
+            get {
+                return ResourceManager.GetString("BlendDialogText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Powerful collaboration, code review, and code management for open source and private projects..
         /// </summary>
         public static string BlurbText {
