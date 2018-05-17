@@ -39,7 +39,7 @@
     <TextBlock Margin="0 16 0 0" FontSize="14">This operation will:</TextBlock>
 
     <StackPanel Orientation="Vertical">
-        <Border Margin="0 8 0 0" CornerRadius="2" Background="#ffeff1f5" Padding="16">
+        <Border Margin="0 8 0 4" CornerRadius="2" Background="#ffeff1f5" Padding="8 16">
                 <StackPanel>
                     <Grid Margin="0 0 0 0">
                         <Grid.ColumnDefinitions>
@@ -80,12 +80,12 @@
         </Border>
 
         <TextBlock TextWrapping="Wrap"
+                   Margin="0 4" 
                    Foreground="Red" 
-                   Margin="0 8"
                    Text="{Binding Error, Mode=OneWay}"
                    Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}" 
                    HorizontalAlignment="Left" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Margin="0 8" Orientation="Horizontal" HorizontalAlignment="Right">
           <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Click="backButton_OnClick">Back</Button>
           <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Click="repoForkButton_OnClick">Fork Repository</Button>
         </StackPanel>
