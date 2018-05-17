@@ -65,10 +65,11 @@
                                 Text="{Binding Login, StringFormat=@{0}}"
                                 TextAlignment="Center"
                                 TextTrimming="CharacterEllipsis"/>
-              <Image
-                              Margin="4"
-                              MaxWidth="100"
-                              Source="{Binding Avatar}" />
+              <Image Margin="4"
+                     Width="100"
+                     Height="100"
+                     Stretch="Uniform"
+                     Source="{Binding AvatarUrl}" />
             </DockPanel>
           </Border>
         </DataTemplate>

@@ -14,11 +14,11 @@ namespace GitHub.SampleData
         {
             Accounts = new[]
             {
-                new AccountDesigner { Login = "Myself" },
-                new AccountDesigner { Login = "MyOrg1" },
-                new AccountDesigner { Login = "MyOrg2" },
-                new AccountDesigner { Login = "MyOrg3" },
-                new AccountDesigner { Login = "a-long-org-name" },
+                new AccountDesigner { Login = "Myself", AvatarUrl = "https://identicons.github.com/myself.png" },
+                new AccountDesigner { Login = "MyOrg1", AvatarUrl = "https://identicons.github.com/myorg1.png" },
+                new AccountDesigner { Login = "MyOrg2", AvatarUrl = "https://identicons.github.com/myorg2.png"  },
+                new AccountDesigner { Login = "MyOrg3", AvatarUrl = "https://identicons.github.com/myorg3.png"  },
+                new AccountDesigner { Login = "a-long-org-name", AvatarUrl = "https://identicons.github.com/a-long-org-name.png"  },
             };
 
             ExistingForks = new[]

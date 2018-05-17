@@ -108,6 +108,14 @@ namespace GitHub.ViewModels.Dialog
 
             Accounts = readOnlyList.Where(arg => arg.Fork == null).Select(arg => arg.Account).ToList();
             ExistingForks = readOnlyList.Where(arg => arg.Fork != null).Select(arg => arg.Fork).ToList();
+
+            // HACK: Our avatar cache only provides avatars in a very small size, but we want to 
+            // display them 100x100 in the Fork view. For now, wse the AvatarUrl directly to get
+            // the avatar, appending "s=100" to the URL to get the correct size.
+            foreach (Account account in Accounts)
+            {
+                account.AvatarUrl += "&s=100";
+            }
         }
     }
 }
