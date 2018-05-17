@@ -24,7 +24,7 @@ namespace GitHub.Services
 
         readonly IGitHubServiceProvider serviceProvider;
         readonly IEnvironment environment;
-        readonly SemaphoreSlim writeSemaphoreSlim = new SemaphoreSlim(1, 1);
+        readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         string storePath;
         string userStorePath;
@@ -39,7 +39,7 @@ namespace GitHub.Services
 
         public void Dispose()
         {
-            writeSemaphoreSlim.Dispose();
+            semaphoreSlim.Dispose();
         }
 
         public async Task<Guid> GetUserGuid()
@@ -146,17 +146,26 @@ namespace GitHub.Services
 
         async Task<string> ReadAllTextAsync(string path)
         {
-            using (var s = File.OpenRead(path))
-            using (var r = new StreamReader(s, Encoding.UTF8))
+            // Avoid IOException when metrics updated multiple times in quick succession
+            await semaphoreSlim.WaitAsync();
+            try
             {
-                return await r.ReadToEndAsync();
+                using (var s = File.OpenRead(path))
+                using (var r = new StreamReader(s, Encoding.UTF8))
+                {
+                    return await r.ReadToEndAsync();
+                }
+            }
+            finally
+            {
+                semaphoreSlim.Release();
             }
         }
 
         async Task WriteAllTextAsync(string path, string text)
         {
             // Avoid IOException when metrics updated multiple times in quick succession
-            await writeSemaphoreSlim.WaitAsync();
+            await semaphoreSlim.WaitAsync();
             try
             {
                 using (var s = new FileStream(path, FileMode.Create))
@@ -167,7 +176,7 @@ namespace GitHub.Services
             }
             finally
             {
-                writeSemaphoreSlim.Release();
+                semaphoreSlim.Release();
             }
         }
 
