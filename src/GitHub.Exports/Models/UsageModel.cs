@@ -73,9 +73,6 @@ namespace GitHub.Models
             public int NumberOfGitHubConnectSectionClones { get; set; }
             public int NumberOfShowRepoForkDialogClicks { get; set; }
             public int NumberOfReposForked { get; set; }
-            public int NumberOfOriginsUpdatedWhenForkingRepo { get; set; }
-            public int NumberOfUpstreamsAddedWhenForkingRepo { get; set; }
-            public int NumberOfTrackMasterUpstreamWhenForkingRepo { get; set; }
             public int ExecuteGoToSolutionOrPullRequestFileCommand { get; set; }
             public int NumberOfPRDetailsNavigateToEditor { get; set; } // Should rename to NumberOfNavigateToEditor
             public int NumberOfNavigateToPullRequestFileDiff { get; set; }

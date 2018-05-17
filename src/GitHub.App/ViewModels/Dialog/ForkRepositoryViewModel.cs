@@ -33,6 +33,7 @@ namespace GitHub.ViewModels.Dialog
 
             selectPage.SwitchOrigin.Subscribe(x => ShowSwitchRepositoryPath((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
+            executePage.Back.Subscribe(x => ShowSelectPage().Forget());
         }
 
         public ILocalRepositoryModel Repository { get; private set; }
@@ -47,7 +48,12 @@ namespace GitHub.ViewModels.Dialog
         {
             Repository = repository;
             Connection = connection;
-            await selectPage.InitializeAsync(repository, connection);
+            await ShowSelectPage();
+        }
+
+        async Task ShowSelectPage()
+        {
+            await selectPage.InitializeAsync(Repository, Connection);
             Content = selectPage;
         }
 

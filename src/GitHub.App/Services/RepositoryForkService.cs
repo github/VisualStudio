@@ -41,7 +41,7 @@ namespace GitHub.Services
             log.Verbose("ForkRepository Source:{SourceOwner}/{SourceName} To:{DestinationOwner}", sourceRepository.Owner, sourceRepository.Name, repositoryFork.Organization ?? "[Current User]");
             log.Verbose("ForkRepository updateOrigin:{UpdateOrigin} addUpstream:{AddUpstream} trackMasterUpstream:{TrackMasterUpstream}", updateOrigin, addUpstream, trackMasterUpstream);
 
-            RecordForkRepositoryUsage(updateOrigin, addUpstream, trackMasterUpstream).Forget();
+            usageTracker.IncrementCounter(model => model.NumberOfReposForked).Forget();
 
             return Observable.Defer(() => apiClient.ForkRepository(sourceRepository.Owner, sourceRepository.Name, repositoryFork)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -61,26 +61,6 @@ namespace GitHub.Services
 
                     return repo.RemoteRepo;
                 });
-        }
-
-        private async Task RecordForkRepositoryUsage(bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
-        {
-            await usageTracker.IncrementCounter(model => model.NumberOfReposForked);
-
-            if (updateOrigin)
-            {
-                await usageTracker.IncrementCounter(model => model.NumberOfOriginsUpdatedWhenForkingRepo);
-            }
-
-            if (addUpstream)
-            {
-                await usageTracker.IncrementCounter(model => model.NumberOfUpstreamsAddedWhenForkingRepo);
-            }
-
-            if (trackMasterUpstream)
-            {
-                await usageTracker.IncrementCounter(model => model.NumberOfTrackMasterUpstreamWhenForkingRepo);
-            }
         }
 
         public IObservable<object> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
