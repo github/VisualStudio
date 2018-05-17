@@ -138,7 +138,7 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateActiveRepo()
         {
-            // NOTE: gitService will be null in Expression Blend or Safe Mode
+            // NOTE: gitService might be null in Blend or Safe Mode
             var repo = gitService?.ActiveRepositories.FirstOrDefault();
 
             if (!Equals(repo, ActiveRepo))
