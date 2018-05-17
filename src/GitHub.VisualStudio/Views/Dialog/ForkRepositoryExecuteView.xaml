@@ -17,6 +17,13 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
+      
+      <!-- Disable links until we make them work-->
+      <Style TargetType="Hyperlink">
+        <Setter Property="IsEnabled" Value="False"/>
+        <Setter Property="Foreground" Value="Black"/>
+      </Style>
+      
     </ResourceDictionary>
   </Control.Resources>
 
