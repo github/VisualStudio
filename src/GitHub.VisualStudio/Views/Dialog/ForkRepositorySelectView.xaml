@@ -7,7 +7,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             Margin="8"
              mc:Ignorable="d" 
              d:DesignHeight="414" d:DesignWidth="440">
 
@@ -24,68 +23,80 @@
     <sampleData:ForkRepositorySelectViewModelDesigner IsLoading="True"/>
   </d:DesignProperties.DataContext>
 
-  <Grid>
+  <Grid Margin="0 8">
     <Grid.RowDefinitions>
-      <RowDefinition Height="2*"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <DockPanel Grid.Row="0">
-      <TextBlock DockPanel.Dock="Top" FontSize="16" Margin="0 8">
+    <TextBlock Grid.Row="0" FontSize="16" Margin="8">
       Where should we fork this repository?
-      </TextBlock>
+    </TextBlock>
 
-      <ui:GitHubProgressBar DockPanel.Dock="Top"
+    <ui:GitHubProgressBar Grid.Row="1"
                           Foreground="{DynamicResource GitHubAccentBrush}"
                           IsIndeterminate="True"
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
 
-      <ListBox Name="accountsListBox"
-               ItemsSource="{Binding Accounts}"
-               Padding="8"
-               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-               SelectionChanged="accountsListBox_SelectionChanged">
-        <ListBox.ItemsPanel>
-          <ItemsPanelTemplate>
-            <WrapPanel IsItemsHost="True"/>
-          </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <DockPanel Width="100">
+    <ListBox Name="accountsListBox"
+             Grid.Row="2"
+             BorderThickness="0"
+             ItemsSource="{Binding Accounts}"
+             VerticalContentAlignment="Top"
+             HorizontalContentAlignment="Stretch"
+             Padding="8"
+             DockPanel.Dock="Top"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             SelectionChanged="accountsListBox_SelectionChanged">
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <UniformGrid Columns="3" IsItemsHost="True" />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Border Margin="4" Background="#fff2f2f2" CornerRadius="3">
+            <DockPanel>
               <TextBlock DockPanel.Dock="Bottom"
-                       Text="{Binding Login, StringFormat=@{0}}"
-                       TextAlignment="Center"
-                       TextTrimming="CharacterEllipsis"/>
-              <Image Margin="0,4"
-                   Source="{Binding Avatar}"
-                   Width="32"/>
+                                Margin="4,0,4,4"
+                                Text="{Binding Login, StringFormat=@{0}}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis"/>
+              <Image Margin="4"
+                     Width="100"
+                     Height="100"
+                     Stretch="Uniform"
+                     Source="{Binding AvatarUrl}" />
             </DockPanel>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-    </DockPanel>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
 
-    <DockPanel Grid.Row="1" Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
-      <TextBlock DockPanel.Dock="Top" Margin="0 8">
-        <Run FontSize="16">Can't find what you're looking for?</Run>
-        <LineBreak/>
-        <Run>You have existing forks of this repository:</Run>
+    <DockPanel Grid.Row="3" 
+               Margin="0 16 0 0"
+               Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
+      <TextBlock DockPanel.Dock="Top" Margin="8 0">
+            <Run FontWeight="SemiBold">Can't find what you're looking for?</Run>
+            <LineBreak/>
+            <Run>You have existing forks of this repository:</Run>
       </TextBlock>
-      <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding ExistingForks}" MaxHeight="120">
-        <!-- SelectionChanged="existingForksListBox_SelectionChanged"-->
-        <ListBox.ItemTemplate>
+
+      <ItemsControl ItemsSource="{Binding ExistingForks}" DockPanel.Dock="Bottom" MaxHeight="120" Padding="8 0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
               <ui:OcticonImage Icon="repo_forked" Margin="0,0,2,-2"/>
               <TextBlock Text="{Binding Owner, Mode=OneWay}"/>
               <TextBlock Text="/"/>
               <TextBlock Text="{Binding Name, Mode=OneWay}"/>
             </StackPanel>
           </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </DockPanel>
   </Grid>
 </UserControl>

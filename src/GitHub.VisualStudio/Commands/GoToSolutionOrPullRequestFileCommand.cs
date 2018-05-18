@@ -150,14 +150,6 @@ namespace GitHub.Commands
         {
             try
             {
-                var session = sessionManager.Value.CurrentSession;
-                if (session == null)
-                {
-                    // No active pull request session
-                    Visible = false;
-                    return;
-                }
-
                 var sourceView = pullRequestEditorService.Value.FindActiveView();
                 if (sourceView == null)
                 {
@@ -185,13 +177,17 @@ namespace GitHub.Commands
                     return;
                 }
 
-                var relativePath = sessionManager.Value.GetRelativePath(textView.TextBuffer);
-                if (relativePath != null)
+                var session = sessionManager.Value.CurrentSession;
+                if (session != null)
                 {
-                    // Active text view is part of a repository
-                    Text = "View Changes in #" + session.PullRequest.Number;
-                    Visible = true;
-                    return;
+                    var relativePath = sessionManager.Value.GetRelativePath(textView.TextBuffer);
+                    if (relativePath != null)
+                    {
+                        // Active text view is part of a repository
+                        Text = "View Changes in #" + session.PullRequest.Number;
+                        Visible = true;
+                        return;
+                    }
                 }
             }
             catch (Exception ex)

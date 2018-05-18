@@ -23,6 +23,8 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         IReactiveCommand<Repository> CreateFork { get; }
 
+        IReactiveCommand<object> BackCommand { get; }
+
         bool ResetMasterTracking { get; set; }
 
         bool AddUpstream { get; set; }
@@ -34,6 +36,7 @@ namespace GitHub.ViewModels.Dialog
         bool CanResetMasterTracking { get; }
 
         string Error { get; }
+        IObservable<object> Back { get; }
 
         /// <summary>
         /// Initializes the view model.

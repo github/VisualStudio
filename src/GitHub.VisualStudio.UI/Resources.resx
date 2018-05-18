@@ -425,6 +425,9 @@
   <data name="Options_EnableTraceLoggingText" xml:space="preserve">
     <value>Enable Trace Logging</value>
   </data>
+  <data name="BlendDialogText" xml:space="preserve">
+    <value>The GitHub extension is not available inside Blend</value>
+  </data>
   <data name="Options_ForkButtonLabel" xml:space="preserve">
     <value>Show Fork button in Team Explorer</value>
   </data>

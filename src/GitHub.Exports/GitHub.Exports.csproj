@@ -159,7 +159,8 @@
     <Compile Include="Commands\IGoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="Commands\IVsCommand.cs" />
     <Compile Include="Commands\IVsCommandBase.cs" />
-    <Compile Include="Exports\ExportForProcess.cs" />
+    <Compile Include="Exports\ExportForVisualStudioProcessAttribute.cs" />
+    <Compile Include="Exports\ExportForProcessAttribute.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\CommitMessage.cs" />
