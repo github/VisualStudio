@@ -7,6 +7,8 @@ using GitHub.Logging;
 using GitHub.Primitives;
 using Serilog;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.Services
 {
@@ -29,6 +31,7 @@ namespace GitHub.Services
 
         readonly DTE dte;
         readonly IVSGitExt gitExt;
+        readonly JoinableTaskFactory joinableTaskFactory;
 
         string solutionPath;
         string repositoryPath;
@@ -40,17 +43,18 @@ namespace GitHub.Services
         ILocalRepositoryModel repositoryModel;
 
         [ImportingConstructor]
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(gitExt, serviceProvider)
+        TeamExplorerContext(SVsServiceProvider serviceProvider, IVSGitExt gitExt)
+            : this(gitExt, serviceProvider, ThreadHelper.JoinableTaskFactory)
         {
         }
 
-        public TeamExplorerContext(IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(IVSGitExt gitExt, IServiceProvider serviceProvider, JoinableTaskFactory joinableTaskFactory = null)
         {
             this.gitExt = gitExt;
+            this.joinableTaskFactory = joinableTaskFactory ?? new JoinableTaskContext().Factory;
 
-            // This is a standard service which should always be available.
-            dte = serviceProvider.GetService<DTE>();
+            // SVsServiceProvider doesn't complain when this isn't called on Main thread
+            dte = (DTE)serviceProvider.GetService(typeof(DTE));
 
             Refresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
@@ -80,27 +84,47 @@ namespace GitHub.Services
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
-                        ActiveRepository = repo;
+                        joinableTaskFactory.Run(async () =>
+                        {
+                            await joinableTaskFactory.SwitchToMainThreadAsync();
+                            ActiveRepository = repo;
+                        });
                     }
                     else if (newCloneUrl != cloneUrl)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
-                        ActiveRepository = repo;
+                        joinableTaskFactory.Run(async () =>
+                        {
+                            await joinableTaskFactory.SwitchToMainThreadAsync();
+                            ActiveRepository = repo;
+                        });
                     }
                     else if (newBranchName != branchName)
                     {
                         log.Debug("Fire StatusChanged event when BranchName changes for ActiveRepository");
-                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                        joinableTaskFactory.Run(async () =>
+                        {
+                            await joinableTaskFactory.SwitchToMainThreadAsync();
+                            StatusChanged?.Invoke(this, EventArgs.Empty);
+                        });
                     }
                     else if (newHeadSha != headSha)
                     {
                         log.Debug("Fire StatusChanged event when HeadSha changes for ActiveRepository");
-                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                        joinableTaskFactory.Run(async () =>
+                        {
+                            await joinableTaskFactory.SwitchToMainThreadAsync();
+                            StatusChanged?.Invoke(this, EventArgs.Empty);
+                        });
                     }
                     else if (newTrackedSha != trackedSha)
                     {
                         log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
-                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                        joinableTaskFactory.Run(async () =>
+                        {
+                            await joinableTaskFactory.SwitchToMainThreadAsync();
+                            StatusChanged?.Invoke(this, EventArgs.Empty);
+                        });
                     }
 
                     repositoryPath = newRepositoryPath;

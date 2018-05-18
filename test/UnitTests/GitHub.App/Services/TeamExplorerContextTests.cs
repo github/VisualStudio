@@ -214,8 +214,8 @@ namespace GitHub.App.UnitTests.Services
         static TeamExplorerContext CreateTeamExplorerContext(IVSGitExt gitExt, DTE dte = null)
         {
             dte = dte ?? Substitute.For<DTE>();
-            var sp = Substitute.For<IGitHubServiceProvider>();
-            sp.GetService<DTE>().Returns(dte);
+            var sp = Substitute.For<IServiceProvider>();
+            sp.GetService(typeof(DTE)).Returns(dte);
             return new TeamExplorerContext(gitExt, sp);
         }
 
