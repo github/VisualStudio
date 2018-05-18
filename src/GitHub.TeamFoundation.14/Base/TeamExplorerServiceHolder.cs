@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -20,19 +21,26 @@ namespace GitHub.VisualStudio.Base
 
         IServiceProvider serviceProvider;
         readonly IVSGitExt gitService;
-
-        // ActiveRepositories PropertyChanged event comes in on a non-main thread
-        readonly SynchronizationContext syncContext;
+        readonly JoinableTaskFactory joinableTaskFactory;
 
         /// <summary>
         /// This class relies on IVSGitExt that provides information when VS switches repositories.
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         [ImportingConstructor]
-        public TeamExplorerServiceHolder(IVSGitExt gitService)
+        TeamExplorerServiceHolder(IVSGitExt gitService) : this(gitService, ThreadHelper.JoinableTaskFactory)
+        {
+        }
+
+        /// <summary>
+        /// This constructor can be used for unit testing.
+        /// </summary>
+        /// <param name="gitService">Used for monitoring the active repository.</param>
+        /// <param name="joinableTaskFactory">Used for switching to the Main thread.</param>
+        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskFactory joinableTaskFactory = null)
         {
             this.gitService = gitService;
-            syncContext = SynchronizationContext.Current;
+            this.joinableTaskFactory = joinableTaskFactory ?? new JoinableTaskContext().Factory;
 
             UpdateActiveRepo();
             if (gitService != null)
@@ -40,7 +48,6 @@ namespace GitHub.VisualStudio.Base
                 gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
             }
         }
-
 
         // set by the sections when they get initialized
         public IServiceProvider ServiceProvider
@@ -142,8 +149,14 @@ namespace GitHub.VisualStudio.Base
             var repo = gitService?.ActiveRepositories.FirstOrDefault();
 
             if (!Equals(repo, ActiveRepo))
-                // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
+            {
+                // Fire property change events on Main thread
+                joinableTaskFactory.Run(async () =>
+                {
+                    await joinableTaskFactory.SwitchToMainThreadAsync();
+                    ActiveRepo = repo;
+                });
+            }
         }
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
