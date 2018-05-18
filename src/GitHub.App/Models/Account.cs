@@ -80,7 +80,7 @@ namespace GitHub.Models
 
         public long PrivateReposInPlan { get; private set; }
 
-        public string AvatarUrl { get; private set; }
+        public string AvatarUrl { get; set; }
 
         public BitmapSource Avatar
         {

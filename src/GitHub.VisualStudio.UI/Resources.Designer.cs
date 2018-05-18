@@ -124,6 +124,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The GitHub extension is not available inside Blend.
+        /// </summary>
+        public static string BlendDialogText {
+            get {
+                return ResourceManager.GetString("BlendDialogText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Powerful collaboration, code review, and code management for open source and private projects..
         /// </summary>
         public static string BlurbText {
@@ -327,6 +336,15 @@ namespace GitHub.VisualStudio.UI {
         public static string ForgotPasswordLink {
             get {
                 return ResourceManager.GetString("ForgotPasswordLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fork.
+        /// </summary>
+        public static string ForkNavigationItemText {
+            get {
+                return ResourceManager.GetString("ForkNavigationItemText", resourceCulture);
             }
         }
         
@@ -660,6 +678,15 @@ namespace GitHub.VisualStudio.UI {
         public static string Options_ExperimentalTitle {
             get {
                 return ResourceManager.GetString("Options_ExperimentalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Fork button in Team Explorer.
+        /// </summary>
+        public static string Options_ForkButtonLabel {
+            get {
+                return ResourceManager.GetString("Options_ForkButtonLabel", resourceCulture);
             }
         }
         

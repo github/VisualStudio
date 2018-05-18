@@ -18,7 +18,7 @@ namespace GitHub.VisualStudio
         public const int createGistCommand = 0x400;
         public const int openLinkCommand = 0x100;
         public const int copyLinkCommand = 0x101;
-        public const int openFileInSolutionCommand = 0x102;
+        public const int goToSolutionOrPullRequestFileCommand = 0x102;
         public const int githubCommand = 0x320;
         public const int helpCommand = 0x321;
         public const int blameCommand = 0x500;
@@ -26,5 +26,6 @@ namespace GitHub.VisualStudio
         // IDs defined in InlineReviewsPackage.vsct
         public const int NextInlineCommentId = 0x1001;
         public const int PreviousInlineCommentId = 0x1002;
+        public const int ToggleInlineCommentMarginId = 0x1003;
     };
 }

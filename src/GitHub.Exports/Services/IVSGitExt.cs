@@ -8,5 +8,6 @@ namespace GitHub.Services
     {
         IReadOnlyList<ILocalRepositoryModel> ActiveRepositories { get; }
         event Action ActiveRepositoriesChanged;
+        void RefreshActiveRepositories();
     }
 }

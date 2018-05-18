@@ -49,14 +49,11 @@
                         VerticalAlignment="Bottom"
                         Margin="0 0 4 0 "
                         Icon="git_pull_request" />
-                    <TextBlock VerticalAlignment="Center">
-                        Pull requests
-                    </TextBlock>
                 </StackPanel>
             </Button>
             <Grid.ToolTip>
                 <TextBlock VerticalAlignment="Center">
-                    Open or Create a Pull request
+                    View, Checkout or Create a Pull request
                 </TextBlock>
             </Grid.ToolTip>
         </Grid>
