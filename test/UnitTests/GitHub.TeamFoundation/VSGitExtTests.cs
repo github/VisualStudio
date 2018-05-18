@@ -39,7 +39,7 @@ public class VSGitExtTests
 
             context.IsActive = activated;
 
-            target.PendingTasks.Wait();
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
             sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
         }
 
@@ -47,7 +47,7 @@ public class VSGitExtTests
         public void ActiveRepositories_ReadUsingThreadPoolThread()
         {
             var gitExt = Substitute.For<IGitExt>();
-            bool threadPool = false;
+            bool? threadPool = null;
             gitExt.ActiveRepositories.Returns(x =>
             {
                 threadPool = Thread.CurrentThread.IsThreadPoolThread;
@@ -55,6 +55,7 @@ public class VSGitExtTests
             });
 
             var target = CreateVSGitExt(gitExt: gitExt);
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
 
             Assert.That(threadPool, Is.True);
         }
@@ -75,7 +76,7 @@ public class VSGitExtTests
             var eventArgs = new PropertyChangedEventArgs(nameof(gitExt.ActiveRepositories));
             gitExt.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(gitExt, eventArgs);
 
-            await target.PendingTasks;
+            await target.JoinableTaskCollection.JoinTillEmptyAsync();
             Assert.That(wasFired, Is.True);
         }
 
@@ -108,7 +109,7 @@ public class VSGitExtTests
             target.ActiveRepositoriesChanged += () => wasFired = true;
 
             context.IsActive = true;
-            target.PendingTasks.Wait();
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
 
             Assert.That(wasFired, Is.True);
         }
@@ -120,11 +121,11 @@ public class VSGitExtTests
             var gitExt = CreateGitExt();
             var target = CreateVSGitExt(context, gitExt);
 
-            bool threadPool = false;
+            bool? threadPool = null;
             target.ActiveRepositoriesChanged += () => threadPool = Thread.CurrentThread.IsThreadPoolThread;
 
             context.IsActive = true;
-            target.PendingTasks.Wait();
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
 
             Assert.That(threadPool, Is.True);
         }
@@ -149,7 +150,7 @@ public class VSGitExtTests
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new[] { repoPath });
             var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
-            target.PendingTasks.Wait();
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
 
             var activeRepositories = target.ActiveRepositories;
 
@@ -166,7 +167,7 @@ public class VSGitExtTests
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new[] { repoPath });
             var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
-            target.PendingTasks.Wait();
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
 
             var activeRepositories = target.ActiveRepositories;
 
@@ -187,7 +188,7 @@ public class VSGitExtTests
             var task2 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories2);
 
             await Task.WhenAll(task1, task2);
-            await target.PendingTasks;
+            target.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
 
             Assert.That(target.ActiveRepositories.Single().LocalPath, Is.EqualTo("repo2"));
         }
@@ -218,7 +219,7 @@ public class VSGitExtTests
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
         var vsGitExt = new VSGitExt(sp, factory, repoFactory);
-        vsGitExt.PendingTasks.Wait();
+        vsGitExt.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
         return vsGitExt;
     }
 
