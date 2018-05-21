@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -51,11 +52,13 @@ namespace GitHub.UI.Controls
         public double ViewportWidth { get; private set; }
         public ScrollViewer ScrollOwner { get; set; }
 
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Can only be applied to controls")]
         public static bool GetIsFixed(FrameworkElement control)
         {
             return (bool)control.GetValue(IsFixedProperty);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Can only be applied to controls")]
         public static void SetIsFixed(FrameworkElement control, bool value)
         {
             control.SetValue(IsFixedProperty, value);
