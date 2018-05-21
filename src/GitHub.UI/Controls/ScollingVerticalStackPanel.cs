@@ -116,7 +116,7 @@ namespace GitHub.UI.Controls
 
         public void SetHorizontalOffset(double offset)
         {
-            var value = Math.Max(0, offset);
+            var value = Math.Max(0, Math.Min(offset, ExtentWidth - ViewportWidth));
 
             if (value != HorizontalOffset)
             {
@@ -127,7 +127,7 @@ namespace GitHub.UI.Controls
 
         public void SetVerticalOffset(double offset)
         {
-            var value = Math.Max(0, offset);
+            var value = Math.Max(0, Math.Min(offset, ExtentHeight - ViewportHeight));
 
             if (value != VerticalOffset)
             {
@@ -157,9 +157,6 @@ namespace GitHub.UI.Controls
                 height += child.DesiredSize.Height;
             }
 
-            ExtentWidth = maxWidth;
-            ExtentHeight = height;
-
             UpdateScrollInfo(new Size(maxWidth, height), availableSize);
 
             return new Size(
@@ -185,17 +182,11 @@ namespace GitHub.UI.Controls
 
         void UpdateScrollInfo(Size extent, Size viewport)
         {
-            var changed = extent.Width != ExtentWidth ||
-                extent.Height != ExtentHeight ||
-                viewport.Width != ViewportWidth ||
-                viewport.Height != ViewportHeight;
-
             ExtentWidth = extent.Width;
             ExtentHeight = extent.Height;
             ViewportWidth = viewport.Width;
             ViewportHeight = viewport.Height;
-
-            if (changed) ScrollOwner?.InvalidateScrollInfo();
+            ScrollOwner?.InvalidateScrollInfo();
         }
     }
 }
