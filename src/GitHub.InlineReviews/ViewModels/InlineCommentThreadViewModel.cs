@@ -20,8 +20,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
-        /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
+        /// <param name="comments">The comments to display in this inline review.</param>
         public InlineCommentThreadViewModel(
             IPullRequestSession session,
             IEnumerable<IPullRequestReviewCommentModel> comments)

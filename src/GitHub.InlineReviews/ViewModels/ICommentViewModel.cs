@@ -88,5 +88,10 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets a command to open the comment in a browser.
         /// </summary>
         ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Deletes a comment.
+        /// </summary>
+        ReactiveCommand<object> Delete { get; }
     }
 }

@@ -32,6 +32,102 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             }
         }
 
+        public class TheBeginEditProperty
+        {
+            [Test]
+            public void CanBeExecutedForPlaceholders()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+                var currentUser = Substitute.For<IAccount>();
+                var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, thread, currentUser);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
+            }
+
+            [Test]
+            public void CanBeExecutedForCommentsByTheSameAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = Substitute.For<IAccount>();
+
+                var pullRequestReviewCommentModel = Substitute.For<IPullRequestReviewCommentModel>();
+                pullRequestReviewCommentModel.User.Returns(currentUser);
+
+                currentUser.Equals(Arg.Is(currentUser)).Returns(true);
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
+            }
+
+            [Test]
+            public void CannotBeExecutedForCommentsByAnotherAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = Substitute.For<IAccount>();
+                var otherUser = Substitute.For<IAccount>();
+
+                var pullRequestReviewCommentModel = Substitute.For<IPullRequestReviewCommentModel>();
+                pullRequestReviewCommentModel.User.Returns(otherUser);
+
+                currentUser.Equals(Arg.Is(otherUser)).Returns(false);
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.False);
+            }
+        }
+
+        public class TheDeleteProperty
+        {
+            [Test]
+            public void CannotBeExecutedForPlaceholders()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+                var currentUser = Substitute.For<IAccount>();
+                var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, thread, currentUser);
+                Assert.That(target.Delete.CanExecute(new object()), Is.False);
+            }
+
+            [Test]
+            public void CanBeExecutedForCommentsByTheSameAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = Substitute.For<IAccount>();
+
+                var pullRequestReviewCommentModel = Substitute.For<IPullRequestReviewCommentModel>();
+                pullRequestReviewCommentModel.User.Returns(currentUser);
+
+                currentUser.Equals(Arg.Is(currentUser)).Returns(true);
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.Delete.CanExecute(new object()), Is.True);
+            }
+
+            [Test]
+            public void CannotBeExecutedForCommentsByAnotherAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = Substitute.For<IAccount>();
+                var otherUser = Substitute.For<IAccount>();
+
+                var pullRequestReviewCommentModel = Substitute.For<IPullRequestReviewCommentModel>();
+                pullRequestReviewCommentModel.User.Returns(otherUser);
+
+                currentUser.Equals(Arg.Is(otherUser)).Returns(false);
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.Delete.CanExecute(new object()), Is.False);
+            }
+        }
+
         public class TheCommitCaptionProperty
         {
             [Test]
@@ -99,16 +195,22 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
         static PullRequestReviewCommentViewModel CreateTarget(
             IPullRequestSession session = null,
-            ICommentThreadViewModel thread = null)
+            ICommentThreadViewModel thread = null,
+            IAccount currentUser = null,
+            IPullRequestReviewCommentModel pullRequestReviewCommentModel = null
+            )
         {
             session = session ?? CreateSession();
             thread = thread ?? CreateThread();
 
+            currentUser = currentUser ?? Substitute.For<IAccount>();
+            pullRequestReviewCommentModel = pullRequestReviewCommentModel ?? Substitute.For<IPullRequestReviewCommentModel>();
+
             return new PullRequestReviewCommentViewModel(
                 session,
                 thread,
-                Substitute.For<IAccount>(),
-                Substitute.For<IPullRequestReviewCommentModel>());
+                currentUser,
+                pullRequestReviewCommentModel);
         }
 
         static IPullRequestSession CreateSession(

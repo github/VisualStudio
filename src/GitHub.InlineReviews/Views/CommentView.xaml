@@ -12,7 +12,7 @@
              xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:CommentViewModelDesigner EditState="Editing">
+        <sample:CommentViewModelDesigner EditState="None">
             <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:CommentViewModelDesigner.Body>
@@ -50,25 +50,41 @@
                 </Style>
             </StackPanel.Style>
 
-            <StackPanel Orientation="Horizontal">
+            <DockPanel>
                 <controls:AccountAvatar Width="16" 
                                         Height="16" 
-                                        Account="{Binding User}"/>
+                                        Account="{Binding User}"
+                                        DockPanel.Dock="Left" />
 
-                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding User.Login}" Margin="4 0"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding User.Login}" Margin="4 0"
+                           DockPanel.Dock="Left" />
                 <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
                                      Command="{Binding OpenOnGitHub}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                     Opacity="0.75" />
+                                     Opacity="0.75"
+                                     DockPanel.Dock="Left"  />
                 <Border Background="{DynamicResource VsBrush.InfoBackground}"
                         BorderBrush="{DynamicResource VsBrush.AccentPale}"
                         BorderThickness="1"
                         CornerRadius="3"
                         Padding="2 1"
+                        DockPanel.Dock="Left" 
                         Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                     <TextBlock FontSize="10">Pending</TextBlock>
                 </Border>
-            </StackPanel>
+                <ui:GitHubActionLink Content="Delete"
+                                     Command="{Binding Delete}"
+                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                     Opacity="0.75"
+                                     HorizontalAlignment="Right"
+                                     DockPanel.Dock="Right"/>
+                <ui:GitHubActionLink Content="Edit"
+                                     Command="{Binding BeginEdit}"
+                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                     Opacity="0.75" 
+                                     HorizontalAlignment="Right"
+                                     DockPanel.Dock="Right" />
+            </DockPanel>
 
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 

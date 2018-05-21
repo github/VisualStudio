@@ -60,9 +60,32 @@ namespace GitHub.InlineReviews.ViewModels
             User = user;
             UpdatedAt = updatedAt;
 
+            var canDelete = this.WhenAnyValue(
+                x => x.EditState,
+                x =>
+                {
+                    var sameUser = user.Equals(currentUser);
+                    var result = x == CommentEditState.None && sameUser;
+
+                    log.Debug("CanDelete CommentEditState: {CommentEditState} SameUser: {SameUser} CanDelete:{CanDelete}", x, sameUser, result);
+
+                    return result;
+                });
+
+            Delete = ReactiveCommand.Create(canDelete);
+
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Equals(currentUser)));
+                x =>
+                {
+                    var sameUser = user.Equals(currentUser);
+                    var result = x == CommentEditState.Placeholder ||
+                            (x == CommentEditState.None && sameUser);
+
+                    log.Debug("CanEdit CommentEditState: {CommentEditState} SameUser: {SameUser} CanEdit:{CanEdit}", x, sameUser, result);
+
+                    return result;
+                });
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
@@ -216,5 +239,8 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> Delete { get; }
     }
 }
