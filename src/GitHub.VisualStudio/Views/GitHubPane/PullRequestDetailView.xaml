@@ -166,11 +166,11 @@
                       Margin="0,0,-8,0"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
-            <ghfvs:ScollingVerticalStackPanel>
+            <ghfvs:ScrollingVerticalStackPanel>
 
                 <StackPanel Orientation="Horizontal" 
                             Margin="0 -4 0 0"
-                            ghfvs:ScollingVerticalStackPanel.IsFixed="true">
+                            ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
                         View on GitHub
                     </ghfvs:GitHubActionLink>
@@ -246,7 +246,7 @@
                 <ghfvs:SectionControl Name="descriptionSection"
                                       HeaderText="Description"
                                       IsExpanded="True"
-                                      ghfvs:ScollingVerticalStackPanel.IsFixed="true">
+                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <StackPanel Orientation="Vertical">
                         <!-- View conversation on GitHub -->
                         <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
@@ -271,7 +271,7 @@
                                       HeaderText="Reviewers"
                                       IsExpanded="True"
                                       Margin="0 8 0 0"
-                                      ghfvs:ScollingVerticalStackPanel.IsFixed="true">
+                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4 12 4">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -287,13 +287,13 @@
                                       IsExpanded="True"
                                       HeaderText="{Binding Files.ChangedFilesCount, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                       Margin="0 8 10 0"
-                                      ghfvs:ScollingVerticalStackPanel.IsFixed="true"/>
+                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true"/>
                 
                 <!-- Put the changes tree outside its expander, so it can scroll horizontally 
                      while the header remains fixed -->
                 <local:PullRequestFilesView DataContext="{Binding Files}"
                                             Visibility="{Binding ElementName=changesSection, Path=IsExpanded, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
-            </ghfvs:ScollingVerticalStackPanel>
+            </ghfvs:ScrollingVerticalStackPanel>
         </ScrollViewer>
     </DockPanel>
 </local:GenericPullRequestDetailView>

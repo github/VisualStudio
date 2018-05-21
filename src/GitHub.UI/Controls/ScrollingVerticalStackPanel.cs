@@ -16,7 +16,7 @@ namespace GitHub.UI.Controls
     /// panel in WPF which allows the horizontal scrollbar to always be present at the bottom while
     /// also making the PR description etc be fixed horizontally (non-scrollable) in the viewport.
     /// </remarks>
-    public class ScollingVerticalStackPanel : Panel, IScrollInfo
+    public class ScrollingVerticalStackPanel : Panel, IScrollInfo
     {
         const int lineSize = 16;
         const int mouseWheelSize = 48;
@@ -29,7 +29,7 @@ namespace GitHub.UI.Controls
             DependencyProperty.RegisterAttached(
                 "IsFixed", 
                 typeof(bool), 
-                typeof(ScollingVerticalStackPanel),
+                typeof(ScrollingVerticalStackPanel),
                 new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public bool CanHorizontallyScroll
