@@ -136,6 +136,11 @@ namespace GitHub.UI.Controls
             }
         }
 
+        protected override void ParentLayoutInvalidated(UIElement child)
+        {
+            base.ParentLayoutInvalidated(child);
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
             var maxWidth = 0.0;
@@ -155,6 +160,8 @@ namespace GitHub.UI.Controls
             ExtentWidth = maxWidth;
             ExtentHeight = height;
 
+            UpdateScrollInfo(new Size(maxWidth, height), new Size(ViewportWidth, ViewportHeight));
+
             return new Size(
                 Math.Min(maxWidth, availableSize.Width),
                 Math.Min(height, availableSize.Height));
@@ -172,10 +179,23 @@ namespace GitHub.UI.Controls
                 y += child.DesiredSize.Height;
             }
 
-            ViewportWidth = finalSize.Width;
-            ViewportHeight = finalSize.Height;
-            ScrollOwner?.InvalidateScrollInfo();
+            UpdateScrollInfo(new Size(ExtentWidth, ExtentHeight), finalSize);
             return finalSize;
+        }
+
+        void UpdateScrollInfo(Size extent, Size viewport)
+        {
+            var changed = extent.Width != ExtentWidth ||
+                extent.Height != ExtentHeight ||
+                viewport.Width != ViewportWidth ||
+                viewport.Height != ViewportHeight;
+
+            ExtentWidth = extent.Width;
+            ExtentHeight = extent.Height;
+            ViewportWidth = viewport.Width;
+            ViewportHeight = viewport.Height;
+
+            if (changed) ScrollOwner?.InvalidateScrollInfo();
         }
     }
 }
