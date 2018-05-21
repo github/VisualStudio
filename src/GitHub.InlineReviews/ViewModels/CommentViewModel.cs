@@ -62,30 +62,14 @@ namespace GitHub.InlineReviews.ViewModels
 
             var canDelete = this.WhenAnyValue(
                 x => x.EditState,
-                x =>
-                {
-                    var sameUser = user.Equals(currentUser);
-                    var result = x == CommentEditState.None && sameUser;
-
-                    log.Debug("CanDelete CommentEditState: {CommentEditState} SameUser: {SameUser} CanDelete:{CanDelete}", x, sameUser, result);
-
-                    return result;
-                });
+                x => x == CommentEditState.None && user.Login.Equals(currentUser.Login));
 
             Delete = ReactiveCommand.Create(canDelete);
 
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
-                x =>
-                {
-                    var sameUser = user.Equals(currentUser);
-                    var result = x == CommentEditState.Placeholder ||
-                            (x == CommentEditState.None && sameUser);
-
-                    log.Debug("CanEdit CommentEditState: {CommentEditState} SameUser: {SameUser} CanEdit:{CanEdit}", x, sameUser, result);
-
-                    return result;
-                });
+                x => x == CommentEditState.Placeholder ||
+                     (x == CommentEditState.None && user.Login.Equals(currentUser.Login)));
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
