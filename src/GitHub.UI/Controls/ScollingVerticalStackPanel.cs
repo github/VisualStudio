@@ -160,7 +160,7 @@ namespace GitHub.UI.Controls
             ExtentWidth = maxWidth;
             ExtentHeight = height;
 
-            UpdateScrollInfo(new Size(maxWidth, height), new Size(ViewportWidth, ViewportHeight));
+            UpdateScrollInfo(new Size(maxWidth, height), availableSize);
 
             return new Size(
                 Math.Min(maxWidth, availableSize.Width),
