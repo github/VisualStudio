@@ -66,27 +66,27 @@ namespace GitHub.InlineReviews.ViewModels
 
             Delete = ReactiveCommand.Create(canDelete);
 
-            var canEdit = this.WhenAnyValue(
+            var canCreate = this.WhenAnyValue(
                 x => x.EditState,
                 x => x == CommentEditState.Placeholder ||
                      (x == CommentEditState.None && user.Login.Equals(currentUser.Login)));
 
-            BeginEdit = ReactiveCommand.Create(canEdit);
-            BeginEdit.Subscribe(DoBeginEdit);
-            AddErrorHandler(BeginEdit);
+            BeginCreate = ReactiveCommand.Create(canCreate);
+            BeginCreate.Subscribe(DoBeginCreate);
+            AddErrorHandler(BeginCreate);
 
-            CommitEdit = ReactiveCommand.CreateAsyncTask(
+            CommitCreate = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
                     this.WhenAnyValue(x => x.IsReadOnly),
                     this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
                     this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
                     (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
-                DoCommitEdit);
-            AddErrorHandler(CommitEdit);
+                DoCommitCreate);
+            AddErrorHandler(CommitCreate);
 
-            CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
-            CancelEdit.Subscribe(DoCancelEdit);
-            AddErrorHandler(CancelEdit);
+            CancelCreate = ReactiveCommand.Create(CommitCreate.IsExecuting.Select(x => !x));
+            CancelCreate.Subscribe(DoCancelCreate);
+            AddErrorHandler(CancelCreate);
 
             OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id, x => x != 0));
         }
@@ -110,18 +110,18 @@ namespace GitHub.InlineReviews.ViewModels
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
         }
 
-        void DoBeginEdit(object unused)
+        void DoBeginCreate(object unused)
         {
-            if (state != CommentEditState.Editing)
+            if (state != CommentEditState.Creating)
             {
                 undoBody = Body;
-                EditState = CommentEditState.Editing;
+                EditState = CommentEditState.Creating;
             }
         }
 
-        void DoCancelEdit(object unused)
+        void DoCancelCreate(object unused)
         {
-            if (EditState == CommentEditState.Editing)
+            if (EditState == CommentEditState.Creating)
             {
                 EditState = string.IsNullOrWhiteSpace(undoBody) ? CommentEditState.Placeholder : CommentEditState.None;
                 Body = undoBody;
@@ -130,7 +130,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task DoCommitEdit(object unused)
+        async Task DoCommitCreate(object unused)
         {
             try
             {
@@ -213,13 +213,13 @@ namespace GitHub.InlineReviews.ViewModels
         public IAccount User { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> BeginEdit { get; }
+        public ReactiveCommand<object> BeginCreate { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> CancelEdit { get; }
+        public ReactiveCommand<object> CancelCreate { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> CommitEdit { get; }
+        public ReactiveCommand<Unit> CommitCreate { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> OpenOnGitHub { get; }

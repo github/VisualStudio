@@ -185,7 +185,7 @@ namespace GitHub.InlineReviews.ViewModels
 
                 if (placeholder?.EditState == CommentEditState.Placeholder)
                 {
-                    await placeholder.BeginEdit.ExecuteAsync(null);
+                    await placeholder.BeginCreate.ExecuteAsync(null);
                     placeholder.Body = placeholderBody;
                 }
             }
@@ -212,7 +212,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             var lastComment = Thread?.Comments.LastOrDefault();
 
-            if (lastComment?.EditState == CommentEditState.Editing)
+            if (lastComment?.EditState == CommentEditState.Creating)
             {
                 if (!lastComment.IsSubmitting) return lastComment.Body;
             }

@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.Views
 
         private void ReplyPlaceholder_GotFocus(object sender, System.Windows.RoutedEventArgs e)
         {
-            var command = ((ICommentViewModel)DataContext)?.BeginEdit;
+            var command = ((ICommentViewModel)DataContext)?.BeginCreate;
 
             if (command?.CanExecute(null) == true)
             {

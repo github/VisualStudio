@@ -9,7 +9,7 @@ namespace GitHub.InlineReviews.ViewModels
     public enum CommentEditState
     {
         None,
-        Editing,
+        Creating,
         Placeholder,
     }
 
@@ -72,17 +72,17 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
-        ReactiveCommand<object> BeginEdit { get; }
+        ReactiveCommand<object> BeginCreate { get; }
 
         /// <summary>
         /// Gets a command which will cancel editing of the comment.
         /// </summary>
-        ReactiveCommand<object> CancelEdit { get; }
+        ReactiveCommand<object> CancelCreate { get; }
 
         /// <summary>
         /// Gets a command which will commit edits to the comment.
         /// </summary>
-        ReactiveCommand<Unit> CommitEdit { get; }
+        ReactiveCommand<Unit> CommitCreate { get; }
 
         /// <summary>
         /// Gets a command to open the comment in a browser.

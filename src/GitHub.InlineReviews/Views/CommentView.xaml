@@ -79,7 +79,7 @@
                                      HorizontalAlignment="Right"
                                      DockPanel.Dock="Right"/>
                 <ui:GitHubActionLink Content="Edit"
-                                     Command="{Binding BeginEdit}"
+                                     Command="{Binding BeginCreate}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
                                      Opacity="0.75" 
                                      HorizontalAlignment="Right"
@@ -102,7 +102,7 @@
                         <DataTrigger Binding="{Binding EditState}" Value="Placeholder">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                        <DataTrigger Binding="{Binding EditState}" Value="Creating">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -144,7 +144,7 @@
                         <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
 
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                            <DataTrigger Binding="{Binding EditState}" Value="Creating">
                                 <Setter Property="MinHeight" Value="100"/>
                                 <Setter Property="PromptText" Value="Leave a comment"/>
                             </DataTrigger>
@@ -186,19 +186,19 @@
                     <Style TargetType="FrameworkElement">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                            <DataTrigger Binding="{Binding EditState}" Value="Creating">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
+                <Button Command="{Binding CommitCreate}" Content="{Binding CommitCaption}"/>
                 <Button Margin="4 0 0 0"
                         Command="{Binding StartReview}"
                         Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}">
                     Start a review
                 </Button>
-                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
+                <Button Margin="4 0 0 0" Command="{Binding CancelCreate}">Cancel</Button>
             </StackPanel>
         </Grid>
     </Grid>

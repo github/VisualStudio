@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var thread = CreateThread();
                 var currentUser = Substitute.For<IAccount>();
                 var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, thread, currentUser);
-                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
+                Assert.That(target.BeginCreate.CanExecute(new object()), Is.True);
             }
 
             [Test]
@@ -58,7 +58,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 currentUser.Equals(Arg.Is(currentUser)).Returns(true);
 
                 var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
-                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
+                Assert.That(target.BeginCreate.CanExecute(new object()), Is.True);
             }
 
             [Test]
@@ -76,7 +76,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 currentUser.Equals(Arg.Is(otherUser)).Returns(false);
 
                 var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
-                Assert.That(target.BeginEdit.CanExecute(new object()), Is.False);
+                Assert.That(target.BeginCreate.CanExecute(new object()), Is.False);
             }
         }
 

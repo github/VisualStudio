@@ -48,10 +48,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IPullRequestSession>(),
                 CreateComments("Comment 1"));
 
-            Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.False);
+            Assert.That(target.Comments[1].CommitCreate.CanExecute(null), Is.False);
 
             target.Comments[1].Body = "Foo";
-            Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.True);
+            Assert.That(target.Comments[1].CommitCreate.CanExecute(null), Is.True);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";
-            target.Comments[2].CommitEdit.Execute(null);
+            target.Comments[2].CommitCreate.Execute(null);
 
             session.Received(1).PostReviewComment("New Comment", 1, "node1");
         }

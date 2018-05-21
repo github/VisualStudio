@@ -111,7 +111,7 @@ namespace GitHub.InlineReviews.Services
             if (item != null)
             {
                 var placeholder = item.ViewModel.Thread.Comments.Last();
-                placeholder.CancelEdit.Take(1).Subscribe(_ => session.Dismiss());
+                placeholder.CancelCreate.Take(1).Subscribe(_ => session.Dismiss());
             }
 
             return trackingPoint;
