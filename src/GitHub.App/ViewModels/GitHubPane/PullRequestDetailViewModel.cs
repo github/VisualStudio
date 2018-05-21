@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -328,7 +329,7 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 Number = number;
-                WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
+                WebUrl = ToPullRequestUrl(localRepository.CloneUrl.Host, owner, localRepository.Name, number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
 
                 await Refresh();
@@ -342,6 +343,12 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 IsLoading = false;
             }
+        }
+
+        static Uri ToPullRequestUrl(string host, string owner, string repositoryName, int number)
+        {
+            var url = string.Format(CultureInfo.InvariantCulture, "https://{0}/{1}/{2}/pull/{3}", host, owner, repositoryName, number);
+            return new Uri(url);
         }
 
         void RefreshIfActive(object sender, EventArgs e)
