@@ -153,7 +153,12 @@ namespace GitHub.UI.Controls
                     isFixed ? availableSize.Width : double.PositiveInfinity,
                     double.PositiveInfinity);
                 child.Measure(childConstraint);
-                maxWidth = Math.Max(maxWidth, child.DesiredSize.Width);
+
+                if (height - VerticalOffset < availableSize.Height)
+                {
+                    maxWidth = Math.Max(maxWidth, child.DesiredSize.Width);
+                }
+
                 height += child.DesiredSize.Height;
             }
 
@@ -167,16 +172,24 @@ namespace GitHub.UI.Controls
         protected override Size ArrangeOverride(Size finalSize)
         {
             var y = -VerticalOffset;
+            var thisRect = new Rect(finalSize);
+            var visibleMaxWidth = 0.0;
 
             foreach (FrameworkElement child in Children)
             {
                 var isFixed = GetIsFixed(child);
                 var x = isFixed ? 0 : -HorizontalOffset;
-                child.Arrange(new Rect(x, y, child.DesiredSize.Width, child.DesiredSize.Height));
+                var childRect = new Rect(x, y, child.DesiredSize.Width, child.DesiredSize.Height);
+                child.Arrange(childRect);
                 y += child.DesiredSize.Height;
+
+                if (childRect.IntersectsWith(thisRect) && childRect.Right > visibleMaxWidth)
+                {
+                    visibleMaxWidth = childRect.Right;
+                }
             }
 
-            UpdateScrollInfo(new Size(ExtentWidth, ExtentHeight), finalSize);
+            UpdateScrollInfo(new Size(visibleMaxWidth, ExtentHeight), new Size(finalSize.Width, finalSize.Height));
             return finalSize;
         }
 
@@ -184,6 +197,7 @@ namespace GitHub.UI.Controls
         {
             ExtentWidth = extent.Width;
             ExtentHeight = extent.Height;
+            ScrollOwner?.InvalidateScrollInfo();
             ViewportWidth = viewport.Width;
             ViewportHeight = viewport.Height;
             ScrollOwner?.InvalidateScrollInfo();
