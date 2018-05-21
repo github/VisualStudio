@@ -34,9 +34,7 @@ namespace GitHub.Services
     {
         static readonly ILogger log = LogManager.ForContext<VSGitServices>();
         readonly IGitHubServiceProvider serviceProvider;
-#if TEAMEXPLORER15
-        readonly IVsStatusbar statusBar;
-#endif
+        readonly Lazy<IStatusBarNotificationService> statusBar;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -47,12 +45,10 @@ namespace GitHub.Services
         IGitExt gitExtService;
 
         [ImportingConstructor]
-        public VSGitServices(IGitHubServiceProvider serviceProvider)
+        public VSGitServices(IGitHubServiceProvider serviceProvider, Lazy<IStatusBarNotificationService> statusBar)
         {
             this.serviceProvider = serviceProvider;
-#if TEAMEXPLORER15
-            this.statusBar = serviceProvider.GetService<IVsStatusbar>();
-#endif
+            this.statusBar = statusBar;
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -94,7 +90,7 @@ namespace GitHub.Services
 
             await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
-                typedProgress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
+                typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
                 await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
 #endif
