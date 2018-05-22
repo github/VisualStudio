@@ -179,7 +179,25 @@ namespace GitHub.UI.Controls
             {
                 var isFixed = GetIsFixed(child);
                 var x = isFixed ? 0 : -HorizontalOffset;
-                var childRect = new Rect(x, y, child.DesiredSize.Width, child.DesiredSize.Height);
+                var width = child.DesiredSize.Width;
+
+                if (isFixed)
+                {
+                    switch (child.HorizontalAlignment)
+                    {
+                        case HorizontalAlignment.Stretch:
+                            width = finalSize.Width;
+                            break;
+                        case HorizontalAlignment.Right:
+                            x = finalSize.Width - child.DesiredSize.Width;
+                            break;
+                        case HorizontalAlignment.Center:
+                            x = (finalSize.Width - child.DesiredSize.Width) / 2;
+                            break;
+                    }
+                }
+
+                var childRect = new Rect(x, y, width, child.DesiredSize.Height);
                 child.Arrange(childRect);
                 y += child.DesiredSize.Height;
 
