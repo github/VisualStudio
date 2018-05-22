@@ -41,14 +41,21 @@ namespace GitHub.Services
 
         readonly IGitClient gitClient;
         readonly IGitService gitService;
+        readonly IVSGitExt gitExt;
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os, IUsageTracker usageTracker)
+        public PullRequestService(
+            IGitClient gitClient,
+            IGitService gitService,
+            IVSGitExt gitExt,
+            IOperatingSystem os,
+            IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
+            this.gitExt = gitExt;
             this.os = os;
             this.usageTracker = usageTracker;
         }
@@ -652,6 +659,8 @@ namespace GitHub.Services
                     await Task.Delay(TimeSpan.FromSeconds(5));
 
                 var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
+                await MarkBranchAsPullRequest(repo, sourceBranch.Name, ret);
+                gitExt.RefreshActiveRepositories();
                 await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests);
                 return ret;
             }

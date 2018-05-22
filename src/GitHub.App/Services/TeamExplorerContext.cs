@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Primitives;
@@ -29,6 +30,7 @@ namespace GitHub.Services
 
         readonly DTE dte;
         readonly IVSGitExt gitExt;
+        readonly IPullRequestService pullRequestService;
 
         string solutionPath;
         string repositoryPath;
@@ -36,18 +38,18 @@ namespace GitHub.Services
         string branchName;
         string headSha;
         string trackedSha;
+        Tuple<string, int> pullRequest;
 
         ILocalRepositoryModel repositoryModel;
 
         [ImportingConstructor]
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(gitExt, serviceProvider)
-        {
-        }
-
-        public TeamExplorerContext(IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(
+            IGitHubServiceProvider serviceProvider,
+            IVSGitExt gitExt,
+            IPullRequestService pullRequestService)
         {
             this.gitExt = gitExt;
+            this.pullRequestService = pullRequestService;
 
             // This is a standard service which should always be available.
             dte = serviceProvider.GetService<DTE>();
@@ -56,7 +58,7 @@ namespace GitHub.Services
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        void Refresh()
+        async void Refresh()
         {
             try
             {
@@ -76,6 +78,7 @@ namespace GitHub.Services
                     var newBranchName = repo?.CurrentBranch?.Name;
                     var newHeadSha = repo?.CurrentBranch?.Sha;
                     var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
+                    var newPullRequest = await pullRequestService.GetPullRequestForCurrentBranch(repo);
 
                     if (newRepositoryPath != repositoryPath)
                     {
@@ -102,6 +105,11 @@ namespace GitHub.Services
                         log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
+                    else if (newPullRequest != pullRequest)
+                    {
+                        log.Debug("Fire StatusChanged event when PullRequest changes for ActiveRepository");
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                    }
 
                     repositoryPath = newRepositoryPath;
                     cloneUrl = newCloneUrl;
@@ -109,6 +117,7 @@ namespace GitHub.Services
                     headSha = newHeadSha;
                     solutionPath = newSolutionPath;
                     trackedSha = newTrackedSha;
+                    pullRequest = newPullRequest;
                 }
             }
             catch (Exception e)
