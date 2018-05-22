@@ -6,6 +6,7 @@ using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressDa
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -33,26 +34,25 @@ namespace GitHub.Services
     public class VSGitServices : IVSGitServices
     {
         static readonly ILogger log = LogManager.ForContext<VSGitServices>();
+
         readonly IGitHubServiceProvider serviceProvider;
-#if TEAMEXPLORER15
+
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
-#endif
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
         /// that instances of this type cannot be created if the TeamFoundation dlls are not available
         /// (otherwise we'll have multiple instances of IVSServices exports, and that would be Bad(tm))
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         IGitExt gitExtService;
 
         [ImportingConstructor]
         public VSGitServices(IGitHubServiceProvider serviceProvider, Lazy<IStatusBarNotificationService> statusBar)
         {
             this.serviceProvider = serviceProvider;
-#if TEAMEXPLORER15
             this.statusBar = statusBar;
-#endif
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
