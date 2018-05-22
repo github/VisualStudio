@@ -176,6 +176,20 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> EditComment(
+            int number, string body)
+        {
+            var model = await service.EditComment(
+                LocalRepository,
+                RepositoryOwner,
+                User,
+                number,
+                body);
+
+            return model;
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
             int inReplyTo,

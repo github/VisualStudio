@@ -77,15 +77,12 @@ namespace GitHub.InlineReviews.ViewModels
             return await Session.PostReviewComment(body, replyId, nodeId);
         }
 
-        Task<ICommentModel> DoEditComment(object parameter)
+        async Task<ICommentModel> DoEditComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            var body = (string)parameter;
-            var replyId = Comments[0].Id;
-            var nodeId = Comments[0].NodeId;
-
-            throw new NotImplementedException();
+            var item = (Tuple<int, string>)parameter;
+            return await Session.EditComment(item.Item1, item.Item2);
         }
 
         async Task<object> DoDeleteComment(object parameter)

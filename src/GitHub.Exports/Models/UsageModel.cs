@@ -65,6 +65,7 @@ namespace GitHub.Models
             public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentDelete { get; set; }
+            public int NumberOfPRReviewDiffViewInlineCommentEdit { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentStartReview { get; set; }
             public int NumberOfPRReviewPosts { get; set; }
             public int NumberOfShowCurrentPullRequest { get; set; }

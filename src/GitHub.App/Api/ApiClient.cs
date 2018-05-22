@@ -110,6 +110,16 @@ namespace GitHub.Api
             return gitHubClient.PullRequest.ReviewComment.CreateReply(owner, name, number, comment);
         }
 
+        public IObservable<PullRequestReviewComment> EditPullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body)
+        {
+            var pullRequestReviewCommentEdit = new PullRequestReviewCommentEdit(body);
+            return gitHubClient.PullRequest.ReviewComment.Edit(owner, name, number, pullRequestReviewCommentEdit);
+        }
+
         public IObservable<Unit> DeletePullRequestReviewComment(
             string owner,
             string name,

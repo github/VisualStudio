@@ -600,6 +600,7 @@ namespace GitHub.InlineReviews.Services
             };
         }
 
+        /// <inheritdoc/>
         public async Task DeleteComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
@@ -615,6 +616,39 @@ namespace GitHub.InlineReviews.Services
                 number);
 
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PullRequestReviewCommentModel> EditComment(ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            IAccount user,
+            int number,
+            string body)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var apiClient = await apiClientFactory.Create(address);
+
+            var result = await apiClient.EditPullRequestReviewComment(
+                remoteRepositoryOwner,
+                localRepository.Name,
+                number,
+                body);
+
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentEdit);
+
+            return new PullRequestReviewCommentModel
+            {
+                Body = result.Body,
+                CommitId = result.CommitId,
+                DiffHunk = result.DiffHunk,
+                Id = result.Id,
+                OriginalCommitId = result.OriginalCommitId,
+                OriginalPosition = result.OriginalPosition,
+                Path = result.Path,
+                Position = result.Position,
+                CreatedAt = result.CreatedAt,
+                User = user,
+            };
         }
 
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)

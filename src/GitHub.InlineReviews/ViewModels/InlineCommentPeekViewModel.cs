@@ -175,8 +175,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             else
             {
-                var newThread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
-                Thread = newThread;
+                Thread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
             }
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))
@@ -189,6 +188,14 @@ namespace GitHub.InlineReviews.ViewModels
                     placeholder.Body = placeholderBody;
                 }
             }
+
+            threadSubscription = Thread
+                .WhenAnyValue(model => model.EditComment, model => model.DeleteComment)
+                .Skip(1)
+                .Subscribe(_ =>
+                {
+
+                });
         }
 
         async Task SessionChanged(IPullRequestSession pullRequestSession)

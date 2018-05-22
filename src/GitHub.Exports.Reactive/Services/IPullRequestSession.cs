@@ -111,7 +111,7 @@ namespace GitHub.Services
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The REST ID of the comment to reply to.</param>
         /// <param name="inReplyToNodeId">The GraphQL ID of the comment to reply to.</param>
-        /// <returns></returns>
+        /// <returns>A comment model.</returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
             int inReplyTo,
@@ -152,5 +152,13 @@ namespace GitHub.Services
         /// <param name="number">The number of the pull request comment to delete</param>
         /// <returns>A task which completes when the session has completed updating.</returns>
         Task DeleteComment(int number);
+
+        /// <summary>
+        /// Edit a PR review comment reply.
+        /// </summary>
+        /// <param name="number">The number of the pull request comment</param>
+        /// <param name="body">The replacement comment body.</param>
+        /// <returns>A comment model.</returns>
+        Task<IPullRequestReviewCommentModel> EditComment(int number, string body);
     }
 }

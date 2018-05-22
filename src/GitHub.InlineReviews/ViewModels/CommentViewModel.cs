@@ -224,7 +224,7 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                var model = await Thread.EditComment.ExecuteAsyncTask(Body);
+                var model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<int, string>(Id, Body));
                 Id = model.Id;
                 NodeId = model.NodeId;
                 EditState = CommentEditState.None;
