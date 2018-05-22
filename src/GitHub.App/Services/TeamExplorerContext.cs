@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Primitives;
@@ -31,6 +32,7 @@ namespace GitHub.Services
 
         readonly Lazy<DTE> dte;
         readonly IVSGitExt gitExt;
+        readonly IPullRequestService pullRequestService;
 
         string solutionPath;
         string repositoryPath;
@@ -38,30 +40,39 @@ namespace GitHub.Services
         string branchName;
         string headSha;
         string trackedSha;
+        Tuple<string, int> pullRequest;
 
         ILocalRepositoryModel repositoryModel;
 
         [ImportingConstructor]
-        TeamExplorerContext(IVSGitExt gitExt, [Import(typeof(SVsServiceProvider))] IServiceProvider sp)
+        TeamExplorerContext(
+            IVSGitExt gitExt,
+            [Import(typeof(SVsServiceProvider))] IServiceProvider sp,
+            IPullRequestService pullRequestService)
             : this(gitExt, new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE))), ThreadHelper.JoinableTaskContext)
         {
         }
 
-        public TeamExplorerContext(IVSGitExt gitExt, Lazy<DTE> dte, JoinableTaskContext joinableTaskContext = null)
+        public TeamExplorerContext(
+            IVSGitExt gitExt,
+            Lazy<DTE> dte,
+            IPullRequestService pullRequestService,
+            JoinableTaskContext joinableTaskContext = null)
         {
             joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(TeamExplorerContext);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
-
+            
             this.gitExt = gitExt;
             this.dte = dte;
+            this.pullRequestService = pullRequestService;
 
             Refresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        void Refresh()
+        async void Refresh()
         {
             try
             {
@@ -83,6 +94,7 @@ namespace GitHub.Services
                     var newBranchName = repo?.CurrentBranch?.Name;
                     var newHeadSha = repo?.CurrentBranch?.Sha;
                     var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
+                    var newPullRequest = await pullRequestService.GetPullRequestForCurrentBranch(repo);
 
                     if (newRepositoryPath != repositoryPath)
                     {
@@ -109,6 +121,11 @@ namespace GitHub.Services
                         log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
                         OnStatusChanged();
                     }
+                    else if (newPullRequest != pullRequest)
+                    {
+                        log.Debug("Fire StatusChanged event when PullRequest changes for ActiveRepository");
+                        OnStatusChanged();
+                    }
 
                     repositoryPath = newRepositoryPath;
                     cloneUrl = newCloneUrl;
@@ -116,6 +133,7 @@ namespace GitHub.Services
                     headSha = newHeadSha;
                     solutionPath = newSolutionPath;
                     trackedSha = newTrackedSha;
+                    pullRequest = newPullRequest;
                 }
             }
             catch (Exception e)
