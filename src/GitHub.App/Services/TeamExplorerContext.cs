@@ -10,6 +10,7 @@ using Serilog;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
@@ -48,8 +49,15 @@ namespace GitHub.Services
         TeamExplorerContext(
             IVSGitExt gitExt,
             [Import(typeof(SVsServiceProvider))] IServiceProvider sp,
-            IPullRequestService pullRequestService)
-            : this(gitExt, new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE))), ThreadHelper.JoinableTaskContext)
+            IPullRequestService pullRequestService) : this(
+                gitExt,
+                new Lazy<DTE>(() =>
+                {
+                    ThreadHelper.ThrowIfNotOnUIThread();
+                    return (DTE)sp.GetService(typeof(DTE));
+                }),
+                pullRequestService,
+                ThreadHelper.JoinableTaskContext)
         {
         }
 
@@ -68,19 +76,21 @@ namespace GitHub.Services
             this.dte = dte;
             this.pullRequestService = pullRequestService;
 
-            Refresh();
+            StartRefresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        async void Refresh()
+        void StartRefresh() => JoinableTaskFactory.RunAsync(RefreshAsync);
+        void Refresh() => JoinableTaskFactory.Run(RefreshAsync);
+
+        async Task RefreshAsync()
         {
             try
             {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+
                 var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-
-                // SVsServiceProvider doesn't complain when this isn't called on Main thread
-                var newSolutionPath = dte.Value.Solution?.FullName;
-
+                var newSolutionPath = dte.Value.Solution?.FullName; // Call on Main thread
                 if (repo == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
@@ -94,37 +104,37 @@ namespace GitHub.Services
                     var newBranchName = repo?.CurrentBranch?.Name;
                     var newHeadSha = repo?.CurrentBranch?.Sha;
                     var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
-                    var newPullRequest = await pullRequestService.GetPullRequestForCurrentBranch(repo);
+                    var newPullRequest = repo != null ? await pullRequestService.GetPullRequestForCurrentBranch(repo) : null;
 
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
-                        OnActiveRepositorySet(repo);
+                        ActiveRepository = repo;
                     }
                     else if (newCloneUrl != cloneUrl)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
-                        OnActiveRepositorySet(repo);
+                        ActiveRepository = repo;
                     }
                     else if (newBranchName != branchName)
                     {
                         log.Debug("Fire StatusChanged event when BranchName changes for ActiveRepository");
-                        OnStatusChanged();
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
                     else if (newHeadSha != headSha)
                     {
                         log.Debug("Fire StatusChanged event when HeadSha changes for ActiveRepository");
-                        OnStatusChanged();
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
                     else if (newTrackedSha != trackedSha)
                     {
                         log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
-                        OnStatusChanged();
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
                     else if (newPullRequest != pullRequest)
                     {
                         log.Debug("Fire StatusChanged event when PullRequest changes for ActiveRepository");
-                        OnStatusChanged();
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
 
                     repositoryPath = newRepositoryPath;
@@ -140,24 +150,6 @@ namespace GitHub.Services
             {
                 log.Error(e, "Refreshing active repository");
             }
-        }
-
-        void OnActiveRepositorySet(ILocalRepositoryModel repo)
-        {
-            JoinableTaskFactory.Run(async () =>
-            {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
-                ActiveRepository = repo;
-            });
-        }
-
-        void OnStatusChanged()
-        {
-            JoinableTaskFactory.Run(async () =>
-            {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
-                StatusChanged?.Invoke(this, EventArgs.Empty);
-            });
         }
 
         /// <summary>
