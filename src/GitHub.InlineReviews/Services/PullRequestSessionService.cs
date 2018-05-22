@@ -600,6 +600,23 @@ namespace GitHub.InlineReviews.Services
             };
         }
 
+        public async Task DeleteComment(
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            IAccount user,
+            int number)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var apiClient = await apiClientFactory.Create(address);
+
+            await apiClient.DeletePullRequestReviewComment(
+                remoteRepositoryOwner,
+                localRepository.Name,
+                number);
+
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete);
+        }
+
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
         {
             var line = DiffUtilities.Match(diff, thread.DiffMatch);

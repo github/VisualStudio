@@ -13,7 +13,7 @@ namespace GitHub.InlineReviews.ViewModels
     {
         ReactiveCommand<ICommentModel> postComment;
         private ReactiveCommand<ICommentModel> editComment;
-        private ReactiveCommand<ICommentModel> deleteComment;
+        private ReactiveCommand<object> deleteComment;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
@@ -57,7 +57,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<ICommentModel> DeleteComment
+        public ReactiveCommand<object> DeleteComment
         {
             get { return deleteComment; }
             set

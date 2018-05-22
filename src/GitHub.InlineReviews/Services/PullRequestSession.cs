@@ -165,6 +165,17 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task DeleteComment(
+            int number)
+        {
+            await service.DeleteComment(
+                LocalRepository,
+                RepositoryOwner,
+                User,
+                number);
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
             int inReplyTo,

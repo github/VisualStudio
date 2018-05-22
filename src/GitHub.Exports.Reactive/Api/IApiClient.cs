@@ -94,5 +94,10 @@ namespace GitHub.Api
         IObservable<Repository> GetRepositories();
         IObservable<Repository> GetRepository(string owner, string repo);
         IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path);
+
+        IObservable<Unit> DeletePullRequestReviewComment(
+            string owner,
+            string name,
+            int number);
     }
 }

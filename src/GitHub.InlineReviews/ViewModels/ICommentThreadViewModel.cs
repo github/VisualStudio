@@ -40,6 +40,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Called by a comment in the thread to send a delete of the comment to the API.
         /// </summary>
-        ReactiveCommand<ICommentModel> DeleteComment { get; }
+        ReactiveCommand<object> DeleteComment { get; }
     }
 }

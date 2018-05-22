@@ -88,11 +88,12 @@ namespace GitHub.InlineReviews.ViewModels
             throw new NotImplementedException();
         }
 
-        Task<ICommentModel> DoDeleteComment(object parameter)
+        async Task<object> DoDeleteComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            throw new NotImplementedException();
+            var number = (int)parameter;
+            await Session.DeleteComment(number);
         }
     }
 }
