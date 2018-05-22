@@ -329,7 +329,7 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 Number = number;
-                WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner);
+                WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner).Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
 
                 await Refresh();
