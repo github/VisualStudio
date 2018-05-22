@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -328,7 +329,7 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 Number = number;
-                WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
+                WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner).Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
 
                 await Refresh();
