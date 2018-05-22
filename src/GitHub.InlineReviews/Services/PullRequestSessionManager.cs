@@ -191,13 +191,20 @@ namespace GitHub.InlineReviews.Services
 
         async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
         {
-            repository = localRepositoryModel;
-            CurrentSession = null;
-            sessions.Clear();
-
-            if (localRepositoryModel != null)
+            try
             {
-                await StatusChanged();
+                repository = localRepositoryModel;
+                CurrentSession = null;
+                sessions.Clear();
+
+                if (localRepositoryModel != null)
+                {
+                    await StatusChanged();
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e, nameof(RepoChanged));
             }
         }
 
@@ -236,7 +243,7 @@ namespace GitHub.InlineReviews.Services
             }
             catch (Exception e)
             {
-                log.Error(e, "Error changing repository");
+                log.Error(e, nameof(StatusChanged));
             }
         }
 
