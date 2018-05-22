@@ -66,6 +66,13 @@ namespace GitHub.InlineReviews.ViewModels
 
             Delete = ReactiveCommand.Create(canDelete);
 
+            var canEdit = this.WhenAnyValue(
+                x => x.EditState,
+                x => x == CommentEditState.None && user.Login.Equals(currentUser.Login));
+
+            BeginEdit = ReactiveCommand.Create(canEdit);
+            BeginEdit.Subscribe(DoBeginEdit);
+
             var canCreate = this.WhenAnyValue(
                 x => x.EditState,
                 x => x == CommentEditState.Placeholder ||
@@ -108,6 +115,15 @@ namespace GitHub.InlineReviews.ViewModels
         protected void AddErrorHandler<T>(ReactiveCommand<T> command)
         {
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
+        }
+
+        void DoBeginEdit(object unused)
+        {
+            if (state != CommentEditState.Editing)
+            {
+                undoBody = Body;
+                EditState = CommentEditState.Editing;
+            }
         }
 
         void DoBeginCreate(object unused)
@@ -220,6 +236,15 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> CommitCreate { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> BeginEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> CancelEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> CommitEdit { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> OpenOnGitHub { get; }

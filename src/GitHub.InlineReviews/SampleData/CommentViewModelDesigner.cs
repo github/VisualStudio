@@ -31,6 +31,9 @@ namespace GitHub.InlineReviews.SampleData
         public ReactiveCommand<object> BeginCreate { get; }
         public ReactiveCommand<object> CancelCreate { get; }
         public ReactiveCommand<Unit> CommitCreate { get; }
+        public ReactiveCommand<object> BeginEdit { get; }
+        public ReactiveCommand<object> CancelEdit { get; }
+        public ReactiveCommand<Unit> CommitEdit { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> Delete { get; }
     }

@@ -10,6 +10,7 @@ namespace GitHub.InlineReviews.ViewModels
     {
         None,
         Creating,
+        Editing,
         Placeholder,
     }
 
@@ -70,19 +71,34 @@ namespace GitHub.InlineReviews.ViewModels
         ICommentThreadViewModel Thread { get; }
 
         /// <summary>
-        /// Gets a command which will begin editing of the comment.
+        /// Gets a command which will begin the creation of the comment.
         /// </summary>
         ReactiveCommand<object> BeginCreate { get; }
 
         /// <summary>
-        /// Gets a command which will cancel editing of the comment.
+        /// Gets a command which will cancel the creation of the comment.
         /// </summary>
         ReactiveCommand<object> CancelCreate { get; }
 
         /// <summary>
-        /// Gets a command which will commit edits to the comment.
+        /// Gets a command which will commit the creation of the comment.
         /// </summary>
         ReactiveCommand<Unit> CommitCreate { get; }
+
+        /// <summary>
+        /// Gets a command which will begin editing of the comment.
+        /// </summary>
+        ReactiveCommand<object> BeginEdit { get; }
+
+        /// <summary>
+        /// Gets a command which will cancel editing of the comment.
+        /// </summary>
+        ReactiveCommand<object> CancelEdit { get; }
+
+        /// <summary>
+        /// Gets a command which will commit edits to the comment.
+        /// </summary>
+        ReactiveCommand<Unit> CommitEdit { get; }
 
         /// <summary>
         /// Gets a command to open the comment in a browser.
