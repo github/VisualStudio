@@ -42,6 +42,7 @@ namespace GitHub.VisualStudio.Base
         {
             joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
+            JoinableTaskCollection.DisplayName = nameof(VSGitExt);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
 
             this.asyncServiceProvider = asyncServiceProvider;
@@ -124,12 +125,7 @@ namespace GitHub.VisualStudio.Base
 
         public event Action ActiveRepositoriesChanged;
 
-        /// <summary>
-        /// Tasks that are pending execution on the thread pool.
-        /// </summary>
-        //public Task PendingTasks { get; private set; } = Task.CompletedTask;
-
-        public JoinableTaskFactory JoinableTaskFactory { get; }
         public JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }
