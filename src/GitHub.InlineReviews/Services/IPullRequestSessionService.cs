@@ -265,12 +265,12 @@ namespace GitHub.InlineReviews.Services
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
-        /// <returns>A model representing the posted comment.</returns>
+        /// <returns>A model representing the review for the posted comment.</returns>
         /// <remarks>
         /// The method posts a new standalone pull request comment that is not attached to a pending
         /// pull request review.
         /// </remarks>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
+        Task<IPullRequestReviewModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
@@ -289,8 +289,8 @@ namespace GitHub.InlineReviews.Services
         /// <param name="number">The pull request number.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The comment ID to reply to.</param>
-        /// <returns>A model representing the posted comment.</returns>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentRepy(
+        /// <returns>A model representing the review for the posted comment.</returns>
+        Task<IPullRequestReviewModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,

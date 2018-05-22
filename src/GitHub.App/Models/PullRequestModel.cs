@@ -13,6 +13,10 @@ namespace GitHub.Models
         IEquatable<PullRequestModel>,
         IComparable<PullRequestModel>
     {
+        public PullRequestModel()
+        {
+        }
+
         public PullRequestModel(int number, string title, IAccount author,
             DateTimeOffset createdAt, DateTimeOffset? updatedAt = null)
         {
@@ -96,7 +100,7 @@ namespace GitHub.Models
             return !(lhs == rhs);
         }
 
-        public int Number { get; }
+        public int Number { get; set; }
 
         string title;
         public string Title
@@ -173,18 +177,6 @@ namespace GitHub.Models
             {
                 Guard.ArgumentNotNull(value, nameof(value));
                 reviews = value;
-                this.RaisePropertyChange();
-            }
-        }
-
-        IReadOnlyList<IPullRequestReviewCommentModel> reviewComments = new IPullRequestReviewCommentModel[0];
-        public IReadOnlyList<IPullRequestReviewCommentModel> ReviewComments
-        {
-            get { return reviewComments; }
-            set
-            {
-                Guard.ArgumentNotNull(value, nameof(value));
-                reviewComments = value;
                 this.RaisePropertyChange();
             }
         }

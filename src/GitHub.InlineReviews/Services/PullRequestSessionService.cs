@@ -42,6 +42,7 @@ namespace GitHub.InlineReviews.Services
         readonly IApiClientFactory apiClientFactory;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
+        readonly IAvatarProvider avatarProvider;
 
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
 
@@ -52,7 +53,8 @@ namespace GitHub.InlineReviews.Services
             IDiffService diffService,
             IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            IAvatarProvider avatarProvider)
         {
             this.gitService = gitService;
             this.gitClient = gitClient;
@@ -60,6 +62,7 @@ namespace GitHub.InlineReviews.Services
             this.apiClientFactory = apiClientFactory;
             this.graphqlFactory = graphqlFactory;
             this.usageTracker = usageTracker;
+            this.avatarProvider = avatarProvider;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
         }
@@ -91,7 +94,7 @@ namespace GitHub.InlineReviews.Services
         {
             relativePath = relativePath.Replace("\\", "/");
 
-            var commentsByPosition = pullRequest.ReviewComments
+            var commentsByPosition = pullRequest.Reviews.SelectMany(x => x.Comments)
                 .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
                 .OrderBy(x => x.Id)
                 .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
@@ -272,7 +275,7 @@ namespace GitHub.InlineReviews.Services
                 .PullRequest(number)
                 .Select(x => x.Id);
 
-            return await graphql.Run(query);
+            return (await graphql.Run(query)).Value;
         }
 
         /// <inheritdoc/>
@@ -329,7 +332,7 @@ namespace GitHub.InlineReviews.Services
 
             var review = new AddPullRequestReviewInput
             {
-                PullRequestId = pullRequestId,
+                PullRequestId = new ID(pullRequestId),
             };
 
             var addReview = new Mutation()
@@ -339,7 +342,7 @@ namespace GitHub.InlineReviews.Services
                     Id = x.PullRequestReview.DatabaseId.Value,
                     Body = x.PullRequestReview.Body,
                     CommitId = x.PullRequestReview.Commit.Oid,
-                    NodeId = x.PullRequestReview.Id,
+                    NodeId = x.PullRequestReview.Id.Value,
                     State = FromGraphQL(x.PullRequestReview.State),
                     User = user,
                 });
@@ -359,7 +362,7 @@ namespace GitHub.InlineReviews.Services
 
             var delete = new DeletePullRequestReviewInput
             {
-                PullRequestReviewId = reviewId,
+                PullRequestReviewId = new ID(reviewId),
             };
 
             var deleteReview = new Mutation()
@@ -416,18 +419,35 @@ namespace GitHub.InlineReviews.Services
             {
                 Body = body,
                 Event = ToGraphQl(e),
-                PullRequestReviewId = pendingReviewId,
+                PullRequestReviewId = new ID(pendingReviewId),
             };
 
+            // TODO: We're only reading the first 100 comments here. Add paging.
             var mutation = new Mutation()
                 .SubmitPullRequestReview(submit)
-                .Select(x => new PullRequestReviewModel
+                .Select(review => new PullRequestReviewModel
                 {
                     Body = body,
-                    CommitId = x.PullRequestReview.Commit.Oid,
-                    Id = x.PullRequestReview.DatabaseId.Value,
-                    NodeId = x.PullRequestReview.Id,
-                    State = (GitHub.Models.PullRequestReviewState)x.PullRequestReview.State,
+                    CommitId = review.PullRequestReview.Commit.Oid,
+                    Comments = review.PullRequestReview.Comments(100, null, null, null).Nodes.Select(comment => new PullRequestReviewCommentModel
+                    {
+                        Id = comment.DatabaseId.Value,
+                        NodeId = comment.Id.Value,
+                        Body = comment.Body,
+                        CommitId = comment.Commit.Oid,
+                        CreatedAt = comment.CreatedAt,
+                        DiffHunk = comment.DiffHunk,
+                        OriginalCommitId = comment.OriginalCommit.Oid,
+                        OriginalPosition = comment.OriginalPosition,
+                        Path = comment.Path,
+                        Position = comment.Position,
+                        PullRequestReviewId = review.PullRequestReview.DatabaseId.Value,
+                        User = Create(comment.Author.Login, comment.Author.AvatarUrl(null)),
+                        IsPending = false,
+                    }).ToList(),
+                    Id = review.PullRequestReview.DatabaseId.Value,
+                    NodeId = review.PullRequestReview.Id.Value,
+                    State = (GitHub.Models.PullRequestReviewState)review.PullRequestReview.State,
                     User = user,
                 });
 
@@ -455,7 +475,7 @@ namespace GitHub.InlineReviews.Services
                 CommitOID = commitId,
                 Path = path,
                 Position = position,
-                PullRequestReviewId = pendingReviewId,
+                PullRequestReviewId = new ID(pendingReviewId),
             };
 
             var addComment = new Mutation()
@@ -463,12 +483,12 @@ namespace GitHub.InlineReviews.Services
                 .Select(x => new PullRequestReviewCommentModel
                 {
                     Id = x.Comment.DatabaseId.Value,
-                    NodeId = x.Comment.Id,
+                    NodeId = x.Comment.Id.Value,
                     Body = x.Comment.Body,
                     CommitId = x.Comment.Commit.Oid,
                     Path = x.Comment.Path,
                     Position = x.Comment.Position,
-                    CreatedAt = x.Comment.CreatedAt.Value,
+                    CreatedAt = x.Comment.CreatedAt,
                     DiffHunk = x.Comment.DiffHunk,
                     OriginalPosition = x.Comment.OriginalPosition,
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,
@@ -496,8 +516,8 @@ namespace GitHub.InlineReviews.Services
             var comment = new AddPullRequestReviewCommentInput
             {
                 Body = body,
-                InReplyTo = inReplyTo,
-                PullRequestReviewId = pendingReviewId,
+                InReplyTo = new ID(inReplyTo),
+                PullRequestReviewId = new ID(pendingReviewId),
             };
 
             var addComment = new Mutation()
@@ -505,12 +525,12 @@ namespace GitHub.InlineReviews.Services
                 .Select(x => new PullRequestReviewCommentModel
                 {
                     Id = x.Comment.DatabaseId.Value,
-                    NodeId = x.Comment.Id,
+                    NodeId = x.Comment.Id.Value,
                     Body = x.Comment.Body,
                     CommitId = x.Comment.Commit.Oid,
                     Path = x.Comment.Path,
                     Position = x.Comment.Position,
-                    CreatedAt = x.Comment.CreatedAt.Value,
+                    CreatedAt = x.Comment.CreatedAt,
                     DiffHunk = x.Comment.DiffHunk,
                     OriginalPosition = x.Comment.OriginalPosition,
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,
@@ -525,7 +545,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
+        public async Task<IPullRequestReviewModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
@@ -549,23 +569,34 @@ namespace GitHub.InlineReviews.Services
 
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
 
-            return new PullRequestReviewCommentModel
+            return new PullRequestReviewModel
             {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                CreatedAt = result.CreatedAt,
+                Id = result.PullRequestReviewId.Value,
+                CommitId = result.OriginalCommitId,
+                State = GitHub.Models.PullRequestReviewState.Commented,
+                SubmittedAt = DateTimeOffset.Now,
                 User = user,
+                Comments = new[]
+                {
+                    new PullRequestReviewCommentModel
+                    {
+                        Body = result.Body,
+                        CommitId = result.CommitId,
+                        DiffHunk = result.DiffHunk,
+                        Id = result.Id,
+                        OriginalCommitId = result.OriginalCommitId,
+                        OriginalPosition = result.OriginalPosition,
+                        Path = result.Path,
+                        Position = result.Position,
+                        CreatedAt = result.CreatedAt,
+                        User = user,
+                    }
+                }
             };
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentRepy(
+        public async Task<IPullRequestReviewModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
@@ -585,18 +616,29 @@ namespace GitHub.InlineReviews.Services
 
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
 
-            return new PullRequestReviewCommentModel
+            return new PullRequestReviewModel
             {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                CreatedAt = result.CreatedAt,
+                Id = result.PullRequestReviewId.Value,
+                CommitId = result.OriginalCommitId,
+                State = GitHub.Models.PullRequestReviewState.Commented,
+                SubmittedAt = DateTimeOffset.Now,
                 User = user,
+                Comments = new[]
+                {
+                    new PullRequestReviewCommentModel
+                    {
+                        Body = result.Body,
+                        CommitId = result.CommitId,
+                        DiffHunk = result.DiffHunk,
+                        Id = result.Id,
+                        OriginalCommitId = result.OriginalCommitId,
+                        OriginalPosition = result.OriginalPosition,
+                        Path = result.Path,
+                        Position = result.Position,
+                        CreatedAt = result.CreatedAt,
+                        User = user,
+                    }
+                }
             };
         }
 
@@ -619,6 +661,17 @@ namespace GitHub.InlineReviews.Services
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
 
+        IAccount Create(string login, string avatarUrl)
+        {
+            return new Account(
+                login,
+                true,
+                false,
+                0,
+                0,
+                avatarUrl,
+                avatarProvider.GetAvatar(avatarUrl));
+        }
 
         static GitHub.Models.PullRequestReviewState FromGraphQL(Octokit.GraphQL.Model.PullRequestReviewState s)
         {

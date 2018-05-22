@@ -374,7 +374,7 @@ namespace GitHub.ViewModels.GitHubPane
                 IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
                 SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
-                CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
+                CommentCount = pullRequest.Comments.Count + pullRequest.Reviews.Sum(x => x.Comments.Count);
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 

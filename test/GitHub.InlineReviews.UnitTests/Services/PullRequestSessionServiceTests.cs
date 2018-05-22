@@ -298,7 +298,8 @@ Line 4";
                 diffService,
                 Substitute.For<IApiClientFactory>(),
                 Substitute.For<IGraphQLClientFactory>(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(),
+                Substitute.For<IAvatarProvider>());
         }
 
         static IPullRequestReviewCommentModel CreateComment(
@@ -325,12 +326,15 @@ Line 4";
             var changedFile2 = Substitute.For<IPullRequestFileModel>();
             changedFile2.FileName.Returns("other.cs");
 
+            var review = Substitute.For<IPullRequestReviewModel>();
+            review.Comments.Returns(comments);
+
             var result = Substitute.For<IPullRequestModel>();
             result.Number.Returns(PullRequestNumber);
             result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
             result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
             result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
-            result.ReviewComments.Returns(comments);
+            result.Reviews.Returns(new[] { review });
 
             return result;
         }
