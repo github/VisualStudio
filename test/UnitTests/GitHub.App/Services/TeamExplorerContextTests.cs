@@ -211,12 +211,16 @@ namespace GitHub.App.UnitTests.Services
             }
         }
 
-        static TeamExplorerContext CreateTeamExplorerContext(IVSGitExt gitExt, DTE dte = null)
+        static TeamExplorerContext CreateTeamExplorerContext(
+            IVSGitExt gitExt,
+            DTE dte = null,
+            IPullRequestService pullRequestService = null)
         {
             dte = dte ?? Substitute.For<DTE>();
+            pullRequestService = pullRequestService ?? Substitute.For<IPullRequestService>();
             var sp = Substitute.For<IGitHubServiceProvider>();
             sp.GetService<DTE>().Returns(dte);
-            return new TeamExplorerContext(gitExt, sp);
+            return new TeamExplorerContext(sp, gitExt, pullRequestService);
         }
 
         static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)
