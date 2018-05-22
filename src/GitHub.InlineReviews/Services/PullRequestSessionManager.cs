@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -69,11 +67,9 @@ namespace GitHub.InlineReviews.Services
             initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => StatusChanged().Forget());
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => RepoChanged(x).Forget());
         }
 
