@@ -538,7 +538,7 @@ Line 4";
 
                 await target.PostReviewComment("New Comment", 1, "node1");
 
-                await service.Received(1).PostStandaloneReviewCommentRepy(
+                await service.Received(1).PostStandaloneReviewCommentReply(
                     target.LocalRepository,
                     "owner",
                     target.User,

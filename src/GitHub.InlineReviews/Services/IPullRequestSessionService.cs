@@ -290,7 +290,7 @@ namespace GitHub.InlineReviews.Services
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The comment ID to reply to.</param>
         /// <returns>A model representing the posted comment.</returns>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentRepy(
+        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,

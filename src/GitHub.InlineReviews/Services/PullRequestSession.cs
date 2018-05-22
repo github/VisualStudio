@@ -174,7 +174,7 @@ namespace GitHub.InlineReviews.Services
 
             if (!HasPendingReview)
             {
-                model = await service.PostStandaloneReviewCommentRepy(
+                model = await service.PostStandaloneReviewCommentReply(
                     LocalRepository,
                     RepositoryOwner,
                     User,
