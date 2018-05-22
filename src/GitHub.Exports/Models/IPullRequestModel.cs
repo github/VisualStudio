@@ -34,6 +34,5 @@ namespace GitHub.Models
         IReadOnlyList<IPullRequestFileModel> ChangedFiles { get; }
         IReadOnlyList<ICommentModel> Comments { get; }
         IReadOnlyList<IPullRequestReviewModel> Reviews { get; set; }
-        IReadOnlyList<IPullRequestReviewCommentModel> ReviewComments { get; set; }
     }
 }

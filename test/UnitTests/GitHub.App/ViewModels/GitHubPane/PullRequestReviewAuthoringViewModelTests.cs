@@ -458,11 +458,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static PullRequestModel CreatePullRequest(
             string authorLogin = "grokys",
-            IEnumerable<IPullRequestReviewModel> reviews = null,
-            IEnumerable<IPullRequestReviewCommentModel> reviewComments = null)
+            IEnumerable<IPullRequestReviewModel> reviews = null)
         {
             reviews = reviews ?? new IPullRequestReviewModel[0];
-            reviewComments = reviewComments ?? new IPullRequestReviewCommentModel[0];
 
             var author = Substitute.For<IAccount>();
             author.Login.Returns(authorLogin);
@@ -473,7 +471,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 author,
                 DateTimeOffset.Now);
             result.Reviews = reviews.ToList();
-            result.ReviewComments = reviewComments.ToList();
             return result;
         }
 

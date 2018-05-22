@@ -157,7 +157,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (review.User.Login == author.Login &&
                         review.State != PullRequestReviewState.Pending)
                     {
-                        var vm = new PullRequestReviewViewModel(editorService, session, pullRequest, review);
+                        var vm = new PullRequestReviewViewModel(editorService, session, review);
                         vm.IsExpanded = isFirst;
                         reviews.Add(vm);
                         isFirst = false;

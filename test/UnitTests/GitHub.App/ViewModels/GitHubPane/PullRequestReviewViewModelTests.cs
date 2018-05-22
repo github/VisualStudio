@@ -37,8 +37,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void HasDetails_True_When_Has_Body()
         {
             var pr = CreatePullRequest();
-            pr.ReviewComments = new IPullRequestReviewCommentModel[0];
-
             var target = CreateTarget(pullRequest: pr);
 
             Assert.That(target.HasDetails, Is.True);
@@ -59,8 +57,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void HasDetails_False_When_Has_No_Body_Or_Comments()
         {
             var pr = CreatePullRequest();
-            ((PullRequestReviewModel)pr.Reviews[0]).Body = string.Empty;
-            pr.ReviewComments = new IPullRequestReviewCommentModel[0];
+            var review = (PullRequestReviewModel)pr.Reviews[0];
+
+            review.Body = string.Empty;
+            review.Comments = new IPullRequestReviewCommentModel[0];
 
             var target = CreateTarget(pullRequest: pr);
 
@@ -81,7 +81,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return new PullRequestReviewViewModel(
                 editorService,
                 session,
-                pullRequest,
                 model);
         }
 
@@ -105,53 +104,50 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                         Id = 1,
                         Body = "Looks good to me!",
                         State = PullRequestReviewState.Approved,
+                        Comments = new[]
+                        {
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "I like this.",
+                                Position = 10,
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "This is good.",
+                                Position = 11,
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "Fine, but outdated.",
+                                Position = null,
+                            },
+                        },
                     },
                     new PullRequestReviewModel
                     {
                         Id = 2,
                         Body = "Changes please.",
                         State = PullRequestReviewState.ChangesRequested,
+                        Comments = new[]
+                        {
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "Not great.",
+                                Position = 20,
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "This sucks.",
+                                Position = 21,
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "Bad and old.",
+                                Position = null,
+                            },
+                        },
                     },
                 },
-                ReviewComments = new[]
-                {
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "I like this.",
-                        PullRequestReviewId = 1,
-                        Position = 10,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "This is good.",
-                        PullRequestReviewId = 1,
-                        Position = 11,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "Fine, but outdated.",
-                        PullRequestReviewId = 1,
-                        Position = null,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "Not great.",
-                        PullRequestReviewId = 2,
-                        Position = 20,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "This sucks.",
-                        PullRequestReviewId = 2,
-                        Position = 21,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "Bad and old.",
-                        PullRequestReviewId = 2,
-                        Position = null,
-                    },
-                }
             };
         }
     }

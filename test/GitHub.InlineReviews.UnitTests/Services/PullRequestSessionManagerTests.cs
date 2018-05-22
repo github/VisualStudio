@@ -677,7 +677,8 @@ Line 4";
                     diff,
                     Substitute.For<IApiClientFactory>(),
                     Substitute.For<IGraphQLClientFactory>(),
-                    Substitute.For<IUsageTracker>());
+                    Substitute.For<IUsageTracker>(),
+                    Substitute.For<IAvatarProvider>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())
                     .Returns("MERGE_BASE");
@@ -861,7 +862,14 @@ Line 4";
             result.Number.Returns(number);
             result.Base.Returns(new GitReferenceModel("BASEREF", "pr", "BASESHA", cloneUrl));
             result.Head.Returns(new GitReferenceModel("HEADREF", "pr", "HEADSHA", cloneUrl));
-            result.ReviewComments.Returns(comments);
+
+            if (comments.Length > 0)
+            {
+                var review = Substitute.For<IPullRequestReviewModel>();
+                review.Comments.Returns(comments);
+                result.Reviews.Returns(new[] { review });
+            }
+
             return result;
         }
 

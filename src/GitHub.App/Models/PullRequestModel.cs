@@ -177,18 +177,6 @@ namespace GitHub.Models
             }
         }
 
-        IReadOnlyList<IPullRequestReviewCommentModel> reviewComments = new IPullRequestReviewCommentModel[0];
-        public IReadOnlyList<IPullRequestReviewCommentModel> ReviewComments
-        {
-            get { return reviewComments; }
-            set
-            {
-                Guard.ArgumentNotNull(value, nameof(value));
-                reviewComments = value;
-                this.RaisePropertyChange();
-            }
-        }
-
         IAccount assignee;
         public IAccount Assignee
         {

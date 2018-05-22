@@ -21,12 +21,10 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         /// <param name="editorService">The pull request editor service.</param>
         /// <param name="session">The pull request session.</param>
-        /// <param name="pullRequest">The pull request model.</param>
         /// <param name="model">The pull request review model.</param>
         public PullRequestReviewViewModel(
             IPullRequestEditorService editorService,
             IPullRequestSession session,
-            IPullRequestModel pullRequest,
             IPullRequestReviewModel model)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
@@ -40,20 +38,17 @@ namespace GitHub.ViewModels.GitHubPane
             var comments = new List<IPullRequestReviewFileCommentViewModel>();
             var outdated = new List<IPullRequestReviewFileCommentViewModel>();
 
-            foreach (var comment in pullRequest.ReviewComments)
+            foreach (var comment in model.Comments)
             {
-                if (comment.PullRequestReviewId == model.Id)
-                {
-                    var vm = new PullRequestReviewFileCommentViewModel(
-                        editorService,
-                        session,
-                        comment);
+                var vm = new PullRequestReviewFileCommentViewModel(
+                    editorService,
+                    session,
+                    comment);
 
-                    if (comment.Position.HasValue)
-                        comments.Add(vm);
-                    else
-                        outdated.Add(vm);
-                }
+                if (comment.Position.HasValue)
+                    comments.Add(vm);
+                else
+                    outdated.Add(vm);
             }
 
             FileComments = comments;
