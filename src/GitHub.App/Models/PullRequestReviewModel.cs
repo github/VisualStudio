@@ -18,7 +18,7 @@ namespace GitHub.Models
 
         public IReadOnlyList<IPullRequestReviewCommentModel> Comments
         {
-            get { return comments ?? (comments = new IPullRequestReviewCommentModel[0]); }
+            get { return comments ?? Array.Empty<IPullRequestReviewCommentModel>(); }
             set
             {
                 Guard.ArgumentNotNull(value, nameof(value));
