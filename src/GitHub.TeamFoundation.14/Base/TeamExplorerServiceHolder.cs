@@ -21,14 +21,13 @@ namespace GitHub.VisualStudio.Base
 
         IServiceProvider serviceProvider;
         readonly IVSGitExt gitService;
-        readonly JoinableTaskFactory joinableTaskFactory;
 
         /// <summary>
         /// This class relies on IVSGitExt that provides information when VS switches repositories.
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         [ImportingConstructor]
-        TeamExplorerServiceHolder(IVSGitExt gitService) : this(gitService, ThreadHelper.JoinableTaskFactory)
+        TeamExplorerServiceHolder(IVSGitExt gitService) : this(gitService, ThreadHelper.JoinableTaskContext)
         {
         }
 
@@ -37,10 +36,14 @@ namespace GitHub.VisualStudio.Base
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         /// <param name="joinableTaskFactory">Used for switching to the Main thread.</param>
-        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskFactory joinableTaskFactory = null)
+        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskContext joinableTaskContext = null)
         {
+            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
+            JoinableTaskCollection = joinableTaskContext.CreateCollection();
+            JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
+            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
+
             this.gitService = gitService;
-            this.joinableTaskFactory = joinableTaskFactory ?? new JoinableTaskContext().Factory;
 
             UpdateActiveRepo();
             if (gitService != null)
@@ -151,9 +154,9 @@ namespace GitHub.VisualStudio.Base
             if (!Equals(repo, ActiveRepo))
             {
                 // Fire property change events on Main thread
-                joinableTaskFactory.Run(async () =>
+                JoinableTaskFactory.Run(async () =>
                 {
-                    await joinableTaskFactory.SwitchToMainThreadAsync();
+                    await JoinableTaskFactory.SwitchToMainThreadAsync();
                     ActiveRepo = repo;
                 });
             }
@@ -184,5 +187,8 @@ namespace GitHub.VisualStudio.Base
         {
             get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
         }
+
+        public JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }
