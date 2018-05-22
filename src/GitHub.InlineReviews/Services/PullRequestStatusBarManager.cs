@@ -5,14 +5,15 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 using GitHub.Commands;
+using GitHub.Extensions;
+using GitHub.Primitives;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.Models;
 using GitHub.Logging;
-using GitHub.Extensions;
 using Serilog;
 using ReactiveUI;
 
@@ -34,24 +35,27 @@ namespace GitHub.InlineReviews.Services
         // TeamExplorerContext needs to retrieve DTE using GetService.
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
+        readonly Lazy<IConnectionManager> connectionManager;
 
         IDisposable currentSessionSubscription;
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(
-            IUsageTracker usageTracker,
+            Lazy<IUsageTracker> usageTracker,
             IOpenPullRequestsCommand openPullRequestsCommand,
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
             Lazy<IPullRequestSessionManager> pullRequestSessionManager,
-            Lazy<ITeamExplorerContext> teamExplorerContext)
+            Lazy<ITeamExplorerContext> teamExplorerContext,
+            Lazy<IConnectionManager> connectionManager)
         {
-            this.openPullRequestsCommand = new UsageTrackingCommand(openPullRequestsCommand,
-                usageTracker, x => x.NumberOfStatusBarOpenPullRequestList);
-            this.showCurrentPullRequestCommand = new UsageTrackingCommand(showCurrentPullRequestCommand,
-                usageTracker, x => x.NumberOfShowCurrentPullRequest);
+            this.openPullRequestsCommand = new UsageTrackingCommand(usageTracker,
+                x => x.NumberOfStatusBarOpenPullRequestList, openPullRequestsCommand);
+            this.showCurrentPullRequestCommand = new UsageTrackingCommand(usageTracker,
+                x => x.NumberOfShowCurrentPullRequest, showCurrentPullRequestCommand);
 
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.teamExplorerContext = teamExplorerContext;
+            this.connectionManager = connectionManager;
         }
 
         /// <summary>
@@ -78,22 +82,53 @@ namespace GitHub.InlineReviews.Services
         {
             currentSessionSubscription?.Dispose();
             currentSessionSubscription = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
-                .Subscribe(x => RefreshCurrentSession(repository, x));
+                .Subscribe(x => RefreshCurrentSession(repository, x).Forget());
         }
 
-        void RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
+        async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
         {
-            var cloneUrl = repository?.CloneUrl;
-            if (cloneUrl != null)
+            try
             {
-                // Only show PR status bar if repo has remote
+                var showStatus = await IsDotComOrEnterpriseRepository(repository);
+                if (!showStatus)
+                {
+                    ShowStatus(null);
+                    return;
+                }
+
                 var viewModel = CreatePullRequestStatusViewModel(session);
                 ShowStatus(viewModel);
             }
-            else
+            catch (Exception e)
             {
-                ShowStatus(null);
+                log.Error(e, nameof(RefreshCurrentSession));
             }
+        }
+
+        async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
+        {
+            var cloneUrl = repository?.CloneUrl;
+            if (cloneUrl == null)
+            {
+                // No active repository or remote
+                return false;
+            }
+
+            var isDotCom = HostAddress.IsGitHubDotComUri(cloneUrl.ToRepositoryUrl());
+            if (isDotCom)
+            {
+                // This is a github.com repository
+                return true;
+            }
+
+            var connection = await connectionManager.Value.GetConnection(repository);
+            if (connection != null)
+            {
+                // This is an enterprise repository
+                return true;
+            }
+
+            return false;
         }
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestSession session)
@@ -142,38 +177,6 @@ namespace GitHub.InlineReviews.Services
         {
             var contentControl = mainWindow?.Template?.FindName(StatusBarPartName, mainWindow) as ContentControl;
             return contentControl?.Content as StatusBar;
-        }
-
-        class UsageTrackingCommand : ICommand
-        {
-            readonly ICommand command;
-            readonly IUsageTracker usageTracker;
-            readonly Expression<Func<UsageModel.MeasuresModel, int>> counter;
-
-            internal UsageTrackingCommand(ICommand command, IUsageTracker usageTracker,
-                Expression<Func<UsageModel.MeasuresModel, int>> counter)
-            {
-                this.command = command;
-                this.usageTracker = usageTracker;
-                this.counter = counter;
-            }
-
-            public event EventHandler CanExecuteChanged
-            {
-                add { command.CanExecuteChanged += value; }
-                remove { command.CanExecuteChanged -= value; }
-            }
-
-            public bool CanExecute(object parameter)
-            {
-                return command.CanExecute(parameter);
-            }
-
-            public void Execute(object parameter)
-            {
-                command.Execute(parameter);
-                usageTracker.IncrementCounter(counter).Forget();
-            }
         }
     }
 }

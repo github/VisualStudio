@@ -125,7 +125,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     public void TargetBranchDisplayNameIncludesRepoOwnerWhenFork()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
-        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
         vm.InitializeAsync(data.ActiveRepo, data.Connection).Wait();
@@ -161,7 +161,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var targetBranch = data.TargetBranch;
         var ms = data.ModelService;
 
-        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
@@ -176,6 +176,14 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         // this is optional
         if (body != null)
             vm.Description = body;
+
+        ms.CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, Arg.Any<string>(), Arg.Any<string>())
+            .Returns(x =>
+            {
+                var pr = Substitute.For<IPullRequestModel>();
+                pr.Base.Returns(new GitReferenceModel("ref", "label", "sha", "https://clone.url"));
+                return Observable.Return(pr);
+            });
 
         await vm.CreatePullRequest.ExecuteAsync();
 

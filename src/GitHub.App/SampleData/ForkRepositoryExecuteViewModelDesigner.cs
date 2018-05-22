@@ -30,6 +30,8 @@ namespace GitHub.SampleData
 
         public IObservable<object> Done => null;
 
+        public IObservable<object> Back => null;
+
         public string Title => null;
 
         public IRepositoryModel SourceRepository { get; set; }
@@ -39,6 +41,8 @@ namespace GitHub.SampleData
         public IAccount DestinationAccount { get; }
 
         public IReactiveCommand<Repository> CreateFork => null;
+
+        public IReactiveCommand<object> BackCommand => null;
 
         public bool ResetMasterTracking { get; set; } = true;
 

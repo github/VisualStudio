@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows;
+using System.Reactive.Linq;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using GitHub.InlineReviews.Glyph.Implementation;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Glyph
 {
@@ -16,95 +17,58 @@ namespace GitHub.InlineReviews.Glyph
     /// Responsibe for updating the margin when tags change.
     /// </summary>
     /// <typeparam name="TGlyphTag">The type of glyph tag we're managing.</typeparam>
-    public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag : ITag
+    public sealed class GlyphMargin<TGlyphTag> : IDisposable where TGlyphTag : ITag
     {
-        bool handleZoom;
-        bool isDisposed;
-        Grid marginVisual;
+        readonly IWpfTextView textView;
+        readonly Grid marginGrid;
+        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
+        readonly GlyphMarginVisualManager<TGlyphTag> visualManager;
+
+        IDisposable visibleSubscription;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
-        IWpfTextView textView;
-        string marginName;
-        GlyphMarginVisualManager<TGlyphTag> visualManager;
-        Func<ITextBuffer, bool> isMarginVisible;
+        bool disposed;
 
         public GlyphMargin(
-            IWpfTextViewHost wpfTextViewHost,
+            IWpfTextView textView,
             IGlyphFactory<TGlyphTag> glyphFactory,
-            Func<Grid> gridFactory,
-            ITagAggregator<TGlyphTag> tagAggregator,
+            Grid marginGrid,
+            IViewTagAggregatorFactoryService tagAggregatorFactory,
             IEditorFormatMap editorFormatMap,
-            Func<ITextBuffer, bool> isMarginVisible,
-            string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
+            string marginPropertiesName)
         {
-            textView = wpfTextViewHost.TextView;
-            this.tagAggregator = tagAggregator;
-            this.isMarginVisible = isMarginVisible;
-            this.marginName = marginName;
-            this.handleZoom = handleZoom;
+            this.textView = textView;
+            this.marginGrid = marginGrid;
+            this.tagAggregatorFactory = tagAggregatorFactory;
+            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginGrid, editorFormatMap, marginPropertiesName);
 
-            marginVisual = gridFactory();
-            marginVisual.Width = marginWidth;
-
-            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
-                editorFormatMap, marginPropertiesName);
-
-            // Do on Loaded to give diff view a chance to initialize.
-            marginVisual.Loaded += OnLoaded;
+            // Initialize when first visible
+            visibleSubscription = marginGrid.WhenAnyValue(x => x.IsVisible).Distinct().Where(x => x).Subscribe(_ => Initialize());
         }
 
         public void Dispose()
         {
-            if (!isDisposed)
+            if (!disposed)
             {
-                tagAggregator.Dispose();
-                marginVisual = null;
-                isDisposed = true;
+                disposed = true;
+
+                textView.LayoutChanged -= OnLayoutChanged;
+                textView.ZoomLevelChanged -= OnZoomLevelChanged;
+
+                tagAggregator?.Dispose();
+                tagAggregator = null;
+
+                visibleSubscription?.Dispose();
+                visibleSubscription = null;
             }
         }
 
-        public ITextViewMargin GetTextViewMargin(string name)
+        void Initialize()
         {
-            return (name == marginName) ? this : null;
-        }
-
-        public bool Enabled
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return true;
-            }
-        }
-
-        public double MarginSize
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual.Width;
-            }
-        }
-
-        public FrameworkElement VisualElement
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return marginVisual;
-            }
-        }
-
-        void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            RefreshMarginVisibility();
-
+            tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(textView);
             tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
             textView.LayoutChanged += OnLayoutChanged;
-            if (handleZoom)
-            {
-                textView.ZoomLevelChanged += OnZoomLevelChanged;
-            }
+            textView.ZoomLevelChanged += OnZoomLevelChanged;
 
             if (textView.InLayout)
             {
@@ -118,17 +82,12 @@ namespace GitHub.InlineReviews.Glyph
                 }
             }
 
-            if (handleZoom)
-            {
-                marginVisual.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
-                marginVisual.LayoutTransform.Freeze();
-            }
+            marginGrid.LayoutTransform = new ScaleTransform(textView.ZoomLevel / 100.0, textView.ZoomLevel / 100.0);
+            marginGrid.LayoutTransform.Freeze();
         }
 
         void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             if (!textView.IsClosed)
             {
                 var list = new List<SnapshotSpan>();
@@ -161,8 +120,6 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
         {
-            RefreshMarginVisibility();
-
             visualManager.SetSnapshotAndUpdate(textView.TextSnapshot, e.NewOrReformattedLines, e.VerticalTranslation ? (IList<ITextViewLine>)textView.TextViewLines : e.TranslatedLines);
 
             var lines = refreshAllGlyphs ? (IList<ITextViewLine>)textView.TextViewLines : e.NewOrReformattedLines;
@@ -178,7 +135,7 @@ namespace GitHub.InlineReviews.Glyph
         void OnZoomLevelChanged(object sender, ZoomLevelChangedEventArgs e)
         {
             refreshAllGlyphs = true;
-            marginVisual.LayoutTransform = e.ZoomTransform;
+            marginGrid.LayoutTransform = e.ZoomTransform;
         }
 
         void RefreshGlyphsOver(ITextViewLine textViewLine)
@@ -191,19 +148,6 @@ namespace GitHub.InlineReviews.Glyph
                 {
                     visualManager.AddGlyph(span.Tag, spans[0]);
                 }
-            }
-        }
-
-        void RefreshMarginVisibility()
-        {
-            marginVisual.Visibility = isMarginVisible(textView.TextBuffer) ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        void ThrowIfDisposed()
-        {
-            if (isDisposed)
-            {
-                throw new ObjectDisposedException(marginName);
             }
         }
     }

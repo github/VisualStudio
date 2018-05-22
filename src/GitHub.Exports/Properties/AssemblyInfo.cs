@@ -5,4 +5,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("GitHub.Exports")]
 [assembly: AssemblyDescription("GitHub interfaces for mef exports")]
 [assembly: Guid("9aea02db-02b5-409c-b0ca-115d05331a6b")]
-[assembly: InternalsVisibleTo("MetricsTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c1a49bb6a01873a4e5434cbaa9993f5a75d3ba66fecfff4d85066c7094913d43f6f9bb706d2eb65f4990a7adfe7321e120ba8be5a8367fc5551c0a6eeb4850c5646377d314142abe69a5fb8ec0957a63ba5893901adb5b4cf0eb7f7e5861376e0cb4fd975576094b2fb4843df9c186eb17232365291b93e17f5e2b6cc1cda2c2")]

@@ -33,6 +33,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly IVSServices vsServices;
         readonly int sectionIndex;
         readonly ILocalRepositories localRepositories;
+        readonly IUsageTracker usageTracker;
 
         bool isCloning;
         bool isCreating;
@@ -99,6 +100,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IPackageSettings packageSettings,
             IVSServices vsServices,
             ILocalRepositories localRepositories,
+            IUsageTracker usageTracker,
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
@@ -108,6 +110,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
             Guard.ArgumentNotNull(vsServices, nameof(vsServices));
             Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
+            Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             Title = "GitHub";
             IsEnabled = true;
@@ -118,6 +121,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             this.packageSettings = packageSettings;
             this.vsServices = vsServices;
             this.localRepositories = localRepositories;
+            this.usageTracker = usageTracker;
 
             Clone = CreateAsyncCommandHack(DoClone);
 
@@ -141,6 +145,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         result.Repository.CloneUrl,
                         result.Repository.Name,
                         result.BasePath);
+
+                    usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
                 catch (Exception e)
                 {

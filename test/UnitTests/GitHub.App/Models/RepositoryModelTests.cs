@@ -19,8 +19,9 @@ public class RepositoryModelTests
         [TestCase("a name", "https://github.com/github/VisualStudio", @"C:\some\path\", "a name", "https://github.com/github/VisualStudio", @"c:\some\path\")]
         public void SameContentEqualsTrue(string name1, string url1, string path1, string name2, string url2, string path2)
         {
-            var a = new LocalRepositoryModel(name1, new UriString(url1), path1);
-            var b = new LocalRepositoryModel(name2, new UriString(url2), path2);
+            var gitService = Substitute.For<IGitService>();
+            var a = new LocalRepositoryModel(name1, new UriString(url1), path1, gitService);
+            var b = new LocalRepositoryModel(name2, new UriString(url2), path2, gitService);
             Assert.That(a, Is.EqualTo(b));
             Assert.False(a == b);
             Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
@@ -57,12 +58,11 @@ public class RepositoryModelTests
         {
             using (var temp = new TempDirectory())
             {
-                var provider = Substitutes.ServiceProvider;
-                var gitservice = provider.GetGitService();
+                var gitService = Substitute.For<IGitService>();
                 var repo = Substitute.For<IRepository>();
                 var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitservice.GetUri(path.FullName).Returns((UriString)null);
-                var model = new LocalRepositoryModel(path.FullName);
+                gitService.GetUri(path.FullName).Returns((UriString)null);
+                var model = new LocalRepositoryModel(path.FullName, gitService);
                 Assert.That("repo-name", Is.EqualTo(model.Name));
             }
         }
@@ -72,12 +72,11 @@ public class RepositoryModelTests
         {
             using (var temp = new TempDirectory())
             {
-                var provider = Substitutes.ServiceProvider;
-                var gitservice = provider.GetGitService();
+                var gitService = Substitute.For<IGitService>();
                 var repo = Substitute.For<IRepository>();
                 var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-                var model = new LocalRepositoryModel(path.FullName);
+                gitService.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
+                var model = new LocalRepositoryModel(path.FullName, gitService);
                 Assert.That("repo-name", Is.EqualTo(model.Name));
                 Assert.That("user", Is.EqualTo(model.Owner));
             }
