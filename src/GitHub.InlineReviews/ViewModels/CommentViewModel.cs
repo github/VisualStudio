@@ -138,7 +138,7 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                await Thread.DeleteComment.ExecuteAsyncTask(Body);
+                await Thread.DeleteComment.ExecuteAsyncTask(Id);
             }
             catch (Exception e)
             {

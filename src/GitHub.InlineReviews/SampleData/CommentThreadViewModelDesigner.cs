@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.SampleData
 
         public ReactiveCommand<ICommentModel> PostComment { get; }
         public ReactiveCommand<ICommentModel> EditComment { get; }
-        public ReactiveCommand<ICommentModel> DeleteComment { get; }
+        public ReactiveCommand<object> DeleteComment { get; }
 
         public Uri GetCommentUrl(int id)
         {

@@ -94,6 +94,8 @@ namespace GitHub.InlineReviews.ViewModels
 
             var number = (int)parameter;
             await Session.DeleteComment(number);
+
+            return new object();
         }
     }
 }
