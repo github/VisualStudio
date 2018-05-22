@@ -29,7 +29,7 @@ namespace GitHub.Services
     {
         static ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
-        readonly DTE dte;
+        readonly Lazy<DTE> dte;
         readonly IVSGitExt gitExt;
         readonly JoinableTaskFactory joinableTaskFactory;
 
@@ -43,18 +43,16 @@ namespace GitHub.Services
         ILocalRepositoryModel repositoryModel;
 
         [ImportingConstructor]
-        TeamExplorerContext(SVsServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(gitExt, serviceProvider, ThreadHelper.JoinableTaskFactory)
+        TeamExplorerContext(IVSGitExt gitExt, [Import(typeof(SVsServiceProvider))] IServiceProvider sp)
+            : this(gitExt, new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE))), ThreadHelper.JoinableTaskFactory)
         {
         }
 
-        public TeamExplorerContext(IVSGitExt gitExt, IServiceProvider serviceProvider, JoinableTaskFactory joinableTaskFactory = null)
+        public TeamExplorerContext(IVSGitExt gitExt, Lazy<DTE> dte, JoinableTaskFactory joinableTaskFactory = null)
         {
             this.gitExt = gitExt;
+            this.dte = dte;
             this.joinableTaskFactory = joinableTaskFactory ?? new JoinableTaskContext().Factory;
-
-            // SVsServiceProvider doesn't complain when this isn't called on Main thread
-            dte = (DTE)serviceProvider.GetService(typeof(DTE));
 
             Refresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
@@ -65,7 +63,9 @@ namespace GitHub.Services
             try
             {
                 var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-                var newSolutionPath = dte.Solution?.FullName;
+
+                // SVsServiceProvider doesn't complain when this isn't called on Main thread
+                var newSolutionPath = dte.Value.Solution?.FullName;
 
                 if (repo == null && newSolutionPath == solutionPath)
                 {

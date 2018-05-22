@@ -214,9 +214,7 @@ namespace GitHub.App.UnitTests.Services
         static TeamExplorerContext CreateTeamExplorerContext(IVSGitExt gitExt, DTE dte = null)
         {
             dte = dte ?? Substitute.For<DTE>();
-            var sp = Substitute.For<IServiceProvider>();
-            sp.GetService(typeof(DTE)).Returns(dte);
-            return new TeamExplorerContext(gitExt, sp);
+            return new TeamExplorerContext(gitExt, new Lazy<DTE>(() => dte));
         }
 
         static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)
