@@ -18,6 +18,8 @@ namespace GitHub.InlineReviews.SampleData
             = new AccountDesigner { Login = "shana", IsUser = true };
 
         public ReactiveCommand<ICommentModel> PostComment { get; }
+        public ReactiveCommand<ICommentModel> EditComment { get; }
+        public ReactiveCommand<ICommentModel> DeleteComment { get; }
 
         public Uri GetCommentUrl(int id)
         {

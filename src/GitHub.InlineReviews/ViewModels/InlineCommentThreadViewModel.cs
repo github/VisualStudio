@@ -35,6 +35,14 @@ namespace GitHub.InlineReviews.ViewModels
                 Observable.Return(true),
                 DoPostComment);
 
+            EditComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(true),
+                DoEditComment);
+
+            DeleteComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(true),
+                DoDeleteComment);
+
             foreach (var comment in comments)
             {
                 Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment));
@@ -67,6 +75,24 @@ namespace GitHub.InlineReviews.ViewModels
             var replyId = Comments[0].Id;
             var nodeId = Comments[0].NodeId;
             return await Session.PostReviewComment(body, replyId, nodeId);
+        }
+
+        Task<ICommentModel> DoEditComment(object parameter)
+        {
+            Guard.ArgumentNotNull(parameter, nameof(parameter));
+
+            var body = (string)parameter;
+            var replyId = Comments[0].Id;
+            var nodeId = Comments[0].NodeId;
+
+            throw new NotImplementedException();
+        }
+
+        Task<ICommentModel> DoDeleteComment(object parameter)
+        {
+            Guard.ArgumentNotNull(parameter, nameof(parameter));
+
+            throw new NotImplementedException();
         }
     }
 }

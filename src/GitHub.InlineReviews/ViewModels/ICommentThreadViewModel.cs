@@ -31,5 +31,15 @@ namespace GitHub.InlineReviews.ViewModels
         /// Called by a comment in the thread to post itself as a new comment to the API.
         /// </summary>
         ReactiveCommand<ICommentModel> PostComment { get; }
+
+        /// <summary>
+        /// Called by a comment in the thread to post itself as an edit to a comment to the API.
+        /// </summary>
+        ReactiveCommand<ICommentModel> EditComment { get; }
+
+        /// <summary>
+        /// Called by a comment in the thread to send a delete of the comment to the API.
+        /// </summary>
+        ReactiveCommand<ICommentModel> DeleteComment { get; }
     }
 }

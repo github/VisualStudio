@@ -108,6 +108,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Deletes a comment.
         /// </summary>
-        ReactiveCommand<object> Delete { get; }
+        ReactiveCommand<Unit> Delete { get; }
     }
 }

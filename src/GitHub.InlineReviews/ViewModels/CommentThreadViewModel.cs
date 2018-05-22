@@ -12,12 +12,13 @@ namespace GitHub.InlineReviews.ViewModels
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
         ReactiveCommand<ICommentModel> postComment;
+        private ReactiveCommand<ICommentModel> editComment;
+        private ReactiveCommand<ICommentModel> deleteComment;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="commentModels">The thread comments.</param>
         protected CommentThreadViewModel(IAccount currentUser)
         {
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
@@ -40,6 +41,30 @@ namespace GitHub.InlineReviews.ViewModels
 
                 // We want to ignore thrown exceptions from PostComment - the error should be handled
                 // by the CommentViewModel that trigged PostComment.Execute();
+                value.ThrownExceptions.Subscribe(_ => { });
+            }
+        }
+
+        public ReactiveCommand<ICommentModel> EditComment
+        {
+            get { return editComment; }
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(value));
+                editComment = value;
+
+                value.ThrownExceptions.Subscribe(_ => { });
+            }
+        }
+
+        public ReactiveCommand<ICommentModel> DeleteComment
+        {
+            get { return deleteComment; }
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(value));
+                deleteComment = value;
+
                 value.ThrownExceptions.Subscribe(_ => { });
             }
         }

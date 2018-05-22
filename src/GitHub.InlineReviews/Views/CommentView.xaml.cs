@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Views
 
         private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (buttonPanel.IsVisible)
+            if (creatingButtonPanel.IsVisible || editingButtonPanel.IsVisible)
             {
                 BringIntoView();
                 body.Focus();
@@ -55,7 +55,7 @@ namespace GitHub.InlineReviews.Views
 
         private void buttonPanel_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            if (buttonPanel.IsVisible)
+            if (creatingButtonPanel.IsVisible || editingButtonPanel.IsVisible)
             {
                 BringIntoView();
             }

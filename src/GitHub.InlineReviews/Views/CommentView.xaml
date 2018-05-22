@@ -12,7 +12,7 @@
              xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:CommentViewModelDesigner EditState="Creating">
+        <sample:CommentViewModelDesigner EditState="Editing">
             <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:CommentViewModelDesigner.Body>
@@ -105,6 +105,9 @@
                         <DataTrigger Binding="{Binding EditState}" Value="Creating">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
@@ -148,6 +151,10 @@
                                 <Setter Property="MinHeight" Value="100"/>
                                 <Setter Property="PromptText" Value="Leave a comment"/>
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                                <Setter Property="MinHeight" Value="100"/>
+                                <Setter Property="PromptText" Value="Leave a comment"/>
+                            </DataTrigger>
                         </Style.Triggers>
 
                         <Style.Resources>
@@ -176,7 +183,7 @@
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
 
-            <StackPanel Name="buttonPanel"
+            <StackPanel Name="creatingButtonPanel"
                         Grid.Column="1" Grid.Row="3" 
                         Margin="4 8" 
                         HorizontalAlignment="Left"
@@ -199,6 +206,26 @@
                     Start a review
                 </Button>
                 <Button Margin="4 0 0 0" Command="{Binding CancelCreate}">Cancel</Button>
+            </StackPanel>
+
+            <StackPanel Name="editingButtonPanel"
+                        Grid.Column="1" Grid.Row="3" 
+                        Margin="4 8" 
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        IsVisibleChanged="buttonPanel_IsVisibleChanged">
+                <StackPanel.Style>
+                    <Style TargetType="FrameworkElement">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Button Command="{Binding CommitEdit}">Edit</Button>
+                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
             </StackPanel>
         </Grid>
     </Grid>
