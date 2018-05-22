@@ -59,23 +59,30 @@ namespace GitHub.VisualStudio.Base
 
         async Task InitializeAsync()
         {
-            gitService = await GetServiceAsync<IGitExt>();
-            if (gitService == null)
+            try
             {
-                log.Error("Couldn't find IGitExt service");
-                return;
-            }
-
-            // Refresh on background thread
-            await Task.Run(() => RefreshActiveRepositories());
-
-            gitService.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(gitService.ActiveRepositories))
+                gitService = await GetServiceAsync<IGitExt>();
+                if (gitService == null)
                 {
-                    RefreshActiveRepositories();
+                    log.Error("Couldn't find IGitExt service");
+                    return;
                 }
-            };
+
+                // Refresh on background thread
+                await Task.Run(() => RefreshActiveRepositories());
+
+                gitService.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(gitService.ActiveRepositories))
+                    {
+                        RefreshActiveRepositories();
+                    }
+                };
+            }
+            catch(Exception e)
+            {
+                log.Error(e, "Error initializing");
+            }
         }
 
         public void RefreshActiveRepositories()
