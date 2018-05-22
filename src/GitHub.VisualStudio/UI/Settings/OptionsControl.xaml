@@ -109,6 +109,9 @@
         <WrapPanel DockPanel.Dock="Top">
           <CheckBox x:Name="chkEditorComments" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EditorCommentsLabel}" />
         </WrapPanel>
+        <WrapPanel DockPanel.Dock="Top">
+          <CheckBox x:Name="chkForkButton" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_ForkButtonLabel}" />
+        </WrapPanel>
         <TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap">
           <LineBreak />
           <Italic>

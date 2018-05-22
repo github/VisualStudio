@@ -141,6 +141,12 @@ namespace GitHub.VisualStudio.Base
             return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
         }
 
+        protected async Task<bool> IsAGitHubDotComRepo()
+        {
+            var origin = await GetRepositoryOrigin();
+            return origin == RepositoryOrigin.DotCom;
+        }
+
         protected async Task<bool> IsUserAuthenticated()
         {
             if (SimpleApiClient == null)

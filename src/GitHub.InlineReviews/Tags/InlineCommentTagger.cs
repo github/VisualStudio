@@ -2,12 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.InlineReviews.Margins;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -33,6 +35,7 @@ namespace GitHub.InlineReviews.Tags
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
         IDisposable sessionManagerSubscription;
+        IDisposable visibleSubscription;
 
         public InlineCommentTagger(
             ITextView view,
@@ -57,6 +60,8 @@ namespace GitHub.InlineReviews.Tags
             sessionManagerSubscription = null;
             fileSubscription?.Dispose();
             fileSubscription = null;
+            visibleSubscription?.Dispose();
+            visibleSubscription = null;
         }
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -163,9 +168,16 @@ namespace GitHub.InlineReviews.Tags
 
             if (relativePath != null)
             {
-                var liveFile = await sessionManager.GetLiveFile(relativePath, view, buffer);
-                fileSubscription = liveFile.LinesChanged.Subscribe(LinesChanged);
-                file = liveFile;
+                file = await sessionManager.GetLiveFile(relativePath, view, buffer);
+
+                var options = view.Options;
+                visibleSubscription =
+                    Observable.FromEventPattern<EditorOptionChangedEventArgs>(options, nameof(options.OptionChanged))
+                    .Select(_ => Unit.Default)
+                    .StartWith(Unit.Default)
+                    .Select(x => options.GetOptionValue(InlineCommentTextViewOptions.MarginVisibleId))
+                    .DistinctUntilChanged()
+                    .Subscribe(VisibleChanged);
             }
             else
             {
@@ -173,6 +185,19 @@ namespace GitHub.InlineReviews.Tags
             }
 
             NotifyTagsChanged();
+        }
+
+        void VisibleChanged(bool enabled)
+        {
+            if (enabled)
+            {
+                fileSubscription = fileSubscription ?? file.LinesChanged.Subscribe(LinesChanged);
+            }
+            else
+            {
+                fileSubscription?.Dispose();
+                fileSubscription = null;
+            }
         }
 
         static void ForgetWithLogging(Task task)
