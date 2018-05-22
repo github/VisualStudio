@@ -34,7 +34,9 @@ namespace GitHub.Services
     {
         static readonly ILogger log = LogManager.ForContext<VSGitServices>();
         readonly IGitHubServiceProvider serviceProvider;
+#if TEAMEXPLORER15
         readonly Lazy<IStatusBarNotificationService> statusBar;
+#endif
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -48,7 +50,9 @@ namespace GitHub.Services
         public VSGitServices(IGitHubServiceProvider serviceProvider, Lazy<IStatusBarNotificationService> statusBar)
         {
             this.serviceProvider = serviceProvider;
+#if TEAMEXPLORER15
             this.statusBar = statusBar;
+#endif
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
