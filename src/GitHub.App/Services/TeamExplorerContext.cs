@@ -31,7 +31,6 @@ namespace GitHub.Services
 
         readonly Lazy<DTE> dte;
         readonly IVSGitExt gitExt;
-        readonly JoinableTaskFactory joinableTaskFactory;
 
         string solutionPath;
         string repositoryPath;
@@ -44,15 +43,19 @@ namespace GitHub.Services
 
         [ImportingConstructor]
         TeamExplorerContext(IVSGitExt gitExt, [Import(typeof(SVsServiceProvider))] IServiceProvider sp)
-            : this(gitExt, new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE))), ThreadHelper.JoinableTaskFactory)
+            : this(gitExt, new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE))), ThreadHelper.JoinableTaskContext)
         {
         }
 
-        public TeamExplorerContext(IVSGitExt gitExt, Lazy<DTE> dte, JoinableTaskFactory joinableTaskFactory = null)
+        public TeamExplorerContext(IVSGitExt gitExt, Lazy<DTE> dte, JoinableTaskContext joinableTaskContext = null)
         {
+            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
+            JoinableTaskCollection = joinableTaskContext.CreateCollection();
+            JoinableTaskCollection.DisplayName = nameof(TeamExplorerContext);
+            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
+
             this.gitExt = gitExt;
             this.dte = dte;
-            this.joinableTaskFactory = joinableTaskFactory ?? new JoinableTaskContext().Factory;
 
             Refresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
@@ -84,47 +87,27 @@ namespace GitHub.Services
                     if (newRepositoryPath != repositoryPath)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
-                        joinableTaskFactory.Run(async () =>
-                        {
-                            await joinableTaskFactory.SwitchToMainThreadAsync();
-                            ActiveRepository = repo;
-                        });
+                        OnActiveRepositorySet(repo);
                     }
                     else if (newCloneUrl != cloneUrl)
                     {
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
-                        joinableTaskFactory.Run(async () =>
-                        {
-                            await joinableTaskFactory.SwitchToMainThreadAsync();
-                            ActiveRepository = repo;
-                        });
+                        OnActiveRepositorySet(repo);
                     }
                     else if (newBranchName != branchName)
                     {
                         log.Debug("Fire StatusChanged event when BranchName changes for ActiveRepository");
-                        joinableTaskFactory.Run(async () =>
-                        {
-                            await joinableTaskFactory.SwitchToMainThreadAsync();
-                            StatusChanged?.Invoke(this, EventArgs.Empty);
-                        });
+                        OnStatusChanged();
                     }
                     else if (newHeadSha != headSha)
                     {
                         log.Debug("Fire StatusChanged event when HeadSha changes for ActiveRepository");
-                        joinableTaskFactory.Run(async () =>
-                        {
-                            await joinableTaskFactory.SwitchToMainThreadAsync();
-                            StatusChanged?.Invoke(this, EventArgs.Empty);
-                        });
+                        OnStatusChanged();
                     }
                     else if (newTrackedSha != trackedSha)
                     {
                         log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
-                        joinableTaskFactory.Run(async () =>
-                        {
-                            await joinableTaskFactory.SwitchToMainThreadAsync();
-                            StatusChanged?.Invoke(this, EventArgs.Empty);
-                        });
+                        OnStatusChanged();
                     }
 
                     repositoryPath = newRepositoryPath;
@@ -139,6 +122,24 @@ namespace GitHub.Services
             {
                 log.Error(e, "Refreshing active repository");
             }
+        }
+
+        void OnActiveRepositorySet(ILocalRepositoryModel repo)
+        {
+            JoinableTaskFactory.Run(async () =>
+            {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                ActiveRepository = repo;
+            });
+        }
+
+        void OnStatusChanged()
+        {
+            JoinableTaskFactory.Run(async () =>
+            {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                StatusChanged?.Invoke(this, EventArgs.Empty);
+            });
         }
 
         /// <summary>
@@ -170,5 +171,8 @@ namespace GitHub.Services
         /// Fired when the current branch, head SHA or tracked SHA changes.
         /// </summary>
         public event EventHandler StatusChanged;
+
+        public JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }
