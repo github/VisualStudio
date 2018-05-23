@@ -56,6 +56,11 @@ namespace GitHub.InlineReviews.ViewModels
         bool IsSubmitting { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the comment can be edited or deleted by the current user
+        /// </summary>
+        bool CanEditOrDelete { get; }
+
+        /// <summary>
         /// Gets the modified date of the comment.
         /// </summary>
         DateTimeOffset UpdatedAt { get; }
