@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using Serilog;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -15,6 +17,8 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
+        static readonly ILogger log = LogManager.ForContext<TeamExplorerServiceHolder>();
+
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
@@ -153,10 +157,17 @@ namespace GitHub.VisualStudio.Base
             if (!Equals(repo, ActiveRepo))
             {
                 // Fire property change events on Main thread
-                JoinableTaskFactory.Run(async () =>
+                JoinableTaskFactory.RunAsync(async () =>
                 {
-                    await JoinableTaskFactory.SwitchToMainThreadAsync();
-                    ActiveRepo = repo;
+                    try
+                    {
+                        await JoinableTaskFactory.SwitchToMainThreadAsync();
+                        ActiveRepo = repo;
+                    }
+                    catch(Exception e)
+                    {
+                        log.Error(e, nameof(UpdateActiveRepo));
+                    }
                 });
             }
         }
