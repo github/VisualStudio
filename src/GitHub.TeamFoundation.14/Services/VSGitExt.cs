@@ -123,15 +123,24 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
+        public void JoinTillEmpty()
+        {
+            JoinableTaskFactory.Context.Factory.Run(async () =>
+            {
+                await JoinableTaskCollection.JoinTillEmptyAsync();
+            });
+        }
+
         async Task<T> GetServiceAsync<T>()
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             return (T)await asyncServiceProvider.GetServiceAsync(typeof(T));
         }
 
+
         public event Action ActiveRepositoriesChanged;
 
-        public JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskCollection JoinableTaskCollection { get; }
         JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }
