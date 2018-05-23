@@ -78,7 +78,7 @@ namespace GitHub.Services
                     var newBranchName = repo?.CurrentBranch?.Name;
                     var newHeadSha = repo?.CurrentBranch?.Sha;
                     var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
-                    var newPullRequest = await pullRequestService.GetPullRequestForCurrentBranch(repo);
+                    var newPullRequest = repo != null ? await pullRequestService.GetPullRequestForCurrentBranch(repo) : null;
 
                     if (newRepositoryPath != repositoryPath)
                     {
