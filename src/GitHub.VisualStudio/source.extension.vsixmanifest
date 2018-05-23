@@ -29,8 +29,8 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Exports.Reactive" Path="|GitHub.Exports.Reactive|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.App" Path="|GitHub.App|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Services.Vssdk" Path="|GitHub.Services.Vssdk|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.14" Path="|GitHub.TeamFoundation.14|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" Path="|GitHub.TeamFoundation.15|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.14" TargetVersion="[14.0,15.0)" Path="|GitHub.TeamFoundation.14|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" TargetVersion="[15.0,16.0)" Path="|GitHub.TeamFoundation.15|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.InlineReviewsPackage" Path="|GitHub.InlineReviews;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.StartPage" Path="|GitHub.StartPage;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.InlineReviews" Path="|GitHub.InlineReviews|" />
