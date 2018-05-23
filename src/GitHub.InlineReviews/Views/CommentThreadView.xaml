@@ -9,10 +9,8 @@
     <d:DesignProperties.DataContext>
         <x:Array Type="{x:Type sample:CommentThreadViewModelDesigner}">
             <sample:CommentThreadViewModelDesigner>
-                <sample:CommentThreadViewModelDesigner.Comments>
+              <!-- <sample:CommentThreadViewModelDesigner.Comments>
                     <sample:CommentViewModelDesigner>
-                        <sample:CommentViewModelDesigner.EditState>Placeholder
-                        </sample:CommentViewModelDesigner.EditState>
                         <sample:CommentViewModelDesigner.Body>
                             I assume this doesn't do anything if our message isn't showing?
                         </sample:CommentViewModelDesigner.Body>
@@ -27,8 +25,8 @@
                             Reply...
                         </sample:CommentViewModelDesigner.Body>
                     </sample:CommentViewModelDesigner>
-                </sample:CommentThreadViewModelDesigner.Comments>
-            </sample:CommentThreadViewModelDesigner>
+                </sample:CommentThreadViewModelDesigner.Comments> -->
+      </sample:CommentThreadViewModelDesigner>
         </x:Array>
     </d:DesignProperties.DataContext>
 
