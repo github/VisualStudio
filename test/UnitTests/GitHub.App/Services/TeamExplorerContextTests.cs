@@ -6,6 +6,7 @@ using NSubstitute;
 using EnvDTE;
 using GitHub.Models;
 using Microsoft.VisualStudio.Threading;
+using System.Threading.Tasks;
 
 namespace GitHub.App.UnitTests.Services
 {
@@ -221,7 +222,7 @@ namespace GitHub.App.UnitTests.Services
             dte = dte ?? Substitute.For<DTE>();
             pullRequestService = pullRequestService ?? Substitute.For<IPullRequestService>();
             joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
-            return new TeamExplorerContext(gitExt, new Lazy<DTE>(() => dte), pullRequestService, joinableTaskContext);
+            return new TeamExplorerContext(gitExt, new AsyncLazy<DTE>(() => Task.FromResult(dte)), pullRequestService, joinableTaskContext);
         }
 
         static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)

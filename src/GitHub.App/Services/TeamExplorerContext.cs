@@ -31,7 +31,7 @@ namespace GitHub.Services
     {
         static ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
-        readonly Lazy<DTE> dte;
+        readonly AsyncLazy<DTE> dteAsync;
         readonly IVSGitExt gitExt;
         readonly IPullRequestService pullRequestService;
 
@@ -51,9 +51,9 @@ namespace GitHub.Services
             [Import(typeof(SVsServiceProvider))] IServiceProvider sp,
             IPullRequestService pullRequestService) : this(
                 gitExt,
-                new Lazy<DTE>(() =>
+                new AsyncLazy<DTE>(async () =>
                 {
-                    ThreadHelper.ThrowIfNotOnUIThread();
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                     return (DTE)sp.GetService(typeof(DTE));
                 }),
                 pullRequestService,
@@ -63,7 +63,7 @@ namespace GitHub.Services
 
         public TeamExplorerContext(
             IVSGitExt gitExt,
-            Lazy<DTE> dte,
+            AsyncLazy<DTE> dteAsync,
             IPullRequestService pullRequestService,
             JoinableTaskContext joinableTaskContext)
         {
@@ -72,7 +72,7 @@ namespace GitHub.Services
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
             
             this.gitExt = gitExt;
-            this.dte = dte;
+            this.dteAsync = dteAsync;
             this.pullRequestService = pullRequestService;
 
             StartRefresh();
@@ -89,7 +89,8 @@ namespace GitHub.Services
                 await JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-                var newSolutionPath = dte.Value.Solution?.FullName; // Call on Main thread
+                var dte = await dteAsync.GetValueAsync();
+                var newSolutionPath = dte.Solution?.FullName; // Call on Main thread
                 if (repo == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
