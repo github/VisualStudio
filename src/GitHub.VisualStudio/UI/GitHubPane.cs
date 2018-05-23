@@ -54,25 +54,14 @@ namespace GitHub.VisualStudio.UI
                         return pane?.WhenAnyValue(p => p.IsSearchEnabled, p => p.SearchQuery)
                             ?? Observable.Return(Tuple.Create<bool, string>(false, null));
                     })
-                    .Subscribe(x => JoinableTaskFactory.Run(async () =>
-                    {
-                        await JoinableTaskFactory.SwitchToMainThreadAsync();
-                        UpdateSearchHost(x.Item1, x.Item2);
-                    }));
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => UpdateSearchHost(x.Item1, x.Item2));
             }
         }
 
-        public GitHubPane() : this(ThreadHelper.JoinableTaskContext)
-        {
-        }
-
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public GitHubPane(JoinableTaskContext joinableTaskContext)
+        public GitHubPane() : base(null)
         {
-            JoinableTaskCollection = joinableTaskContext.CreateCollection();
-            JoinableTaskCollection.DisplayName = nameof(GitHubPane);
-            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
-
             Caption = "GitHub";
             Content = contentPresenter = new ContentPresenter();
 
@@ -222,7 +211,5 @@ namespace GitHub.VisualStudio.UI
 
             public uint GetTokens(uint dwMaxTokens, IVsSearchToken[] rgpSearchTokens) => 0;
         }
-
-        public JoinableTaskCollection JoinableTaskCollection { get; }
-        JoinableTaskFactory JoinableTaskFactory { get; }    }
+    }
 }
