@@ -65,9 +65,8 @@ namespace GitHub.Services
             IVSGitExt gitExt,
             Lazy<DTE> dte,
             IPullRequestService pullRequestService,
-            JoinableTaskContext joinableTaskContext = null)
+            JoinableTaskContext joinableTaskContext)
         {
-            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(TeamExplorerContext);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);

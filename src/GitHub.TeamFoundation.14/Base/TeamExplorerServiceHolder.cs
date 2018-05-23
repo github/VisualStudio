@@ -36,9 +36,8 @@ namespace GitHub.VisualStudio.Base
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         /// <param name="joinableTaskFactory">Used for switching to the Main thread.</param>
-        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskContext joinableTaskContext = null)
+        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskContext joinableTaskContext)
         {
-            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);

@@ -38,9 +38,8 @@ namespace GitHub.VisualStudio.Base
         }
 
         public VSGitExt(IAsyncServiceProvider asyncServiceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory,
-            JoinableTaskContext joinableTaskContext = null)
+            JoinableTaskContext joinableTaskContext)
         {
-            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(VSGitExt);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);

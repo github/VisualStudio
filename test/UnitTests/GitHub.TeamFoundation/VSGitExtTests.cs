@@ -11,6 +11,7 @@ using NUnit.Framework;
 using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 
 public class VSGitExtTests
@@ -208,17 +209,18 @@ public class VSGitExtTests
     }
 
     static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IAsyncServiceProvider sp = null,
-        ILocalRepositoryModelFactory repoFactory = null)
+        ILocalRepositoryModelFactory repoFactory = null, JoinableTaskContext joinableTaskContext = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();
         sp = sp ?? Substitute.For<IAsyncServiceProvider>();
         repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
+        joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
         var factory = Substitute.For<IVSUIContextFactory>();
         var contextGuid = new Guid(Guids.GitSccProviderId);
         factory.GetUIContext(contextGuid).Returns(context);
         sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
-        var vsGitExt = new VSGitExt(sp, factory, repoFactory);
+        var vsGitExt = new VSGitExt(sp, factory, repoFactory, joinableTaskContext);
         vsGitExt.JoinableTaskCollection.JoinTillEmptyAsync().Wait();
         return vsGitExt;
     }

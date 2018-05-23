@@ -71,7 +71,6 @@ namespace GitHub.VisualStudio.UI
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane(JoinableTaskContext joinableTaskContext)
         {
-            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(GitHubPane);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
