@@ -188,14 +188,6 @@ namespace GitHub.InlineReviews.ViewModels
                     placeholder.Body = placeholderBody;
                 }
             }
-
-            threadSubscription = Thread
-                .WhenAnyValue(model => model.EditComment, model => model.DeleteComment)
-                .Skip(1)
-                .Subscribe(_ =>
-                {
-
-                });
         }
 
         async Task SessionChanged(IPullRequestSession pullRequestSession)
