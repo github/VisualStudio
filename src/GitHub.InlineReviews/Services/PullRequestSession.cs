@@ -173,6 +173,8 @@ namespace GitHub.InlineReviews.Services
                 RepositoryOwner,
                 User,
                 number);
+
+            await RemoveComment(number);
         }
 
         /// <inheritdoc/>
@@ -186,6 +188,7 @@ namespace GitHub.InlineReviews.Services
                 number,
                 body);
 
+            await ReplaceComment(model);
             return model;
         }
 
@@ -308,6 +311,24 @@ namespace GitHub.InlineReviews.Services
             PullRequest.ReviewComments = PullRequest.ReviewComments
                 .Concat(new[] { comment })
                 .ToList();
+            await Update(PullRequest);
+        }
+
+        async Task ReplaceComment(IPullRequestReviewCommentModel comment)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Select(model => model.Id == comment.Id ? comment: model)
+                .ToList();
+
+            await Update(PullRequest);
+        }
+
+        async Task RemoveComment(int commentId)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Where(model => model.Id != commentId)
+                .ToList();
+
             await Update(PullRequest);
         }
 
