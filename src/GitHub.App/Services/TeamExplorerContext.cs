@@ -45,6 +45,7 @@ namespace GitHub.Services
         Tuple<string, int> pullRequest;
 
         ILocalRepositoryModel repositoryModel;
+        JoinableTask refreshJoinableTask;
 
         [ImportingConstructor]
         TeamExplorerContext(
@@ -80,13 +81,17 @@ namespace GitHub.Services
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        void StartRefresh() => JoinableTaskFactory.Context.Factory.RunAsync(QueueRefreshAsync).Task.FileAndForget(log);
-        void Refresh() => JoinableTaskFactory.Context.Factory.Run(QueueRefreshAsync);
+        void StartRefresh() => JoinableTaskFactory.RunAsync(QueueRefreshAsync).Task.FileAndForget(log);
+        void Refresh() => JoinableTaskFactory.Run(QueueRefreshAsync);
 
         async Task QueueRefreshAsync()
         {
-            await JoinableTaskCollection.JoinTillEmptyAsync();
-            await JoinableTaskFactory.RunAsync(RefreshAsync);
+            if (refreshJoinableTask != null)
+            {
+                await refreshJoinableTask.JoinAsync(); // make sure StartRefresh has completed
+            }
+
+            await (refreshJoinableTask = JoinableTaskFactory.RunAsync(RefreshAsync));
         }
 
         async Task RefreshAsync()
