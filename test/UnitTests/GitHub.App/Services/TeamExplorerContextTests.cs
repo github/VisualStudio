@@ -26,7 +26,7 @@ namespace GitHub.App.UnitTests.Services
             }
 
             [Test]
-            public void SetActiveRepository_CheckWasSet()
+            public async Task SetActiveRepository_CheckWasSet()
             {
                 var gitExt = CreateGitExt();
                 var repositoryPath = Directory.GetCurrentDirectory();
@@ -34,8 +34,9 @@ namespace GitHub.App.UnitTests.Services
                 SetActiveRepository(gitExt, repoInfo);
                 var target = CreateTeamExplorerContext(gitExt);
 
-                var repo = target.ActiveRepository;
+                await target.JoinableTaskCollection.JoinTillEmptyAsync();
 
+                var repo = target.ActiveRepository;
                 Assert.That(repo, Is.EqualTo(repoInfo));
             }
         }
