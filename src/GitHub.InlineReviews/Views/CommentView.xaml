@@ -74,14 +74,20 @@
 
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
                           Visibility="{Binding CanEditOrDelete, Converter={ui:BooleanToVisibilityConverter}}">
-                <ui:GitHubActionLink Content="Edit"
-                                     Command="{Binding BeginEdit}"
-                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                     Opacity="0.75" />
-                <ui:GitHubActionLink Content="Delete"
-                                     Command="{Binding Delete}"
-                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                     Opacity="0.75"/>
+                <ui:OcticonButton Command="{Binding BeginEdit}"
+                                  Width="16"
+                                  Height="16"
+                                  Margin="0"
+                                  Background="Transparent"
+                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                  Icon="pencil"/>
+                <ui:OcticonButton Command="{Binding Delete}"
+                                  Width="16"
+                                  Height="16"
+                                  Margin="0"
+                                  Background="Transparent"
+                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                  Icon="x"/>
               </StackPanel>
 
             </DockPanel>
