@@ -223,7 +223,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}">Edit</Button>
+                <Button Command="{Binding CommitEdit}">Update Comment</Button>
                 <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
             </StackPanel>
         </Grid>
