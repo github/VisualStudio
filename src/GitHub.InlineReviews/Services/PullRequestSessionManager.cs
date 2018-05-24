@@ -68,11 +68,11 @@ namespace GitHub.InlineReviews.Services
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => StatusChanged().Forget());
+                .Subscribe(_ => StatusChanged().FileAndForget(log));
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => RepoChanged(x).Forget());
+                .Subscribe(x => RepoChanged(x).FileAndForget(log));
         }
 
         /// <inheritdoc/>
@@ -193,60 +193,46 @@ namespace GitHub.InlineReviews.Services
 
         async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
         {
-            try
-            {
-                repository = localRepositoryModel;
-                CurrentSession = null;
-                sessions.Clear();
+            repository = localRepositoryModel;
+            CurrentSession = null;
+            sessions.Clear();
 
-                if (localRepositoryModel != null)
-                {
-                    await StatusChanged();
-                }
-            }
-            catch (Exception e)
+            if (localRepositoryModel != null)
             {
-                log.Error(e, nameof(RepoChanged));
+                await StatusChanged();
             }
         }
 
         async Task StatusChanged()
         {
-            try
+            var session = CurrentSession;
+
+            var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+            if (pr != null)
             {
-                var session = CurrentSession;
+                var changePR =
+                    pr.Item1 != (session?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
+                    pr.Item2 != (session?.PullRequest.Number);
 
-                var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
-                if (pr != null)
+                if (changePR)
                 {
-                    var changePR =
-                        pr.Item1 != (session?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
-                        pr.Item2 != (session?.PullRequest.Number);
-
-                    if (changePR)
+                    var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
+                    var pullRequest = await modelService?.GetPullRequest(pr.Item1, repository.Name, pr.Item2);
+                    if (pullRequest != null)
                     {
-                        var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
-                        var pullRequest = await modelService?.GetPullRequest(pr.Item1, repository.Name, pr.Item2);
-                        if (pullRequest != null)
-                        {
-                            var newSession = await GetSessionInternal(pullRequest);
-                            if (newSession != null) newSession.IsCheckedOut = true;
-                            session = newSession;
-                        }
+                        var newSession = await GetSessionInternal(pullRequest);
+                        if (newSession != null) newSession.IsCheckedOut = true;
+                        session = newSession;
                     }
                 }
-                else
-                {
-                    session = null;
-                }
-
-                CurrentSession = session;
-                initialized.TrySetResult(null);
             }
-            catch (Exception e)
+            else
             {
-                log.Error(e, nameof(StatusChanged));
+                session = null;
             }
+
+            CurrentSession = session;
+            initialized.TrySetResult(null);
         }
 
         async Task<PullRequestSession> GetSessionInternal(IPullRequestModel pullRequest)
