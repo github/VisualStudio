@@ -68,11 +68,11 @@ namespace GitHub.InlineReviews.Services
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => StatusChanged().FileAndForget(log));
+                .Subscribe(_ => StatusChanged().LogAndForget(log));
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => RepoChanged(x).FileAndForget(log));
+                .Subscribe(x => RepoChanged(x).LogAndForget(log));
         }
 
         /// <inheritdoc/>

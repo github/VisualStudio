@@ -53,7 +53,7 @@ namespace GitHub.VisualStudio.Base
             // The IGitExt service isn't available when a TFS based solution is opened directly.
             // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
             var context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
-            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.FileAndForget(log));
+            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.LogAndForget(log));
         }
 
         async Task InitializeAsync()
