@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace GitHub.Logging
@@ -25,6 +26,17 @@ namespace GitHub.Logging
                 logger.Warning(messageTemplate, propertyValues);
 #pragma warning restore Serilog004
             }
+        }
+
+        public static void FileAndForget(this Task task, ILogger log)
+        {
+            task.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    log.Error(t.Exception, nameof(FileAndForget));
+                }
+            });
         }
     }
 }

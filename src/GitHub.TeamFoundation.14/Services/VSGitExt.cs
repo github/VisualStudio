@@ -53,35 +53,28 @@ namespace GitHub.VisualStudio.Base
             // The IGitExt service isn't available when a TFS based solution is opened directly.
             // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
             var context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
-            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync));
+            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.FileAndForget(log));
         }
 
         async Task InitializeAsync()
         {
-            try
+            gitService = await GetServiceAsync<IGitExt>();
+            if (gitService == null)
             {
-                gitService = await GetServiceAsync<IGitExt>();
-                if (gitService == null)
+                log.Error("Couldn't find IGitExt service");
+                return;
+            }
+
+            // Refresh on background thread
+            await Task.Run(() => RefreshActiveRepositories());
+
+            gitService.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(gitService.ActiveRepositories))
                 {
-                    log.Error("Couldn't find IGitExt service");
-                    return;
+                    RefreshActiveRepositories();
                 }
-
-                // Refresh on background thread
-                await Task.Run(() => RefreshActiveRepositories());
-
-                gitService.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(gitService.ActiveRepositories))
-                    {
-                        RefreshActiveRepositories();
-                    }
-                };
-            }
-            catch(Exception e)
-            {
-                log.Error(e, "Error initializing");
-            }
+            };
         }
 
         public void RefreshActiveRepositories()
