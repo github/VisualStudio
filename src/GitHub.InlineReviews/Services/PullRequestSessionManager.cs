@@ -67,9 +67,11 @@ namespace GitHub.InlineReviews.Services
             initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => StatusChanged().Forget());
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => RepoChanged(x).Forget());
         }
 

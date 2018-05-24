@@ -3,6 +3,7 @@ using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Primitives;
@@ -86,11 +87,10 @@ namespace GitHub.Services
         {
             try
             {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                await TaskScheduler.Default; // switch to threadpool
 
                 var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-                var dte = await dteAsync.GetValueAsync();
-                var newSolutionPath = dte.Solution?.FullName; // Call on Main thread
+                string newSolutionPath = await GetSolutionPath();
                 if (repo == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
@@ -150,6 +150,13 @@ namespace GitHub.Services
             {
                 log.Error(e, "Refreshing active repository");
             }
+        }
+
+        async Task<string> GetSolutionPath()
+        {
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            var dte = await dteAsync.GetValueAsync();
+            return dte.Solution?.FullName;
         }
 
         /// <summary>

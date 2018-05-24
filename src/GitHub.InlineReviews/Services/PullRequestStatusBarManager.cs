@@ -69,6 +69,7 @@ namespace GitHub.InlineReviews.Services
             try
             {
                 teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository)
+                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => RefreshActiveRepository(x));
             }
             catch (Exception e)
