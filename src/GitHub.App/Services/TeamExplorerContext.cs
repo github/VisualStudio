@@ -80,8 +80,14 @@ namespace GitHub.Services
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        void StartRefresh() => JoinableTaskFactory.RunAsync(RefreshAsync);
-        void Refresh() => JoinableTaskFactory.Run(RefreshAsync);
+        void StartRefresh() => JoinableTaskFactory.Context.Factory.RunAsync(QueueRefreshAsync).Task.FileAndForget(log);
+        void Refresh() => JoinableTaskFactory.Context.Factory.Run(QueueRefreshAsync);
+
+        async Task QueueRefreshAsync()
+        {
+            await JoinableTaskCollection.JoinTillEmptyAsync();
+            await JoinableTaskFactory.RunAsync(RefreshAsync);
+        }
 
         async Task RefreshAsync()
         {
