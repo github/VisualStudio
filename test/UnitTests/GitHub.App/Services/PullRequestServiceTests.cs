@@ -208,7 +208,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RenamedInWorkingDirFile_False()
+        public async Task RenamedInWorkingDirFile_True()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -225,11 +225,11 @@ public class PullRequestServiceTests : TestBaseClass
                 File.Move(file, renamedFile);
 
                 // NOTE: `RetrieveStatus(new StatusOptions { DetectRenamesInWorkDir = true })` would need to be used
-                // for renamed files to appear as `RenamedInWorkingDir` rather than `Missing` and `Untracked`.
+                // for renamed files to appear as `RenamedInWorkingDir` rather than `DeletedFromWorkdir` and `NewInWorkdir`.
                 // This isn't required in the current implementation.
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-                Assert.False(isClean);
+                Assert.True(isClean);
             }
         }
 
