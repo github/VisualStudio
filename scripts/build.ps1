@@ -38,6 +38,9 @@ Param(
     ,
     [switch]
     $Trace = $false
+    ,
+    [switch]
+    $ForVSInstaller = $false
 )
 
 Set-StrictMode -Version Latest
@@ -79,6 +82,6 @@ if ($Package) {
     Write-Output "Building GitHub for Visual Studio"
 }
 
-Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package
+Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller
 
 Pop-Location
