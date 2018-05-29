@@ -64,7 +64,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
             Assert.That(string.Empty, Is.EqualTo(target.Thread.Comments[0].Body));
-            Assert.That(CommentEditState.Creating, Is.EqualTo(target.Thread.Comments[0].EditState));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Thread.Comments[0].EditState));
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                     RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
                 });
 
-            await target.Thread.Comments[0].CommitCreate.ExecuteAsyncTask(null);
+            await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
 
             Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
         }
@@ -179,7 +179,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
             var placeholder = target.Thread.Comments.Last();
-            placeholder.BeginCreate.Execute(null);
+            placeholder.BeginEdit.Execute(null);
             placeholder.Body = "Comment being edited";
 
             var file = await sessionManager.GetLiveFile(
@@ -190,7 +190,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             placeholder = target.Thread.Comments.Last();
             Assert.That(3, Is.EqualTo(target.Thread.Comments.Count));
-            Assert.That(CommentEditState.Creating, Is.EqualTo(placeholder.EditState));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(placeholder.EditState));
             Assert.That("Comment being edited", Is.EqualTo(placeholder.Body));
         }
 
@@ -222,9 +222,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
 
             var placeholder = target.Thread.Comments.Last();
-            placeholder.BeginCreate.Execute(null);
+            placeholder.BeginEdit.Execute(null);
             placeholder.Body = "Comment being edited";
-            placeholder.CommitCreate.Execute(null);
+            placeholder.CommitEdit.Execute(null);
 
             placeholder = target.Thread.Comments.Last();
             Assert.That(CommentEditState.Placeholder, Is.EqualTo(placeholder.EditState));
@@ -259,7 +259,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
 
             var placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
-            placeholder.BeginCreate.Execute(null);
+            placeholder.BeginEdit.Execute(null);
             placeholder.Body = "Comment being edited";
             placeholder.StartReview.Execute(null);
 

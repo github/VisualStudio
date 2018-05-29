@@ -54,7 +54,7 @@ namespace GitHub.InlineReviews.ViewModels
                 o => null);
 
             var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser);
-            placeholder.BeginCreate.Execute(null);
+            placeholder.BeginEdit.Execute(null);
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
 

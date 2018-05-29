@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.ViewModels
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
-        private bool canEditOrDelete;
+        private bool canDelete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
@@ -61,48 +61,30 @@ namespace GitHub.InlineReviews.ViewModels
             User = user;
             UpdatedAt = updatedAt;
 
-            var canEditOrDeleteObservable = this.WhenAnyValue(
+            var canDelete = this.WhenAnyValue(
                 x => x.EditState,
                 x => x == CommentEditState.None && user.Login.Equals(currentUser.Login));
 
-            canEditOrDeleteObservable.Subscribe(b => CanEditOrDelete = b);
+            canDelete.Subscribe(b => CanDelete = b);
 
-            Delete = ReactiveCommand.CreateAsyncTask(canEditOrDeleteObservable, DoDelete);
+            Delete = ReactiveCommand.CreateAsyncTask(canDelete, DoDelete);
 
-            BeginEdit = ReactiveCommand.Create(canEditOrDeleteObservable);
+            var canEdit = this.WhenAnyValue(
+                x => x.EditState,
+                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Equals(currentUser)));
+
+            BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
             AddErrorHandler(BeginEdit);
-
-            var canCreate = this.WhenAnyValue(
-                x => x.EditState,
-                x => x == CommentEditState.Placeholder ||
-                     (x == CommentEditState.None && user.Login.Equals(currentUser.Login)));
-
-            BeginCreate = ReactiveCommand.Create(canCreate);
-            BeginCreate.Subscribe(DoBeginCreate);
-            AddErrorHandler(BeginCreate);
-
-            CommitCreate = ReactiveCommand.CreateAsyncTask(
-                Observable.CombineLatest(
-                    this.WhenAnyValue(x => x.IsReadOnly),
-                    this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
-                    this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
-                    (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
-                DoCommitCreate);
-            AddErrorHandler(CommitCreate);
 
             CommitEdit = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
                     this.WhenAnyValue(x => x.IsReadOnly),
                     this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
-                    this.WhenAnyObservable(x => x.Thread.EditComment.CanExecuteObservable),
+                    this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
                     (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
                 DoCommitEdit);
             AddErrorHandler(CommitEdit);
-
-            CancelCreate = ReactiveCommand.Create(CommitCreate.IsExecuting.Select(x => !x));
-            CancelCreate.Subscribe(DoCancelCreate);
-            AddErrorHandler(CancelCreate);
 
             CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
             CancelEdit.Subscribe(DoCancelEdit);
@@ -160,15 +142,6 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        void DoBeginCreate(object unused)
-        {
-            if (state != CommentEditState.Creating)
-            {
-                undoBody = Body;
-                EditState = CommentEditState.Creating;
-            }
-        }
-
         void DoCancelEdit(object unused)
         {
             if (EditState == CommentEditState.Editing)
@@ -180,25 +153,24 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        void DoCancelCreate(object unused)
-        {
-            if (EditState == CommentEditState.Creating)
-            {
-                EditState = string.IsNullOrWhiteSpace(undoBody) ? CommentEditState.Placeholder : CommentEditState.None;
-                Body = undoBody;
-                ErrorMessage = null;
-                undoBody = null;
-            }
-        }
-
-        async Task DoCommitCreate(object unused)
+        async Task DoCommitEdit(object unused)
         {
             try
             {
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                var model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                ICommentModel model;
+
+                if (Id == 0)
+                {
+                    model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                }
+                else
+                {
+                    model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<int, string>(Id, Body));
+                }
+
                 Id = model.Id;
                 NodeId = model.NodeId;
                 EditState = CommentEditState.None;
@@ -209,31 +181,6 @@ namespace GitHub.InlineReviews.ViewModels
                 var message = e.Message;
                 ErrorMessage = message;
                 log.Error(e, "Error posting comment");
-            }
-            finally
-            {
-                IsSubmitting = false;
-            }
-        }
-
-        async Task DoCommitEdit(object unused)
-        {
-            try
-            {
-                ErrorMessage = null;
-                IsSubmitting = true;
-
-                var model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<int, string>(Id, Body));
-                Id = model.Id;
-                NodeId = model.NodeId;
-                EditState = CommentEditState.None;
-                UpdatedAt = DateTimeOffset.Now;
-            }
-            catch (Exception e)
-            {
-                var message = e.Message;
-                ErrorMessage = message;
-                log.Error(e, "Error editing comment");
             }
             finally
             {
@@ -282,10 +229,10 @@ namespace GitHub.InlineReviews.ViewModels
             protected set { this.RaiseAndSetIfChanged(ref isSubmitting, value); }
         }
 
-        public bool CanEditOrDelete
+        public bool CanDelete
         {
-            get { return canEditOrDelete; }
-            private set { this.RaiseAndSetIfChanged(ref canEditOrDelete, value); }
+            get { return canDelete; }
+            private set { this.RaiseAndSetIfChanged(ref canDelete, value); }
         }
 
         /// <inheritdoc/>
@@ -303,15 +250,6 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public IAccount User { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<object> BeginCreate { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<object> CancelCreate { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit> CommitCreate { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> BeginEdit { get; }

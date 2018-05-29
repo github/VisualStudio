@@ -24,14 +24,11 @@ namespace GitHub.InlineReviews.SampleData
         public CommentEditState EditState { get; set; }
         public bool IsReadOnly { get; set; }
         public bool IsSubmitting { get; set; }
-        public bool CanEditOrDelete { get; } = true;
+        public bool CanDelete { get; } = true;
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }
 
-        public ReactiveCommand<object> BeginCreate { get; }
-        public ReactiveCommand<object> CancelCreate { get; }
-        public ReactiveCommand<Unit> CommitCreate { get; }
         public ReactiveCommand<object> BeginEdit { get; }
         public ReactiveCommand<object> CancelEdit { get; }
         public ReactiveCommand<Unit> CommitEdit { get; }

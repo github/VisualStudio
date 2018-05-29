@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var thread = CreateThread();
                 var currentUser = Substitute.For<IAccount>();
                 var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, thread, currentUser);
-                Assert.That(target.BeginCreate.CanExecute(new object()), Is.True);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
             }
 
             [Test]
@@ -57,7 +57,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 pullRequestReviewCommentModel.User.Returns(currentUser);
 
                 var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
-                Assert.That(target.BeginCreate.CanExecute(new object()), Is.True);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
             }
 
             [Test]
@@ -76,7 +76,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 pullRequestReviewCommentModel.User.Returns(otherUser);
 
                 var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
-                Assert.That(target.BeginCreate.CanExecute(new object()), Is.False);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.False);
             }
         }
 
@@ -197,8 +197,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             IPullRequestSession session = null,
             ICommentThreadViewModel thread = null,
             IAccount currentUser = null,
-            IPullRequestReviewCommentModel pullRequestReviewCommentModel = null
-            )
+            IPullRequestReviewCommentModel pullRequestReviewCommentModel = null)
         {
             session = session ?? CreateSession();
             thread = thread ?? CreateThread();

@@ -61,7 +61,7 @@ namespace GitHub.InlineReviews.ViewModels
                 .ToProperty(this, x => x.CommitCaption);
             
             StartReview = ReactiveCommand.CreateAsyncTask(
-                CommitCreate.CanExecuteObservable,
+                CommitEdit.CanExecuteObservable,
                 DoStartReview);
             AddErrorHandler(StartReview);
         }
@@ -125,7 +125,7 @@ namespace GitHub.InlineReviews.ViewModels
             try
             {
                 await session.StartReview();
-                await CommitCreate.ExecuteAsync(null);
+                await CommitEdit.ExecuteAsync(null);
             }
             finally
             {

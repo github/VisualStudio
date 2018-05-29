@@ -9,7 +9,6 @@ namespace GitHub.InlineReviews.ViewModels
     public enum CommentEditState
     {
         None,
-        Creating,
         Editing,
         Placeholder,
     }
@@ -58,7 +57,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets a value indicating whether the comment can be edited or deleted by the current user
         /// </summary>
-        bool CanEditOrDelete { get; }
+        bool CanDelete { get; }
 
         /// <summary>
         /// Gets the modified date of the comment.
@@ -74,21 +73,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets the thread that the comment is a part of.
         /// </summary>
         ICommentThreadViewModel Thread { get; }
-
-        /// <summary>
-        /// Gets a command which will begin the creation of the comment.
-        /// </summary>
-        ReactiveCommand<object> BeginCreate { get; }
-
-        /// <summary>
-        /// Gets a command which will cancel the creation of the comment.
-        /// </summary>
-        ReactiveCommand<object> CancelCreate { get; }
-
-        /// <summary>
-        /// Gets a command which will commit the creation of the comment.
-        /// </summary>
-        ReactiveCommand<Unit> CommitCreate { get; }
 
         /// <summary>
         /// Gets a command which will begin editing of the comment.

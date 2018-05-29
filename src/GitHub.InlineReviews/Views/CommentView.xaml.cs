@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Views
 
         private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (creatingButtonPanel.IsVisible || editingButtonPanel.IsVisible)
+            if (buttonPanel.IsVisible)
             {
                 BringIntoView();
                 body.Focus();
@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.Views
 
         private void ReplyPlaceholder_GotFocus(object sender, System.Windows.RoutedEventArgs e)
         {
-            var command = ((ICommentViewModel)DataContext)?.BeginCreate;
+            var command = ((ICommentViewModel)DataContext)?.BeginEdit;
 
             if (command?.CanExecute(null) == true)
             {
@@ -55,7 +55,7 @@ namespace GitHub.InlineReviews.Views
 
         private void buttonPanel_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            if (creatingButtonPanel.IsVisible || editingButtonPanel.IsVisible)
+            if (buttonPanel.IsVisible)
             {
                 BringIntoView();
             }

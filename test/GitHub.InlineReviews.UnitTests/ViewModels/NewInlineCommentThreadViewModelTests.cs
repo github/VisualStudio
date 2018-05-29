@@ -25,7 +25,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             Assert.That(target.Comments, Has.One.Items);
             Assert.That(string.Empty, Is.EqualTo(target.Comments[0].Body));
-            Assert.That(CommentEditState.Creating, Is.EqualTo(target.Comments[0].EditState));
+            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Comments[0].EditState));
         }
 
         [Test]
@@ -64,14 +64,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             file.CommitSha.Returns((string)null);
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.That(target.Comments[0].CommitCreate.CanExecute(null), Is.False);
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.False);
 
             target.Comments[0].Body = "Foo";
-            Assert.That(target.Comments[0].CommitCreate.CanExecute(null), Is.False);
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.False);
 
             file.CommitSha.Returns("COMMIT_SHA");
             RaisePropertyChanged(file, nameof(file.CommitSha));
-            Assert.That(target.Comments[0].CommitCreate.CanExecute(null), Is.True);
+            Assert.That(target.Comments[0].CommitEdit.CanExecute(null), Is.True);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
 
             target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitCreate.Execute(null);
+            target.Comments[0].CommitEdit.Execute(null);
 
             session.Received(1).PostReviewComment(
                 "New Comment",
@@ -112,7 +112,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var target = new NewInlineCommentThreadViewModel(session, file, 16, true);
 
             target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitCreate.Execute(null);
+            target.Comments[0].CommitEdit.Execute(null);
 
             session.Received(1).PostReviewComment(
                 "New Comment",

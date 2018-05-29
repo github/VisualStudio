@@ -12,7 +12,7 @@
              xmlns:views="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:CommentViewModelDesigner EditState="None">
+        <sample:CommentViewModelDesigner EditState="Editing">
             <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:CommentViewModelDesigner.Body>
@@ -51,29 +51,28 @@
             </StackPanel.Style>
 
             <DockPanel>
-
               <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
                 <controls:AccountAvatar Width="16" 
-                                Height="16" 
-                                Account="{Binding User}"/>
+                                        Height="16" 
+                                        Account="{Binding User}"/>
 
                 <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding User.Login}" Margin="4 0"/>
                 <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
-                             Command="{Binding OpenOnGitHub}"
-                             Foreground="{DynamicResource GitHubVsToolWindowText}"
-                             Opacity="0.75" />
+                                     Command="{Binding OpenOnGitHub}"
+                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                     Opacity="0.75" />
                 <Border Background="{DynamicResource VsBrush.InfoBackground}"
                         BorderBrush="{DynamicResource VsBrush.AccentPale}"
                         BorderThickness="1"
                         CornerRadius="3"
                         Padding="2 1"
                         Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                  <TextBlock FontSize="10">Pending</TextBlock>
+                    <TextBlock FontSize="10">Pending</TextBlock>
                 </Border>
               </StackPanel>
 
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
-                          Visibility="{Binding CanEditOrDelete, Converter={ui:BooleanToVisibilityConverter}}">
+                          Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
                 <ui:OcticonButton Command="{Binding BeginEdit}"
                                   Width="16"
                                   Height="16"
@@ -89,13 +88,12 @@
                                   Foreground="{DynamicResource GitHubVsToolWindowText}"
                                   Icon="x"/>
               </StackPanel>
-
             </DockPanel>
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
-                                          Margin="0 2 0 0"
-                                          Foreground="{DynamicResource VsBrush.WindowText}"
-                                          Markdown="{Binding Body}"/>
+                                    Margin="0 2 0 0"
+                                    Foreground="{DynamicResource VsBrush.WindowText}"
+                                    Markdown="{Binding Body}"/>
         </StackPanel>
 
         <!-- Displays edit view or a reply placeholder-->
@@ -105,9 +103,6 @@
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding EditState}" Value="Placeholder">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding EditState}" Value="Creating">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding EditState}" Value="Editing">
@@ -152,10 +147,6 @@
                         <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
 
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding EditState}" Value="Creating">
-                                <Setter Property="MinHeight" Value="100"/>
-                                <Setter Property="PromptText" Value="Leave a comment"/>
-                            </DataTrigger>
                             <DataTrigger Binding="{Binding EditState}" Value="Editing">
                                 <Setter Property="MinHeight" Value="100"/>
                                 <Setter Property="PromptText" Value="Leave a comment"/>
@@ -188,32 +179,7 @@
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
 
-            <StackPanel Name="creatingButtonPanel"
-                        Grid.Column="1" Grid.Row="3" 
-                        Margin="4 8" 
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal"
-                        IsVisibleChanged="buttonPanel_IsVisibleChanged">
-                <StackPanel.Style>
-                    <Style TargetType="FrameworkElement">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding EditState}" Value="Creating">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <Button Command="{Binding CommitCreate}" Content="{Binding CommitCaption}"/>
-                <Button Margin="4 0 0 0"
-                        Command="{Binding StartReview}"
-                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}">
-                    Start a review
-                </Button>
-                <Button Margin="4 0 0 0" Command="{Binding CancelCreate}">Cancel</Button>
-            </StackPanel>
-
-            <StackPanel Name="editingButtonPanel"
+            <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
                         Margin="4 8" 
                         HorizontalAlignment="Left"
@@ -229,7 +195,12 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}">Update Comment</Button>
+                <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
+                <Button Margin="4 0 0 0"
+                        Command="{Binding StartReview}"
+                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}">
+                    Start a review
+                </Button>
                 <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
             </StackPanel>
         </Grid>
