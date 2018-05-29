@@ -54,14 +54,16 @@ namespace GitHub.InlineReviews.ViewModels
             this.session = session;
             IsPending = isPending;
 
-            var pendingReviewAndIdObservable = Observable.Zip(session.WhenAnyValue(x => x.HasPendingReview, x => !x), this.WhenAnyValue(model => model.Id, i => i == 0));
+            var pendingReviewAndIdObservable = Observable.CombineLatest(session.WhenAnyValue(x => x.HasPendingReview, x => !x),
+                this.WhenAnyValue(model => model.Id, i => i == 0),
+                (hasPendingReview, isNewComment) => new { hasPendingReview, isNewComment });
 
             canStartReview = pendingReviewAndIdObservable
-                    .Select(list => list.All(b => b))
+                    .Select(arg => arg.hasPendingReview && arg.isNewComment)
                     .ToProperty(this, x => x.CanStartReview);
 
             commitCaption = pendingReviewAndIdObservable
-                .Select(list => !list[1] ? Resources.EditComment : list[0] ? Resources.AddSingleComment : Resources.AddReviewComment)
+                .Select(arg => !arg.isNewComment ? Resources.EditComment : arg.hasPendingReview ? Resources.AddSingleComment : Resources.AddReviewComment)
                 .ToProperty(this, x => x.CommitCaption);
 
             StartReview = ReactiveCommand.CreateAsyncTask(
