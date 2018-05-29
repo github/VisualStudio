@@ -54,7 +54,8 @@ namespace GitHub.InlineReviews.ViewModels
             this.session = session;
             IsPending = isPending;
 
-            var pendingReviewAndIdObservable = Observable.CombineLatest(session.WhenAnyValue(x => x.HasPendingReview, x => !x),
+            var pendingReviewAndIdObservable = Observable.CombineLatest(
+                session.WhenAnyValue(x => x.HasPendingReview, x => !x),
                 this.WhenAnyValue(model => model.Id, i => i == 0),
                 (hasPendingReview, isNewComment) => new { hasPendingReview, isNewComment });
 
