@@ -30,6 +30,19 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
                 Assert.That(target.CanStartReview, Is.True);
             }
+
+            [Test]
+            public void IsFalseWhenEditingExistingComment()
+            {
+                var session = CreateSession(false);
+
+                var pullRequestReviewCommentModel = Substitute.For<IPullRequestReviewCommentModel>();
+                pullRequestReviewCommentModel.Id.Returns(1);
+
+                var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
+
+                Assert.That(target.CanStartReview, Is.False);
+            }
         }
 
         public class TheBeginEditProperty
@@ -146,6 +159,19 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var target = CreateTarget(session);
 
                 Assert.That(target.CommitCaption, Is.EqualTo("Add a single comment"));
+            }
+
+            [Test]
+            public void IsEditCommentWhenEditingExistingComment()
+            {
+                var session = CreateSession(false);
+
+                var pullRequestReviewCommentModel = Substitute.For<IPullRequestReviewCommentModel>();
+                pullRequestReviewCommentModel.Id.Returns(1);
+
+                var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
+
+                Assert.That(target.CommitCaption, Is.EqualTo("Edit Comment"));
             }
         }
 
