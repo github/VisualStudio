@@ -36,7 +36,7 @@
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity">
                                             <SplineDoubleKeyFrame KeyTime="0" Value="0.5"/>
                                         </DoubleAnimationUsingKeyFrames>
-                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Path" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0" Value="0.5"/>
                                         </DoubleAnimationUsingKeyFrames>
                                     </Storyboard>
@@ -81,7 +81,8 @@
                         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="16" Height="16">
                             <Border BorderBrush="Transparent" BorderThickness="1">
 
-                                <ui:OcticonPath Height="16"
+                                <ui:OcticonPath x:Name="Path"
+                                                Height="16"
                                                 Fill="{TemplateBinding Foreground}"
                                                 Icon="{TemplateBinding Icon}"
                                                 SnapsToDevicePixels="True"/>
