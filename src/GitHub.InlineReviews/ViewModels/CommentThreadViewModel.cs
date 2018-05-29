@@ -34,7 +34,7 @@ namespace GitHub.InlineReviews.ViewModels
         public ReactiveCommand<ICommentModel> PostComment
         {
             get { return postComment; }
-            set
+            protected set
             {
                 Guard.ArgumentNotNull(value, nameof(value));
                 postComment = value;
@@ -48,7 +48,7 @@ namespace GitHub.InlineReviews.ViewModels
         public ReactiveCommand<ICommentModel> EditComment
         {
             get { return editComment; }
-            set
+            protected set
             {
                 Guard.ArgumentNotNull(value, nameof(value));
                 editComment = value;
@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews.ViewModels
         public ReactiveCommand<object> DeleteComment
         {
             get { return deleteComment; }
-            set
+            protected set
             {
                 Guard.ArgumentNotNull(value, nameof(value));
                 deleteComment = value;
