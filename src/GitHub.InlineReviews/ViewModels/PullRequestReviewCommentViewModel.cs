@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -53,13 +54,16 @@ namespace GitHub.InlineReviews.ViewModels
             this.session = session;
             IsPending = isPending;
 
-            canStartReview = session.WhenAnyValue(x => x.HasPendingReview, x => !x)
-                .ToProperty(this, x => x.CanStartReview);
-            commitCaption = session.WhenAnyValue(
-                x => x.HasPendingReview,
-                x => x ? Resources.AddReviewComment : Resources.AddSingleComment)
+            var pendingReviewAndIdObservable = Observable.Zip(session.WhenAnyValue(x => x.HasPendingReview, x => !x), this.WhenAnyValue(model => model.Id, i => i == 0));
+
+            canStartReview = pendingReviewAndIdObservable
+                    .Select(list => list.All(b => b))
+                    .ToProperty(this, x => x.CanStartReview);
+
+            commitCaption = pendingReviewAndIdObservable
+                .Select(list => !list[1] ? Resources.EditComment : list[0] ? Resources.AddReviewComment : Resources.AddSingleComment)
                 .ToProperty(this, x => x.CommitCaption);
-            
+
             StartReview = ReactiveCommand.CreateAsyncTask(
                 CommitEdit.CanExecuteObservable,
                 DoStartReview);
@@ -85,6 +89,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Creates a placeholder comment which can be used to add a new comment to a thread.
         /// </summary>
+        /// <param name="session">The pull request session.</param>
         /// <param name="thread">The comment thread.</param>
         /// <param name="currentUser">The current user.</param>
         /// <returns>THe placeholder comment.</returns>

@@ -71,7 +71,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Equals(currentUser)));
+                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Login.Equals(currentUser.Login)));
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);

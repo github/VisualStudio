@@ -277,6 +277,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit Comment.
+        /// </summary>
+        public static string EditComment {
+            get {
+                return ResourceManager.GetString("EditComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The host isn&apos;t available or is not a GitHub Enterprise server. Check the address and try again..
         /// </summary>
         public static string enterpriseConnectingFailedMessage {
