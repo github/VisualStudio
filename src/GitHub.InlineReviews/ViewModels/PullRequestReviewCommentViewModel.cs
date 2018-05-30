@@ -64,7 +64,7 @@ namespace GitHub.InlineReviews.ViewModels
                     .ToProperty(this, x => x.CanStartReview);
 
             commitCaption = pendingReviewAndIdObservable
-                .Select(arg => !arg.isNewComment ? Resources.EditComment : arg.hasPendingReview ? Resources.AddSingleComment : Resources.AddReviewComment)
+                .Select(arg => !arg.isNewComment ? Resources.UpdateComment : arg.hasPendingReview ? Resources.AddSingleComment : Resources.AddReviewComment)
                 .ToProperty(this, x => x.CommitCaption);
 
             StartReview = ReactiveCommand.CreateAsyncTask(

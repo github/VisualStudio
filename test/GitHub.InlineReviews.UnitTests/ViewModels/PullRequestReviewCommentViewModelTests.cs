@@ -162,7 +162,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             }
 
             [Test]
-            public void IsEditCommentWhenEditingExistingComment()
+            public void IsUpdateCommentWhenEditingExistingComment()
             {
                 var session = CreateSession(false);
 
@@ -171,7 +171,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
                 var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
 
-                Assert.That(target.CommitCaption, Is.EqualTo("Edit Comment"));
+                Assert.That(target.CommitCaption, Is.EqualTo("Update comment"));
             }
         }
 

@@ -431,7 +431,7 @@
   <data name="Options_ForkButtonLabel" xml:space="preserve">
     <value>Show Fork button in Team Explorer</value>
   </data>
-  <data name="EditComment" xml:space="preserve">
-    <value>Edit Comment</value>
+  <data name="UpdateComment" xml:space="preserve">
+    <value>Update Comment</value>
   </data>
 </root>
