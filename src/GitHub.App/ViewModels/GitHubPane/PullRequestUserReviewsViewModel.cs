@@ -26,8 +26,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IModelServiceFactory modelServiceFactory;
         IPullRequestSession session;
+        string login;
         IActorViewModel user;
         string title;
         IReadOnlyList<IPullRequestReviewViewModel> reviews;
@@ -35,16 +35,13 @@ namespace GitHub.ViewModels.GitHubPane
         [ImportingConstructor]
         public PullRequestUserReviewsViewModel(
             IPullRequestEditorService editorService,
-            IPullRequestSessionManager sessionManager,
-            IModelServiceFactory modelServiceFactory)
+            IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
 
             this.editorService = editorService;
             this.sessionManager = sessionManager;
-            this.modelServiceFactory = modelServiceFactory;
 
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
@@ -103,11 +100,9 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
+                this.login = login;
                 session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
-
-                var modelService = await modelServiceFactory.CreateAsync(connection);
-                User = new ActorViewModel(await modelService.GetActor(login));
-                await Refresh();
+                await Load(session.PullRequest);                
             }
             finally
             {
@@ -122,6 +117,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 Error = null;
                 IsBusy = true;
+                await session.Refresh();
                 await Load(session.PullRequest);
             }
             catch (Exception ex)
@@ -153,17 +149,29 @@ namespace GitHub.ViewModels.GitHubPane
 
                 foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.SubmittedAt))
                 {
-                    if (review.Author.Login == User.Login &&
-                        review.State != PullRequestReviewState.Pending)
+                    if (review.Author.Login == login)
                     {
-                        var vm = new PullRequestReviewViewModel(editorService, session, review);
-                        vm.IsExpanded = isFirst;
-                        reviews.Add(vm);
-                        isFirst = false;
+                        if (User == null)
+                        {
+                            User = new ActorViewModel(review.Author);
+                        }
+
+                        if (review.State != PullRequestReviewState.Pending)
+                        {
+                            var vm = new PullRequestReviewViewModel(editorService, session, review);
+                            vm.IsExpanded = isFirst;
+                            reviews.Add(vm);
+                            isFirst = false;
+                        }
                     }
                 }
 
                 Reviews = reviews;
+
+                if (User == null)
+                {
+                    User = new ActorViewModel(new ActorModel { Login = login });
+                }
             }
             finally
             {

@@ -19,15 +19,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public async Task InitializeAsync_Loads_User()
         {
             var modelSerivce = Substitute.For<IModelService>();
-            var user = new ActorModel { Login = AuthorLogin };
-            modelSerivce.GetActor(AuthorLogin).Returns(user);
 
-            var target = CreateTarget(
-                modelServiceFactory: CreateFactory(modelSerivce));
+            var target = CreateTarget();
 
             await Initialize(target);
 
-            Assert.That(target.User.Login, Is.EqualTo(user.Login));
+            Assert.That(target.User.Login, Is.EqualTo(AuthorLogin));
         }
 
         [Test]
@@ -70,13 +67,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 },
             };
 
-            var modelSerivce = Substitute.For<IModelService>();
-            modelSerivce.GetActor(AuthorLogin).Returns(author);
-
             var user = Substitute.For<IAccount>();
             var target = CreateTarget(
-                sessionManager: CreateSessionManager(pullRequest),
-                modelServiceFactory: CreateFactory(modelSerivce));
+                sessionManager: CreateSessionManager(pullRequest));
 
             await Initialize(target);
 
@@ -115,13 +108,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 },
             };
 
-            var modelSerivce = Substitute.For<IModelService>();
-            modelSerivce.GetActor(AuthorLogin).Returns(author);
-
             var user = Substitute.For<IAccount>();
             var target = CreateTarget(
-                sessionManager: CreateSessionManager(pullRequest),
-                modelServiceFactory: CreateFactory(modelSerivce));
+                sessionManager: CreateSessionManager(pullRequest));
 
             await Initialize(target);
 
@@ -159,13 +148,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 },
             };
 
-            var modelSerivce = Substitute.For<IModelService>();
-            modelSerivce.GetActor(AuthorLogin).Returns(author);
-
             var user = Substitute.For<IAccount>();
             var target = CreateTarget(
-                sessionManager: CreateSessionManager(pullRequest),
-                modelServiceFactory: CreateFactory(modelSerivce));
+                sessionManager: CreateSessionManager(pullRequest));
 
             await Initialize(target);
 
@@ -201,6 +186,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             };
 
             var session = Substitute.For<IPullRequestSession>();
+            session.User.Returns(new ActorModel { Login = AuthorLogin });
             session.PullRequest.Returns(pullRequest);
 
             var result = Substitute.For<IPullRequestSessionManager>();
@@ -211,17 +197,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         PullRequestUserReviewsViewModel CreateTarget(
             IPullRequestEditorService editorService = null,
-            IPullRequestSessionManager sessionManager = null,
-            IModelServiceFactory modelServiceFactory = null)
+            IPullRequestSessionManager sessionManager = null)
         {
             editorService = editorService ?? Substitute.For<IPullRequestEditorService>();
             sessionManager = sessionManager ?? CreateSessionManager();
-            modelServiceFactory = modelServiceFactory ?? Substitute.For<IModelServiceFactory>();
 
             return new PullRequestUserReviewsViewModel(
                 editorService,
-                sessionManager,
-                modelServiceFactory);
+                sessionManager);
         }
 
         IModelServiceFactory CreateFactory(IModelService modelService)

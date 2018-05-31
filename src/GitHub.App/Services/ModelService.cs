@@ -64,18 +64,6 @@ namespace GitHub.Services
                 .Select(Create);
         }
 
-        public Task<ActorModel> GetActor(string login)
-        {
-            var query = new Query()
-                .User(login)
-                .Select(x => new ActorModel
-                {
-                    Login = x.Login,
-                    AvatarUrl = x.AvatarUrl(null),
-                });
-            return graphql.Run(query);
-        }
-
         public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
