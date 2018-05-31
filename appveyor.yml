@@ -1,9 +1,25 @@
 os: Visual Studio 2017
 version: '2.5.5.{build}'
 skip_tags: true
+
+environment:
+  matrix:
+    - BUILD_TYPE: normal
+
 install:
 - ps: |
     $full_build = Test-Path env:GHFVS_KEY
+    $forVSInstaller = $env:BUILD_TYPE -eq "vsinstaller"
+    $package = $full_build -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master" -or $forVSInstaller -or $env:BUILD_TYPE -eq "package")
+
+    $message = "Building "
+    if ($package) { $message += "and packaging "}
+    $message += "version " + $env:APPVEYOR_BUILD_NUMBER + " "
+
+    if ($full_build) { $message += "(full build)" } else { $message += "(partial build)" }
+    if ($forVSInstaller) { $message += " for the VS installer" }
+    Write-Host $message
+
     git submodule init
     git submodule sync
 
@@ -19,13 +35,24 @@ install:
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
 build_script:
-- ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
+- ps: scripts\build.ps1 -AppVeyor -Package:$package -BuildNumber:$env:APPVEYOR_BUILD_NUMBER -ForVSInstaller:$forVSInstaller
 test:
   categories:
     except:
       - Timings
 on_success:
 - ps: |
-    if ($full_build) {
-      script\Sign-Package -AppVeyor
+    if ($package) {
+      Write-Host "Signing and packaging"
+      script\Sign-Package -AppVeyor -ForVSInstaller:$forVSInstaller
     }
+
+for:
+-
+  branches:
+    only:
+      - /releases/.*-vsinstaller/
+  environment:
+    matrix:
+      - BUILD_TYPE: vsinstaller
+      - BUILD_TYPE: package
