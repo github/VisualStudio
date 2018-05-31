@@ -936,7 +936,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Update Comment.
+        ///   Looks up a localized string similar to Update comment.
         /// </summary>
         public static string UpdateComment {
             get {
