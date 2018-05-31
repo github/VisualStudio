@@ -81,7 +81,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            var item = (Tuple<int, string>)parameter;
+            var item = (Tuple<string, string>)parameter;
             return await Session.EditComment(item.Item1, item.Item2);
         }
 

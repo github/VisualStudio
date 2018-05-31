@@ -168,7 +168,7 @@ namespace GitHub.InlineReviews.ViewModels
                 }
                 else
                 {
-                    model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<int, string>(Id, Body));
+                    model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(NodeId, Body));
                 }
 
                 Id = model.Id;

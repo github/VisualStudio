@@ -156,9 +156,9 @@ namespace GitHub.Services
         /// <summary>
         /// Edit a PR review comment reply.
         /// </summary>
-        /// <param name="number">The number of the pull request comment</param>
+        /// <param name="commentNodeId">The node id of the pull request comment</param>
         /// <param name="body">The replacement comment body.</param>
         /// <returns>A comment model.</returns>
-        Task<IPullRequestReviewCommentModel> EditComment(int number, string body);
+        Task<IPullRequestReviewCommentModel> EditComment(string commentNodeId, string body);
     }
 }

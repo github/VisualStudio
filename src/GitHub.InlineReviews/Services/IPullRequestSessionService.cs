@@ -320,13 +320,13 @@ namespace GitHub.InlineReviews.Services
         /// <param name="localRepository">The local repository.</param>
         /// <param name="remoteRepositoryOwner">The owner of the repository fork to delete from.</param>
         /// <param name="user">The user deleting the comment.</param>
-        /// <param name="number">The pull request comment number.</param>
+        /// <param name="commentNodeId">The pull request comment node id.</param>
         /// <param name="body">The replacement comment body.</param>
         /// <returns>A model representing the edited comment.</returns>
         Task<PullRequestReviewCommentModel> EditComment(ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
-            int number,
+            string commentNodeId,
             string body);
     }
 }

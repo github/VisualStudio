@@ -178,14 +178,13 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> EditComment(
-            int number, string body)
+        public async Task<IPullRequestReviewCommentModel> EditComment(string commentNodeId, string body)
         {
             var model = await service.EditComment(
                 LocalRepository,
                 RepositoryOwner,
                 User,
-                number,
+                commentNodeId,
                 body);
 
             await ReplaceComment(model);
