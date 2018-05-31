@@ -650,7 +650,7 @@ namespace GitHub.InlineReviews.Services
                     OriginalCommitId = x.PullRequestReviewComment.OriginalCommit.Oid,
                     PullRequestReviewId = x.PullRequestReviewComment.PullRequestReview.DatabaseId.Value,
                     User = user,
-                    IsPending = false,
+                    IsPending = !x.PullRequestReviewComment.PublishedAt.HasValue,
                 });
 
             var result = await graphql.Run(editComment);
