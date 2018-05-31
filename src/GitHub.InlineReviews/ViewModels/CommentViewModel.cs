@@ -65,7 +65,7 @@ namespace GitHub.InlineReviews.ViewModels
                 x => x.EditState,
                 x => x == CommentEditState.None && user.Login.Equals(currentUser.Login));
 
-            canDelete.Subscribe(b => CanDelete = b);
+            canDelete.ToProperty(this, x => x.CanDelete);
 
             Delete = ReactiveCommand.CreateAsyncTask(canDelete, DoDelete);
 
