@@ -348,49 +348,7 @@ namespace GitHub.InlineReviews.Services
                 Status = (PullRequestFileStatus)Enum.Parse(typeof(PullRequestFileStatus), file.Status, true),
             }).ToList();
 
-            var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
-
-            foreach (CommentAdapter comment in result.Reviews.SelectMany(x => x.Comments))
-            {
-                if (comment.ReplyTo == null)
-                {
-                    commentsByReplyId.Add(comment.Id, new List<CommentAdapter> { comment });
-                }
-            }
-
-            foreach (CommentAdapter comment in result.Reviews.SelectMany(x => x.Comments))
-            {
-                if (comment.ReplyTo != null)
-                {
-                    List<CommentAdapter> thread;
-
-                    if (commentsByReplyId.TryGetValue(comment.ReplyTo, out thread))
-                    {
-                        thread.Add(comment);
-                    }
-                }
-            }
-
-            var threads = new List<PullRequestReviewThreadModel>();
-
-            foreach (var thread in commentsByReplyId)
-            {
-                var c = thread.Value[0];
-                threads.Add(new PullRequestReviewThreadModel
-                {
-                    Comments = thread.Value,
-                    CommitSha = c.CommitSha,
-                    DiffHunk = c.DiffHunk,
-                    Id = c.Id,
-                    IsOutdated = c.Position == null,
-                    OriginalCommitSha = c.OriginalCommitId,
-                    OriginalPosition = c.OriginalPosition,
-                    Path = c.Path,
-                    Position = c.Position,
-                });
-            }
-
-            result.Threads = threads;
+            BuildPullRequestThreads(result);
             return result;
         }
 
@@ -801,6 +759,79 @@ namespace GitHub.InlineReviews.Services
         Task<IRepository> GetRepository(ILocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
+        }
+
+        static void BuildPullRequestThreads(PullRequestDetailModel model)
+        {
+            var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
+
+            // Get all comments that are not replies.
+            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
+            {
+                if (comment.ReplyTo == null)
+                {
+                    commentsByReplyId.Add(comment.Id, new List<CommentAdapter> { comment });
+                }
+            }
+
+            // Get the comments that are replies and place them into the relevant list.
+            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
+            {
+                if (comment.ReplyTo != null)
+                {
+                    var threadId = comment.ReplyTo;
+                    List<CommentAdapter> thread;
+
+                    while (threadId != null)
+                    {
+                        if (commentsByReplyId.TryGetValue(comment.ReplyTo, out thread))
+                        {
+                            thread.Add(comment);
+                            break;
+                        }
+                        else
+                        {
+                            // If the comment that was replied to was not a top-level comment, then
+                            // try to find the parent comment and get its `replyTo`.
+                            threadId = model.Reviews
+                                .SelectMany(x => x.Comments)
+                                .Cast<CommentAdapter>()
+                                .FirstOrDefault(x => x.Id == threadId)?.ReplyTo;
+                        }
+                    }
+                }
+            }
+
+            // Build a collection of threads for the information collected above.
+            var threads = new List<PullRequestReviewThreadModel>();
+
+            foreach (var threadSource in commentsByReplyId)
+            {
+                var adapter = threadSource.Value[0];
+
+                var thread = new PullRequestReviewThreadModel
+                {
+                    Comments = threadSource.Value,
+                    CommitSha = adapter.CommitSha,
+                    DiffHunk = adapter.DiffHunk,
+                    Id = adapter.Id,
+                    IsOutdated = adapter.Position == null,
+                    OriginalCommitSha = adapter.OriginalCommitId,
+                    OriginalPosition = adapter.OriginalPosition,
+                    Path = adapter.Path,
+                    Position = adapter.Position,
+                };
+
+                // Set a reference to the thread in the comment.
+                foreach (var comment in threadSource.Value)
+                {
+                    comment.Thread = thread;
+                }
+
+                threads.Add(thread);
+            }
+
+            model.Threads = threads;
         }
 
         static GitHub.Models.PullRequestReviewState FromGraphQL(Octokit.GraphQL.Model.PullRequestReviewState s)
