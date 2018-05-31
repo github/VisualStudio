@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.ViewModels
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
-        private bool canDelete;
+        bool canDelete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
