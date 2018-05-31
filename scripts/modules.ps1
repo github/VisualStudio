@@ -120,7 +120,7 @@ New-Module -ScriptBlock {
             $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
             new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
         } elseif (!$Deploy) {
-            $configuration += "WithoutVsix"
+            $configuration += "CIPartialBuild"
             $flag1 = "/p:Package=Skip"
         }
 
