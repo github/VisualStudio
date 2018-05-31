@@ -779,25 +779,12 @@ namespace GitHub.InlineReviews.Services
             {
                 if (comment.ReplyTo != null)
                 {
-                    var threadId = comment.ReplyTo;
-                    List<CommentAdapter> thread;
+                    List<CommentAdapter> thread = null;
 
-                    while (threadId != null)
+                    if (commentsByReplyId.TryGetValue(comment.ReplyTo, out thread))
                     {
-                        if (commentsByReplyId.TryGetValue(comment.ReplyTo, out thread))
-                        {
-                            thread.Add(comment);
-                            break;
-                        }
-                        else
-                        {
-                            // If the comment that was replied to was not a top-level comment, then
-                            // try to find the parent comment and get its `replyTo`.
-                            threadId = model.Reviews
-                                .SelectMany(x => x.Comments)
-                                .Cast<CommentAdapter>()
-                                .FirstOrDefault(x => x.Id == threadId)?.ReplyTo;
-                        }
+                        thread.Add(comment);
+                        break;
                     }
                 }
             }

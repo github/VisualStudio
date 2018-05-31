@@ -38,16 +38,19 @@ namespace GitHub.ViewModels.GitHubPane
 
             foreach (var comment in model.Comments)
             {
-                var vm = new PullRequestReviewCommentViewModel(
-                    editorService,
-                    session,
-                    comment.Thread.Path,
-                    comment);
+                if (comment.Thread != null)
+                {
+                    var vm = new PullRequestReviewCommentViewModel(
+                        editorService,
+                        session,
+                        comment.Thread.Path,
+                        comment);
 
-                if (comment.Thread.Position != null)
-                    comments.Add(vm);
-                else
-                    outdated.Add(vm);
+                    if (comment.Thread.Position != null)
+                        comments.Add(vm);
+                    else
+                        outdated.Add(vm);
+                }
             }
 
             FileComments = comments;
