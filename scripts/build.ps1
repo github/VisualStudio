@@ -41,6 +41,7 @@ Param(
     ,
     [switch]
     $ForVSInstaller = $false
+
 )
 
 Set-StrictMode -Version Latest
@@ -62,13 +63,6 @@ if ($UpdateSubmodules) {
 
 if ($Clean) {
 	Clean-WorkingTree
-}
-
-$fullBuild = Test-Path env:GHFVS_KEY
-$publishable = $fullBuild -and $AppVeyor -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master")
-if ($publishable) { #forcing a deploy flag for CI
-    $Package = $true
-    $BumpVersion = $true
 }
 
 if ($BumpVersion) {
