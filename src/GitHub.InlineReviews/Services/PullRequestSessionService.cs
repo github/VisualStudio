@@ -278,7 +278,7 @@ namespace GitHub.InlineReviews.Services
                     .Select(pr => new PullRequestDetailModel
                     {
                         Id = pr.Id.Value,
-                        Number = number,
+                        Number = pr.Number,
                         Author = new ActorModel
                         {
                             Login = pr.Author.Login,
