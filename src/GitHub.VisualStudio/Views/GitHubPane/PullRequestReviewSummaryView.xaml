@@ -89,7 +89,7 @@
 
         <ui:GitHubActionLink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                              CommandParameter="{Binding}"
-                             Visibility="{Binding Id, Converter={ui:EqualsToVisibilityConverter 0}}"
+                             Visibility="{Binding Id, Converter={ui:EqualsToVisibilityConverter {x:Null}}}"
                              Content="{x:Static prop:Resources.AddYourReview}"/>
 
     </Grid>
