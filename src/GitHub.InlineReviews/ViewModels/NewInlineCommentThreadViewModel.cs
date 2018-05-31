@@ -89,7 +89,7 @@ namespace GitHub.InlineReviews.ViewModels
             throw new NotSupportedException("Cannot navigate to a non-posted comment.");
         }
 
-        async Task<ICommentModel> DoPostComment(object parameter)
+        async Task<CommentModel> DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 

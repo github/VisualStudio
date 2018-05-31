@@ -31,7 +31,7 @@ namespace GitHub.InlineReviews.Views
 
         void DoOpenOnGitHub()
         {
-            GetBrowser().OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
+            ////GetBrowser().OpenUrl(ViewModel.Thread.GetCommentUrl(ViewModel.Id));
         }
 
         private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)

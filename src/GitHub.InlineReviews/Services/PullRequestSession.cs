@@ -11,6 +11,7 @@ using ReactiveUI;
 using System.Threading;
 using System.Reactive.Subjects;
 using static System.FormattableString;
+using GitHub.Primitives;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -32,16 +33,15 @@ namespace GitHub.InlineReviews.Services
         bool isCheckedOut;
         string mergeBase;
         IReadOnlyList<IPullRequestSessionFile> files;
-        IPullRequestModel pullRequest;
+        PullRequestDetailModel pullRequest;
         string pullRequestNodeId;
-        Subject<IPullRequestModel> pullRequestChanged = new Subject<IPullRequestModel>();
+        Subject<PullRequestDetailModel> pullRequestChanged = new Subject<PullRequestDetailModel>();
         bool hasPendingReview;
-        string pendingReviewNodeId { get; set; }
 
         public PullRequestSession(
             IPullRequestSessionService service,
-            IAccount user,
-            IPullRequestModel pullRequest,
+            ActorModel user,
+            PullRequestDetailModel pullRequest,
             ILocalRepositoryModel localRepository,
             string repositoryOwner,
             bool isCheckedOut)
@@ -127,77 +127,68 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+        public async Task<PullRequestReviewCommentModel> PostReviewComment(
             string body,
             string commitId,
             string path,
             IReadOnlyList<DiffChunk> diff,
             int position)
         {
-            IPullRequestReviewCommentModel model;
-
             if (!HasPendingReview)
             {
-                model = await service.PostStandaloneReviewComment(
+                var model = await service.PostStandaloneReviewComment(
                     LocalRepository,
-                    RepositoryOwner,
-                    User,
-                    PullRequest.Number,
+                    PullRequest.Id,
                     body,
                     commitId,
                     path,
                     position);
+                await AddReview(model);
+                return model.Comments[0];
             }
             else
             {
-                model = await service.PostPendingReviewComment(
+                var model = await service.PostPendingReviewComment(
                     LocalRepository,
-                    User,
-                    pendingReviewNodeId,
+                    PendingReviewId,
                     body,
                     commitId,
                     path,
                     position);
+                await AddComment(model);
+                return model;
             }
-
-            await AddComment(model);
-            return model;
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostReviewComment(
+        public async Task<PullRequestReviewCommentModel> PostReviewComment(
             string body,
-            int inReplyTo,
-            string inReplyToNodeId)
+            string inReplyTo)
         {
-            IPullRequestReviewCommentModel model;
-
             if (!HasPendingReview)
             {
-                model = await service.PostStandaloneReviewCommentRepy(
+                var model = await service.PostStandaloneReviewCommentReply(
                     LocalRepository,
-                    RepositoryOwner,
-                    User,
-                    PullRequest.Number,
+                    PullRequest.Id,
                     body,
                     inReplyTo);
+                await AddReview(model);
+                return model.Comments[0];
             }
             else
             {
-                model = await service.PostPendingReviewCommentReply(
+                var model = await service.PostPendingReviewCommentReply(
                     LocalRepository,
-                    User,
-                    pendingReviewNodeId,
+                    PendingReviewId,
                     body,
-                    inReplyToNodeId);
+                    inReplyTo);
+                await AddComment(model);
+                return model;
             }
-
-            await AddComment(model);
-            return model;
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewModel> StartReview()
+        public async Task<PullRequestReviewModel> StartReview()
         {
             if (HasPendingReview)
             {
@@ -206,7 +197,6 @@ namespace GitHub.InlineReviews.Services
 
             var model = await service.CreatePendingReview(
                 LocalRepository,
-                User,
                 await GetPullRequestNodeId());
 
             await AddReview(model);
@@ -221,31 +211,26 @@ namespace GitHub.InlineReviews.Services
                 throw new InvalidOperationException("There is no pending review to cancel.");
             }
 
-            await service.CancelPendingReview(LocalRepository, pendingReviewNodeId);
+            await service.CancelPendingReview(LocalRepository, PendingReviewId);
 
             PullRequest.Reviews = PullRequest.Reviews
-                .Where(x => x.NodeId != pendingReviewNodeId)
-                .ToList();
-            PullRequest.ReviewComments = PullRequest.ReviewComments
-                .Where(x => x.PullRequestReviewId != PendingReviewId)
+                .Where(x => x.Id != PendingReviewId)
                 .ToList();
 
             await Update(PullRequest);
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewModel> PostReview(string body, Octokit.PullRequestReviewEvent e)
+        public async Task<PullRequestReviewModel> PostReview(string body, Octokit.PullRequestReviewEvent e)
         {
-            IPullRequestReviewModel model;
+            PullRequestReviewModel model;
 
-            if (pendingReviewNodeId == null)
+            if (PendingReviewId == null)
             {
                 model = await service.PostReview(
                     LocalRepository,
-                    RepositoryOwner,
-                    User,
-                    PullRequest.Number,
-                    PullRequest.Head.Sha,
+                    PullRequest.Id,
+                    PullRequest.HeadRefSha,
                     body,
                     e);
             }
@@ -253,8 +238,7 @@ namespace GitHub.InlineReviews.Services
             {
                 model = await service.SubmitPendingReview(
                     LocalRepository,
-                    User,
-                    pendingReviewNodeId,
+                    PendingReviewId,
                     body,
                     e);
             }
@@ -264,7 +248,19 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task Update(IPullRequestModel pullRequestModel)
+        public async Task Refresh()
+        {
+            var address = HostAddress.Create(LocalRepository.CloneUrl);
+            var model = await service.ReadPullRequestDetail(
+                address,
+                RepositoryOwner,
+                LocalRepository.Name,
+                PullRequest.Number);
+            await Update(model);
+        }
+
+        /// <inheritdoc/>
+        async Task Update(PullRequestDetailModel pullRequestModel)
         {
             PullRequest = pullRequestModel;
             mergeBase = null;
@@ -278,40 +274,38 @@ namespace GitHub.InlineReviews.Services
             pullRequestChanged.OnNext(pullRequestModel);
         }
 
-        async Task AddComment(IPullRequestReviewCommentModel comment)
+        async Task AddComment(PullRequestReviewCommentModel comment)
         {
-            PullRequest.ReviewComments = PullRequest.ReviewComments
+            var review = PullRequest.Reviews.FirstOrDefault(x => x.Id == PendingReviewId);
+
+            if (review == null)
+            {
+                throw new KeyNotFoundException("Could not find pending review.");
+            }
+
+            review.Comments = review.Comments
                 .Concat(new[] { comment })
                 .ToList();
+
             await Update(PullRequest);
         }
 
-        async Task AddReview(IPullRequestReviewModel review)
+        async Task AddReview(PullRequestReviewModel review)
         {
             PullRequest.Reviews = PullRequest.Reviews
-                .Where(x => x.NodeId != review.NodeId)
+                .Where(x => x.Id != review.Id)
                 .Concat(new[] { review })
                 .ToList();
-
-            if (review.State != PullRequestReviewState.Pending)
-            {
-                foreach (var comment in PullRequest.ReviewComments)
-                {
-                    if (comment.PullRequestReviewId == review.Id)
-                    {
-                        comment.IsPending = false;
-                    }
-                }
-            }
 
             await Update(PullRequest);
         }
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
+            await Task.Delay(0);
             var mergeBaseSha = await GetMergeBase();
-            file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = file.IsTrackingHead ? PullRequest.Head.Sha : file.CommitSha;
+            file.BaseSha = PullRequest.BaseRefSha;
+            file.CommitSha = file.IsTrackingHead ? PullRequest.HeadRefSha : file.CommitSha;
             file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
             file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff, file.CommitSha);
         }
@@ -319,19 +313,17 @@ namespace GitHub.InlineReviews.Services
         void UpdatePendingReview()
         {
             var pendingReview = PullRequest.Reviews
-                .FirstOrDefault(x => x.State == PullRequestReviewState.Pending && x.User.Login == User.Login);
+                .FirstOrDefault(x => x.State == PullRequestReviewState.Pending && x.Author.Login == User.Login);
 
             if (pendingReview != null)
             {
                 HasPendingReview = true;
-                pendingReviewNodeId = pendingReview.NodeId;
                 PendingReviewId = pendingReview.Id;
             }
             else
             {
                 HasPendingReview = false;
-                pendingReviewNodeId = null;
-                PendingReviewId = 0;
+                PendingReviewId = null;
             }
         }
 
@@ -384,10 +376,10 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IAccount User { get; }
+        public ActorModel User { get; }
 
         /// <inheritdoc/>
-        public IPullRequestModel PullRequest
+        public PullRequestDetailModel PullRequest
         {
             get { return pullRequest; }
             private set
@@ -405,7 +397,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IObservable<IPullRequestModel> PullRequestChanged => pullRequestChanged;
+        public IObservable<PullRequestDetailModel> PullRequestChanged => pullRequestChanged;
 
         /// <inheritdoc/>
         public ILocalRepositoryModel LocalRepository { get; }
@@ -421,7 +413,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public long PendingReviewId { get; private set; }
+        public string PendingReviewId { get; private set; }
 
         IEnumerable<string> FilePaths
         {

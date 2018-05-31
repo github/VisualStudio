@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
 using NSubstitute;
 using NUnit.Framework;
 using ReactiveUI;
@@ -107,8 +108,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return new PullRequestReviewCommentViewModel(
                 session,
                 thread,
-                Substitute.For<IAccount>(),
-                Substitute.For<IPullRequestReviewCommentModel>());
+                Substitute.For<IActorViewModel>(),
+                new PullRequestReviewCommentModel());
         }
 
         static IPullRequestSession CreateSession(
@@ -116,6 +117,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var result = Substitute.For<IPullRequestSession>();
             result.HasPendingReview.Returns(hasPendingReview);
+            result.User.Returns(new ActorModel());
             return result;
         }
 
@@ -123,7 +125,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             bool canPost = true)
         {
             var result = Substitute.For<ICommentThreadViewModel>();
-            result.PostComment.Returns(new ReactiveCommand<ICommentModel>(Observable.Return(canPost), _ => null));
+            result.PostComment.Returns(new ReactiveCommand<CommentModel>(Observable.Return(canPost), _ => null));
             return result;
         }
     }

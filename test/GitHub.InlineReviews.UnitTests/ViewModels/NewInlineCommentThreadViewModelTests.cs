@@ -1,14 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reactive.Linq;
-using GitHub.Api;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
-using Octokit;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
@@ -18,14 +14,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesReplyPlaceholder()
         {
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                CreateSession(),
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
                 false);
 
             Assert.That(target.Comments, Has.One.Items);
             Assert.That(string.Empty, Is.EqualTo(target.Comments[0].Body));
-            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Comments[0].EditState));
+            Assert.That(CommentEditState.Placeholder, Is.EqualTo(target.Comments[0].EditState));
         }
 
         [Test]
@@ -33,7 +29,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                CreateSession(),
                 file,
                 10,
                 false);
@@ -57,7 +53,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                CreateSession(),
                 file,
                 10,
                 false);
@@ -122,14 +118,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 7);
         }
 
-        IApiClient CreateApiClient()
-        {
-            var result = Substitute.For<IApiClient>();
-            result.CreatePullRequestReviewComment(null, null, 0, null, null, null, 0)
-                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
-            return result;
-        }
-
         IPullRequestSessionFile CreateFile()
         {
             var result = Substitute.For<IPullRequestSessionFile>();
@@ -154,7 +142,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             result.RepositoryOwner.Returns("owner");
             result.LocalRepository.Name.Returns("repo");
             result.LocalRepository.Owner.Returns("shouldnt-be-used");
-            result.PullRequest.Number.Returns(47);
+            result.PullRequest.Returns(new PullRequestDetailModel { Number = 47 });
+            result.User.Returns(new ActorModel());
             return result;
         }
 

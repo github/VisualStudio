@@ -28,6 +28,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
         const int CurrentBranchPullRequestNumber = 15;
         const int NotCurrentBranchPullRequestNumber = 10;
         const string OwnerCloneUrl = "https://github.com/owner/repo";
+        static readonly ActorModel CurrentUser = new ActorModel { Login = "currentUser" };
 
         public PullRequestSessionManagerTests()
         {
@@ -40,18 +41,19 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public void ReadsPullRequestFromCorrectFork()
             {
                 var service = CreatePullRequestService();
+                var sessionService = CreateSessionService();
+
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
                     Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
 
                 var connectionManager = CreateConnectionManager();
-                var modelFactory = CreateModelServiceFactory();
                 var target = CreateTarget(
                     service: service,
-                    connectionManager: connectionManager,
-                    modelServiceFactory: modelFactory);
+                    sessionService: sessionService,
+                    connectionManager: connectionManager);
 
-                var modelService = modelFactory.CreateBlocking(connectionManager.Connections[0]);
-                modelService.Received(1).GetPullRequest("fork", "repo", 15);
+                var address = HostAddress.Create(OwnerCloneUrl);
+                sessionService.Received(1).ReadPullRequestDetail(address, "fork", "repo", 15);
             }
 
             [Test]
@@ -221,7 +223,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             {
                 var textView = CreateTextView();
 
-                var target = CreateTarget(sessionService: CreateSessionService(true));
+                var target = CreateTarget(sessionService: CreateSessionService(isModified: true));
                 var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                 Assert.That(file.CommitSha, Is.Null);
@@ -276,10 +278,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 var threads = new List<IInlineCommentThreadModel>
-                {
-                    CreateInlineCommentThreadModel(1),
-                    CreateInlineCommentThreadModel(2),
-                };
+                        {
+                            CreateInlineCommentThreadModel(1),
+                            CreateInlineCommentThreadModel(2),
+                        };
 
                 var target = CreateTarget(sessionService: sessionService);
 
@@ -340,10 +342,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.CreateRebuildSignal().Returns(rebuild);
 
                 var threads = new List<IInlineCommentThreadModel>
-                {
-                    CreateInlineCommentThreadModel(1),
-                    CreateInlineCommentThreadModel(2),
-                };
+                        {
+                            CreateInlineCommentThreadModel(1),
+                            CreateInlineCommentThreadModel(2),
+                        };
 
                 var target = CreateTarget(sessionService: sessionService);
 
@@ -379,10 +381,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
 
                 var threads = new List<IInlineCommentThreadModel>
-                {
-                    CreateInlineCommentThreadModel(1),
-                    CreateInlineCommentThreadModel(2),
-                };
+                        {
+                            CreateInlineCommentThreadModel(1),
+                            CreateInlineCommentThreadModel(2),
+                        };
 
                 var target = CreateTarget(sessionService: sessionService);
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -422,7 +424,7 @@ Line 4";
 Line 2
 Line 3 with comment
 Line 4";
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var thread = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -433,18 +435,15 @@ Line 4";
                     var textView = CreateTextView(contents);
                     var pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
-                        OwnerCloneUrl,
-                        comment);
+                        thread);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                    var target = CreateTarget(
-                        sessionService: CreateRealSessionService(diff: diffService),
-                        modelServiceFactory: CreateModelServiceFactory(pullRequest));
+                    var target = CreateTarget(sessionService: CreateRealSessionService(diffService, pullRequest));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
-                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
+                    Assert.That(file.InlineCommentThreads.Count, Is.EqualTo(1));
+                    Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
                 }
             }
 
@@ -465,7 +464,7 @@ Line 1
 Line 2
 Line 3 with comment
 Line 4";
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -476,14 +475,11 @@ Line 4";
                     var textView = CreateTextView(contents);
                     var pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
-                        OwnerCloneUrl,
                         comment);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                    var target = CreateTarget(
-                        sessionService: CreateRealSessionService(diff: diffService),
-                        modelServiceFactory: CreateModelServiceFactory(pullRequest));
+                    var target = CreateTarget(sessionService: CreateRealSessionService(diffService, pullRequest));
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                     Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
@@ -499,8 +495,8 @@ Line 4";
                     Assert.That(
                         new[]
                         {
-                            Tuple.Create(2, DiffSide.Right),
-                            Tuple.Create(4, DiffSide.Right),
+                                    Tuple.Create(2, DiffSide.Right),
+                                    Tuple.Create(4, DiffSide.Right),
                         },
                         Is.EqualTo(linesChanged.ToArray()));
                 }
@@ -517,12 +513,12 @@ Line 4";
 Line 2
 Line 3 with comment
 Line 4";
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
 +Line 3 with comment", "Original Comment");
-                var updatedComment = CreateComment(@"@@ -1,4 +1,4 @@
+                var updatedComment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -533,27 +529,29 @@ Line 4";
                     var textView = CreateTextView(contents);
                     var pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
-                        OwnerCloneUrl,
                         comment);
+                    var sessionService = CreateRealSessionService(diffService, pullRequest);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                    var target = CreateTarget(
-                        sessionService: CreateRealSessionService(diff: diffService),
-                        modelServiceFactory: CreateModelServiceFactory(pullRequest));
+                    var target = CreateTarget(sessionService: sessionService);
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That("Original Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Body));
+                    Assert.That(file.InlineCommentThreads[0].Comments[0].Comment.Body, Is.EqualTo("Original Comment"));
 
                     pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
-                        OwnerCloneUrl,
                         updatedComment);
-                    await target.CurrentSession.Update(pullRequest);
+                    sessionService.ReadPullRequestDetail(
+                        Arg.Any<HostAddress>(),
+                        Arg.Any<string>(),
+                        Arg.Any<string>(),
+                        Arg.Any<int>()).Returns(pullRequest);
+                    await target.CurrentSession.Refresh();
 
                     await file.LinesChanged.Take(1);
 
-                    Assert.That("Updated Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Body));
+                    Assert.That("Updated Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Comment.Body));
                 }
             }
 
@@ -561,54 +559,56 @@ Line 4";
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
-Line 2
-Line 3
-Line 4";
+        Line 2
+        Line 3
+        Line 4";
                 var contents = @"Line 1
-Line 2
-Line 3 with comment
-Line 4";
-                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
- Line 1
- Line 2
--Line 3
-+Line 3 with comment", "Comment1");
+        Line 2
+        Line 3 with comment
+        Line 4";
+                var comment1 = CreateCommentThread(@"@@ -1,4 +1,4 @@
+         Line 1
+         Line 2
+        -Line 3
+        +Line 3 with comment", "Comment1");
 
-                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
- Line 1
- Line 2
--Line 3
-+Line 3 with comment", "Comment2");
+                var comment2 = CreateCommentThread(@"@@ -1,4 +1,4 @@
+         Line 1
+         Line 2
+        -Line 3
+        +Line 3 with comment", "Comment2");
 
                 using (var diffService = new FakeDiffService())
                 {
                     var textView = CreateTextView(contents);
                     var pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
-                        OwnerCloneUrl,
                         comment1);
+                    var sessionService = CreateRealSessionService(diffService, pullRequest);
 
                     diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                    var target = CreateTarget(
-                        sessionService: CreateRealSessionService(diff: diffService),
-                        modelServiceFactory: CreateModelServiceFactory(pullRequest));
+                    var target = CreateTarget(sessionService: sessionService);
                     var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
                     Assert.That(1, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
 
                     pullRequest = CreatePullRequestModel(
                         CurrentBranchPullRequestNumber,
-                        OwnerCloneUrl,
                         comment1,
                         comment2);
-                    await target.CurrentSession.Update(pullRequest);
+                    sessionService.ReadPullRequestDetail(
+                        Arg.Any<HostAddress>(),
+                        Arg.Any<string>(),
+                        Arg.Any<string>(),
+                        Arg.Any<int>()).Returns(pullRequest);
+                    await target.CurrentSession.Refresh();
 
                     var linesChanged = await file.LinesChanged.Take(1);
 
                     Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].Comments.Count));
-                    Assert.That("Comment1", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Body));
-                    Assert.That("Comment2", Is.EqualTo(file.InlineCommentThreads[0].Comments[1].Body));
+                    Assert.That("Comment1", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Comment.Body));
+                    Assert.That("Comment2", Is.EqualTo(file.InlineCommentThreads[0].Comments[1].Comment.Body));
                 }
             }
 
@@ -630,15 +630,15 @@ Line 4";
             }
 
             [Test]
-            public async Task UpdatingCurrentSessionPullRequestTriggersLinesChanged()
+            public async Task RefreshingCurrentSessionPullRequestTriggersLinesChanged()
             {
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 var expectedLineNumber = 2;
                 var threads = new[]
                 {
-                    CreateInlineCommentThreadModel(expectedLineNumber),
-                };
+                            CreateInlineCommentThreadModel(expectedLineNumber),
+                        };
 
                 sessionService.BuildCommentThreads(null, null, null, null).ReturnsForAnyArgs(threads);
 
@@ -649,27 +649,40 @@ Line 4";
 
                 file.LinesChanged.Subscribe(x => raised = x.Count == 1 && x[0].Item1 == expectedLineNumber);
 
-                // LinesChanged should be raised even if the IPullRequestModel is the same.
-                await target.CurrentSession.Update(target.CurrentSession.PullRequest);
+                // LinesChanged should be raised even if the PullRequestDetailModel is the same.
+                await target.CurrentSession.Refresh();
 
                 Assert.That(raised, Is.True);
             }
 
-            static IPullRequestReviewCommentModel CreateComment(
+            static PullRequestReviewThreadModel CreateCommentThread(
                 string diffHunk,
                 string body = "Comment",
                 string filePath = FilePath)
             {
-                var result = Substitute.For<IPullRequestReviewCommentModel>();
-                result.Body.Returns(body);
-                result.DiffHunk.Returns(diffHunk);
-                result.Path.Returns(filePath);
-                result.OriginalCommitId.Returns("ORIG");
-                result.OriginalPosition.Returns(1);
-                return result;
+                var thread = new PullRequestReviewThreadModel
+                {
+                    DiffHunk = diffHunk,
+                    Path = filePath,
+                    OriginalCommitSha = "ORIG",
+                    OriginalPosition = 1,
+                };
+
+                thread.Comments = new[]
+                {
+                    new PullRequestReviewCommentModel
+                    {
+                        Body = body,
+                        Thread = thread,
+                    },
+                };
+
+                return thread;
             }
 
-            IPullRequestSessionService CreateRealSessionService(IDiffService diff)
+            IPullRequestSessionService CreateRealSessionService(
+                IDiffService diff,
+                PullRequestDetailModel pullRequest)
             {
                 var result = Substitute.ForPartsOf<PullRequestSessionService>(
                     Substitute.For<IGitService>(),
@@ -677,10 +690,18 @@ Line 4";
                     diff,
                     Substitute.For<IApiClientFactory>(),
                     Substitute.For<IGraphQLClientFactory>(),
-                    Substitute.For<IUsageTracker>());
+                    Substitute.For<IUsageTracker>(),
+                    Substitute.For<IAvatarProvider>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
-                result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<IPullRequestModel>())
-                    .Returns("MERGE_BASE");
+                result.GetPullRequestMergeBase(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<PullRequestDetailModel>()).Returns("MERGE_BASE");
+                result.ReadPullRequestDetail(
+                    Arg.Any<HostAddress>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<int>()).Returns(pullRequest);
+                result.ReadViewer(Arg.Any<HostAddress>()).Returns(new ActorModel());
                 return result;
             }
 
@@ -738,49 +759,16 @@ Line 4";
         public class TheGetSessionMethod : PullRequestSessionManagerTests
         {
             [Test]
-            public async Task GetSessionReturnsAndUpdatesCurrentSessionIfNumbersMatch()
-            {
-                var target = CreateTarget();
-                var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber);
-                var result = await target.GetSession(newModel);
-
-                Assert.That(target.CurrentSession, Is.SameAs(result));
-                Assert.That(result.PullRequest, Is.SameAs(newModel));
-            }
-
-            [Test]
-            public async Task GetSessionReturnsNewSessionForPullRequestWithDifferentNumber()
+            public async Task GetSessionReturnsSameSessionForSamePullRequest()
             {
                 var target = CreateTarget();
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
-                var result = await target.GetSession(newModel);
-
-                Assert.That(target.CurrentSession, Is.Not.SameAs(result));
-                Assert.That(result.PullRequest, Is.SameAs(newModel));
-                Assert.That(result.IsCheckedOut, Is.False);
-            }
-
-            [Test]
-            public async Task GetSessionReturnsNewSessionForPullRequestWithDifferentBaseOwner()
-            {
-                var target = CreateTarget();
-                var newModel = CreatePullRequestModel(CurrentBranchPullRequestNumber, "https://github.com/fork/repo");
-                var result = await target.GetSession(newModel);
-
-                Assert.That(target.CurrentSession, Is.Not.SameAs(result));
-                Assert.That(result.PullRequest, Is.SameAs(newModel));
-                Assert.That(result.IsCheckedOut, Is.False);
-            }
-
-            [Test]
-            public async Task GetSessionReturnsSameSessionEachTime()
-            {
-                var target = CreateTarget();
-                var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
-                var result1 = await target.GetSession(newModel);
-                var result2 = await target.GetSession(newModel);
+                var result1 = await target.GetSession("owner", "repo", 5);
+                var result2 = await target.GetSession("owner", "repo", 5);
+                var result3 = await target.GetSession("owner", "repo", 6);
 
                 Assert.That(result1, Is.SameAs(result2));
+                Assert.That(result1, Is.Not.SameAs(result3));
             }
 
             [Test]
@@ -793,7 +781,7 @@ Line 4";
                 Func<Task> run = async () =>
                 {
                     var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
-                    var session = await target.GetSession(newModel);
+                    var session = await target.GetSession("owner", "repo", 5);
 
                     Assert.That(session, Is.Not.Null);
 
@@ -813,21 +801,21 @@ Line 4";
             public async Task GetSessionUpdatesCurrentSessionIfCurrentBranchIsPullRequestButWasNotMarked()
             {
                 var service = CreatePullRequestService();
+                var model = CreatePullRequestModel();
+                var sessionService = CreateSessionService(model);
 
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
 
-                var target = CreateTarget(service: service);
+                var target = CreateTarget(service: service, sessionService: sessionService);
 
                 Assert.That(target.CurrentSession, Is.Null);
-
-                var model = CreatePullRequestModel(CurrentBranchPullRequestNumber);
 
                 service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<ILocalRepositoryModel>(), model).Returns(Observable.Return(true));
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("owner", CurrentBranchPullRequestNumber)));
 
-                var session = await target.GetSession(model);
+                var session = await target.GetSession("owner", "name", CurrentBranchPullRequestNumber);
 
-                Assert.That(session, Is.SameAs(target.CurrentSession));
+                Assert.That(target.CurrentSession, Is.SameAs(session));
             }
         }
 
@@ -835,33 +823,50 @@ Line 4";
             IPullRequestService service = null,
             IPullRequestSessionService sessionService = null,
             IConnectionManager connectionManager = null,
-            IModelServiceFactory modelServiceFactory = null,
             ITeamExplorerContext teamExplorerContext = null)
         {
             service = service ?? CreatePullRequestService();
             sessionService = sessionService ?? CreateSessionService();
             connectionManager = connectionManager ?? CreateConnectionManager();
-            modelServiceFactory = modelServiceFactory ?? CreateModelServiceFactory();
             teamExplorerContext = teamExplorerContext ?? CreateTeamExplorerContext(CreateRepositoryModel());
 
             return new PullRequestSessionManager(
                 service,
                 sessionService,
                 connectionManager,
-                modelServiceFactory,
                 teamExplorerContext);
         }
 
-        IPullRequestModel CreatePullRequestModel(
-            int number,
-            string cloneUrl = OwnerCloneUrl,
-            params IPullRequestReviewCommentModel[] comments)
+        PullRequestDetailModel CreatePullRequestModel(
+            int number = 5,
+            params PullRequestReviewThreadModel[] threads)
         {
-            var result = Substitute.For<IPullRequestModel>();
-            result.Number.Returns(number);
-            result.Base.Returns(new GitReferenceModel("BASEREF", "pr", "BASESHA", cloneUrl));
-            result.Head.Returns(new GitReferenceModel("HEADREF", "pr", "HEADSHA", cloneUrl));
-            result.ReviewComments.Returns(comments);
+            var result = new PullRequestDetailModel
+            {
+                Number = number,
+                BaseRefName = "BASEREF",
+                BaseRefSha = "BASESHA",
+                HeadRefName = "HEADREF",
+                HeadRefSha = "HEADSHA",
+                Threads = threads,
+            };
+
+            if (threads.Length > 0)
+            {
+                result.Reviews = new[]
+                {
+                    new PullRequestReviewModel
+                    {
+                        Comments = threads.SelectMany(x => x.Comments).ToList(),
+                        Author = CurrentUser,
+                    },
+                };
+            }
+            else
+            {
+                result.Reviews = new PullRequestReviewModel[0];
+            }
+
             return result;
         }
 
@@ -883,29 +888,19 @@ Line 4";
             return result;
         }
 
-        IModelServiceFactory CreateModelServiceFactory(IPullRequestModel pullRequest = null)
+        IPullRequestSessionService CreateSessionService(
+            PullRequestDetailModel pullRequest = null,
+            bool isModified = false)
         {
-            var modelService = Substitute.For<IModelService>();
-            modelService.GetPullRequest(null, null, 0).ReturnsForAnyArgs(x =>
-            {
-                var cloneUrl = $"https://github.com/{x.ArgAt<string>(0)}/{x.ArgAt<string>(1)}";
-                var pr = pullRequest ?? CreatePullRequestModel(x.ArgAt<int>(2), cloneUrl);
-                return Observable.Return(pr);
-            });
+            pullRequest = pullRequest ?? CreatePullRequestModel();
 
-            var factory = Substitute.For<IModelServiceFactory>();
-            factory.CreateAsync(null).ReturnsForAnyArgs(modelService);
-            factory.CreateBlocking(null).ReturnsForAnyArgs(modelService);
-            return factory;
-        }
-
-        IPullRequestSessionService CreateSessionService(bool isModified = false)
-        {
             var sessionService = Substitute.For<IPullRequestSessionService>();
             sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
             sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(!isModified);
             sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
             sessionService.GetTipSha(null).ReturnsForAnyArgs("TIPSHA");
+            sessionService.ReadPullRequestDetail(null, null, null, 0).ReturnsForAnyArgs(pullRequest);
+            sessionService.ReadViewer(null).ReturnsForAnyArgs(CurrentUser);
             return sessionService;
         }
 

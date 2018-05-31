@@ -36,7 +36,7 @@ namespace GitHub.Services
         /// <param name="pullRequest">The pull request details.</param>
         /// <param name="localBranchName">The name of the local branch.</param>
         /// <returns></returns>
-        IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName);
+        IObservable<Unit> Checkout(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName);
 
         /// <summary>
         /// Carries out a pull on the current branch.
@@ -71,7 +71,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Ensures that all local branches for the specified pull request are marked as PR branches.
@@ -87,7 +87,7 @@ namespace GitHub.Services
         /// for the specified pull request are indeed marked and returns a value indicating whether any branches
         /// have had the mark added.
         /// </remarks>
-        IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Determines whether the specified pull request is from the specified repository.
@@ -95,7 +95,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        bool IsPullRequestFromRepository(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        bool IsPullRequestFromRepository(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Switches to an existing branch for the specified pull request.
@@ -103,7 +103,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Gets the history divergence between the current HEAD and the specified pull request.
@@ -119,7 +119,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        Task<string> GetMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        Task<string> GetMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Gets the changes between the pull request base and head.
@@ -127,7 +127,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Gets the pull request associated with the current branch.
@@ -139,7 +139,7 @@ namespace GitHub.Services
         /// </returns>
         /// <remarks>
         /// This method does not do an API request - it simply checks the mark left in the git
-        /// config by <see cref="Checkout(ILocalRepositoryModel, IPullRequestModel, string)"/>.
+        /// config by <see cref="Checkout(ILocalRepositoryModel, PullRequestDetailModel, string)"/>.
         /// </remarks>
         IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
@@ -164,7 +164,7 @@ namespace GitHub.Services
         /// <returns>The path to the temporary file.</returns>
         Task<string> ExtractToTempFile(
             ILocalRepositoryModel repository,
-            IPullRequestModel pullRequest,
+            PullRequestDetailModel pullRequest,
             string relativePath,
             string commitSha,
             Encoding encoding);

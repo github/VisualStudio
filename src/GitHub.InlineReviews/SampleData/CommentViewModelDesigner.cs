@@ -2,10 +2,8 @@
 using System.Reactive;
 using System.Diagnostics.CodeAnalysis;
 using GitHub.InlineReviews.ViewModels;
-using GitHub.Models;
-using GitHub.SampleData;
-using GitHub.UI;
 using ReactiveUI;
+using GitHub.ViewModels;
 
 namespace GitHub.InlineReviews.SampleData
 {
@@ -14,11 +12,10 @@ namespace GitHub.InlineReviews.SampleData
     {
         public CommentViewModelDesigner()
         {
-            User = new AccountDesigner { Login = "shana", IsUser = true };
+            Author = new ActorViewModel { Login = "shana" };
         }
 
-        public int Id { get; set; }
-        public string NodeId { get; set; }
+        public string Id { get; set; }
         public string Body { get; set; }
         public string ErrorMessage { get; set; }
         public CommentEditState EditState { get; set; }
@@ -26,7 +23,7 @@ namespace GitHub.InlineReviews.SampleData
         public bool IsSubmitting { get; set; }
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
-        public IAccount User { get; set; }
+        public IActorViewModel Author { get; set; }
 
         public ReactiveCommand<object> BeginEdit { get; }
         public ReactiveCommand<object> CancelEdit { get; }

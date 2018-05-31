@@ -5,6 +5,7 @@ using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
 using GitHub.Api;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -18,6 +19,7 @@ namespace GitHub.Services
 
         IObservable<IAccount> GetCurrentUser();
         IObservable<IAccount> GetUser(string login);
+        Task<ActorModel> GetActor(string login);
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
         IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo);

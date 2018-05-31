@@ -105,6 +105,7 @@ namespace GitHub.ViewModels.GitHubPane
                 { string.Empty, new PullRequestDirectoryNode(string.Empty) }
             };
 
+            await Task.Delay(0);
             using (var changes = await service.GetTreeChanges(session.LocalRepository, session.PullRequest))
             {
                 foreach (var changedFile in session.PullRequest.ChangedFiles)
@@ -175,7 +176,7 @@ namespace GitHub.ViewModels.GitHubPane
             return dir;
         }
 
-        static string GetOldFileName(IPullRequestFileModel file, TreeChanges changes)
+        static string GetOldFileName(PullRequestFileModel file, TreeChanges changes)
         {
             if (file.Status == PullRequestFileStatus.Renamed)
             {

@@ -50,12 +50,12 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    <Reference Include="Octokit.GraphQL, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">

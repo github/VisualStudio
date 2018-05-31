@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+             xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vm="clr-namespace:GitHub.ViewModels.GitHubPane;assembly=GitHub.App"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
@@ -15,9 +16,9 @@
 
     <d:DesignData.DataContext>
         <vm:PullRequestReviewSummaryViewModel Id="1" State="Pending" FileCommentCount="2">
-            <vm:PullRequestReviewSummaryViewModel.User>
+            <!--<vm:PullRequestReviewSummaryViewModel.User>
                 <sampleData:AccountDesigner Login="meaghanlewis"/>
-            </vm:PullRequestReviewSummaryViewModel.User>
+            </vm:PullRequestReviewSummaryViewModel.User>-->
         </vm:PullRequestReviewSummaryViewModel>
     </d:DesignData.DataContext>
 
@@ -33,7 +34,7 @@
     
     <Grid>
         <Border CornerRadius="2"
-                Visibility="{Binding Id, Converter={ui:NotEqualsToVisibilityConverter 0}}">
+                Visibility="{Binding Id, Converter={ui:NotEqualsToVisibilityConverter {x:Null}}}">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Padding" Value="0 5"/>
@@ -57,13 +58,15 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <c:AccountAvatar Grid.Column="0"
-                                 VerticalAlignment="Top"
-                                 Margin="2"
-                                 Account="{Binding User}"
-                                 Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
-                                 CommandParameter="{Binding}"
-                                 Cursor="Hand"/>
+                <v:ActorAvatarView Grid.Column="0"
+                                   VerticalAlignment="Top"
+                                   Margin="2"
+                                   ViewModel="{Binding User}"
+                                   Width="16"
+                                   Height="16"
+                                   Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                                   CommandParameter="{Binding}"
+                                   Cursor="Hand"/>
                 <ui:GitHubActionLink Grid.Column="1" FontWeight="SemiBold" Margin="2 1 2 0"
                                      Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                                      CommandParameter="{Binding}"

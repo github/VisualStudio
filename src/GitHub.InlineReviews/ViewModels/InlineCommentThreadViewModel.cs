@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="session">The current PR review session.</param>
         public InlineCommentThreadViewModel(
             IPullRequestSession session,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            IEnumerable<InlineCommentModel> comments)
             : base(session.User)
         {
             Guard.ArgumentNotNull(session, nameof(session));
@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             foreach (var comment in comments)
             {
-                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment));
+                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment.Comment));
             }
 
             Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
@@ -59,14 +59,13 @@ namespace GitHub.InlineReviews.ViewModels
                 id));
         }
 
-        async Task<ICommentModel> DoPostComment(object parameter)
+        async Task<CommentModel> DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var body = (string)parameter;
             var replyId = Comments[0].Id;
-            var nodeId = Comments[0].NodeId;
-            return await Session.PostReviewComment(body, replyId, nodeId);
+            return await Session.PostReviewComment(body, replyId);
         }
     }
 }

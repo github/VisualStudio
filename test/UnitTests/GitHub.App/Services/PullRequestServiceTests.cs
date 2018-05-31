@@ -661,9 +661,9 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
-        static IPullRequestModel CreatePullRequest()
+        static PullRequestDetailModel CreatePullRequest()
         {
-            var result = Substitute.For<IPullRequestModel>();
+            var result = new PullRequestDetailModel();
             return result;
         }
     }
@@ -723,9 +723,14 @@ public class PullRequestServiceTests : TestBaseClass
             var service = CreateTarget(gitClient, MockGitService());
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
-            var pr = Substitute.For<IPullRequestModel>();
-            pr.Number.Returns(4);
-            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
+
+            var pr = new PullRequestDetailModel
+            {
+                Number = 4,
+                BaseRefName = "master",
+                BaseRefSha = "123",
+                BaseRepositoryOwner = "owner",
+            };
 
             await service.Checkout(localRepo, pr, "pr/123-foo1");
 
@@ -744,10 +749,16 @@ public class PullRequestServiceTests : TestBaseClass
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
 
-            var pr = Substitute.For<IPullRequestModel>();
-            pr.Number.Returns(5);
-            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
-            pr.Head.Returns(new GitReferenceModel("prbranch", "owner:prbranch", "123", "https://foo.bar/owner/repo"));
+            var pr = new PullRequestDetailModel
+            {
+                Number = 5,
+                BaseRefName = "master",
+                BaseRefSha = "123",
+                BaseRepositoryOwner = "owner",
+                HeadRefName = "prbranch",
+                HeadRefSha = "123",
+                HeadRepositoryOwner = "owner",
+            };
 
             await service.Checkout(localRepo, pr, "prbranch");
 
@@ -767,14 +778,20 @@ public class PullRequestServiceTests : TestBaseClass
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
 
-            var pr = Substitute.For<IPullRequestModel>();
-            pr.Number.Returns(5);
-            pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
-            pr.Head.Returns(new GitReferenceModel("prbranch", "fork:prbranch", "123", "https://foo.bar/fork/repo.git"));
+            var pr = new PullRequestDetailModel
+            {
+                Number = 5,
+                BaseRefName = "master",
+                BaseRefSha = "123",
+                BaseRepositoryOwner = "owner",
+                HeadRefName = "prbranch",
+                HeadRefSha = "123",
+                HeadRepositoryOwner = "fork",
+            };
 
             await service.Checkout(localRepo, pr, "pr/5-fork-branch");
 
-            gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork", new Uri("https://foo.bar/fork/repo.git")).Forget();
+            gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork", new Uri("https://foo.bar/fork/repo")).Forget();
             gitClient.Received().SetConfig(Arg.Any<IRepository>(), "remote.fork.created-by-ghfvs", "true").Forget();
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork").Forget();
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "prbranch:pr/5-fork-branch").Forget();
@@ -801,14 +818,20 @@ public class PullRequestServiceTests : TestBaseClass
                 remoteCollection["fork"].Returns(remote);
                 repo.Network.Remotes.Returns(remoteCollection);
 
-                var pr = Substitute.For<IPullRequestModel>();
-                pr.Number.Returns(5);
-                pr.Base.Returns(new GitReferenceModel("master", "owner:master", "123", "https://foo.bar/owner/repo.git"));
-                pr.Head.Returns(new GitReferenceModel("prbranch", "fork:prbranch", "123", "https://foo.bar/fork/repo.git"));
+                var pr = new PullRequestDetailModel
+                {
+                    Number = 5,
+                    BaseRefName = "master",
+                    BaseRefSha = "123",
+                    BaseRepositoryOwner = "owner",
+                    HeadRefName = "prbranch",
+                    HeadRefSha = "123",
+                    HeadRepositoryOwner = "fork",
+                };
 
                 await service.Checkout(localRepo, pr, "pr/5-fork-branch");
 
-                gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork1", new Uri("https://foo.bar/fork/repo.git")).Forget();
+                gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork1", new Uri("https://foo.bar/fork/repo")).Forget();
                 gitClient.Received().SetConfig(Arg.Any<IRepository>(), "remote.fork1.created-by-ghfvs", "true").Forget();
             }
         }
@@ -898,16 +921,18 @@ public class PullRequestServiceTests : TestBaseClass
             Assert.That("pr/1-foo", Is.EqualTo(result.Name));
         }
 
-        static IPullRequestModel CreatePullRequest(bool fromFork)
+        static PullRequestDetailModel CreatePullRequest(bool fromFork)
         {
-            var author = Substitute.For<IAccount>();
-
-            return new PullRequestModel(1, "PR 1", author, DateTimeOffset.Now)
+            return new PullRequestDetailModel
             {
-                State = PullRequestStateEnum.Open,
-                Body = string.Empty,
-                Head = new GitReferenceModel("source", fromFork ? "fork:baz" : "foo:baz", "sha", fromFork ? "https://github.com/fork/bar.git" : "https://github.com/foo/bar.git"),
-                Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
+                Number = 1,
+                Title = "PR 1",
+                HeadRefName = "source",
+                HeadRefSha = "HEAD_SHA",
+                HeadRepositoryOwner = fromFork ? "fork" : "foo",
+                BaseRefName = "dest",
+                BaseRefSha = "BASE_SHA",
+                BaseRepositoryOwner = "foo",
             };
         }
 

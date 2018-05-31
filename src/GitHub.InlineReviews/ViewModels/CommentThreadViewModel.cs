@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.ViewModels;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -11,26 +12,26 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
-        ReactiveCommand<ICommentModel> postComment;
+        ReactiveCommand<CommentModel> postComment;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
         /// <param name="commentModels">The thread comments.</param>
-        protected CommentThreadViewModel(IAccount currentUser)
+        protected CommentThreadViewModel(ActorModel currentUser)
         {
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
             Comments = new ObservableCollection<ICommentViewModel>();
-            CurrentUser = currentUser;
+            CurrentUser = new ActorViewModel(currentUser);
         }
 
         /// <inheritdoc/>
         public ObservableCollection<ICommentViewModel> Comments { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<ICommentModel> PostComment
+        public ReactiveCommand<CommentModel> PostComment
         {
             get { return postComment; }
             set
@@ -45,7 +46,7 @@ namespace GitHub.InlineReviews.ViewModels
         }
 
         /// <inheritdoc/>
-        public IAccount CurrentUser { get; }
+        public IActorViewModel CurrentUser { get; }
 
         /// <inheritdoc/>
         public abstract Uri GetCommentUrl(int id);
