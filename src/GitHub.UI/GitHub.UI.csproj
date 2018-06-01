@@ -264,6 +264,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources.zh-Hans.resx" />
     <EmbeddedResource Include="TestAutomation\AutomationIDs.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AutomationIDs.Designer.cs</LastGenOutput>

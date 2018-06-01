@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CloneTitle" xml:space="preserve">
-    <value>克隆一个 git 仓库</value>
+    <value>克隆一个 {0} 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>无法连接到github.com！</value>
@@ -154,10 +154,10 @@
     <value>请输入您的密码。</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
-    <value>发布存储库</value>
+    <value>发布版本库</value>
   </data>
   <data name="PublishToTitle" xml:space="preserve">
-    <value>已添加库到书签 '%s'</value>
+    <value>发布版本库至 {0}</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>请输入请求的标题!</value>
@@ -181,7 +181,7 @@
     <value>路径太长</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
-    <value>% 1 已经存在 。</value>
+    <value>版本库 '{0}/{1}'已存在。</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
     <value>请选择一个表单并且重试。</value>
@@ -199,13 +199,13 @@
     <value>这个名字不能超过100个字符</value>
   </data>
   <data name="SafeRepositoryNameWarning" xml:space="preserve">
-    <value>新增就业岗位0个</value>
+    <value>将要创建为 {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
     <value>在您的手机上安装双重验证程序：Google Authenticator</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
-    <value>{0}向您发送了一条消息。</value>
+    <value>我们将发送一条验证码短信到您的手机。</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
     <value>双重身份认证</value>
@@ -223,15 +223,101 @@
     <value>拉取请求</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>Pull 请求</value>
+    <value>推送请求</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
-    <value>添加...</value>
+    <value>添加</value>
   </data>
   <data name="Fork" xml:space="preserve">
-    <value>餐叉</value>
+    <value>fork</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
-    <value>#无效</value>
+    <value>[无效]</value>
+  </data>
+  <data name="BrowseForDirectory" xml:space="preserve">
+    <value>为新版本库选择文件夹。</value>
+  </data>
+  <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
+    <value>不是企业服务器。请输入企业服务器 URL</value>
+  </data>
+  <data name="LoginFailedForbiddenMessage" xml:space="preserve">
+    <value>请确保使用您的密码而不是登录的个人访问令牌。</value>
+  </data>
+  <data name="PRCreatedUpstream" xml:space="preserve">
+    <value>在 [{1}] ({2}) 上成功创建分支 ** {0} ** 拉取请求</value>
+  </data>
+  <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
+    <value>远程不存在源分支, 你有没有推送它？</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>你必须先拉取再推送</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>没有需要拉取的提交</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>没有需要推送的提交</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>* 未提供说明。*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>签出 {0}</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>签出到 {0}</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>从 {0} 分支 {1} 拉取</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>推至 {0}  分支 {1}</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>远程</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>源存版本库不再可用。</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>无法签出, 因为您的工作目录有未提交的更改。</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>同步 {0} 子模块</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>在PATH 找不到 Git.exe。
+
+请安装 Git for Windows : https://git-scm.com/download/win</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>批准</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>更改需求</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>已评论</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>进行中</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>按回车键导航到编辑器</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>在导航到编辑器之前签出 PR 分支</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>按回车键导航到编辑器 (PR 分支必须签出)</value>
+  </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>Fork版本库</value>
+  </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>原始开关</value>
   </data>
 </root>

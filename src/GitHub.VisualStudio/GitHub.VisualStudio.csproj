@@ -436,8 +436,16 @@
     <EmbeddedResource Include="VSPackage.zh-Hans.resx" />
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="GitHub.VisualStudio.en-US.vsct" />
-    <VSCTCompile Include="GitHub.VisualStudio.zh-Hans.vsct" />
+    <VSCTCompile Include="GitHub.VisualStudio.en-US.vsct" >
+	 <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
+	     <DependentUpon>GitHub.VisualStudio.vsct</DependentUpon>
+	</VSCTCompile>
+    <VSCTCompile Include="GitHub.VisualStudio.zh-Hans.vsct" >
+	 <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
+	     <DependentUpon>GitHub.VisualStudio.vsct</DependentUpon>
+	</VSCTCompile>
     <Content Include="Resources\preview_200x200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -469,8 +477,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GitHub.VisualStudio.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-      <SubType>Designer</SubType>
+     
     </None>
   </ItemGroup>
   <ItemGroup>

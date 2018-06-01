@@ -117,10 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="110" xml:space="preserve">
-    <value>GitHub.VisualStudio</value>
+  <data name="day" xml:space="preserve">
+    <value>{0:N0} 天前</value>
   </data>
-  <data name="112" xml:space="preserve">
-    <value>将GitHub的工作流带入 Visual Studio 的扩展</value>
+  <data name="days" xml:space="preserve">
+    <value>{0:N0} 天前</value>
+  </data>
+  <data name="hour" xml:space="preserve">
+    <value>{0:N0} 小时前</value>
+  </data>
+  <data name="hours" xml:space="preserve">
+    <value>{0:N0} 小时前</value>
+  </data>
+  <data name="minute" xml:space="preserve">
+    <value>{0:N0} 分钟前</value>
+  </data>
+  <data name="minutes" xml:space="preserve">
+    <value>{0:N0} 分钟前</value>
+  </data>
+  <data name="month" xml:space="preserve">
+    <value>{0:N0} 月前</value>
+  </data>
+  <data name="months" xml:space="preserve">
+    <value>{0:N0} 月前</value>
+  </data>
+  <data name="second" xml:space="preserve">
+    <value>{0:N0} 秒前</value>
+  </data>
+  <data name="seconds" xml:space="preserve">
+    <value>{0:N0} 秒前</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>{0:N0} 年前</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>{0:N0} 年前</value>
   </data>
 </root>
