@@ -31,6 +31,96 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
                 Assert.That(target.CanStartReview, Is.True);
             }
+
+            [Test]
+            public void IsFalseWhenEditingExistingComment()
+            {
+                var session = CreateSession(false);
+                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Id = "1" };
+                var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
+
+                Assert.That(target.CanStartReview, Is.False);
+            }
+        }
+
+        public class TheBeginEditProperty
+        {
+            [Test]
+            public void CanBeExecutedForPlaceholders()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+                var currentUser = Substitute.For<IActorViewModel>();
+                var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, thread, currentUser);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
+            }
+
+            [Test]
+            public void CanBeExecutedForCommentsByTheSameAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = new ActorModel { Login = "CurrentUser" };
+                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = currentUser };
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
+            }
+
+            [Test]
+            public void CannotBeExecutedForCommentsByAnotherAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = new ActorModel { Login = "CurrentUser" };
+                var otherUser = new ActorModel { Login = "OtherUser" };
+                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = otherUser };
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.BeginEdit.CanExecute(new object()), Is.False);
+            }
+        }
+
+        public class TheDeleteProperty
+        {
+            [Test]
+            public void CannotBeExecutedForPlaceholders()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+                var currentUser = Substitute.For<IActorViewModel>();
+                var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, thread, currentUser);
+                Assert.That(target.Delete.CanExecute(new object()), Is.False);
+            }
+
+            [Test]
+            public void CanBeExecutedForCommentsByTheSameAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = new ActorModel { Login = "CurrentUser" };
+                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = currentUser };
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.Delete.CanExecute(new object()), Is.True);
+            }
+
+            [Test]
+            public void CannotBeExecutedForCommentsByAnotherAuthor()
+            {
+                var session = CreateSession();
+                var thread = CreateThread();
+
+                var currentUser = new ActorModel { Login = "CurrentUser" };
+                var otherUser = new ActorModel { Login = "OtherUser" };
+                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = otherUser };
+
+                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                Assert.That(target.Delete.CanExecute(new object()), Is.False);
+            }
         }
 
         public class TheCommitCaptionProperty
@@ -51,6 +141,16 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var target = CreateTarget(session);
 
                 Assert.That(target.CommitCaption, Is.EqualTo("Add a single comment"));
+            }
+
+            [Test]
+            public void IsUpdateCommentWhenEditingExistingComment()
+            {
+                var session = CreateSession(false);
+                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Id = "1" };
+                var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
+
+                Assert.That(target.CommitCaption, Is.EqualTo("Update comment"));
             }
         }
 
@@ -100,16 +200,21 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
         static PullRequestReviewCommentViewModel CreateTarget(
             IPullRequestSession session = null,
-            ICommentThreadViewModel thread = null)
+            ICommentThreadViewModel thread = null,
+            ActorModel currentUser = null,
+            PullRequestReviewCommentModel pullRequestReviewCommentModel = null)
         {
             session = session ?? CreateSession();
             thread = thread ?? CreateThread();
 
+            currentUser = currentUser ?? new ActorModel { Login = "CurrentUser" };
+            pullRequestReviewCommentModel = pullRequestReviewCommentModel ?? new PullRequestReviewCommentModel();
+
             return new PullRequestReviewCommentViewModel(
                 session,
                 thread,
-                Substitute.For<IActorViewModel>(),
-                new PullRequestReviewCommentModel());
+                new ActorViewModel(currentUser),
+                pullRequestReviewCommentModel);
         }
 
         static IPullRequestSession CreateSession(

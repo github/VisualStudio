@@ -132,13 +132,27 @@ namespace GitHub.Services
         /// Posts the currently pending review.
         /// </summary>
         /// <param name="body">The review body.</param>
-        /// <param name="state">The review event.</param>
+        /// <param name="e">The review event.</param>
         /// <returns>The review model.</returns>
         Task<PullRequestReviewModel> PostReview(string body, PullRequestReviewEvent e);
 
         /// <summary>
-        /// Refreshes the pull request session.
+        /// Deletes a pull request comment.
         /// </summary>
+        /// <param name="number">The number of the pull request comment to delete</param>
+        /// <returns>A task which completes when the session has completed updating.</returns>
+        Task DeleteComment(int number);
+
+        /// <summary>
+        /// Edit a PR review comment reply.
+        /// </summary>
+        /// <param name="commentNodeId">The node id of the pull request comment</param>
+        /// <param name="body">The replacement comment body.</param>
+        /// <returns>A comment model.</returns>
+        Task<PullRequestReviewCommentModel> EditComment(string commentNodeId, string body);
+
+        /// <summary>
+        /// Refreshes the pull request session.
         /// <returns>A task which completes when the session has completed refreshing.</returns>
         Task Refresh();
     }

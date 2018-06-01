@@ -18,6 +18,8 @@ namespace GitHub.InlineReviews.SampleData
             = new ActorViewModel { Login = "shana" };
 
         public ReactiveCommand<CommentModel> PostComment { get; }
+        public ReactiveCommand<CommentModel> EditComment { get; }
+        public ReactiveCommand<object> DeleteComment { get; }
 
         public Uri GetCommentUrl(int id)
         {

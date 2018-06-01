@@ -161,6 +161,31 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task DeleteComment(
+            int number)
+        {
+            await service.DeleteComment(
+                LocalRepository,
+                RepositoryOwner,
+                number);
+
+            await RemoveComment(number);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PullRequestReviewCommentModel> EditComment(string commentNodeId, string body)
+        {
+            var model = await service.EditComment(
+                LocalRepository,
+                RepositoryOwner,
+                commentNodeId,
+                body);
+
+            await ReplaceComment(model);
+            return model;
+        }
+
+        /// <inheritdoc/>
         public async Task<PullRequestReviewCommentModel> PostReviewComment(
             string body,
             string inReplyTo)
@@ -286,8 +311,27 @@ namespace GitHub.InlineReviews.Services
             review.Comments = review.Comments
                 .Concat(new[] { comment })
                 .ToList();
-
             await Update(PullRequest);
+        }
+
+        async Task ReplaceComment(PullRequestReviewCommentModel comment)
+        {
+            await Task.Delay(0); throw new NotImplementedException();
+            ////PullRequest.ReviewComments = PullRequest.ReviewComments
+            ////    .Select(model => model.Id == comment.Id ? comment: model)
+            ////    .ToList();
+
+            ////await Update(PullRequest);
+        }
+
+        async Task RemoveComment(int commentId)
+        {
+            await Task.Delay(0); throw new NotImplementedException();
+            ////PullRequest.ReviewComments = PullRequest.ReviewComments
+            ////    .Where(model => model.Id != commentId)
+            ////    .ToList();
+
+            ////await Update(PullRequest);
         }
 
         async Task AddReview(PullRequestReviewModel review)

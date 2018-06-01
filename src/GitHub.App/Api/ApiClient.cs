@@ -110,6 +110,24 @@ namespace GitHub.Api
             return gitHubClient.PullRequest.ReviewComment.CreateReply(owner, name, number, comment);
         }
 
+        public IObservable<PullRequestReviewComment> EditPullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body)
+        {
+            var pullRequestReviewCommentEdit = new PullRequestReviewCommentEdit(body);
+            return gitHubClient.PullRequest.ReviewComment.Edit(owner, name, number, pullRequestReviewCommentEdit);
+        }
+
+        public IObservable<Unit> DeletePullRequestReviewComment(
+            string owner,
+            string name,
+            int number)
+        {
+            return gitHubClient.PullRequest.ReviewComment.Delete(owner, name, number);
+        }
+
         public IObservable<Gist> CreateGist(NewGist newGist)
         {
             return gitHubClient.Gist.Create(newGist);

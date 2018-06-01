@@ -45,6 +45,14 @@ namespace GitHub.InlineReviews.ViewModels
                 this.WhenAnyValue(x => x.NeedsPush, x => !x),
                 DoPostComment);
 
+            EditComment = ReactiveCommand.CreateAsyncTask<CommentModel>(
+                Observable.Return(false),
+                o => null);
+
+            DeleteComment = ReactiveCommand.CreateAsyncTask<object>(
+                Observable.Return(false),
+                o => null);
+
             var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser);
             placeholder.BeginEdit.Execute(null);
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
