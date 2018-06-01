@@ -223,7 +223,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                         peekSession.TextView,
                         peekSession.TextView.TextBuffer);
                     AddCommentToExistingThread(file);
-                    return file.InlineCommentThreads[0].Comments.Last().Comment;
                 });
 
             var placeholder = target.Thread.Comments.Last();
@@ -260,7 +259,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                         peekSession.TextView,
                         peekSession.TextView.TextBuffer);
                     RaiseLinesChanged(file, Tuple.Create(10, DiffSide.Right));
-                    return new PullRequestReviewModel();
                 });
 
             var placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();

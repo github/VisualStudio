@@ -97,8 +97,7 @@ namespace GitHub.Services
         /// <param name="path">The relative path of the file to comment on.</param>
         /// <param name="fileDiff">The diff between the PR head and base.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
-        /// <returns>A comment model.</returns>
-        Task<PullRequestReviewCommentModel> PostReviewComment(
+        Task PostReviewComment(
             string body,
             string commitId,
             string path,
@@ -111,14 +110,14 @@ namespace GitHub.Services
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The GraphQL ID of the comment to reply to.</param>
         /// <returns></returns>
-        Task<PullRequestReviewCommentModel> PostReviewComment(
+        Task PostReviewComment(
             string body,
             string inReplyTo);
 
         /// <summary>
         /// Starts a new pending pull request review.
         /// </summary>
-        Task<PullRequestReviewModel> StartReview();
+        Task StartReview();
 
         /// <summary>
         /// Cancels the currently pending review.
@@ -134,7 +133,7 @@ namespace GitHub.Services
         /// <param name="body">The review body.</param>
         /// <param name="e">The review event.</param>
         /// <returns>The review model.</returns>
-        Task<PullRequestReviewModel> PostReview(string body, PullRequestReviewEvent e);
+        Task PostReview(string body, PullRequestReviewEvent e);
 
         /// <summary>
         /// Deletes a pull request comment.
@@ -149,7 +148,7 @@ namespace GitHub.Services
         /// <param name="commentNodeId">The node id of the pull request comment</param>
         /// <param name="body">The replacement comment body.</param>
         /// <returns>A comment model.</returns>
-        Task<PullRequestReviewCommentModel> EditComment(string commentNodeId, string body);
+        Task EditComment(string commentNodeId, string body);
 
         /// <summary>
         /// Refreshes the pull request session.

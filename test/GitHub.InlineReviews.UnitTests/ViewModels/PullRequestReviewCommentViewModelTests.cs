@@ -230,7 +230,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             bool canPost = true)
         {
             var result = Substitute.For<ICommentThreadViewModel>();
-            result.PostComment.Returns(new ReactiveCommand<CommentModel>(Observable.Return(canPost), _ => null));
             return result;
         }
     }

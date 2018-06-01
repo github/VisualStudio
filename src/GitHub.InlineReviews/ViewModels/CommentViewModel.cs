@@ -157,20 +157,14 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                CommentModel model;
-
                 if (Id == null)
                 {
-                    model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                    await Thread.PostComment.ExecuteAsyncTask(Body);
                 }
                 else
                 {
-                    model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(Id, Body));
+                    await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(Id, Body));
                 }
-
-                Id = model.Id;
-                EditState = CommentEditState.None;
-                UpdatedAt = DateTimeOffset.Now;
             }
             catch (Exception e)
             {

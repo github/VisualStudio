@@ -430,7 +430,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewModel> CreatePendingReview(
+        public async Task<PullRequestDetailModel> CreatePendingReview(
             ILocalRepositoryModel localRepository,
             string pullRequestId)
         {
@@ -442,28 +442,21 @@ namespace GitHub.InlineReviews.Services
                 PullRequestId = new ID(pullRequestId),
             };
 
-            var addReview = new Mutation()
+            var mutation = new Mutation()
                 .AddPullRequestReview(review)
-                .Select(x => new PullRequestReviewModel
+                .Select(x => new
                 {
-                    Id = x.PullRequestReview.Id.Value,
-                    Body = x.PullRequestReview.Body,
-                    CommitId = x.PullRequestReview.Commit.Oid,
-                    State = FromGraphQL(x.PullRequestReview.State),
-                    Author = new ActorModel
-                    {
-                        Login = x.PullRequestReview.Author.Login,
-                        AvatarUrl = x.PullRequestReview.Author.AvatarUrl(null),
-                    },
+                    x.PullRequestReview.Repository.Owner.Login,
+                    x.PullRequestReview.PullRequest.Number
                 });
 
-            var result = await graphql.Run(addReview);
+            var result = await graphql.Run(mutation);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentStartReview);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         /// <inheritdoc/>
-        public async Task CancelPendingReview(
+        public async Task<PullRequestDetailModel> CancelPendingReview(
             ILocalRepositoryModel localRepository,
             string reviewId)
         {
@@ -475,15 +468,20 @@ namespace GitHub.InlineReviews.Services
                 PullRequestReviewId = new ID(reviewId),
             };
 
-            var deleteReview = new Mutation()
+            var mutation = new Mutation()
                 .DeletePullRequestReview(delete)
-                .Select(x => x.ClientMutationId);
+                .Select(x => new
+                {
+                    x.PullRequestReview.Repository.Owner.Login,
+                    x.PullRequestReview.PullRequest.Number
+                });
 
-            await graphql.Run(deleteReview);
+            var result = await graphql.Run(mutation);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewModel> PostReview(
+        public async Task<PullRequestDetailModel> PostReview(
             ILocalRepositoryModel localRepository,
             string pullRequestId,
             string commitId,
@@ -503,26 +501,18 @@ namespace GitHub.InlineReviews.Services
 
             var mutation = new Mutation()
                 .AddPullRequestReview(addReview)
-                .Select(review => new PullRequestReviewModel
+                .Select(x => new
                 {
-                    Id = review.PullRequestReview.Id.Value,
-                    Body = body,
-                    CommitId = review.PullRequestReview.Commit.Oid,
-                    Comments = new PullRequestReviewCommentModel[0],
-                    State = (GitHub.Models.PullRequestReviewState)review.PullRequestReview.State,
-                    Author = new ActorModel
-                    {
-                        Login = review.PullRequestReview.Author.Login,
-                        AvatarUrl = review.PullRequestReview.Author.AvatarUrl(null),
-                    },
+                    x.PullRequestReview.Repository.Owner.Login,
+                    x.PullRequestReview.PullRequest.Number
                 });
 
             var result = await graphql.Run(mutation);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
-        public async Task<PullRequestReviewModel> SubmitPendingReview(
+        public async Task<PullRequestDetailModel> SubmitPendingReview(
             ILocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
@@ -540,44 +530,19 @@ namespace GitHub.InlineReviews.Services
 
             var mutation = new Mutation()
                 .SubmitPullRequestReview(submit)
-                .Select(review => new PullRequestReviewModel
+                .Select(x => new
                 {
-                    Id = review.PullRequestReview.Id.Value,
-                    Body = body,
-                    CommitId = review.PullRequestReview.Commit.Oid,
-                    Comments = review.PullRequestReview.Comments(100, null, null, null).AllPages().Select(comment => new CommentAdapter
-                    {
-                        Id = comment.Id.Value,
-                        Author = new ActorModel
-                        {
-                            Login = comment.Author.Login,
-                            AvatarUrl = comment.Author.AvatarUrl(null),
-                        },
-                        Body = comment.Body,
-                        CommitSha = comment.Commit.Oid,
-                        CreatedAt = comment.CreatedAt,
-                        DiffHunk = comment.DiffHunk,
-                        OriginalCommitId = comment.OriginalCommit.Oid,
-                        OriginalPosition = comment.OriginalPosition,
-                        Path = comment.Path,
-                        Position = comment.Position,
-                        ReplyTo = comment.ReplyTo.Id.Value,
-                    }).ToList(),
-                    State = (GitHub.Models.PullRequestReviewState)review.PullRequestReview.State,
-                    Author = new ActorModel
-                    {
-                        Login = review.PullRequestReview.Author.Login,
-                        AvatarUrl = review.PullRequestReview.Author.AvatarUrl(null),
-                    },
+                    x.PullRequestReview.Repository.Owner.Login,
+                    x.PullRequestReview.PullRequest.Number
                 });
 
             var result = await graphql.Run(mutation);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewCommentModel> PostPendingReviewComment(
+        public async Task<PullRequestDetailModel> PostPendingReviewComment(
             ILocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
@@ -599,31 +564,19 @@ namespace GitHub.InlineReviews.Services
 
             var addComment = new Mutation()
                 .AddPullRequestReviewComment(comment)
-                .Select(x => new CommentAdapter
+                .Select(x => new
                 {
-                    Id = x.Comment.Id.Value,
-                    Author = new ActorModel
-                    {
-                        Login = x.Comment.Author.Login,
-                        AvatarUrl = x.Comment.Author.AvatarUrl(null),
-                    },
-                    Body = x.Comment.Body,
-                    CommitSha = x.Comment.Commit.Oid,
-                    Path = x.Comment.Path,
-                    Position = x.Comment.Position,
-                    CreatedAt = x.Comment.CreatedAt,
-                    DiffHunk = x.Comment.DiffHunk,
-                    OriginalPosition = x.Comment.OriginalPosition,
-                    OriginalCommitId = x.Comment.OriginalCommit.Oid,
+                    x.Comment.Repository.Owner.Login,
+                    x.Comment.PullRequest.Number
                 });
 
             var result = await graphql.Run(addComment);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewCommentModel> PostPendingReviewCommentReply(
+        public async Task<PullRequestDetailModel> PostPendingReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
@@ -641,31 +594,19 @@ namespace GitHub.InlineReviews.Services
 
             var addComment = new Mutation()
                 .AddPullRequestReviewComment(comment)
-                .Select(x => new CommentAdapter
+                .Select(x => new
                 {
-                    Id = x.Comment.Id.Value,
-                    Author = new ActorModel
-                    {
-                        Login = x.Comment.Author.Login,
-                        AvatarUrl = x.Comment.Author.AvatarUrl(null),
-                    },
-                    Body = x.Comment.Body,
-                    CommitSha = x.Comment.Commit.Oid,
-                    Path = x.Comment.Path,
-                    Position = x.Comment.Position,
-                    CreatedAt = x.Comment.CreatedAt,
-                    DiffHunk = x.Comment.DiffHunk,
-                    OriginalPosition = x.Comment.OriginalPosition,
-                    OriginalCommitId = x.Comment.OriginalCommit.Oid,
+                    x.Comment.Repository.Owner.Login,
+                    x.Comment.PullRequest.Number
                 });
 
             var result = await graphql.Run(addComment);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewModel> PostStandaloneReviewComment(
+        public async Task<PullRequestDetailModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
             string pullRequestId,
             string body,
@@ -695,44 +636,19 @@ namespace GitHub.InlineReviews.Services
 
             var mutation = new Mutation()
                 .AddPullRequestReview(addReview)
-                .Select(review => new PullRequestReviewModel
+                .Select(x => new
                 {
-                    Id = review.PullRequestReview.Id.Value,
-                    Body = body,
-                    CommitId = review.PullRequestReview.Commit.Oid,
-                    Comments = review.PullRequestReview.Comments(100, null, null, null).AllPages().Select(comment => new CommentAdapter
-                    {
-                        Id = comment.Id.Value,
-                        Author = new ActorModel
-                        {
-                            Login = comment.Author.Login,
-                            AvatarUrl = comment.Author.AvatarUrl(null),
-                        },
-                        Body = comment.Body,
-                        CommitSha = comment.Commit.Oid,
-                        CreatedAt = comment.CreatedAt,
-                        DiffHunk = comment.DiffHunk,
-                        OriginalCommitId = comment.OriginalCommit.Oid,
-                        OriginalPosition = comment.OriginalPosition,
-                        Path = comment.Path,
-                        Position = comment.Position,
-                        ReplyTo = comment.ReplyTo.Id.Value,
-                    }).ToList(),
-                    State = (GitHub.Models.PullRequestReviewState)review.PullRequestReview.State,
-                    Author = new ActorModel
-                    {
-                        Login = review.PullRequestReview.Author.Login,
-                        AvatarUrl = review.PullRequestReview.Author.AvatarUrl(null),
-                    },
+                    x.PullRequestReview.Repository.Owner.Login,
+                    x.PullRequestReview.PullRequest.Number
                 });
 
             var result = await graphql.Run(mutation);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewModel> PostStandaloneReviewCommentReply(
+        public async Task<PullRequestDetailModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string pullRequestId,
             string body,
@@ -744,7 +660,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task DeleteComment(
+        public async Task<PullRequestDetailModel> DeleteComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             int number)
@@ -758,10 +674,11 @@ namespace GitHub.InlineReviews.Services
                 number);
 
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete);
+            return await ReadPullRequestDetail(address, remoteRepositoryOwner, localRepository.Name, number);
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestReviewCommentModel> EditComment(ILocalRepositoryModel localRepository,
+        public async Task<PullRequestDetailModel> EditComment(ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             string commentNodeId,
             string body)
@@ -776,27 +693,15 @@ namespace GitHub.InlineReviews.Services
             };
 
             var editComment = new Mutation().UpdatePullRequestReviewComment(updatePullRequestReviewCommentInput)
-                .Select(x => new CommentAdapter
+                .Select(x => new
                 {
-                    Id = x.PullRequestReviewComment.Id.Value,
-                    Body = x.PullRequestReviewComment.Body,
-                    CommitSha = x.PullRequestReviewComment.Commit.Oid,
-                    Path = x.PullRequestReviewComment.Path,
-                    Position = x.PullRequestReviewComment.Position,
-                    CreatedAt = x.PullRequestReviewComment.CreatedAt,
-                    DiffHunk = x.PullRequestReviewComment.DiffHunk,
-                    OriginalPosition = x.PullRequestReviewComment.OriginalPosition,
-                    OriginalCommitId = x.PullRequestReviewComment.OriginalCommit.Oid,
-                    Author = new ActorModel
-                    {
-                        Login = x.PullRequestReviewComment.Author.Login,
-                        AvatarUrl = x.PullRequestReviewComment.Author.AvatarUrl(null),
-                    },
+                    x.PullRequestReviewComment.Repository.Owner.Login,
+                    x.PullRequestReviewComment.PullRequest.Number
                 });
 
             var result = await graphql.Run(editComment);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return result;
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)

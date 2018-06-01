@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
@@ -31,16 +32,16 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Called by a comment in the thread to post itself as a new comment to the API.
         /// </summary>
-        ReactiveCommand<CommentModel> PostComment { get; }
+        ReactiveCommand<Unit> PostComment { get; }
 
         /// <summary>
         /// Called by a comment in the thread to post itself as an edit to a comment to the API.
         /// </summary>
-        ReactiveCommand<CommentModel> EditComment { get; }
+        ReactiveCommand<Unit> EditComment { get; }
 
         /// <summary>
         /// Called by a comment in the thread to send a delete of the comment to the API.
         /// </summary>
-        ReactiveCommand<object> DeleteComment { get; }
+        ReactiveCommand<Unit> DeleteComment { get; }
     }
 }

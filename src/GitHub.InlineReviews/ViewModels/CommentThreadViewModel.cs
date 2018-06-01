@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -12,9 +13,9 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
-        ReactiveCommand<CommentModel> postComment;
-        ReactiveCommand<CommentModel> editComment;
-        ReactiveCommand<object> deleteComment;
+        ReactiveCommand<Unit> postComment;
+        ReactiveCommand<Unit> editComment;
+        ReactiveCommand<Unit> deleteComment;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
@@ -32,7 +33,7 @@ namespace GitHub.InlineReviews.ViewModels
         public ObservableCollection<ICommentViewModel> Comments { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<CommentModel> PostComment
+        public ReactiveCommand<Unit> PostComment
         {
             get { return postComment; }
             protected set
@@ -46,7 +47,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<CommentModel> EditComment
+        public ReactiveCommand<Unit> EditComment
         {
             get { return editComment; }
             protected set
@@ -58,7 +59,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<object> DeleteComment
+        public ReactiveCommand<Unit> DeleteComment
         {
             get { return deleteComment; }
             protected set

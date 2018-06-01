@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -67,31 +65,29 @@ namespace GitHub.InlineReviews.ViewModels
                 id));
         }
 
-        async Task<CommentModel> DoPostComment(object parameter)
+        async Task DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var body = (string)parameter;
             var replyId = Comments[0].Id;
-            return await Session.PostReviewComment(body, replyId);
+            await Session.PostReviewComment(body, replyId);
         }
 
-        async Task<CommentModel> DoEditComment(object parameter)
+        async Task DoEditComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var item = (Tuple<string, string>)parameter;
-            return await Session.EditComment(item.Item1, item.Item2);
+            await Session.EditComment(item.Item1, item.Item2);
         }
 
-        async Task<object> DoDeleteComment(object parameter)
+        async Task DoDeleteComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var number = (int)parameter;
             await Session.DeleteComment(number);
-
-            return new object();
         }
     }
 }

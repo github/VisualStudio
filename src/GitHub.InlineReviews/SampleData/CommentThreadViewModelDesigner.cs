@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -17,9 +18,9 @@ namespace GitHub.InlineReviews.SampleData
         public IActorViewModel CurrentUser { get; set; }
             = new ActorViewModel { Login = "shana" };
 
-        public ReactiveCommand<CommentModel> PostComment { get; }
-        public ReactiveCommand<CommentModel> EditComment { get; }
-        public ReactiveCommand<object> DeleteComment { get; }
+        public ReactiveCommand<Unit> PostComment { get; }
+        public ReactiveCommand<Unit> EditComment { get; }
+        public ReactiveCommand<Unit> DeleteComment { get; }
 
         public Uri GetCommentUrl(int id)
         {

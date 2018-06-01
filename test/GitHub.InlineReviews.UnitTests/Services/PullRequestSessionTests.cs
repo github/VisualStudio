@@ -10,7 +10,6 @@ using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
-using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -121,7 +120,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var currentUser = CreateActor();
                 var service = Substitute.For<IPullRequestSessionService>();
                 var review = CreateReview(author: currentUser, state: PullRequestReviewState.Pending);
-                service.CreatePendingReview(null, null).ReturnsForAnyArgs(review);
+                service.CreatePendingReview(null, null).ReturnsForAnyArgs(CreatePullRequest(review));
 
                 var target = new PullRequestSession(
                     service,
@@ -375,6 +374,7 @@ Line 4";
                 var service = CreateMockSessionService();
                 var target = CreateTarget(service, "fork", "owner", false);
 
+                service.PostReview(null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
                 await target.PostReview("New Review", Octokit.PullRequestReviewEvent.Approve);
 
                 await service.Received(1).PostReview(
@@ -391,6 +391,7 @@ Line 4";
                 var service = CreateMockSessionService();
                 var target = CreateTarget(service, "fork", "owner", true);
 
+                service.SubmitPendingReview(null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
                 await target.PostReview("New Review", Octokit.PullRequestReviewEvent.RequestChanges);
 
                 await service.Received(1).SubmitPendingReview(
@@ -398,41 +399,6 @@ Line 4";
                     "pendingReviewId",
                     "New Review",
                     Octokit.PullRequestReviewEvent.RequestChanges);
-            }
-
-            [Test]
-            public async Task AddsReviewToModel()
-            {
-                var service = CreateMockSessionService();
-                var target = CreateTarget(service, "fork", "owner", false);
-
-                var model = await target.PostReview("New Review", Octokit.PullRequestReviewEvent.RequestChanges);
-
-                Assert.That(target.PullRequest.Reviews.Last(), Is.SameAs(model));
-            }
-
-            [Test]
-            public async Task ReplacesPendingReviewWithModel()
-            {
-                var service = CreateMockSessionService();
-                var target = CreateTarget(service, "fork", "owner", true);
-
-                Assert.That(
-                    target.PullRequest.Reviews.Where(x => x.State == PullRequestReviewState.Pending).Count(),
-                    Is.EqualTo(1));
-
-                var submittedReview = CreateReview(
-                    id: "pendingReviewId",
-                    author: target.User,
-                    state: PullRequestReviewState.Approved);
-                service.SubmitPendingReview(null, null, null, Octokit.PullRequestReviewEvent.Approve)
-                    .ReturnsForAnyArgs(submittedReview);
-
-                var model = await target.PostReview("New Review", Octokit.PullRequestReviewEvent.Approve);
-
-                Assert.That(
-                    target.PullRequest.Reviews.Where(x => x.State == PullRequestReviewState.Pending).Count(),
-                    Is.Zero);
             }
         }
 
@@ -444,6 +410,7 @@ Line 4";
                 var service = CreateMockSessionService();
                 var target = CreateTarget(service, "fork", "owner", false);
 
+                service.PostStandaloneReviewComment(null, null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
                 await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
 
                 await service.Received(1).PostStandaloneReviewComment(
@@ -461,6 +428,7 @@ Line 4";
                 var service = CreateMockSessionService();
                 var target = CreateTarget(service, "fork", "owner", false);
 
+                service.PostStandaloneReviewCommentReply(null, null, null, null).ReturnsForAnyArgs(CreatePullRequest());
                 await target.PostReviewComment("New Comment", "node1");
 
                 await service.Received(1).PostStandaloneReviewCommentReply(
@@ -476,6 +444,7 @@ Line 4";
                 var service = CreateMockSessionService();
                 var target = CreateTarget(service, "fork", "owner", true);
 
+                service.PostPendingReviewComment(null, null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
                 await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
 
                 await service.Received(1).PostPendingReviewComment(
@@ -493,6 +462,7 @@ Line 4";
                 var service = CreateMockSessionService();
                 var target = CreateTarget(service, "fork", "owner", true);
 
+                service.PostPendingReviewCommentReply(null, null, null, null).ReturnsForAnyArgs(CreatePullRequest());
                 await target.PostReviewComment("New Comment", "node1");
 
                 await service.Received(1).PostPendingReviewCommentReply(
@@ -772,17 +742,6 @@ Line 4";
             };
         }
 
-        static IRepository CreateRepository()
-        {
-            var result = Substitute.For<IRepository>();
-            var branch = Substitute.For<Branch>();
-            var commit = Substitute.For<Commit>();
-            commit.Sha.Returns("BRANCH_TIP");
-            branch.Tip.Returns(commit);
-            result.Head.Returns(branch);
-            return result;
-        }
-
         static ILocalRepositoryModel CreateLocalRepository()
         {
             var result = Substitute.For<ILocalRepositoryModel>();
@@ -793,14 +752,6 @@ Line 4";
         static IPullRequestSessionService CreateMockSessionService()
         {
             var result = Substitute.For<IPullRequestSessionService>();
-            result.PostStandaloneReviewComment(null, null, null, null, null, 0)
-                .ReturnsForAnyArgs(CreateReview(comments: CreateComment()));
-            result.PostStandaloneReviewCommentReply(null, null, null, null)
-                .ReturnsForAnyArgs(CreateReview(comments: CreateComment()));
-            result.PostReview(null, null, null, null, Octokit.PullRequestReviewEvent.Approve)
-                .ReturnsForAnyArgs(CreateReview());
-            result.SubmitPendingReview(null, null, null, Octokit.PullRequestReviewEvent.Approve)
-                .ReturnsForAnyArgs(CreateReview());
             return result;
         }
 
