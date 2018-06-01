@@ -433,8 +433,11 @@
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.zh-Hans.resx" />
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="GitHub.VisualStudio.en-US.vsct" />
+    <VSCTCompile Include="GitHub.VisualStudio.zh-Hans.vsct" />
     <Content Include="Resources\preview_200x200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -465,10 +468,10 @@
     <None Include="..\..\build\version" />
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="GitHub.VisualStudio.vsct">
+    <None Include="GitHub.VisualStudio.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
-    </VSCTCompile>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\common\CodeAnalysisDictionary.xml">

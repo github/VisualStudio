@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CloneTitle" xml:space="preserve">
+    <value>克隆一个 git 仓库</value>
+  </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>无法连接到github.com！</value>
+  </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>创建一个GitHub Gist！</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>创建一个{0}存储库！</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs！</value>
+  </data>
+  <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
+    <value>请输入企业网址！</value>
+  </data>
+  <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
+    <value>请输入有效网址</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>是否忘记了您的密码?</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>您的用户名和密码</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>登录失败</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>连接到 GitHub</value>
+  </data>
+  <data name="PasswordValidatorEmpty" xml:space="preserve">
+    <value>请输入您的密码。</value>
+  </data>
+  <data name="PublishTitle" xml:space="preserve">
+    <value>发布存储库</value>
+  </data>
+  <data name="PublishToTitle" xml:space="preserve">
+    <value>已添加库到书签 '%s'</value>
+  </data>
+  <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
+    <value>请输入请求的标题!</value>
+  </data>
+  <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
+    <value>源和目标分支不能相同!</value>
+  </data>
+  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
+    <value>选择了项目。</value>
+  </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>请输入名称</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>请输入有效路径</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>包含无效字符</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>路径太长</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
+    <value>% 1 已经存在 。</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
+    <value>请选择一个表单并且重试。</value>
+  </data>
+  <data name="RepositoryCreationFailedQuota" xml:space="preserve">
+    <value>私密文档</value>
+  </data>
+  <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
+    <value>同名的广告活动已存在</value>
+  </data>
+  <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
+    <value>请输入姓名</value>
+  </data>
+  <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
+    <value>这个名字不能超过100个字符</value>
+  </data>
+  <data name="SafeRepositoryNameWarning" xml:space="preserve">
+    <value>新增就业岗位0个</value>
+  </data>
+  <data name="TwoFactorApp" xml:space="preserve">
+    <value>在您的手机上安装双重验证程序：Google Authenticator</value>
+  </data>
+  <data name="TwoFactorSms" xml:space="preserve">
+    <value>{0}向您发送了一条消息。</value>
+  </data>
+  <data name="TwoFactorTitle" xml:space="preserve">
+    <value>双重身份认证</value>
+  </data>
+  <data name="TwoFactorUnknown" xml:space="preserve">
+    <value>输入任何你喜欢的一个标志 % ，</value>
+  </data>
+  <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
+    <value>请输入您的用户名或邮箱地址.</value>
+  </data>
+  <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
+    <value>用户名或电子邮件地址</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>拉取请求</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Pull 请求</value>
+  </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>添加...</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>餐叉</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>#无效</value>
+  </data>
+</root>

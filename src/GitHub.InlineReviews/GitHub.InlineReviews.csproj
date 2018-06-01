@@ -419,11 +419,17 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="VSPackage.de.resx" />
+    <EmbeddedResource Include="VSPackage.fr.resx" />
+    <EmbeddedResource Include="VSPackage.it.resx" />
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.ru.resx" />
+    <EmbeddedResource Include="VSPackage.zh-Hans.resx" />
+    <EmbeddedResource Include="VSPackage.zh-Hant.resx" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
