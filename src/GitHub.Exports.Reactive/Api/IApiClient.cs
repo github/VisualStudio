@@ -90,6 +90,30 @@ namespace GitHub.Api
         /// <returns></returns>
         IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(string owner, string name, int number, string body, int inReplyTo);
 
+        /// <summary>
+        /// Delete a PR review comment.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request comment number.</param>
+        IObservable<Unit> DeletePullRequestReviewComment(
+            string owner,
+            string name,
+            int number);
+
+        /// <summary>
+        /// Edits a PR review comment.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request comment number.</param>
+        /// <param name="body">The replacement comment body.</param>
+        IObservable<PullRequestReviewComment> EditPullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body);
+
         IObservable<Branch> GetBranches(string owner, string repo);
         IObservable<Repository> GetRepositories();
         IObservable<Repository> GetRepository(string owner, string repo);
