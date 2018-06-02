@@ -434,4 +434,79 @@
   <data name="UpdateComment" xml:space="preserve">
     <value>Update comment</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="StartAReview" xml:space="preserve">
+    <value>Start a review</value>
+  </data>
+  <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
+    <value>You must commit and push your changes to add a comment here.</value>
+  </data>
+  <data name="PreviousComment" xml:space="preserve">
+    <value>Previous Comment</value>
+  </data>
+  <data name="NextComment" xml:space="preserve">
+    <value>Next Comment</value>
+  </data>
+  <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
+    <value>View, Checkout or Create a Pull request</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ForkRepository" xml:space="preserve">
+    <value>Fork Repository</value>
+  </data>
+  <data name="ForkTheRepository" xml:space="preserve">
+    <value>Fork the repository</value>
+  </data>
+  <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
+    <value> Update your local repository's</value>
+  </data>
+  <data name="ToPointTo" xml:space="preserve">
+    <value>to point to</value>
+  </data>
+  <data name="CreatePullRequest" xml:space="preserve">
+    <value>Create pull request</value>
+  </data>
+  <data name="SignInToGitHub" xml:space="preserve">
+    <value>Sign in to GitHub</value>
+  </data>
+  <data name="Pull" xml:space="preserve">
+    <value>Pull</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="Sync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="Wrote" xml:space="preserve">
+    <value>wrote</value>
+  </data>
+  <data name="SubmitYourReviewFor" xml:space="preserve">
+    <value>Submit your review for</value>
+  </data>
+  <data name="YourReviewSummary" xml:space="preserve">
+    <value>Your review summary</value>
+  </data>
+  <data name="CommentOnly" xml:space="preserve">
+    <value>Comment only</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="RequestChanges" xml:space="preserve">
+    <value>Request changes</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="OutdatedComments" xml:space="preserve">
+    <value>Outdated comments</value>
+  </data>
 </root>

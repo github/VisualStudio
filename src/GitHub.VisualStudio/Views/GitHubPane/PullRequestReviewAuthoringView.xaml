@@ -8,6 +8,7 @@
                                              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                              xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+                                             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                              xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.App"
                                              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                              Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -31,13 +32,13 @@
     <ScrollViewer>
         <StackPanel Margin="8,0">
             <TextBlock FontSize="16" Margin="0 4 0 0">
-                <Run>Submit your review for</Run>
+                <Run Text="{x:Static prop:Resources.SubmitYourReviewFor}"></Run>
                 <Hyperlink Command="{Binding NavigateToPullRequest}">
                     <Run>#</Run><Run Text="{Binding PullRequestModel.Number, Mode=OneWay}"/>
                 </Hyperlink>
             </TextBlock>
             <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding PullRequestModel.Title}" TextWrapping="Wrap"/>
-            <TextBlock Margin="0 12 0 4">Your review summary</TextBlock>
+            <TextBlock Margin="0 12 0 4" Text="{x:Static prop:Resources.YourReviewSummary}"></TextBlock>
             <TextBox AcceptsReturn="True"
                      Background="{DynamicResource VsBrush.BrandedUIBackground}"
                      Foreground="{DynamicResource VsBrush.BrandedUIText}"
@@ -56,23 +57,23 @@
                                 BorderThickness="1"
                                 Padding="4">
                             <StackPanel Background="{DynamicResource GitHubVsToolWindowBackground}">
-                                <ui:GitHubActionLink Command="{Binding Comment}" Margin="4">Comment only</ui:GitHubActionLink>
+                                <ui:GitHubActionLink Command="{Binding Comment}" Margin="4" Content="{x:Static prop:Resources.CommentOnly}"></ui:GitHubActionLink>
                                 <ui:GitHubActionLink Command="{Binding Approve}"
                                                      Visibility="{Binding CanApproveRequestChanges, Converter={ui:BooleanToVisibilityConverter}}"
-                                                     Margin="4">
-                                    Approve
+                                                     Margin="4" Content="{x:Static prop:Resources.Approve}">
+                                    
                                 </ui:GitHubActionLink>
                                 <ui:GitHubActionLink Command="{Binding RequestChanges}"
                                                      Visibility="{Binding CanApproveRequestChanges, Converter={ui:BooleanToVisibilityConverter}}"
-                                                     Margin="4">
-                                    Request changes
+                                                     Margin="4" Content="{x:Static prop:Resources.RequestChanges}">
+                                   
                                 </ui:GitHubActionLink>
                             </StackPanel>
                         </Border>
                     </ui:DropDownButton.DropDownContent>
                 </ui:DropDownButton>
                 <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Width="1" Height="16" Margin="4 0"/>
-                <ui:GitHubActionLink Command="{Binding Cancel}" VerticalAlignment="Center">Cancel</ui:GitHubActionLink>
+                <ui:GitHubActionLink Command="{Binding Cancel}" VerticalAlignment="Center" Content="{x:Static prop:Resources.CancelLink}"></ui:GitHubActionLink>
             </StackPanel>
 
             <TextBox Grid.Column="0"

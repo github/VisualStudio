@@ -172,13 +172,13 @@
                     Margin="6,0,0,0"
                     HorizontalAlignment="Right"
                     Command="{Binding CreatePullRequest}"
-                    Content="Create pull request"
+                    Content="{x:Static prop:Resources.CreatePullRequest}"
                     Style="{StaticResource GitHubVsPrimaryActionButton}" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCreateButton}"/>
             <Button DockPanel.Dock="Right"
                     HorizontalAlignment="Right"
                     Command="{Binding Cancel}"
-                    Content="Cancel"
+                    Content="{x:Static prop:Resources.CancelLink}"
                     Style="{StaticResource GitHubVsButton}" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCancelButton}"/>
 
