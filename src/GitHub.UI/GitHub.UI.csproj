@@ -254,17 +254,20 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\Octicons\OcticonPaths.en-US.resx" />
     <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>OcticonPaths.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources.en-US.resx" />
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.zh-Hans.resx" />
+    <EmbeddedResource Include="TestAutomation\AutomationIDs.en-US.resx" />
     <EmbeddedResource Include="TestAutomation\AutomationIDs.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AutomationIDs.Designer.cs</LastGenOutput>

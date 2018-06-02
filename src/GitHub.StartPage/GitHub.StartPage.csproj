@@ -187,6 +187,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources.en-US.resx" />
     <EmbeddedResource Include="Resources.resx" />
     <EmbeddedResource Include="Resources.zh-Hans.resx" />
   </ItemGroup>

@@ -420,6 +420,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.de.resx" />
+    <EmbeddedResource Include="VSPackage.en-US.resx" />
     <EmbeddedResource Include="VSPackage.fr.resx" />
     <EmbeddedResource Include="VSPackage.it.resx" />
     <EmbeddedResource Include="VSPackage.resx">
