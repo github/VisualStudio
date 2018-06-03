@@ -21,24 +21,7 @@
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidGitHubPkg">
-
-    <Menus>
-      <Menu guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" priority="0x0000" type="ToolWindowToolbar">
-        <Strings>
-          <ButtonText>WindowToolBar</ButtonText>
-          <CommandName>Window Toolbar</CommandName>
-        </Strings>
-      </Menu>
-
-      <Menu guid="guidContextMenuSet" id="idGitHubContextMenu" priority="0x200" type="Menu">
-        <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
-        <Strings>
-          <ButtonText>GitHub</ButtonText>
-          <CommandName>GitHub</CommandName>
-        </Strings>
-      </Menu>
-
-    </Menus>
+ 
 
     <!-- Parenting of buttons is done in the CommandPlacements section -->
     <Buttons>
