@@ -6,6 +6,7 @@
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
                                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                   xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                                  xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -114,14 +115,14 @@
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ghfvs:LinkDropDown Header="Assignee"
+        <ghfvs:LinkDropDown Header="{x:Static prop:Resources.Assignee}"
                          ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAssignee}"
                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
           
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ghfvs:LinkDropDown Header="Author"
+        <ghfvs:LinkDropDown Header="{x:Static prop:Resources.Author}"
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"
                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListAuthorFilterComboBox}" />          
@@ -154,7 +155,7 @@
       <ghfvs:GitHubActionLink Grid.Column="1"
                            HorizontalAlignment="Right"
                            Command="{Binding CreatePullRequest}"
-                           Content="Create New"
+                           Content="{x:Static prop:Resources.CreateNew}"
                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateNewHyperlink}" />
     </Grid>
 

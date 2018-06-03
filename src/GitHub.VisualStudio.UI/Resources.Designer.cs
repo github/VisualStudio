@@ -19,7 +19,7 @@ namespace GitHub.VisualStudio.UI {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -97,6 +97,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 Assignee 的本地化字符串。
+        /// </summary>
+        public static string Assignee {
+            get {
+                return ResourceManager.GetString("Assignee", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Invalid authentication code 的本地化字符串。
         /// </summary>
         public static string authenticationFailedLabelContent {
@@ -129,6 +138,15 @@ namespace GitHub.VisualStudio.UI {
         public static string authenticationSentLabelMessage {
             get {
                 return ResourceManager.GetString("authenticationSentLabelMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Author 的本地化字符串。
+        /// </summary>
+        public static string Author {
+            get {
+                return ResourceManager.GetString("Author", resourceCulture);
             }
         }
         
@@ -273,6 +291,15 @@ namespace GitHub.VisualStudio.UI {
         public static string CreateLink {
             get {
                 return ResourceManager.GetString("CreateLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create New 的本地化字符串。
+        /// </summary>
+        public static string CreateNew {
+            get {
+                return ResourceManager.GetString("CreateNew", resourceCulture);
             }
         }
         
