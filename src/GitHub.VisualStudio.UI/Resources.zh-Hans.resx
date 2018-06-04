@@ -190,7 +190,7 @@
     <value>维基</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>Pulse</value>
+    <value>动态</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
     <value>拉取请求</value>
@@ -202,7 +202,7 @@
     <value>问题</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
-    <value>图形</value>
+    <value>图表</value>
   </data>
   <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
     <value>连接...</value>
@@ -441,7 +441,7 @@
     <value>挂起</value>
   </data>
   <data name="StartAReview" xml:space="preserve">
-    <value>开始审阅</value>
+    <value>开始复审</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
     <value>您必须提交和推送更改, 才能在此添加注释。</value>
@@ -508,5 +508,14 @@
   </data>
   <data name="OutdatedComments" xml:space="preserve">
     <value>过期批注</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>创建</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>分配</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>作者</value>
   </data>
 </root>

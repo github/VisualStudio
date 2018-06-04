@@ -509,4 +509,13 @@
   <data name="OutdatedComments" xml:space="preserve">
     <value>Outdated comments</value>
   </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Create New</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>Assignee</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
 </root>

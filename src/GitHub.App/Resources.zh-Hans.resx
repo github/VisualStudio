@@ -121,19 +121,19 @@
     <value>克隆一个 {0} 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>无法连接到github.com！</value>
+    <value>无法连接到github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
-    <value>创建一个GitHub Gist！</value>
+    <value>创建一个GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>创建一个{0}存储库！</value>
+    <value>创建一个{0}存储库</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
-    <value>GistFromVisualStudio.cs！</value>
+    <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>请输入企业网址！</value>
+    <value>请输入企业网址</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
     <value>请输入有效网址</value>
