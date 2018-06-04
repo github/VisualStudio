@@ -159,16 +159,9 @@ namespace GitHub.VisualStudio.Base
                 // Fire property change events on Main thread
                 JoinableTaskFactory.RunAsync(async () =>
                 {
-                    try
-                    {
-                        await JoinableTaskFactory.SwitchToMainThreadAsync();
-                        ActiveRepo = repo;
-                    }
-                    catch(Exception e)
-                    {
-                        log.Error(e, nameof(UpdateActiveRepo));
-                    }
-                });
+                    await JoinableTaskFactory.SwitchToMainThreadAsync();
+                    ActiveRepo = repo;
+                }).Task.LogAndForget(log);
             }
         }
 
