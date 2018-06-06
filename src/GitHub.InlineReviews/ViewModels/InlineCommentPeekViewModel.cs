@@ -175,8 +175,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             else
             {
-                var newThread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
-                Thread = newThread;
+                Thread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
             }
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))

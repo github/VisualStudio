@@ -24,6 +24,7 @@ namespace GitHub.InlineReviews.SampleData
         public CommentEditState EditState { get; set; }
         public bool IsReadOnly { get; set; }
         public bool IsSubmitting { get; set; }
+        public bool CanDelete { get; } = true;
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }
@@ -32,5 +33,6 @@ namespace GitHub.InlineReviews.SampleData
         public ReactiveCommand<object> CancelEdit { get; }
         public ReactiveCommand<Unit> CommitEdit { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit> Delete { get; }
     }
 }

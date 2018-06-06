@@ -20,8 +20,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
-        /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
+        /// <param name="comments">The comments to display in this inline review.</param>
         public InlineCommentThreadViewModel(
             IPullRequestSession session,
             IEnumerable<IPullRequestReviewCommentModel> comments)
@@ -34,6 +34,14 @@ namespace GitHub.InlineReviews.ViewModels
             PostComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(true),
                 DoPostComment);
+
+            EditComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(true),
+                DoEditComment);
+
+            DeleteComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(true),
+                DoDeleteComment);
 
             foreach (var comment in comments)
             {
@@ -67,6 +75,24 @@ namespace GitHub.InlineReviews.ViewModels
             var replyId = Comments[0].Id;
             var nodeId = Comments[0].NodeId;
             return await Session.PostReviewComment(body, replyId, nodeId);
+        }
+
+        async Task<ICommentModel> DoEditComment(object parameter)
+        {
+            Guard.ArgumentNotNull(parameter, nameof(parameter));
+
+            var item = (Tuple<string, string>)parameter;
+            return await Session.EditComment(item.Item1, item.Item2);
+        }
+
+        async Task<object> DoDeleteComment(object parameter)
+        {
+            Guard.ArgumentNotNull(parameter, nameof(parameter));
+
+            var number = (int)parameter;
+            await Session.DeleteComment(number);
+
+            return new object();
         }
     }
 }

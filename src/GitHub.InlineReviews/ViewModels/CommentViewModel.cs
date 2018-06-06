@@ -24,6 +24,7 @@ namespace GitHub.InlineReviews.ViewModels
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
+        bool canDelete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
@@ -60,9 +61,17 @@ namespace GitHub.InlineReviews.ViewModels
             User = user;
             UpdatedAt = updatedAt;
 
+            var canDelete = this.WhenAnyValue(
+                x => x.EditState,
+                x => x == CommentEditState.None && user.Login.Equals(currentUser.Login));
+
+            canDelete.ToProperty(this, x => x.CanDelete);
+
+            Delete = ReactiveCommand.CreateAsyncTask(canDelete, DoDelete);
+
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Equals(currentUser)));
+                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Login.Equals(currentUser.Login)));
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
@@ -103,6 +112,27 @@ namespace GitHub.InlineReviews.ViewModels
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
         }
 
+        async Task DoDelete(object unused)
+        {
+            try
+            {
+                ErrorMessage = null;
+                IsSubmitting = true;
+
+                await Thread.DeleteComment.ExecuteAsyncTask(Id);
+            }
+            catch (Exception e)
+            {
+                var message = e.Message;
+                ErrorMessage = message;
+                log.Error(e, "Error Deleting comment");
+            }
+            finally
+            {
+                IsSubmitting = false;
+            }
+        }
+
         void DoBeginEdit(object unused)
         {
             if (state != CommentEditState.Editing)
@@ -130,7 +160,17 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                var model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                ICommentModel model;
+
+                if (Id == 0)
+                {
+                    model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                }
+                else
+                {
+                    model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(NodeId, Body));
+                }
+
                 Id = model.Id;
                 NodeId = model.NodeId;
                 EditState = CommentEditState.None;
@@ -189,6 +229,12 @@ namespace GitHub.InlineReviews.ViewModels
             protected set { this.RaiseAndSetIfChanged(ref isSubmitting, value); }
         }
 
+        public bool CanDelete
+        {
+            get { return canDelete; }
+            private set { this.RaiseAndSetIfChanged(ref canDelete, value); }
+        }
+
         /// <inheritdoc/>
         public DateTimeOffset UpdatedAt
         {
@@ -216,5 +262,8 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> Delete { get; }
     }
 }
