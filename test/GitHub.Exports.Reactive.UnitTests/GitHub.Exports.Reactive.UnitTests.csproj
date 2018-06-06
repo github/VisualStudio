@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\NUnit3TestAdapter.3.9.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\..\packages\NUnit3TestAdapter.3.9.0\build\net35\NUnit3TestAdapter.props')" />
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{596595A6-2A3C-469E-9386-9E3767D863A5}</ProjectGuid>
+    <ProjectGuid>{C59868FC-D8BC-4D47-B4F3-16908D2641C6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UnitTests</RootNamespace>
-    <AssemblyName>UnitTests</AssemblyName>
+    <RootNamespace>GitHub.Exports.Reactive.UnitTests</RootNamespace>
+    <AssemblyName>GitHub.Exports.Reactive.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -227,99 +230,17 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="nunit.core, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="nunit.core.interfaces, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="nunit.util, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnitTestAdapter.2.0.0\lib\nunit.util.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NUnit.VisualStudio.TestAdapter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4cb40d35494691ac, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnitTestAdapter.2.0.0\lib\NUnit.VisualStudio.TestAdapter.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Args.cs" />
-    <Compile Include="GitHub.Api\LoginManagerTests.cs" />
-    <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
-    <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
-    <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
-    <Compile Include="GitHub.App\Factories\ModelServiceFactoryTests.cs" />
-    <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
-    <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
-    <Compile Include="GitHub.App\Models\PullRequestModelTests.cs" />
-    <Compile Include="GitHub.App\Models\RepositoryModelTests.cs" />
-    <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
-    <Compile Include="GitHub.App\Services\GitClientTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestFilesViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestReviewAuthoringViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestReviewViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestUserReviewsViewModelTests.cs" />
-    <Compile Include="GitHub.App\Services\ImageDownloaderTests.cs" />
-    <Compile Include="GitHub.Exports.Reactive\Services\PullRequestEditorServiceTests.cs" />
-    <Compile Include="GitHub.App\Services\OAuthCallbackListenerTests.cs" />
-    <Compile Include="GitHub.App\Services\PullRequestServiceTests.cs" />
-    <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
-    <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
-    <Compile Include="GitHub.App\Services\TeamExplorerContextTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\GitHubDialogWindowViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\GistCreationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\LoginToGitHubForEnterpriseViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\GitHubPaneViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\NavigationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\LoginCredentialsViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\LoginToGitHubViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\PullRequestCreationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestDetailViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\GitHubPane\PullRequestListViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\RepositoryCloneViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\RepositoryCreationViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\TeamExplorer\RepositoryPublishViewModelTests.cs" />
-    <Compile Include="GitHub.App\ViewModels\Dialog\Login2FaViewModelTests.cs" />
-    <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
-    <Compile Include="GitHub.Exports\GitServiceTests.cs" />
-    <Compile Include="GitHub.Exports\VSServicesTests.cs" />
-    <Compile Include="GitHub.Exports\HostAddressTests.cs" />
-    <Compile Include="GitHub.Exports\LocalRepositoryModelTests.cs" />
-    <Compile Include="GitHub.Extensions\GuardTests.cs" />
-    <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
-    <Compile Include="GitHub.Primitives\UriStringTests.cs" />
-    <Compile Include="GitHub.TeamFoundation\VSGitExtTests.cs" />
-    <Compile Include="GitHub.UI\Converters.cs" />
-    <Compile Include="GitHub.UI\TestAutomation\ResourceValueTests.cs" />
-    <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
-    <Compile Include="GitHub.VisualStudio\Services\JsonConnectionCacheTests.cs" />
-    <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
-    <Compile Include="GitHub.VisualStudio\Services\MetricsTests.cs" />
-    <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
-    <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
-    <Compile Include="Helpers\CommandTestHelpers.cs" />
-    <Compile Include="Helpers\LazySubstitute.cs" />
-    <Compile Include="Helpers\ReactiveTestHelper.cs" />
-    <Compile Include="Helpers\RepositoryHelpers.cs" />
-    <Compile Include="Helpers\SimpleJson.cs" />
+    <Compile Include="Caches\AccountCacheItemTests.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
-    <Compile Include="Helpers\TestSharedCache.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Substitutes.cs" />
-    <Compile Include="TestDoubles\FakeCommitLog.cs" />
-    <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\TestImageCache.cs" />
-    <Compile Include="..\..\src\common\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
+    <Compile Include="Services\PullRequestEditorServiceTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
@@ -391,36 +312,8 @@
       <Name>GitHub.VisualStudio</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="UnitTests.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup />
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\NUnit3TestAdapter.3.9.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NUnit3TestAdapter.3.9.0\build\net35\NUnit3TestAdapter.props'))" />
-  </Target>
-  <Import Project="..\..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
