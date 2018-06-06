@@ -10,6 +10,7 @@ using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
 using NUnit.Framework;
+using Serilog;
 
 namespace UnitTests.GitHub.App.Models
 {
@@ -135,6 +136,7 @@ namespace UnitTests.GitHub.App.Models
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex, "Error'");
                 }
             }
 
