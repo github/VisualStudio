@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -18,6 +19,12 @@ namespace GitHub.Services
         readonly Guid commandGroup;
         readonly int commandId;
         readonly IOleCommandTarget next;
+        readonly ICommand targetCommand;
+
+        public static IDisposable AddCommandFilter(IVsTextView textView, Guid commandGroup, int commandId, ICommand targetCommand)
+        {
+            return new TextViewCommandDispatcher(textView, commandGroup, commandId, targetCommand);
+        }
 
         /// <summary>
         /// Add a command filter to <see cref="IVsTextView"/>.
@@ -25,11 +32,13 @@ namespace GitHub.Services
         /// <param name="textView">The text view to filter commands from.</param>
         /// <param name="commandGroup">The group of the command to listen for.</param>
         /// <param name="commandId">The ID of the command to listen for.</param>
-        public TextViewCommandDispatcher(IVsTextView textView, Guid commandGroup, int commandId)
+        /// <param name="targetCommand">The command to dispatch to.</param>
+        TextViewCommandDispatcher(IVsTextView textView, Guid commandGroup, int commandId, ICommand targetCommand)
         {
             this.textView = textView;
             this.commandGroup = commandGroup;
             this.commandId = commandId;
+            this.targetCommand = targetCommand;
 
             ErrorHandler.ThrowOnFailure(textView.AddCommandFilter(this, out next));
         }
@@ -46,8 +55,8 @@ namespace GitHub.Services
         {
             if (pguidCmdGroup == commandGroup && nCmdID == commandId)
             {
-                Exec?.Invoke(this, EventArgs.Empty);
-                return 0;
+                targetCommand.Execute(null);
+                return VSConstants.S_OK;
             }
 
             return next?.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut) ?? 0;
@@ -69,10 +78,5 @@ namespace GitHub.Services
 
             return next?.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText) ?? 0;
         }
-
-        /// <summary>
-        /// Fired when a command of the filtered type is executed.
-        /// </summary>
-        public event EventHandler Exec;
     }
 }

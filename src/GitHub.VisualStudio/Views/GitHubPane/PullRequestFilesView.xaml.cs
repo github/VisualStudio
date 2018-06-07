@@ -7,6 +7,7 @@ using System.Windows.Media;
 using GitHub.Exports;
 using GitHub.UI.Helpers;
 using GitHub.ViewModels.GitHubPane;
+using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
@@ -17,6 +18,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         public PullRequestFilesView()
         {
             InitializeComponent();
+            PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)

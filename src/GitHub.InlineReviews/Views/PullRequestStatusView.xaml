@@ -35,29 +35,52 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Visibility="{Binding Number, TargetNullValue=Collapsed}">
-        <Button
+    <StackPanel Orientation="Horizontal">
+        <Grid Visibility="{Binding Number, Converter={ui:EqualsToVisibilityConverter {x:Null}}}">
+            <Button
             Foreground="{DynamicResource VsBrush.StatusBarText}"
             BorderThickness="0"
             Padding="4 0"
-            Command="{Binding ShowCurrentPullRequestCommand}">
+            Command="{Binding OpenPullRequestsCommand}">
 
-            <StackPanel Orientation="Horizontal">
-                <ui:OcticonPath
-                    Fill="White"
-                    VerticalAlignment="Bottom"
-                    Margin="0 0 4 0 "
-                    Icon="git_pull_request" />
-                <TextBlock
-                    VerticalAlignment="Center">
-                    #<Run Text="{Binding Number}" />
+                <StackPanel Orientation="Horizontal">
+                    <ui:OcticonPath
+                        Fill="White"
+                        VerticalAlignment="Bottom"
+                        Margin="0 0 4 0 "
+                        Icon="git_pull_request" />
+                </StackPanel>
+            </Button>
+            <Grid.ToolTip>
+                <TextBlock VerticalAlignment="Center">
+                    View, Checkout or Create a Pull request
                 </TextBlock>
-            </StackPanel>
-        </Button>
-        <Grid.ToolTip>
-            <TextBlock VerticalAlignment="Center">
+            </Grid.ToolTip>
+        </Grid>
+
+        <Grid Visibility="{Binding Number, Converter={ui:NotEqualsToVisibilityConverter {x:Null}}}">
+            <Button
+                Foreground="{DynamicResource VsBrush.StatusBarText}"
+                BorderThickness="0"
+                Padding="4 0"
+                Command="{Binding ShowCurrentPullRequestCommand}">
+
+                <StackPanel Orientation="Horizontal">
+                    <ui:OcticonPath
+                        Fill="White"
+                        VerticalAlignment="Bottom"
+                        Margin="0 0 4 0 "
+                        Icon="git_pull_request" />
+                    <TextBlock VerticalAlignment="Center">
+                        #<Run Text="{Binding Number}" />
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+            <Grid.ToolTip>
+                <TextBlock VerticalAlignment="Center">
                     #<Run Text="{Binding Number}" /> - <Run Text="{Binding Title}" />
-            </TextBlock>
-        </Grid.ToolTip>
-    </Grid>
+                </TextBlock>
+            </Grid.ToolTip>
+        </Grid>
+    </StackPanel>
 </UserControl>

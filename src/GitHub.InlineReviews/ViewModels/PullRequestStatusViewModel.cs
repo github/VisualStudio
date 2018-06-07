@@ -9,8 +9,9 @@ namespace GitHub.InlineReviews.ViewModels
         int? number;
         string title;
 
-        public PullRequestStatusViewModel(ICommand showCurrentPullRequestCommand)
+        public PullRequestStatusViewModel(ICommand openPullRequestsCommand, ICommand showCurrentPullRequestCommand)
         {
+            OpenPullRequestsCommand = openPullRequestsCommand;
             ShowCurrentPullRequestCommand = showCurrentPullRequestCommand;
         }
 
@@ -40,6 +41,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
+        public ICommand OpenPullRequestsCommand { get; }
         public ICommand ShowCurrentPullRequestCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;

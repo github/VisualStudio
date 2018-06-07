@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Design;
@@ -12,6 +11,7 @@ using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.Settings;
@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
         {
             LogVersionInformation();
             await base.InitializeAsync(cancellationToken, progress);
-            
+
             await InitializeLoggingAsync();
             await GetServiceAsync(typeof(IUsageTracker));
 
@@ -56,7 +56,7 @@ namespace GitHub.VisualStudio
             {
                 packageSettings.PropertyChanged += (sender, args) =>
                 {
-                    if (args.PropertyName == "EnableTraceLogging")
+                    if (args.PropertyName == nameof(packageSettings.EnableTraceLogging))
                     {
                         LogManager.EnableTraceLogging(packageSettings.EnableTraceLogging);
                     }
@@ -74,19 +74,35 @@ namespace GitHub.VisualStudio
 
         async Task InitializeMenus()
         {
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
-            var exports = componentModel.DefaultExportProvider;
-            var commands = new IVsCommandBase[]
+            IVsCommandBase[] commands;
+            if (ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
-                exports.GetExportedValue<IAddConnectionCommand>(),
-                exports.GetExportedValue<IBlameLinkCommand>(),
-                exports.GetExportedValue<ICopyLinkCommand>(),
-                exports.GetExportedValue<ICreateGistCommand>(),
-                exports.GetExportedValue<IOpenLinkCommand>(),
-                exports.GetExportedValue<IOpenPullRequestsCommand>(),
-                exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
-                exports.GetExportedValue<IShowGitHubPaneCommand>()
-            };
+                var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+                var exports = componentModel.DefaultExportProvider;
+                commands = new IVsCommandBase[]
+                {
+                    exports.GetExportedValue<IAddConnectionCommand>(),
+                    exports.GetExportedValue<IBlameLinkCommand>(),
+                    exports.GetExportedValue<ICopyLinkCommand>(),
+                    exports.GetExportedValue<ICreateGistCommand>(),
+                    exports.GetExportedValue<IOpenLinkCommand>(),
+                    exports.GetExportedValue<IOpenPullRequestsCommand>(),
+                    exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
+                    exports.GetExportedValue<IShowGitHubPaneCommand>(),
+                    exports.GetExportedValue<IGoToSolutionOrPullRequestFileCommand>(),
+                    exports.GetExportedValue<ISyncSubmodulesCommand>()
+                };
+            }
+            else
+            {
+                // Show info message box when executed in non-Visual Studio process
+                var message = Resources.BlendDialogText;
+                commands = new IVsCommandBase[]
+                {
+                    new ShowMessageBoxCommand(AddConnectionCommand.CommandSet, AddConnectionCommand.CommandId, this, message),
+                    new ShowMessageBoxCommand(ShowGitHubPaneCommand.CommandSet, ShowGitHubPaneCommand.CommandId, this, message)
+                };
+            }
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
@@ -107,9 +123,6 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ServiceProviderExports
     {
-        // Only export services for the Visual Studio process (they don't work in Expression Blend).
-        const string ProcessName = "devenv";
-
         readonly IServiceProvider serviceProvider;
 
         [ImportingConstructor]
@@ -118,19 +131,19 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        [ExportForProcess(typeof(ILoginManager), ProcessName)]
+        [ExportForVisualStudioProcess]
         public ILoginManager LoginManager => GetService<ILoginManager>();
 
-        [ExportForProcess(typeof(IGitHubServiceProvider), ProcessName)]
+        [ExportForVisualStudioProcess]
         public IGitHubServiceProvider GitHubServiceProvider => GetService<IGitHubServiceProvider>();
 
-        [ExportForProcess(typeof(IUsageTracker), ProcessName)]
+        [ExportForVisualStudioProcess]
         public IUsageTracker UsageTracker => GetService<IUsageTracker>();
 
-        [ExportForProcess(typeof(IVSGitExt), ProcessName)]
+        [ExportForVisualStudioProcess]
         public IVSGitExt VSGitExt => GetService<IVSGitExt>();
 
-        [ExportForProcess(typeof(IPackageSettings), ProcessName)]
+        [ExportForVisualStudioProcess]
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));

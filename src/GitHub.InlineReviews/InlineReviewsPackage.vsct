@@ -49,6 +49,8 @@
         <Strings>
           <CommandName>GitHub.InlineReviews.NextInlineComment</CommandName>
           <ButtonText>Next Comment</ButtonText>
+          <CanonicalName>.GitHub.NextComment</CanonicalName>
+          <LocCanonicalName>.GitHub.NextComment</LocCanonicalName>
         </Strings>
       </Button>
       <Button guid="guidGitHubCommandSet" id="PreviousInlineCommentId" priority="0x0100" type="Button">
@@ -58,6 +60,17 @@
         <Strings>
           <CommandName>GitHub.InlineReviews.PreviousInlineComment</CommandName>
           <ButtonText>Previous Comment</ButtonText>
+          <CanonicalName>.GitHub.PreviousComment</CanonicalName>
+          <LocCanonicalName>.GitHub.PreviousComment</LocCanonicalName>
+        </Strings>
+      </Button>
+      <Button guid="guidGitHubCommandSet" id="ToggleInlineCommentMarginId" type="Button">
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Toggle Comment Margin</ButtonText>
+          <CanonicalName>.GitHub.ToggleInlineCommentMargin</CanonicalName>
+          <LocCanonicalName>.GitHub.ToggleInlineCommentMargin</LocCanonicalName>
         </Strings>
       </Button>
     </Buttons>
@@ -75,6 +88,7 @@
       <IDSymbol name="PullRequestCommentsToolWindowCommandId" value="0x1000" />
       <IDSymbol name="NextInlineCommentId" value="0x1001" />
       <IDSymbol name="PreviousInlineCommentId" value="0x1002" />
+      <IDSymbol name="ToggleInlineCommentMarginId" value="0x1003" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{775aa523-6c52-4c11-9c28-823c99d15613}" >

@@ -50,7 +50,8 @@
                 </Style>
             </StackPanel.Style>
 
-            <StackPanel Orientation="Horizontal">
+            <DockPanel>
+              <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
                 <controls:AccountAvatar Width="16" 
                                         Height="16" 
                                         Account="{Binding User}"/>
@@ -68,8 +69,26 @@
                         Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                     <TextBlock FontSize="10">Pending</TextBlock>
                 </Border>
-            </StackPanel>
+              </StackPanel>
 
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
+                          Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
+                <ui:OcticonButton Command="{Binding BeginEdit}"
+                                  Width="16"
+                                  Height="16"
+                                  Margin="0"
+                                  Background="Transparent"
+                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                  Icon="pencil"/>
+                <ui:OcticonButton Command="{Binding Delete}"
+                                  Width="16"
+                                  Height="16"
+                                  Margin="0"
+                                  Background="Transparent"
+                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                  Icon="x"/>
+              </StackPanel>
+            </DockPanel>
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
                                     Margin="0 2 0 0"
@@ -159,7 +178,7 @@
                 <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
-            
+
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
                         Margin="4 8" 

@@ -90,7 +90,8 @@ namespace GitHub.InlineReviews.Services
         /// Extracts a file at a specified commit from the repository.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="pullRequestNumber">The pull request number</param>
+        /// <param name="sha">The SHA of the commit.</param>
         /// <param name="relativePath">The path to the file, relative to the repository.</param>
         /// <returns>
         /// The contents of the file, or null if the file was not found at the specified commit.
@@ -146,7 +147,7 @@ namespace GitHub.InlineReviews.Services
         /// <summary>
         /// Gets the GraphQL ID for a pull request.
         /// </summary>
-        /// <param name="repository">The local repository.</param>
+        /// <param name="localRepository">The local repository.</param>
         /// <param name="repositoryOwner">The owner of the remote fork.</param>
         /// <param name="number">The pull request number.</param>
         /// <returns></returns>
@@ -184,6 +185,7 @@ namespace GitHub.InlineReviews.Services
         /// <summary>
         /// Cancels a pending review on the server.
         /// </summary>
+        /// <param name="localRepository">The local repository.</param>
         /// <param name="reviewId">The GraphQL ID of the review.</param>
         Task CancelPendingReview(
             ILocalRepositoryModel localRepository,
@@ -290,12 +292,41 @@ namespace GitHub.InlineReviews.Services
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The comment ID to reply to.</param>
         /// <returns>A model representing the posted comment.</returns>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentRepy(
+        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
             int number,
             string body,
             int inReplyTo);
+
+        /// <summary>
+        /// Delete a PR review comment.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository fork to delete from.</param>
+        /// <param name="user">The user deleting the comment.</param>
+        /// <param name="number">The pull request comment number.</param>
+        /// <returns></returns>
+        Task DeleteComment(
+            ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            IAccount user,
+            int number);
+
+        /// <summary>
+        /// Edit a PR review comment.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository fork to delete from.</param>
+        /// <param name="user">The user deleting the comment.</param>
+        /// <param name="commentNodeId">The pull request comment node id.</param>
+        /// <param name="body">The replacement comment body.</param>
+        /// <returns>A model representing the edited comment.</returns>
+        Task<PullRequestReviewCommentModel> EditComment(ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            IAccount user,
+            string commentNodeId,
+            string body);
     }
 }

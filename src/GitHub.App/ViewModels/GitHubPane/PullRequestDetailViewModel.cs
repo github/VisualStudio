@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -7,8 +8,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using System.Globalization;
 using GitHub.App;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Helpers;
@@ -36,7 +37,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
-        readonly IStatusBarNotificationService statusBarNotificationService;
+        readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         IModelService modelService;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -71,22 +72,22 @@ namespace GitHub.ViewModels.GitHubPane
             IModelServiceFactory modelServiceFactory,
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
-            IStatusBarNotificationService statusBarNotificationService,
-            IPullRequestFilesViewModel files)
+            IPullRequestFilesViewModel files,
+            ISyncSubmodulesCommand syncSubmodulesCommand)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
-            Guard.ArgumentNotNull(statusBarNotificationService, nameof(statusBarNotificationService));
+            Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
             this.modelServiceFactory = modelServiceFactory;
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
-            this.statusBarNotificationService = statusBarNotificationService;
+            this.syncSubmodulesCommand = syncSubmodulesCommand;
             Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -328,7 +329,7 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 Number = number;
-                WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
+                WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner).Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
 
                 await Refresh();
@@ -606,21 +607,17 @@ namespace GitHub.ViewModels.GitHubPane
                 IsBusy = true;
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
-                var writer = new StringWriter(CultureInfo.CurrentCulture);
-                var complete = await pullRequestsService.SyncSubmodules(LocalRepository, line =>
-                {
-                    writer.WriteLine(line);
-                    statusBarNotificationService.ShowMessage(line);
-                });
+                var result = await syncSubmodulesCommand.SyncSubmodules();
+                var complete = result.Item1;
+                var summary = result.Item2;
                 if (!complete)
                 {
-                    throw new ApplicationException(writer.ToString());
+                    throw new ApplicationException(summary);
                 }
             }
             finally
             {
                 IsBusy = false;
-                statusBarNotificationService.ShowMessage(string.Empty);
             }
         }
 

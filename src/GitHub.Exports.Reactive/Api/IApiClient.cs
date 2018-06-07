@@ -14,6 +14,7 @@ namespace GitHub.Api
         IGitHubClient GitHubClient { get; }
 
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
+        IObservable<Repository> ForkRepository(string owner, string name, NewRepositoryFork repository);
         IObservable<Gist> CreateGist(NewGist newGist);
         IObservable<User> GetUser();
         IObservable<User> GetUser(string login);
@@ -29,6 +30,7 @@ namespace GitHub.Api
         /// <returns></returns>
         IObservable<Repository> GetRepositoriesForOrganization(string organization);
 
+        IObservable<Repository> GetForks(string owner, string name);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
@@ -87,6 +89,30 @@ namespace GitHub.Api
         /// <param name="inReplyTo">The comment ID to reply to.</param>
         /// <returns></returns>
         IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(string owner, string name, int number, string body, int inReplyTo);
+
+        /// <summary>
+        /// Delete a PR review comment.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request comment number.</param>
+        IObservable<Unit> DeletePullRequestReviewComment(
+            string owner,
+            string name,
+            int number);
+
+        /// <summary>
+        /// Edits a PR review comment.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request comment number.</param>
+        /// <param name="body">The replacement comment body.</param>
+        IObservable<PullRequestReviewComment> EditPullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body);
 
         IObservable<Branch> GetBranches(string owner, string repo);
         IObservable<Repository> GetRepositories();

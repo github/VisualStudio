@@ -145,18 +145,22 @@
   <ItemGroup>
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
     <Compile Include="Commands\IOpenLinkCommand.cs" />
     <Compile Include="Commands\ICreateGistCommand.cs" />
     <Compile Include="Commands\IShowCurrentPullRequestCommand.cs" />
+    <Compile Include="Commands\ISyncSubmodulesCommand.cs" />
     <Compile Include="Commands\IShowGitHubPaneCommand.cs" />
     <Compile Include="Commands\IOpenPullRequestsCommand.cs" />
     <Compile Include="Commands\IAddConnectionCommand.cs" />
     <Compile Include="Commands\INextInlineCommentCommand.cs" />
     <Compile Include="Commands\InlineCommentNavigationParams.cs" />
     <Compile Include="Commands\IPreviousInlineCommentCommand.cs" />
+    <Compile Include="Commands\IGoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="Commands\IVsCommand.cs" />
     <Compile Include="Commands\IVsCommandBase.cs" />
-    <Compile Include="Exports\ExportForProcess.cs" />
+    <Compile Include="Exports\ExportForVisualStudioProcessAttribute.cs" />
+    <Compile Include="Exports\ExportForProcessAttribute.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\CommitMessage.cs" />

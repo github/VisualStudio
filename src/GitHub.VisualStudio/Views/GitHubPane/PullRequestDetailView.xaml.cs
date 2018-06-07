@@ -41,15 +41,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         void DoOpenOnGitHub()
         {
             var browser = VisualStudioBrowser;
-            var cloneUrl = ViewModel.LocalRepository.CloneUrl;
-            var url = ToPullRequestUrl(cloneUrl.Host, ViewModel.RemoteRepositoryOwner, ViewModel.LocalRepository.Name, ViewModel.Model.Number);
-            browser.OpenUrl(url);
-        }
-
-        static Uri ToPullRequestUrl(string host, string owner, string repositoryName, int number)
-        {
-            var url = string.Format(CultureInfo.InvariantCulture, "https://{0}/{1}/{2}/pull/{3}", host, owner, repositoryName, number);
-            return new Uri(url);
+            browser.OpenUrl(ViewModel.WebUrl);
         }
 
         void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)

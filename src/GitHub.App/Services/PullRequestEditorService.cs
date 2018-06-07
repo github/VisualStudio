@@ -4,13 +4,10 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using EnvDTE;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
@@ -21,6 +18,7 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
+using EnvDTE;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -39,6 +37,8 @@ namespace GitHub.Services
         readonly IPullRequestService pullRequestService;
         readonly IVsEditorAdaptersFactoryService vsEditorAdaptersFactory;
         readonly IStatusBarNotificationService statusBar;
+        readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
+        readonly IEditorOptionsFactoryService editorOptionsFactoryService;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
@@ -47,23 +47,29 @@ namespace GitHub.Services
             IPullRequestService pullRequestService,
             IVsEditorAdaptersFactoryService vsEditorAdaptersFactory,
             IStatusBarNotificationService statusBar,
+            IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
+            IEditorOptionsFactoryService editorOptionsFactoryService,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
             Guard.ArgumentNotNull(pullRequestService, nameof(pullRequestService));
             Guard.ArgumentNotNull(vsEditorAdaptersFactory, nameof(vsEditorAdaptersFactory));
             Guard.ArgumentNotNull(statusBar, nameof(statusBar));
+            Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(goToSolutionOrPullRequestFileCommand));
+            Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(editorOptionsFactoryService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
             this.serviceProvider = serviceProvider;
             this.pullRequestService = pullRequestService;
             this.vsEditorAdaptersFactory = vsEditorAdaptersFactory;
             this.statusBar = statusBar;
+            this.goToSolutionOrPullRequestFileCommand = goToSolutionOrPullRequestFileCommand;
+            this.editorOptionsFactoryService = editorOptionsFactoryService;
             this.usageTracker = usageTracker;
         }
 
         /// <inheritdoc/>
-        public async Task OpenFile(
+        public async Task<ITextView> OpenFile(
             IPullRequestSession session,
             string relativePath,
             bool workingDirectory)
@@ -73,7 +79,7 @@ namespace GitHub.Services
 
             try
             {
-                var fullPath = Path.Combine(session.LocalRepository.LocalPath, relativePath);
+                var fullPath = GetAbsolutePath(session.LocalRepository, relativePath);
                 string fileName;
                 string commitSha;
 
@@ -94,20 +100,17 @@ namespace GitHub.Services
                     commitSha = file.CommitSha;
                 }
 
+                IVsTextView textView;
+                IWpfTextView wpfTextView;
                 using (workingDirectory ? null : OpenInProvisionalTab())
                 {
-                    var window = VisualStudio.Services.Dte.ItemOperations.OpenFile(fileName);
-                    window.Document.ReadOnly = !workingDirectory;
-
-                    var buffer = GetBufferAt(fileName);
+                    var readOnly = !workingDirectory;
+                    textView = OpenDocument(fileName, readOnly, out wpfTextView);
 
                     if (!workingDirectory)
                     {
-                        AddBufferTag(buffer, session, fullPath, commitSha, null);
-
-                        var textView = FindActiveView();
-                        var file = await session.GetFile(relativePath);
-                        EnableNavigateToEditor(textView, session, file);
+                        AddBufferTag(wpfTextView.TextBuffer, session, fullPath, commitSha, null);
+                        EnableNavigateToEditor(textView, session);
                     }
                 }
 
@@ -115,15 +118,18 @@ namespace GitHub.Services
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile);
+
+                return wpfTextView;
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
+                return null;
             }
         }
 
         /// <inheritdoc/>
-        public async Task OpenDiff(IPullRequestSession session, string relativePath, string headSha)
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, bool scrollToFirstDiff)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
@@ -143,9 +149,10 @@ namespace GitHub.Services
                         file.CommitSha,
                         encoding);
 
-                if (FocusExistingDiffViewer(session, mergeBase, rightFile))
+                var diffViewer = FocusExistingDiffViewer(session, mergeBase, rightFile);
+                if (diffViewer != null)
                 {
-                    return;
+                    return diffViewer;
                 }
 
                 var leftFile = await pullRequestService.ExtractToTempFile(
@@ -168,6 +175,7 @@ namespace GitHub.Services
                 }
 
                 IVsWindowFrame frame;
+                using (OpenWithOption(DifferenceViewerOptions.ScrollToFirstDiffName, scrollToFirstDiff))
                 using (OpenInProvisionalTab())
                 {
                     var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
@@ -185,31 +193,52 @@ namespace GitHub.Services
                         (uint)options);
                 }
 
-                var diffViewer = GetDiffViewer(frame);
+                diffViewer = GetDiffViewer(frame);
+
+                var leftText = diffViewer.LeftView.TextBuffer.CurrentSnapshot.GetText();
+                var rightText = diffViewer.RightView.TextBuffer.CurrentSnapshot.GetText();
+                if (leftText == string.Empty)
+                {
+                    // Don't show LeftView when empty.
+                    diffViewer.ViewMode = DifferenceViewMode.RightViewOnly;
+                }
+                else if (rightText == string.Empty)
+                {
+                    // Don't show RightView when empty.
+                    diffViewer.ViewMode = DifferenceViewMode.LeftViewOnly;
+                }
+                else if (leftText == rightText)
+                {
+                    // Don't show LeftView when no changes.
+                    diffViewer.ViewMode = DifferenceViewMode.RightViewOnly;
+                }
 
                 AddBufferTag(diffViewer.LeftView.TextBuffer, session, leftPath, mergeBase, DiffSide.Left);
 
                 if (!workingDirectory)
                 {
                     AddBufferTag(diffViewer.RightView.TextBuffer, session, rightPath, file.CommitSha, DiffSide.Right);
-                    EnableNavigateToEditor(diffViewer.LeftView, session, file);
-                    EnableNavigateToEditor(diffViewer.RightView, session, file);
-                    EnableNavigateToEditor(diffViewer.InlineView, session, file);
+                    EnableNavigateToEditor(diffViewer.LeftView, session);
+                    EnableNavigateToEditor(diffViewer.RightView, session);
+                    EnableNavigateToEditor(diffViewer.InlineView, session);
                 }
 
                 if (workingDirectory)
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution);
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
+
+                return diffViewer;
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
+                return null;
             }
         }
 
         /// <inheritdoc/>
-        public async Task OpenDiff(
+        public async Task<IDifferenceViewer> OpenDiff(
             IPullRequestSession session,
             string relativePath,
             IInlineCommentThreadModel thread)
@@ -218,33 +247,61 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(thread, nameof(thread));
 
-            await OpenDiff(session, relativePath, thread.CommitSha);
-
-            // HACK: We need to wait here for the diff view to set itself up and move its cursor
-            // to the first changed line. There must be a better way of doing this.
-            await Task.Delay(1500);
+            var diffViewer = await OpenDiff(session, relativePath, thread.CommitSha, scrollToFirstDiff: false);
 
             var param = (object)new InlineCommentNavigationParams
             {
                 FromLine = thread.LineNumber - 1,
             };
 
-            VisualStudio.Services.Dte.Commands.Raise(
-                Guids.CommandSetString,
-                PkgCmdIDList.NextInlineCommentId,
-                ref param,
-                null);
+            // HACK: We need to wait here for the inline comment tags to initialize so we can find the next inline comment.
+            // There must be a better way of doing this.
+            await Task.Delay(1500);
+            RaiseWhenAvailable(Guids.CommandSetString, PkgCmdIDList.NextInlineCommentId, param);
+
+            return diffViewer;
         }
 
-        public IVsTextView NavigateToEquivalentPosition(IVsTextView sourceView, string targetFile)
+        static bool RaiseWhenAvailable(string guid, int id, object param)
+        {
+            var commands = VisualStudio.Services.Dte.Commands;
+            var command = commands.Item(guid, id);
+
+            if (command.IsAvailable)
+            {
+                commands.Raise(command.Guid, command.ID, ref param, null);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void OpenActiveDocumentInCodeView(IVsTextView sourceView)
+        {
+            var dte = serviceProvider.GetService<DTE>();
+            // Not sure how to get a file name directly from IVsTextView. Using DTE.ActiveDocument.FullName.
+            var fullPath = dte.ActiveDocument.FullName;
+            // VsShellUtilities.OpenDocument with VSConstants.LOGVIEWID.Code_guid always open a new Code view.
+            // Using DTE.ItemOperations.OpenFile with Constants.vsViewKindCode instead,
+            dte.ItemOperations.OpenFile(fullPath, EnvDTE.Constants.vsViewKindCode);
+            var codeView = FindActiveView();
+            NavigateToEquivalentPosition(sourceView, codeView);
+        }
+
+        public bool IsEditableDiff(ITextView textView)
+        {
+            var readOnly = textView.Options.GetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId);
+            var isDiff = IsDiff(textView);
+            return !readOnly && isDiff;
+        }
+
+        public void NavigateToEquivalentPosition(IVsTextView sourceView, IVsTextView targetView)
         {
             int line;
             int column;
             ErrorHandler.ThrowOnFailure(sourceView.GetCaretPos(out line, out column));
             var text1 = GetText(sourceView);
-
-            var view = OpenDocument(targetFile);
-            var text2 = VsShellUtilities.GetRunningDocumentContents(serviceProvider, targetFile);
+            var text2 = GetText(targetView);
 
             var fromLines = ReadLines(text1);
             var toLines = ReadLines(text2);
@@ -256,10 +313,8 @@ namespace GitHub.Services
                 column = 0;
             }
 
-            ErrorHandler.ThrowOnFailure(view.SetCaretPos(matchingLine, column));
-            ErrorHandler.ThrowOnFailure(view.CenterLines(matchingLine, 1));
-
-            return view;
+            ErrorHandler.ThrowOnFailure(targetView.SetCaretPos(matchingLine, column));
+            ErrorHandler.ThrowOnFailure(targetView.CenterLines(matchingLine, 1));
         }
 
         public IVsTextView FindActiveView()
@@ -369,6 +424,13 @@ namespace GitHub.Services
             return matchingLine;
         }
 
+        static string GetAbsolutePath(ILocalRepositoryModel localRepository, string relativePath)
+        {
+            var localPath = localRepository.LocalPath;
+            relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(localPath, relativePath);
+        }
+
         string GetText(IVsTextView textView)
         {
             IVsTextLines buffer;
@@ -383,7 +445,7 @@ namespace GitHub.Services
             return text;
         }
 
-        IVsTextView OpenDocument(string fullPath)
+        IVsTextView OpenDocument(string fullPath, bool readOnly, out IWpfTextView wpfTextView)
         {
             var logicalView = VSConstants.LOGVIEWID.TextView_guid;
             IVsUIHierarchy hierarchy;
@@ -391,10 +453,14 @@ namespace GitHub.Services
             IVsWindowFrame windowFrame;
             IVsTextView view;
             VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
+
+            wpfTextView = vsEditorAdaptersFactory.GetWpfTextView(view);
+            wpfTextView?.Options?.SetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId, readOnly);
+
             return view;
         }
 
-        bool FocusExistingDiffViewer(
+        IDifferenceViewer FocusExistingDiffViewer(
             IPullRequestSession session,
             string mergeBase,
             string rightPath)
@@ -424,17 +490,13 @@ namespace GitHub.Services
                         leftBufferInfo.Session.PullRequest.Number == session.PullRequest.Number &&
                         leftBufferInfo.CommitSha == mergeBase)
                     {
-                        return ErrorHandler.Succeeded(windowFrame.Show());
+                        ErrorHandler.ThrowOnFailure(windowFrame.Show());
+                        return diffViewer;
                     }
                 }
             }
 
-            return false;
-        }
-
-        void ShowErrorInStatusBar(string message)
-        {
-            statusBar.ShowMessage(message);
+            return null;
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
@@ -464,23 +526,17 @@ namespace GitHub.Services
             }
         }
 
-        void EnableNavigateToEditor(ITextView textView, IPullRequestSession session, IPullRequestSessionFile file)
+        void EnableNavigateToEditor(ITextView textView, IPullRequestSession session)
         {
             var vsTextView = vsEditorAdaptersFactory.GetViewAdapter(textView);
-            EnableNavigateToEditor(vsTextView, session, file);
+            EnableNavigateToEditor(vsTextView, session);
         }
 
-        void EnableNavigateToEditor(IVsTextView vsTextView, IPullRequestSession session, IPullRequestSessionFile file)
+        void EnableNavigateToEditor(IVsTextView vsTextView, IPullRequestSession session)
         {
             var commandGroup = VSConstants.CMDSETID.StandardCommandSet2K_guid;
             var commandId = (int)VSConstants.VSStd2KCmdID.RETURN;
-            new TextViewCommandDispatcher(vsTextView, commandGroup, commandId).Exec +=
-                async (s, e) => await DoNavigateToEditor(session, file);
-
-            var contextMenuCommandGroup = new Guid(Guids.guidContextMenuSetString);
-            var goToCommandId = PkgCmdIDList.openFileInSolutionCommand;
-            new TextViewCommandDispatcher(vsTextView, contextMenuCommandGroup, goToCommandId).Exec +=
-                async (s, e) => await DoNavigateToEditor(session, file);
+            TextViewCommandDispatcher.AddCommandFilter(vsTextView, commandGroup, commandId, goToSolutionOrPullRequestFileCommand);
 
             EnableNavigateStatusBarMessage(vsTextView, session);
         }
@@ -497,35 +553,6 @@ namespace GitHub.Services
 
             textView.LostAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(string.Empty);
-        }
-
-        async Task DoNavigateToEditor(IPullRequestSession session, IPullRequestSessionFile file)
-        {
-            try
-            {
-                if (!session.IsCheckedOut)
-                {
-                    ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
-                    return;
-                }
-
-                var fullPath = GetAbsolutePath(session, file);
-
-                var activeView = FindActiveView();
-                if (activeView == null)
-                {
-                    ShowErrorInStatusBar("Couldn't find active view");
-                    return;
-                }
-
-                NavigateToEquivalentPosition(activeView, fullPath);
-
-                await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
-            }
-            catch (Exception e)
-            {
-                ShowErrorInStatusBar("Error navigating to editor", e);
-            }
         }
 
         ITextBuffer GetBufferAt(string filePath)
@@ -567,19 +594,7 @@ namespace GitHub.Services
             }
         }
 
-        void ShowInfoMessage(string message)
-        {
-            ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
-                serviceProvider, message, null,
-                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
-        }
-
-        static string GetAbsolutePath(IPullRequestSession session, IPullRequestSessionFile file)
-        {
-            var localPath = session.LocalRepository.LocalPath;
-            var relativePath = file.RelativePath.Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(localPath, relativePath);
-        }
+        static bool IsDiff(ITextView textView) => textView.Roles.Contains("DIFF");
 
         static IDifferenceViewer GetDiffViewer(IVsWindowFrame frame)
         {
@@ -598,6 +613,28 @@ namespace GitHub.Services
             return new NewDocumentStateScope(
                 __VSNEWDOCUMENTSTATE.NDS_Provisional,
                 VSConstants.NewDocumentStateReason.SolutionExplorer);
+        }
+
+        IDisposable OpenWithOption(string optionId, object value) => new OpenWithOptionScope(editorOptionsFactoryService, optionId, value);
+
+        class OpenWithOptionScope : IDisposable
+        {
+            readonly IEditorOptionsFactoryService editorOptionsFactoryService;
+            readonly string optionId;
+            readonly object savedValue;
+
+            internal OpenWithOptionScope(IEditorOptionsFactoryService editorOptionsFactoryService, string optionId, object value)
+            {
+                this.editorOptionsFactoryService = editorOptionsFactoryService;
+                this.optionId = optionId;
+                savedValue = editorOptionsFactoryService.GlobalOptions.GetOptionValue(optionId);
+                editorOptionsFactoryService.GlobalOptions.SetOptionValue(optionId, value);
+            }
+
+            public void Dispose()
+            {
+                editorOptionsFactoryService.GlobalOptions.SetOptionValue(optionId, savedValue);
+            }
         }
 
         static IList<string> ReadLines(string text)
