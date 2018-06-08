@@ -18,7 +18,7 @@ public class AvatarProviderTests
     public class TheDefaultOrgBitmapImageProperty : TestBaseClass
     {
         [Test]
-        public async Task CanBeAccessedFromMultipleThreads()
+        public async Task CanBeAccessedFromMultipleThreadsAsync()
         {
             var blobCache = new InMemoryBlobCache();
             var sharedCache = Substitute.For<ISharedCache>();
@@ -43,7 +43,7 @@ public class AvatarProviderTests
     public class TheDefaultUserBitmapImageProperty : TestBaseClass
     {
         [Test]
-        public async Task CanBeAccessedFromMultipleThreads()
+        public async Task CanBeAccessedFromMultipleThreadsAsync()
         {
             var blobCache = new InMemoryBlobCache();
             var sharedCache = Substitute.For<ISharedCache>();
@@ -68,7 +68,7 @@ public class AvatarProviderTests
     public class TheGetAvatarMethod : TestBaseClass
     {
         [Test]
-        public async Task GetsAvatarFromCache()
+        public async Task GetsAvatarFromCacheAsync()
         {
             var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
             var avatarUrl = new Uri("https://avatars.githubusercontent.com/u/e?email=me@test.com&s=140");
@@ -87,7 +87,7 @@ public class AvatarProviderTests
         }
 
         [Test]
-        public async Task RetrievesGitHubAvatar()
+        public async Task RetrievesGitHubAvatarAsync()
         {
             var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
             var avatarUrl = new Uri("https://avatars.githubusercontent.com/u/e?email=me@test.com&s=140");

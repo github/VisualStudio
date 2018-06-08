@@ -64,7 +64,7 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Text.Data, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Data.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Data.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Logic.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Logic.dll</HintPath>
@@ -241,10 +241,6 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
-      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
-      <Name>GitHub.InlineReviews</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
@@ -260,10 +256,6 @@
     <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
       <Name>GitHub.VisualStudio.UI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
-      <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
-      <Name>GitHub.VisualStudio</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

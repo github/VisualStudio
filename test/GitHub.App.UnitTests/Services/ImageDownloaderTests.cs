@@ -15,7 +15,7 @@ public class ImageDownloaderTests
     public class TheDownloadImageBytesMethod
     {
         [Test]
-        public async Task HttpStatusCode_OK()
+        public async Task HttpStatusCode_OK_Async()
         {
             var url = new Uri("http://foo.bar");
             var httpClient = Substitute.For<IHttpClient>();

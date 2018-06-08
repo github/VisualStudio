@@ -38,7 +38,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
 
             [Test]
-            public async Task OkCommandCompletesAndReturnsNullWithNoAuthorizationCode()
+            public async Task OkCommandCompletesAndReturnsNullWithNoAuthorizationCodeAsync()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -52,7 +52,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
 
             [Test]
-            public async Task OkCommandCompletesAndReturnsAuthorizationCode()
+            public async Task OkCommandCompletesAndReturnsAuthorizationCodeAsync()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -67,7 +67,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
 
             [Test]
-            public async Task ResendCodeCommandCompletesAndReturnsRequestResendCode()
+            public async Task ResendCodeCommandCompletesAndReturnsRequestResendCodeAsync()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -83,7 +83,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
            
             [Test]
-            public async Task ShowErrorMessageIsClearedWhenAuthenticationCodeSent()
+            public async Task ShowErrorMessageIsClearedWhenAuthenticationCodeSentAsync()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -101,7 +101,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
         public class TheCancelMethod
         {
             [Test]
-            public async Task CancelCommandCompletesAndReturnsNull()
+            public async Task CancelCommandCompletesAndReturnsNullAsync()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -117,7 +117,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
 
             [Test]
-            public async Task Cancel_Resets_TwoFactorType()
+            public async Task Cancel_Resets_TwoFactorType_Async()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorRequiredException(TwoFactorType.Sms);

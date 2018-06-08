@@ -47,7 +47,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
         public class TheStartWithConnectionMethod
         {
             [Test]
-            public async Task ShowsLoginDialogWhenNoConnectionsAvailable()
+            public async Task ShowsLoginDialogWhenNoConnectionsAvailableAsync()
             {
                 var target = CreateTarget();
                 var content = Substitute.For<ITestViewModel>();
@@ -58,7 +58,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
 			}
 
             [Test]
-            public async Task ShowsContentWhenConnectionAvailable()
+            public async Task ShowsContentWhenConnectionAvailableAsync()
             {
                 var connectionManager = CreateConnectionManager(1);
                 var target = CreateTarget(connectionManager);
@@ -71,7 +71,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
 
             [Test]
-            public async Task ShowsContentWhenLoggedIn()
+            public async Task ShowsContentWhenLoggedInAsync()
             {
                 var target = CreateTarget();
                 var content = Substitute.For<ITestViewModel>();
@@ -87,7 +87,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             }
 
             [Test]
-            public async Task ClosesDialogWhenLoginReturnsNullConnection()
+            public async Task ClosesDialogWhenLoginReturnsNullConnectionAsync()
             {
                 var target = CreateTarget();
                 var content = Substitute.For<ITestViewModel>();

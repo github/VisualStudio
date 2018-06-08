@@ -54,7 +54,7 @@ public class RepositoryCloneViewModelTests
     public class TheLoadRepositoriesCommand : TestBaseClass
     {
         [Test]
-        public async Task LoadsRepositories()
+        public async Task LoadsRepositoriesAsync()
         {
             var repos = new IRemoteRepositoryModel[]
             {
@@ -81,7 +81,7 @@ public class RepositoryCloneViewModelTests
     public class TheIsBusyProperty : TestBaseClass
     {
         [Test]
-        public async Task StartsTrueBecomesFalseWhenCompleted()
+        public async Task StartsTrueBecomesFalseWhenCompletedAsync()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
             var modelService = Substitute.For<IModelService>();
@@ -169,7 +169,7 @@ public class RepositoryCloneViewModelTests
         }
 
         [Test]
-        public async Task IsFalseWhenLoadingAndCompletedWithRepository()
+        public async Task IsFalseWhenLoadingAndCompletedWithRepositoryAsync()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
             var modelService = Substitute.For<IModelService>();
@@ -212,7 +212,7 @@ public class RepositoryCloneViewModelTests
         }
 
         [Test]
-        public async Task IsTrueWhenLoadingCompleteNotFailedAndNoRepositories()
+        public async Task IsTrueWhenLoadingCompleteNotFailedAndNoRepositoriesAsync()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
             var modelService = Substitute.For<IModelService>();
@@ -277,7 +277,7 @@ public class RepositoryCloneViewModelTests
         }
 
         [Test]
-        public async Task IsFalseWhenLoadingCompleteNotFailedAndNoRepositories()
+        public async Task IsFalseWhenLoadingCompleteNotFailedAndNoRepositoriesAsync()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
             var modelService = Substitute.For<IModelService>();

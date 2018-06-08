@@ -27,7 +27,7 @@ namespace UnitTests.GitHub.App.Factories
             }
 
             [Test]
-            public async Task ShouldCreateDifferentModelServiceForDifferentConnectionsWithSameAddress()
+            public async Task ShouldCreateDifferentModelServiceForDifferentConnectionsWithSameAddressAsync()
             {
                 var target = CreateTarget();
                 var instance1 = await target.CreateAsync(CreateConnection("https://github.com"));
@@ -37,7 +37,7 @@ namespace UnitTests.GitHub.App.Factories
             }
 
             [Test]
-            public async Task ShouldCacheModelServiceForHost()
+            public async Task ShouldCacheModelServiceForHostAsync()
             {
                 var target = CreateTarget();
                 var connection = CreateConnection("https://github.com");
@@ -48,7 +48,7 @@ namespace UnitTests.GitHub.App.Factories
             }
 
             [Test]
-            public async Task ShouldInsertUser()
+            public async Task ShouldInsertUserAsync()
             {
                 var hostCacheFactory = Substitute.For<IHostCacheFactory>();
                 var target = CreateTarget(hostCacheFactory: hostCacheFactory);

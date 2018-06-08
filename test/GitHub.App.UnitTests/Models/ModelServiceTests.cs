@@ -27,7 +27,7 @@ public class ModelServiceTests
     public class TheGetCurrentUserMethod : TestBaseClass
     {
         [Test]
-        public async Task RetrievesCurrentUser()
+        public async Task RetrievesCurrentUserAsync()
         {
             var cache = new InMemoryBlobCache();
             await cache.InsertObject<AccountCacheItem>("user", new AccountCacheItem(CreateOctokitUser("octocat")));
@@ -42,7 +42,7 @@ public class ModelServiceTests
     public class TheInsertUserMethod : TestBaseClass
     {
         [Test]
-        public async Task AddsUserToCache()
+        public async Task AddsUserToCacheAsync()
         {
             var cache = new InMemoryBlobCache();
             var modelService = CreateTarget(hostCache: cache);
@@ -57,7 +57,7 @@ public class ModelServiceTests
     public class TheGetGitIgnoreTemplatesMethod : TestBaseClass
     {
         [Test]
-        public async Task CanRetrieveAndCacheGitIgnores()
+        public async Task CanRetrieveAndCacheGitIgnoresAsync()
         {
             var data = new[] { "dotnet", "peanuts", "bloomcounty" };
             var apiClient = Substitute.For<IApiClient>();
@@ -84,7 +84,7 @@ public class ModelServiceTests
     public class TheGetLicensesMethod : TestBaseClass
     {
         [Test]
-        public async Task CanRetrieveAndCacheLicenses()
+        public async Task CanRetrieveAndCacheLicensesAsync()
         {
             var data = new[]
             {
@@ -113,7 +113,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task ReturnsEmptyIfLicenseApiNotFound()
+        public async Task ReturnsEmptyIfLicenseApiNotFoundAsync()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses()
@@ -126,7 +126,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task ReturnsEmptyIfCacheReadFails()
+        public async Task ReturnsEmptyIfCacheReadFailsAsync()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = Substitute.For<IBlobCache>();
@@ -144,7 +144,7 @@ public class ModelServiceTests
     {
         [Test]
         [Ignore("Skip this test as it will no longer be relevant with the GraphQL migration")]
-        public async Task CanRetrieveAndCacheUserAndAccounts()
+        public async Task CanRetrieveAndCacheUserAndAccountsAsync()
         {
             var orgs = new[]
             {
@@ -174,7 +174,7 @@ public class ModelServiceTests
 
         [Test]
         [Ignore("Skip this test as it will no longer be relevant with the GraphQL migration")]
-        public async Task CanRetrieveUserFromCacheAndAccountsFromApi()
+        public async Task CanRetrieveUserFromCacheAndAccountsFromApiAsync()
         {
             var orgs = new[]
             {
@@ -202,7 +202,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task OnlyRetrievesOneUserEvenIfCacheOrApiReturnsMoreThanOne()
+        public async Task OnlyRetrievesOneUserEvenIfCacheOrApiReturnsMoreThanOneAsync()
         {
             // This should be impossible, but let's pretend it does happen.
             var users = new[]
@@ -226,7 +226,7 @@ public class ModelServiceTests
     {
         [Test]
         [Ignore("Skip this test as it will no longer be relevant with the GraphQL migration")]
-        public async Task CanRetrieveAndCacheRepositoriesForUserAndOrganizations()
+        public async Task CanRetrieveAndCacheRepositoriesForUserAndOrganizationsAsync()
         {
             var orgs = new[]
             {
@@ -314,7 +314,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task WhenNotLoggedInReturnsEmptyCollection()
+        public async Task WhenNotLoggedInReturnsEmptyCollectionAsync()
         {
             var apiClient = Substitute.For<IApiClient>();
             var modelService = CreateTarget(apiClient: apiClient);
@@ -325,7 +325,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task WhenLoggedInDoesNotBlowUpOnUnexpectedNetworkProblems()
+        public async Task WhenLoggedInDoesNotBlowUpOnUnexpectedNetworkProblemsAsync()
         {
             var apiClient = Substitute.For<IApiClient>();
             var modelService = CreateTarget(apiClient: apiClient);
@@ -341,7 +341,7 @@ public class ModelServiceTests
     public class TheInvalidateAllMethod : TestBaseClass
     {
         [Test]
-        public async Task InvalidatesTheCache()
+        public async Task InvalidatesTheCacheAsync()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = new InMemoryBlobCache();
@@ -355,7 +355,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task VaccumsTheCache()
+        public async Task VaccumsTheCacheAsync()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = Substitute.For<IBlobCache>();
@@ -377,7 +377,7 @@ public class ModelServiceTests
     {
         [Test]
         [Ignore("Pull requests always refresh from the server now. Migrate this test to data that doesn't require constant refreshing.")]
-        public async Task NonExpiredIndexReturnsCache()
+        public async Task NonExpiredIndexReturnsCacheAsync()
         {
             var expected = 5;
 
@@ -428,7 +428,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task ExpiredIndexReturnsLive()
+        public async Task ExpiredIndexReturnsLiveAsync()
         {
             var expected = 5;
 
@@ -496,7 +496,7 @@ public class ModelServiceTests
         }
 
         [Test]
-        public async Task ExpiredIndexClearsItems()
+        public async Task ExpiredIndexClearsItemsAsync()
         {
             var expected = 5;
 

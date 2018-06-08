@@ -143,7 +143,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     [TestCase("repo-name-9", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "target-branch", "title", null)]
     [TestCase("repo-name-10", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", "title", "description")]
     [TestCase("repo-name-11", "source-repo-owner", "source-branch", false, false, "source-repo-owner", "master", null, null)]
-    public async Task CreatingPRs(
+    public async Task CreatingPRsAsync(
         string repoName, string sourceRepoOwner, string sourceBranchName,
         bool repoIsFork, bool sourceBranchIsTracking,
         string targetRepoOwner, string targetBranchName,
@@ -196,7 +196,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     }
 
     [Test]
-    public void TemplateIsUsedIfPresent()
+    public async Task TemplateIsUsedIfPresentAsync()
     {
         var data = PrepareTestData("stuff", "owner", "master", "owner", "master",
             "origin", false, true);
@@ -205,7 +205,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Return("Test PR template"));
 
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
-        vm.InitializeAsync(data.ActiveRepo, data.Connection).Wait();
+        await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         Assert.That("Test PR template", Is.EqualTo(vm.Description));
     }

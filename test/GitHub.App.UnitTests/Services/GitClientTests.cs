@@ -16,7 +16,7 @@ public class GitClientTests
         [TestCase(FileStatus.Unaltered, false)]
         [TestCase(FileStatus.ModifiedInIndex, true)]
         [TestCase(FileStatus.ModifiedInWorkdir, true)]
-        public async Task RetrieveStatus(FileStatus fileStatus, bool expect)
+        public async Task RetrieveStatusAsync(FileStatus fileStatus, bool expect)
         {
             var path = "path";
             var repo = Substitute.For<IRepository>();
@@ -32,7 +32,7 @@ public class GitClientTests
         }
 
         [Test]
-        public async Task TreeEntry_Null_False()
+        public async Task TreeEntry_Null_False_Async()
         {
             var path = "path";
             var repo = Substitute.For<IRepository>();
@@ -48,7 +48,7 @@ public class GitClientTests
         }
 
         [Test]
-        public async Task TreeEntryTarget_GitLink_False()
+        public async Task TreeEntryTarget_GitLink_False_Async()
         {
             var path = "path";
             var repo = Substitute.For<IRepository>();
@@ -69,7 +69,7 @@ public class GitClientTests
         [TestCase(1, 0, true)]
         [TestCase(0, 1, true)]
         [TestCase(1, 1, true)]
-        public async Task ContentChanges(int linesAdded, int linesDeleted, bool expected)
+        public async Task ContentChangesAsync(int linesAdded, int linesDeleted, bool expected)
         {
             var path = "path";
             var repo = Substitute.For<IRepository>();
@@ -96,7 +96,7 @@ public class GitClientTests
         [TestCase(0, true)]
         [TestCase(2, false)]
         [TestCase(null, false)]
-        public async Task IsHeadPushed(int? aheadBy, bool expected)
+        public async Task IsHeadPushedAsync(int? aheadBy, bool expected)
         {
             var gitClient = CreateGitClient();
             var repository = MockTrackedBranchRepository(aheadBy);
@@ -121,7 +121,7 @@ public class GitClientTests
     public class ThePushMethod : TestBaseClass
     {
         [Test]
-        public async Task PushesToDefaultOrigin()
+        public async Task PushesToDefaultOriginAsync()
         {
             var origin = Substitute.For<Remote>();
             var head = Substitute.For<Branch>();
@@ -137,7 +137,7 @@ public class GitClientTests
         }
 
         [Test]
-        public async Task DoesNotPushEmptyRepository()
+        public async Task DoesNotPushEmptyRepositoryAsync()
         {
             var repository = Substitute.For<IRepository>();
             var gitClient = CreateGitClient();
@@ -152,7 +152,7 @@ public class GitClientTests
     public class TheSetRemoteMethod : TestBaseClass
     {
         [Test]
-        public async Task SetsTheConfigToTheRemoteBranch()
+        public async Task SetsTheConfigToTheRemoteBranchAsync()
         {
             var config = Substitute.For<Configuration>();
             var repository = Substitute.For<IRepository>();
@@ -169,7 +169,7 @@ public class GitClientTests
     public class TheSetTrackingMethod : TestBaseClass
     {
         [Test]
-        public async Task SetsTheRemoteTrackingBranch()
+        public async Task SetsTheRemoteTrackingBranchAsync()
         {
             var config = Substitute.For<Configuration>();
             var origin = Substitute.For<Remote>();
@@ -195,7 +195,7 @@ public class GitClientTests
     {
         [TestCase("https://github.com/owner/repo", "https://github.com/owner/repo")]
         [TestCase("git@github.com:github/VisualStudioBuildScripts", "https://github.com/github/VisualStudioBuildScripts")]
-        public async Task FetchUsingHttps(string repoUrl, string expectFetchUrl)
+        public async Task FetchUsingHttpsAsync(string repoUrl, string expectFetchUrl)
         {
             var repo = Substitute.For<IRepository>();
             var uri = new UriString(repoUrl);
@@ -211,7 +211,7 @@ public class GitClientTests
         [TestCase("https://github.com/owner/repo", "https://github.com/owner/repo", null)]
         [TestCase("https://github.com/fetch/repo", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
         [TestCase("git@github.com:owner/repo", "git@github.com:owner/repo", "https://github.com/owner/repo")]
-        public async Task UseOriginWhenPossible(string fetchUrl, string originUrl, string addUrl = null)
+        public async Task UseOriginWhenPossibleAsync(string fetchUrl, string originUrl, string addUrl = null)
         {
             var remote = Substitute.For<Remote>();
             remote.Url.Returns(originUrl);
@@ -237,7 +237,7 @@ public class GitClientTests
     public class TheGetPullRequestMergeBaseMethod : TestBaseClass
     {
         [Test]
-        public async Task LocalBaseHeadAndMergeBase_DontFetch()
+        public async Task LocalBaseHeadAndMergeBase_DontFetchAsync()
         {
             var targetCloneUrl = new UriString("https://github.com/owner/repo");
             var baseSha = "baseSha";
@@ -260,7 +260,7 @@ public class GitClientTests
         [TestCase(null, "headSha", "mergeBaseSha", 1)]
         [TestCase("baseSha", null, "mergeBaseSha", 1)]
         [TestCase("baseSha", "headSha", null, 0)]
-        public async Task WhenToFetch(string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
+        public async Task WhenToFetchAsync(string baseSha, string headSha, string mergeBaseSha, int receivedFetch)
         {
             var targetCloneUri = new UriString("https://github.com/owner/repo");
             var baseRef = "master";
@@ -286,7 +286,7 @@ public class GitClientTests
 
         // PR base might not exist, so we must fetch `refs/pull/<PR>/head` first.
         [TestCase(null, null, "mergeBaseSha", "baseRef", 777, "refs/pull/777/head")]
-        public async Task WhatToFetch(string baseSha, string headSha, string mergeBaseSha, string baseRef, int pullNumber,
+        public async Task WhatToFetchAsync(string baseSha, string headSha, string mergeBaseSha, string baseRef, int pullNumber,
             string expectRefSpec)
         {
             var repo = MockRepo(baseSha, headSha, mergeBaseSha);

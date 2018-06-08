@@ -16,7 +16,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
     public class PullRequestReviewAuthoringViewModelTests
     {
         [Test]
-        public async Task Creates_New_Pending_Review_Model()
+        public async Task Creates_New_Pending_Review_Model_Async()
         {
             var target = CreateTarget();
 
@@ -26,7 +26,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Uses_Existing_Pending_Review_Model()
+        public async Task Uses_Existing_Pending_Review_Model_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest(reviews: review);
@@ -39,7 +39,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Doesnt_Use_Non_Pending_Review_Model()
+        public async Task Doesnt_Use_Non_Pending_Review_Model_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Approved);
             var model = CreatePullRequest(reviews: review);
@@ -52,7 +52,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Doesnt_Use_Other_Users_Pending_Review_Model()
+        public async Task Doesnt_Use_Other_Users_Pending_Review_Model_Async()
         {
             var review = CreateReview(12, "shana", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest(reviews: review);
@@ -65,7 +65,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Body_Is_Set()
+        public async Task Body_Is_Set_Async()
         {
             var review = CreateReview(body: "Review body");
             var model = CreatePullRequest(reviews: review);
@@ -78,7 +78,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task CanApproveRequestChanges_Is_False_When_Is_Own_PullRequest()
+        public async Task CanApproveRequestChanges_Is_False_When_Is_Own_PullRequest_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("grokys", review);
@@ -91,7 +91,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task CanApproveRequestChanges_Is_True_When_Is_Someone_Elses_PullRequest()
+        public async Task CanApproveRequestChanges_Is_True_When_Is_Someone_Elses_PullRequest_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -104,7 +104,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Initializes_Files()
+        public async Task Initializes_Files_Async()
         {
             var session = CreateSession();
             var sessionManager = CreateSessionManager(session);
@@ -116,7 +116,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task ReInitializes_Files_When_Session_PullRequestChanged()
+        public async Task ReInitializes_Files_When_Session_PullRequestChanged_Async()
         {
             var session = CreateSession();
             var sessionManager = CreateSessionManager(session);
@@ -132,7 +132,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Popuplates_FileComments()
+        public async Task Popuplates_FileComments_Async()
         {
             var review = CreateReview(id: 12);
             var model = CreatePullRequest(reviews: review);
@@ -153,7 +153,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Updates_FileComments_When_Session_PullRequestChanged()
+        public async Task Updates_FileComments_When_Session_PullRequestChanged_Async()
         {
             var review = CreateReview(id: 12);
             var model = CreatePullRequest(reviews: review);
@@ -184,7 +184,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Updates_Model_Id_From_PendingReviewId_When_Session_PullRequestChanged()
+        public async Task Updates_Model_Id_From_PendingReviewId_When_Session_PullRequestChanged_Async()
         {
             var model = CreatePullRequest();
             var session = CreateSession(
@@ -209,7 +209,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Approve_Calls_Session_PostReview_And_Closes()
+        public async Task Approve_Calls_Session_PostReview_And_Closes_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -228,7 +228,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Comment_Is_Disabled_When_Has_Empty_Body_And_No_File_Comments()
+        public async Task Comment_Is_Disabled_When_Has_Empty_Body_And_No_File_Comments_Async()
         {
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -241,7 +241,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Comment_Is_Enabled_When_Has_Body()
+        public async Task Comment_Is_Enabled_When_Has_Body_Async()
         {
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -255,7 +255,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Comment_Is_Enabled_When_Has_File_Comments()
+        public async Task Comment_Is_Enabled_When_Has_File_Comments_Async()
         {
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -271,7 +271,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Comment_Calls_Session_PostReview_And_Closes()
+        public async Task Comment_Calls_Session_PostReview_And_Closes_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -290,7 +290,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task RequestChanges_Is_Disabled_When_Has_Empty_Body_And_No_File_RequestChangess()
+        public async Task RequestChanges_Is_Disabled_When_Has_Empty_Body_And_No_File_RequestChangess_Async()
         {
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -303,7 +303,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task RequestChanges_Is_Enabled_When_Has_Body()
+        public async Task RequestChanges_Is_Enabled_When_Has_Body_Async()
         {
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -317,7 +317,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task RequestChanges_Is_Enabled_When_Has_File_Comments()
+        public async Task RequestChanges_Is_Enabled_When_Has_File_Comments_Async()
         {
             var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -333,7 +333,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task RequestChanges_Calls_Session_PostReview_And_Closes()
+        public async Task RequestChanges_Calls_Session_PostReview_And_Closes_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -352,7 +352,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Cancel_Calls_Session_CancelReview_And_Closes_When_Has_Pending_Review()
+        public async Task Cancel_Calls_Session_CancelReview_And_Closes_When_Has_Pending_Review_Async()
         {
             var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
@@ -370,7 +370,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Cancel_Just_Closes_When_Has_No_Pending_Review()
+        public async Task Cancel_Just_Closes_When_Has_No_Pending_Review_Async()
         {
             var model = CreatePullRequest("shana");
             var session = CreateSession();

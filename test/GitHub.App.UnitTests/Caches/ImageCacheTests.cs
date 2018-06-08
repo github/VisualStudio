@@ -18,7 +18,7 @@ public class ImageCacheTests
     public class TheGetImageBytesMethod : TestBaseClass
     {
         [Test]
-        public async Task RetrievesImageFromCacheAndDoesNotFetchIt()
+        public async Task RetrievesImageFromCacheAndDoesNotFetchItAsync()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
             var cache = new InMemoryBlobCache();
@@ -37,7 +37,7 @@ public class ImageCacheTests
         }
 
         [Test]
-        public async Task WhenLoadingFromCacheFailsInvalidatesCacheEntry()
+        public async Task WhenLoadingFromCacheFailsInvalidatesCacheEntryAsync()
         {
             var cache = new InMemoryBlobCache();
             await cache.Insert("https://fake/", new byte[] { 0, 0, 0 });
@@ -57,7 +57,7 @@ public class ImageCacheTests
         }
 
         [Test]
-        public async Task DownloadsImageWhenMissingAndCachesIt()
+        public async Task DownloadsImageWhenMissingAndCachesItAsync()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
 
@@ -140,7 +140,7 @@ public class ImageCacheTests
     public class TheInvalidateMethod : TestBaseClass
     {
         [Test]
-        public async Task RemovesImageFromCache()
+        public async Task RemovesImageFromCacheAsync()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
             var cache = new InMemoryBlobCache();
@@ -158,7 +158,7 @@ public class ImageCacheTests
     public class TheSeedImageMethod : TestBaseClass
     {
         [Test]
-        public async Task AddsImageDirectlyToCache()
+        public async Task AddsImageDirectlyToCacheAsync()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
             var cache = new InMemoryBlobCache();

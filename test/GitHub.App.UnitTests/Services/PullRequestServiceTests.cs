@@ -21,7 +21,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheIsWorkingDirectoryCleanMethod
     {
         [Test]
-        public async Task NewRepo_True()
+        public async Task NewRepo_True_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -36,7 +36,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task UntrackedFile_True()
+        public async Task UntrackedFile_True_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -54,7 +54,7 @@ public class PullRequestServiceTests : TestBaseClass
 
 
         [Test]
-        public async Task CommitFile_True()
+        public async Task CommitFile_True_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -73,7 +73,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task AddedFile_False()
+        public async Task AddedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -92,28 +92,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ModifiedFile_False()
-        {
-            using (var tempDir = new TempDirectory())
-            using (var repo = CreateRepository(tempDir))
-            {
-                var service = CreatePullRequestService(repo);
-                var repositoryModel = CreateLocalRepositoryModel(repo);
-                var path = "file.txt";
-                var file = Path.Combine(repo.Info.WorkingDirectory, path);
-                File.WriteAllText(file, "contents");
-                Commands.Stage(repo, path);
-                repo.Commit("foo", Author, Author);
-                File.WriteAllText(file, "contents2");
-
-                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
-
-                Assert.False(isClean);
-            }
-        }
-
-        [Test]
-        public async Task StagedFile_False()
+        public async Task ModifiedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -126,6 +105,27 @@ public class PullRequestServiceTests : TestBaseClass
                 Commands.Stage(repo, path);
                 repo.Commit("foo", Author, Author);
                 File.WriteAllText(file, "contents2");
+
+                var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
+
+                Assert.False(isClean);
+            }
+        }
+
+        [Test]
+        public async Task StagedFile_False_Async()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
                 Commands.Stage(repo, path);
 
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
@@ -135,7 +135,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task MissingFile_False()
+        public async Task MissingFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -156,7 +156,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RemovedFile_False()
+        public async Task RemovedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -178,7 +178,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RenamedInIndexFile_False()
+        public async Task RenamedInIndexFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -203,7 +203,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RenamedInWorkingDirFile_False()
+        public async Task RenamedInWorkingDirFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -229,7 +229,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test] // WorkDirModified
-        public async Task ChangedSubmodule_True()
+        public async Task ChangedSubmodule_True_Async()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
@@ -256,7 +256,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheCountSubmodulesToSyncMethod
     {
         [Test] // WorkDirDeleted
-        public async Task CommittedSubmodule_True()
+        public async Task CommittedSubmodule_True_Async()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
@@ -276,7 +276,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test] // WorkDirUninitialized
-        public async Task UninitializedSubmodule_True()
+        public async Task UninitializedSubmodule_True_Async()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
@@ -299,7 +299,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test] // WorkDirModified
-        public async Task ChangedSubmodule_True()
+        public async Task ChangedSubmodule_True_Async()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
@@ -325,7 +325,7 @@ public class PullRequestServiceTests : TestBaseClass
         // TODO: Find out when `SubmoduleStatus.WorkDirAdded` is used.
 
         [Test]
-        public async Task UpdatedSubmodule_False()
+        public async Task UpdatedSubmodule_False_Async()
         {
             using (var subRepoDir = new TempDirectory())
             using (var subRepo = CreateRepository(subRepoDir))
@@ -346,7 +346,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task NewRepo_False()
+        public async Task NewRepo_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -361,7 +361,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task UntrackedFile_False()
+        public async Task UntrackedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -378,7 +378,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task CommitFile_False()
+        public async Task CommitFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -397,7 +397,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task AddedFile_False()
+        public async Task AddedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -416,28 +416,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ModifiedFile_False()
-        {
-            using (var tempDir = new TempDirectory())
-            using (var repo = CreateRepository(tempDir))
-            {
-                var service = CreatePullRequestService(repo);
-                var repositoryModel = CreateLocalRepositoryModel(repo);
-                var path = "file.txt";
-                var file = Path.Combine(repo.Info.WorkingDirectory, path);
-                File.WriteAllText(file, "contents");
-                Commands.Stage(repo, path);
-                repo.Commit("foo", Author, Author);
-                File.WriteAllText(file, "contents2");
-
-                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
-
-                Assert.That(0, Is.EqualTo(count));
-            }
-        }
-
-        [Test]
-        public async Task StagedFile_False()
+        public async Task ModifiedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -450,6 +429,27 @@ public class PullRequestServiceTests : TestBaseClass
                 Commands.Stage(repo, path);
                 repo.Commit("foo", Author, Author);
                 File.WriteAllText(file, "contents2");
+
+                var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
+
+                Assert.That(0, Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public async Task StagedFile_False_Async()
+        {
+            using (var tempDir = new TempDirectory())
+            using (var repo = CreateRepository(tempDir))
+            {
+                var service = CreatePullRequestService(repo);
+                var repositoryModel = CreateLocalRepositoryModel(repo);
+                var path = "file.txt";
+                var file = Path.Combine(repo.Info.WorkingDirectory, path);
+                File.WriteAllText(file, "contents");
+                Commands.Stage(repo, path);
+                repo.Commit("foo", Author, Author);
+                File.WriteAllText(file, "contents2");
                 Commands.Stage(repo, path);
 
                 var count = await service.CountSubmodulesToSync(repositoryModel).FirstAsync();
@@ -459,7 +459,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task MissingFile_False()
+        public async Task MissingFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -480,7 +480,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RemovedFile_False()
+        public async Task RemovedFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -502,7 +502,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RenamedInIndexFile_False()
+        public async Task RenamedInIndexFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -527,7 +527,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RenamedInWorkingDirFile_False()
+        public async Task RenamedInWorkingDirFile_False_Async()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -587,7 +587,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheExtractToTempFileMethod
     {
         [Test]
-        public async Task ExtractsExistingFile()
+        public async Task ExtractsExistingFile_Async()
         {
             var gitClient = MockGitClient();
             var target = CreateTarget(gitClient);
@@ -609,7 +609,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task CreatesEmptyFileForNonExistentFile()
+        public async Task CreatesEmptyFileForNonExistentFileAsync()
         {
             var gitClient = MockGitClient();
             var target = CreateTarget(gitClient);
@@ -717,7 +717,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheCheckoutMethod
     {
         [Test]
-        public async Task ShouldCheckoutExistingBranch()
+        public async Task ShouldCheckoutExistingBranchAsync()
         {
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
@@ -736,7 +736,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ShouldCheckoutLocalBranch()
+        public async Task ShouldCheckoutLocalBranchAsync()
         {
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
@@ -759,7 +759,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ShouldCheckoutBranchFromFork()
+        public async Task ShouldCheckoutBranchFromForkAsync()
         {
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
@@ -785,7 +785,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ShouldUseUniquelyNamedRemoteForFork()
+        public async Task ShouldUseUniquelyNamedRemoteForForkAsync()
         {
             var gitClient = MockGitClient();
             var gitService = MockGitService();
@@ -817,7 +817,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheGetDefaultLocalBranchNameMethod
     {
         [Test]
-        public async Task ShouldReturnCorrectDefaultLocalBranchName()
+        public async Task ShouldReturnCorrectDefaultLocalBranchNameAsync()
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
@@ -827,7 +827,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ShouldReturnCorrectDefaultLocalBranchNameForPullRequestsWithNonLatinChars()
+        public async Task ShouldReturnCorrectDefaultLocalBranchNameForPullRequestsWithNonLatinCharsAsync()
         {
             var service = new PullRequestService(
                 MockGitClient(),
@@ -842,7 +842,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task DefaultLocalBranchNameShouldNotClashWithExistingBranchNames()
+        public async Task DefaultLocalBranchNameShouldNotClashWithExistingBranchNamesAsync()
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
@@ -855,7 +855,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheGetLocalBranchesMethod
     {
         [Test]
-        public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepository()
+        public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepositoryAsync()
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
@@ -868,7 +868,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task ShouldReturnMarkedBranchForPullRequestFromFork()
+        public async Task ShouldReturnMarkedBranchForPullRequestFromForkAsync()
         {
             var repo = Substitute.For<IRepository>();
             var config = Substitute.For<Configuration>();
@@ -922,7 +922,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheRemoteUnusedRemotesMethod
     {
         [Test]
-        public async Task ShouldRemoveUnusedRemote()
+        public async Task ShouldRemoveUnusedRemoteAsync()
         {
             var gitClient = MockGitClient();
             var gitService = MockGitService();

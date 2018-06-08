@@ -25,7 +25,7 @@ namespace UnitTests.GitHub.App.Services
         }
 
         [Test]
-        public async Task ListenStopsHttpListener()
+        public async Task ListenStopsHttpListenerAsync()
         {
             var httpListener = CreateHttpListener("id1");
             var target = new OAuthCallbackListener(httpListener);
@@ -62,10 +62,10 @@ namespace UnitTests.GitHub.App.Services
         }
 
         [Test]
-        public async Task SuccessfulResponseClosesResponse()
+        public async Task SuccessfulResponseClosesResponseAsync()
         {
             var httpListener = CreateHttpListener("id1");
-            var context = httpListener.GetContext();
+            var context = await httpListener.GetContextAsync();
             var target = new OAuthCallbackListener(httpListener);
 
             await target.Listen("id1", CancellationToken.None);

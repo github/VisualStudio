@@ -13,7 +13,7 @@ public class RepositoryCloneServiceTests
     public class TheCloneRepositoryMethod : TestBaseClass
     {
         [Test]
-        public async Task ClonesToRepositoryPath()
+        public async Task ClonesToRepositoryPathAsync()
         {
             var serviceProvider = Substitutes.ServiceProvider;
             var operatingSystem = serviceProvider.GetOperatingSystem();
@@ -27,7 +27,7 @@ public class RepositoryCloneServiceTests
         }
 
         [Test]
-        public async Task UpdatesMetricsWhenRepositoryCloned()
+        public async Task UpdatesMetricsWhenRepositoryClonedAsync()
         {
             var serviceProvider = Substitutes.ServiceProvider;
             var operatingSystem = serviceProvider.GetOperatingSystem();
