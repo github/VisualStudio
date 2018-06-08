@@ -143,6 +143,7 @@ public class ModelServiceTests
     public class TheGetAccountsMethod : TestBaseClass
     {
         [Test]
+        [Ignore("Skip this test as it will no longer be relevant with the GraphQL migration")]
         public async Task CanRetrieveAndCacheUserAndAccounts()
         {
             var orgs = new[]
@@ -172,6 +173,7 @@ public class ModelServiceTests
         }
 
         [Test]
+        [Ignore("Skip this test as it will no longer be relevant with the GraphQL migration")]
         public async Task CanRetrieveUserFromCacheAndAccountsFromApi()
         {
             var orgs = new[]
@@ -223,6 +225,7 @@ public class ModelServiceTests
     public class TheGetRepositoriesMethod : TestBaseClass
     {
         [Test]
+        [Ignore("Skip this test as it will no longer be relevant with the GraphQL migration")]
         public async Task CanRetrieveAndCacheRepositoriesForUserAndOrganizations()
         {
             var orgs = new[]
