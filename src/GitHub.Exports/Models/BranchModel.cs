@@ -32,9 +32,7 @@ namespace GitHub.Models
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
             Name = DisplayName = branch.FriendlyName;
-#pragma warning disable 0618 // TODO: Replace `Branch.Remote` with `Repository.Network.Remotes[branch.RemoteName]`.
-            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url, gitService) : repo;
-#pragma warning restore 0618
+            Repository = repo;
             Sha = branch.Tip?.Sha;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
 
