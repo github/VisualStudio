@@ -183,7 +183,7 @@ namespace GitHub.Models
                 // BranchModel doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(LocalPath))
                 {
-                    return new LocalBranchModel(repo?.Head, this, gitService);
+                    return new LocalBranchModel(repo, repo?.Head, this, gitService);
                 }
             }
         }
