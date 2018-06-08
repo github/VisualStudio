@@ -1,5 +1,4 @@
 ﻿using System;
-using GitHub.Primitives;
 using GitHub.Collections;
 
 namespace GitHub.Models
@@ -11,10 +10,5 @@ namespace GitHub.Models
         string Name { get; }
         IRepositoryModel Repository { get; }
         string DisplayName { get; set; }
-        string Sha { get; }
-        bool IsTracking { get; }
-        string TrackedSha { get; }
-        UriString TrackedRemoteUrl { get; }
-        string TrackedRemoteCanonicalName { get; }
     }
 }

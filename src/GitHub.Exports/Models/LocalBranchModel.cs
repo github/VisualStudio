@@ -4,7 +4,7 @@ using LibGit2Sharp;
 
 namespace GitHub.Models
 {
-    public class LocalBranchModel : BranchModel, IBranch
+    public class LocalBranchModel : BranchModel, ILocalBranch
     {
         public LocalBranchModel(IRepository repository, Branch branch, IRepositoryModel repo, IGitService gitService)
             : base(branch?.FriendlyName, repo)
@@ -20,5 +20,11 @@ namespace GitHub.Models
                 TrackedRemoteCanonicalName = trackedBranch.UpstreamBranchCanonicalName;
             }
         }
+
+        public string Sha { get; }
+        public bool IsTracking { get; }
+        public string TrackedSha { get; }
+        public UriString TrackedRemoteUrl { get; }
+        public string TrackedRemoteCanonicalName { get; }
     }
 }

@@ -164,6 +164,7 @@
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\ActorModel.cs" />
+    <Compile Include="Models\ILocalBranch.cs" />
     <Compile Include="Models\LocalBranchModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />

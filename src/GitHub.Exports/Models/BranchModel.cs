@@ -31,12 +31,6 @@ namespace GitHub.Models
         public IRepositoryModel Repository { get; private set; }
         public string DisplayName { get; set; }
 
-        public string Sha { get; protected set; }
-        public bool IsTracking { get; protected set; }
-        public string TrackedSha { get; protected set; }
-        public UriString TrackedRemoteUrl { get; protected set; }
-        public string TrackedRemoteCanonicalName { get; protected set; }
-
         #region Equality things
         public void CopyFrom(IBranch other)
         {
@@ -46,7 +40,6 @@ namespace GitHub.Models
             Name = other.Name;
             Repository = other.Repository;
             DisplayName = other.DisplayName;
-            IsTracking = other.IsTracking;
         }
 
         public override bool Equals(object obj)

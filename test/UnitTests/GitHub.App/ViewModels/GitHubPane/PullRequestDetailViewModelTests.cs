@@ -526,7 +526,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager = null)
         {
             var repository = Substitute.For<ILocalRepositoryModel>();
-            var currentBranchModel = new BranchModel(currentBranch, repository);
+            var currentBranchModel = CreateLocalBranch(currentBranch, repository);
             repository.CurrentBranch.Returns(currentBranchModel);
             repository.CloneUrl.Returns(new UriString(Uri.ToString()));
             repository.LocalPath.Returns(@"C:\projects\ThisRepo");
@@ -611,6 +611,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 UpdatedAt = DateTimeOffset.Now,
                 Reviews = reviews.ToList(),
             };
+        }
+
+        static ILocalBranch CreateLocalBranch(string sourceBranchName, ILocalRepositoryModel activeRepo)
+        {
+            var branch = Substitute.For<ILocalBranch>();
+            branch.DisplayName.Returns(sourceBranchName);
+            branch.Name.Returns(sourceBranchName);
+            branch.Id.Returns(activeRepo.Name + "/" + sourceBranchName);
+            branch.Repository.Returns(activeRepo);
+            return branch;
         }
 
         static IObservable<Unit> Throws(string message)

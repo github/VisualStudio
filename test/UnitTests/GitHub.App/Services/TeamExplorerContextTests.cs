@@ -227,7 +227,7 @@ namespace GitHub.App.UnitTests.Services
         {
             var repo = Substitute.For<ILocalRepositoryModel>();
             repo.LocalPath.Returns(path);
-            var currentBranch = Substitute.For<IBranch>();
+            var currentBranch = Substitute.For<ILocalBranch>();
             currentBranch.Name.Returns(branchName);
             currentBranch.Sha.Returns(headSha);
             currentBranch.TrackedSha.Returns(trackedSha);

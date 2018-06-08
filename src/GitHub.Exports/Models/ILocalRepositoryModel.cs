@@ -18,7 +18,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the current branch.
         /// </summary>
-        IBranch CurrentBranch { get; }
+        ILocalBranch CurrentBranch { get; }
 
         /// <summary>
         /// Updates the url information based on the local path

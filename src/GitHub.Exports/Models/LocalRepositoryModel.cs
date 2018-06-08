@@ -176,7 +176,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the current branch of the repository.
         /// </summary>
-        public IBranch CurrentBranch
+        public ILocalBranch CurrentBranch
         {
             get
             {

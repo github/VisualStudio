@@ -91,7 +91,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         if (repoIsFork)
             githubRepoParent = CreateRepository(targetRepoOwner, repoName, id: 1);
         var githubRepo = CreateRepository(sourceRepoOwner, repoName, id: 2, parent: githubRepoParent);
-        var sourceBranch = new BranchModel(sourceBranchName, activeRepo);
+        var sourceBranch = CreateLocalBranch(sourceBranchName, activeRepo);
         var sourceRepo = new RemoteRepositoryModel(githubRepo);
         var targetRepo = targetRepoOwner == sourceRepoOwner ? sourceRepo : sourceRepo.Parent;
         var targetBranch = targetBranchName != targetRepo.DefaultBranch.Name ? new BranchModel(targetBranchName, targetRepo) : targetRepo.DefaultBranch;
@@ -208,5 +208,15 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         vm.InitializeAsync(data.ActiveRepo, data.Connection).Wait();
 
         Assert.That("Test PR template", Is.EqualTo(vm.Description));
+    }
+
+    static ILocalBranch CreateLocalBranch(string sourceBranchName, ILocalRepositoryModel activeRepo)
+    {
+        var branch = Substitute.For<ILocalBranch>();
+        branch.DisplayName.Returns(sourceBranchName);
+        branch.Name.Returns(sourceBranchName);
+        branch.Id.Returns(activeRepo.Name + "/" + sourceBranchName);
+        branch.Repository.Returns(activeRepo);
+        return branch;
     }
 }
