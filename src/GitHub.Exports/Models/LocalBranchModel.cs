@@ -6,7 +6,7 @@ namespace GitHub.Models
 {
     public class LocalBranchModel : BranchModel, ILocalBranch
     {
-        public LocalBranchModel(IRepository repository, Branch branch, IRepositoryModel repo, IGitService gitService)
+        public LocalBranchModel(IRepository repository, Branch branch, IRepositoryModel repo)
             : base(branch?.FriendlyName, repo)
         {
             Sha = branch.Tip?.Sha;
