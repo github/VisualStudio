@@ -202,17 +202,23 @@ namespace GitHub.InlineReviews.Services
             {
                 var session = CurrentSession;
 
-                var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+
+                Tuple<string, int> pr = null;
+
+                // HACK: Don't use tagged branch info when testing.
+                // pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+
                 if(pr == null)
                 {
                     try
                     {
                         // If the branch hasn't been tagged, try inferring the associated PR
-                        pr = await sessionService.InferPullRequestForCurrentBranch(repository);
+                        var branch = repository.CurrentBranch;
+                        pr = await sessionService.FindPullRequestForRef(branch.TrackedRemoteUrl, branch.TrackedRemoteCanonicalName);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
-                        log.Error(e, nameof(sessionService.InferPullRequestForCurrentBranch));
+                        log.Error(e, nameof(sessionService.FindPullRequestForRef));
                     }
                 }
 

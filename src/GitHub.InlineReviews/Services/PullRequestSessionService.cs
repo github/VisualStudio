@@ -267,25 +267,26 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Tuple<string, int>> InferPullRequestForCurrentBranch(ILocalRepositoryModel localRepository)
+        public async Task<Tuple<string, int>> FindPullRequestForRef(UriString repositoryUrl, string refQualifiedName)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(repositoryUrl.Host);
             var graphql = await graphqlFactory.CreateConnection(address);
 
-            var localOwner = localRepository.Owner;
-            var headRefName = localRepository.CurrentBranch.Name;
-
             var query =
-                from x in new Query().Repository(localOwner, localRepository.Name)
-                select Enumerable.Concat(
-                    (from a in x.PullRequests(100, null, null, null, null, null, headRefName, null, null).Nodes select new PullRequestOwnerInfo { BaseRepositoryOwner = a.Repository.Owner.Login, Number = a.Number, HeadRepositoryOwner = a.HeadRepositoryOwner.Login, HeadRefName = a.HeadRefName }).ToList(),
-                    x.Parent != null ? (from b in x.Parent.PullRequests(100, null, null, null, null, null, headRefName, null, null).Nodes select new PullRequestOwnerInfo { BaseRepositoryOwner = b.Repository.Owner.Login, Number = b.Number, HeadRepositoryOwner = b.HeadRepositoryOwner.Login, HeadRefName = b.HeadRefName }).ToList() : new List<PullRequestOwnerInfo>()
-                );
+                from x in new Query()
+                    .Repository(repositoryUrl.Owner, repositoryUrl.RepositoryName)
+                    .Ref(refQualifiedName)
+                    .AssociatedPullRequests(first: 100)
+                    .Nodes
+                select
+                    new PullRequestOwnerInfo
+                    {
+                        BaseRepositoryOwner = x.Repository.Owner.Login,
+                        Number = x.Number
+                    };
 
             var results = await graphql.Run(query);
-
-            var match = results.Where(x => x.HeadRepositoryOwner == localOwner && x.HeadRefName == headRefName).FirstOrDefault();
-
+            var match = results.FirstOrDefault();
             return match != null ? new Tuple<string, int>(match.BaseRepositoryOwner, match.Number) : null;
         }
 
@@ -293,8 +294,6 @@ namespace GitHub.InlineReviews.Services
         {
             public string BaseRepositoryOwner { get; set; }
             public int Number { get; set; }
-            public string HeadRepositoryOwner { get; set; }
-            public string HeadRefName { get; set; }
         }
 
         public virtual async Task<PullRequestDetailModel> ReadPullRequestDetail(HostAddress address, string owner, string name, int number)

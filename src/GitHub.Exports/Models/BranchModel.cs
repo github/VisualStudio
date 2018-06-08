@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using GitHub.Primitives;
 using GitHub.Services;
 
 namespace GitHub.Models
@@ -34,19 +35,29 @@ namespace GitHub.Models
 #pragma warning disable 0618 // TODO: Replace `Branch.Remote` with `Repository.Network.Remotes[branch.RemoteName]`.
             Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url, gitService) : repo;
 #pragma warning restore 0618
-            IsTracking = branch.IsTracking;
             Sha = branch.Tip?.Sha;
-            TrackedSha = branch.TrackedBranch?.Tip?.Sha;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
+
+            if(IsTracking = branch.IsTracking)
+            {
+                var trackedBranch = branch.TrackedBranch;
+                TrackedSha = trackedBranch.Tip?.Sha;
+#pragma warning disable 0618 // TODO: Replace `Branch.Remote` with `Repository.Network.Remotes[branch.RemoteName]`.
+                TrackedRemoteUrl = new UriString(trackedBranch.Remote.Url);
+#pragma warning restore 0618
+                TrackedRemoteCanonicalName = trackedBranch.UpstreamBranchCanonicalName;
+            }
         }
 
         public string Id { get; private set; }
         public string Name { get; private set; }
         public IRepositoryModel Repository { get; private set; }
-        public bool IsTracking { get; private set; }
         public string DisplayName { get; set; }
         public string Sha { get; private set; }
+        public bool IsTracking { get; private set; }
         public string TrackedSha { get; private set; }
+        public UriString TrackedRemoteUrl { get; private set; }
+        public string TrackedRemoteCanonicalName { get; private set; }
 
         #region Equality things
         public void CopyFrom(IBranch other)
