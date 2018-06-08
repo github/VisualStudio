@@ -284,7 +284,7 @@ public class RepositoryPublishViewModelTests
     public class ThePublishRepositoryCommand : TestBaseClass
     {
         [Test]
-        public async Task RepositoryExistsCallsNotificationServiceWithError()
+        public async Task RepositoryExistsCallsNotificationServiceWithErrorAsync()
         {
             var cm = Substitutes.ConnectionManager;
             var notificationService = Substitute.For<INotificationService>();
@@ -303,7 +303,7 @@ public class RepositoryPublishViewModelTests
         }
 
         [Test]
-        public async Task ResetsWhenSwitchingHosts()
+        public async Task ResetsWhenSwitchingHostsAsync()
         {
             var args = Helpers.GetArgs(GitHubUrls.GitHub, "https://github.enterprise");
 
@@ -338,7 +338,7 @@ public class RepositoryPublishViewModelTests
         }
 
         [Test]
-        public async Task ResetsWhenSwitchingAccounts()
+        public async Task ResetsWhenSwitchingAccountsAsync()
         {
             var cm = Substitutes.ConnectionManager;
             var adds = new List<HostAddress>();

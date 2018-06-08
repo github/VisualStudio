@@ -17,7 +17,7 @@ namespace UnitTests.GitHub.App.Factories
         public class TheCreateAsyncMethod
         {
             [Test]
-            public async Task ShouldCreateDifferentModelServiceForDifferentHost()
+            public async Task ShouldCreateDifferentModelServiceForDifferentHostAsync()
             {
                 var target = CreateTarget();
                 var instance1 = await target.CreateAsync(CreateConnection("https://github.com"));

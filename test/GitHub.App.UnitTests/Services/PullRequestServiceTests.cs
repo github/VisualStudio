@@ -595,7 +595,7 @@ public class PullRequestServiceTests : TestBaseClass
             var fileContent = "file content";
             var pr = CreatePullRequest();
 
-            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(fileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTaskAsync(fileContent));
             var file = await target.ExtractToTempFile(repository, pr, "filename", "123", Encoding.UTF8);
 
             try
@@ -616,7 +616,7 @@ public class PullRequestServiceTests : TestBaseClass
             var repository = Substitute.For<ILocalRepositoryModel>();
             var pr = CreatePullRequest();
 
-            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(null));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTaskAsync(null));
             var file = await target.ExtractToTempFile(repository, pr, "filename", "123", Encoding.UTF8);
 
             try
@@ -632,7 +632,7 @@ public class PullRequestServiceTests : TestBaseClass
         // https://github.com/github/VisualStudio/issues/1010
         [TestCase("utf-8")]        // Unicode (UTF-8)
         [TestCase("Windows-1252")] // Western European (Windows)        
-        public async Task CanChangeEncoding(string encodingName)
+        public async Task CanChangeEncodingAsync(string encodingName)
         {
             var encoding = Encoding.GetEncoding(encodingName);
             var repoDir = Path.GetTempPath();
@@ -647,7 +647,7 @@ public class PullRequestServiceTests : TestBaseClass
             var expectedContent = fileContent;
             File.WriteAllText(expectedPath, expectedContent, encoding);
 
-            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTask(fileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTaskAsync(fileContent));
             var file = await target.ExtractToTempFile(repository, pr, "filename", "123", encoding);
 
             try
@@ -1020,7 +1020,7 @@ public class PullRequestServiceTests : TestBaseClass
         return result;
     }
 
-    static Task<string> GetFileTask(object content)
+    static Task<string> GetFileTaskAsync(object content)
     {
         if (content is string)
         {

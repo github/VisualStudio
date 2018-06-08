@@ -24,7 +24,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public class TheBodyProperty
         {
             [Test]
-            public async Task ShouldUsePlaceholderBodyIfNoneExists()
+            public async Task ShouldUsePlaceholderBodyIfNoneExistsAsync()
             {
                 var target = CreateTarget();
 
@@ -37,7 +37,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public class TheHeadProperty : TestBaseClass
         {
             [Test]
-            public async Task ShouldAcceptNullHead()
+            public async Task ShouldAcceptNullHeadAsync()
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel();
@@ -54,7 +54,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public class TheReviewsProperty : TestBaseClass
         {
             [Test]
-            public async Task ShouldShowLatestAcceptedOrChangesRequestedReview()
+            public async Task ShouldShowLatestAcceptedOrChangesRequestedReviewAsync()
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
@@ -75,7 +75,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task ShouldShowLatestCommentedReviewIfNothingElsePresent()
+            public async Task ShouldShowLatestCommentedReviewIfNothingElsePresentAsync()
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
@@ -91,7 +91,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task ShouldNotShowStartNewReviewWhenHasPendingReview()
+            public async Task ShouldNotShowStartNewReviewWhenHasPendingReviewAsync()
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
@@ -105,7 +105,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task ShouldShowPendingReviewOverApproved()
+            public async Task ShouldShowPendingReviewOverApprovedAsync()
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
@@ -120,7 +120,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task ShouldNotShowPendingReviewForOtherUser()
+            public async Task ShouldNotShowPendingReviewForOtherUserAsync()
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
@@ -159,7 +159,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public class TheCheckoutCommand : TestBaseClass
         {
             [Test]
-            public async Task CheckedOutAndUpToDate()
+            public async Task CheckedOutAndUpToDateAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -172,7 +172,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task NotCheckedOut()
+            public async Task NotCheckedOutAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -186,7 +186,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task NotCheckedOutWithWorkingDirectoryDirty()
+            public async Task NotCheckedOutWithWorkingDirectoryDirtyAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -200,7 +200,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckoutExistingLocalBranch()
+            public async Task CheckoutExistingLocalBranchAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -213,7 +213,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckoutNonExistingLocalBranch()
+            public async Task CheckoutNonExistingLocalBranchAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master");
@@ -225,7 +225,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task UpdatesOperationErrorWithExceptionMessage()
+            public async Task UpdatesOperationErrorWithExceptionMessageAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -241,7 +241,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task SetsOperationErrorOnCheckoutFailure()
+            public async Task SetsOperationErrorOnCheckoutFailureAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -257,7 +257,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task ClearsOperationErrorOnCheckoutSuccess()
+            public async Task ClearsOperationErrorOnCheckoutSuccessAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -274,7 +274,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task ClearsOperationErrorOnCheckoutRefresh()
+            public async Task ClearsOperationErrorOnCheckoutRefreshAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -294,7 +294,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public class ThePullCommand : TestBaseClass
         {
             [Test]
-            public async Task NotCheckedOut()
+            public async Task NotCheckedOutAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -307,7 +307,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndUpToDate()
+            public async Task CheckedOutAndUpToDateAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -322,7 +322,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndBehind()
+            public async Task CheckedOutAndBehindAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -338,7 +338,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndAheadAndBehind()
+            public async Task CheckedOutAndAheadAndBehindAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -355,7 +355,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndBehindFork()
+            public async Task CheckedOutAndBehindForkAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -372,7 +372,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task UpdatesOperationErrorWithExceptionMessage()
+            public async Task UpdatesOperationErrorWithExceptionMessageAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -388,7 +388,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public class ThePushCommand : TestBaseClass
         {
             [Test]
-            public async Task NotCheckedOut()
+            public async Task NotCheckedOutAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -401,7 +401,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndUpToDate()
+            public async Task CheckedOutAndUpToDateAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -416,7 +416,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndAhead()
+            public async Task CheckedOutAndAheadAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -432,7 +432,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndBehind()
+            public async Task CheckedOutAndBehindAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -448,7 +448,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndAheadAndBehind()
+            public async Task CheckedOutAndAheadAndBehindAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -465,7 +465,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task CheckedOutAndAheadOfFork()
+            public async Task CheckedOutAndAheadOfForkAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "pr/123",
@@ -482,7 +482,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
 
             [Test]
-            public async Task UpdatesOperationErrorWithExceptionMessage()
+            public async Task UpdatesOperationErrorWithExceptionMessageAsync()
             {
                 var target = CreateTarget(
                     currentBranch: "master",

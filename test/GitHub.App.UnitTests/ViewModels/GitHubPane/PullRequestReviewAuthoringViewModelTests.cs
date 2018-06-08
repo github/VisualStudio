@@ -20,7 +20,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             var target = CreateTarget();
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Model.Id, Is.EqualTo(0));
         }
@@ -33,7 +33,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Model.Id, Is.EqualTo(12));
         }
@@ -46,7 +46,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Model.Id, Is.EqualTo(0));
         }
@@ -59,7 +59,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Model.Id, Is.EqualTo(0));
         }
@@ -72,7 +72,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Body, Is.EqualTo("Review body"));
         }
@@ -85,7 +85,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.CanApproveRequestChanges, Is.False);
         }
@@ -98,7 +98,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.CanApproveRequestChanges, Is.True);
         }
@@ -110,7 +110,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var sessionManager = CreateSessionManager(session);
             var target = CreateTarget(sessionManager: sessionManager);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             await target.Files.Received(1).InitializeAsync(session, Arg.Any<Func<IInlineCommentThreadModel, bool>>());
         }
@@ -122,7 +122,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var sessionManager = CreateSessionManager(session);
             var target = CreateTarget(sessionManager: sessionManager);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             await target.Files.Received(1).InitializeAsync(session, Arg.Any<Func<IInlineCommentThreadModel, bool>>());
 
@@ -147,7 +147,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.FileComments, Has.Count.EqualTo(2));
         }
@@ -168,7 +168,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.FileComments, Has.Count.EqualTo(2));
 
@@ -198,7 +198,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Model.Id, Is.EqualTo(0));
 
@@ -218,7 +218,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
 
-            await Initialize(target);
+            await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
             target.Approve.Execute(null);
@@ -235,7 +235,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var session = CreateSession();
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.IsFalse(target.Comment.CanExecute(null));
         }
@@ -248,7 +248,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var session = CreateSession();
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
             target.Body = "Review body";
 
             Assert.IsTrue(target.Comment.CanExecute(null));
@@ -265,7 +265,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     CreateInlineCommentThread(CreateReviewComment(12))));
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.IsTrue(target.Comment.CanExecute(null));
         }
@@ -280,7 +280,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
 
-            await Initialize(target);
+            await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
             target.Comment.Execute(null);
@@ -297,7 +297,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var session = CreateSession();
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.IsFalse(target.RequestChanges.CanExecute(null));
         }
@@ -310,7 +310,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var session = CreateSession();
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
             target.Body = "Review body";
 
             Assert.IsTrue(target.RequestChanges.CanExecute(null));
@@ -327,7 +327,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     CreateInlineCommentThread(CreateReviewComment(12))));
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.IsTrue(target.RequestChanges.CanExecute(null));
         }
@@ -342,7 +342,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var target = CreateTarget(model, session);
 
-            await Initialize(target);
+            await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
             target.RequestChanges.Execute(null);
@@ -360,7 +360,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var closed = false;
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
             target.Cancel.Execute(null);
@@ -377,7 +377,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var closed = false;
 
             var target = CreateTarget(model, session);
-            await Initialize(target);
+            await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
             target.Cancel.Execute(null);
@@ -543,7 +543,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return result;
         }
 
-        static async Task Initialize(
+        static async Task InitializeAsync(
             IPullRequestReviewAuthoringViewModel target,
             ILocalRepositoryModel localRepository = null)
         {

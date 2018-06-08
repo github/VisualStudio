@@ -89,7 +89,7 @@ public class RepositoryCreationViewModelTests
     public class TheBrowseForDirectoryCommand : TestBaseClass
     {
         [Test]
-        public async Task SetsTheBaseRepositoryPathWhenUserChoosesADirectory()
+        public async Task SetsTheBaseRepositoryPathWhenUserChoosesADirectoryAsync()
         {
             var provider = Substitutes.ServiceProvider;
             var windows = provider.GetOperatingSystem();
@@ -105,7 +105,7 @@ public class RepositoryCreationViewModelTests
         }
 
         [Test]
-        public async Task DoesNotChangeTheBaseRepositoryPathWhenUserDoesNotChooseResult()
+        public async Task DoesNotChangeTheBaseRepositoryPathWhenUserDoesNotChooseResultAsync()
         {
             var provider = Substitutes.ServiceProvider;
             var windows = provider.GetOperatingSystem();
@@ -339,7 +339,7 @@ public class RepositoryCreationViewModelTests
     public class TheAccountsProperty : TestBaseClass
     {
         [Test]
-        public void IsPopulatedByTheRepositoryHost()
+        public async Task IsPopulatedByTheRepositoryHosAsynct()
         {
             var accounts = new List<IAccount> { new AccountDesigner(), new AccountDesigner() };
             var connection = Substitute.For<IConnection>();
@@ -351,7 +351,7 @@ public class RepositoryCreationViewModelTests
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IRepositoryCreationService>(),
                 Substitute.For<IUsageTracker>());
-            vm.InitializeAsync(connection).Wait();
+            await vm.InitializeAsync(connection);
 
             Assert.That(vm.Accounts[0], Is.EqualTo(vm.SelectedAccount));
             Assert.That(2, Is.EqualTo(vm.Accounts.Count));
@@ -361,7 +361,7 @@ public class RepositoryCreationViewModelTests
     public class TheGitIgnoreTemplatesProperty : TestBaseClass
     {
         [Test]
-        public async Task IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        public async Task IsPopulatedByTheApiAndSortedWithRecommendedFirstAsync()
         {
             var gitIgnoreTemplates = new[]
             {
@@ -399,7 +399,7 @@ public class RepositoryCreationViewModelTests
     public class TheLicensesProperty : TestBaseClass
     {
         [Test]
-        public async Task IsPopulatedByTheModelService()
+        public async Task IsPopulatedByTheModelServiceAsync()
         {
             var licenses = new[]
             {
@@ -439,7 +439,7 @@ public class RepositoryCreationViewModelTests
     public class TheSelectedGitIgnoreProperty : TestBaseClass
     {
         [Test]
-        public async Task DefaultsToVisualStudio()
+        public async Task DefaultsToVisualStudioAsync()
         {
             var gitignores = new[]
             {
@@ -483,7 +483,7 @@ public class RepositoryCreationViewModelTests
     public class TheCreateRepositoryCommand : TestBaseClass
     {
         [Test]
-        public async Task DisplaysUserErrorWhenCreationFails()
+        public async Task DisplaysUserErrorWhenCreationFailsAsync()
         {
             var creationService = Substitutes.RepositoryCreationService;
             var provider = Substitutes.GetServiceProvider(creationService: creationService);

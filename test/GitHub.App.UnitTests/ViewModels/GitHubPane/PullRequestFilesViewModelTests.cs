@@ -15,7 +15,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         static readonly Uri Uri = new Uri("http://foo");
 
         [Test]
-        public async Task ShouldCreateChangesTree()
+        public async Task ShouldCreateChangesTreeAsync()
         {
             var target = CreateTarget();
             var session = CreateSession();
@@ -58,7 +58,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task FileCommentCountShouldTrackSessionInlineComments()
+        public async Task FileCommentCountShouldTrackSessionInlineCommentsAsync()
         {
             var outdatedThread = CreateThread(-1);
             var session = CreateSession();

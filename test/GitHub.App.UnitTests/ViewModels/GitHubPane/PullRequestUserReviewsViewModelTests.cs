@@ -16,7 +16,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         const string AuthorLogin = "grokys";
 
         [Test]
-        public async Task InitializeAsync_Loads_User()
+        public async Task InitializeAsync_Loads_User_Async()
         {
             var modelSerivce = Substitute.For<IModelService>();
             var user = Substitute.For<IAccount>();
@@ -25,13 +25,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(
                 modelServiceFactory: CreateFactory(modelSerivce));
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.User, Is.SameAs(user));
         }
 
         [Test]
-        public async Task InitializeAsync_Creates_Reviews()
+        public async Task InitializeAsync_Creates_Reviews_Async()
         {
             var author = Substitute.For<IAccount>();
             author.Login.Returns(AuthorLogin);
@@ -80,14 +80,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(
                 modelServiceFactory: CreateFactory(modelSerivce));
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             // Should load reviews by the correct author which are not Pending.
             Assert.That(target.Reviews, Has.Count.EqualTo(3));
         }
 
         [Test]
-        public async Task Orders_Reviews_Descending()
+        public async Task Orders_Reviews_Descending_Async()
         {
             var author = Substitute.For<IAccount>();
             author.Login.Returns(AuthorLogin);
@@ -126,7 +126,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(
                 modelServiceFactory: CreateFactory(modelSerivce));
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(
                 target.Reviews.Select(x => x.Model.SubmittedAt),
@@ -134,7 +134,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task First_Review_Is_Expanded()
+        public async Task First_Review_Is_Expanded_Async()
         {
             var author = Substitute.For<IAccount>();
             author.Login.Returns(AuthorLogin);
@@ -173,14 +173,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(
                 modelServiceFactory: CreateFactory(modelSerivce));
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Reviews[0].IsExpanded, Is.True);
             Assert.That(target.Reviews[1].IsExpanded, Is.False);
             Assert.That(target.Reviews[2].IsExpanded, Is.False);
         }
 
-        async Task Initialize(
+        async Task InitializeAsync(
             PullRequestUserReviewsViewModel target,
             ILocalRepositoryModel localRepository = null,
             IConnection connection = null,

@@ -21,104 +21,104 @@ public class GitHubPaneViewModelTests : TestBaseClass
     public class TheInitializeMethod
     {
         [Test]
-        public async Task NotAGitRepositoryShownWhenNoRepository()
+        public async Task NotAGitRepositoryShownWhenNoRepositoryAsync()
         {
             var te = Substitute.For<ITeamExplorerContext>();
             te.ActiveRepository.Returns(null as ILocalRepositoryModel);
             var target = CreateTarget(teamExplorerContext: te);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<INotAGitRepositoryViewModel>());
         }
 
         [Test]
-        public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNull()
+        public async Task NotAGitHubRepositoryShownWhenRepositoryCloneUrlIsNullAsync()
         {
             var te = CreateTeamExplorerContext(null);
             var target = CreateTarget(teamExplorerContext: te);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
         }
 
         [Test]
-        public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstance()
+        public async Task NotAGitHubRepositoryShownWhenRepositoryIsNotAGitHubInstanceAsync()
         {
             var te = CreateTeamExplorerContext("https://some.site/foo/bar");
             var target = CreateTarget(teamExplorerContext: te);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
         }
 
         [Test]
-        public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepo()
+        public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepoAsync()
         {
             var te = CreateTeamExplorerContext("https://github.com/invalid/repo");
             var target = CreateTarget(teamExplorerContext: te);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<INotAGitHubRepositoryViewModel>());
         }
 
         [Test]
-        public async Task LoggedOutShownWhenNotLoggedInToGitHub()
+        public async Task LoggedOutShownWhenNotLoggedInToGitHubAsync()
         {
             var te = CreateTeamExplorerContext(ValidGitHubRepo);
             var cm = CreateConnectionManager("https://enterprise.com");
             var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
         }
 
         [Test]
-        public async Task LoggedOutShownWhenNotLoggedInToEnterprise()
+        public async Task LoggedOutShownWhenNotLoggedInToEnterpriseAsync()
         {
             var te = CreateTeamExplorerContext(ValidEnterpriseRepo);
             var cm = CreateConnectionManager("https://github.com");
             var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
         }
 
         [Test]
-        public async Task NavigatorShownWhenRepositoryIsAGitHubRepo()
+        public async Task NavigatorShownWhenRepositoryIsAGitHubRepoAsync()
         {
             var cm = CreateConnectionManager("https://github.com");
             var target = CreateTarget(connectionManager: cm);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
         }
 
         [Test]
-        public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepo()
+        public async Task NavigatorShownWhenRepositoryIsAnEnterpriseRepoAsync()
         {
             var te = CreateTeamExplorerContext(ValidEnterpriseRepo);
             var cm = CreateConnectionManager("https://enterprise.com");
             var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<INavigationViewModel>());
         }
 
         [Test]
-        public async Task NavigatorShownWhenUserLogsIn()
+        public async Task NavigatorShownWhenUserLogsInAsync()
         {
             var cm = CreateConnectionManager();
             var target = CreateTarget(connectionManager: cm);
 
-            await Initialize(target);
+            await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
@@ -131,14 +131,14 @@ public class GitHubPaneViewModelTests : TestBaseClass
     public class TheShowPullRequestsMethod
     {
         [Test]
-        public async Task HasNoEffectWhenUserLoggedOut()
+        public async Task HasNoEffectWhenUserLoggedOutAsync()
         {
             var viewModelFactory = Substitute.For<IViewViewModelFactory>();
             var target = CreateTarget(
                 viewModelFactory: viewModelFactory,
                 connectionManager: CreateConnectionManager());
 
-            await Initialize(target);
+            await InitializeAsync(target);
             Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
 
             await target.ShowPullRequests();
@@ -147,7 +147,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         }
 
         [Test]
-        public async Task HasNoEffectWhenAlreadyCurrentPage()
+        public async Task HasNoEffectWhenAlreadyCurrentPageAsync()
         {
             var cm = CreateConnectionManager(ValidGitHubRepo);
             var nav = new NavigationViewModel();
@@ -155,7 +155,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
                 connectionManager: cm,
                 navigator: nav);
 
-            await Initialize(target);
+            await InitializeAsync(target);
             Assert.That(nav, Is.SameAs(target.Content));
             Assert.That(nav.Content, Is.InstanceOf<IPullRequestListViewModel>());
 
@@ -266,7 +266,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         return result;
     }
 
-    static async Task Initialize(GitHubPaneViewModel target)
+    static async Task InitializeAsync(GitHubPaneViewModel target)
     {
         var paneServiceProvider = Substitute.For<IServiceProvider>();
         var menuCommandService = Substitute.For<IMenuCommandService>();

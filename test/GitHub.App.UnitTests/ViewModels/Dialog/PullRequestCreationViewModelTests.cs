@@ -122,13 +122,13 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     }
 
     [Test]
-    public void TargetBranchDisplayNameIncludesRepoOwnerWhenFork()
+    public async Task TargetBranchDisplayNameIncludesRepoOwnerWhenForkAsync()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
         var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
-        vm.InitializeAsync(data.ActiveRepo, data.Connection).Wait();
+        await vm.InitializeAsync(data.ActiveRepo, data.Connection);
         Assert.That("octokit/master", Is.EqualTo(vm.TargetBranch.DisplayName));
     }
 

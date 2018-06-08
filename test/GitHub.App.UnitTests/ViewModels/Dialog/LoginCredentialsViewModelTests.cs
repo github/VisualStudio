@@ -15,7 +15,7 @@ public class LoginCredentialsViewModelTests
     public class TheDoneSignal : TestBaseClass
     {
         [Test]
-        public async Task SucessfulGitHubLoginSignalsDone()
+        public async Task SucessfulGitHubLoginSignalsDoneAsync()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
             var connection = Substitute.For<IConnection>();
@@ -36,7 +36,7 @@ public class LoginCredentialsViewModelTests
         }
 
         [Test]
-        public async Task FailedGitHubLoginDoesNotSignalDone()
+        public async Task FailedGitHubLoginDoesNotSignalDoneAsync()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
 
@@ -56,7 +56,7 @@ public class LoginCredentialsViewModelTests
         }
 
         [Test]
-        public async Task AllowsLoginFromEnterpriseAfterGitHubLoginHasFailed()
+        public async Task AllowsLoginFromEnterpriseAfterGitHubLoginHasFailedAsync()
         {
             var connectionManager = Substitute.For<IConnectionManager>();
             var connection = Substitute.For<IConnection>();
