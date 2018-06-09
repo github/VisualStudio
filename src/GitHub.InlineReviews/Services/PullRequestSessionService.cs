@@ -556,6 +556,8 @@ namespace GitHub.InlineReviews.Services
                 CommitId = result.CommitId,
                 DiffHunk = result.DiffHunk,
                 Id = result.Id,
+                //TODO: Populate this
+                NodeId = string.Empty,
                 OriginalCommitId = result.OriginalCommitId,
                 OriginalPosition = result.OriginalPosition,
                 Path = result.Path,
@@ -592,6 +594,8 @@ namespace GitHub.InlineReviews.Services
                 CommitId = result.CommitId,
                 DiffHunk = result.DiffHunk,
                 Id = result.Id,
+                //TODO: Populate this
+                NodeId = string.Empty,
                 OriginalCommitId = result.OriginalCommitId,
                 OriginalPosition = result.OriginalPosition,
                 Path = result.Path,
