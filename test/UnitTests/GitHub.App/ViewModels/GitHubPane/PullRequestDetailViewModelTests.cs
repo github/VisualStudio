@@ -613,14 +613,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             };
         }
 
-        static ILocalBranch CreateLocalBranch(string sourceBranchName, ILocalRepositoryModel activeRepo)
+        static ILocalBranch CreateLocalBranch(string sourceBranchName, ILocalRepositoryModel parentRepo)
         {
-            var branch = Substitute.For<ILocalBranch>();
-            branch.DisplayName.Returns(sourceBranchName);
-            branch.Name.Returns(sourceBranchName);
-            branch.Id.Returns(activeRepo.Name + "/" + sourceBranchName);
-            branch.Repository.Returns(activeRepo);
-            return branch;
+            var repository = Substitute.For<LibGit2Sharp.IRepository>();
+            var branch = Substitute.For<LibGit2Sharp.Branch>();
+            branch.FriendlyName.Returns(sourceBranchName);
+            branch.IsTracking.Returns(false);
+            var localBranch = new LocalBranchModel(repository, branch, parentRepo);
+            return localBranch;
         }
 
         static IObservable<Unit> Throws(string message)

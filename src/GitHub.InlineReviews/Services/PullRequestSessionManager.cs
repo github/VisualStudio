@@ -205,10 +205,10 @@ namespace GitHub.InlineReviews.Services
 
                 Tuple<string, int> pr = null;
 
-                // HACK: Don't use tagged branch info when testing.
-                // pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                // Use tagged branch info when available
+                 pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
 
-                if(pr == null)
+                if (pr == null)
                 {
                     try
                     {
