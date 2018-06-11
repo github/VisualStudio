@@ -140,7 +140,6 @@ namespace GitHub.InlineReviews.Services
             {
                 model = await service.PostStandaloneReviewComment(
                     LocalRepository,
-                    RepositoryOwner,
                     User,
                     PullRequest.Number,
                     body,
@@ -203,7 +202,6 @@ namespace GitHub.InlineReviews.Services
             {
                 model = await service.PostStandaloneReviewCommentReply(
                     LocalRepository,
-                    RepositoryOwner,
                     User,
                     PullRequest.Number,
                     body,
