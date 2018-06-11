@@ -203,6 +203,19 @@ namespace GitHub.InlineReviews.Services
                 var session = CurrentSession;
 
                 var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+                if(pr == null)
+                {
+                    try
+                    {
+                        // If the branch hasn't been tagged, try inferring the associated PR
+                        pr = await sessionService.InferPullRequestForCurrentBranch(repository);
+                    }
+                    catch(Exception e)
+                    {
+                        log.Error(e, nameof(sessionService.InferPullRequestForCurrentBranch));
+                    }
+                }
+
                 if (pr != null)
                 {
                     var changePR =

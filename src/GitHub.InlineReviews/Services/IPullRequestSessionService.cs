@@ -136,6 +136,13 @@ namespace GitHub.InlineReviews.Services
         Task<byte[]> ReadFileAsync(string path);
 
         /// <summary>
+        /// Infer the PR that is most likely to be associated with the current branch.
+        /// </summary>
+        /// <param name="repository">The local repository.</param>
+        /// <returns>A pull request qualifed by its target owner and number.</returns>
+        Task<Tuple<string, int>> InferPullRequestForCurrentBranch(ILocalRepositoryModel repository);
+
+        /// <summary>
         /// Reads a <see cref="PullRequestDetailModel"/> for a specified pull request.
         /// </summary>
         /// <param name="address">The host address.</param>
