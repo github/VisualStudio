@@ -5,7 +5,6 @@ using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
 using GitHub.Api;
-using System.Threading.Tasks;
 
 namespace GitHub.Services
 {

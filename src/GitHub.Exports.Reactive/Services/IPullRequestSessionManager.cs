@@ -65,6 +65,13 @@ namespace GitHub.Services
         /// </returns>
         string GetRelativePath(ITextBuffer buffer);
 
+        /// <summary>
+        /// Gets an <see cref="IPullRequestSession"/> for a pull request.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <returns>An <see cref="IPullRequestSession"/>.</returns>
         Task<IPullRequestSession> GetSession(string owner, string name, int number);
 
         /// <summary>
