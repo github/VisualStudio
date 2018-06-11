@@ -138,10 +138,11 @@ namespace GitHub.InlineReviews.Services
 
             if (!HasPendingReview)
             {
+                var pullRequestNodeId = await GetPullRequestNodeId();
                 model = await service.PostStandaloneReviewComment(
                     LocalRepository,
                     User,
-                    PullRequest.Number,
+                    pullRequestNodeId,
                     body,
                     commitId,
                     path,
@@ -200,10 +201,11 @@ namespace GitHub.InlineReviews.Services
 
             if (!HasPendingReview)
             {
+                var pullRequestNodeId = await GetPullRequestNodeId();
                 model = await service.PostStandaloneReviewCommentReply(
                     LocalRepository,
                     User,
-                    PullRequest.Number,
+                    pullRequestNodeId,
                     body,
                     inReplyTo);
             }

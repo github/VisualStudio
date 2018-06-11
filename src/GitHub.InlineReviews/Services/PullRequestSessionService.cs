@@ -529,7 +529,7 @@ namespace GitHub.InlineReviews.Services
         public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
             IAccount user,
-            int pullRequestId,
+            string pullRequestNodeId,
             string body,
             string commitId,
             string path,
@@ -543,7 +543,7 @@ namespace GitHub.InlineReviews.Services
                 Body = body,
                 CommitOID = commitId,
                 Event = Octokit.GraphQL.Model.PullRequestReviewEvent.Comment,
-                PullRequestId = pullRequestId.ToString(),
+                PullRequestId = pullRequestNodeId,
                 Comments = new[]
                 {
                     new DraftPullRequestReviewComment
@@ -586,11 +586,11 @@ namespace GitHub.InlineReviews.Services
         public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
             IAccount user,
-            int pullRequestId,
+            string pullRequestNodeId,
             string body,
             int inReplyTo)
         {
-            var review = await CreatePendingReview(localRepository, user, pullRequestId.ToString());
+            var review = await CreatePendingReview(localRepository, user, pullRequestNodeId);
             var comment = await PostPendingReviewCommentReply(localRepository, user, review.Id.ToString(), body, inReplyTo.ToString());
             return comment;
         }

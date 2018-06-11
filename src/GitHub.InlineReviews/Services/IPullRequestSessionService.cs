@@ -261,7 +261,7 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
         /// <param name="user">The user posting the comment.</param>
-        /// <param name="pullRequestId">The pull request number.</param>
+        /// <param name="pullRequestNodeId">The pull request node id.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
@@ -273,7 +273,7 @@ namespace GitHub.InlineReviews.Services
         /// </remarks>
         Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(ILocalRepositoryModel localRepository,
             IAccount user,
-            int pullRequestId,
+            string pullRequestNodeId,
             string body,
             string commitId,
             string path,
@@ -284,13 +284,13 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
         /// <param name="user">The user posting the comment.</param>
-        /// <param name="pullRequestId">The pull request number.</param>
+        /// <param name="pullRequestNodeId">The pull request node id.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="inReplyTo">The comment ID to reply to.</param>
         /// <returns>A model representing the posted comment.</returns>
         Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(ILocalRepositoryModel localRepository,
             IAccount user,
-            int pullRequestId,
+            string pullRequestNodeId,
             string body,
             int inReplyTo);
 
