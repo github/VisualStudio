@@ -273,21 +273,38 @@ namespace GitHub.InlineReviews.Services
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var query =
-                from x in new Query()
-                    .Repository(repositoryUrl.Owner, repositoryUrl.RepositoryName)
-                    .Ref(refQualifiedName)
-                    .AssociatedPullRequests(first: 100)
-                    .Nodes
-                select
-                    new PullRequestOwnerInfo
-                    {
-                        BaseRepositoryOwner = x.Repository.Owner.Login,
-                        Number = x.Number
-                    };
-
+                from r in new Query().Repository(repositoryUrl.Owner, repositoryUrl.RepositoryName)
+                select new
+                {
+                    Owner = r.Owner.Login,
+                    Parent = r.Parent != null ? r.Parent.Owner.Login : null,
+                    PullRequests =
+                        (from x in r.Ref(refQualifiedName)
+                            .AssociatedPullRequests(100, null, null, null, null, null, null, null, null).Nodes
+                        select new PullRequestOwnerInfo
+                        {
+                            BaseRepositoryOwner = x.Repository.Owner.Login,
+                            Number = x.Number
+                        }).ToList()
+                };
+                
             var results = await graphql.Run(query);
-            var match = results.FirstOrDefault();
-            return match != null ? new Tuple<string, int>(match.BaseRepositoryOwner, match.Number) : null;
+
+            // Find pull request to the parent repo if any
+            var pullRequestToParent = results.PullRequests.Where(x => results.Parent != null && x.BaseRepositoryOwner == results.Parent).FirstOrDefault();
+            if(pullRequestToParent != null)
+            {
+                return new Tuple<string, int>(pullRequestToParent.BaseRepositoryOwner, pullRequestToParent.Number);
+            }
+
+            // Find pull request to the owner repo if any
+            var pullRequestToOwner = results.PullRequests.Where(x => x.BaseRepositoryOwner == results.Owner).FirstOrDefault();
+            if (pullRequestToOwner != null)
+            {
+                return new Tuple<string, int>(pullRequestToOwner.BaseRepositoryOwner, pullRequestToOwner.Number);
+            }
+
+            return null;
         }
 
         public class PullRequestOwnerInfo
