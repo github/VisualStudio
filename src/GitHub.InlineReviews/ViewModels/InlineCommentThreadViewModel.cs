@@ -72,9 +72,8 @@ namespace GitHub.InlineReviews.ViewModels
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var body = (string)parameter;
-            var replyId = Comments[0].Id;
             var nodeId = Comments[0].NodeId;
-            return await Session.PostReviewComment(body, replyId, nodeId);
+            return await Session.PostReviewComment(body, nodeId);
         }
 
         async Task<ICommentModel> DoEditComment(object parameter)

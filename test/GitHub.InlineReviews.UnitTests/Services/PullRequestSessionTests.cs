@@ -536,14 +536,14 @@ Line 4";
                 var service = CreateService();
                 var target = CreateTarget(service, "fork", "owner", false);
 
-                await target.PostReviewComment("New Comment", 1, "node1");
+                await target.PostReviewComment("New Comment", "node1");
 
                 await service.Received(1).PostStandaloneReviewCommentReply(
                     target.LocalRepository,
                     target.User,
                     PullRequestNodeId,
                     "New Comment",
-                    1);
+                    "node1");
             }
 
             [Test]
@@ -570,7 +570,7 @@ Line 4";
                 var service = CreateService();
                 var target = CreateTarget(service, "fork", "owner", true);
 
-                await target.PostReviewComment("New Comment", 1, "node1");
+                await target.PostReviewComment("New Comment", "node1");
 
                 await service.Received(1).PostPendingReviewCommentReply(
                     target.LocalRepository,

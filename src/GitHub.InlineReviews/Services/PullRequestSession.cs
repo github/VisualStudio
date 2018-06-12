@@ -194,20 +194,18 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
-            int inReplyTo,
             string inReplyToNodeId)
         {
             IPullRequestReviewCommentModel model;
 
             if (!HasPendingReview)
             {
-                var pullRequestNodeId = await GetPullRequestNodeId();
                 model = await service.PostStandaloneReviewCommentReply(
                     LocalRepository,
                     User,
                     pullRequestNodeId,
                     body,
-                    inReplyTo);
+                    inReplyToNodeId);
             }
             else
             {

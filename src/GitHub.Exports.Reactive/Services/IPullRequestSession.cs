@@ -109,12 +109,10 @@ namespace GitHub.Services
         /// Posts a PR review comment reply.
         /// </summary>
         /// <param name="body">The comment body.</param>
-        /// <param name="inReplyTo">The REST ID of the comment to reply to.</param>
         /// <param name="inReplyToNodeId">The GraphQL ID of the comment to reply to.</param>
         /// <returns>A comment model.</returns>
         Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
-            int inReplyTo,
             string inReplyToNodeId);
 
         /// <summary>

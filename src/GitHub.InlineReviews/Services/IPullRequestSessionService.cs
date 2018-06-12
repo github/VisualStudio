@@ -286,13 +286,13 @@ namespace GitHub.InlineReviews.Services
         /// <param name="user">The user posting the comment.</param>
         /// <param name="pullRequestNodeId">The pull request node id.</param>
         /// <param name="body">The comment body.</param>
-        /// <param name="inReplyTo">The comment ID to reply to.</param>
+        /// <param name="inReplyToNodeId">The comment node id to reply to.</param>
         /// <returns>A model representing the posted comment.</returns>
         Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(ILocalRepositoryModel localRepository,
             IAccount user,
             string pullRequestNodeId,
             string body,
-            int inReplyTo);
+            string inReplyToNodeId);
 
         /// <summary>
         /// Delete a PR review comment.

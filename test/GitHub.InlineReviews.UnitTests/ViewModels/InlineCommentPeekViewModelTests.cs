@@ -210,7 +210,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             Assert.That(2, Is.EqualTo(target.Thread.Comments.Count));
 
-            sessionManager.CurrentSession.PostReviewComment(null, 0, null)
+            sessionManager.CurrentSession.PostReviewComment(null, null)
                 .ReturnsForAnyArgs(async x =>
                 {
                     var file = await sessionManager.GetLiveFile(
