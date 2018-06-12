@@ -45,8 +45,9 @@ namespace GitHub.InlineReviews.ViewModels
             CommentEditState state,
             IActorViewModel author,
             DateTimeOffset updatedAt,
-            bool isPending)
-            : base(thread, currentUser, commentId, body, state, author, updatedAt)
+            bool isPending,
+            Uri webUrl)
+            : base(thread, currentUser, commentId, body, state, author, updatedAt, webUrl)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
@@ -94,7 +95,8 @@ namespace GitHub.InlineReviews.ViewModels
                   CommentEditState.None, 
                   new ActorViewModel(model.Author), 
                   model.CreatedAt, 
-                  review.State == PullRequestReviewState.Pending)
+                  review.State == PullRequestReviewState.Pending,
+                  new Uri(model.Url))
         {
         }
 
@@ -119,7 +121,8 @@ namespace GitHub.InlineReviews.ViewModels
                 CommentEditState.Placeholder,
                 currentUser,
                 DateTimeOffset.MinValue,
-                false);
+                false,
+                null);
         }
 
         /// <inheritdoc/>

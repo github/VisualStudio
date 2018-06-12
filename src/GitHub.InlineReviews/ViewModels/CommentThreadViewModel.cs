@@ -73,8 +73,5 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public IActorViewModel CurrentUser { get; }
-
-        /// <inheritdoc/>
-        public abstract Uri GetCommentUrl(int id);
     }
 }

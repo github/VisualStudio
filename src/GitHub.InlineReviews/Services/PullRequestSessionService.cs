@@ -324,6 +324,7 @@ namespace GitHub.InlineReviews.Services
                                 OriginalCommitId = comment.OriginalCommit.Oid,
                                 ReplyTo = comment.ReplyTo != null ? comment.ReplyTo.Id.Value : null,
                                 CreatedAt = comment.CreatedAt,
+                                Url = comment.Url,
                             }).ToList(),
                         }).ToList(),
                     }).Compile();

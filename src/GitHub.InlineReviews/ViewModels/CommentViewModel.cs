@@ -44,7 +44,8 @@ namespace GitHub.InlineReviews.ViewModels
             string body,
             CommentEditState state,
             IActorViewModel author,
-            DateTimeOffset updatedAt)
+            DateTimeOffset updatedAt,
+            Uri webUrl)
         {
             Guard.ArgumentNotNull(thread, nameof(thread));
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
@@ -57,6 +58,7 @@ namespace GitHub.InlineReviews.ViewModels
             EditState = state;
             Author = author;
             UpdatedAt = updatedAt;
+            WebUrl = webUrl;
 
             var canDelete = this.WhenAnyValue(
                 x => x.EditState,
@@ -100,7 +102,15 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel model)
-            : this(thread, new ActorViewModel(currentUser), model.Id, model.Body, CommentEditState.None, new ActorViewModel(model.Author), model.CreatedAt)
+            : this(
+                  thread, 
+                  new ActorViewModel(currentUser), 
+                  model.Id, 
+                  model.Body, 
+                  CommentEditState.None, 
+                  new ActorViewModel(model.Author), 
+                  model.CreatedAt,
+                  new Uri(model.Url))
         {
         }
 
@@ -237,6 +247,9 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public IActorViewModel Author { get; }
+
+        /// <inheritdoc/>
+        public Uri WebUrl { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> BeginEdit { get; }

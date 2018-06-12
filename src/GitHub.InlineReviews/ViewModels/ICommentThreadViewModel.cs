@@ -13,13 +13,6 @@ namespace GitHub.InlineReviews.ViewModels
     public interface ICommentThreadViewModel
     {
         /// <summary>
-        /// Gets the browser URI for a comment in the thread.
-        /// </summary>
-        /// <param name="id">The ID of the comment.</param>
-        /// <returns>The URI.</returns>
-        Uri GetCommentUrl(int id);
-
-        /// <summary>
         /// Gets the comments in the thread.
         /// </summary>
         ObservableCollection<ICommentViewModel> Comments { get; }

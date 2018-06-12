@@ -59,17 +59,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
-        /// <inheritdoc/>
-        public override Uri GetCommentUrl(int id)
-        {
-            return new Uri(string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}/pull/{1}#discussion_r{2}",
-                Session.LocalRepository.CloneUrl.ToRepositoryUrl(Session.RepositoryOwner),
-                Session.PullRequest.Number,
-                id));
-        }
-
         async Task DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));

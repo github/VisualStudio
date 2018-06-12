@@ -25,6 +25,7 @@ namespace GitHub.InlineReviews.SampleData
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IActorViewModel Author { get; set; }
+        public Uri WebUrl { get; }
 
         public ReactiveCommand<object> BeginEdit { get; }
         public ReactiveCommand<object> CancelEdit { get; }

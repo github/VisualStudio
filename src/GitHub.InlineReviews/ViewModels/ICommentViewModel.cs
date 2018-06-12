@@ -70,6 +70,11 @@ namespace GitHub.InlineReviews.ViewModels
         ICommentThreadViewModel Thread { get; }
 
         /// <summary>
+        /// Gets the URL of the comment on the web.
+        /// </summary>
+        Uri WebUrl { get; }
+
+        /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
         ReactiveCommand<object> BeginEdit { get; }

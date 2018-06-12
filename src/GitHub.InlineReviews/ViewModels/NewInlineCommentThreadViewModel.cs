@@ -91,12 +91,6 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref needsPush, value); }
         }
 
-        /// <inheritdoc/>
-        public override Uri GetCommentUrl(int id)
-        {
-            throw new NotSupportedException("Cannot navigate to a non-posted comment.");
-        }
-
         async Task DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));

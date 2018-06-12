@@ -26,5 +26,10 @@ namespace GitHub.Models
         /// Gets the creation time of the comment.
         /// </summary>
         public DateTimeOffset CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets the HTTP URL permalink for the comment.
+        /// </summary>
+        public string Url { get; set; }
     }
 }
