@@ -150,23 +150,38 @@ namespace GitHub.Services
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
                 var statusOptions = new StatusOptions { ExcludeSubmodules = true };
-                var isClean = !IsFilthy(repo.RetrieveStatus(statusOptions));
+                var status = repo.RetrieveStatus(statusOptions);
+                var isClean = !IsCheckoutBlockingDirty(status);
                 return Observable.Return(isClean);
             }
         }
 
-        static bool IsFilthy(RepositoryStatus status)
+        static bool IsCheckoutBlockingDirty(RepositoryStatus status)
         {
             if (status.IsDirty)
             {
-                // This is similar to IsDirty, but also allows NewInWorkdir files
-                return status.Any(entry =>
-                    entry.State != FileStatus.Ignored &&
-                    entry.State != FileStatus.Unaltered &&
-                    entry.State != FileStatus.NewInWorkdir);
+                return status.Any(entry => IsCheckoutBlockingChange(entry));
             }
 
             return false;
+        }
+
+        // This is similar to IsDirty, but also allows NewInWorkdir and DeletedFromWorkdir files
+        static bool IsCheckoutBlockingChange(StatusEntry entry)
+        {
+            switch (entry.State)
+            {
+                case FileStatus.Ignored:
+                    return false;
+                case FileStatus.Unaltered:
+                    return false;
+                case FileStatus.NewInWorkdir:
+                    return false;
+                case FileStatus.DeletedFromWorkdir:
+                    return false;
+                default:
+                    return true;
+            }
         }
 
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)

@@ -134,8 +134,13 @@ public class PullRequestServiceTests : TestBaseClass
             }
         }
 
+        // Files can sometimes show up as DeletedFromWorkdir but not appear on Team Explorer or when `git status` is executed.
+        // https://github.com/github/VisualStudio/issues/1691
+        //
+        // Since there is no reason to block a checkout when a file is missing, IsWorkingDirectoryClean should return true
+        // when a file has been deleted.
         [Test]
-        public async Task MissingFile_False()
+        public async Task DeletedFromWorkdir_True()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -151,7 +156,7 @@ public class PullRequestServiceTests : TestBaseClass
 
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-                Assert.False(isClean);
+                Assert.True(isClean);
             }
         }
 
@@ -203,7 +208,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
-        public async Task RenamedInWorkingDirFile_False()
+        public async Task RenamedInWorkingDirFile_True()
         {
             using (var tempDir = new TempDirectory())
             using (var repo = CreateRepository(tempDir))
@@ -220,11 +225,11 @@ public class PullRequestServiceTests : TestBaseClass
                 File.Move(file, renamedFile);
 
                 // NOTE: `RetrieveStatus(new StatusOptions { DetectRenamesInWorkDir = true })` would need to be used
-                // for renamed files to appear as `RenamedInWorkingDir` rather than `Missing` and `Untracked`.
+                // for renamed files to appear as `RenamedInWorkingDir` rather than `DeletedFromWorkdir` and `NewInWorkdir`.
                 // This isn't required in the current implementation.
                 var isClean = await service.IsWorkingDirectoryClean(repositoryModel).FirstAsync();
 
-                Assert.False(isClean);
+                Assert.True(isClean);
             }
         }
 
