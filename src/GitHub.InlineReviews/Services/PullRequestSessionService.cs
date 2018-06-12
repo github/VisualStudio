@@ -46,7 +46,6 @@ namespace GitHub.InlineReviews.Services
         readonly IApiClientFactory apiClientFactory;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
-        readonly IAvatarProvider avatarProvider;
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
 
         [ImportingConstructor]
@@ -56,8 +55,7 @@ namespace GitHub.InlineReviews.Services
             IDiffService diffService,
             IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
-            IUsageTracker usageTracker,
-            IAvatarProvider avatarProvider)
+            IUsageTracker usageTracker)
         {
             this.gitService = gitService;
             this.gitClient = gitClient;
@@ -65,7 +63,6 @@ namespace GitHub.InlineReviews.Services
             this.apiClientFactory = apiClientFactory;
             this.graphqlFactory = graphqlFactory;
             this.usageTracker = usageTracker;
-            this.avatarProvider = avatarProvider;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
         }

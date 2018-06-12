@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -80,6 +81,7 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<object> NavigateToPullRequest { get; }
 
         /// <inheritdoc/>
+        [SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "login")]
         public async Task InitializeAsync(
             ILocalRepositoryModel localRepository,
             IConnection connection,

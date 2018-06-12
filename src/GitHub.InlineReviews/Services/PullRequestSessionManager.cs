@@ -33,7 +33,6 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionManager>();
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
-        readonly IConnectionManager connectionManager;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         TaskCompletionSource<object> initialized;
@@ -45,23 +44,19 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="service">The PR service to use.</param>
         /// <param name="sessionService">The PR session service to use.</param>
-        /// <param name="connectionManager">The connectionManager to use.</param>
         /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
             IPullRequestService service,
             IPullRequestSessionService sessionService,
-            IConnectionManager connectionManager,
             ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
-            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.service = service;
             this.sessionService = sessionService;
-            this.connectionManager = connectionManager;
             initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))

@@ -833,7 +833,6 @@ Line 4";
             return new PullRequestSessionManager(
                 service,
                 sessionService,
-                connectionManager,
                 teamExplorerContext);
         }
 

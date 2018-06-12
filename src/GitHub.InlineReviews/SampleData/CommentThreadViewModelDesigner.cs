@@ -21,10 +21,5 @@ namespace GitHub.InlineReviews.SampleData
         public ReactiveCommand<Unit> PostComment { get; }
         public ReactiveCommand<Unit> EditComment { get; }
         public ReactiveCommand<Unit> DeleteComment { get; }
-
-        public Uri GetCommentUrl(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

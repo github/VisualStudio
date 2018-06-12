@@ -296,8 +296,7 @@ Line 4";
                 diffService,
                 Substitute.For<IApiClientFactory>(),
                 Substitute.For<IGraphQLClientFactory>(),
-                Substitute.For<IUsageTracker>(),
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IUsageTracker>());
         }
 
         static PullRequestReviewThreadModel CreateCommentThread(
