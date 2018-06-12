@@ -690,8 +690,7 @@ Line 4";
                     diff,
                     Substitute.For<IApiClientFactory>(),
                     Substitute.For<IGraphQLClientFactory>(),
-                    Substitute.For<IUsageTracker>(),
-                    Substitute.For<IAvatarProvider>());
+                    Substitute.For<IUsageTracker>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 result.GetPullRequestMergeBase(
                     Arg.Any<ILocalRepositoryModel>(),

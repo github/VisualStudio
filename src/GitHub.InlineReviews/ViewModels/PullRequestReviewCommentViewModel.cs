@@ -96,7 +96,7 @@ namespace GitHub.InlineReviews.ViewModels
                   new ActorViewModel(model.Author), 
                   model.CreatedAt, 
                   review.State == PullRequestReviewState.Pending,
-                  new Uri(model.Url))
+                  model.Url != null ? new Uri(model.Url) : null)
         {
         }
 

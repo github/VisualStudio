@@ -20,8 +20,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 false);
 
             Assert.That(target.Comments, Has.One.Items);
-            Assert.That(string.Empty, Is.EqualTo(target.Comments[0].Body));
-            Assert.That(CommentEditState.Placeholder, Is.EqualTo(target.Comments[0].EditState));
+            Assert.That(target.Comments[0].Body, Is.EqualTo(string.Empty));
+            Assert.That(target.Comments[0].EditState, Is.EqualTo(CommentEditState.Placeholder));
         }
 
         [Test]

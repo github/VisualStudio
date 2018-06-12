@@ -302,7 +302,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Comment = new PullRequestReviewCommentModel
                 {
                     Body = body,
-                }
+                },
+                Review = new PullRequestReviewModel(),
             };
         }
 

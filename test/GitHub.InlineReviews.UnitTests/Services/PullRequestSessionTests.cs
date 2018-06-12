@@ -763,8 +763,7 @@ Line 4";
                 diffService ?? Substitute.For<IDiffService>(),
                 Substitute.For<IApiClientFactory>(),
                 Substitute.For<IGraphQLClientFactory>(),
-                Substitute.For<IUsageTracker>(),
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IUsageTracker>());
 
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
             result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<PullRequestDetailModel>())

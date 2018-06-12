@@ -72,9 +72,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Comment = new PullRequestReviewCommentModel
                 {
                     Id = id,
-                    //Author = new ActorModel { Login = "CurrentUser" },
                     Body = body,
                 },
+                Review = new PullRequestReviewModel(),
             };
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
@@ -156,6 +157,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
         public class TheStartReviewCommand
         {
+            public TheStartReviewCommand()
+            {
+                Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+            }
+
             [Test]
             public void IsDisabledWhenSessionHasPendingReview()
             {
@@ -240,6 +246,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             bool canPost = true)
         {
             var result = Substitute.For<ICommentThreadViewModel>();
+            result.PostComment.Returns(ReactiveCommand.CreateAsyncTask(_ => Task.CompletedTask));
             return result;
         }
     }
