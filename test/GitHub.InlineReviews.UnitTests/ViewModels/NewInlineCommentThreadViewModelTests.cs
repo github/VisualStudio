@@ -10,6 +10,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
     public class NewInlineCommentThreadViewModelTests
     {
+        public NewInlineCommentThreadViewModelTests()
+        {
+            Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+        }
+
         [Test]
         public void CreatesReplyPlaceholder()
         {
@@ -21,7 +26,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             Assert.That(target.Comments, Has.One.Items);
             Assert.That(target.Comments[0].Body, Is.EqualTo(string.Empty));
-            Assert.That(target.Comments[0].EditState, Is.EqualTo(CommentEditState.Placeholder));
+            Assert.That(target.Comments[0].EditState, Is.EqualTo(CommentEditState.Editing));
         }
 
         [Test]
