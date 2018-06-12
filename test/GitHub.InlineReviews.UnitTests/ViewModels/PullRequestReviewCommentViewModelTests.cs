@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             {
                 var session = CreateSession(false);
                 var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Id = "1" };
-                var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
+                var target = CreateTarget(session, comment: pullRequestReviewCommentModel);
 
                 Assert.That(target.CanStartReview, Is.False);
             }
@@ -62,9 +62,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var thread = CreateThread();
 
                 var currentUser = new ActorModel { Login = "CurrentUser" };
-                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = currentUser };
+                var comment = new PullRequestReviewCommentModel { Author = currentUser };
 
-                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                var target = CreateTarget(session, thread, currentUser, null, comment);
                 Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
             }
 
@@ -76,9 +76,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
                 var currentUser = new ActorModel { Login = "CurrentUser" };
                 var otherUser = new ActorModel { Login = "OtherUser" };
-                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = otherUser };
+                var comment = new PullRequestReviewCommentModel { Author = otherUser };
 
-                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                var target = CreateTarget(session, thread, currentUser, null, comment);
                 Assert.That(target.BeginEdit.CanExecute(new object()), Is.False);
             }
         }
@@ -102,9 +102,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var thread = CreateThread();
 
                 var currentUser = new ActorModel { Login = "CurrentUser" };
-                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = currentUser };
+                var comment = new PullRequestReviewCommentModel { Author = currentUser };
 
-                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                var target = CreateTarget(session, thread, currentUser, null, comment);
                 Assert.That(target.Delete.CanExecute(new object()), Is.True);
             }
 
@@ -116,9 +116,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
                 var currentUser = new ActorModel { Login = "CurrentUser" };
                 var otherUser = new ActorModel { Login = "OtherUser" };
-                var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Author = otherUser };
+                var comment = new PullRequestReviewCommentModel { Author = otherUser };
 
-                var target = CreateTarget(session, thread, currentUser, pullRequestReviewCommentModel);
+                var target = CreateTarget(session, thread, currentUser, null, comment);
                 Assert.That(target.Delete.CanExecute(new object()), Is.False);
             }
         }
@@ -148,7 +148,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             {
                 var session = CreateSession(false);
                 var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Id = "1" };
-                var target = CreateTarget(session, pullRequestReviewCommentModel: pullRequestReviewCommentModel);
+                var target = CreateTarget(session, comment: pullRequestReviewCommentModel);
 
                 Assert.That(target.CommitCaption, Is.EqualTo("Update comment"));
             }
@@ -202,19 +202,21 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             IPullRequestSession session = null,
             ICommentThreadViewModel thread = null,
             ActorModel currentUser = null,
-            PullRequestReviewCommentModel pullRequestReviewCommentModel = null)
+            PullRequestReviewModel review = null,
+            PullRequestReviewCommentModel comment = null)
         {
             session = session ?? CreateSession();
             thread = thread ?? CreateThread();
-
             currentUser = currentUser ?? new ActorModel { Login = "CurrentUser" };
-            pullRequestReviewCommentModel = pullRequestReviewCommentModel ?? new PullRequestReviewCommentModel();
+            comment = comment ?? new PullRequestReviewCommentModel();
+            review = review ?? CreateReview(comment);
 
             return new PullRequestReviewCommentViewModel(
                 session,
                 thread,
                 new ActorViewModel(currentUser),
-                pullRequestReviewCommentModel);
+                review,
+                comment);
         }
 
         static IPullRequestSession CreateSession(
@@ -224,6 +226,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             result.HasPendingReview.Returns(hasPendingReview);
             result.User.Returns(new ActorModel());
             return result;
+        }
+
+        static PullRequestReviewModel CreateReview(params PullRequestReviewCommentModel[] comments)
+        {
+            return new PullRequestReviewModel
+            {
+                Comments = comments,
+            };
         }
 
         static ICommentThreadViewModel CreateThread(

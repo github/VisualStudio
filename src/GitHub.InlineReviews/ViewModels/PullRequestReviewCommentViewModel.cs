@@ -83,6 +83,7 @@ namespace GitHub.InlineReviews.ViewModels
             IPullRequestSession session,
             ICommentThreadViewModel thread,
             IActorViewModel currentUser,
+            PullRequestReviewModel review,
             PullRequestReviewCommentModel model)
             : this(
                   session, 
@@ -93,7 +94,7 @@ namespace GitHub.InlineReviews.ViewModels
                   CommentEditState.None, 
                   new ActorViewModel(model.Author), 
                   model.CreatedAt, 
-                  false/*model.IsPending*/)
+                  review.State == PullRequestReviewState.Pending)
         {
         }
 

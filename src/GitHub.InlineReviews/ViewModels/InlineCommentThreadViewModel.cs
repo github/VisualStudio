@@ -43,7 +43,12 @@ namespace GitHub.InlineReviews.ViewModels
 
             foreach (var comment in comments)
             {
-                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment.Comment));
+                Comments.Add(new PullRequestReviewCommentViewModel(
+                    session,
+                    this,
+                    CurrentUser,
+                    comment.Review,
+                    comment.Comment));
             }
 
             Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
