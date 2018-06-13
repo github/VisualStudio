@@ -13,7 +13,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository to look at for the remote.</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
-        UriString GetUri(IRepository repository, string remote = "origin");
+        UriString GetUri(IRepository repository, string remote = null);
 
         /// <summary>
         /// Probes for a git repository and if one is found, returns a <see cref="UriString"/> for the repository's
@@ -25,7 +25,7 @@ namespace GitHub.Services
         /// </remarks>
         /// <param name="path">The path to start probing</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
-        UriString GetUri(string path, string remote = "origin");
+        UriString GetUri(string path, string remote = null);
         
         /// <summary>
         /// Probes for a git repository and if one is found, returns a <see cref="IRepositoryModel"/> instance for the
@@ -44,7 +44,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repo"></param>
         /// <returns></returns>
-        UriString GetRemoteUri(IRepository repo, string remote = "origin");
+        UriString GetRemoteUri(IRepository repo, string remote = null);
 
         /// <summary>
         /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
