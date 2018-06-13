@@ -137,7 +137,7 @@ namespace GitHub.Services
         /// </remarks>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
         /// <returns>The remote named "origin" or the first remote in the list.</returns>
-        static string FindOriginalRemoteName(IRepository repo)
+        public string FindOriginalRemoteName(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
             var remote = remotes[defaultOriginName];

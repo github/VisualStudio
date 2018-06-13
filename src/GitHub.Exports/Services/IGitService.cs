@@ -53,5 +53,17 @@ namespace GitHub.Services
         /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
         /// <returns></returns>
         Task<string> GetLatestPushedSha(string path);
+
+        /// <summary>
+        /// Find a remote named "origin" or the first remote in the list.
+        /// </summary>
+        /// <remarks>
+        /// When a repository is cloned, a remote named "origin" is automatically added with the clone URL. 
+        /// The remote list order doesn't change when a remote is added, deleted or renamed. This means that
+        /// if a user renames "origin", the first remote in the list will still contain the original clone URL.
+        /// </remarks>
+        /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
+        /// <returns>The remote named "origin" or the first remote in the list.</returns>
+        string FindOriginalRemoteName(IRepository repo);
     }
 }
