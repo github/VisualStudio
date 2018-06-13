@@ -20,7 +20,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository to look at for the remote.</param>
         /// <param name="remote">The name of the remote to look for</param>
         /// <returns>Returns a <see cref="UriString"/> representing the uri of the remote normalized to a GitHub repository url or null if none found.</returns>
-        public UriString GetUri(IRepository repository, string remote = "origin")
+        public UriString GetUri(IRepository repository, string remote = null)
         {
             return UriString.ToUriString(GetRemoteUri(repository, remote)?.ToRepositoryUrl());
         }
@@ -36,7 +36,7 @@ namespace GitHub.Services
         /// <param name="path">The path to start probing</param>
         /// <param name="remote">The name of the remote to look for</param>
         /// <returns>Returns a <see cref="UriString"/> representing the uri of the remote normalized to a GitHub repository url or null if none found.</returns>
-        public UriString GetUri(string path, string remote = "origin")
+        public UriString GetUri(string path, string remote = null)
         {
             using (var repo = GetRepository(path))
             {
@@ -66,8 +66,15 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <param name="remote">The name of the remote to look for</param>
         /// <returns></returns>
-        public UriString GetRemoteUri(IRepository repo, string remote = "origin")
+        public UriString GetRemoteUri(IRepository repo, string remote = null)
         {
+            if (repo == null)
+            {
+                return null;
+            }
+
+            remote = remote ?? FindOriginalRemoteName(repo);
+
             return repo
                 ?.Network
                 .Remotes[remote]
@@ -116,6 +123,28 @@ namespace GitHub.Services
                     return null;
                 }
             });
+        }
+
+        /// <summary>
+        /// Find a remote named "origin" or the first remote in the list.
+        /// </summary>
+        /// <remarks>
+        /// When a repository is cloned, a remote named "origin" is automatically added with the clone URL. 
+        /// The remote list order doesn't change when a remote is added, deleted or renamed. This means that
+        /// if a user renames "origin", the first remote in the list will still contain the original clone URL.
+        /// </remarks>
+        /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
+        /// <returns>The remote named "origin" or the first remote in the list.</returns>
+        static string FindOriginalRemoteName(IRepository repo)
+        {
+            var remotes = repo.Network.Remotes;
+            var remote = remotes["origin"];
+            if (remote == null)
+            {
+                remote = remotes.FirstOrDefault();
+            }
+
+            return remote.Name;
         }
     }
 }
