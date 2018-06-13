@@ -17,7 +17,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
-        const string defaultOriginName = "origin";
         static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly IGitService gitService;
         readonly PullOptions pullOptions;
@@ -98,10 +97,11 @@ namespace GitHub.Services
         {
             var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
 
-            var originRemote = repo.Network.Remotes[defaultOriginName];
+            var originName = gitService.FindOriginalRemoteName(repo);
+            var originRemote = repo.Network.Remotes[originName];
             if (originRemote != null && originRemote.Url == httpsUrl)
             {
-                return Fetch(repo, defaultOriginName, refspecs);
+                return Fetch(repo, originName, refspecs);
             }
 
             return Task.Factory.StartNew(() =>
