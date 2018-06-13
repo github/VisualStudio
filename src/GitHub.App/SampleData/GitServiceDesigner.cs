@@ -12,6 +12,6 @@ namespace GitHub.SampleData
         public IRepository GetRepository(string path) => null;
         public UriString GetUri(string path, string remote = null) => null;
         public UriString GetUri(IRepository repository, string remote = null) => null;
-        public string FindOriginalRemoteName(IRepository repo) => null;
+        public string GetOriginRemoteName(IRepository repo) => null;
     }
 }

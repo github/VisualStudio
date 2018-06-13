@@ -330,7 +330,7 @@ public class GitClientTests
     static GitClient CreateGitClient()
     {
         var gitService = Substitute.For<IGitService>();
-        gitService.FindOriginalRemoteName(null).ReturnsForAnyArgs("origin");
+        gitService.GetOriginRemoteName(null).ReturnsForAnyArgs("origin");
         return new GitClient(
             Substitute.For<IGitHubCredentialProvider>(),
             gitService);

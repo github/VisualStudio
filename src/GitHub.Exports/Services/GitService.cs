@@ -75,7 +75,13 @@ namespace GitHub.Services
                 return null;
             }
 
-            remote = remote ?? FindOriginalRemoteName(repo);
+            if(repo.Network.Remotes.Count() == 0)
+            {
+                // Repository doesn't have a remote 
+                return null;
+            }
+
+            remote = remote ?? GetOriginRemoteName(repo);
 
             return repo
                 ?.Network
@@ -137,7 +143,8 @@ namespace GitHub.Services
         /// </remarks>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
         /// <returns>The remote named "origin" or the first remote in the list.</returns>
-        public string FindOriginalRemoteName(IRepository repo)
+        /// <exception cref="InvalidOperationException">If repository contains no remotes.</exception>
+        public string GetOriginRemoteName(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
             var remote = remotes[defaultOriginName];
@@ -152,7 +159,7 @@ namespace GitHub.Services
                 return remote.Name;
             }
 
-            return null;
+            throw new InvalidOperationException("Can't get origin remote name because repository contains no remotes.");
         }
     }
 }

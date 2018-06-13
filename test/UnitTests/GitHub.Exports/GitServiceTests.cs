@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
@@ -39,12 +40,17 @@ public class GitServiceTests : TestBaseClass
             "https://github.com/github/VisualStudio", Description = "Return first remote when no origin")]
         public void DifferentRemoteNames(string urls, string remoteNames, string expected)
         {
-            var repository = CreateRepository(urls.Split(';'), remoteNames.Split(';'));
+            var repository = CreateRepository(Split(urls), Split(remoteNames));
             var target = new GitService();
 
             var uri = target.GetUri(repository);
 
             Assert.That(uri?.ToString(), Is.EqualTo(expected));
+        }
+
+        static string[] Split(string text)
+        {
+            return text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 
