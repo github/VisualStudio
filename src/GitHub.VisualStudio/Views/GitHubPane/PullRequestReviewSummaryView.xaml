@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
@@ -16,9 +17,9 @@
 
     <d:DesignData.DataContext>
         <vm:PullRequestReviewSummaryViewModel Id="1" State="Pending" FileCommentCount="2">
-            <!--<vm:PullRequestReviewSummaryViewModel.User>
-                <sampleData:AccountDesigner Login="meaghanlewis"/>
-            </vm:PullRequestReviewSummaryViewModel.User>-->
+            <vm:PullRequestReviewSummaryViewModel.User>
+                <ghfvs:ActorViewModel Login="meaghanlewis"/>
+            </vm:PullRequestReviewSummaryViewModel.User>
         </vm:PullRequestReviewSummaryViewModel>
     </d:DesignData.DataContext>
 
