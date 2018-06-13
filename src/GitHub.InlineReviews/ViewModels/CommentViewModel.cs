@@ -137,6 +137,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             if (state != CommentEditState.Editing)
             {
+                ErrorMessage = null;
                 undoBody = Body;
                 EditState = CommentEditState.Editing;
             }
