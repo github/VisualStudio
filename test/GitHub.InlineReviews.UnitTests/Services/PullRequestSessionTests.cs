@@ -20,6 +20,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
     public class PullRequestSessionTests
     {
         const int PullRequestNumber = 5;
+        const string PullRequestNodeId = "pull_request_id";
         const string RepoUrl = "https://foo.bar/owner/repo";
         const string FilePath = "test.cs";
 
@@ -514,16 +515,15 @@ Line 4";
             [Test]
             public async Task PostsToCorrectForkWithNoPendingReview()
             {
-                var service = Substitute.For<IPullRequestSessionService>();
+                var service = CreateService();
                 var target = CreateTarget(service, "fork", "owner", false);
 
                 await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
 
                 await service.Received(1).PostStandaloneReviewComment(
                     target.LocalRepository,
-                    "owner",
                     target.User,
-                    PullRequestNumber,
+                    PullRequestNodeId,
                     "New Comment",
                     "COMMIT_ID",
                     "file.cs",
@@ -533,24 +533,23 @@ Line 4";
             [Test]
             public async Task PostsReplyToCorrectForkWithNoPendingReview()
             {
-                var service = Substitute.For<IPullRequestSessionService>();
+                var service = CreateService();
                 var target = CreateTarget(service, "fork", "owner", false);
 
-                await target.PostReviewComment("New Comment", 1, "node1");
+                await target.PostReviewComment("New Comment", "node1");
 
                 await service.Received(1).PostStandaloneReviewCommentReply(
                     target.LocalRepository,
-                    "owner",
                     target.User,
-                    PullRequestNumber,
+                    PullRequestNodeId,
                     "New Comment",
-                    1);
+                    "node1");
             }
 
             [Test]
             public async Task PostsToCorrectForkWithPendingReview()
             {
-                var service = Substitute.For<IPullRequestSessionService>();
+                var service = CreateService();
                 var target = CreateTarget(service, "fork", "owner", true);
 
                 await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
@@ -568,10 +567,10 @@ Line 4";
             [Test]
             public async Task PostsReplyToCorrectForkWithPendingReview()
             {
-                var service = Substitute.For<IPullRequestSessionService>();
+                var service = CreateService();
                 var target = CreateTarget(service, "fork", "owner", true);
 
-                await target.PostReviewComment("New Comment", 1, "node1");
+                await target.PostReviewComment("New Comment", "node1");
 
                 await service.Received(1).PostPendingReviewCommentReply(
                     target.LocalRepository,
@@ -579,6 +578,16 @@ Line 4";
                     "pendingReviewId",
                     "New Comment",
                     "node1");
+            }
+
+            static IPullRequestSessionService CreateService()
+            {
+                var service = Substitute.For<IPullRequestSessionService>();
+
+                service.GetGraphQLPullRequestId(Arg.Any<ILocalRepositoryModel>(), Arg.Any<string>(), Arg.Any<int>())
+                    .Returns(PullRequestNodeId);
+
+                return service;
             }
 
             PullRequestSession CreateTarget(
