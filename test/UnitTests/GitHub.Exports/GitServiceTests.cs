@@ -1,11 +1,7 @@
-﻿using System;
-using GitHub.Services;
+﻿using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
 public class GitServiceTests : TestBaseClass
 {
@@ -25,12 +21,21 @@ public class GitServiceTests : TestBaseClass
     [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
     public void GetUriShouldNotThrow(string url, string expected)
     {
-        var origin = Substitute.For<Remote>();
-        origin.Url.Returns(url);
-        var repository = Substitute.For<IRepository>();
-        repository.Network.Remotes["origin"].Returns(origin);
+        var repository = CreateRepository(url);
+        var target = new GitService();
 
-        var gitservice = new GitService();
-        Assert.That(expected, Is.EqualTo(gitservice.GetUri(repository)?.ToString()));
+        var uri = target.GetUri(repository);
+
+        Assert.That(uri?.ToString(), Is.EqualTo(expected));
+    }
+
+    static IRepository CreateRepository(string url, string defaultBranchName = "origin")
+    {
+        var defaultBranch = Substitute.For<Remote>();
+        defaultBranch.Url.Returns(url);
+        defaultBranch.Name.Returns(defaultBranchName);
+        var repository = Substitute.For<IRepository>();
+        repository.Network.Remotes[defaultBranchName].Returns(defaultBranch);
+        return repository;
     }
 }
