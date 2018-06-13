@@ -139,12 +139,18 @@ namespace GitHub.Services
         {
             var remotes = repo.Network.Remotes;
             var remote = remotes["origin"];
-            if (remote == null)
+            if (remote != null)
             {
-                remote = remotes.FirstOrDefault();
+                return remote.Name;
             }
 
-            return remote.Name;
+            remote = remotes.FirstOrDefault();
+            if (remote != null)
+            {
+                return remote.Name;
+            }
+
+            return null;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GitHub.Services;
+﻿using System.Collections.Generic;
+using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
@@ -23,7 +24,22 @@ public class GitServiceTests : TestBaseClass
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
         public void ShouldNotThrow(string url, string expected)
         {
-            var repository = CreateRepository(url);
+            var repository = CreateRepository(new[] { url }, new[] { "origin" });
+            var target = new GitService();
+
+            var uri = target.GetUri(repository);
+
+            Assert.That(uri?.ToString(), Is.EqualTo(expected));
+        }
+
+        [TestCase("https://github.com/github/VisualStudio", "origin", "https://github.com/github/VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio", "renamed", "https://github.com/github/VisualStudio")]
+        [TestCase("", "", null, Description = "No remotes returns null")]
+        [TestCase("https://github.com/github/VisualStudio;https://github.com/jcansdale/VisualStudio", "github;jcansdale",
+            "https://github.com/github/VisualStudio", Description = "Return first remote when no origin")]
+        public void DifferentRemoteNames(string urls, string remoteNames, string expected)
+        {
+            var repository = CreateRepository(urls.Split(';'), remoteNames.Split(';'));
             var target = new GitService();
 
             var uri = target.GetUri(repository);
@@ -32,13 +48,25 @@ public class GitServiceTests : TestBaseClass
         }
     }
 
-    static IRepository CreateRepository(string url, string defaultBranchName = "origin")
+    static IRepository CreateRepository(string[] urls, string[] remoteNames)
     {
-        var defaultBranch = Substitute.For<Remote>();
-        defaultBranch.Url.Returns(url);
-        defaultBranch.Name.Returns(defaultBranchName);
         var repository = Substitute.For<IRepository>();
-        repository.Network.Remotes[defaultBranchName].Returns(defaultBranch);
+        var remoteCollection = Substitute.For<RemoteCollection>();
+
+        var remoteList = new List<Remote>();
+        for (var count = 0; count < urls.Length; count++)
+        {
+            var url = urls[count];
+            var remoteName = remoteNames[count];
+            var remote = Substitute.For<Remote>();
+            remote.Url.Returns(url);
+            remote.Name.Returns(remoteName);
+            remoteCollection[remoteName].Returns(remote);
+            remoteList.Add(remote);
+        }
+
+        remoteCollection.GetEnumerator().Returns(_ => remoteList.GetEnumerator());
+        repository.Network.Remotes.Returns(remoteCollection);
         return repository;
     }
 }
