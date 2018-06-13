@@ -71,6 +71,7 @@
                 </Border>
               </StackPanel>
 
+              <!--
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
                           Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
                 <ui:OcticonButton Command="{Binding BeginEdit}"
@@ -88,6 +89,7 @@
                                   Foreground="{DynamicResource GitHubVsToolWindowText}"
                                   Icon="x"/>
               </StackPanel>
+              -->
             </DockPanel>
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
