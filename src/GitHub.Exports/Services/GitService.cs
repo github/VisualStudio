@@ -13,6 +13,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitService : IGitService
     {
+        const string defaultOriginName = "origin";
+
         /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
         /// is null or no remote named origin exists, this method returns null
@@ -138,7 +140,7 @@ namespace GitHub.Services
         static string FindOriginalRemoteName(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
-            var remote = remotes["origin"];
+            var remote = remotes[defaultOriginName];
             if (remote != null)
             {
                 return remote.Name;
