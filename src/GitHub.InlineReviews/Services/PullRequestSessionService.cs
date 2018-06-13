@@ -517,7 +517,7 @@ namespace GitHub.InlineReviews.Services
                     OriginalCommitId = x.Comment.OriginalCommit.Oid,
                     PullRequestReviewId = x.Comment.PullRequestReview.DatabaseId.Value,
                     User = user,
-                    IsPending = false,
+                    IsPending = true,
                 });
 
             var result = await graphql.Run(addComment);
@@ -593,6 +593,7 @@ namespace GitHub.InlineReviews.Services
             var review = await CreatePendingReview(localRepository, user, pullRequestNodeId);
             var comment = await PostPendingReviewCommentReply(localRepository, user, review.NodeId, body, inReplyToNodeId);
             await SubmitPendingReview(localRepository, user, review.NodeId, null, PullRequestReviewEvent.Comment);
+            comment.IsPending = false;
             return comment;
         }
 
