@@ -5,7 +5,7 @@ using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
 
-public class GitServiceTests : TestBaseClass
+public class GitServiceTests /*: TestBaseClass*/
 {
     public class TheGetUriMethod
     {
@@ -25,22 +25,7 @@ public class GitServiceTests : TestBaseClass
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
         public void ShouldNotThrow(string url, string expected)
         {
-            var repository = CreateRepository(new[] { url }, new[] { "origin" });
-            var target = new GitService();
-
-            var uri = target.GetUri(repository);
-
-            Assert.That(uri?.ToString(), Is.EqualTo(expected));
-        }
-
-        [TestCase("https://github.com/github/VisualStudio", "origin", "https://github.com/github/VisualStudio")]
-        [TestCase("https://github.com/github/VisualStudio", "renamed", "https://github.com/github/VisualStudio")]
-        [TestCase("", "", null, Description = "No remotes returns null")]
-        [TestCase("https://github.com/github/VisualStudio;https://github.com/jcansdale/VisualStudio", "github;jcansdale",
-            "https://github.com/github/VisualStudio", Description = "Return first remote when no origin")]
-        public void DifferentRemoteNames(string urls, string remoteNames, string expected)
-        {
-            var repository = CreateRepository(Split(urls), Split(remoteNames));
+            var repository = CreateRepository(new[] { url }, new[] { "origin" }, new string[0], new string[0]);
             var target = new GitService();
 
             var uri = target.GetUri(repository);
@@ -51,13 +36,27 @@ public class GitServiceTests : TestBaseClass
 
     public class TheGetOriginRemoteNameMethod
     {
-        [Test]
-        public void RepositoryHasNoRemotes_ThrowsInvalidOperationException()
+        [TestCase("https://github.com/github/VisualStudio", "no_origin", "no_master", "github", Description = "No `origin` remote or `master` branch defined")]
+        public void ThrowsInvalidOperationException(string urls, string remoteNames, string branchNames, string branchRemoteNames)
         {
-            var repository = CreateRepository(Split(""), Split(""));
+            var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));
             var target = new GitService();
 
             Assert.Throws<InvalidOperationException>(() => target.GetOriginRemoteName(repository));
+        }
+
+        [TestCase("https://github.com/github/VisualStudio", "origin", "master;HEAD", "jcansdale;grokys", "origin",
+            Description = "Use remote named `origin` if it exists")]
+        [TestCase("", "", "master;HEAD", "jcansdale;grokys", "grokys", Description = "Use remote from HEAD if it exists")]
+        [TestCase("", "", "master", "jcansdale", "jcansdale", Description = "Use remote from branch named `master` if it exists")]
+        public void GetOriginRemoteName(string urls, string remoteNames, string branchNames, string branchRemoteNames, string expectedRemoteName)
+        {
+            var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));
+            var target = new GitService();
+
+            var remoteName = target.GetOriginRemoteName(repository);
+
+            Assert.That(remoteName, Is.EqualTo(expectedRemoteName));
         }
     }
 
@@ -66,16 +65,29 @@ public class GitServiceTests : TestBaseClass
         return text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    static IRepository CreateRepository(string[] urls, string[] remoteNames)
+    static IRepository CreateRepository(string[] urls, string[] remoteNames, string[] branchNames, string[] branchRemoteNames)
     {
         var repository = Substitute.For<IRepository>();
         var remoteCollection = Substitute.For<RemoteCollection>();
 
-        var remoteList = new List<Remote>();
-        for (var count = 0; count < urls.Length; count++)
+        for (var branchCount = 0; branchCount < branchNames.Length; branchCount++)
         {
-            var url = urls[count];
-            var remoteName = remoteNames[count];
+            var branchName = branchNames[branchCount];
+            var branchRemoteName = branchRemoteNames[branchCount];
+            var branch = Substitute.For<Branch>();
+            branch.RemoteName.Returns(branchRemoteName);
+            repository.Branches[branchName].Returns(branch);
+            if (branchName == "HEAD")
+            {
+                repository.Head.Returns(branch);
+            }
+        }
+
+        var remoteList = new List<Remote>();
+        for (var remoteCount = 0; remoteCount < urls.Length; remoteCount++)
+        {
+            var url = urls[remoteCount];
+            var remoteName = remoteNames[remoteCount];
             var remote = Substitute.For<Remote>();
             remote.Url.Returns(url);
             remote.Name.Returns(remoteName);

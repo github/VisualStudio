@@ -134,29 +134,34 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Find a remote named "origin" or the first remote in the list.
+        /// Find a remote named "origin", the remote tracking the HEAD branch or the remote tracking "master".
         /// </summary>
-        /// <remarks>
-        /// When a repository is cloned, a remote named "origin" is automatically added with the clone URL. 
-        /// The remote list order doesn't change when a remote is added, deleted or renamed. This means that
-        /// if a user renames "origin", the first remote in the list will still contain the original clone URL.
-        /// </remarks>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
         /// <returns>The remote named "origin" or the first remote in the list.</returns>
-        /// <exception cref="InvalidOperationException">If repository contains no remotes.</exception>
+        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote, HEAD branch or "master" branch.</exception>
         public string GetOriginRemoteName(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
             var remote = remotes[defaultOriginName];
             if (remote != null)
             {
+                // Use remote named "origin"
                 return remote.Name;
             }
 
-            remote = remotes.FirstOrDefault();
-            if (remote != null)
+            var remoteName = repo.Head?.RemoteName;
+            if (remoteName != null)
             {
-                return remote.Name;
+                // Use remote from the HEAD branch
+                return remoteName;
+            }
+
+            var masterBranch = repo.Branches["master"];
+            remoteName = masterBranch?.RemoteName;
+            if (remoteName != null)
+            {
+                // Use remote from the "master" branch
+                return remoteName;
             }
 
             throw new InvalidOperationException("Can't get origin remote name because repository contains no remotes.");
