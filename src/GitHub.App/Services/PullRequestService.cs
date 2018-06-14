@@ -287,7 +287,7 @@ namespace GitHub.Services
                     }
                     else if (repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl())
                     {
-                        var remote = await gitClient.GetHttpRemote(repo, "origin");
+                        var remote = await gitClient.GetHttpRemote(repo);
                         await gitClient.Fetch(repo, remote.Name);
                         await gitClient.Checkout(repo, localBranchName);
                     }
@@ -371,7 +371,7 @@ namespace GitHub.Services
                 // TreeChanges doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    var remote = await gitClient.GetHttpRemote(repo);
                     await gitClient.Fetch(repo, remote.Name);
                     var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
                     return Observable.Return(changes);
@@ -437,7 +437,7 @@ namespace GitHub.Services
 
                     if (branchName != null)
                     {
-                        var remote = await gitClient.GetHttpRemote(repo, "origin");
+                        var remote = await gitClient.GetHttpRemote(repo);
                         await gitClient.Fetch(repo, remote.Name);
 
                         var branch = repo.Branches[branchName];
@@ -497,7 +497,7 @@ namespace GitHub.Services
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    var remote = await gitClient.GetHttpRemote(repo);
                     await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding, tempFilePath);
                 }
             }
@@ -610,7 +610,7 @@ namespace GitHub.Services
             catch (FileNotFoundException)
             {
                 var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo);
                 await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
                 contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
             }
@@ -663,7 +663,7 @@ namespace GitHub.Services
             // PullRequestModel doesn't keep a reference to repo
             using (var repo = await Task.Run(() => gitService.GetRepository(sourceRepository.LocalPath)))
             {
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo);
                 await gitClient.Push(repo, sourceBranch.Name, remote.Name);
 
                 if (!repo.Branches[sourceBranch.Name].IsTracking)
