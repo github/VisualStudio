@@ -72,13 +72,18 @@ namespace GitHub.Services
             HostAddress address,
             string owner,
             string name,
-            string after)
+            string after,
+            PullRequestStateEnum[] states)
         {
             if (readPullRequests == null)
             {
                 readPullRequests = new Query()
                     .Repository(Var(nameof(owner)), Var(nameof(name)))
-                    .PullRequests(first: 100, after: Var(nameof(after)), orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt })
+                    .PullRequests(
+                        first: 100,
+                        after: Var(nameof(after)),
+                        orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
+                        states: Var(nameof(states)))
                     .Select(page => new Page<PullRequestListItemModel>
                     {
                         EndCursor = page.PageInfo.EndCursor,
@@ -107,6 +112,7 @@ namespace GitHub.Services
                 { nameof(owner), owner },
                 { nameof(name), name },
                 { nameof(after), after },
+                { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
             };
 
             return await graphql.Run(readPullRequests, vars);

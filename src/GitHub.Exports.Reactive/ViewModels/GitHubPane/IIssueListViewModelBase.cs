@@ -16,6 +16,10 @@ namespace GitHub.ViewModels.GitHubPane
 
         ILocalRepositoryModel LocalRepository { get; }
 
+        string SelectedState { get; set; }
+
+        IReadOnlyList<string> States { get; }
+
         ReactiveCommand<Unit> OpenItem { get; }
 
         Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,7 +10,7 @@ using System.Windows.Threading;
 
 namespace GitHub.Collections
 {
-    public class VirtualizingList<T> : IReadOnlyList<T>, IList, INotifyCollectionChanged
+    public class VirtualizingList<T> : IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged
     {
         readonly Dictionary<int, IReadOnlyList<T>> pages = new Dictionary<int, IReadOnlyList<T>>();
         readonly IVirtualizingListSource<T> source;
@@ -82,6 +83,7 @@ namespace GitHub.Collections
         bool ICollection.IsSynchronized => false;
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -144,6 +146,7 @@ namespace GitHub.Collections
                     // Don't send a Reset if the count is available immediately, as this causes
                     // a NullReferenceException in ListCollectionView.
                     count = countTask.Result;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
                 }
                 else
                 {
@@ -151,6 +154,7 @@ namespace GitHub.Collections
                     {
                         count = x.Result;
                         SendReset();
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }

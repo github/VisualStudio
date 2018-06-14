@@ -23,7 +23,8 @@ namespace GitHub.Services
             HostAddress address,
             string owner,
             string name,
-            string after);
+            string after,
+            PullRequestStateEnum[] states);
 
         IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,

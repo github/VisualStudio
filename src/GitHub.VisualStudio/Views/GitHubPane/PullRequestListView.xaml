@@ -11,8 +11,43 @@
         <ghfvs:PullRequestListViewModelDesigner/>
     </d:DesignProperties.DataContext>
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <DockPanel>
+        <StackPanel DockPanel.Dock="Top"
+                    HorizontalAlignment="Left"
+                    Margin="8"
+                    Orientation="Horizontal">
+            <ghfvs:DropDownButton Foreground="{DynamicResource GitHubActionLinkItemBrush}">
+                <ghfvs:DropDownButton.DropDownContent>
+                    <ListBox Background="{DynamicResource VsBrush.Window}"
+                             BorderBrush="{DynamicResource VsBrush.WindowFrame}"
+                             BorderThickness="1"
+                             ItemsSource="{Binding States}"
+                             MinWidth="100"
+                             SelectedItem="{Binding SelectedState}"/>
+                </ghfvs:DropDownButton.DropDownContent>
+                <TextBlock>
+                    <Hyperlink Foreground="{DynamicResource GitHubActionLinkItemBrush}">
+                        <Run Text="{Binding Items.Count, Mode=OneWay}"/>
+                        <Run Text="{Binding SelectedState, Mode=OneWay}"/>
+                    </Hyperlink>
+                </TextBlock>
+            </ghfvs:DropDownButton>
+
+            <Separator Style="{StaticResource VerticalSeparator}" Margin="8 0" />
+
+            <ghfvs:GitHubActionLink>Create New</ghfvs:GitHubActionLink>
+        </StackPanel>
         <ListBox ItemsSource="{Binding ItemsView}"
+                 BorderThickness="0"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">

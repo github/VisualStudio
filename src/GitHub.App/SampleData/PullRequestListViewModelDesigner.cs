@@ -45,17 +45,17 @@ namespace GitHub.SampleData
             };
 
             ItemsView = CollectionViewSource.GetDefaultView(Items);
+            States = new[] { "Open", "Closed", "All" };
+            SelectedState = "Open";
         }
 
         public IReadOnlyList<IViewModel> Items { get; }
-
         public ICollectionView ItemsView { get; }
-
         public ILocalRepositoryModel LocalRepository { get; set; }
-
         public string SearchQuery { get; set; }
-
         public ReactiveCommand<Unit> OpenItem { get; }
+        public string SelectedState { get; set; }
+        public IReadOnlyList<string> States { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }

@@ -8,7 +8,11 @@ namespace GitHub.UI
     public class DropDownButton : ContentControl
     {
         public static readonly DependencyProperty AutoCloseOnClickProperty =
-            DependencyProperty.Register("AutoCloseOnClick", typeof(bool), typeof(DropDownButton));
+            DependencyProperty.Register(
+                "AutoCloseOnClick",
+                typeof(bool),
+                typeof(DropDownButton),
+                new FrameworkPropertyMetadata(true));
         public static readonly DependencyProperty DropDownContentProperty =
             DependencyProperty.Register(nameof(DropDownContent), typeof(object), typeof(DropDownButton));
         public static readonly DependencyProperty IsOpenProperty =

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Collections;
@@ -13,6 +14,7 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : IssueListViewModelBase, IPullRequestListViewModel
     {
+        static readonly IReadOnlyList<string> states = new[] { "Open", "Closed", "All" };
         readonly IPullRequestService service;
 
         [ImportingConstructor]
@@ -20,6 +22,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             this.service = service;
         }
+
+        public override IReadOnlyList<string> States => states;
 
         protected override IVirtualizingListSource<IViewModel> CreateItemSource()
         {
@@ -49,11 +53,27 @@ namespace GitHub.ViewModels.GitHubPane
 
             protected override Task<Page<PullRequestListItemModel>> LoadPage(string after)
             {
+                PullRequestStateEnum[] states;
+
+                switch (owner.SelectedState)
+                {
+                    case "Open":
+                        states = new[] { PullRequestStateEnum.Open };
+                        break;
+                    case "Closed":
+                        states = new[] { PullRequestStateEnum.Closed, PullRequestStateEnum.Merged };
+                        break;
+                    default:
+                        states = new[] { PullRequestStateEnum.Open, PullRequestStateEnum.Closed, PullRequestStateEnum.Merged };
+                        break;
+                }
+
                 return owner.service.ReadPullRequests(
                     HostAddress.Create(owner.LocalRepository.CloneUrl),
                     owner.LocalRepository.Owner,
                     owner.LocalRepository.Name,
-                    after);
+                    after,
+                    states);
             }
 
             protected override void OnBeginLoading()

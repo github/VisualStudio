@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Collections;
+using GitHub.Extensions;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -14,6 +18,7 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IViewModel> items;
         ICollectionView itemsView;
         string searchQuery;
+        string selectedState;
 
         public IssueListViewModelBase()
         {
@@ -40,11 +45,21 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref searchQuery, value); }
         }
 
+        public string SelectedState
+        {
+            get { return selectedState; }
+            set { this.RaiseAndSetIfChanged(ref selectedState, value); }
+        }
+
+        public abstract IReadOnlyList<string> States { get; }
+
         public ReactiveCommand<Unit> OpenItem { get; }
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
             LocalRepository = repository;
+            SelectedState = States.FirstOrDefault();
+            this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Load().Forget());
             await Load();
         }
 
