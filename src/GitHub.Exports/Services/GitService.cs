@@ -81,7 +81,7 @@ namespace GitHub.Services
                 return null;
             }
 
-            remote = remote ?? GetOriginRemoteName(repo);
+            remote = remote ?? GetDefaultRemoteName(repo);
 
             return repo
                 ?.Network
@@ -137,9 +137,9 @@ namespace GitHub.Services
         /// Find a remote named "origin", the remote tracking the HEAD branch or the remote tracking "master".
         /// </summary>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
-        /// <returns>The remote named "origin" or the first remote in the list.</returns>
+        /// <returns>The remote named "origin", the remote tracking the HEAD branch or the remote tracking "master"</returns>
         /// <exception cref="InvalidOperationException">If repository contains no "origin" remote, HEAD branch or "master" branch.</exception>
-        public string GetOriginRemoteName(IRepository repo)
+        public string GetDefaultRemoteName(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
             var remote = remotes[defaultOriginName];

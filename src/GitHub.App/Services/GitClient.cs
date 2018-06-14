@@ -97,7 +97,7 @@ namespace GitHub.Services
         {
             var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
 
-            var originName = gitService.GetOriginRemoteName(repo);
+            var originName = gitService.GetDefaultRemoteName(repo);
             var originRemote = repo.Network.Remotes[originName];
             if (originRemote != null && originRemote.Url == httpsUrl)
             {
@@ -341,7 +341,7 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                remote = remote ?? gitService.GetOriginRemoteName(repo);
+                remote = remote ?? gitService.GetDefaultRemoteName(repo);
                 var uri = gitService.GetRemoteUri(repo, remote);
                 var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
                 var ret = repo.Network.Remotes[remoteName];

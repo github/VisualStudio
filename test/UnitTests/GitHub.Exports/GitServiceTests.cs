@@ -42,7 +42,7 @@ public class GitServiceTests /*: TestBaseClass*/
             var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));
             var target = new GitService();
 
-            Assert.Throws<InvalidOperationException>(() => target.GetOriginRemoteName(repository));
+            Assert.Throws<InvalidOperationException>(() => target.GetDefaultRemoteName(repository));
         }
 
         [TestCase("https://github.com/github/VisualStudio", "origin", "master;HEAD", "jcansdale;grokys", "origin",
@@ -54,7 +54,7 @@ public class GitServiceTests /*: TestBaseClass*/
             var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));
             var target = new GitService();
 
-            var remoteName = target.GetOriginRemoteName(repository);
+            var remoteName = target.GetDefaultRemoteName(repository);
 
             Assert.That(remoteName, Is.EqualTo(expectedRemoteName));
         }
