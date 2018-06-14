@@ -152,7 +152,13 @@ namespace GitHub.Services
         /// <returns></returns>
         Task UnsetConfig(IRepository repository, string key);
 
-        Task<Remote> GetHttpRemote(IRepository repo, string remote);
+        /// <summary>
+        /// Get a <see cref="Remote"/> that used the http protocol.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="remote">The name of the remote or null to use original remote.</param>
+        /// <returns>A <see cref="Remote"/> that uses the http protocol.</returns>
+        Task<Remote> GetHttpRemote(IRepository repo, string remote = null);
 
         /// <summary>
         /// Extracts a file at a specified commit from the repository.
