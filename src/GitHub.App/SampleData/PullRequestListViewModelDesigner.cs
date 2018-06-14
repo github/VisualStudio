@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
+using ReactiveUI;
 
 namespace GitHub.SampleData
 {
@@ -52,6 +54,8 @@ namespace GitHub.SampleData
         public ILocalRepositoryModel LocalRepository { get; set; }
 
         public string SearchQuery { get; set; }
+
+        public ReactiveCommand<Unit> OpenItem { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }

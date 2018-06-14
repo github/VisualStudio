@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -13,6 +15,8 @@ namespace GitHub.ViewModels.GitHubPane
         ICollectionView ItemsView { get; }
 
         ILocalRepositoryModel LocalRepository { get; }
+
+        ReactiveCommand<Unit> OpenItem { get; }
 
         Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
     }

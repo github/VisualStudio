@@ -5,6 +5,7 @@ using GitHub.Collections;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -23,6 +24,13 @@ namespace GitHub.ViewModels.GitHubPane
         protected override IVirtualizingListSource<IViewModel> CreateItemSource()
         {
             return new ItemSource(this);
+        }
+
+        protected override Task DoOpenItem(IViewModel item)
+        {
+            var i = (IPullRequestListItemViewModel)item;
+            NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{i.Number}"));
+            return Task.CompletedTask;
         }
 
         class ItemSource : SequentialListSource<PullRequestListItemModel, IViewModel>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Collections;
@@ -13,6 +14,11 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IViewModel> items;
         ICollectionView itemsView;
         string searchQuery;
+
+        public IssueListViewModelBase()
+        {
+            OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
+        }
 
         public IReadOnlyList<IViewModel> Items
         {
@@ -34,6 +40,8 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref searchQuery, value); }
         }
 
+        public ReactiveCommand<Unit> OpenItem { get; }
+
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
             LocalRepository = repository;
@@ -41,6 +49,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         protected abstract IVirtualizingListSource<IViewModel> CreateItemSource();
+        protected abstract Task DoOpenItem(IViewModel item);
 
         Task Load()
         {
@@ -49,6 +58,12 @@ namespace GitHub.ViewModels.GitHubPane
             ItemsView = new VirtualizingListCollectionView<IViewModel>(items);
 
             return Task.CompletedTask;
+        }
+
+        async Task OpenItemImpl(object i)
+        {
+            var item = i as IViewModel;
+            if (item != null) await DoOpenItem(item);
         }
     }
 }
