@@ -76,7 +76,7 @@ namespace GitHub.Services
 
                         if (addUpstream)
                         {
-                            var remote = await gitClient.GetHttpRemote(activeRepo, "origin");
+                            var remote = await gitClient.GetHttpRemote(activeRepo);
                             currentOrigin = new Uri(remote.Url);
                         }
 
