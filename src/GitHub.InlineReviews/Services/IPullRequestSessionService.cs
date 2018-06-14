@@ -260,9 +260,8 @@ namespace GitHub.InlineReviews.Services
         /// Posts a new standalone PR review comment.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
         /// <param name="user">The user posting the comment.</param>
-        /// <param name="number">The pull request number.</param>
+        /// <param name="pullRequestNodeId">The pull request node id.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
@@ -272,11 +271,9 @@ namespace GitHub.InlineReviews.Services
         /// The method posts a new standalone pull request comment that is not attached to a pending
         /// pull request review.
         /// </remarks>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
-            ILocalRepositoryModel localRepository,
-            string remoteRepositoryOwner,
+        Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(ILocalRepositoryModel localRepository,
             IAccount user,
-            int number,
+            string pullRequestNodeId,
             string body,
             string commitId,
             string path,
@@ -286,19 +283,16 @@ namespace GitHub.InlineReviews.Services
         /// Posts a PR review comment reply.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
         /// <param name="user">The user posting the comment.</param>
-        /// <param name="number">The pull request number.</param>
+        /// <param name="pullRequestNodeId">The pull request node id.</param>
         /// <param name="body">The comment body.</param>
-        /// <param name="inReplyTo">The comment ID to reply to.</param>
+        /// <param name="inReplyToNodeId">The comment node id to reply to.</param>
         /// <returns>A model representing the posted comment.</returns>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(
-            ILocalRepositoryModel localRepository,
-            string remoteRepositoryOwner,
+        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(ILocalRepositoryModel localRepository,
             IAccount user,
-            int number,
+            string pullRequestNodeId,
             string body,
-            int inReplyTo);
+            string inReplyToNodeId);
 
         /// <summary>
         /// Delete a PR review comment.
