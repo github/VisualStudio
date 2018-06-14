@@ -75,7 +75,7 @@ namespace GitHub.Services
                 return null;
             }
 
-            if(repo.Network.Remotes.Count() == 0)
+            if (repo.Network.Remotes.Count() == 0)
             {
                 // Repository doesn't have a remote 
                 return null;
