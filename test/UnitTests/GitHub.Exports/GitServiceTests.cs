@@ -5,7 +5,7 @@ using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
 
-public class GitServiceTests /*: TestBaseClass*/
+public class GitServiceTests
 {
     public class TheGetUriMethod
     {
@@ -31,6 +31,28 @@ public class GitServiceTests /*: TestBaseClass*/
             var uri = target.GetUri(repository);
 
             Assert.That(uri?.ToString(), Is.EqualTo(expected));
+        }
+
+        [TestCase("https://github.com/github/VisualStudio", "no_origin", "no_master", "github", Description = "No `origin` remote or `master` branch defined")]
+        public void UriShouldBeNull(string urls, string remoteNames, string branchNames, string branchRemoteNames)
+        {
+            var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));
+            var target = new GitService();
+
+            var uri = target.GetUri(repository);
+
+            Assert.That(uri, Is.Null);
+        }
+
+        [Test]
+        public void RepositoryNull_UriShouldBeNull()
+        {
+            var repository = null as IRepository;
+            var target = new GitService();
+
+            var uri = target.GetUri(repository);
+
+            Assert.That(uri, Is.Null);
         }
     }
 

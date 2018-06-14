@@ -75,16 +75,14 @@ namespace GitHub.Services
                 return null;
             }
 
-            if (repo.Network.Remotes.Count() == 0)
+            remote = remote ?? TryGetDefaultRemoteName(repo);
+            if (remote == null)
             {
-                // Repository doesn't have a remote 
                 return null;
             }
 
-            remote = remote ?? GetDefaultRemoteName(repo);
-
             return repo
-                ?.Network
+                .Network
                 .Remotes[remote]
                 ?.Url;
         }
@@ -141,6 +139,17 @@ namespace GitHub.Services
         /// <exception cref="InvalidOperationException">If repository contains no "origin" remote, HEAD branch or "master" branch.</exception>
         public string GetDefaultRemoteName(IRepository repo)
         {
+            var remoteName = TryGetDefaultRemoteName(repo);
+            if (remoteName != null)
+            {
+                return remoteName;
+            }
+
+            throw new InvalidOperationException("Can't get default remote name because repository contains no `origin` remote, HEAD branch or `master` branch.");
+        }
+
+        static string TryGetDefaultRemoteName(IRepository repo)
+        {
             var remotes = repo.Network.Remotes;
             var remote = remotes[defaultOriginName];
             if (remote != null)
@@ -164,7 +173,7 @@ namespace GitHub.Services
                 return remoteName;
             }
 
-            throw new InvalidOperationException("Can't get origin remote name because repository contains no remotes.");
+            return null;
         }
     }
 }
