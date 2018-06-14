@@ -198,10 +198,12 @@
     <Compile Include="ViewModels\Dialog\IRepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IRepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IRepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IIssueListViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestFilesViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestReviewAuthoringViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestReviewFileCommentViewModel.cs" />

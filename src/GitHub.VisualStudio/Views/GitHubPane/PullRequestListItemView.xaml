@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestListItemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+             mc:Ignorable="d" d:DesignWidth="300"
+             Padding="0 4">
+    <d:DesignData.DataContext>
+        <ghfvs:PullRequestListItemViewModelDesigner Number="399"
+                                                    Title="Let's try doing this differently"
+                                                    CommentCount="4"
+                                                    UpdatedAt="2018-01-29">
+            <ghfvs:PullRequestListItemViewModelDesigner.Author>
+                <ghfvs:ActorViewModelDesigner Login="shana"/>
+            </ghfvs:PullRequestListItemViewModelDesigner.Author>
+        </ghfvs:PullRequestListItemViewModelDesigner>
+    </d:DesignData.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <Grid>
+        <Image HorizontalAlignment="Left"
+               Stretch="None"
+               Opacity="0.2"
+               Visibility="{Binding Converter={ghfvs:EqualsToVisibilityConverter {x:Null}}}">
+            <Image.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <GeometryDrawing Brush="{DynamicResource GitHubVsGrayText}">
+                            <GeometryDrawing.Geometry>
+                                <GeometryGroup>
+                                    <RectangleGeometry Rect="0, 6, 30, 30" RadiusX="3" RadiusY="3"/>
+                                    <RectangleGeometry Rect="40, 8, 140, 10" RadiusX="3" RadiusY="3"/>
+                                    <RectangleGeometry Rect="40, 27, 100, 10" RadiusX="3" RadiusY="3"/>
+                                </GeometryGroup>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </Image.Source>
+        </Image>
+
+        <DockPanel Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
+            <views:ActorAvatarView DockPanel.Dock="Left"
+                                   ViewModel="{Binding Author}"
+                                   Margin="0,1,10,0"
+                                   Width="30"
+                                   Height="30"
+                                   VerticalAlignment="Top"/>
+
+            <TextBlock DockPanel.Dock="Top"
+                       Margin="0,-1,5,0"
+                       Text="{Binding Title}"
+                       TextTrimming="CharacterEllipsis"/>
+
+            <StackPanel DockPanel.Dock="Top"
+                    Margin="0,2,5,0"
+                    Orientation="Horizontal"
+                    TextBlock.Foreground="{DynamicResource GitHubVsGrayText}">
+                <TextBlock>
+                <Hyperlink>
+                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                </Hyperlink>
+                <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                <Run>by</Run>
+                <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                </TextBlock>
+                <TextBlock Margin="4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
+                <ghfvs:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>
+                <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top"/>
+                </TextBlock>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</UserControl>

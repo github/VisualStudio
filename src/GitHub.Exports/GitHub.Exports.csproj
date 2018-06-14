@@ -143,6 +143,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\IVirtualizingListSource.cs" />
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
     <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
@@ -172,8 +173,10 @@
     <Compile Include="Models\CommentModel.cs" />
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
+    <Compile Include="Models\Page.cs" />
     <Compile Include="Models\PullRequestFileModel.cs" />
     <Compile Include="Models\PullRequestDetailModel.cs" />
+    <Compile Include="Models\PullRequestListItemModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="Models\PullRequestReviewThreadModel.cs" />
@@ -188,6 +191,7 @@
     <Compile Include="ViewModels\GitHubPane\IGitHubPaneViewModel.cs" />
     <Compile Include="ViewModels\IConnectionInitializedViewModel.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
+    <Compile Include="ViewModels\ILabelViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="ViewModels\IOpenInBrowser.cs" />
     <None Include="..\common\settings.json">

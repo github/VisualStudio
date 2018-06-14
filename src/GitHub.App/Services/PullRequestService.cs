@@ -1,23 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Diagnostics;
-using GitHub.Models;
-using System.Reactive.Linq;
-using Rothko;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive.Threading.Tasks;
-using GitHub.Primitives;
-using System.Text.RegularExpressions;
-using System.Globalization;
 using System.Reactive;
-using System.Collections.Generic;
-using LibGit2Sharp;
-using GitHub.Logging;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
+using GitHub.Models;
+using GitHub.Primitives;
+using LibGit2Sharp;
+using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
+using Rothko;
 using static System.FormattableString;
+using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
@@ -30,6 +34,7 @@ namespace GitHub.Services
 
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
+        static ICompiledQuery<Page<PullRequestListItemModel>> readPullRequests;
 
         static readonly string[] TemplatePaths = new[]
         {
@@ -42,6 +47,7 @@ namespace GitHub.Services
         readonly IGitClient gitClient;
         readonly IGitService gitService;
         readonly IVSGitExt gitExt;
+        readonly IGraphQLClientFactory graphqlFactory;
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
@@ -50,14 +56,60 @@ namespace GitHub.Services
             IGitClient gitClient,
             IGitService gitService,
             IVSGitExt gitExt,
+            IGraphQLClientFactory graphqlFactory,
             IOperatingSystem os,
             IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
             this.gitExt = gitExt;
+            this.graphqlFactory = graphqlFactory;
             this.os = os;
             this.usageTracker = usageTracker;
+        }
+
+        public async Task<Page<PullRequestListItemModel>> ReadPullRequests(
+            HostAddress address,
+            string owner,
+            string name,
+            string after)
+        {
+            if (readPullRequests == null)
+            {
+                readPullRequests = new Query()
+                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .PullRequests(first: 100, after: Var(nameof(after)), orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt })
+                    .Select(page => new Page<PullRequestListItemModel>
+                    {
+                        EndCursor = page.PageInfo.EndCursor,
+                        HasNextPage = page.PageInfo.HasNextPage,
+                        TotalCount = page.TotalCount,
+                        Items = page.Nodes.Select(pr => new PullRequestListItemModel
+                        {
+                            Id = pr.Id.Value,
+                            Author = new ActorModel
+                            {
+                                Login = pr.Author.Login,
+                                AvatarUrl = pr.Author.AvatarUrl(null),
+                            },
+                            CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                            Number = pr.Number,
+                            State = (PullRequestStateEnum)pr.State,
+                            Title = pr.Title,
+                            UpdatedAt = pr.UpdatedAt,
+                        }).ToList(),
+                    }).Compile();
+            }
+
+            var graphql = await graphqlFactory.CreateConnection(address);
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(after), after },
+            };
+
+            return await graphql.Run(readPullRequests, vars);
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
