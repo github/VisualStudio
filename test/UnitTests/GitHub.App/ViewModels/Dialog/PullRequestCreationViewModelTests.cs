@@ -36,6 +36,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         l2repo.Branches.Returns(l2branchcol);
         l2repo.Head.Returns(l2branch);
         gitService.GetRepository(Args.String).Returns(l2repo);
+        gitService.GetOriginRemoteName(l2repo).Returns(remote);
         return l2repo;
     }
 
