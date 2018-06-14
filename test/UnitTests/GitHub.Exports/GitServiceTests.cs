@@ -47,11 +47,23 @@ public class GitServiceTests : TestBaseClass
 
             Assert.That(uri?.ToString(), Is.EqualTo(expected));
         }
+    }
 
-        static string[] Split(string text)
+    public class TheGetOriginRemoteNameMethod
+    {
+        [Test]
+        public void RepositoryHasNoRemotes_ThrowsInvalidOperationException()
         {
-            return text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var repository = CreateRepository(Split(""), Split(""));
+            var target = new GitService();
+
+            Assert.Throws<InvalidOperationException>(() => target.GetOriginRemoteName(repository));
         }
+    }
+
+    static string[] Split(string text)
+    {
+        return text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
     static IRepository CreateRepository(string[] urls, string[] remoteNames)
