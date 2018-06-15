@@ -213,10 +213,7 @@ public class GitClientTests
         [TestCase("git@github.com:owner/repo", "git@github.com:owner/repo", "https://github.com/owner/repo")]
         public async Task UseOriginWhenPossible(string fetchUrl, string originUrl, string addUrl = null)
         {
-            var remote = Substitute.For<Remote>();
-            remote.Url.Returns(originUrl);
-            var repo = Substitute.For<IRepository>();
-            repo.Network.Remotes["origin"].Returns(remote);
+            var repo = CreateRepository("origin", originUrl);
             var fetchUri = new UriString(fetchUrl);
             var refSpec = "refSpec";
             var gitClient = CreateGitClient();
@@ -231,6 +228,41 @@ public class GitClientTests
             {
                 repo.Network.Remotes.DidNotReceiveWithAnyArgs().Add(null, null);
             }
+        }
+
+        [TestCase("https://github.com/owner/repo", "origin", "https://github.com/owner/repo", null)]
+        [TestCase("https://github.com/fetch/repo", "origin", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
+        [TestCase("git@github.com:owner/repo", "origin", "git@github.com:owner/repo", "https://github.com/owner/repo")]
+        [TestCase("https://github.com/jcansdale/repo", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Use existing remote")]
+        public async Task UseExistingRemoteWhenPossible(string fetchUrl, string remoteName, string remoteUrl, string addUrl = null)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            if (addUrl != null)
+            {
+                repo.Network.Remotes.Received().Add(Arg.Any<string>(), addUrl);
+            }
+            else
+            {
+                repo.Network.Remotes.DidNotReceiveWithAnyArgs().Add(null, null);
+            }
+        }
+
+        static IRepository CreateRepository(string remoteName, string remoteUrl)
+        {
+            var remote = Substitute.For<Remote>();
+            remote.Name.Returns(remoteName);
+            remote.Url.Returns(remoteUrl);
+            var remotes = new List<Remote> { remote };
+            var repo = Substitute.For<IRepository>();
+            repo.Network.Remotes[remoteName].Returns(remote);
+            repo.Network.Remotes.GetEnumerator().Returns(_ => remotes.GetEnumerator());
+            return repo;
         }
     }
 
