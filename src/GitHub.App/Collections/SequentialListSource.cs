@@ -1,38 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using GitHub.Logging;
 using GitHub.Models;
+using ReactiveUI;
 using Serilog;
 
 namespace GitHub.Collections
 {
-    public abstract class SequentialListSource<TModel, TViewModel> : IVirtualizingListSource<TViewModel>
+    public abstract class SequentialListSource<TModel, TViewModel> : ReactiveObject, IVirtualizingListSource<TViewModel>
     {
         static readonly ILogger log = LogManager.ForContext<SequentialListSource<TModel, TViewModel>>();
 
-        readonly CancellationToken cancel;
         readonly Dispatcher dispatcher;
         readonly object loadLock = new object();
         Dictionary<int, Page<TModel>> pages = new Dictionary<int, Page<TModel>>();
         Task loading = Task.CompletedTask;
+        bool disposed;
+        bool isLoading;
         int? count;
         int nextPage;
         int loadTo;
         string after;
 
-        public SequentialListSource(CancellationToken cancel)
+        public SequentialListSource()
         {
-            this.cancel = cancel;
             dispatcher = Application.Current.Dispatcher;
         }
 
+        public bool IsLoading
+        {
+            get { return isLoading; }
+            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
+        }
+
         public virtual int PageSize => 100;
+
         event EventHandler PageLoaded;
+
+        public void Dispose() => disposed = true;
 
         public async Task<int> GetCount()
         {
@@ -69,10 +78,12 @@ namespace GitHub.Collections
 
         protected virtual void OnBeginLoading()
         {
+            IsLoading = true;
         }
 
         protected virtual void OnEndLoading()
         {
+            IsLoading = false;
         }
 
         async Task<Page<TModel>> EnsureLoaded(int pageNumber)
@@ -85,7 +96,7 @@ namespace GitHub.Collections
             var pageLoaded = WaitPageLoaded(pageNumber);
             loadTo = Math.Max(loadTo, pageNumber);
 
-            while (!cancel.IsCancellationRequested)
+            while (!disposed)
             {
                 lock (loadLock)
                 {
@@ -126,7 +137,7 @@ namespace GitHub.Collections
         {
             OnBeginLoading();
 
-            while (nextPage <= loadTo && !cancel.IsCancellationRequested)
+            while (nextPage <= loadTo && !disposed)
             {
                 await LoadNextPage().ConfigureAwait(false);
                 PageLoaded?.Invoke(this, EventArgs.Empty);

@@ -8,7 +8,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
     <d:DesignProperties.DataContext>
-        <ghfvs:PullRequestListViewModelDesigner/>
+        <ghfvs:PullRequestListViewModelDesigner Message="NoItemsMatchCriteria"/>
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>
@@ -46,19 +46,66 @@
 
             <ghfvs:GitHubActionLink>Create New</ghfvs:GitHubActionLink>
         </StackPanel>
-        <ListBox ItemsSource="{Binding ItemsView}"
+        <Grid>
+            <ListBox ItemsSource="{Binding ItemsView}"
                  BorderThickness="0"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <local:PullRequestListItemView/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:PullRequestListItemView/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Margin="10" 
+                        VerticalAlignment="Center"
+                        Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter NoOpenItems}}">
+                <ghfvs:OcticonImage Icon="git_pull_request"
+                                    Margin="0,5"
+                                    Width="48"
+                                    Height="48"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsWindowText}"
+                           HorizontalAlignment="Center"
+                           FontSize="16"
+                           Margin="4"
+                           Text="There aren't any open pull requests"/>
+                <TextBlock TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="4"
+                           Opacity="0.75"
+                           Text="Pull requests let you tell others about changes you've pushed to a repository on GitHub"/>
+                <TextBlock TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="4"
+                           Opacity="0.75">
+                    To get started you can
+                    <Hyperlink Foreground="{DynamicResource GitHubActionLinkItemBrush}">
+                        create a pull request
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Margin="10" 
+                        VerticalAlignment="Center"
+                        Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter NoItemsMatchCriteria}}">
+                <ghfvs:OcticonImage Icon="git_pull_request"
+                                    Margin="0,5"
+                                    Width="48"
+                                    Height="48"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsWindowText}"
+                           HorizontalAlignment="Center"
+                           FontSize="16"
+                           Margin="4"
+                           Text="No results matched your search."/>
+            </StackPanel>
+        </Grid>
     </DockPanel>
 </UserControl>

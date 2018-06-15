@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Models;
@@ -27,9 +26,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         public override IReadOnlyList<string> States => states;
 
-        protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource(CancellationToken cancel)
+        protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
         {
-            return new ItemSource(this, cancel);
+            return new ItemSource(this);
         }
 
         protected override Task DoOpenItem(IViewModel item)
@@ -43,8 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             readonly PullRequestListViewModel owner;
 
-            public ItemSource(PullRequestListViewModel owner, CancellationToken cancel)
-                : base(cancel)
+            public ItemSource(PullRequestListViewModel owner)
             {
                 this.owner = owner;
             }
@@ -81,16 +79,6 @@ namespace GitHub.ViewModels.GitHubPane
                 sw.Stop();
                 System.Diagnostics.Debug.WriteLine("Read PR page in " + sw.Elapsed);
                 return result;
-            }
-
-            protected override void OnBeginLoading()
-            {
-                owner.IsBusy = true;
-            }
-
-            protected override void OnEndLoading()
-            {
-                owner.IsBusy = false;
             }
         }
     }

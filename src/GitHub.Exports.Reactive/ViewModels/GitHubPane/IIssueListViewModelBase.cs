@@ -8,6 +8,13 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    public enum IssueListMessage
+    {
+        None,
+        NoOpenItems,
+        NoItemsMatchCriteria,
+    }
+
     public interface IIssueListViewModelBase : ISearchablePageViewModel
     {
         IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
@@ -15,6 +22,8 @@ namespace GitHub.ViewModels.GitHubPane
         ICollectionView ItemsView { get; }
 
         ILocalRepositoryModel LocalRepository { get; }
+
+        IssueListMessage Message { get; }
 
         string SelectedState { get; set; }
 

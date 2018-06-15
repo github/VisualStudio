@@ -6,7 +6,6 @@ using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using GitHub.Models;
-using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
@@ -52,6 +51,7 @@ namespace GitHub.SampleData
         public IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
         public ICollectionView ItemsView { get; }
         public ILocalRepositoryModel LocalRepository { get; set; }
+        public IssueListMessage Message { get; set; }
         public string SearchQuery { get; set; }
         public ReactiveCommand<Unit> OpenItem { get; }
         public string SelectedState { get; set; }

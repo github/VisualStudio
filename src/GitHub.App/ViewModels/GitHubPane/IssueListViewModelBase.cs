@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +16,10 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public abstract class IssueListViewModelBase : PanePageViewModelBase, IIssueListViewModelBase
     {
-        CancellationTokenSource cancel;
         IReadOnlyList<IIssueListItemViewModelBase> items;
         ICollectionView itemsView;
+        IDisposable subscription;
+        IssueListMessage message;
         string searchQuery;
         string selectedState;
         string stringFilter;
@@ -42,6 +44,12 @@ namespace GitHub.ViewModels.GitHubPane
 
         public ILocalRepositoryModel LocalRepository { get; private set; }
 
+        public IssueListMessage Message
+        {
+            get { return message; }
+            private set { this.RaiseAndSetIfChanged(ref message, value); }
+        }
+
         public string SearchQuery
         {
             get { return searchQuery; }
@@ -64,23 +72,36 @@ namespace GitHub.ViewModels.GitHubPane
             SelectedState = States.FirstOrDefault();
             this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Refresh().Forget());
             this.WhenAnyValue(x => x.SearchQuery).Skip(1).Subscribe(_ => FilterChanged());
+            IsLoading = true;
             await Refresh();
         }
 
         public override Task Refresh()
         {
-            cancel?.Cancel();
-            cancel?.Dispose();
-            cancel = new CancellationTokenSource();
+            subscription?.Dispose();
 
-            var items = new VirtualizingList<IIssueListItemViewModelBase>(CreateItemSource(cancel.Token), null);
+            var dispose = new CompositeDisposable();
+            var itemSource = CreateItemSource();
+            var items = new VirtualizingList<IIssueListItemViewModelBase>(itemSource, null);
+            var view = new VirtualizingListCollectionView<IIssueListItemViewModelBase>(items);
+
+            view.Filter = FilterItem;
             Items = items;
-            ItemsView = new VirtualizingListCollectionView<IIssueListItemViewModelBase>(items);
-            ItemsView.Filter = FilterItem;
+            ItemsView = view;
+
+            dispose.Add(itemSource);
+            dispose.Add(
+                Observable.CombineLatest(
+                    itemSource.WhenAnyValue(x => x.IsLoading),
+                    view.WhenAnyValue(x => x.Count),
+                    (loading, count) => Tuple.Create(loading, count))
+                .Subscribe(x => UpdateState(x.Item1, x.Item2)));
+            subscription = dispose;
+
             return Task.CompletedTask;
         }
 
-        protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource(CancellationToken cancel);
+        protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource();
         protected abstract Task DoOpenItem(IViewModel item);
 
         void FilterChanged()
@@ -134,6 +155,26 @@ namespace GitHub.ViewModels.GitHubPane
         {
             var item = i as IViewModel;
             if (item != null) await DoOpenItem(item);
+        }
+
+        void UpdateState(bool loading, int count)
+        {
+            var message = IssueListMessage.None;
+
+            if (!loading)
+            {
+                if (count == 0)
+                {
+                    message = SelectedState == States[0] && string.IsNullOrWhiteSpace(SearchQuery) ?
+                        IssueListMessage.NoOpenItems :
+                        IssueListMessage.NoItemsMatchCriteria;
+                }
+
+                IsLoading = false;
+            }
+
+            IsBusy = loading;
+            Message = message;
         }
     }
 }
