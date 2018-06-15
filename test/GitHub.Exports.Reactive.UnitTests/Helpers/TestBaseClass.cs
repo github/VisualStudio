@@ -1,17 +1,14 @@
-﻿using EntryExitDecoratorInterfaces;
-using GitHub.Models;
-using Octokit;
+﻿using Octokit;
 using System;
 using System.IO;
 using System.IO.Compression;
-using NUnit.Framework;
 
 /// <summary>
 /// This base class will get its methods called by the most-derived
 /// classes. The calls are injected by the EntryExitMethodDecorator Fody
 /// addin, so don't be surprised if you don't see any calls in the code.
 /// </summary>
-public class TestBaseClass : IEntryExitDecorator
+public class TestBaseClass
 {
     public virtual void OnEntry()
     {
