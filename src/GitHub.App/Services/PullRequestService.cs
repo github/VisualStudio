@@ -34,6 +34,7 @@ namespace GitHub.Services
 
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
+        static ICompiledQuery<Page<ActorModel>> readAssignableUsers;
         static ICompiledQuery<Page<PullRequestListItemModel>> readPullRequests;
 
         static readonly string[] TemplatePaths = new[]
@@ -129,6 +130,41 @@ namespace GitHub.Services
             }
 
             return result;
+        }
+
+        public async Task<Page<ActorModel>> ReadAssignableUsers(
+            HostAddress address,
+            string owner,
+            string name,
+            string after)
+        {
+            if (readAssignableUsers == null)
+            {
+                readAssignableUsers = new Query()
+                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .AssignableUsers(first: 100, after: Var(nameof(after)))
+                    .Select(connection => new Page<ActorModel>
+                    {
+                        EndCursor = connection.PageInfo.EndCursor,
+                        HasNextPage = connection.PageInfo.HasNextPage,
+                        TotalCount = connection.TotalCount,
+                        Items = connection.Nodes.Select(user => new ActorModel
+                        {
+                            AvatarUrl = user.AvatarUrl(30),
+                            Login = user.Login,
+                        }).ToList(),
+                    }).Compile();
+            }
+
+            var graphql = await graphqlFactory.CreateConnection(address);
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(after), after },
+            };
+
+            return await graphql.Run(readAssignableUsers, vars);
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,

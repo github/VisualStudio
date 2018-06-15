@@ -17,6 +17,8 @@ namespace GitHub.ViewModels.GitHubPane
 
     public interface IIssueListViewModelBase : ISearchablePageViewModel
     {
+        IUserFilterViewModel AuthorFilter { get; }
+
         IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
 
         ICollectionView ItemsView { get; }

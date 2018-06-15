@@ -38,6 +38,15 @@ namespace GitHub.ViewModels.GitHubPane
             return Task.CompletedTask;
         }
 
+        protected override Task<Page<ActorModel>> LoadAuthors(string after)
+        {
+            return service.ReadAssignableUsers(
+                HostAddress.Create(LocalRepository.CloneUrl),
+                LocalRepository.Owner,
+                LocalRepository.Name,
+                after);
+        }
+
         class ItemSource : SequentialListSource<PullRequestListItemModel, IIssueListItemViewModelBase>
         {
             readonly PullRequestListViewModel owner;

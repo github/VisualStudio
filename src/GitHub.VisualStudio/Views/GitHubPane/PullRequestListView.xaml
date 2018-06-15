@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
@@ -21,11 +22,11 @@
     </UserControl.Resources>
     
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top"
-                    HorizontalAlignment="Left"
-                    Margin="8"
-                    Orientation="Horizontal">
-            <ghfvs:DropDownButton Foreground="{DynamicResource GitHubActionLinkItemBrush}">
+        <DockPanel DockPanel.Dock="Top"
+                   Margin="8">
+            <ghfvs:DropDownButton DockPanel.Dock="Left"
+                                  Cursor="Hand"
+                                  Foreground="{DynamicResource GitHubActionLinkItemBrush}">
                 <ghfvs:DropDownButton.DropDownContent>
                     <ListBox Background="{DynamicResource VsBrush.Window}"
                              BorderBrush="{DynamicResource VsBrush.WindowFrame}"
@@ -42,10 +43,33 @@
                 </TextBlock>
             </ghfvs:DropDownButton>
 
-            <Separator Style="{StaticResource VerticalSeparator}" Margin="8 0" />
+            <Separator DockPanel.Dock="Left" Style="{StaticResource VerticalSeparator}" Margin="4 0" />
 
-            <ghfvs:GitHubActionLink>Create New</ghfvs:GitHubActionLink>
-        </StackPanel>
+            <ghfvs:GitHubActionLink DockPanel.Dock="Left">
+                Create New
+            </ghfvs:GitHubActionLink>
+
+            <ghfvs:DropDownButton DockPanel.Dock="Right"
+                                  AutoCloseOnClick="False"
+                                  Cursor="Hand"
+                                  Foreground="{DynamicResource GitHubActionLinkItemBrush}"
+                                  ToolTip="Filter by Author"
+                                  VerticalAlignment="Center">
+                <ghfvs:OcticonImage Icon="person" Height="12" Width="12"/>
+                <ghfvs:DropDownButton.DropDownContent>
+                    <Border Background="{DynamicResource VsBrush.Window}"
+                            BorderBrush="{DynamicResource VsBrush.WindowFrame}"
+                            BorderThickness="1"
+                            Padding="2"
+                            MinWidth="150"
+                            MaxHeight="250">
+                        <v:UserFilterView DataContext="{Binding AuthorFilter}"/>
+                    </Border>
+                </ghfvs:DropDownButton.DropDownContent>
+            </ghfvs:DropDownButton>
+
+            <Rectangle/>
+        </DockPanel>
         <Grid>
             <ListBox ItemsSource="{Binding ItemsView}"
                  BorderThickness="0"

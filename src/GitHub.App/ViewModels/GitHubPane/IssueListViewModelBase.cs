@@ -24,10 +24,17 @@ namespace GitHub.ViewModels.GitHubPane
         string selectedState;
         string stringFilter;
         int numberFilter;
+        IUserFilterViewModel authorFilter;
 
         public IssueListViewModelBase()
         {
             OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
+        }
+
+        public IUserFilterViewModel AuthorFilter
+        {
+            get { return authorFilter; }
+            private set { this.RaiseAndSetIfChanged(ref authorFilter, value); }
         }
 
         public IReadOnlyList<IIssueListItemViewModelBase> Items
@@ -70,6 +77,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             LocalRepository = repository;
             SelectedState = States.FirstOrDefault();
+            AuthorFilter = new UserFilterViewModel("Author", LoadAuthors);
             this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Refresh().Forget());
             this.WhenAnyValue(x => x.SearchQuery).Skip(1).Subscribe(_ => FilterChanged());
             IsLoading = true;
@@ -103,6 +111,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource();
         protected abstract Task DoOpenItem(IViewModel item);
+        protected abstract Task<Page<ActorModel>> LoadAuthors(string after);
 
         void FilterChanged()
         {

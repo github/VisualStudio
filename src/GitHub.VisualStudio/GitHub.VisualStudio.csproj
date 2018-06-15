@@ -429,6 +429,9 @@
     <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
       <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UserFilterView.xaml.cs">
+      <DependentUpon>UserFilterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ViewLocator.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -618,6 +621,10 @@
     <Page Include="Views\TeamExplorer\RepositoryPublishView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserFilterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using GitHub.Models;
+using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
@@ -48,6 +49,7 @@ namespace GitHub.SampleData
             SelectedState = "Open";
         }
 
+        public IUserFilterViewModel AuthorFilter { get; set; }
         public IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
         public ICollectionView ItemsView { get; }
         public ILocalRepositoryModel LocalRepository { get; set; }

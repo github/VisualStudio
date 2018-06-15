@@ -14,7 +14,7 @@
                                 Margin="{TemplateBinding Padding}">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
-                                    <DockPanel>
+                                    <DockPanel Background="{TemplateBinding Background}">
                                         <Polygon DockPanel.Dock="Right"
                                                  Margin="4,0"
                                                  Fill="{TemplateBinding Foreground}"
