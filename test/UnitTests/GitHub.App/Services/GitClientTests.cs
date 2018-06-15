@@ -208,32 +208,12 @@ public class GitClientTests
             repo.Network.Remotes.Received(1).Add(Arg.Any<string>(), expectFetchUrl);
         }
 
-        [TestCase("https://github.com/owner/repo", "https://github.com/owner/repo", null)]
-        [TestCase("https://github.com/fetch/repo", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
-        [TestCase("git@github.com:owner/repo", "git@github.com:owner/repo", "https://github.com/owner/repo")]
-        public async Task UseOriginWhenPossible(string fetchUrl, string originUrl, string addUrl = null)
-        {
-            var repo = CreateRepository("origin", originUrl);
-            var fetchUri = new UriString(fetchUrl);
-            var refSpec = "refSpec";
-            var gitClient = CreateGitClient();
-
-            await gitClient.Fetch(repo, fetchUri, refSpec);
-
-            if (addUrl != null)
-            {
-                repo.Network.Remotes.Received().Add(Arg.Any<string>(), addUrl);
-            }
-            else
-            {
-                repo.Network.Remotes.DidNotReceiveWithAnyArgs().Add(null, null);
-            }
-        }
-
         [TestCase("https://github.com/owner/repo", "origin", "https://github.com/owner/repo", null)]
         [TestCase("https://github.com/fetch/repo", "origin", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
-        [TestCase("git@github.com:owner/repo", "origin", "git@github.com:owner/repo", "https://github.com/owner/repo")]
+        [TestCase("git@github.com:owner/repo", "origin", "git@github.com:owner/repo", "https://github.com/owner/repo", Description = "Only use http style urls")]
         [TestCase("https://github.com/jcansdale/repo", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Use existing remote")]
+        [TestCase("https://github.com/jcansdale/repo.git", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Ignore trailing .git")]
+        [TestCase("https://github.com/JCANSDALE/REPO", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Ignore different case")]
         public async Task UseExistingRemoteWhenPossible(string fetchUrl, string remoteName, string remoteUrl, string addUrl = null)
         {
             var repo = CreateRepository(remoteName, remoteUrl);
