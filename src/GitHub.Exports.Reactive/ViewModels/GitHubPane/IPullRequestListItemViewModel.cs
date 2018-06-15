@@ -14,11 +14,6 @@ namespace GitHub.ViewModels.GitHubPane
         string Id { get; }
 
         /// <summary>
-        /// Gets the author of the issue or pull request.
-        /// </summary>
-        IActorViewModel Author { get; }
-
-        /// <summary>
         /// Gets the number of comments in the issue or pull request.
         /// </summary>
         int CommentCount { get; }

@@ -16,5 +16,10 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the issue or pull request title.
         /// </summary>
         string Title { get; }
+
+        /// <summary>
+        /// Gets the author of the issue or pull request.
+        /// </summary>
+        IActorViewModel Author { get; }
     }
 }

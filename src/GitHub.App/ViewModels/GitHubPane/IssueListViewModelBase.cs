@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -77,9 +77,14 @@ namespace GitHub.ViewModels.GitHubPane
         {
             LocalRepository = repository;
             SelectedState = States.FirstOrDefault();
-            AuthorFilter = new UserFilterViewModel("Author", LoadAuthors);
+            AuthorFilter = new UserFilterViewModel(LoadAuthors);
             this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Refresh().Forget());
-            this.WhenAnyValue(x => x.SearchQuery).Skip(1).Subscribe(_ => FilterChanged());
+
+            Observable.Merge(
+                this.WhenAnyValue(x => x.SearchQuery).Skip(1).SelectUnit(),
+                AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
+                .Subscribe(_ => FilterChanged());
+
             IsLoading = true;
             await Refresh();
         }
@@ -140,24 +145,33 @@ namespace GitHub.ViewModels.GitHubPane
 
         bool FilterItem(object o)
         {
+            var item = o as IIssueListItemViewModelBase;
+            var result = true;
+
             if (!string.IsNullOrWhiteSpace(SearchQuery))
             {
-                var item = o as IIssueListItemViewModelBase;
 
                 if (item != null)
                 {
                     if (numberFilter != 0)
                     {
-                        return item.Number == numberFilter;
+                        result = item.Number == numberFilter;
                     }
                     else
                     {
-                        return item.Title.ToUpper().Contains(stringFilter);
+                        result = item.Title.ToUpper().Contains(stringFilter);
                     }
                 }
             }
 
-            return true;
+            if (result && AuthorFilter.Selected != null)
+            {
+                result = item.Author.Login.Equals(
+                    AuthorFilter.Selected.Login,
+                    StringComparison.CurrentCultureIgnoreCase);
+            }
+
+            return result;
         }
 
         async Task OpenItemImpl(object i)

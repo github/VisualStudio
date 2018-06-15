@@ -11,10 +11,23 @@
     </d:DesignData.DataContext>
     
     <DockPanel>
-        <ghfvs:PromptTextBox DockPanel.Dock="Top"
+        <ghfvs:PromptTextBox Name="searchBox"
+                             DockPanel.Dock="Top"
                              Margin="2"
                              PromptText="Search"
                              Text="{Binding Filter, Delay=300, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button DockPanel.Dock="Top"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{Binding ClearSelection}"
+                Margin="2"
+                HorizontalContentAlignment="Stretch"
+                Visibility="{Binding Selected, Converter={ghfvs:NullToVisibilityConverter}}">
+            <DockPanel>
+                <ghfvs:OcticonImage DockPanel.Dock="Right" Icon="x"/>
+                <TextBlock>Clear filter</TextBlock>
+            </DockPanel>
+        </Button>
         <ListBox Background="Transparent"
                  BorderThickness="0"
                  ItemsSource="{Binding UsersView}"

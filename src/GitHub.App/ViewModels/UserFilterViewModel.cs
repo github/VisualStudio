@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Collections;
+using System.Windows.Data;
+using GitHub.Extensions;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -10,28 +14,52 @@ namespace GitHub.ViewModels
 {
     public class UserFilterViewModel : ViewModelBase, IUserFilterViewModel
     {
-        readonly VirtualizingList<IActorViewModel> users;
         readonly LoadPageDelegate load;
-        ObservableAsPropertyHelper<string> header;
+        ReactiveList<IActorViewModel> users;
+        ListCollectionView usersView;
         string filter;
         IActorViewModel selected;
+        IActorViewModel ersatzUser;
 
         public delegate Task<Page<ActorModel>> LoadPageDelegate(string after);
 
-        public UserFilterViewModel(string header, LoadPageDelegate load)
+        public UserFilterViewModel(LoadPageDelegate load)
         {
             this.load = load;
-            users = new VirtualizingList<IActorViewModel>(new UserSource(this), null);
-            UsersView = new VirtualizingListCollectionView<IActorViewModel>(users);
-            UsersView.Filter = FilterUsers;
-            this.WhenAnyValue(x => x.Filter).Subscribe(_ => UsersView.Refresh());
-            this.header = this.WhenAnyValue(x => x.Selected, x => x?.Login ?? header)
-                .ToProperty(this, x => x.Header);
+            this.WhenAnyValue(x => x.Filter).Subscribe(FilterChanged);
+            ClearSelection = ReactiveCommand.Create(
+                this.WhenAnyValue(x => x.Selected).Select(x => x != null))
+                .OnExecuteCompleted(_ => Selected = null);
         }
 
-        public IReadOnlyList<IActorViewModel> Users { get; }
-        public ICollectionView UsersView { get; }
-        public string Header => header.Value;
+        public IReadOnlyList<IActorViewModel> Users
+        {
+            get
+            {
+                if (users == null)
+                {
+                    users = new ReactiveList<IActorViewModel>();
+                    Load().Forget();
+                }
+
+                return users;
+            }
+        }
+
+        public ICollectionView UsersView
+        {
+            get
+            {
+                if (usersView == null)
+                {
+                    usersView = new ListCollectionView((IList)Users);
+                    usersView.CustomSort = new UserComparer(this);
+                    usersView.Filter = FilterUsers;
+                }
+
+                return usersView;
+            }
+        }
 
         public string Filter
         {
@@ -45,6 +73,32 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selected, value); }
         }
 
+        public ReactiveCommand<object> ClearSelection { get; }
+
+        void FilterChanged(string filter)
+        {
+            if (users == null) return;
+
+            if (ersatzUser != null)
+            {
+                users.Remove(ersatzUser);
+                ersatzUser = null;
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                var existing = users.FirstOrDefault(x => x.Login.Equals(filter, StringComparison.CurrentCultureIgnoreCase));
+
+                if (existing == null)
+                {
+                    ersatzUser = new ActorViewModel(new ActorModel { Login = filter });
+                    users.Add(ersatzUser);
+                }
+            }
+
+            usersView.Refresh();
+        }
+
         bool FilterUsers(object obj)
         {
             if (Filter != null)
@@ -56,24 +110,33 @@ namespace GitHub.ViewModels
             return true;
         }
 
-        class UserSource : SequentialListSource<ActorModel, IActorViewModel>
+        async Task Load()
+        {
+            string after = null;
+
+            while (true)
+            {
+                var page = await load(after);
+                users.AddRange(page.Items.Select(x => new ActorViewModel(x)));
+                after = page.EndCursor;
+                if (!page.HasNextPage) break;
+            }
+        }
+
+        class UserComparer : IComparer
         {
             readonly UserFilterViewModel owner;
 
-            public UserSource(UserFilterViewModel owner)
+            public UserComparer(UserFilterViewModel owner)
             {
                 this.owner = owner;
             }
 
-            protected override IActorViewModel CreateViewModel(ActorModel model)
+            public int Compare(object x, object y)
             {
-                var result = new ActorViewModel(model);
-                return result;
-            }
-
-            protected override Task<Page<ActorModel>> LoadPage(string after)
-            {
-                return owner.load(after);
+                if (x == owner.ersatzUser) return -1;
+                if (y == owner.ersatzUser) return 1;
+                return ((IActorViewModel)x).Login.CompareTo(((IActorViewModel)y).Login);
             }
         }
     }

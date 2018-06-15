@@ -28,5 +28,10 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 vm.OpenItem.Execute(pr);
             }
         }
+
+        private void AuthorDropdown_PopupOpened(object sender, EventArgs e)
+        {
+            userFilter.FocusSearchBox();
+        }
     }
 }

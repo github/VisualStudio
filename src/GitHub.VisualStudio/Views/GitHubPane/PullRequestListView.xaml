@@ -29,9 +29,10 @@
                                   Foreground="{DynamicResource GitHubActionLinkItemBrush}">
                 <ghfvs:DropDownButton.DropDownContent>
                     <ListBox Background="{DynamicResource VsBrush.Window}"
-                             BorderBrush="{DynamicResource VsBrush.WindowFrame}"
+                             BorderBrush="{DynamicResource VsBrush.DropDownPopupBorder}"
                              BorderThickness="1"
                              ItemsSource="{Binding States}"
+                             Margin="2"
                              MinWidth="100"
                              SelectedItem="{Binding SelectedState}"/>
                 </ghfvs:DropDownButton.DropDownContent>
@@ -53,17 +54,19 @@
                                   AutoCloseOnClick="False"
                                   Cursor="Hand"
                                   Foreground="{DynamicResource GitHubActionLinkItemBrush}"
+                                  Padding="2"
                                   ToolTip="Filter by Author"
-                                  VerticalAlignment="Center">
+                                  VerticalAlignment="Center"
+                                  PopupOpened="AuthorDropdown_PopupOpened">
                 <ghfvs:OcticonImage Icon="person" Height="12" Width="12"/>
                 <ghfvs:DropDownButton.DropDownContent>
                     <Border Background="{DynamicResource VsBrush.Window}"
-                            BorderBrush="{DynamicResource VsBrush.WindowFrame}"
+                            BorderBrush="{DynamicResource VsBrush.DropDownPopupBorder}"
                             BorderThickness="1"
                             Padding="2"
                             MinWidth="150"
                             MaxHeight="250">
-                        <v:UserFilterView DataContext="{Binding AuthorFilter}"/>
+                        <v:UserFilterView x:Name="userFilter" DataContext="{Binding AuthorFilter}"/>
                     </Border>
                 </ghfvs:DropDownButton.DropDownContent>
             </ghfvs:DropDownButton>
