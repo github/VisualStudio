@@ -69,7 +69,7 @@ public class GitServiceTests
 
         [TestCase("https://github.com/github/VisualStudio", "origin", "master;HEAD", "jcansdale;grokys", "origin",
             Description = "Use remote named `origin` if it exists")]
-        [TestCase("", "", "master;HEAD", "jcansdale;grokys", "grokys", Description = "Use remote from HEAD if it exists")]
+        [TestCase("", "", "master;HEAD", "jcansdale;grokys", "jcansdale", Description = "Don't use remote from HEAD")]
         [TestCase("", "", "master", "jcansdale", "jcansdale", Description = "Use remote from branch named `master` if it exists")]
         public void GetOriginRemoteName(string urls, string remoteNames, string branchNames, string branchRemoteNames, string expectedRemoteName)
         {

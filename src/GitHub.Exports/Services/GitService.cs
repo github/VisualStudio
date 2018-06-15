@@ -132,11 +132,11 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Find a remote named "origin", the remote tracking the HEAD branch or the remote tracking "master".
+        /// Find a remote named "origin" or the remote tracking "master".
         /// </summary>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
-        /// <returns>The remote named "origin", the remote tracking the HEAD branch or the remote tracking "master"</returns>
-        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote, HEAD branch or "master" branch.</exception>
+        /// <returns>The remote named "origin" or the remote tracking "master"</returns>
+        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote or "master" branch.</exception>
         public string GetDefaultRemoteName(IRepository repo)
         {
             var remoteName = TryGetDefaultRemoteName(repo);
@@ -145,7 +145,7 @@ namespace GitHub.Services
                 return remoteName;
             }
 
-            throw new InvalidOperationException("Can't get default remote name because repository contains no `origin` remote, HEAD branch or `master` branch.");
+            throw new InvalidOperationException("Can't get default remote name because repository contains no `origin` remote or `master` branch.");
         }
 
         static string TryGetDefaultRemoteName(IRepository repo)
@@ -158,15 +158,8 @@ namespace GitHub.Services
                 return remote.Name;
             }
 
-            var remoteName = repo.Head?.RemoteName;
-            if (remoteName != null)
-            {
-                // Use remote from the HEAD branch
-                return remoteName;
-            }
-
             var masterBranch = repo.Branches["master"];
-            remoteName = masterBranch?.RemoteName;
+            var remoteName = masterBranch?.RemoteName;
             if (remoteName != null)
             {
                 // Use remote from the "master" branch
