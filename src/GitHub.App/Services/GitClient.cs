@@ -98,10 +98,12 @@ namespace GitHub.Services
         {
             var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
 
-            var originRemote = repo.Network.Remotes[defaultOriginName];
-            if (originRemote != null && originRemote.Url == httpsUrl)
+            foreach (var originRemote in repo.Network.Remotes)
             {
-                return Fetch(repo, defaultOriginName, refspecs);
+                if (originRemote.Url == httpsUrl)
+                {
+                    return Fetch(repo, defaultOriginName, refspecs);
+                }
             }
 
             return Task.Factory.StartNew(() =>
