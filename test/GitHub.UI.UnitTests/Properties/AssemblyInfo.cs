@@ -37,3 +37,13 @@ using NUnit.Framework;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: Timeout(2 /*minutes*/ * 60 * 1000)]
+
+[SetUpFixture]
+public class SplatModeDetectorSetUp
+{
+    [OneTimeSetUp]
+    public void RunBeforeAnyTests()
+    {
+        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+    }
+}
