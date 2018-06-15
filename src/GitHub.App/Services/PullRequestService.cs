@@ -89,7 +89,7 @@ namespace GitHub.Services
                         EndCursor = page.PageInfo.EndCursor,
                         HasNextPage = page.PageInfo.HasNextPage,
                         TotalCount = page.TotalCount,
-                        Items = page.Nodes.Select(pr => new PullRequestListItemModel
+                        Items = page.Nodes.Select(pr => new ListItemAdapter
                         {
                             Id = pr.Id.Value,
                             Author = new ActorModel
@@ -99,6 +99,11 @@ namespace GitHub.Services
                             },
                             CommentCount = pr.Comments(0, null, null, null).TotalCount,
                             Number = pr.Number,
+                            Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                            {
+                                Body = review.Body,
+                                CommentCount = review.Comments(null, null, null, null).TotalCount,
+                            }).ToList(),
                             State = (PullRequestStateEnum)pr.State,
                             Title = pr.Title,
                             UpdatedAt = pr.UpdatedAt,
@@ -115,7 +120,15 @@ namespace GitHub.Services
                 { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
             };
 
-            return await graphql.Run(readPullRequests, vars);
+            var result = await graphql.Run(readPullRequests, vars);
+
+            foreach (ListItemAdapter item in result.Items)
+            {
+                item.CommentCount += item.Reviews.Sum(x => x.Count);
+                item.Reviews = null;
+            }
+
+            return result;
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
@@ -786,6 +799,18 @@ namespace GitHub.Services
             }
 
             return null;
+        }
+
+        class ListItemAdapter : PullRequestListItemModel
+        {
+            public IList<ReviewAdapter> Reviews { get; set; }
+        }
+
+        class ReviewAdapter
+        {
+            public string Body { get; set; }
+            public int CommentCount { get; set; }
+            public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
         }
     }
 }

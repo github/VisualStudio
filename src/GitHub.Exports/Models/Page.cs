@@ -27,6 +27,6 @@ namespace GitHub.Models
         /// <summary>
         /// Gets or sets the items in the page.
         /// </summary>
-        public IList<T> Items { get; set; }
+        public IReadOnlyList<T> Items { get; set; }
     }
 }

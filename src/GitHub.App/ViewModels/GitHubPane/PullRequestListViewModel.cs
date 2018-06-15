@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Models;
@@ -68,12 +69,16 @@ namespace GitHub.ViewModels.GitHubPane
                         break;
                 }
 
-                return owner.service.ReadPullRequests(
+                var sw = Stopwatch.StartNew();
+                var result = owner.service.ReadPullRequests(
                     HostAddress.Create(owner.LocalRepository.CloneUrl),
                     owner.LocalRepository.Owner,
                     owner.LocalRepository.Name,
                     after,
                     states);
+                sw.Stop();
+                System.Diagnostics.Debug.WriteLine("Read PR page in " + sw.Elapsed);
+                return result;
             }
 
             protected override void OnBeginLoading()
