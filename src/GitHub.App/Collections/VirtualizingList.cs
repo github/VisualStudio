@@ -172,8 +172,12 @@ namespace GitHub.Collections
             {
                 pages.Add(number, placeholderPage);
                 var page = await source.GetPage(number);
-                pages[number] = page;
-                SendReset();
+
+                if (page != null)
+                {
+                    pages[number] = page;
+                    SendReset();
+                }
             }
             catch (Exception)
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Models;
@@ -26,9 +27,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         public override IReadOnlyList<string> States => states;
 
-        protected override IVirtualizingListSource<IViewModel> CreateItemSource()
+        protected override IVirtualizingListSource<IViewModel> CreateItemSource(CancellationToken cancel)
         {
-            return new ItemSource(this);
+            return new ItemSource(this, cancel);
         }
 
         protected override Task DoOpenItem(IViewModel item)
@@ -42,7 +43,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             readonly PullRequestListViewModel owner;
 
-            public ItemSource(PullRequestListViewModel owner)
+            public ItemSource(PullRequestListViewModel owner, CancellationToken cancel)
+                : base(cancel)
             {
                 this.owner = owner;
             }

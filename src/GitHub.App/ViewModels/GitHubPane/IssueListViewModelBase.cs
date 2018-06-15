@@ -15,6 +15,7 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public abstract class IssueListViewModelBase : PanePageViewModelBase, IIssueListViewModelBase
     {
+        CancellationTokenSource cancel;
         IReadOnlyList<IViewModel> items;
         ICollectionView itemsView;
         string searchQuery;
@@ -65,13 +66,17 @@ namespace GitHub.ViewModels.GitHubPane
 
         public override Task Refresh()
         {
-            var items = new VirtualizingList<IViewModel>(CreateItemSource(), null);
+            cancel?.Cancel();
+            cancel?.Dispose();
+            cancel = new CancellationTokenSource();
+
+            var items = new VirtualizingList<IViewModel>(CreateItemSource(cancel.Token), null);
             Items = items;
             ItemsView = new VirtualizingListCollectionView<IViewModel>(items);
             return Task.CompletedTask;
         }
 
-        protected abstract IVirtualizingListSource<IViewModel> CreateItemSource();
+        protected abstract IVirtualizingListSource<IViewModel> CreateItemSource(CancellationToken cancel);
         protected abstract Task DoOpenItem(IViewModel item);
 
         async Task OpenItemImpl(object i)

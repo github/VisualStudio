@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -14,6 +15,7 @@ namespace GitHub.Collections
     {
         static readonly ILogger log = LogManager.ForContext<SequentialListSource<TModel, TViewModel>>();
 
+        readonly CancellationToken cancel;
         readonly Dispatcher dispatcher;
         readonly object loadLock = new object();
         Dictionary<int, Page<TModel>> pages = new Dictionary<int, Page<TModel>>();
@@ -23,8 +25,9 @@ namespace GitHub.Collections
         int loadTo;
         string after;
 
-        public SequentialListSource()
+        public SequentialListSource(CancellationToken cancel)
         {
+            this.cancel = cancel;
             dispatcher = Application.Current.Dispatcher;
         }
 
@@ -48,6 +51,12 @@ namespace GitHub.Collections
             dispatcher.VerifyAccess();
 
             var page = await EnsureLoaded(pageNumber);
+
+            if (page == null)
+            {
+                return null;
+            }
+
             var result = page.Items
                 .Select(CreateViewModel)
                 .ToList();
@@ -76,7 +85,7 @@ namespace GitHub.Collections
             var pageLoaded = WaitPageLoaded(pageNumber);
             loadTo = Math.Max(loadTo, pageNumber);
 
-            while (true)
+            while (!cancel.IsCancellationRequested)
             {
                 lock (loadLock)
                 {
@@ -93,6 +102,8 @@ namespace GitHub.Collections
                     return pages[pageNumber];
                 }
             }
+
+            return null;
         }
 
         Task WaitPageLoaded(int page)
@@ -115,7 +126,7 @@ namespace GitHub.Collections
         {
             OnBeginLoading();
 
-            while (nextPage <= loadTo)
+            while (nextPage <= loadTo && !cancel.IsCancellationRequested)
             {
                 await LoadNextPage().ConfigureAwait(false);
                 PageLoaded?.Invoke(this, EventArgs.Empty);
