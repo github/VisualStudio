@@ -59,21 +59,20 @@ namespace GitHub.ViewModels.GitHubPane
         {
             LocalRepository = repository;
             SelectedState = States.FirstOrDefault();
-            this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Load().Forget());
-            await Load();
+            this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Refresh().Forget());
+            await Refresh();
         }
 
-        protected abstract IVirtualizingListSource<IViewModel> CreateItemSource();
-        protected abstract Task DoOpenItem(IViewModel item);
-
-        Task Load()
+        public override Task Refresh()
         {
             var items = new VirtualizingList<IViewModel>(CreateItemSource(), null);
             Items = items;
             ItemsView = new VirtualizingListCollectionView<IViewModel>(items);
-
             return Task.CompletedTask;
         }
+
+        protected abstract IVirtualizingListSource<IViewModel> CreateItemSource();
+        protected abstract Task DoOpenItem(IViewModel item);
 
         async Task OpenItemImpl(object i)
         {
