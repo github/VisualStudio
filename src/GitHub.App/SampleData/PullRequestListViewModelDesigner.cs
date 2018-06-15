@@ -49,7 +49,7 @@ namespace GitHub.SampleData
             SelectedState = "Open";
         }
 
-        public IReadOnlyList<IViewModel> Items { get; }
+        public IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
         public ICollectionView ItemsView { get; }
         public ILocalRepositoryModel LocalRepository { get; set; }
         public string SearchQuery { get; set; }

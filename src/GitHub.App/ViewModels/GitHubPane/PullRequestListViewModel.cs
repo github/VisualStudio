@@ -27,7 +27,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public override IReadOnlyList<string> States => states;
 
-        protected override IVirtualizingListSource<IViewModel> CreateItemSource(CancellationToken cancel)
+        protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource(CancellationToken cancel)
         {
             return new ItemSource(this, cancel);
         }
@@ -39,7 +39,7 @@ namespace GitHub.ViewModels.GitHubPane
             return Task.CompletedTask;
         }
 
-        class ItemSource : SequentialListSource<PullRequestListItemModel, IViewModel>
+        class ItemSource : SequentialListSource<PullRequestListItemModel, IIssueListItemViewModelBase>
         {
             readonly PullRequestListViewModel owner;
 
@@ -49,7 +49,7 @@ namespace GitHub.ViewModels.GitHubPane
                 this.owner = owner;
             }
 
-            protected override IViewModel CreateViewModel(PullRequestListItemModel model)
+            protected override IIssueListItemViewModelBase CreateViewModel(PullRequestListItemModel model)
             {
                 return new PullRequestListItemViewModel(model);
             }

@@ -10,7 +10,7 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public interface IIssueListViewModelBase : ISearchablePageViewModel
     {
-        IReadOnlyList<IViewModel> Items { get; }
+        IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
 
         ICollectionView ItemsView { get; }
 

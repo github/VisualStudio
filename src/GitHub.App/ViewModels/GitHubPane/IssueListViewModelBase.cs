@@ -16,17 +16,19 @@ namespace GitHub.ViewModels.GitHubPane
     public abstract class IssueListViewModelBase : PanePageViewModelBase, IIssueListViewModelBase
     {
         CancellationTokenSource cancel;
-        IReadOnlyList<IViewModel> items;
+        IReadOnlyList<IIssueListItemViewModelBase> items;
         ICollectionView itemsView;
         string searchQuery;
         string selectedState;
+        string stringFilter;
+        int numberFilter;
 
         public IssueListViewModelBase()
         {
             OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
         }
 
-        public IReadOnlyList<IViewModel> Items
+        public IReadOnlyList<IIssueListItemViewModelBase> Items
         {
             get { return items; }
             private set { this.RaiseAndSetIfChanged(ref items, value); }
@@ -61,6 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
             LocalRepository = repository;
             SelectedState = States.FirstOrDefault();
             this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Refresh().Forget());
+            this.WhenAnyValue(x => x.SearchQuery).Skip(1).Subscribe(_ => FilterChanged());
             await Refresh();
         }
 
@@ -70,14 +73,62 @@ namespace GitHub.ViewModels.GitHubPane
             cancel?.Dispose();
             cancel = new CancellationTokenSource();
 
-            var items = new VirtualizingList<IViewModel>(CreateItemSource(cancel.Token), null);
+            var items = new VirtualizingList<IIssueListItemViewModelBase>(CreateItemSource(cancel.Token), null);
             Items = items;
-            ItemsView = new VirtualizingListCollectionView<IViewModel>(items);
+            ItemsView = new VirtualizingListCollectionView<IIssueListItemViewModelBase>(items);
+            ItemsView.Filter = FilterItem;
             return Task.CompletedTask;
         }
 
-        protected abstract IVirtualizingListSource<IViewModel> CreateItemSource(CancellationToken cancel);
+        protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource(CancellationToken cancel);
         protected abstract Task DoOpenItem(IViewModel item);
+
+        void FilterChanged()
+        {
+            if (!string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                numberFilter = 0;
+
+                if (SearchQuery.StartsWith('#'))
+                {
+                    int.TryParse(SearchQuery.Substring(1), out numberFilter);
+                }
+
+                if (numberFilter == 0)
+                {
+                    stringFilter = SearchQuery.ToUpper();
+                }
+            }
+            else
+            {
+                stringFilter = null;
+                numberFilter = 0;
+            }
+
+            ItemsView?.Refresh();
+        }
+
+        bool FilterItem(object o)
+        {
+            if (!string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                var item = o as IIssueListItemViewModelBase;
+
+                if (item != null)
+                {
+                    if (numberFilter != 0)
+                    {
+                        return item.Number == numberFilter;
+                    }
+                    else
+                    {
+                        return item.Title.ToUpper().Contains(stringFilter);
+                    }
+                }
+            }
+
+            return true;
+        }
 
         async Task OpenItemImpl(object i)
         {
