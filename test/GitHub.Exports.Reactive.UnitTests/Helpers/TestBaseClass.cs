@@ -10,16 +10,6 @@ using System.IO.Compression;
 /// </summary>
 public class TestBaseClass
 {
-    public virtual void OnEntry()
-    {
-        // Ensure that every test has the InUnitTestRunner flag
-        // set, so threading doesn't go nuts.
-        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-    }
-
-    public virtual void OnExit()
-    {
-    }
 
     protected static User CreateOctokitUser(string login = "login", string url = "https://url")
     {
