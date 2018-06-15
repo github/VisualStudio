@@ -188,9 +188,16 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (count == 0)
                 {
-                    message = SelectedState == States[0] && string.IsNullOrWhiteSpace(SearchQuery) ?
-                        IssueListMessage.NoOpenItems :
-                        IssueListMessage.NoItemsMatchCriteria;
+                    if (SelectedState == States[0] &&
+                        string.IsNullOrWhiteSpace(SearchQuery) &&
+                        AuthorFilter.Selected == null)
+                    {
+                        message = IssueListMessage.NoOpenItems;
+                    }
+                    else
+                    {
+                        message = IssueListMessage.NoItemsMatchCriteria;
+                    }
                 }
 
                 IsLoading = false;
