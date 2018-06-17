@@ -115,7 +115,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource();
-        protected abstract Task DoOpenItem(IViewModel item);
+        protected abstract Task DoOpenItem(IIssueListItemViewModelBase item);
         protected abstract Task<Page<ActorModel>> LoadAuthors(string after);
 
         void FilterChanged()
@@ -176,7 +176,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task OpenItemImpl(object i)
         {
-            var item = i as IViewModel;
+            var item = i as IIssueListItemViewModelBase;
             if (item != null) await DoOpenItem(item);
         }
 

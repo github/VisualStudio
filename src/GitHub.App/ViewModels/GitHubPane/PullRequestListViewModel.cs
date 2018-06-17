@@ -35,7 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
             return new ItemSource(this);
         }
 
-        protected override Task DoOpenItem(IViewModel item)
+        protected override Task DoOpenItem(IIssueListItemViewModelBase item)
         {
             var i = (IPullRequestListItemViewModel)item;
             NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{i.Number}"));
