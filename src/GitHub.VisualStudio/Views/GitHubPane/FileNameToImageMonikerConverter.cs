@@ -2,11 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Windows.Data;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
@@ -15,13 +15,14 @@ namespace GitHub.VisualStudio.Views.GitHubPane
     {
         private const string shellFileAssociations = "ShellFileAssociations";
         private const string defaultIconMoniker = "DefaultIconMoniker";
-        private const string knownMonikersPrefix = "KnownMonikers.";
 
         private readonly Package package;
+        private readonly IVsImageService2 imageService;
 
         public FileNameToImageMonikerConverter()
         {
             package = (Package)Services.GitHubServiceProvider.GetService(typeof(Package));
+            imageService = (IVsImageService2)Package.GetGlobalService(typeof(SVsImageService));
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -51,22 +52,10 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             return null;
         }
 
-        private static ImageMoniker? TryParseImageMoniker(string str)
+        private ImageMoniker? TryParseImageMoniker(string str)
         {
-            // This is the common case: KnownMonikers.Foo
-
-            if (str.StartsWith(knownMonikersPrefix, StringComparison.Ordinal))
-            {
-                var propertyName = str.Substring(knownMonikersPrefix.Length);
-                var property = typeof(KnownMonikers).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static);
-
-                return property?.GetValue(null) as ImageMoniker?;
-            }
-
-            // Custom icon - this will look like: cb4a8fc6-efe7-424a-b611-23adf22b568e:6
-
             ImageMoniker imageMoniker;
-            if (ImagingUtilities.TryParseImageMoniker(str, out imageMoniker))
+            if (imageService.TryParseImageMoniker(str, out imageMoniker))
                 return imageMoniker;
 
             return null;
