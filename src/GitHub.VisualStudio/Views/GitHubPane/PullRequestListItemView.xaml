@@ -65,14 +65,12 @@
             <StackPanel DockPanel.Dock="Top"
                     Margin="0,2,5,0"
                     Orientation="Horizontal"
-                    TextBlock.Foreground="{DynamicResource GitHubVsGrayText}">
+                    Opacity="0.5">
                 <TextBlock>
-                <Hyperlink>
                     <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
-                </Hyperlink>
-                <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-                <Run>by</Run>
-                <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                    <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                    by
+                    <Run Text="{Binding Author.Login, Mode=OneWay}"/>
                 </TextBlock>
                 <TextBlock Margin="4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
                 <ghfvs:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>

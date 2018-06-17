@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
     <d:DesignProperties.DataContext>
-        <ghfvs:PullRequestListViewModelDesigner Message="NoItemsMatchCriteria"/>
+        <ghfvs:PullRequestListViewModelDesigner Message="None"/>
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>
@@ -20,7 +20,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <DockPanel>
         <DockPanel DockPanel.Dock="Top"
                    Margin="8">
@@ -80,7 +80,7 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}">
                 <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                         <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
