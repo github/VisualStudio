@@ -7,6 +7,7 @@ using GitHub.Collections;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using ReactiveUI;
 using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -22,9 +23,12 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestListViewModel(IPullRequestService service)
         {
             this.service = service;
+            CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
         }
 
         public override IReadOnlyList<string> States => states;
+
+        public ReactiveCommand<object> CreatePullRequest { get; }
 
         protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
         {

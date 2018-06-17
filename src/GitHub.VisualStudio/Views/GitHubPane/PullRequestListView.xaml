@@ -46,7 +46,8 @@
 
             <Separator DockPanel.Dock="Left" Style="{StaticResource VerticalSeparator}" Margin="4 0" />
 
-            <ghfvs:GitHubActionLink DockPanel.Dock="Left">
+            <ghfvs:GitHubActionLink DockPanel.Dock="Left"
+                                    Command="{Binding CreatePullRequest}">
                 Create New
             </ghfvs:GitHubActionLink>
 
@@ -115,7 +116,8 @@
                            Margin="4"
                            Opacity="0.75">
                     To get started you can
-                    <Hyperlink Foreground="{DynamicResource GitHubActionLinkItemBrush}">
+                    <Hyperlink Command="{Binding CreatePullRequest}"
+                               Foreground="{DynamicResource GitHubActionLinkItemBrush}">
                         create a pull request
                     </Hyperlink>
                 </TextBlock>

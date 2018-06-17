@@ -55,9 +55,10 @@ namespace GitHub.SampleData
         public ILocalRepositoryModel LocalRepository { get; set; }
         public IssueListMessage Message { get; set; }
         public string SearchQuery { get; set; }
-        public ReactiveCommand<Unit> OpenItem { get; }
         public string SelectedState { get; set; }
         public IReadOnlyList<string> States { get; }
+        public ReactiveCommand<object> CreatePullRequest { get; }
+        public ReactiveCommand<Unit> OpenItem { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
