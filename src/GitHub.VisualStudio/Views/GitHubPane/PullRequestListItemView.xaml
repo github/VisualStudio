@@ -11,6 +11,7 @@
         <ghfvs:PullRequestListItemViewModelDesigner Number="399"
                                                     Title="Let's try doing this differently"
                                                     CommentCount="4"
+                                                    IsCurrent="True"
                                                     UpdatedAt="2018-01-29">
             <ghfvs:PullRequestListItemViewModelDesigner.Author>
                 <ghfvs:ActorViewModelDesigner Login="shana"/>
@@ -56,6 +57,13 @@
                                    Width="30"
                                    Height="30"
                                    VerticalAlignment="Top"/>
+
+            <ghfvs:OcticonImage DockPanel.Dock="Right"
+                                Background="Transparent"
+                                Icon="git_pull_request"
+                                ToolTip="This is the current branch"
+                                VerticalAlignment="Stretch"
+                                Visibility="{Binding IsCurrent, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
 
             <TextBlock DockPanel.Dock="Top"
                        Margin="0,-1,5,0"

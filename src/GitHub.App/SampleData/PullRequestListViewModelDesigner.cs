@@ -22,6 +22,7 @@ namespace GitHub.SampleData
                 new PullRequestListItemViewModelDesigner
                 {
                     Number = 399,
+                    IsCurrent = true,
                     Title = "Let's try doing this differently",
                     Author = new ActorViewModelDesigner("shana"),
                     UpdatedAt = DateTimeOffset.Now - TimeSpan.FromDays(1),

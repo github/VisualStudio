@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
     public class PullRequestListItemViewModel : ViewModelBase, IPullRequestListItemViewModel
     {
+        bool isCurrent;
+
         public PullRequestListItemViewModel(PullRequestListItemModel model)
         {
             Id = model.Id;
@@ -21,6 +24,12 @@ namespace GitHub.ViewModels.GitHubPane
         public IActorViewModel Author { get; protected set; }
 
         public int CommentCount { get; protected set; }
+
+        public bool IsCurrent
+        {
+            get { return isCurrent; }
+            internal set { this.RaiseAndSetIfChanged(ref isCurrent, value); }
+        }
 
         public IReadOnlyList<ILabelViewModel> Labels { get; protected set; }
 

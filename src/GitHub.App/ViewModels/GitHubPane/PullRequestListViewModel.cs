@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using GitHub.Collections;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -17,12 +18,22 @@ namespace GitHub.ViewModels.GitHubPane
     public class PullRequestListViewModel : IssueListViewModelBase, IPullRequestListViewModel
     {
         static readonly IReadOnlyList<string> states = new[] { "Open", "Closed", "All" };
+        readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestService service;
+        readonly IDisposable subscription;
 
         [ImportingConstructor]
-        public PullRequestListViewModel(IPullRequestService service)
+        public PullRequestListViewModel(
+            IPullRequestSessionManager sessionManager,
+            IPullRequestService service)
         {
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(service, nameof(service));
+
+            this.sessionManager = sessionManager;
             this.service = service;
+
+            subscription = sessionManager.WhenAnyValue(x => x.CurrentSession.PullRequest.Number).Subscribe(UpdateCurrent);
             CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
         }
 
@@ -51,6 +62,22 @@ namespace GitHub.ViewModels.GitHubPane
                 after);
         }
 
+        void UpdateCurrent(int number)
+        {
+            if (Items != null)
+            {
+                foreach (var i in Items)
+                {
+                    var item = i as PullRequestListItemViewModel;
+
+                    if (item != null)
+                    {
+                        item.IsCurrent = item.Number == number;
+                    }
+                }
+            }
+        }
+
         class ItemSource : SequentialListSource<PullRequestListItemModel, IIssueListItemViewModelBase>
         {
             readonly PullRequestListViewModel owner;
@@ -62,7 +89,9 @@ namespace GitHub.ViewModels.GitHubPane
 
             protected override IIssueListItemViewModelBase CreateViewModel(PullRequestListItemModel model)
             {
-                return new PullRequestListItemViewModel(model);
+                var result = new PullRequestListItemViewModel(model);
+                result.IsCurrent = owner.sessionManager.CurrentSession?.PullRequest.Number == model.Number;
+                return result;
             }
 
             protected override Task<Page<PullRequestListItemModel>> LoadPage(string after)

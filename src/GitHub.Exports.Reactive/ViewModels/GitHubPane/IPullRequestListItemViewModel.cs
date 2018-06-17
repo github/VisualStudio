@@ -19,6 +19,12 @@ namespace GitHub.ViewModels.GitHubPane
         int CommentCount { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the currently checked out branch is the pull request
+        /// branch.
+        /// </summary>
+        bool IsCurrent { get; }
+
+        /// <summary>
         /// Gets the labels applied to the issue or pull request.
         /// </summary>
         IReadOnlyList<ILabelViewModel> Labels { get; }

@@ -77,11 +77,12 @@
         </DockPanel>
         <Grid>
             <ListBox ItemsSource="{Binding ItemsView}"
-                 BorderThickness="0"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}">
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
                     </Style>
                 </ListBox.ItemContainerStyle>

@@ -12,6 +12,7 @@ namespace GitHub.SampleData
         public string Id { get; set; }
         public IActorViewModel Author { get; set; }
         public int CommentCount { get; set; }
+        public bool IsCurrent { get; set; }
         public IReadOnlyList<ILabelViewModel> Labels { get; set; }
         public int Number { get; set; }
         public string Title { get; set; }
