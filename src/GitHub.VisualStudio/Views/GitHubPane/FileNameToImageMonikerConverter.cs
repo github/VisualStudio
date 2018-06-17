@@ -41,7 +41,8 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
             using (var key = package.ApplicationRegistryRoot.OpenSubKey(shellFileAssociations + "\\" + extension))
             {
-                if (key?.GetValue(defaultIconMoniker) is string str)
+                var str = key?.GetValue(defaultIconMoniker) as string;
+                if (str != null)
                     return TryParseImageMoniker(str);
             }
 
@@ -62,7 +63,8 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
             // Custom icon - this will look like: cb4a8fc6-efe7-424a-b611-23adf22b568e:6
 
-            if (ImagingUtilities.TryParseImageMoniker(str, out var imageMoniker))
+            ImageMoniker imageMoniker;
+            if (ImagingUtilities.TryParseImageMoniker(str, out imageMoniker))
                 return imageMoniker;
 
             return null;
