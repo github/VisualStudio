@@ -25,7 +25,7 @@ namespace GitHub.InlineReviews.ViewModels
         CommentEditState state;
         DateTimeOffset updatedAt;
         string undoBody;
-        bool canDelete;
+        ObservableAsPropertyHelper<bool> canDelete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
@@ -60,13 +60,13 @@ namespace GitHub.InlineReviews.ViewModels
             UpdatedAt = updatedAt;
             WebUrl = webUrl;
 
-            var canDelete = this.WhenAnyValue(
+            var canDeleteObservable = this.WhenAnyValue(
                 x => x.EditState,
                 x => x == CommentEditState.None && author.Login == currentUser.Login);
 
-            canDelete.ToProperty(this, x => x.CanDelete);
+            canDelete = canDeleteObservable.ToProperty(this, x => x.CanDelete);
 
-            Delete = ReactiveCommand.CreateAsyncTask(canDelete, DoDelete);
+            Delete = ReactiveCommand.CreateAsyncTask(canDeleteObservable, DoDelete);
 
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
@@ -144,6 +144,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             if (state != CommentEditState.Editing)
             {
+                ErrorMessage = null;
                 undoBody = Body;
                 EditState = CommentEditState.Editing;
             }
@@ -228,8 +229,7 @@ namespace GitHub.InlineReviews.ViewModels
 
         public bool CanDelete
         {
-            get { return canDelete; }
-            private set { this.RaiseAndSetIfChanged(ref canDelete, value); }
+            get { return canDelete.Value; }
         }
 
         /// <inheritdoc/>
