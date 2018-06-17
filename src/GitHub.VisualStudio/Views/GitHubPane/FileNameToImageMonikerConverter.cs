@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -9,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
+    [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used in XAML")]
     internal sealed class FileNameToImageMonikerConverter : IValueConverter
     {
         private const string shellFileAssociations = "ShellFileAssociations";
