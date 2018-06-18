@@ -79,6 +79,21 @@ public class GitServiceTests
 
             Assert.That(remoteName, Is.EqualTo(expectedRemoteName));
         }
+
+        [TestCase("https://github.com/github/VisualStudio", "configured_origin", "configured_origin", "configured_origin",
+            Description = "Use remote from `" + GitService.OriginConfigKey + "` config setting if it exists")]
+        [TestCase("https://github.com/github/VisualStudio;https://github.com/jcansdale/VisualStudio", "origin;configured_origin",
+            "configured_origin", "configured_origin", Description = "Allow user to override the default origin remote")]
+        public void GetOriginFromConfig(string urls, string remoteNames, string configOrigin, string expectedRemoteName)
+        {
+            var config = CreateConfiguration(configOrigin);
+            var repository = CreateRepository(Split(urls), Split(remoteNames), Split(""), Split(""), config);
+            var target = new GitService();
+
+            var remoteName = target.GetDefaultRemoteName(repository);
+
+            Assert.That(remoteName, Is.EqualTo(expectedRemoteName));
+        }
     }
 
     static string[] Split(string text)
@@ -86,9 +101,14 @@ public class GitServiceTests
         return text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    static IRepository CreateRepository(string[] urls, string[] remoteNames, string[] branchNames, string[] branchRemoteNames)
+    static IRepository CreateRepository(string[] urls, string[] remoteNames, string[] branchNames, string[] branchRemoteNames,
+        Configuration config = null)
     {
+        config = config ?? Substitute.For<Configuration>();
+
         var repository = Substitute.For<IRepository>();
+        repository.Config.Returns(config);
+
         var remoteCollection = Substitute.For<RemoteCollection>();
 
         for (var branchCount = 0; branchCount < branchNames.Length; branchCount++)
@@ -119,5 +139,12 @@ public class GitServiceTests
         remoteCollection.GetEnumerator().Returns(_ => remoteList.GetEnumerator());
         repository.Network.Remotes.Returns(remoteCollection);
         return repository;
+    }
+
+    static Configuration CreateConfiguration(string configOrigin)
+    {
+        var config = Substitute.For<Configuration>();
+        config.GetValueOrDefault<string>(GitService.OriginConfigKey).Returns(configOrigin);
+        return config;
     }
 }

@@ -55,11 +55,12 @@ namespace GitHub.Services
         Task<string> GetLatestPushedSha(string path);
 
         /// <summary>
-        /// Find a remote named "origin".
+        /// Find a remote named "origin" or remote overridden by "ghfvs.origin" config property.
         /// </summary>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
-        /// <returns>The remote named "origin".</returns>
-        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote.</exception>
+        /// <returns>The remote named "origin" or remote overridden by "ghfvs.origin" config property.</returns>
+        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote
+        /// or remote overridden by "ghfvs.origin" config property.</exception>
         string GetDefaultRemoteName(IRepository repo);
     }
 }

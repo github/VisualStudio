@@ -13,6 +13,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitService : IGitService
     {
+        public const string OriginConfigKey = "ghfvs.origin";
         const string defaultOriginName = "origin";
 
         /// <summary>
@@ -132,11 +133,12 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Find a remote named "origin".
+        /// Find a remote named "origin" or remote overridden by "ghfvs.origin" config property.
         /// </summary>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
-        /// <returns>The remote named "origin".</returns>
-        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote.</exception>
+        /// <returns>The remote named "origin" or remote overridden by "ghfvs.origin" config property.</returns>
+        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote
+        /// or remote overridden by "ghfvs.origin" config property.</exception>
         public string GetDefaultRemoteName(IRepository repo)
         {
             var remoteName = TryGetDefaultRemoteName(repo);
@@ -145,17 +147,23 @@ namespace GitHub.Services
                 return remoteName;
             }
 
-            throw new InvalidOperationException("Can't get default remote name because repository contains no `origin` remote or `master` branch.");
+            throw new InvalidOperationException("Can't get default remote name because repository contains no `origin`.");
         }
 
         static string TryGetDefaultRemoteName(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
-            var remote = remotes[defaultOriginName];
-            if (remote != null)
+
+            var remoteName = repo.Config.GetValueOrDefault<string>(OriginConfigKey);
+            if (remoteName != null && remotes[remoteName] != null)
+            {
+                return remoteName;
+            }
+
+            if (remotes[defaultOriginName] != null)
             {
                 // Use remote named "origin"
-                return remote.Name;
+                return defaultOriginName;
             }
 
             return null;
