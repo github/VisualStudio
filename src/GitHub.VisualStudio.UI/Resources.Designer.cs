@@ -936,6 +936,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Update comment.
+        /// </summary>
+        public static string UpdateComment {
+            get {
+                return ResourceManager.GetString("UpdateComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to updated {0}.
         /// </summary>
         public static string UpdatedFormat {

@@ -18,6 +18,7 @@ using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
 using Octokit.GraphQL;
+using Octokit.GraphQL.Core;
 using Octokit.GraphQL.Model;
 using ReactiveUI;
 using Serilog;
@@ -527,77 +528,130 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
-            string remoteRepositoryOwner,
             IAccount user,
-            int number,
+            string pullRequestNodeId,
             string body,
             string commitId,
             string path,
             int position)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var apiClient = await apiClientFactory.Create(address);
+            var graphql = await graphqlFactory.CreateConnection(address);
 
-            var result = await apiClient.CreatePullRequestReviewComment(
-                remoteRepositoryOwner,
-                localRepository.Name,
-                number,
-                body,
-                commitId,
-                path,
-                position);
-
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-
-            return new PullRequestReviewCommentModel
+            var addReview = new AddPullRequestReviewInput
             {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                CreatedAt = result.CreatedAt,
-                User = user,
+                Body = body,
+                CommitOID = commitId,
+                Event = Octokit.GraphQL.Model.PullRequestReviewEvent.Comment,
+                PullRequestId = pullRequestNodeId,
+                Comments = new[]
+                {
+                    new DraftPullRequestReviewComment
+                    {
+                        Body = body,
+                        Path = path,
+                        Position = position,
+                    },
+                },
             };
+
+            var mutation = new Mutation()
+                .AddPullRequestReview(addReview)
+                .Select(payload =>
+                    payload.PullRequestReview
+                        .Comments(1, null, null, null)
+                        .Nodes.Select(x => new PullRequestReviewCommentModel
+                        {
+                            Id = x.DatabaseId.Value,
+                            NodeId = x.Id,
+                            Body = x.Body,
+                            CommitId = x.Commit.Oid,
+                            Path = x.Path,
+                            Position = x.Position,
+                            CreatedAt = x.CreatedAt.Value,
+                            DiffHunk = x.DiffHunk,
+                            OriginalPosition = x.OriginalPosition,
+                            OriginalCommitId = x.OriginalCommit.Oid,
+                            PullRequestReviewId = x.PullRequestReview.DatabaseId.Value,
+                            User = user,
+                            IsPending = false
+                        }));
+
+            var result = (await graphql.Run(mutation)).First();
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
+            return result;
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentRepy(
+        public async Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentReply(
+            ILocalRepositoryModel localRepository,
+            IAccount user,
+            string pullRequestNodeId,
+            string body,
+            string inReplyToNodeId)
+        {
+            var review = await CreatePendingReview(localRepository, user, pullRequestNodeId);
+            var comment = await PostPendingReviewCommentReply(localRepository, user, review.NodeId, body, inReplyToNodeId);
+            await SubmitPendingReview(localRepository, user, review.NodeId, null, PullRequestReviewEvent.Comment);
+            comment.IsPending = false;
+            return comment;
+        }
+
+        /// <inheritdoc/>
+        public async Task DeleteComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             IAccount user,
-            int number,
-            string body,
-            int inReplyTo)
+            int number)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
 
-            var result = await apiClient.CreatePullRequestReviewComment(
+            await apiClient.DeletePullRequestReviewComment(
                 remoteRepositoryOwner,
                 localRepository.Name,
-                number,
-                body,
-                inReplyTo);
+                number);
 
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete);
+        }
 
-            return new PullRequestReviewCommentModel
+        /// <inheritdoc/>
+        public async Task<PullRequestReviewCommentModel> EditComment(ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            IAccount user,
+            string commentNodeId,
+            string body)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var updatePullRequestReviewCommentInput = new UpdatePullRequestReviewCommentInput
             {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                CreatedAt = result.CreatedAt,
-                User = user,
+                Body = body,
+                PullRequestReviewCommentId = commentNodeId
             };
+
+            var editComment = new Mutation().UpdatePullRequestReviewComment(updatePullRequestReviewCommentInput)
+                .Select(x => new PullRequestReviewCommentModel
+                {
+                    Id = x.PullRequestReviewComment.DatabaseId.Value,
+                    NodeId = x.PullRequestReviewComment.Id,
+                    Body = x.PullRequestReviewComment.Body,
+                    CommitId = x.PullRequestReviewComment.Commit.Oid,
+                    Path = x.PullRequestReviewComment.Path,
+                    Position = x.PullRequestReviewComment.Position,
+                    CreatedAt = x.PullRequestReviewComment.CreatedAt.Value,
+                    DiffHunk = x.PullRequestReviewComment.DiffHunk,
+                    OriginalPosition = x.PullRequestReviewComment.OriginalPosition,
+                    OriginalCommitId = x.PullRequestReviewComment.OriginalCommit.Oid,
+                    PullRequestReviewId = x.PullRequestReviewComment.PullRequestReview.DatabaseId.Value,
+                    User = user,
+                    IsPending = !x.PullRequestReviewComment.PublishedAt.HasValue,
+                });
+
+            var result = await graphql.Run(editComment);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
+            return result;
         }
 
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
