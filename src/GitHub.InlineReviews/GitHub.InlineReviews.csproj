@@ -412,12 +412,19 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="InlineReviewsPackage.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-      <SubType>Designer</SubType>
-    </None>
+      <None Include="InlineReviewsPackage.vsct">
+     </None>
+  <VSCTCompile Include="InlineReviewsPackage.en-US.vsct" >
+	<ResourceName>Menus.ctmenu</ResourceName>
+	<DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
+	</VSCTCompile>
+     <VSCTCompile Include="InlineReviewsPackage.zh-Hans.vsct">
+	<ResourceName>Menus.ctmenu</ResourceName>
+		<DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
+	</VSCTCompile>
+     <Content Include="Resources\logo_32x32%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
@@ -468,13 +475,9 @@
   <ItemGroup>
     <Analyzer Include="..\..\packages\SerilogAnalyzer.0.12.0.0\analyzers\dotnet\cs\SerilogAnalyzer.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <VSCTCompile Include="InlineReviewsPackage.en-US.vsct" />
-    <VSCTCompile Include="InlineReviewsPackage.zh-Hans.vsct" />
-    <Content Include="Resources\logo_32x32%402x.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+ 
+  
+ 
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != '' And '$(NCrunch)' != '1'" />
