@@ -55,11 +55,11 @@ namespace GitHub.Services
         Task<string> GetLatestPushedSha(string path);
 
         /// <summary>
-        /// Find a remote named "origin" or the remote tracking "master".
+        /// Find a remote named "origin".
         /// </summary>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
-        /// <returns>The remote named "origin" or the remote tracking "master"</returns>
-        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote or "master" branch.</exception>
+        /// <returns>The remote named "origin".</returns>
+        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote.</exception>
         string GetDefaultRemoteName(IRepository repo);
     }
 }

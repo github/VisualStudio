@@ -59,6 +59,7 @@ public class GitServiceTests
     public class TheGetOriginRemoteNameMethod
     {
         [TestCase("https://github.com/github/VisualStudio", "no_origin", "no_master", "github", Description = "No `origin` remote or `master` branch defined")]
+        [TestCase("https://github.com/jcansdale/VisualStudio", "jcansdale", "master", "jcansdale", Description = "Don't use remote from branch named `master`")]
         public void ThrowsInvalidOperationException(string urls, string remoteNames, string branchNames, string branchRemoteNames)
         {
             var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));
@@ -69,8 +70,6 @@ public class GitServiceTests
 
         [TestCase("https://github.com/github/VisualStudio", "origin", "master;HEAD", "jcansdale;grokys", "origin",
             Description = "Use remote named `origin` if it exists")]
-        [TestCase("", "", "master;HEAD", "jcansdale;grokys", "jcansdale", Description = "Don't use remote from HEAD")]
-        [TestCase("", "", "master", "jcansdale", "jcansdale", Description = "Use remote from branch named `master` if it exists")]
         public void GetOriginRemoteName(string urls, string remoteNames, string branchNames, string branchRemoteNames, string expectedRemoteName)
         {
             var repository = CreateRepository(Split(urls), Split(remoteNames), Split(branchNames), Split(branchRemoteNames));

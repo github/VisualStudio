@@ -132,11 +132,11 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Find a remote named "origin" or the remote tracking "master".
+        /// Find a remote named "origin".
         /// </summary>
         /// <param name="repo">The <see cref="IRepository" /> to find a remote for.</param>
-        /// <returns>The remote named "origin" or the remote tracking "master"</returns>
-        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote or "master" branch.</exception>
+        /// <returns>The remote named "origin".</returns>
+        /// <exception cref="InvalidOperationException">If repository contains no "origin" remote.</exception>
         public string GetDefaultRemoteName(IRepository repo)
         {
             var remoteName = TryGetDefaultRemoteName(repo);
@@ -156,14 +156,6 @@ namespace GitHub.Services
             {
                 // Use remote named "origin"
                 return remote.Name;
-            }
-
-            var masterBranch = repo.Branches["master"];
-            var remoteName = masterBranch?.RemoteName;
-            if (remoteName != null)
-            {
-                // Use remote from the "master" branch
-                return remoteName;
             }
 
             return null;
