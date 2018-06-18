@@ -18,8 +18,8 @@
         <Binding>
             <Binding.Source>
                 <ghfvs:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
-                                                               TargetBranchDisplayName="master-is-always-stable"
-                                                               CommentCount="10">
+                                                          TargetBranchDisplayName="master-is-always-stable"
+                                                          CommentCount="10">
                     <ghfvs:PullRequestDetailViewModelDesigner.UpdateState>
                         <ghfvs:PullRequestUpdateStateDesigner CommitsAhead="0" CommitsBehind="0" UpToDate="True"/>
                     </ghfvs:PullRequestDetailViewModelDesigner.UpdateState>
@@ -76,94 +76,54 @@
         <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </FrameworkElement.CommandBindings>
 
-    <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
-        <Grid DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Column="0"
-                       Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
+    <DockPanel Grid.IsSharedSizeScope="True">
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Vertical"
+                    Margin="8 0 0 0">
+            
+            <!-- Title -->
+            <TextBlock Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                        TextWrapping="Wrap"
                        Margin="0 0 5 3"
                        Text="{Binding Model.Title}"/>
 
-            <StackPanel Grid.Column="0"
-                        Grid.Row="1"
-                        Orientation="Horizontal">
-
+            <!-- State and branches -->
+            <StackPanel Orientation="Horizontal">
                 <TextBlock FontWeight="Bold"
-                           Margin="0 0 4 0"
                            VerticalAlignment="Center"
                            Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                            Style="{StaticResource StateIndicator}"/>
 
-                <Rectangle Grid.Column="1" Margin="5 0 10 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
+                <Rectangle Margin="9 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
 
-                <!-- source and target branches -->
-                <Grid Margin="0 -3" HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                    <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
+                </Border>
 
-                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" />
-                    </Border>
+                <ghfvs:OcticonImage Grid.Column="2" VerticalAlignment="Center" Margin="5 3" Icon="arrow_left" />
 
-                    <ghfvs:OcticonImage Grid.Column="2" VerticalAlignment="Center" Margin="5" Icon="arrow_left" />
+                <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                    <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
+                </Border>
 
-                    <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
-                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" />
-                    </Border>
-                </Grid>
             </StackPanel>
-        </Grid>
 
-        <!-- Avatar, PR Title, Open/Merged/Closed state and actions area -->
-        <Grid DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
-                <TextBlock Grid.Column="0" Opacity="0.5" VerticalAlignment="Center"
-                           Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-            </StackPanel>
+            <!-- Updated at -->
+            <TextBlock Opacity="0.5"
+                       Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
 
             <!-- Git operation error message -->
-            <TextBox Grid.Column="0"
-                     Grid.ColumnSpan="3"
-                     Grid.Row="2"
-                     Foreground="Red" 
-                     Margin="0 2 0 0"
+            <TextBox Foreground="Red" 
+                     Margin="-2 4"
                      Text="{Binding OperationError, Mode=OneWay}"
-                     VerticalAlignment="Center"
-                     TextWrapping="Wrap"
                      Style="{StaticResource FlatReadOnlyTextBox}"
                      Visibility="{Binding OperationError, Converter={ghfvs:NullToVisibilityConverter}}"/>
-        </Grid>
+        </StackPanel>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,5,-8,0"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0,5,0,0"/>
 
         <ScrollViewer CanContentScroll="True"
-                      Margin="0,0,-8,0"
+                      Padding="8 0 0 0"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
             <ghfvs:ScrollingVerticalStackPanel>
