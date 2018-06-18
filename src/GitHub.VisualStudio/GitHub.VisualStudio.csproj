@@ -142,6 +142,12 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Editor.14.3.25407\lib\net45\Microsoft.VisualStudio.Editor.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.ImageCatalog.14.3.25407\lib\net45\Microsoft.VisualStudio.ImageCatalog.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Imaging, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.14.3.25407\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.14.3.25407\lib\Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.dll</HintPath>
@@ -387,6 +393,8 @@
     <Compile Include="Views\Dialog\RepositoryRecloneView.xaml.cs">
       <DependentUpon>RepositoryRecloneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\DirectoryIsExpandedToImageMonikerConverter.cs" />
+    <Compile Include="Views\GitHubPane\FileNameToImageMonikerConverter.cs" />
     <Compile Include="Views\GitHubPane\LoggedOutView.xaml.cs">
       <DependentUpon>LoggedOutView.xaml</DependentUpon>
     </Compile>
