@@ -233,6 +233,39 @@ public class GitClientTests
             }
         }
 
+        [TestCase("https://github.com/upstream_owner/repo", "origin", "https://github.com/origin_owner/repo",
+            "upstream_owner", "https://github.com/upstream_owner/repo")]
+        public async Task CreateRemoteWithNameOfOwner(string fetchUrl, string remoteName, string remoteUrl,
+            string expectRemoteName, string expectRemoteUrl)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            repo.Network.Remotes.Received(1).Add(expectRemoteName, expectRemoteUrl);
+            repo.Network.Remotes.Received(0).Remove(Arg.Any<string>());
+        }
+
+        [TestCase("https://github.com/same_name/repo", "same_name", "https://github.com/different_name/repo",
+            "same_name", "https://github.com/same_name/repo")]
+        public async Task UseTemporaryRemoteWhenSameRemoteWithDifferentUrlExists(string fetchUrl, string remoteName, string remoteUrl,
+            string expectRemoteName, string expectRemoteUrl)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            repo.Network.Remotes.Received(0).Add(expectRemoteName, expectRemoteUrl);
+            repo.Network.Remotes.Received(1).Add(Arg.Any<string>(), expectRemoteUrl);
+            repo.Network.Remotes.Received(1).Remove(Arg.Any<string>());
+        }
+
         [TestCase("https://github.com/owner/repo", "origin", "https://github.com/owner/repo", "origin")]
         [TestCase("https://github.com/owner/repo", "not_origin", "https://github.com/owner/repo", "not_origin")]
         public async Task FetchFromExistingRemote(string fetchUrl, string remoteName, string remoteUrl, string expectRemoteName)
