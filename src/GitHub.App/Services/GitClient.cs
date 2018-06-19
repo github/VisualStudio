@@ -118,8 +118,17 @@ namespace GitHub.Services
             {
                 try
                 {
-                    var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
-                    var remote = repo.Network.Remotes.Add(tempRemoteName, httpsString);
+                    var remoteName = cloneUrl.Owner;
+                    var removeRemote = false;
+
+                    if (repo.Network.Remotes[remoteName] != null)
+                    {
+                        // If a remote with this neme already exists, use a unique name and remove remote afterwards
+                        remoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
+                        removeRemote = true;
+                    }
+
+                    var remote = repo.Network.Remotes.Add(remoteName, httpsString);
                     try
                     {
 #pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
@@ -128,7 +137,10 @@ namespace GitHub.Services
                     }
                     finally
                     {
-                        repo.Network.Remotes.Remove(tempRemoteName);
+                        if (removeRemote)
+                        {
+                            repo.Network.Remotes.Remove(remoteName);
+                        }
                     }
                 }
                 catch (Exception ex)
