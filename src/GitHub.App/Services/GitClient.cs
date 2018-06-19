@@ -96,19 +96,9 @@ namespace GitHub.Services
 
         public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
         {
-            var httpsString = cloneUrl.ToRepositoryUrl().ToString();
-
             foreach (var remote in repo.Network.Remotes)
             {
-                var remoteUrl = new UriString(remote.Url);
-                if (!remoteUrl.IsHypertextTransferProtocol)
-                {
-                    // Only match http urls
-                    continue;
-                }
-
-                var remoteHttpsString = remoteUrl.ToRepositoryUrl().ToString();
-                if (remoteHttpsString.Equals(httpsString, StringComparison.OrdinalIgnoreCase))
+                if (UriString.RepositoryUrlsAreEqual(new UriString(remote.Url), cloneUrl))
                 {
                     return Fetch(repo, remote.Name, refspecs);
                 }
@@ -128,7 +118,7 @@ namespace GitHub.Services
                         removeRemote = true;
                     }
 
-                    var remote = repo.Network.Remotes.Add(remoteName, httpsString);
+                    var remote = repo.Network.Remotes.Add(remoteName, cloneUrl);
                     try
                     {
 #pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
