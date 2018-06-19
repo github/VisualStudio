@@ -10,6 +10,7 @@ using Serilog;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
+using System.Windows;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -46,11 +47,11 @@ namespace GitHub.VisualStudio.Base
             JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
 
-            this.gitService = gitService;
-
-            UpdateActiveRepo();
+            // This might be null in Blend or SafeMode
             if (gitService != null)
             {
+                this.gitService = gitService;
+                UpdateActiveRepo();
                 gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
             }
         }
@@ -151,8 +152,7 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateActiveRepo()
         {
-            // NOTE: gitService might be null in Blend or Safe Mode
-            var repo = gitService?.ActiveRepositories.FirstOrDefault();
+            var repo = gitService.ActiveRepositories.FirstOrDefault();
 
             if (!Equals(repo, ActiveRepo))
             {
