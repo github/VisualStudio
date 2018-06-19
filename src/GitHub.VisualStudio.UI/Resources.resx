@@ -325,7 +325,7 @@
     <value>No repository</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>We couldn't find a git repository here. Open a git project or click "File -&gt; Add to Source Control" in a project to get started.</value>
+    <value>Open a git project or solution to get started.</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
     <value>Create an account</value>
