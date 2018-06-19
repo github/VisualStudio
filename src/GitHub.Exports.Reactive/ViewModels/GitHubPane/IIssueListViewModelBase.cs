@@ -19,6 +19,8 @@ namespace GitHub.ViewModels.GitHubPane
     {
         IUserFilterViewModel AuthorFilter { get; }
 
+        IReadOnlyList<IRepositoryModel> Forks { get; }
+
         IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
 
         ICollectionView ItemsView { get; }
@@ -26,6 +28,8 @@ namespace GitHub.ViewModels.GitHubPane
         ILocalRepositoryModel LocalRepository { get; }
 
         IssueListMessage Message { get; }
+
+        IRepositoryModel RemoteRepository { get; set; }
 
         string SelectedState { get; set; }
 

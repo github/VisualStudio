@@ -25,7 +25,9 @@ namespace GitHub.ViewModels.GitHubPane
         [ImportingConstructor]
         public PullRequestListViewModel(
             IPullRequestSessionManager sessionManager,
+            IRepositoryService repositoryService,
             IPullRequestService service)
+            : base(repositoryService)
         {
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(service, nameof(service));
@@ -113,9 +115,9 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var sw = Stopwatch.StartNew();
                 var result = owner.service.ReadPullRequests(
-                    HostAddress.Create(owner.LocalRepository.CloneUrl),
-                    owner.LocalRepository.Owner,
-                    owner.LocalRepository.Name,
+                    HostAddress.Create(owner.RemoteRepository.CloneUrl),
+                    owner.RemoteRepository.Owner,
+                    owner.RemoteRepository.Name,
                     after,
                     states);
                 sw.Stop();

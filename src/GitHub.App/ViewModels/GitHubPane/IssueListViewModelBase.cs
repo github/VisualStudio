@@ -10,24 +10,30 @@ using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
     public abstract class IssueListViewModelBase : PanePageViewModelBase, IIssueListViewModelBase
     {
+        readonly IRepositoryService repositoryService;
         IReadOnlyList<IIssueListItemViewModelBase> items;
         ICollectionView itemsView;
         IDisposable subscription;
         IssueListMessage message;
+        IRepositoryModel remoteRepository;
+        IReadOnlyList<IRepositoryModel> forks;
         string searchQuery;
         string selectedState;
         string stringFilter;
         int numberFilter;
         IUserFilterViewModel authorFilter;
 
-        public IssueListViewModelBase()
+        public IssueListViewModelBase(IRepositoryService repositoryService)
         {
+            this.repositoryService = repositoryService;
             OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
         }
 
@@ -35,6 +41,12 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return authorFilter; }
             private set { this.RaiseAndSetIfChanged(ref authorFilter, value); }
+        }
+
+        public IReadOnlyList<IRepositoryModel> Forks
+        {
+            get { return forks; }
+            set { this.RaiseAndSetIfChanged(ref forks, value); }
         }
 
         public IReadOnlyList<IIssueListItemViewModelBase> Items
@@ -55,6 +67,12 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return message; }
             private set { this.RaiseAndSetIfChanged(ref message, value); }
+        }
+
+        public IRepositoryModel RemoteRepository
+        {
+            get { return remoteRepository; }
+            set { this.RaiseAndSetIfChanged(ref remoteRepository, value); }
         }
 
         public string SearchQuery
@@ -78,7 +96,32 @@ namespace GitHub.ViewModels.GitHubPane
             LocalRepository = repository;
             SelectedState = States.FirstOrDefault();
             AuthorFilter = new UserFilterViewModel(LoadAuthors);
-            this.WhenAnyValue(x => x.SelectedState).Skip(1).Subscribe(_ => Refresh().Forget());
+
+            var parentOwner = await repositoryService.ReadParentOwnerLogin(
+                HostAddress.Create(repository.CloneUrl),
+                repository.Owner,
+                repository.Name);
+
+            if (parentOwner == null)
+            {
+                RemoteRepository = repository;
+            }
+            else
+            {
+                RemoteRepository = new RepositoryModel(
+                    repository.Name,
+                    UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parentOwner)));
+
+                Forks = new IRepositoryModel[]
+                {
+                    RemoteRepository,
+                    repository,
+                };
+            }
+
+            this.WhenAnyValue(x => x.SelectedState, x => x.RemoteRepository)
+                .Skip(1)
+                .Subscribe(_ => Refresh().Forget());
 
             Observable.Merge(
                 this.WhenAnyValue(x => x.SearchQuery).Skip(1).SelectUnit(),

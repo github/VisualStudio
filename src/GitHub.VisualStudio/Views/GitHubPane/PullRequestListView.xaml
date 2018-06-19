@@ -73,6 +73,33 @@
                 </ghfvs:DropDownButton.DropDownContent>
             </ghfvs:DropDownButton>
 
+            <ghfvs:DropDownButton DockPanel.Dock="Right"
+                                  Cursor="Hand"
+                                  Foreground="{DynamicResource GitHubActionLinkItemBrush}"
+                                  Padding="2"
+                                  ToolTip="Select Fork"
+                                  VerticalAlignment="Center"
+                                  Visibility="{Binding Forks, Converter={ghfvs:NullToVisibilityConverter}}">
+                <ghfvs:OcticonImage Icon="repo_forked" Height="12" Width="12"/>
+                <ghfvs:DropDownButton.DropDownContent>
+                    <ListBox Background="{DynamicResource VsBrush.Window}"
+                             BorderBrush="{DynamicResource VsBrush.DropDownPopupBorder}"
+                             BorderThickness="1"
+                             ItemsSource="{Binding Forks}"
+                             Padding="2"
+                             MinWidth="100"
+                             SelectedItem="{Binding RemoteRepository}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Run Text="{Binding Owner, Mode=OneWay}"/>/<Run Text="{Binding Name, Mode=OneWay}"/>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ghfvs:DropDownButton.DropDownContent>
+            </ghfvs:DropDownButton>
+
             <Rectangle/>
         </DockPanel>
         <Grid>
