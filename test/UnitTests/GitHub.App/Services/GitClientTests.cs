@@ -233,6 +233,23 @@ public class GitClientTests
             }
         }
 
+        [TestCase("https://github.com/owner/repo", "origin", "https://github.com/owner/repo", "origin")]
+        [TestCase("https://github.com/owner/repo", "not_origin", "https://github.com/owner/repo", "not_origin")]
+        public async Task FetchFromExistingRemote(string fetchUrl, string remoteName, string remoteUrl, string expectRemoteName)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            var remote = repo.Network.Remotes[expectRemoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
+            repo.Network.Received(1).Fetch(remote, Arg.Any<string[]>(), Arg.Any<FetchOptions>());
+#pragma warning restore 0618
+        }
+
         static IRepository CreateRepository(string remoteName, string remoteUrl)
         {
             var remote = Substitute.For<Remote>();
