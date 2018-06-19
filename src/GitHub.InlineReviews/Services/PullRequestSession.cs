@@ -138,11 +138,11 @@ namespace GitHub.InlineReviews.Services
 
             if (!HasPendingReview)
             {
+                var pullRequestNodeId = await GetPullRequestNodeId();
                 model = await service.PostStandaloneReviewComment(
                     LocalRepository,
-                    RepositoryOwner,
                     User,
-                    PullRequest.Number,
+                    pullRequestNodeId,
                     body,
                     commitId,
                     path,
@@ -165,22 +165,48 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task DeleteComment(
+            int number)
+        {
+            await service.DeleteComment(
+                LocalRepository,
+                RepositoryOwner,
+                User,
+                number);
+
+            await RemoveComment(number);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IPullRequestReviewCommentModel> EditComment(string commentNodeId, string body)
+        {
+            var model = await service.EditComment(
+                LocalRepository,
+                RepositoryOwner,
+                User,
+                commentNodeId,
+                body);
+
+            await ReplaceComment(model);
+            return model;
+        }
+
+        /// <inheritdoc/>
         public async Task<IPullRequestReviewCommentModel> PostReviewComment(
             string body,
-            int inReplyTo,
             string inReplyToNodeId)
         {
             IPullRequestReviewCommentModel model;
 
             if (!HasPendingReview)
             {
-                model = await service.PostStandaloneReviewCommentRepy(
+                var pullRequestNodeId = await GetPullRequestNodeId();
+                model = await service.PostStandaloneReviewCommentReply(
                     LocalRepository,
-                    RepositoryOwner,
                     User,
-                    PullRequest.Number,
+                    pullRequestNodeId,
                     body,
-                    inReplyTo);
+                    inReplyToNodeId);
             }
             else
             {
@@ -283,6 +309,24 @@ namespace GitHub.InlineReviews.Services
             PullRequest.ReviewComments = PullRequest.ReviewComments
                 .Concat(new[] { comment })
                 .ToList();
+            await Update(PullRequest);
+        }
+
+        async Task ReplaceComment(IPullRequestReviewCommentModel comment)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Select(model => model.Id == comment.Id ? comment: model)
+                .ToList();
+
+            await Update(PullRequest);
+        }
+
+        async Task RemoveComment(int commentId)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Where(model => model.Id != commentId)
+                .ToList();
+
             await Update(PullRequest);
         }
 
