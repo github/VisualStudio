@@ -109,8 +109,9 @@ namespace GitHub.Services
                 try
                 {
                     var remoteName = cloneUrl.Owner;
-                    var removeRemote = false;
+                    var remoteUri = cloneUrl.ToRepositoryUrl();
 
+                    var removeRemote = false;
                     if (repo.Network.Remotes[remoteName] != null)
                     {
                         // If a remote with this neme already exists, use a unique name and remove remote afterwards
@@ -118,7 +119,7 @@ namespace GitHub.Services
                         removeRemote = true;
                     }
 
-                    var remote = repo.Network.Remotes.Add(remoteName, cloneUrl);
+                    var remote = repo.Network.Remotes.Add(remoteName, remoteUri.ToString());
                     try
                     {
 #pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
