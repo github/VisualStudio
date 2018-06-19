@@ -568,8 +568,11 @@ namespace GitHub.Services
         {
             foreach (var remote in repo.Network.Remotes)
             {
-                // Compare Urls ignoring any trailing .git
-                if (new UriString(remote.Url).ToRepositoryUrl() == cloneUri.ToRepositoryUrl())
+                // Compare Urls ignoring case and any trailing ".git"
+                if (string.Equals(
+                    new UriString(remote.Url).ToRepositoryUrl().ToString(),
+                    cloneUri.ToRepositoryUrl().ToString(),
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     return remote.Name;
                 }
