@@ -110,7 +110,7 @@ namespace GitHub.Services
                 var remoteHttpsString = remoteUrl.ToRepositoryUrl().ToString();
                 if (remoteHttpsString.Equals(httpsString, StringComparison.OrdinalIgnoreCase))
                 {
-                    return Fetch(repo, defaultOriginName, refspecs);
+                    return Fetch(repo, remote.Name, refspecs);
                 }
             }
 
