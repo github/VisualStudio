@@ -47,13 +47,13 @@ namespace GitHub.Extensions
         /// </summary>
         /// <param name="task">The <see cref="Task"/> to log exceptions from.</param>
         /// <param name="log">The <see cref="ILogger"/> to use.</param>
-        public static void LogAndForget(this Task task, ILogger log)
+        public static void Forget(this Task task, ILogger log)
         {
             task.ContinueWith(t =>
             {
                 if (t.IsFaulted)
                 {
-                    log.Error(t.Exception, nameof(LogAndForget));
+                    log.Error(t.Exception, nameof(Forget));
                 }
             });
         }

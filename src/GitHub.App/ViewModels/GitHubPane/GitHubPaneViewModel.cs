@@ -332,9 +332,9 @@ namespace GitHub.ViewModels.GitHubPane
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                .Skip(1)
                .ObserveOn(RxApp.MainThreadScheduler)
-               .Subscribe(x => UpdateContent(x).LogAndForget(log));
+               .Subscribe(x => UpdateContent(x).Forget(log));
 
-            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).LogAndForget(log);
+            connectionManager.Connections.CollectionChanged += (_, __) => UpdateContent(LocalRepository).Forget(log);
 
             var menuService = (IMenuCommandService)paneServiceProvider.GetService(typeof(IMenuCommandService));
             BindNavigatorCommand(menuService, PkgCmdIDList.pullRequestCommand, showPullRequests);

@@ -161,7 +161,7 @@ namespace GitHub.VisualStudio.Base
                 {
                     await JoinableTaskFactory.SwitchToMainThreadAsync();
                     ActiveRepo = repo;
-                }).Task.LogAndForget(log);
+                }).Task.Forget(log);
             }
         }
 
