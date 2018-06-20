@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Logging;
+using GitHub.Extensions;
 using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.Shell;
@@ -53,7 +54,7 @@ namespace GitHub.VisualStudio.Base
             // The IGitExt service isn't available when a TFS based solution is opened directly.
             // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
             var context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
-            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.LogAndForget(log));
+            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.Forget(log));
         }
 
         async Task InitializeAsync()

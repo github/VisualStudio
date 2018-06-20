@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Primitives;
+using GitHub.Extensions;
 using Serilog;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
@@ -72,7 +73,7 @@ namespace GitHub.Services
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(TeamExplorerContext);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
-            
+
             this.gitExt = gitExt;
             this.dteAsync = dteAsync;
             this.pullRequestService = pullRequestService;
@@ -81,7 +82,7 @@ namespace GitHub.Services
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        void StartRefresh() => JoinableTaskFactory.RunAsync(QueueRefreshAsync).Task.LogAndForget(log);
+        void StartRefresh() => JoinableTaskFactory.RunAsync(QueueRefreshAsync).Task.Forget(log);
         void Refresh() => JoinableTaskFactory.Run(QueueRefreshAsync);
 
         async Task QueueRefreshAsync()
