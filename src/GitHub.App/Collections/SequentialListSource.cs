@@ -28,7 +28,7 @@ namespace GitHub.Collections
 
         public SequentialListSource()
         {
-            dispatcher = Application.Current.Dispatcher;
+            dispatcher = Application.Current?.Dispatcher;
         }
 
         public bool IsLoading
@@ -45,7 +45,7 @@ namespace GitHub.Collections
 
         public async Task<int> GetCount()
         {
-            dispatcher.VerifyAccess();
+            dispatcher?.VerifyAccess();
 
             if (!count.HasValue)
             {
@@ -57,7 +57,7 @@ namespace GitHub.Collections
 
         public async Task<IReadOnlyList<TViewModel>> GetPage(int pageNumber)
         {
-            dispatcher.VerifyAccess();
+            dispatcher?.VerifyAccess();
 
             var page = await EnsureLoaded(pageNumber);
 

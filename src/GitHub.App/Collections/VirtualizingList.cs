@@ -27,7 +27,7 @@ namespace GitHub.Collections
             Placeholder = placeholder;
             emptyPage = Enumerable.Repeat(default(T), PageSize).ToList();
             placeholderPage = Enumerable.Repeat(placeholder, PageSize).ToList();
-            dispatcher = Application.Current.Dispatcher;
+            dispatcher = Application.Current?.Dispatcher;
         }
 
         public T this[int index]
@@ -45,7 +45,15 @@ namespace GitHub.Collections
                 else
                 {
                     LoadPage(pageNumber);
-                    return placeholderPage[0];
+
+                    if (pages.TryGetValue(pageNumber, out page))
+                    {
+                        return page[pageIndex];
+                    }
+                    else
+                    {
+                        return placeholderPage[0];
+                    }
                 }
             }
 
@@ -135,7 +143,7 @@ namespace GitHub.Collections
 
         void LoadCount()
         {
-            dispatcher.VerifyAccess();
+            dispatcher?.VerifyAccess();
 
             try
             {
@@ -166,7 +174,7 @@ namespace GitHub.Collections
 
         async void LoadPage(int number)
         {
-            dispatcher.VerifyAccess();
+            dispatcher?.VerifyAccess();
 
             try
             {
