@@ -111,6 +111,7 @@
                           Grid.Column="1"
                           MaxLength="{x:Static ghfvs:Constants.MaxRepositoryNameLength}"
                           Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" 
+                          SpellCheck.IsEnabled="True"
                           AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryNameTextBox}" />
 
                 <StackPanel Grid.Row="1" Grid.Column="1">
@@ -132,6 +133,7 @@
                           Grid.Row="2"
                           Grid.Column="1"
                           Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
+                          SpellCheck.IsEnabled="True"
                           AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryDescriptionTextBox}" />
 
         <Label Grid.Row="3"
