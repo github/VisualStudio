@@ -232,6 +232,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+      <Link>SplatModeDetectorSetUp.cs</Link>
+    </Compile>
     <Compile Include="Args.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />

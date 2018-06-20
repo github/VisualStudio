@@ -113,6 +113,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+      <Link>SplatModeDetectorSetUp.cs</Link>
+    </Compile>
     <Compile Include="Models\DiffUtilitiesTests.cs" />
     <Compile Include="Services\PullRequestSessionManagerTests.cs" />
     <Compile Include="Services\PullRequestSessionServiceTests.cs" />

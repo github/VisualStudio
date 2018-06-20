@@ -146,6 +146,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+      <Link>SplatModeDetectorSetUp.cs</Link>
+    </Compile>
     <Compile Include="Args.cs" />
     <Compile Include="Caches\ImageCacheTests.cs" />
     <Compile Include="Factories\ModelServiceFactoryTests.cs" />

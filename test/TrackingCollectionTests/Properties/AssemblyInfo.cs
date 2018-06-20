@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 
@@ -36,14 +35,4 @@ using NUnit.Framework;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Timeout(2 /*minutes*/ *60*1000)]
-
-[SetUpFixture]
-public class SplatModeDetectorSetUp
-{
-    [OneTimeSetUp]
-    public void RunBeforeAnyTests()
-    {
-        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-    }
-}
+[assembly: Timeout(2 /*minutes*/ * 60 * 1000)]

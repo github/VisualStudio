@@ -228,6 +228,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+      <Link>SplatModeDetectorSetUp.cs</Link>
+    </Compile>
     <Compile Include="Caches\AccountCacheItemTests.cs" />
     <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

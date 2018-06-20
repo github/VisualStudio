@@ -81,6 +81,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+      <Link>SplatModeDetectorSetUp.cs</Link>
+    </Compile>
     <Compile Include="ITestOutputHelper.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Thing.cs" />
