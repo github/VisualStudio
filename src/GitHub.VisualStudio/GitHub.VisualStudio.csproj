@@ -34,7 +34,7 @@
     <RootNamespace>GitHub.VisualStudio</RootNamespace>
     <AssemblyName>GitHub.VisualStudio</AssemblyName>
     <StartAction>Program</StartAction>
-    <StartProgram Condition="' $(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
+    <StartProgram Condition=" '$(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <LangVersion>6</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
