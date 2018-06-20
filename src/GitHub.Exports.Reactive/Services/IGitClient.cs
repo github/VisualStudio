@@ -153,11 +153,14 @@ namespace GitHub.Services
         Task UnsetConfig(IRepository repository, string key);
 
         /// <summary>
-        /// Get a <see cref="Remote"/> that used the http protocol.
+        /// Get an equivalent <see cref="Remote"/> that uses the https protocol.
         /// </summary>
+        /// <remarks>
+        /// This method is nessesary because the extension doesn't support SSH authentication.
+        /// </remarks>
         /// <param name="repository">The repository</param>
-        /// <param name="remote">The name of the remote or null to use original remote.</param>
-        /// <returns>A <see cref="Remote"/> that uses the http protocol.</returns>
+        /// <param name="remote">The name of the remote or null to use the origin remote.</param>
+        /// <returns>A <see cref="Remote"/> that uses the https protocol.</returns>
         Task<Remote> GetHttpRemote(IRepository repo, string remote = null);
 
         /// <summary>
