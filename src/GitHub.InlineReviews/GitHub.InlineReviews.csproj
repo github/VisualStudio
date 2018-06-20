@@ -22,6 +22,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.InlineReviews</RootNamespace>
     <AssemblyName>GitHub.InlineReviews</AssemblyName>
+    <LangVersion>6</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>

@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              Name="root">
 
@@ -47,10 +49,14 @@
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>
+            <local:DirectoryIsExpandedToImageMonikerConverter x:Key="DirectoryIsExpandedToImageMonikerConverter" />
+            <local:FileNameToImageMonikerConverter x:Key="FileNameToImageMonikerConverter" />
+
             <HierarchicalDataTemplate DataType="{x:Type ghfvs:PullRequestDirectoryNode}"
                                       ItemsSource="{Binding Children}">
                 <StackPanel Orientation="Horizontal">
-                    <ghfvs:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" Margin="0,0,0,2"/>
+                    <imaging:CrispImage Moniker="{Binding Converter={StaticResource DirectoryIsExpandedToImageMonikerConverter}, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Path=IsExpanded}"
+                                        Width="16" Height="16" Margin="0,0,0,2"/>
                     <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                 </StackPanel>
             </HierarchicalDataTemplate>
@@ -60,27 +66,8 @@
                             Tag="{Binding DataContext, ElementName=root}"
                             KeyboardNavigation.DirectionalNavigation="None">
 
-                    <!-- 
-                      We need to change the color of the file icon when the file is deleted, but applying the style
-                      to OcticonImage directly borks the designer (see #1410). Work around this by applying the color
-                      to a parent control and let the foreground be inherited by the icon.
-                    -->
-                    <Decorator>
-                        <Decorator.Style>
-                            <Style TargetType="Decorator">
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Status}" Value="Removed"/>
-                                            <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Path=IsSelected}" Value="False"/>
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="TextBlock.Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Decorator.Style>
-                        <ghfvs:OcticonImage Icon="file_code" Margin="0,0,0,2"/>
-                    </Decorator>
+                    <imaging:CrispImage Moniker="{Binding Converter={StaticResource FileNameToImageMonikerConverter}, Path=FileName}"
+                                        Width="16" Height="16" Margin="0,0,0,2"/>
 
                     <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
                         <TextBlock.Style>
