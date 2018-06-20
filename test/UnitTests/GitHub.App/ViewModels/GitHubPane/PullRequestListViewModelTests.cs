@@ -1,21 +1,106 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Media.Imaging;
-using GitHub.Collections;
+using System.Threading.Tasks;
 using GitHub.Models;
-using GitHub.Services;
-using GitHub.Settings;
-using GitHub.ViewModels.GitHubPane;
 using GitHub.Primitives;
+using GitHub.Services;
+using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
 using NUnit.Framework;
-using GitHub.Factories;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
     public class PullRequestListViewModelTests : TestBaseClass
     {
+        [Test]
+        public async Task OpenItem_Navigates_To_Correct_Fork_Url()
+        {
+            var repository = CreateLocalRepository();
+            var target = await CreateTargetAndInitialize(
+                repositoryService: CreateRepositoryService("owner"),
+                repository: CreateLocalRepository("fork", "name"));
+
+            var uri = (Uri)null;
+            target.NavigationRequested.Subscribe(x => uri = x);
+
+            target.OpenItem.Execute(target.Items[1]);
+
+            Assert.That(uri, Is.EqualTo(new Uri("github://pane/owner/name/pull/2")));
+        }
+
+        static ILocalRepositoryModel CreateLocalRepository(
+            string owner = "owner",
+            string name = "name")
+        {
+            var result = Substitute.For<ILocalRepositoryModel>();
+            result.CloneUrl.Returns(new UriString($"https://giuthub.com/{owner}/{name}"));
+            result.Owner.Returns(owner);
+            result.Name.Returns(name);
+            return result;
+        }
+
+        static IPullRequestSessionManager CreateSessionManager(PullRequestDetailModel pullRequest = null)
+        {
+            pullRequest = pullRequest ?? new PullRequestDetailModel();
+
+            var session = Substitute.For<IPullRequestSession>();
+            session.PullRequest.Returns(pullRequest);
+
+            var result = Substitute.For<IPullRequestSessionManager>();
+            result.CurrentSession.Returns(session);
+            return result;
+        }
+
+        static IPullRequestService CreatePullRequestService(int itemCount = 10)
+        {
+            var result = Substitute.For<IPullRequestService>();
+            result.ReadPullRequests(null, null, null, null, null).ReturnsForAnyArgs(
+                new Page<PullRequestListItemModel>
+                {
+                    Items = Enumerable.Range(0, itemCount).Select(x => new PullRequestListItemModel
+                    {
+                        Id = "pr" + x,
+                        Number = x + 1,
+                    }).ToList()
+                });
+            return result;
+        }
+
+        static IRepositoryService CreateRepositoryService(string parentOwnerLogin = null)
+        {
+            var result = Substitute.For<IRepositoryService>();
+            result.ReadParentOwnerLogin(null, null, null).ReturnsForAnyArgs(parentOwnerLogin);
+            return result;
+        }
+
+        static PullRequestListViewModel CreateTarget(
+            IPullRequestSessionManager sessionManager = null,
+            IRepositoryService repositoryService = null,
+            IPullRequestService service = null)
+        {
+            sessionManager = sessionManager ?? CreateSessionManager();
+            repositoryService = repositoryService ?? CreateRepositoryService();
+            service = service ?? CreatePullRequestService();
+
+            return new PullRequestListViewModel(
+                sessionManager,
+                repositoryService,
+                service);
+        }
+
+        static async Task<PullRequestListViewModel> CreateTargetAndInitialize(
+            IPullRequestSessionManager sessionManager = null,
+            IRepositoryService repositoryService = null,
+            IPullRequestService service = null,
+            ILocalRepositoryModel repository = null,
+            IConnection connection = null)
+        {
+            var result = CreateTarget(sessionManager, repositoryService, service);
+            await result.InitializeAsync(repository, connection);
+            return result;
+        }
+
         ////[Test]
         ////public void SelectingAssigneeShouldTriggerFilter()
         ////{
