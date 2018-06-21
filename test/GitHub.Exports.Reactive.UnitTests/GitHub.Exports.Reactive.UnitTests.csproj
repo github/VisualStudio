@@ -226,11 +226,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs">
       <Link>SplatModeDetectorSetUp.cs</Link>
     </Compile>
+    <Compile Include="..\Helpers\TestBaseClass.cs" />
     <Compile Include="Caches\AccountCacheItemTests.cs" />
-    <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\PullRequestEditorServiceTests.cs" />
   </ItemGroup>

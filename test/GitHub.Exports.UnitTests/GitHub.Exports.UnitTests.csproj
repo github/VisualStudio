@@ -220,12 +220,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs">
       <Link>SplatModeDetectorSetUp.cs</Link>
     </Compile>
+    <Compile Include="..\Helpers\TestBaseClass.cs" />
     <Compile Include="Args.cs" />
     <Compile Include="GitServiceTests.cs" />
-    <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="HostAddressTests.cs" />
     <Compile Include="LocalRepositoryModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

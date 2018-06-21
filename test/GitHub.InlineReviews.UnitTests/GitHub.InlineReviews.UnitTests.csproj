@@ -113,7 +113,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs">
       <Link>SplatModeDetectorSetUp.cs</Link>
     </Compile>
     <Compile Include="Models\DiffUtilitiesTests.cs" />

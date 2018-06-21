@@ -144,20 +144,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\common\SplatModeDetectorSetUp.cs">
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs">
       <Link>SplatModeDetectorSetUp.cs</Link>
     </Compile>
+    <Compile Include="..\Helpers\CommandTestHelpers.cs" />
+    <Compile Include="..\Helpers\LazySubstitute.cs" />
+    <Compile Include="..\Helpers\ReactiveTestHelper.cs" />
+    <Compile Include="..\Helpers\RepositoryHelpers.cs" />
+    <Compile Include="..\Helpers\SimpleJson.cs" />
+    <Compile Include="..\Helpers\TestBaseClass.cs" />
+    <Compile Include="..\Helpers\TestImageCache.cs" />
+    <Compile Include="..\Helpers\TestSharedCache.cs" />
     <Compile Include="Args.cs" />
     <Compile Include="Caches\ImageCacheTests.cs" />
     <Compile Include="Factories\ModelServiceFactoryTests.cs" />
-    <Compile Include="Helpers\CommandTestHelpers.cs" />
-    <Compile Include="Helpers\LazySubstitute.cs" />
-    <Compile Include="Helpers\ReactiveTestHelper.cs" />
-    <Compile Include="Helpers\RepositoryHelpers.cs" />
-    <Compile Include="Helpers\SimpleJson.cs" />
-    <Compile Include="Helpers\TestBaseClass.cs" />
-    <Compile Include="Helpers\TestImageCache.cs" />
-    <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Models\AccountModelTests.cs" />
     <Compile Include="Models\ModelServiceTests.cs" />
     <Compile Include="Models\PullRequestModelTests.cs" />
