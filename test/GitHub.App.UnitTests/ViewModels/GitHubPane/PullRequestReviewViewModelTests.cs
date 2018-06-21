@@ -14,7 +14,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void Empty_Body_Is_Exposed_As_Null()
         {
             var pr = CreatePullRequest();
-            ((PullRequestReviewModel)pr.Reviews[0]).Body = string.Empty;
+            pr.Reviews[0].Body = string.Empty;
 
             var target = CreateTarget(pullRequest: pr);
 
@@ -25,7 +25,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void Creates_FileComments_And_OutdatedComments()
         {
             var pr = CreatePullRequest();
-            ((PullRequestReviewModel)pr.Reviews[0]).Body = string.Empty;
+            pr.Reviews[0].Body = string.Empty;
 
             var target = CreateTarget(pullRequest: pr);
 
@@ -37,8 +37,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void HasDetails_True_When_Has_Body()
         {
             var pr = CreatePullRequest();
-            pr.ReviewComments = new IPullRequestReviewCommentModel[0];
-
             var target = CreateTarget(pullRequest: pr);
 
             Assert.That(target.HasDetails, Is.True);
@@ -48,7 +46,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void HasDetails_True_When_Has_Comments()
         {
             var pr = CreatePullRequest();
-            ((PullRequestReviewModel)pr.Reviews[0]).Body = string.Empty;
+            pr.Reviews[0].Body = string.Empty;
 
             var target = CreateTarget(pullRequest: pr);
 
@@ -59,8 +57,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public void HasDetails_False_When_Has_No_Body_Or_Comments()
         {
             var pr = CreatePullRequest();
-            ((PullRequestReviewModel)pr.Reviews[0]).Body = string.Empty;
-            pr.ReviewComments = new IPullRequestReviewCommentModel[0];
+            var review = pr.Reviews[0];
+
+            review.Body = string.Empty;
+            review.Comments = new PullRequestReviewCommentModel[0];
 
             var target = CreateTarget(pullRequest: pr);
 
@@ -70,8 +70,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         PullRequestReviewViewModel CreateTarget(
             IPullRequestEditorService editorService = null,
             IPullRequestSession session = null,
-            IPullRequestModel pullRequest = null,
-            IPullRequestReviewModel model = null)
+            PullRequestDetailModel pullRequest = null,
+            PullRequestReviewModel model = null)
         {
             editorService = editorService ?? Substitute.For<IPullRequestEditorService>();
             session = session ?? Substitute.For<IPullRequestSession>();
@@ -81,77 +81,77 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return new PullRequestReviewViewModel(
                 editorService,
                 session,
-                pullRequest,
                 model);
         }
 
-        private PullRequestModel CreatePullRequest(
+        private PullRequestDetailModel CreatePullRequest(
             int number = 5,
             string title = "Pull Request Title",
             string body = "Pull Request Body",
-            IAccount author = null,
-            DateTimeOffset? createdAt = null)
+            ActorModel author = null)
         {
-            author = author ?? Substitute.For<IAccount>();
-            createdAt = createdAt ?? DateTimeOffset.Now;
-
-            return new PullRequestModel(number, title, author, createdAt.Value)
+            var thread1 = new PullRequestReviewThreadModel
             {
+                Position = 10
+            };
+
+            return new PullRequestDetailModel
+            {
+                Number = number,
+                Title = title,
+                Author = author ?? new ActorModel(),
                 Body = body,
                 Reviews = new[]
                 {
                     new PullRequestReviewModel
                     {
-                        Id = 1,
+                        Id = "1",
                         Body = "Looks good to me!",
                         State = PullRequestReviewState.Approved,
+                        Comments = new[]
+                        {
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "I like this.",
+                                Thread = new PullRequestReviewThreadModel { Position = 10 },
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "This is good.",
+                                Thread = new PullRequestReviewThreadModel { Position = 11 },
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "Fine, but outdated.",
+                                Thread = new PullRequestReviewThreadModel { Position = null },
+                            },
+                        },
                     },
                     new PullRequestReviewModel
                     {
-                        Id = 2,
+                        Id = "2",
                         Body = "Changes please.",
                         State = PullRequestReviewState.ChangesRequested,
+                        Comments = new[]
+                        {
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "Not great.",
+                                Thread = new PullRequestReviewThreadModel { Position = 20 },
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "This sucks.",
+                                Thread = new PullRequestReviewThreadModel { Position = 21 },
+                            },
+                            new PullRequestReviewCommentModel
+                            {
+                                Body = "Bad and old.",
+                                Thread = new PullRequestReviewThreadModel { Position = null },
+                            },
+                        },
                     },
                 },
-                ReviewComments = new[]
-                {
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "I like this.",
-                        PullRequestReviewId = 1,
-                        Position = 10,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "This is good.",
-                        PullRequestReviewId = 1,
-                        Position = 11,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "Fine, but outdated.",
-                        PullRequestReviewId = 1,
-                        Position = null,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "Not great.",
-                        PullRequestReviewId = 2,
-                        Position = 20,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "This sucks.",
-                        PullRequestReviewId = 2,
-                        Position = 21,
-                    },
-                    new PullRequestReviewCommentModel
-                    {
-                        Body = "Bad and old.",
-                        PullRequestReviewId = 2,
-                        Position = null,
-                    },
-                }
             };
         }
     }

@@ -11,6 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.App</RootNamespace>
     <AssemblyName>GitHub.App</AssemblyName>
+    <LangVersion>6</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -144,12 +145,12 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.14.3.25407\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    <Reference Include="Octokit.GraphQL, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.2.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.2-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -208,12 +209,10 @@
     <Compile Include="Commands\UsageTrackingCommand.cs" />
     <Compile Include="Factories\ViewViewModelFactory.cs" />
     <Compile Include="Factories\ModelServiceFactory.cs" />
-    <Compile Include="Models\IssueCommentModel.cs" />
-    <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
+    <Compile Include="Models\PullRequestModel.cs" />
     <Compile Include="SampleData\ForkRepositoryExecuteViewModelDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
-    <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="SampleData\GitServiceDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySwitchViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
@@ -224,6 +223,7 @@
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\RepositoryForkService.cs" />
+    <Compile Include="ViewModels\ActorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositoryExecuteViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositorySwitchViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositoryViewModel.cs" />
@@ -255,7 +255,7 @@
     <Compile Include="ViewModels\GitHubPane\NotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewAuthoringViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestReviewFileCommentViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewSummaryViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestReviewViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestUserReviewsViewModel.cs" />
@@ -267,8 +267,6 @@
     <Compile Include="Extensions\AkavacheExtensions.cs" />
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Models\PullRequestFileModel.cs" />
-    <Compile Include="Models\PullRequestModel.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

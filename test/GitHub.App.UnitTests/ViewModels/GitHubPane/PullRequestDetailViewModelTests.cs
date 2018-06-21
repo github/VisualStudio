@@ -34,7 +34,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             }
         }
 
-        public class TheHeadProperty : TestBaseClass
+        public class TheSourceBranchDisplayNameProperty : TestBaseClass
         {
             [Test]
             public async Task ShouldAcceptNullHeadAsync()
@@ -42,8 +42,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 var target = CreateTarget();
                 var model = CreatePullRequestModel();
 
-                // PullRequest.Head can be null for example if a user deletes the repository after creating the PR.
-                model.Head = null;
+                // PullRequest.HeadRepositoryOwner can be null if a user deletes the repository after creating the PR.
+                model.HeadRepositoryOwner = null;
 
                 await target.Load(model);
 
@@ -58,10 +58,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.ChangesRequested),
-                    CreatePullRequestReviewModel(2, "shana", PullRequestReviewState.ChangesRequested),
-                    CreatePullRequestReviewModel(3, "grokys", PullRequestReviewState.Approved),
-                    CreatePullRequestReviewModel(4, "grokys", PullRequestReviewState.Commented));
+                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.ChangesRequested),
+                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.ChangesRequested),
+                    CreatePullRequestReviewModel("3", "grokys", PullRequestReviewState.Approved),
+                    CreatePullRequestReviewModel("4", "grokys", PullRequestReviewState.Commented));
 
                 await target.Load(model);
 
@@ -69,9 +69,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
                 Assert.That(target.Reviews[1].User.Login, Is.EqualTo("shana"));
                 Assert.That(target.Reviews[2].User.Login, Is.EqualTo("grokys"));
-                Assert.That(target.Reviews[0].Id, Is.EqualTo(3));
-                Assert.That(target.Reviews[1].Id, Is.EqualTo(2));
-                Assert.That(target.Reviews[2].Id, Is.EqualTo(0));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo("3"));
+                Assert.That(target.Reviews[1].Id, Is.EqualTo("2"));
+                Assert.That(target.Reviews[2].Id, Is.Null);
             }
 
             [Test]
@@ -79,15 +79,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel(1, "shana", PullRequestReviewState.Commented),
-                    CreatePullRequestReviewModel(2, "shana", PullRequestReviewState.Commented));
+                    CreatePullRequestReviewModel("1", "shana", PullRequestReviewState.Commented),
+                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.Commented));
 
                 await target.Load(model);
 
                 Assert.That(target.Reviews, Has.Count.EqualTo(2));
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("shana"));
                 Assert.That(target.Reviews[1].User.Login, Is.EqualTo("grokys"));
-                Assert.That(target.Reviews[0].Id, Is.EqualTo(2));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo("2"));
             }
 
             [Test]
@@ -95,13 +95,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.Pending));
+                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.Pending));
 
                 await target.Load(model);
 
                 Assert.That(target.Reviews, Has.Count.EqualTo(1));
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
-                Assert.That(target.Reviews[0].Id, Is.EqualTo(1));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo("1"));
             }
 
             [Test]
@@ -109,14 +109,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel(1, "grokys", PullRequestReviewState.Approved),
-                    CreatePullRequestReviewModel(2, "grokys", PullRequestReviewState.Pending));
+                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.Approved),
+                    CreatePullRequestReviewModel("2", "grokys", PullRequestReviewState.Pending));
 
                 await target.Load(model);
 
                 Assert.That(target.Reviews, Has.Count.EqualTo(1));
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
-                Assert.That(target.Reviews[0].Id, Is.EqualTo(2));
+                Assert.That(target.Reviews[0].Id, Is.EqualTo("2"));
             }
 
             [Test]
@@ -124,33 +124,35 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel(1, "shana", PullRequestReviewState.Pending));
+                    CreatePullRequestReviewModel("1", "shana", PullRequestReviewState.Pending));
 
                 await target.Load(model);
 
                 Assert.That(target.Reviews, Has.Count.EqualTo(1));
                 Assert.That(target.Reviews[0].User.Login, Is.EqualTo("grokys"));
-                Assert.That(target.Reviews[0].Id, Is.EqualTo(0));
+                Assert.That(target.Reviews[0].Id, Is.Null);
             }
 
-            static PullRequestModel CreatePullRequestModel(
-                params IPullRequestReviewModel[] reviews)
+            static PullRequestDetailModel CreatePullRequestModel(
+                params PullRequestReviewModel[] reviews)
             {
                 return PullRequestDetailViewModelTests.CreatePullRequestModel(reviews: reviews);
             }
 
             static PullRequestReviewModel CreatePullRequestReviewModel(
-                long id,
+                string id,
                 string login,
                 PullRequestReviewState state)
             {
-                var account = Substitute.For<IAccount>();
-                account.Login.Returns(login);
+                var account = new ActorModel
+                {
+                    Login = login,
+                };
 
                 return new PullRequestReviewModel
                 {
                     Id = id,
-                    User = account,
+                    Author = account,
                     State = state,
                 };
             }
@@ -232,7 +234,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     existingPrBranch: "pr/123");
                 var pr = CreatePullRequestModel();
 
-                pr.Head = new GitReferenceModel("source", null, "sha", (string)null);
+                pr.HeadRepositoryOwner = null;
 
                 await target.Load(pr);
 
@@ -535,22 +537,22 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             if (existingPrBranch != null)
             {
                 var existingBranchModel = new BranchModel(existingPrBranch, repository);
-                pullRequestService.GetLocalBranches(repository, Arg.Any<IPullRequestModel>())
+                pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequestDetailModel>())
                     .Returns(Observable.Return(existingBranchModel));
             }
             else
             {
-                pullRequestService.GetLocalBranches(repository, Arg.Any<IPullRequestModel>())
+                pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequestDetailModel>())
                     .Returns(Observable.Empty<IBranch>());
             }
 
-            pullRequestService.Checkout(repository, Arg.Any<IPullRequestModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
+            pullRequestService.Checkout(repository, Arg.Any<PullRequestDetailModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
             pullRequestService.GetDefaultLocalBranchName(repository, Arg.Any<int>(), Arg.Any<string>()).Returns(x => Observable.Return($"pr/{x[1]}"));
-            pullRequestService.IsPullRequestFromRepository(repository, Arg.Any<IPullRequestModel>()).Returns(!prFromFork);
+            pullRequestService.IsPullRequestFromRepository(repository, Arg.Any<PullRequestDetailModel>()).Returns(!prFromFork);
             pullRequestService.IsWorkingDirectoryClean(repository).Returns(Observable.Return(!dirty));
             pullRequestService.Pull(repository).Returns(x => Throws("Pull threw"));
             pullRequestService.Push(repository).Returns(x => Throws("Push threw"));
-            pullRequestService.SwitchToBranch(repository, Arg.Any<IPullRequestModel>())
+            pullRequestService.SwitchToBranch(repository, Arg.Any<PullRequestDetailModel>())
                 .Returns(
                     x => Throws("Switch threw"),
                     _ => Observable.Return(Unit.Default));
@@ -564,11 +566,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             if (sessionManager == null)
             {
                 var currentSession = Substitute.For<IPullRequestSession>();
-                currentSession.User.Login.Returns("grokys");
+                currentSession.PullRequest.Returns(CreatePullRequestModel());
+                currentSession.User.Returns(new ActorModel { Login = "grokys" });
 
                 sessionManager = Substitute.For<IPullRequestSessionManager>();
                 sessionManager.CurrentSession.Returns(currentSession);
-                sessionManager.GetSession(null).ReturnsForAnyArgs(currentSession);
+                sessionManager.GetSession("owner", "repo", 1).ReturnsForAnyArgs(currentSession);
             }
 
             var vm = new PullRequestDetailViewModel(
@@ -584,21 +587,28 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return Tuple.Create(vm, pullRequestService);
         }
 
-        static PullRequestModel CreatePullRequestModel(
+        static PullRequestDetailModel CreatePullRequestModel(
             int number = 1,
             string body = "PR Body",
-            IEnumerable<IPullRequestReviewModel> reviews = null)
+            IEnumerable<PullRequestReviewModel> reviews = null)
         {
             var author = Substitute.For<IAccount>();
 
-            reviews = reviews ?? new IPullRequestReviewModel[0];
+            reviews = reviews ?? new PullRequestReviewModel[0];
 
-            return new PullRequestModel(number, "PR 1", author, DateTimeOffset.Now)
+            return new PullRequestDetailModel
             {
+                Number = number,
+                Title = "PR 1",
+                Author = new ActorModel(),
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel("source", "foo:baz", "sha", "https://github.com/foo/bar.git"),
-                Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
+                BaseRefName = "master",
+                BaseRefSha = "BASE_REF",
+                HeadRefName = "baz",
+                HeadRefSha = "HEAD_REF",
+                HeadRepositoryOwner = "foo",
+                UpdatedAt = DateTimeOffset.Now,
                 Reviews = reviews.ToList(),
             };
         }

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using GitHub.Extensions;
-using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
-using Serilog;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -21,13 +19,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         /// <param name="editorService">The pull request editor service.</param>
         /// <param name="session">The pull request session.</param>
-        /// <param name="pullRequest">The pull request model.</param>
         /// <param name="model">The pull request review model.</param>
         public PullRequestReviewViewModel(
             IPullRequestEditorService editorService,
             IPullRequestSession session,
-            IPullRequestModel pullRequest,
-            IPullRequestReviewModel model)
+            PullRequestReviewModel model)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(session, nameof(session));
@@ -40,16 +36,17 @@ namespace GitHub.ViewModels.GitHubPane
             var comments = new List<IPullRequestReviewFileCommentViewModel>();
             var outdated = new List<IPullRequestReviewFileCommentViewModel>();
 
-            foreach (var comment in pullRequest.ReviewComments)
+            foreach (var comment in model.Comments)
             {
-                if (comment.PullRequestReviewId == model.Id)
+                if (comment.Thread != null)
                 {
-                    var vm = new PullRequestReviewFileCommentViewModel(
+                    var vm = new PullRequestReviewCommentViewModel(
                         editorService,
                         session,
+                        comment.Thread.Path,
                         comment);
 
-                    if (comment.Position.HasValue)
+                    if (comment.Thread.Position != null)
                         comments.Add(vm);
                     else
                         outdated.Add(vm);
@@ -65,7 +62,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public IPullRequestReviewModel Model { get; }
+        public PullRequestReviewModel Model { get; }
 
         /// <inheritdoc/>
         public string Body { get; }

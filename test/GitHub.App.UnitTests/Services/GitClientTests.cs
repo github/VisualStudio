@@ -208,15 +208,15 @@ public class GitClientTests
             repo.Network.Remotes.Received(1).Add(Arg.Any<string>(), expectFetchUrl);
         }
 
-        [TestCase("https://github.com/owner/repo", "https://github.com/owner/repo", null)]
-        [TestCase("https://github.com/fetch/repo", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
-        [TestCase("git@github.com:owner/repo", "git@github.com:owner/repo", "https://github.com/owner/repo")]
-        public async Task UseOriginWhenPossibleAsync(string fetchUrl, string originUrl, string addUrl = null)
+        [TestCase("https://github.com/owner/repo", "origin", "https://github.com/owner/repo", null)]
+        [TestCase("https://github.com/fetch/repo", "origin", "https://github.com/origin/repo", "https://github.com/fetch/repo")]
+        [TestCase("git@github.com:owner/repo", "origin", "git@github.com:owner/repo", "https://github.com/owner/repo", Description = "Only use http style urls")]
+        [TestCase("https://github.com/jcansdale/repo", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Use existing remote")]
+        [TestCase("https://github.com/jcansdale/repo.git", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Ignore trailing .git")]
+        [TestCase("https://github.com/JCANSDALE/REPO", "jcansdale", "https://github.com/jcansdale/repo", null, Description = "Ignore different case")]
+        public async Task UseExistingRemoteWhenPossible(string fetchUrl, string remoteName, string remoteUrl, string addUrl = null)
         {
-            var remote = Substitute.For<Remote>();
-            remote.Url.Returns(originUrl);
-            var repo = Substitute.For<IRepository>();
-            repo.Network.Remotes["origin"].Returns(remote);
+            var repo = CreateRepository(remoteName, remoteUrl);
             var fetchUri = new UriString(fetchUrl);
             var refSpec = "refSpec";
             var gitClient = CreateGitClient();
@@ -231,6 +231,68 @@ public class GitClientTests
             {
                 repo.Network.Remotes.DidNotReceiveWithAnyArgs().Add(null, null);
             }
+        }
+
+        [TestCase("https://github.com/upstream_owner/repo", "origin", "https://github.com/origin_owner/repo",
+            "upstream_owner", "https://github.com/upstream_owner/repo")]
+        public async Task CreateRemoteWithNameOfOwner(string fetchUrl, string remoteName, string remoteUrl,
+            string expectRemoteName, string expectRemoteUrl)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            repo.Network.Remotes.Received(1).Add(expectRemoteName, expectRemoteUrl);
+            repo.Network.Remotes.Received(0).Remove(Arg.Any<string>());
+        }
+
+        [TestCase("https://github.com/same_name/repo", "same_name", "https://github.com/different_name/repo",
+            "same_name", "https://github.com/same_name/repo")]
+        public async Task UseTemporaryRemoteWhenSameRemoteWithDifferentUrlExists(string fetchUrl, string remoteName, string remoteUrl,
+            string expectRemoteName, string expectRemoteUrl)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            repo.Network.Remotes.Received(0).Add(expectRemoteName, expectRemoteUrl);
+            repo.Network.Remotes.Received(1).Add(Arg.Any<string>(), expectRemoteUrl);
+            repo.Network.Remotes.Received(1).Remove(Arg.Any<string>());
+        }
+
+        [TestCase("https://github.com/owner/repo", "origin", "https://github.com/owner/repo", "origin")]
+        [TestCase("https://github.com/owner/repo", "not_origin", "https://github.com/owner/repo", "not_origin")]
+        public async Task FetchFromExistingRemote(string fetchUrl, string remoteName, string remoteUrl, string expectRemoteName)
+        {
+            var repo = CreateRepository(remoteName, remoteUrl);
+            var fetchUri = new UriString(fetchUrl);
+            var refSpec = "refSpec";
+            var gitClient = CreateGitClient();
+
+            await gitClient.Fetch(repo, fetchUri, refSpec);
+
+            var remote = repo.Network.Remotes[expectRemoteName];
+#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
+            repo.Network.Received(1).Fetch(remote, Arg.Any<string[]>(), Arg.Any<FetchOptions>());
+#pragma warning restore 0618
+        }
+
+        static IRepository CreateRepository(string remoteName, string remoteUrl)
+        {
+            var remote = Substitute.For<Remote>();
+            remote.Name.Returns(remoteName);
+            remote.Url.Returns(remoteUrl);
+            var remotes = new List<Remote> { remote };
+            var repo = Substitute.For<IRepository>();
+            repo.Network.Remotes[remoteName].Returns(remote);
+            repo.Network.Remotes.GetEnumerator().Returns(_ => remotes.GetEnumerator());
+            return repo;
         }
     }
 

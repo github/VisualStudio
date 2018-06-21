@@ -10,6 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub</RootNamespace>
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
+    <LangVersion>6</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -170,6 +171,7 @@
     <Compile Include="Factories\IModelServiceFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
+    <Compile Include="Models\InlineCommentModel.cs" />
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
     <Compile Include="Models\PullRequestTextBufferInfo.cs" />
@@ -224,6 +226,7 @@
     <Compile Include="ViewModels\Dialog\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\Dialog\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ILoginToGitHubViewModel.cs" />
+    <Compile Include="ViewModels\IActorViewModel.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />

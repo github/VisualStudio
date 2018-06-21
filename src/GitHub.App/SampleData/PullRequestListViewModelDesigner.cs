@@ -18,6 +18,7 @@ namespace GitHub.SampleData
         public PullRequestListViewModelDesigner()
         {
             var prs = new TrackingCollection<IPullRequestModel>(Observable.Empty<IPullRequestModel>());
+
             prs.Add(new PullRequestModel(399, "Let's try doing this differently",
                 new AccountDesigner { Login = "shana", IsUser = true },
                 DateTimeOffset.Now - TimeSpan.FromDays(1))
@@ -58,7 +59,7 @@ namespace GitHub.SampleData
 
         public IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
         public IRemoteRepositoryModel SelectedRepository { get; set; }
-        public IPullRequestModel CheckedOutPullRequest { get; set; }
+        public PullRequestDetailModel CheckedOutPullRequest { get; set; }
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
 

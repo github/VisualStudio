@@ -45,8 +45,8 @@ namespace GitHub.Primitives
 
             if (RepositoryName != null)
             {
-                NameWithOwner = Owner != null 
-                    ? string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName) 
+                NameWithOwner = Owner != null
+                    ? string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName)
                     : RepositoryName;
             }
         }
@@ -70,12 +70,12 @@ namespace GitHub.Primitives
             {
                 RepositoryName = GetRepositoryName(uri.Segments.Last());
             }
-            
+
             if (uri.Segments.Length > 2)
             {
                 Owner = (uri.Segments[uri.Segments.Length - 2] ?? "").TrimEnd('/').ToNullIfEmpty();
             }
-            
+
             IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
         }
 
@@ -210,11 +210,36 @@ namespace GitHub.Primitives
             return String.Concat(Value, addition);
         }
 
+        /// <summary>
+        /// Compare repository URLs ignoring any trailing ".git" or difference in case.
+        /// </summary>
+        /// <returns>True if URLs reference the same repository.</returns>
+        public static bool RepositoryUrlsAreEqual(UriString uri1, UriString uri2)
+        {
+            if (!uri1.IsHypertextTransferProtocol || !uri2.IsHypertextTransferProtocol)
+            {
+                // Not a repository URL
+                return false;
+            }
+
+            // Normalize repository URLs
+            var str1 = uri1.ToRepositoryUrl().ToString();
+            var str2 = uri2.ToRepositoryUrl().ToString();
+            return string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase);
+        }
+
         public override string ToString()
         {
             // Makes this look better in the debugger.
             return Value;
         }
+
+        /// <summary>
+        /// Makes a copy of the URI with the specified owner.
+        /// </summary>
+        /// <param name="owner">The owner.</param>
+        /// <returns>A new <see cref="UriString"/>.</returns>
+        public UriString WithOwner(string owner) => ToUriString(ToRepositoryUrl(owner));
 
         protected UriString(SerializationInfo info, StreamingContext context)
             : this(GetSerializedValue(info))
@@ -244,7 +269,7 @@ namespace GitHub.Primitives
 
         static string GetRepositoryName(string repositoryNameSegment)
         {
-            if (String.IsNullOrEmpty(repositoryNameSegment) 
+            if (String.IsNullOrEmpty(repositoryNameSegment)
                 || repositoryNameSegment.Equals("/", StringComparison.Ordinal))
             {
                 return null;
