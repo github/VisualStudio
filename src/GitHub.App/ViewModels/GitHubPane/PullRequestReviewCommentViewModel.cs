@@ -12,17 +12,18 @@ namespace GitHub.ViewModels.GitHubPane
     /// <summary>
     /// A view model for a file comment in a <see cref="PullRequestReviewViewModel"/>.
     /// </summary>
-    public class PullRequestReviewFileCommentViewModel : IPullRequestReviewFileCommentViewModel
+    public class PullRequestReviewCommentViewModel : IPullRequestReviewFileCommentViewModel
     {
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSession session;
-        readonly IPullRequestReviewCommentModel model;
+        readonly PullRequestReviewCommentModel model;
         IInlineCommentThreadModel thread;
 
-        public PullRequestReviewFileCommentViewModel(
+        public PullRequestReviewCommentViewModel(
             IPullRequestEditorService editorService,
             IPullRequestSession session,
-            IPullRequestReviewCommentModel model)
+            string relativePath,
+            PullRequestReviewCommentModel model)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(session, nameof(session));
@@ -31,6 +32,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.editorService = editorService;
             this.session = session;
             this.model = model;
+            RelativePath = relativePath;
 
             Open = ReactiveCommand.CreateAsyncTask(DoOpen);
         }
@@ -39,7 +41,7 @@ namespace GitHub.ViewModels.GitHubPane
         public string Body => model.Body;
 
         /// <inheritdoc/>
-        public string RelativePath => model.Path;
+        public string RelativePath { get; set; }
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> Open { get; }
@@ -50,9 +52,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (thread == null)
                 {
-                    var commit = model.Position.HasValue ? model.CommitId : model.OriginalCommitId;
-                    var file = await session.GetFile(RelativePath, commit);
-                    thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Id == model.Id));
+                    var file = await session.GetFile(RelativePath, model.Thread.CommitSha);
+                    thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
                 }
 
                 if (thread != null && thread.LineNumber != -1)

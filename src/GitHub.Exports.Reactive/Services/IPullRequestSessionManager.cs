@@ -66,15 +66,13 @@ namespace GitHub.Services
         string GetRelativePath(ITextBuffer buffer);
 
         /// <summary>
-        /// Gets a pull request session for a pull request that may not be checked out.
+        /// Gets an <see cref="IPullRequestSession"/> for a pull request.
         /// </summary>
-        /// <param name="pullRequest">The pull request model.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request number.</param>
         /// <returns>An <see cref="IPullRequestSession"/>.</returns>
-        /// <remarks>
-        /// If the provided pull request model represents the current session then that will be
-        /// returned. If not, a new pull request session object will be created.
-        /// </remarks>
-        Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest);
+        Task<IPullRequestSession> GetSession(string owner, string name, int number);
 
         /// <summary>
         /// Gets information about the pull request that a Visual Studio text buffer is a part of.

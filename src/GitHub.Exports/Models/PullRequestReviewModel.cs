@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GitHub.Models
 {
@@ -34,43 +35,43 @@ namespace GitHub.Models
     }
 
     /// <summary>
-    /// Represents a review of a pull request.
+    /// Holds details about a pull request review.
     /// </summary>
-    public interface IPullRequestReviewModel
+    public class PullRequestReviewModel
     {
         /// <summary>
-        /// Gets the ID of the review.
+        /// Gets or sets the GraphQL ID of the pull request review.
         /// </summary>
-        long Id { get; }
+        public string Id { get; set; }
 
         /// <summary>
-        /// Gets the GraphQL ID for the review.
+        /// Gets or sets the author of the pull request review.
         /// </summary>
-        string NodeId { get; set; }
+        public ActorModel Author { get; set; }
 
         /// <summary>
-        /// Gets the author of the review.
+        /// Gets or sets the review's body markdown.
         /// </summary>
-        IAccount User { get; }
+        public string Body { get; set; }
 
         /// <summary>
-        /// Gets the body of the review.
+        /// Gets or sets the review's state (approved, requested changes, commented etc).
         /// </summary>
-        string Body { get; }
+        public PullRequestReviewState State { get; set; }
 
         /// <summary>
-        /// Gets the state of the review.
+        /// Gets or sets the SHA at which the review was left.
         /// </summary>
-        PullRequestReviewState State { get; }
+        public string CommitId { get; set; }
 
         /// <summary>
-        /// Gets the SHA of the commit that the review was submitted on.
+        /// Gets or sets the date/time at which the review was submitted.
         /// </summary>
-        string CommitId { get; }
+        public DateTimeOffset? SubmittedAt { get; set; }
 
         /// <summary>
-        /// Gets the date/time that the review was submitted.
+        /// Gets or sets the review comments.
         /// </summary>
-        DateTimeOffset? SubmittedAt { get; }
+        public IReadOnlyList<PullRequestReviewCommentModel> Comments { get; set; } = Array.Empty<PullRequestReviewCommentModel>();
     }
 }

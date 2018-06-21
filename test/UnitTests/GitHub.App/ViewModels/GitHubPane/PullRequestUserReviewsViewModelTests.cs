@@ -19,66 +19,57 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         public async Task InitializeAsync_Loads_User()
         {
             var modelSerivce = Substitute.For<IModelService>();
-            var user = Substitute.For<IAccount>();
-            modelSerivce.GetUser(AuthorLogin).Returns(Observable.Return(user));
 
-            var target = CreateTarget(
-                modelServiceFactory: CreateFactory(modelSerivce));
+            var target = CreateTarget();
 
             await Initialize(target);
 
-            Assert.That(target.User, Is.SameAs(user));
+            Assert.That(target.User.Login, Is.EqualTo(AuthorLogin));
         }
 
         [Test]
         public async Task InitializeAsync_Creates_Reviews()
         {
-            var author = Substitute.For<IAccount>();
-            author.Login.Returns(AuthorLogin);
+            var author = new ActorModel { Login = AuthorLogin };
+            var anotherAuthor = new ActorModel { Login = "SomeoneElse" };
 
-            var anotherAuthor = Substitute.For<IAccount>();
-            anotherAuthor.Login.Returns("SomeoneElse");
-
-            var pullRequest = new PullRequestModel(5, "PR title", author, DateTimeOffset.Now)
+            var pullRequest = new PullRequestDetailModel
             {
+                Number = 5,
+                Author = author,
                 Reviews = new[]
                 {
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Approved,
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.ChangesRequested,
                     },
                     new PullRequestReviewModel
                     {
-                        User = anotherAuthor,
+                        Author = anotherAuthor,
                         State = PullRequestReviewState.Approved,
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Dismissed,
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Pending,
                     },
                 },
-                ReviewComments = new IPullRequestReviewCommentModel[0],
             };
-
-            var modelSerivce = Substitute.For<IModelService>();
-            modelSerivce.GetUser(AuthorLogin).Returns(Observable.Return(author));
-            modelSerivce.GetPullRequest("owner", "repo", 5).Returns(Observable.Return(pullRequest));
 
             var user = Substitute.For<IAccount>();
             var target = CreateTarget(
-                modelServiceFactory: CreateFactory(modelSerivce));
+                sessionManager: CreateSessionManager(pullRequest));
 
             await Initialize(target);
 
@@ -89,45 +80,41 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Orders_Reviews_Descending()
         {
-            var author = Substitute.For<IAccount>();
-            author.Login.Returns(AuthorLogin);
+            var author = new ActorModel { Login = AuthorLogin };
 
-            var pullRequest = new PullRequestModel(5, "PR title", author, DateTimeOffset.Now)
+            var pullRequest = new PullRequestDetailModel
             {
+                Number = 5,
                 Reviews = new[]
                 {
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Approved,
                         SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(2),
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.ChangesRequested,
                         SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(3),
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Dismissed,
                         SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(1),
                     },
                 },
-                ReviewComments = new IPullRequestReviewCommentModel[0],
             };
-
-            var modelSerivce = Substitute.For<IModelService>();
-            modelSerivce.GetUser(AuthorLogin).Returns(Observable.Return(author));
-            modelSerivce.GetPullRequest("owner", "repo", 5).Returns(Observable.Return(pullRequest));
 
             var user = Substitute.For<IAccount>();
             var target = CreateTarget(
-                modelServiceFactory: CreateFactory(modelSerivce));
+                sessionManager: CreateSessionManager(pullRequest));
 
             await Initialize(target);
 
+            Assert.That(target.Reviews, Is.Not.Empty);
             Assert.That(
                 target.Reviews.Select(x => x.Model.SubmittedAt),
                 Is.EqualTo(target.Reviews.Select(x => x.Model.SubmittedAt).OrderByDescending(x => x)));
@@ -136,42 +123,34 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task First_Review_Is_Expanded()
         {
-            var author = Substitute.For<IAccount>();
-            author.Login.Returns(AuthorLogin);
+            var author = new ActorModel { Login = AuthorLogin };
 
-            var anotherAuthor = Substitute.For<IAccount>();
-            author.Login.Returns("SomeoneElse");
-
-            var pullRequest = new PullRequestModel(5, "PR title", author, DateTimeOffset.Now)
+            var pullRequest = new PullRequestDetailModel
             {
+                Number = 5,
                 Reviews = new[]
                 {
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Approved,
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.ChangesRequested,
                     },
                     new PullRequestReviewModel
                     {
-                        User = author,
+                        Author = author,
                         State = PullRequestReviewState.Dismissed,
                     },
                 },
-                ReviewComments = new IPullRequestReviewCommentModel[0],
             };
-
-            var modelSerivce = Substitute.For<IModelService>();
-            modelSerivce.GetUser(AuthorLogin).Returns(Observable.Return(author));
-            modelSerivce.GetPullRequest("owner", "repo", 5).Returns(Observable.Return(pullRequest));
 
             var user = Substitute.For<IAccount>();
             var target = CreateTarget(
-                modelServiceFactory: CreateFactory(modelSerivce));
+                sessionManager: CreateSessionManager(pullRequest));
 
             await Initialize(target);
 
@@ -199,19 +178,33 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 login);
         }
 
+        IPullRequestSessionManager CreateSessionManager(PullRequestDetailModel pullRequest = null)
+        {
+            pullRequest = pullRequest ?? new PullRequestDetailModel
+            {
+                Reviews = new PullRequestReviewModel[0],
+            };
+
+            var session = Substitute.For<IPullRequestSession>();
+            session.User.Returns(new ActorModel { Login = AuthorLogin });
+            session.PullRequest.Returns(pullRequest);
+
+            var result = Substitute.For<IPullRequestSessionManager>();
+            result.GetSession(null, null, 0).ReturnsForAnyArgs(session);
+
+            return result;
+        }
+
         PullRequestUserReviewsViewModel CreateTarget(
             IPullRequestEditorService editorService = null,
-            IPullRequestSessionManager sessionManager = null,
-            IModelServiceFactory modelServiceFactory = null)
+            IPullRequestSessionManager sessionManager = null)
         {
             editorService = editorService ?? Substitute.For<IPullRequestEditorService>();
-            sessionManager = sessionManager ?? Substitute.For<IPullRequestSessionManager>();
-            modelServiceFactory = modelServiceFactory ?? Substitute.For<IModelServiceFactory>();
+            sessionManager = sessionManager ?? CreateSessionManager();
 
             return new PullRequestUserReviewsViewModel(
                 editorService,
-                sessionManager,
-                modelServiceFactory);
+                sessionManager);
         }
 
         IModelServiceFactory CreateFactory(IModelService modelService)

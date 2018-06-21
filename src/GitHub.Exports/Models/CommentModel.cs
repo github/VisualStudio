@@ -5,31 +5,31 @@ namespace GitHub.Models
     /// <summary>
     /// An issue or pull request review comment.
     /// </summary>
-    public interface ICommentModel
+    public class CommentModel
     {
         /// <summary>
         /// Gets the ID of the comment.
         /// </summary>
-        int Id { get; }
-
-        /// <summary>
-        /// Gets the GraphQL ID of the comment.
-        /// </summary>
-        string NodeId { get; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Gets the author of the comment.
         /// </summary>
-        IAccount User { get; }
+        public ActorModel Author { get; set; }
 
         /// <summary>
         /// Gets the body of the comment.
         /// </summary>
-        string Body { get; }
+        public string Body { get; set; }
 
         /// <summary>
         /// Gets the creation time of the comment.
         /// </summary>
-        DateTimeOffset CreatedAt { get; }
+        public DateTimeOffset CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets the HTTP URL permalink for the comment.
+        /// </summary>
+        public string Url { get; set; }
     }
 }
