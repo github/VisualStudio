@@ -579,7 +579,6 @@ public class ModelServiceTests
     {
         return new ModelService(
             apiClient ?? Substitute.For<IApiClient>(),
-            graphql ?? Substitute.For<Octokit.GraphQL.IConnection>(),
             hostCache ?? new InMemoryBlobCache(),
             Substitute.For<IAvatarProvider>());
     }

@@ -20,14 +20,14 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget();
             var session = CreateSession();
 
-            session.PullRequest.ChangedFiles.Returns(new[]
+            session.PullRequest.ChangedFiles = new[]
             {
-                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
-            });
+                new PullRequestFileModel { FileName = "readme.md", Sha = "abc", Status = PullRequestFileStatus.Modified },
+                new PullRequestFileModel { FileName = "dir1/f1.cs", Sha = "abc", Status = PullRequestFileStatus.Modified },
+                new PullRequestFileModel { FileName = "dir1/f2.cs", Sha = "abc", Status = PullRequestFileStatus.Modified },
+                new PullRequestFileModel { FileName = "dir1/dir1a/f3.cs", Sha = "abc", Status = PullRequestFileStatus.Modified },
+                new PullRequestFileModel { FileName = "dir2/f4.cs", Sha = "abc", Status = PullRequestFileStatus.Modified },
+            };
 
             await target.InitializeAsync(session);
 
@@ -63,10 +63,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var outdatedThread = CreateThread(-1);
             var session = CreateSession();
 
-            session.PullRequest.ChangedFiles.Returns(new[]
+            session.PullRequest.ChangedFiles = new[]
             {
-                new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
-            });
+                new PullRequestFileModel { FileName = "readme.md", Sha = "abc", Status = PullRequestFileStatus.Modified, }
+            };
 
             var file = Substitute.For<IPullRequestSessionFile>();
             var thread1 = CreateThread(5);
@@ -101,14 +101,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         static IPullRequestSession CreateSession()
         {
             var author = Substitute.For<IAccount>();
-            var pr = Substitute.For<IPullRequestModel>();
 
             var repository = Substitute.For<ILocalRepositoryModel>();
             repository.LocalPath.Returns(@"C:\Foo");
 
             var result = Substitute.For<IPullRequestSession>();
             result.LocalRepository.Returns(repository);
-            result.PullRequest.Returns(pr);
+            result.PullRequest.Returns(new PullRequestDetailModel());
             return result;
         }
 

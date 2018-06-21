@@ -106,6 +106,11 @@ namespace GitHub.UI
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (Text == null)
+            {
+                return new Size();
+            }
+
             var parts = Text
                 .Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar })
                 .ToList();

@@ -12,7 +12,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the underlying pull request review model.
         /// </summary>
-        IPullRequestReviewModel Model { get; }
+        PullRequestReviewModel Model { get; }
 
         /// <summary>
         /// Gets the body of the review.

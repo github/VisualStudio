@@ -10,12 +10,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the ID of the pull request review.
         /// </summary>
-        long Id { get; set; }
+        string Id { get; set; }
 
         /// <summary>
         /// Gets the user who submitted the review.
         /// </summary>
-        IAccount User { get; set; }
+        IActorViewModel User { get; set; }
 
         /// <summary>
         /// Gets the state of the review.

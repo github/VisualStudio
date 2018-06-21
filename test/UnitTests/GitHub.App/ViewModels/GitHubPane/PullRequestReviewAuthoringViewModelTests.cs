@@ -22,46 +22,46 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             await Initialize(target);
 
-            Assert.That(target.Model.Id, Is.EqualTo(0));
+            Assert.That(target.Model.Id, Is.Null);
         }
 
         [Test]
         public async Task Uses_Existing_Pending_Review_Model()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest(reviews: review);
 
             var target = CreateTarget(model);
 
             await Initialize(target);
 
-            Assert.That(target.Model.Id, Is.EqualTo(12));
+            Assert.That(target.Model.Id, Is.EqualTo("12"));
         }
 
         [Test]
         public async Task Doesnt_Use_Non_Pending_Review_Model()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Approved);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Approved);
             var model = CreatePullRequest(reviews: review);
 
             var target = CreateTarget(model);
 
             await Initialize(target);
 
-            Assert.That(target.Model.Id, Is.EqualTo(0));
+            Assert.That(target.Model.Id, Is.Null);
         }
 
         [Test]
         public async Task Doesnt_Use_Other_Users_Pending_Review_Model()
         {
-            var review = CreateReview(12, "shana", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "shana", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest(reviews: review);
 
             var target = CreateTarget(model);
 
             await Initialize(target);
 
-            Assert.That(target.Model.Id, Is.EqualTo(0));
+            Assert.That(target.Model.Id, Is.Null);
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task CanApproveRequestChanges_Is_False_When_Is_Own_PullRequest()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("grokys", review);
 
             var target = CreateTarget(model);
@@ -93,7 +93,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task CanApproveRequestChanges_Is_True_When_Is_Someone_Elses_PullRequest()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
 
             var target = CreateTarget(model);
@@ -134,16 +134,18 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Popuplates_FileComments()
         {
-            var review = CreateReview(id: 12);
+            var review = CreateReview(id: "12");
+            var anotherReview = CreateReview(id: "11");
             var model = CreatePullRequest(reviews: review);
             var session = CreateSession(
                 "grokys",
+                model,
                 CreateSessionFile(
                     CreateInlineCommentThread(
-                        CreateReviewComment(11)),
+                        CreateReviewComment(anotherReview)),
                     CreateInlineCommentThread(
-                        CreateReviewComment(12),
-                        CreateReviewComment(12))));
+                        CreateReviewComment(review),
+                        CreateReviewComment(review))));
 
             var target = CreateTarget(model, session);
 
@@ -155,16 +157,18 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Updates_FileComments_When_Session_PullRequestChanged()
         {
-            var review = CreateReview(id: 12);
+            var review = CreateReview(id: "12");
+            var anotherReview = CreateReview(id: "11");
             var model = CreatePullRequest(reviews: review);
             var session = CreateSession(
                 "grokys",
+                model,
                 CreateSessionFile(
                     CreateInlineCommentThread(
-                        CreateReviewComment(11)),
+                        CreateReviewComment(anotherReview)),
                     CreateInlineCommentThread(
-                        CreateReviewComment(12),
-                        CreateReviewComment(12))));
+                        CreateReviewComment(review),
+                        CreateReviewComment(review))));
 
             var target = CreateTarget(model, session);
 
@@ -174,9 +178,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             var newSessionFile = CreateSessionFile(
                 CreateInlineCommentThread(
-                    CreateReviewComment(11)),
+                    CreateReviewComment(anotherReview)),
                 CreateInlineCommentThread(
-                    CreateReviewComment(12)));
+                    CreateReviewComment(review)));
             session.GetAllFiles().Returns(new[] { newSessionFile });
             RaisePullRequestChanged(session, CreatePullRequest());
 
@@ -186,34 +190,37 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Updates_Model_Id_From_PendingReviewId_When_Session_PullRequestChanged()
         {
+            var review = CreateReview(id: "12");
+            var anotherReview = CreateReview(id: "11");
             var model = CreatePullRequest();
             var session = CreateSession(
                 "grokys",
+                model,
                 CreateSessionFile(
                     CreateInlineCommentThread(
-                        CreateReviewComment(11)),
+                        CreateReviewComment(anotherReview)),
                     CreateInlineCommentThread(
-                        CreateReviewComment(12),
-                        CreateReviewComment(12))));
+                        CreateReviewComment(review),
+                        CreateReviewComment(review))));
 
             var target = CreateTarget(model, session);
 
             await Initialize(target);
 
-            Assert.That(target.Model.Id, Is.EqualTo(0));
+            Assert.That(target.Model.Id, Is.Null);
 
-            session.PendingReviewId.Returns(123);
+            session.PendingReviewId.Returns("123");
             RaisePullRequestChanged(session, model);
 
-            Assert.That(target.Model.Id, Is.EqualTo(123));
+            Assert.That(target.Model.Id, Is.EqualTo("123"));
         }
 
         [Test]
         public async Task Approve_Calls_Session_PostReview_And_Closes()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
-            var session = CreateSession();
+            var session = CreateSession(model: model);
             var closed = false;
 
             var target = CreateTarget(model, session);
@@ -230,9 +237,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Comment_Is_Disabled_When_Has_Empty_Body_And_No_File_Comments()
         {
-            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
-            var session = CreateSession();
+            var session = CreateSession(model: model);
 
             var target = CreateTarget(model, session);
             await Initialize(target);
@@ -243,7 +250,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Comment_Is_Enabled_When_Has_Body()
         {
-            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession();
 
@@ -257,12 +264,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Comment_Is_Enabled_When_Has_File_Comments()
         {
-            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession(
                 "grokys",
+                model,
                 CreateSessionFile(
-                    CreateInlineCommentThread(CreateReviewComment(12))));
+                    CreateInlineCommentThread(CreateReviewComment(review))));
 
             var target = CreateTarget(model, session);
             await Initialize(target);
@@ -273,7 +281,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Comment_Calls_Session_PostReview_And_Closes()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession();
             var closed = false;
@@ -292,7 +300,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task RequestChanges_Is_Disabled_When_Has_Empty_Body_And_No_File_RequestChangess()
         {
-            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession();
 
@@ -305,7 +313,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task RequestChanges_Is_Enabled_When_Has_Body()
         {
-            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession();
 
@@ -319,12 +327,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task RequestChanges_Is_Enabled_When_Has_File_Comments()
         {
-            var review = CreateReview(12, "grokys", body: "", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", body: "", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession(
                 "grokys",
+                model,
                 CreateSessionFile(
-                    CreateInlineCommentThread(CreateReviewComment(12))));
+                    CreateInlineCommentThread(CreateReviewComment(review))));
 
             var target = CreateTarget(model, session);
             await Initialize(target);
@@ -335,7 +344,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task RequestChanges_Calls_Session_PostReview_And_Closes()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession();
             var closed = false;
@@ -354,9 +363,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         [Test]
         public async Task Cancel_Calls_Session_CancelReview_And_Closes_When_Has_Pending_Review()
         {
-            var review = CreateReview(12, "grokys", state: PullRequestReviewState.Pending);
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
-            var session = CreateSession();
+            var session = CreateSession(model: model);
             var closed = false;
 
             var target = CreateTarget(model, session);
@@ -387,107 +396,102 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         static PullRequestReviewAuthoringViewModel CreateTarget(
-            IPullRequestModel model,
+            PullRequestDetailModel model,
             IPullRequestSession session = null)
         {
+            session = session ?? CreateSession(model: model);
+
             return CreateTarget(
-                sessionManager: CreateSessionManager(session),
-                modelServiceFactory: CreateModelServiceFactory(CreateModelService(model)));
+                sessionManager: CreateSessionManager(session));
         }
 
         static PullRequestReviewAuthoringViewModel CreateTarget(
             IPullRequestEditorService editorService = null,
             IPullRequestSessionManager sessionManager = null,
-            IModelServiceFactory modelServiceFactory = null,
             IPullRequestFilesViewModel files = null)
         {
             editorService = editorService ?? Substitute.For<IPullRequestEditorService>();
             sessionManager = sessionManager ?? CreateSessionManager();
-            modelServiceFactory = modelServiceFactory ?? CreateModelServiceFactory();
             files = files ?? Substitute.For<IPullRequestFilesViewModel>();
 
             return new PullRequestReviewAuthoringViewModel(
                 editorService,
                 sessionManager,
-                modelServiceFactory,
                 files);
         }
 
         static PullRequestReviewModel CreateReview(
-            int id = 5,
+            string id = "5",
             string login = "grokys",
             string body = "Review body",
             PullRequestReviewState state = PullRequestReviewState.Pending)
         {
-            var user = Substitute.For<IAccount>();
-            user.Login.Returns(login);
-
             return new PullRequestReviewModel
             {
                 Id = id,
                 State = state,
-                User = user,
-                Body = body,                
+                Author = new ActorModel
+                {
+                    Login = login,
+                },
+                Body = body,
             };
         }
 
-        static PullRequestReviewCommentModel CreateReviewComment(
-            int pullRequestReviewId)
+        static InlineCommentModel CreateReviewComment(PullRequestReviewModel review)
         {
-            return new PullRequestReviewCommentModel
+            return new InlineCommentModel
             {
-                PullRequestReviewId = pullRequestReviewId,
+                Review = review,
+                Comment = new PullRequestReviewCommentModel(),
             };
         }
 
-        static PullRequestModel CreatePullRequest(
+        static PullRequestDetailModel CreatePullRequest(
             string authorLogin = "grokys",
-            params IPullRequestReviewModel[] reviews)
+            params PullRequestReviewModel[] reviews)
         {
-            var author = Substitute.For<IAccount>();
-            author.Login.Returns(authorLogin);
-
-            var result = new PullRequestModel(
-                5,
-                "Pull Request",
-                author,
-                DateTimeOffset.Now);
-            result.Reviews = reviews.ToList();
-            return result;
+            return new PullRequestDetailModel
+            {
+                Number = 5,
+                Title = "Pull Request",
+                Author = new ActorModel
+                {
+                    Login = authorLogin,
+                },
+                Reviews = reviews.ToList(),
+            };
         }
 
-        static PullRequestModel CreatePullRequest(
+        static PullRequestDetailModel CreatePullRequest(
             string authorLogin = "grokys",
-            IEnumerable<IPullRequestReviewModel> reviews = null,
-            IEnumerable<IPullRequestReviewCommentModel> reviewComments = null)
+            IEnumerable<PullRequestReviewModel> reviews = null)
         {
-            reviews = reviews ?? new IPullRequestReviewModel[0];
-            reviewComments = reviewComments ?? new IPullRequestReviewCommentModel[0];
-
-            var author = Substitute.For<IAccount>();
-            author.Login.Returns(authorLogin);
-
-            var result = new PullRequestModel(
-                5,
-                "Pull Request",
-                author,
-                DateTimeOffset.Now);
-            result.Reviews = reviews.ToList();
-            result.ReviewComments = reviewComments.ToList();
-            return result;
+            return new PullRequestDetailModel
+            {
+                Number = 5,
+                Title = "Pull Request",
+                Author = new ActorModel
+                {
+                    Login = authorLogin,
+                },
+                Reviews = (reviews ?? new PullRequestReviewModel[0]).ToList()
+            };
         }
 
         static IPullRequestSession CreateSession(
             string userLogin = "grokys",
+            PullRequestDetailModel model = null,
             params IPullRequestSessionFile[] files)
         {
-            var user = Substitute.For<IAccount>();
-            user.Login.Returns(userLogin);
+            model = model ?? CreatePullRequest();
 
             var result = Substitute.For<IPullRequestSession>();
-            result.User.Returns(user);
+            result.PendingReviewId.Returns((string)null);
+            result.PullRequest.Returns(model);
+            result.User.Returns(new ActorModel { Login = userLogin });
             result.GetAllFiles().Returns(files);
-            result.PullRequestChanged.Returns(new Subject<IPullRequestModel>());
+            result.PullRequestChanged.Returns(new Subject<PullRequestDetailModel>());
             return result;
         }
 
@@ -500,7 +504,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         static IInlineCommentThreadModel CreateInlineCommentThread(
-            params IPullRequestReviewCommentModel[] comments)
+            params InlineCommentModel[] comments)
         {
             var result = Substitute.For<IInlineCommentThreadModel>();
             result.Comments.Returns(comments);
@@ -513,25 +517,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             session = session ?? CreateSession();
 
             var result = Substitute.For<IPullRequestSessionManager>();
-            result.GetSession(null).ReturnsForAnyArgs(session);
-            return result;
-        }
-
-        static IModelService CreateModelService(IPullRequestModel pullRequest = null)
-        {
-            pullRequest = pullRequest ?? CreatePullRequest();
-
-            var result = Substitute.For<IModelService>();
-            result.GetPullRequest(null, null, 0).ReturnsForAnyArgs(Observable.Return(pullRequest));
-            return result;
-        }
-
-        static IModelServiceFactory CreateModelServiceFactory(IModelService service = null)
-        {
-            service = service ?? CreateModelService();
-
-            var result = Substitute.For<IModelServiceFactory>();
-            result.CreateAsync(null).ReturnsForAnyArgs(service);
+            result.GetSession(null, null, 0).ReturnsForAnyArgs(session);
             return result;
         }
 
@@ -557,9 +543,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 5);
         }
 
-        static void RaisePullRequestChanged(IPullRequestSession session, PullRequestModel newPullRequest)
+        static void RaisePullRequestChanged(IPullRequestSession session, PullRequestDetailModel newPullRequest)
         {
-            ((ISubject<IPullRequestModel>)session.PullRequestChanged).OnNext(newPullRequest);
+            ((ISubject<PullRequestDetailModel>)session.PullRequestChanged).OnNext(newPullRequest);
         }
     }
 }

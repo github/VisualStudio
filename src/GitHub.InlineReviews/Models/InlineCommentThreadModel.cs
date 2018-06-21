@@ -30,7 +30,7 @@ namespace GitHub.InlineReviews.Models
             string relativePath,
             string commitSha,
             IList<DiffLine> diffMatch,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            IEnumerable<InlineCommentModel> comments)
         {
             Guard.ArgumentNotNull(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(commitSha, nameof(commitSha));
@@ -41,10 +41,15 @@ namespace GitHub.InlineReviews.Models
             DiffLineType = diffMatch[0].Type;
             CommitSha = commitSha;
             RelativePath = relativePath;
+
+            foreach (var comment in comments)
+            {
+                comment.Thread = this;
+            }
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
+        public IReadOnlyList<InlineCommentModel> Comments { get; }
 
         /// <inheritdoc/>
         public IList<DiffLine> DiffMatch { get; }
