@@ -136,10 +136,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -198,10 +195,6 @@
       <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
       <Name>Akavache_Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
-      <Project>{674B69B8-0780-4D54-AE2B-C15821FA51CB}</Project>
-      <Name>Octokit.Reactive</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
@@ -230,36 +223,13 @@
       <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
       <Name>GitHub.Exports</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
-      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
-      <Name>GitHub.Extensions.Reactive</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
-      <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
-      <Name>GitHub.TeamFoundation.14</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
-      <Project>{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}</Project>
-      <Name>GitHub.UI.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.UI\GitHub.UI.csproj">
-      <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
-      <Name>GitHub.UI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
-      <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
-      <Name>GitHub.VisualStudio.UI</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.7.18\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -267,9 +237,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.7.18\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.7.18\build\Microsoft.VisualStudio.Threading.Analyzers.targets'))" />
   </Target>
-  <Import Project="..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.7.18\build\Microsoft.VisualStudio.Threading.Analyzers.targets" Condition="Exists('..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.7.18\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
