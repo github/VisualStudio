@@ -7,7 +7,6 @@ public class UriStringTests
 {
     public class TheConstructor : TestBaseClass
     {
-
         [TestCase("http://192.168.1.3/foo/bar.git", "192.168.1.3", "foo", "bar")]
         [TestCase("http://haacked@example.com/foo/bar", "example.com", "foo", "bar")]
         [TestCase("http://haacked:password@example.com/foo/bar", "example.com", "foo", "bar")]
@@ -41,7 +40,6 @@ public class UriStringTests
             Assert.False(cloneUrl.IsFileUri);
         }
 
-
         [TestCase(@"..\bar\foo")]
         [TestCase(@"..\..\foo")]
         [TestCase(@"../..\foo")]
@@ -67,7 +65,6 @@ public class UriStringTests
             Assert.True(cloneUrl.IsFileUri);
         }
 
-
         [TestCase("complete garbage", "", "", null)]
         [TestCase(@"..\other_folder", "", "", "other_folder")]
         [TestCase("http://example.com", "example.com", null, null)]
@@ -89,7 +86,6 @@ public class UriStringTests
             Assert.That(cloneUrl.RepositoryName, Is.EqualTo(repositoryName));
         }
 
-
         [TestCase(@"http:\\example.com/bar\baz")]
         [TestCase(@"http://example.com/bar/baz")]
         public void NormalizesSeparator(string uriString)
@@ -107,7 +103,6 @@ public class UriStringTests
 
     public class TheNameWithOwnerProperty : TestBaseClass
     {
-
         [TestCase("http://192.168.1.3/foo/bar.git", "foo/bar")]
         [TestCase("http://192.168.1.3/foo/bar", "foo/bar")]
         [TestCase("http://192.168.1.3/foo/bar/baz/qux", "baz/qux")]
@@ -125,7 +120,6 @@ public class UriStringTests
 
     public class TheCombineMethod : TestBaseClass
     {
-
         [TestCase("http://example.com", "foo/bar", @"http://example.com/foo/bar")]
         [TestCase("http://example.com/", "foo/bar", @"http://example.com/foo/bar")]
         [TestCase("http://example.com/", "/foo/bar/", @"http://example.com/foo/bar/")]
@@ -146,7 +140,6 @@ public class UriStringTests
 
     public class TheIsValidUriProperty : TestBaseClass
     {
-
         [TestCase("http://example.com/", true)]
         [TestCase("file:///C:/dev/exp/foo", true)]
         [TestCase("garbage", false)]
@@ -159,7 +152,6 @@ public class UriStringTests
 
     public class TheToRepositoryUrlMethod : TestBaseClass
     {
-
         [TestCase("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
         [TestCase("http://example.com/", "http://example.com/")]
         [TestCase("http://haacked@example.com/foo/bar", "http://example.com/foo/bar")]
@@ -175,7 +167,6 @@ public class UriStringTests
         {
             Assert.That(new UriString(uriString).ToRepositoryUrl(), Is.EqualTo(new Uri(expected)));
         }
-
 
         [TestCase("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
         [TestCase("http://example.com/", "http://example.com/")]
@@ -233,7 +224,6 @@ public class UriStringTests
 
     public class TheAdditionOperator : TestBaseClass
     {
-
         [TestCase("http://example.com", "foo/bar", @"http://example.com/foo/bar")]
         [TestCase("http://example.com/", "foo/bar", @"http://example.com/foo/bar")]
         [TestCase("http://example.com/", "/foo/bar/", @"http://example.com/foo/bar/")]
@@ -293,7 +283,6 @@ public class UriStringTests
 
     public class TheIsHypertextTransferProtocolProperty : TestBaseClass
     {
-
         [TestCase("http://example.com", true)]
         [TestCase("HTTP://example.com", true)]
         [TestCase("https://example.com", true)]
@@ -310,7 +299,6 @@ public class UriStringTests
 
     public class TheEqualsMethod : TestBaseClass
     {
-
         [TestCase("https://github.com/foo/bar", "https://github.com/foo/bar", true)]
         [TestCase("https://github.com/foo/bar", "https://github.com/foo/BAR", false)]
         [TestCase("https://github.com/foo/bar", "https://github.com/foo/bar/", false)]
