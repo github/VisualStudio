@@ -42,7 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the user whose reviews are being shown.
         /// </summary>
-        IAccount User { get; }
+        IActorViewModel User { get; }
 
         /// <summary>
         /// Gets a command that navigates to the parent pull request in the GitHub pane.

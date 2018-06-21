@@ -175,7 +175,7 @@ namespace GitHub.ViewModels.GitHubPane
             return dir;
         }
 
-        static string GetOldFileName(IPullRequestFileModel file, TreeChanges changes)
+        static string GetOldFileName(PullRequestFileModel file, TreeChanges changes)
         {
             if (file.Status == PullRequestFileStatus.Renamed)
             {

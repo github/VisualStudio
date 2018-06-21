@@ -71,7 +71,6 @@ namespace UnitTests.GitHub.App.Factories
 
             return new ModelServiceFactory(
                 apiClientFactory,
-                graphQLClientFactory,
                 hostCacheFactory,
                 avatarProvider);
         }

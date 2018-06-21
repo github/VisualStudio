@@ -151,6 +151,7 @@ namespace GitHub.InlineReviews.Tags
             }
             else
             {
+                side = DiffSide.Right;
                 await InitializeLiveFile();
                 sessionManagerSubscription = sessionManager
                     .WhenAnyValue(x => x.CurrentSession)

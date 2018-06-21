@@ -32,7 +32,7 @@ Line 2
 Line 3 with comment
 Line 4";
 
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -51,7 +51,7 @@ Line 4";
                         "HEAD_SHA");
 
                     var thread = result.Single();
-                    Assert.That(2, Is.EqualTo(thread.LineNumber));
+                    Assert.That(thread.LineNumber, Is.EqualTo(2));
                 }
             }
 
@@ -61,7 +61,7 @@ Line 4";
                 var baseContents = "Line 1";
                 var headContents = "Line 1";
 
-                var comment = CreateComment(@"@@ -10,7 +10,6 @@ class Program");
+                var comment = CreateCommentThread(@"@@ -10,7 +10,6 @@ class Program");
 
                 using (var diffService = new FakeDiffService(FilePath, baseContents))
                 {
@@ -93,7 +93,7 @@ Line 2
 Line 3 with comment
 Line 4";
 
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -112,7 +112,7 @@ Line 4";
                         "HEAD_SHA");
 
                     var thread = result.Single();
-                    Assert.That(4, Is.EqualTo(thread.LineNumber));
+                    Assert.That(thread.LineNumber, Is.EqualTo(4));
                 }
             }
 
@@ -128,13 +128,13 @@ Line 2
 Line 3 with comment
 Line 4";
 
-                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment1 = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
 +Line 3 with comment", position: 1);
 
-                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment2 = CreateCommentThread(@"@@ -1,4 +1,4 @@
 -Line 1
  Line 2
 -Line 3
@@ -152,8 +152,8 @@ Line 4";
                         diff,
                         "HEAD_SHA");
 
-                    Assert.That(2, Is.EqualTo(result.Count));
-                    Assert.That(-1, Is.EqualTo(result[1].LineNumber));
+                    Assert.That(result.Count, Is.EqualTo(2));
+                    Assert.That(result[1].LineNumber, Is.EqualTo(-1));
                 }
             }
 
@@ -174,7 +174,7 @@ Line 2
 Line 3 with comment
 Line 4";
 
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -193,7 +193,7 @@ Line 4";
                         "HEAD_SHA");
 
                     var thread = result.First();
-                    Assert.That(4, Is.EqualTo(thread.LineNumber));
+                    Assert.That(thread.LineNumber, Is.EqualTo(4));
                 }
             }
         }
@@ -217,7 +217,7 @@ Line 2
 Line 3 with comment
 Line 4";
 
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -240,14 +240,12 @@ Line 4";
                     diff = await diffService.Diff(FilePath, newHeadContents);
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
-                    Assert.That(3, Is.EqualTo(threads[0].LineNumber));
-                    Assert.That(
-                        new[]
-                        {
-                            Tuple.Create(2, DiffSide.Right),
-                            Tuple.Create(3, DiffSide.Right)
-                        },
-                        Is.EqualTo(changedLines.ToArray()));
+                    Assert.That(threads[0].LineNumber, Is.EqualTo(3));
+                    Assert.That(changedLines.ToArray(), Is.EqualTo(new[]
+                    {
+                        Tuple.Create(2, DiffSide.Right),
+                        Tuple.Create(3, DiffSide.Right)
+                    }));
                 }
             }
 
@@ -263,7 +261,7 @@ Line 2
 Line 3 with comment
 Line 4";
 
-                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
@@ -285,7 +283,7 @@ Line 4";
                     var changedLines = target.UpdateCommentThreads(threads, diff);
 
                     Assert.That(threads[0].IsStale, Is.False);
-                    Assert.That(new[] { Tuple.Create(2, DiffSide.Right) }, Is.EqualTo(changedLines.ToArray()));
+                    Assert.That(changedLines.ToArray(), Is.EqualTo(new[] { Tuple.Create(2, DiffSide.Right) }));
                 }
             }
         }
@@ -301,38 +299,56 @@ Line 4";
                 Substitute.For<IUsageTracker>());
         }
 
-        static IPullRequestReviewCommentModel CreateComment(
+        static PullRequestReviewThreadModel CreateCommentThread(
             string diffHunk,
             string filePath = FilePath,
             string body = "Comment",
             int position = 1)
         {
-            var result = Substitute.For<IPullRequestReviewCommentModel>();
-            result.Body.Returns(body);
-            result.DiffHunk.Returns(diffHunk);
-            result.Path.Returns(filePath);
-            result.OriginalCommitId.Returns("ORIG");
-            result.OriginalPosition.Returns(position);
-            return result;
+            return new PullRequestReviewThreadModel
+            {
+                DiffHunk = diffHunk,
+                Path = filePath,
+                OriginalCommitSha = "ORIG",
+                OriginalPosition = position,
+                Comments = new[]
+                {
+                    new PullRequestReviewCommentModel
+                    {
+                        Body = body,
+                        Author = new ActorModel { Login = "Author" },
+                    }
+                },
+            };
         }
 
-        static IPullRequestModel CreatePullRequest(
+        static PullRequestDetailModel CreatePullRequest(
             string filePath,
-            params IPullRequestReviewCommentModel[] comments)
+            params PullRequestReviewThreadModel[] threads)
         {
-            var changedFile1 = Substitute.For<IPullRequestFileModel>();
-            changedFile1.FileName.Returns(filePath);
-            var changedFile2 = Substitute.For<IPullRequestFileModel>();
-            changedFile2.FileName.Returns("other.cs");
-
-            var result = Substitute.For<IPullRequestModel>();
-            result.Number.Returns(PullRequestNumber);
-            result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
-            result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
-            result.ChangedFiles.Returns(new[] { changedFile1, changedFile2 });
-            result.ReviewComments.Returns(comments);
-
-            return result;
+            return new PullRequestDetailModel
+            {
+                Number = PullRequestNumber,
+                BaseRefName = "BASE",
+                BaseRefSha = "BASE_SHA",
+                BaseRepositoryOwner = "owner",
+                HeadRefName = "HEAD",
+                HeadRefSha = "HEAD_SHA",
+                HeadRepositoryOwner = "owner",
+                ChangedFiles = new []
+                {
+                    new PullRequestFileModel { FileName = filePath },
+                    new PullRequestFileModel { FileName = "other.cs" },
+                },
+                Threads = threads,
+                Reviews = new[]
+                {
+                    new PullRequestReviewModel
+                    {
+                        Comments = threads.SelectMany(x => x.Comments).ToList(),
+                    },
+                },
+            };
         }
     }
 }

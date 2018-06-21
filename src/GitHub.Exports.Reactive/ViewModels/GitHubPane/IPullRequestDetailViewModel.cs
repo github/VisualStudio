@@ -69,7 +69,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
-        IPullRequestModel Model { get; }
+        PullRequestDetailModel Model { get; }
 
         /// <summary>
         /// Gets the session for the pull request.
@@ -96,6 +96,11 @@ namespace GitHub.ViewModels.GitHubPane
         int Number { get; }
 
         /// <summary>
+        /// Gets the Pull Request author.
+        /// </summary>
+        IActorViewModel Author { get; }
+
+        /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
         /// </summary>
         string SourceBranchDisplayName { get; }
@@ -104,11 +109,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a string describing how to display the pull request's target branch.
         /// </summary>
         string TargetBranchDisplayName { get; }
-
-        /// <summary>
-        /// Gets the number of comments made on the pull request.
-        /// </summary>
-        int CommentCount { get; }
 
         /// <summary>
         /// Gets a value indicating whether the pull request branch is checked out.

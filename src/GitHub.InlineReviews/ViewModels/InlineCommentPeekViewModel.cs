@@ -124,6 +124,7 @@ namespace GitHub.InlineReviews.ViewModels
             else
             {
                 relativePath = sessionManager.GetRelativePath(buffer);
+                side = DiffSide.Right;
                 file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer);
                 await SessionChanged(sessionManager.CurrentSession);
                 sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)

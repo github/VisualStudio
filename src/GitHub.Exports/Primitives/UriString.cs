@@ -216,6 +216,13 @@ namespace GitHub.Primitives
             return Value;
         }
 
+        /// <summary>
+        /// Makes a copy of the URI with the specified owner.
+        /// </summary>
+        /// <param name="owner">The owner.</param>
+        /// <returns>A new <see cref="UriString"/>.</returns>
+        public UriString WithOwner(string owner) => ToUriString(ToRepositoryUrl(owner));
+
         protected UriString(SerializationInfo info, StreamingContext context)
             : this(GetSerializedValue(info))
         {

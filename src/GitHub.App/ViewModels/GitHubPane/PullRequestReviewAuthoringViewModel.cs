@@ -24,12 +24,10 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IModelServiceFactory modelServiceFactory;
-        IModelService modelService;
         IPullRequestSession session;
         IDisposable sessionSubscription;
-        IPullRequestReviewModel model;
-        IPullRequestModel pullRequestModel;
+        PullRequestReviewModel model;
+        PullRequestDetailModel pullRequestModel;
         string body;
         ObservableAsPropertyHelper<bool> canApproveRequestChanges;
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> fileComments;
@@ -39,22 +37,19 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestReviewAuthoringViewModel(
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
-            IModelServiceFactory modelServiceFactory,
             IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(files, nameof(files));
 
             this.editorService = editorService;
             this.sessionManager = sessionManager;
-            this.modelServiceFactory = modelServiceFactory;
 
             canApproveRequestChanges = this.WhenAnyValue(
                 x => x.Model,
                 x => x.PullRequestModel,
-                (review, pr) => review != null && pr != null && review.User.Login != pr.Author.Login)
+                (review, pr) => review != null && pr != null && review.Author.Login != pr.Author.Login)
                 .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
@@ -83,14 +78,14 @@ namespace GitHub.ViewModels.GitHubPane
         public string RemoteRepositoryOwner { get; private set; }
 
         /// <inheritdoc/>
-        public IPullRequestReviewModel Model
+        public PullRequestReviewModel Model
         {
             get { return model; }
             private set { this.RaiseAndSetIfChanged(ref model, value); }
         }
 
         /// <inheritdoc/>
-        public IPullRequestModel PullRequestModel
+        public PullRequestDetailModel PullRequestModel
         {
             get { return pullRequestModel; }
             private set { this.RaiseAndSetIfChanged(ref pullRequestModel, value); }
@@ -150,12 +145,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
-                modelService = await modelServiceFactory.CreateAsync(connection);
-                var pullRequest = await modelService.GetPullRequest(
-                    RemoteRepositoryOwner,
-                    LocalRepository.Name,
-                    pullRequestNumber);
-                await Load(pullRequest);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                await Load(session.PullRequest);
             }
             finally
             {
@@ -170,11 +161,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 Error = null;
                 IsBusy = true;
-                var pullRequest = await modelService.GetPullRequest(
-                    RemoteRepositoryOwner,
-                    LocalRepository.Name,
-                    PullRequestModel.Number);
-                await Load(pullRequest);
+                await session.Refresh();
+                await Load(session.PullRequest);
             }
             catch (Exception ex)
             {
@@ -185,25 +173,24 @@ namespace GitHub.ViewModels.GitHubPane
                     LocalRepository.Name,
                     PullRequestModel.Number,
                     Model.Id,
-                    modelService.ApiClient.HostAddress.Title);
+                    session.LocalRepository.CloneUrl.Host);
                 Error = ex;
                 IsBusy = false;
             }
         }
 
-        async Task Load(IPullRequestModel pullRequest)
+        async Task Load(PullRequestDetailModel pullRequest)
         {
             try
             {
-                session = await sessionManager.GetSession(pullRequest);
                 PullRequestModel = pullRequest;
 
                 Model = pullRequest.Reviews.FirstOrDefault(x =>
-                    x.State == PullRequestReviewState.Pending && x.User.Login == session.User.Login) ??
+                    x.State == PullRequestReviewState.Pending && x.Author.Login == session.User.Login) ??
                     new PullRequestReviewModel
                     {
                         Body = string.Empty,
-                        User = session.User,
+                        Author = session.User,
                         State = PullRequestReviewState.Pending,
                     };
 
@@ -221,16 +208,16 @@ namespace GitHub.ViewModels.GitHubPane
 
         bool FilterComments(IInlineCommentThreadModel thread)
         {
-            return thread.Comments.Any(x => x.PullRequestReviewId == Model.Id);
+            return thread.Comments.Any(x => x.Review.Id == Model.Id);
         }
 
         async Task UpdateFileComments()
         {
-            var result = new List<PullRequestReviewFileCommentViewModel>();
+            var result = new List<PullRequestReviewCommentViewModel>();
 
-            if (Model.Id == 0 && session.PendingReviewId != 0)
+            if (Model.Id == null && session.PendingReviewId != null)
             {
-                ((PullRequestReviewModel)Model).Id = session.PendingReviewId;
+                Model.Id = session.PendingReviewId;
             }
 
             foreach (var file in await session.GetAllFiles())
@@ -239,12 +226,13 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     foreach (var comment in thread.Comments)
                     {
-                        if (comment.PullRequestReviewId == Model.Id)
+                        if (comment.Review.Id == Model.Id)
                         {
-                            result.Add(new PullRequestReviewFileCommentViewModel(
+                            result.Add(new PullRequestReviewCommentViewModel(
                                 editorService,
                                 session,
-                                comment));
+                                thread.RelativePath,
+                                comment.Comment));
                         }
                     }
                 }
@@ -281,7 +269,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             try
             {
-                if (Model?.Id != 0)
+                if (Model?.Id != null)
                 {
                     await session.CancelReview();
                 }
