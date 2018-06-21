@@ -18,6 +18,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
     public class PullRequestSessionTests
     {
         const int PullRequestNumber = 5;
+        const string PullRequestNodeId = "pull_request_id";
         const string RepoUrl = "https://foo.bar/owner/repo";
         const string FilePath = "test.cs";
 
