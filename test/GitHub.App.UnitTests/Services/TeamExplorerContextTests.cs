@@ -5,6 +5,8 @@ using NUnit.Framework;
 using NSubstitute;
 using EnvDTE;
 using GitHub.Models;
+using Microsoft.VisualStudio.Threading;
+using System.Threading.Tasks;
 
 namespace GitHub.App.UnitTests.Services
 {
@@ -24,7 +26,7 @@ namespace GitHub.App.UnitTests.Services
             }
 
             [Test]
-            public void SetActiveRepository_CheckWasSet()
+            public async Task SetActiveRepository_CheckWasSet()
             {
                 var gitExt = CreateGitExt();
                 var repositoryPath = Directory.GetCurrentDirectory();
@@ -32,8 +34,9 @@ namespace GitHub.App.UnitTests.Services
                 SetActiveRepository(gitExt, repoInfo);
                 var target = CreateTeamExplorerContext(gitExt);
 
-                var repo = target.ActiveRepository;
+                await target.JoinableTaskCollection.JoinTillEmptyAsync();
 
+                var repo = target.ActiveRepository;
                 Assert.That(repo, Is.EqualTo(repoInfo));
             }
         }
@@ -214,13 +217,13 @@ namespace GitHub.App.UnitTests.Services
         static TeamExplorerContext CreateTeamExplorerContext(
             IVSGitExt gitExt,
             DTE dte = null,
-            IPullRequestService pullRequestService = null)
+            IPullRequestService pullRequestService = null,
+            JoinableTaskContext joinableTaskContext = null)
         {
             dte = dte ?? Substitute.For<DTE>();
             pullRequestService = pullRequestService ?? Substitute.For<IPullRequestService>();
-            var sp = Substitute.For<IGitHubServiceProvider>();
-            sp.GetService<DTE>().Returns(dte);
-            return new TeamExplorerContext(sp, gitExt, pullRequestService);
+            joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
+            return new TeamExplorerContext(gitExt, new AsyncLazy<DTE>(() => Task.FromResult(dte)), pullRequestService, joinableTaskContext);
         }
 
         static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)
