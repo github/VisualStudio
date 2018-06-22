@@ -260,8 +260,8 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
         }
 
-        IPullRequestModel checkedOutPullRequest;
-        public IPullRequestModel CheckedOutPullRequest
+        PullRequestDetailModel checkedOutPullRequest;
+        public PullRequestDetailModel CheckedOutPullRequest
         {
             get { return checkedOutPullRequest; }
             set { this.RaiseAndSetIfChanged(ref checkedOutPullRequest, value); }

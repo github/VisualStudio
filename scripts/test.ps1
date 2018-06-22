@@ -37,22 +37,64 @@ if (!$?) {
     $exitcode = 1
 }
 
-Write-Output "Running GitHub.UI.UnitTests..."
-Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config
+Write-Output "Running GitHub.Api.UnitTests..."
+Run-NUnit test GitHub.Api.UnitTests $TimeoutDuration $config
 if (!$?) {
     $exitcode = 2
 }
 
-Write-Output "Running UnitTests..."
-Run-NUnit test UnitTests $TimeoutDuration $config
+Write-Output "Running GitHub.App.UnitTests..."
+Run-NUnit test GitHub.App.UnitTests $TimeoutDuration $config
 if (!$?) {
     $exitcode = 3
+}
+
+Write-Output "Running GitHub.Exports.Reactive.UnitTests..."
+Run-NUnit test GitHub.Exports.Reactive.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 4
+}
+
+Write-Output "Running GitHub.Exports.UnitTests..."
+Run-NUnit test GitHub.Exports.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 5
+}
+
+Write-Output "Running GitHub.Extensions.UnitTests..."
+Run-NUnit test GitHub.Extensions.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 6
+}
+
+Write-Output "Running GitHub.Primitives.UnitTests..."
+Run-NUnit test GitHub.Primitives.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 7
+}
+
+Write-Output "Running GitHub.TeamFoundation.UnitTests..."
+Run-NUnit test GitHub.TeamFoundation.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 8
+}
+
+Write-Output "Running GitHub.UI.UnitTests..."
+Run-NUnit test GitHub.UI.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 9
+}
+
+Write-Output "Running GitHub.VisualStudio.UnitTests..."
+Run-NUnit test GitHub.VisualStudio.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 10
 }
 
 Write-Output "Running GitHub.InlineReviews.UnitTests..."
 Run-NUnit test GitHub.InlineReviews.UnitTests $TimeoutDuration $config
 if (!$?) {
-    $exitcode = 4
+    $exitcode = 11
 }
 
 if ($exitcode -ne 0) {
