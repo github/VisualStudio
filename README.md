@@ -35,7 +35,7 @@ Beta releases will have `(beta)` in their title in the gallery, following the ve
 
 ## Build requirements
 
-* Visual Studio 2015+
+* Visual Studio 2017 (15.7.4)+
 * Visual Studio SDK
 
 ## Build
@@ -50,13 +50,13 @@ git submodule deinit script
 git submodule update
 ```
 
-Open the `GitHubVS.sln` solution with Visual Studio 2015+.
+Open the `GitHubVS.sln` solution with Visual Studio 2017+.
 To be able to use the GitHub API, you'll need to:
 
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
 - Open [src/GitHub.Api/ApiClientConfiguration_User.cs](src/GitHub.Api/ApiClientConfiguration_User.cs) and fill out the clientId/clientSecret fields for your application. **Note this has recently changed location, so you may need to re-do this**
 
-Build using Visual Studio 2015 or:
+Build using Visual Studio 2017 or:
 
 ```txt
 build.cmd
@@ -95,7 +95,7 @@ Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contri
 
 ## Copyright
 
-Copyright 2015 - 2017 GitHub, Inc.
+Copyright 2015 - 2018 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)
 
