@@ -16,7 +16,7 @@ public class SimpleApiClientFactoryTests
         public async Task CreatesNewInstanceOfSimpleApiClient()
         {
             const string url = "https://github.com/github/CreatesNewInstanceOfSimpleApiClient";
-            var program = Substitute.For<IProgram>();
+            var program = CreateProgram();
             var keychain = Substitute.For<IKeychain>();
             var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
@@ -40,7 +40,7 @@ public class SimpleApiClientFactoryTests
         public async Task RemovesClientFromCache()
         {
             const string url = "https://github.com/github/RemovesClientFromCache";
-            var program = Substitute.For<IProgram>();
+            var program = CreateProgram();
             var enterpriseProbe = Substitute.For<IEnterpriseProbe>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var factory = new SimpleApiClientFactory(
@@ -54,6 +54,13 @@ public class SimpleApiClientFactoryTests
 
             Assert.That(client, Is.Not.SameAs(factory.Create(url)));
         }
+    }
+
+    static IProgram CreateProgram()
+    {
+        var program = Substitute.For<IProgram>();
+        program.ProductHeader.Returns(new ProductHeaderValue("ProductName"));
+        return program;
     }
 
     static IKeychain CreateKeychain()
