@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.ComponentModel.Composition;
 using GitHub.UI;
 using GitHub.Models;
@@ -44,20 +45,52 @@ namespace GitHub.Commands
             ParametersDescription = "u";    // accept a single url
         }
 
-        public override async Task Execute(string cloneUrl)
+        public override async Task Execute(string url)
         {
-            var repository = new UrlRepositoryModel(cloneUrl);
-            var path = await dialogService.Value.ShowReCloneDialog(repository);
-            if (path == null)
+            var repository = new UrlRepositoryModel(url);
+            var targetDir = await dialogService.Value.ShowReCloneDialog(repository);
+            if (targetDir == null)
             {
                 return;
             }
 
-            var repoDirName = repository.Name;
-            await repositoryCloneService.Value.CloneRepository(cloneUrl, repoDirName, path);
+            await repositoryCloneService.Value.CloneRepository(repository.CloneUrl, repository.Name, targetDir);
+            var repositoryDir = Path.Combine(targetDir, repository.Name);
+            if (Directory.Exists(repositoryDir))
+            {
+                return;
+            }
 
-            dte.Value.ExecuteCommand("File.OpenFolder", path);
+            dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
             dte.Value.ExecuteCommand("View.TfsTeamExplorer");
+
+            TryOpenFile(url, repositoryDir);
+        }
+
+        bool TryOpenFile(string url, string repositoryDir)
+        {
+            var path = FindPath(url);
+            if (path == null)
+            {
+                return false;
+            }
+
+            var windowsPath = path.Replace('/', '\\');
+            var fullPath = Path.Combine(repositoryDir, windowsPath);
+            if (!File.Exists(fullPath))
+            {
+                return false;
+            }
+
+            dte.Value.ItemOperations.OpenFile(fullPath);
+            return true;
+        }
+
+        static string FindPath(string cloneUrl, string matchPath = "/blob/master/")
+        {
+            var uriString = new UriString(cloneUrl);
+            var prefix = uriString.ToRepositoryUrl() + matchPath;
+            return cloneUrl.StartsWith(prefix) ? cloneUrl.Substring(prefix.Length) : null;
         }
 
         class UrlRepositoryModel : IRepositoryModel
