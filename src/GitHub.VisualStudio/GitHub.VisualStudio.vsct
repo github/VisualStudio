@@ -112,6 +112,17 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubCmdSet" id="openFromUrlCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>Open from GitHub</ButtonText>
+          <CanonicalName>.GitHub.OpenFromUrl</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFromUrl</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
         <Icon guid="guidImages" id="arrow_left" />
@@ -333,6 +344,7 @@
       <IDSymbol name="showGitHubPaneCommand" value="0x200"/>
       <IDSymbol name="showCurrentPullRequestCommand" value="0x202"/>
       <IDSymbol name="syncSubmodulesCommand" value="0x0203" />
+      <IDSymbol name="openFromUrlCommand" value="0x0204" />    
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->
