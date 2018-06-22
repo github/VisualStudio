@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.Services.Vssdk</RootNamespace>
     <AssemblyName>GitHub.Services.Vssdk</AssemblyName>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>

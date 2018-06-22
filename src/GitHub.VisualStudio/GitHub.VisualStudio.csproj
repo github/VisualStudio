@@ -36,7 +36,7 @@
     <StartAction>Program</StartAction>
     <StartProgram Condition=" '$(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
