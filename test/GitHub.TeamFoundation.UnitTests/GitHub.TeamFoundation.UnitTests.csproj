@@ -191,10 +191,6 @@
       <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
       <Name>GitHub.Exports</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
-      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
-      <Name>GitHub.InlineReviews</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
