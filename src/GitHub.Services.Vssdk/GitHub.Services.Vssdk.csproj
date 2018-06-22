@@ -6,6 +6,10 @@
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
   </ItemGroup>

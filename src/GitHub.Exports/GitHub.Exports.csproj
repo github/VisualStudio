@@ -25,6 +25,7 @@
     <PackageReference Include="EnvDTE80" Version="8.0.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.23.1" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.164" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
     <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost" Version="14.0.25424" />
     <PackageReference Include="Microsoft.VisualStudio.Editor" Version="14.3.25407" />
     <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
