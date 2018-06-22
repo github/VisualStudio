@@ -93,10 +93,6 @@
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
-      <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
-      <Name>GitHub.VisualStudio</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Helpers\SharedDictionary.xaml">

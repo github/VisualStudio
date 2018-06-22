@@ -199,10 +199,6 @@
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
-      <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
-      <Name>GitHub.VisualStudio</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
