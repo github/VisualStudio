@@ -65,18 +65,23 @@ namespace GitHub.Primitives
 
         void SetUri(Uri uri)
         {
+            var ownerSegment = FindSegment(uri.Segments, 0);
+            var repositorySegment = FindSegment(uri.Segments, 1);
+
+            if (repositorySegment == null)
+            {
+                // Prioritize having a RepositoryName over an Owner
+                repositorySegment = ownerSegment;
+                ownerSegment = null;
+            }
+
             Host = uri.Host;
-            if (uri.Segments.Any())
-            {
-                RepositoryName = GetRepositoryName(uri.Segments.Last());
-            }
-
-            if (uri.Segments.Length > 2)
-            {
-                Owner = (uri.Segments[uri.Segments.Length - 2] ?? "").TrimEnd('/').ToNullIfEmpty();
-            }
-
+            Owner = ownerSegment;
+            RepositoryName = GetRepositoryName(repositorySegment);
             IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
+
+            string FindSegment(string[] segments, int number)
+                => segments.Skip(number + 1).FirstOrDefault()?.TrimEnd("/");
         }
 
         void SetFilePath(Uri uri)

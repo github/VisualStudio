@@ -26,10 +26,11 @@ public class UriStringTests
             "foo.com", "github", "Windows")]
         [TestCase("https://haacked@bitbucket.org/haacked/test-mytest.git", "bitbucket.org", "haacked", "test-mytest")]
         [TestCase("https://git01.codeplex.com/nuget", "git01.codeplex.com", null, "nuget")]
-        [TestCase("https://example.com/vpath/foo/bar", "example.com", "foo", "bar")]
-        [TestCase("https://example.com/vpath/foo/bar.git", "example.com", "foo", "bar")]
+        [TestCase("https://example.com/vpath/foo/bar", "example.com", "vpath", "foo")]
+        [TestCase("https://example.com/vpath/foo/bar.git", "example.com", "vpath", "foo")]
         [TestCase("https://github.com/github/Windows.git?pr=24&branch=pr/23&filepath=relative/to/the/path.md",
             "github.com", "github", "Windows")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/code.cs", "github.com", "github", "VisualStudio")]
         public void ParsesWellFormedUrlComponents(string url, string expectedHost, string owner, string repositoryName)
         {
             var cloneUrl = new UriString(url);
@@ -105,11 +106,12 @@ public class UriStringTests
     {
         [TestCase("http://192.168.1.3/foo/bar.git", "foo/bar")]
         [TestCase("http://192.168.1.3/foo/bar", "foo/bar")]
-        [TestCase("http://192.168.1.3/foo/bar/baz/qux", "baz/qux")]
+        [TestCase("http://192.168.1.3/foo/bar/baz/qux", "foo/bar")]
         [TestCase("https://github.com/github/Windows.git", "github/Windows")]
         [TestCase("https://github.com/github/", "github")]
         [TestCase("blah@bar.com:/Windows.git", "Windows")]
         [TestCase("git@github.com:github/Windows.git", "github/Windows")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/code.cs", "github/VisualStudio")]
         public void DependsOnOwnerAndRepoNameNotBeingNull(string url, string expectedNameWithOwner)
         {
             var cloneUrl = new UriString(url);
@@ -163,6 +165,7 @@ public class UriStringTests
         [TestCase("git@example.com:org/repo.git", "https://example.com/org/repo")]
         [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/shana/cef")]
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/code.cs", "https://github.com/github/VisualStudio")]
         public void ConvertsToWebUrl(string uriString, string expected)
         {
             Assert.That(new UriString(uriString).ToRepositoryUrl(), Is.EqualTo(new Uri(expected)));
