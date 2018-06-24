@@ -39,10 +39,10 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         IModelService modelService;
-        IPullRequestModel model;
+        PullRequestDetailModel model;
+        IActorViewModel author;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
-        int commentCount;
         string body;
         IReadOnlyList<IPullRequestReviewSummaryViewModel> reviews;
         IPullRequestCheckoutState checkoutState;
@@ -127,7 +127,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
-        public IPullRequestModel Model
+        public PullRequestDetailModel Model
         {
             get { return model; }
             private set
@@ -164,6 +164,15 @@ namespace GitHub.ViewModels.GitHubPane
         public int Number { get; private set; }
 
         /// <summary>
+        /// Gets the Pull Request author.
+        /// </summary>
+        public IActorViewModel Author
+        {
+            get { return author; }
+            private set { this.RaiseAndSetIfChanged(ref author, value); }
+        }
+
+        /// <summary>
         /// Gets the session for the pull request.
         /// </summary>
         public IPullRequestSession Session { get; private set; }
@@ -184,15 +193,6 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
-        }
-
-        /// <summary>
-        /// Gets the number of comments made on the pull request.
-        /// </summary>
-        public int CommentCount
-        {
-            get { return commentCount; }
-            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
         }
 
         /// Gets a value indicating whether the pull request branch is checked out.
@@ -331,8 +331,8 @@ namespace GitHub.ViewModels.GitHubPane
                 Number = number;
                 WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner).Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
-
-                await Refresh();
+                Session = await sessionManager.GetSession(owner, repo, number);
+                await Load(Session.PullRequest);
                 teamExplorerContext.StatusChanged += RefreshIfActive;
             }
             catch (Exception ex)
@@ -361,20 +361,19 @@ namespace GitHub.ViewModels.GitHubPane
         /// Loads the view model from octokit models.
         /// </summary>
         /// <param name="pullRequest">The pull request model.</param>
-        public async Task Load(IPullRequestModel pullRequest)
+        public async Task Load(PullRequestDetailModel pullRequest)
         {
             try
             {
                 var firstLoad = (Model == null);
                 Model = pullRequest;
-                Session = await sessionManager.GetSession(pullRequest);
+                Author = new ActorViewModel(pullRequest.Author);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
                 IsBusy = true;
-                IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
-                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
-                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
-                CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
+                IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, pullRequest);
+                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.HeadRepositoryOwner, pullRequest.HeadRefName);
+                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.BaseRepositoryOwner, pullRequest.BaseRefName);
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
@@ -434,7 +433,7 @@ namespace GitHub.ViewModels.GitHubPane
                     var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
-                    if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                    if (pullRequest.HeadRepositoryOwner == null)
                     {
                         disabled = Resources.SourceRepositoryNoLongerAvailable;
                     }
@@ -480,8 +479,8 @@ namespace GitHub.ViewModels.GitHubPane
                 Error = null;
                 OperationError = null;
                 IsBusy = true;
-                var pullRequest = await modelService.GetPullRequest(RemoteRepositoryOwner, LocalRepository.Name, Number);
-                await Load(pullRequest);
+                await Session.Refresh();
+                await Load(Session.PullRequest);
             }
             catch (Exception ex)
             {
@@ -539,11 +538,11 @@ namespace GitHub.ViewModels.GitHubPane
             command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
+        static string GetBranchDisplayName(bool isFromFork, string owner, string label)
         {
-            if (targetBranchLabel != null)
+            if (owner != null)
             {
-                return isFromFork ? targetBranchLabel : targetBranchLabel.Split(':')[1];
+                return isFromFork ? owner + ':' + label : label;
             }
             else
             {

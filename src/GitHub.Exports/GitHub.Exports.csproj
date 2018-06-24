@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub</RootNamespace>
     <AssemblyName>GitHub.Exports</AssemblyName>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -164,15 +164,20 @@
     <Compile Include="Exports\ExportForProcessAttribute.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
+    <Compile Include="Models\ActorModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />
     <Compile Include="Models\DiffUtilities.cs" />
-    <Compile Include="Models\ICommentModel.cs" />
+    <Compile Include="Models\CommentModel.cs" />
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
-    <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
-    <Compile Include="Models\IPullRequestReviewModel.cs" />
+    <Compile Include="Models\IPullRequestModel.cs" />
+    <Compile Include="Models\PullRequestFileModel.cs" />
+    <Compile Include="Models\PullRequestDetailModel.cs" />
+    <Compile Include="Models\PullRequestReviewCommentModel.cs" />
+    <Compile Include="Models\PullRequestReviewModel.cs" />
+    <Compile Include="Models\PullRequestReviewThreadModel.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
@@ -208,7 +213,6 @@
     <Compile Include="Services\IConnectionCache.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Factories\IViewViewModelFactory.cs" />
-    <Compile Include="Models\IPullRequestFileModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
     <Compile Include="Models\RepositoryModel.cs" />
@@ -274,7 +278,6 @@
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
-    <Compile Include="Models\IPullRequestModel.cs" />
     <Compile Include="Services\IVSGitExt.cs" />
     <Compile Include="Services\IVSUIContextFactory.cs" />
   </ItemGroup>

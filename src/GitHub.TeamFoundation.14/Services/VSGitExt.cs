@@ -2,13 +2,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Logging;
+using GitHub.Extensions;
 using GitHub.TeamFoundation.Services;
 using Serilog;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Task = System.Threading.Tasks.Task;
 
@@ -32,14 +33,18 @@ namespace GitHub.VisualStudio.Base
         IGitExt gitService;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
-        [ImportingConstructor]
         public VSGitExt(IAsyncServiceProvider asyncServiceProvider)
-            : this(asyncServiceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory())
+            : this(asyncServiceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory(), ThreadHelper.JoinableTaskContext)
         {
         }
 
-        public VSGitExt(IAsyncServiceProvider asyncServiceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory)
+        public VSGitExt(IAsyncServiceProvider asyncServiceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory,
+            JoinableTaskContext joinableTaskContext)
         {
+            JoinableTaskCollection = joinableTaskContext.CreateCollection();
+            JoinableTaskCollection.DisplayName = nameof(VSGitExt);
+            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
+
             this.asyncServiceProvider = asyncServiceProvider;
             this.repositoryFactory = repositoryFactory;
 
@@ -49,29 +54,28 @@ namespace GitHub.VisualStudio.Base
             // The IGitExt service isn't available when a TFS based solution is opened directly.
             // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
             var context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
-            context.WhenActivated(() => Initialize());
+            context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.Forget(log));
         }
 
-        void Initialize()
+        async Task InitializeAsync()
         {
-            PendingTasks = asyncServiceProvider.GetServiceAsync(typeof(IGitExt)).ContinueWith(t =>
+            gitService = await GetServiceAsync<IGitExt>();
+            if (gitService == null)
             {
-                gitService = (IGitExt)t.Result;
-                if (gitService == null)
-                {
-                    log.Error("Couldn't find IGitExt service");
-                    return;
-                }
+                log.Error("Couldn't find IGitExt service");
+                return;
+            }
 
-                RefreshActiveRepositories();
-                gitService.PropertyChanged += (s, e) =>
+            // Refresh on background thread
+            await Task.Run(() => RefreshActiveRepositories());
+
+            gitService.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(gitService.ActiveRepositories))
                 {
-                    if (e.PropertyName == nameof(gitService.ActiveRepositories))
-                    {
-                        RefreshActiveRepositories();
-                    }
-                };
-            }, TaskScheduler.Default);
+                    RefreshActiveRepositories();
+                }
+            };
         }
 
         public void RefreshActiveRepositories()
@@ -113,11 +117,24 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
+        public void JoinTillEmpty()
+        {
+            JoinableTaskFactory.Context.Factory.Run(async () =>
+            {
+                await JoinableTaskCollection.JoinTillEmptyAsync();
+            });
+        }
+
+        async Task<T> GetServiceAsync<T>()
+        {
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            return (T)await asyncServiceProvider.GetServiceAsync(typeof(T));
+        }
+
+
         public event Action ActiveRepositoriesChanged;
 
-        /// <summary>
-        /// Tasks that are pending execution on the thread pool.
-        /// </summary>
-        public Task PendingTasks { get; private set; } = Task.CompletedTask;
+        JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

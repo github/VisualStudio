@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -32,8 +31,6 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionManager>();
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
-        readonly IConnectionManager connectionManager;
-        readonly IModelServiceFactory modelServiceFactory;
         readonly Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>> sessions =
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         TaskCompletionSource<object> initialized;
@@ -45,36 +42,28 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="service">The PR service to use.</param>
         /// <param name="sessionService">The PR session service to use.</param>
-        /// <param name="connectionManager">The connectionManager to use.</param>
-        /// <param name="modelServiceFactory">The ModelService factory.</param>
         /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
             IPullRequestService service,
             IPullRequestSessionService sessionService,
-            IConnectionManager connectionManager,
-            IModelServiceFactory modelServiceFactory,
             ITeamExplorerContext teamExplorerContext)
         {
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionService, nameof(sessionService));
-            Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
-            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
 
             this.service = service;
             this.sessionService = sessionService;
-            this.connectionManager = connectionManager;
-            this.modelServiceFactory = modelServiceFactory;
             initialized = new TaskCompletionSource<object>(null);
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => StatusChanged().Forget());
+                .Subscribe(_ => StatusChanged().Forget(log));
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => RepoChanged(x).Forget());
+                .Subscribe(x => RepoChanged(x).Forget(log));
         }
 
         /// <inheritdoc/>
@@ -155,11 +144,11 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
+        public async Task<IPullRequestSession> GetSession(string owner, string name, int number)
         {
-            Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
+            var session = await GetSessionInternal(owner, name, number);
 
-            if (await service.EnsureLocalBranchesAreMarkedAsPullRequests(repository, pullRequest))
+            if (await service.EnsureLocalBranchesAreMarkedAsPullRequests(repository, session.PullRequest))
             {
                 // The branch for the PR was not previously marked with the PR number in the git
                 // config so we didn't pick up that the current branch is a PR branch. That has
@@ -167,7 +156,7 @@ namespace GitHub.InlineReviews.Services
                 await StatusChanged();
             }
 
-            return await GetSessionInternal(pullRequest);
+            return session;
         }
 
         /// <inheritdoc/>
@@ -207,48 +196,36 @@ namespace GitHub.InlineReviews.Services
 
         async Task StatusChanged()
         {
-            try
+            var session = CurrentSession;
+
+            var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+            if (pr != null)
             {
-                var session = CurrentSession;
+                var changePR =
+                    pr.Item1 != (session?.PullRequest.BaseRepositoryOwner) ||
+                    pr.Item2 != (session?.PullRequest.Number);
 
-                var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
-                if (pr != null)
+                if (changePR)
                 {
-                    var changePR =
-                        pr.Item1 != (session?.PullRequest.Base.RepositoryCloneUrl.Owner) ||
-                        pr.Item2 != (session?.PullRequest.Number);
-
-                    if (changePR)
-                    {
-                        var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
-                        var pullRequest = await modelService?.GetPullRequest(pr.Item1, repository.Name, pr.Item2);
-                        if (pullRequest != null)
-                        {
-                            var newSession = await GetSessionInternal(pullRequest);
-                            if (newSession != null) newSession.IsCheckedOut = true;
-                            session = newSession;
-                        }
-                    }
+                    var newSession = await GetSessionInternal(pr.Item1, repository.Name, pr.Item2);
+                    if (newSession != null) newSession.IsCheckedOut = true;
+                    session = newSession;
                 }
-                else
-                {
-                    session = null;
-                }
-
-                CurrentSession = session;
-                initialized.TrySetResult(null);
             }
-            catch (Exception e)
+            else
             {
-                log.Error(e, "Error changing repository");
+                session = null;
             }
+
+            CurrentSession = session;
+            initialized.TrySetResult(null);
         }
 
-        async Task<PullRequestSession> GetSessionInternal(IPullRequestModel pullRequest)
+        async Task<PullRequestSession> GetSessionInternal(string owner, string name, int number)
         {
             PullRequestSession session = null;
             WeakReference<PullRequestSession> weakSession;
-            var key = Tuple.Create(pullRequest.Base.RepositoryCloneUrl.Owner, pullRequest.Number);
+            var key = Tuple.Create(owner, number);
 
             if (sessions.TryGetValue(key, out weakSession))
             {
@@ -257,23 +234,17 @@ namespace GitHub.InlineReviews.Services
 
             if (session == null)
             {
-                var modelService = await connectionManager.GetModelService(repository, modelServiceFactory);
+                var address = HostAddress.Create(repository.CloneUrl);
+                var pullRequest = await sessionService.ReadPullRequestDetail(address, owner, name, number);
 
-                if (modelService != null)
-                {
-                    session = new PullRequestSession(
-                        sessionService,
-                        await modelService.GetCurrentUser(),
-                        pullRequest,
-                        repository,
-                        key.Item1,
-                        false);
-                    sessions[key] = new WeakReference<PullRequestSession>(session);
-                }
-            }
-            else
-            {
-                await session.Update(pullRequest);
+                session = new PullRequestSession(
+                    sessionService,
+                    await sessionService.ReadViewer(address),
+                    pullRequest,
+                    repository,
+                    key.Item1,
+                    false);
+                sessions[key] = new WeakReference<PullRequestSession>(session);
             }
 
             return session;
@@ -287,12 +258,12 @@ namespace GitHub.InlineReviews.Services
             {
                 var mergeBase = await session.GetMergeBase();
                 var contents = sessionService.GetContents(file.TextBuffer);
-                file.BaseSha = session.PullRequest.Base.Sha;
+                file.BaseSha = session.PullRequest.BaseRefSha;
                 file.CommitSha = await CalculateCommitSha(session, file, contents);
                 file.Diff = await sessionService.Diff(
                     session.LocalRepository,
                     mergeBase,
-                    session.PullRequest.Head.Sha,
+                    session.PullRequest.HeadRefSha,
                     file.RelativePath,
                     contents);
 
@@ -302,7 +273,7 @@ namespace GitHub.InlineReviews.Services
                         session.PullRequest,
                         file.RelativePath,
                         file.Diff,
-                        session.PullRequest.Head.Sha);
+                        session.PullRequest.HeadRefSha);
                 }
                 else
                 {

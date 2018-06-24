@@ -35,13 +35,12 @@ namespace GitHub.SampleData
         {
             var repoPath = @"C:\Repo";
 
-            Model = new PullRequestModel(419,
-                "Error handling/bubbling from viewmodels to views to viewhosts",
-                 new AccountDesigner { Login = "shana", IsUser = true },
-                 DateTime.Now.Subtract(TimeSpan.FromDays(3)))
+            Model = new PullRequestDetailModel
             {
-                State = PullRequestStateEnum.Open,
-                CommitCount = 9,
+                Number = 419,
+                Title = "Error handling/bubbling from viewmodels to views to viewhosts",
+                Author = new ActorModel { Login = "shana" },
+                UpdatedAt = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(3)),
             };
 
             SourceBranchDisplayName = "shana/error-handling";
@@ -71,22 +70,22 @@ This requires that errors be propagated from the viewmodel to the view and from 
             {
                 new PullRequestReviewSummaryViewModel
                 {
-                    Id = 2,
-                    User = new AccountDesigner { Login = "grokys", IsUser = true },
+                    Id = "id1",
+                    User = new ActorViewModel { Login = "grokys" },
                     State = PullRequestReviewState.Pending,
                     FileCommentCount = 0,
                 },
                 new PullRequestReviewSummaryViewModel
                 {
-                    Id = 1,
-                    User = new AccountDesigner { Login = "jcansdale", IsUser = true },
+                    Id = "id",
+                    User = new ActorViewModel { Login = "jcansdale" },
                     State = PullRequestReviewState.Approved,
                     FileCommentCount = 5,
                 },
                 new PullRequestReviewSummaryViewModel
                 {
-                    Id = 2,
-                    User = new AccountDesigner { Login = "shana", IsUser = true },
+                    Id = "id3",
+                    User = new ActorViewModel { Login = "shana" },
                     State = PullRequestReviewState.ChangesRequested,
                     FileCommentCount = 5,
                 },
@@ -98,11 +97,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
             Files = new PullRequestFilesViewModelDesigner();
         }
 
-        public IPullRequestModel Model { get; }
+        public PullRequestDetailModel Model { get; }
         public IPullRequestSession Session { get; }
         public ILocalRepositoryModel LocalRepository { get; }
         public string RemoteRepositoryOwner { get; }
         public int Number { get; set; }
+        public IActorViewModel Author { get; set; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public int CommentCount { get; set; }
