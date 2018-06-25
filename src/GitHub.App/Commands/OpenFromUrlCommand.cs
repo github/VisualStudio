@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows;
 using System.ComponentModel.Composition;
 using GitHub.UI;
 using GitHub.Models;
@@ -47,6 +48,16 @@ namespace GitHub.Commands
 
         public override async Task Execute(string url)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                url = FindClipboardUrl();
+            }
+
+            if (url == null)
+            {
+                return;
+            }
+
             var repository = new UrlRepositoryModel(url);
             var targetDir = await dialogService.Value.ShowReCloneDialog(repository);
             if (targetDir == null)
@@ -56,7 +67,7 @@ namespace GitHub.Commands
 
             await repositoryCloneService.Value.CloneRepository(repository.CloneUrl, repository.Name, targetDir);
             var repositoryDir = Path.Combine(targetDir, repository.Name);
-            if (Directory.Exists(repositoryDir))
+            if (!Directory.Exists(repositoryDir))
             {
                 return;
             }
@@ -65,6 +76,19 @@ namespace GitHub.Commands
             dte.Value.ExecuteCommand("View.TfsTeamExplorer");
 
             TryOpenFile(url, repositoryDir);
+        }
+
+        static string FindClipboardUrl()
+        {
+            var clipboardText = Clipboard.GetText(TextDataFormat.Text);
+            var uriString = new UriString(clipboardText);
+
+            if (!uriString.IsValidUri || !uriString.IsHypertextTransferProtocol)
+            {
+                return null;
+            }
+
+            return uriString;
         }
 
         bool TryOpenFile(string url, string repositoryDir)
@@ -90,7 +114,19 @@ namespace GitHub.Commands
         {
             var uriString = new UriString(cloneUrl);
             var prefix = uriString.ToRepositoryUrl() + matchPath;
-            return cloneUrl.StartsWith(prefix) ? cloneUrl.Substring(prefix.Length) : null;
+            if (!cloneUrl.StartsWith(prefix))
+            {
+                return null;
+            }
+
+            var endIndex = cloneUrl.IndexOf('#');
+            if (endIndex == -1)
+            {
+                endIndex = cloneUrl.Length;
+            }
+
+            var path = cloneUrl.Substring(prefix.Length, endIndex - prefix.Length);
+            return path;
         }
 
         class UrlRepositoryModel : IRepositoryModel
