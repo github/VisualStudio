@@ -2,8 +2,6 @@
 using System.IO;
 using System.Windows;
 using System.ComponentModel.Composition;
-using GitHub.UI;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.Primitives;
 using GitHub.VisualStudio;
@@ -17,7 +15,6 @@ namespace GitHub.Commands
     [Export(typeof(IOpenFromUrlCommand))]
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
-        readonly Lazy<IDialogService> dialogService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
         readonly Lazy<DTE> dte;
 
@@ -33,12 +30,10 @@ namespace GitHub.Commands
 
         [ImportingConstructor]
         public OpenFromUrlCommand(
-            Lazy<IDialogService> dialogService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
             [Import(typeof(SVsServiceProvider))] IServiceProvider sp) :
             base(CommandSet, CommandId)
         {
-            this.dialogService = dialogService;
             this.repositoryCloneService = repositoryCloneService;
             dte = new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE)));
 
@@ -50,45 +45,32 @@ namespace GitHub.Commands
         {
             if (string.IsNullOrEmpty(url))
             {
-                url = FindClipboardUrl();
+                url = Clipboard.GetText(TextDataFormat.Text);
             }
 
-            if (url == null)
+            var gitHubUrl = new UriString(url);
+            if (!gitHubUrl.IsValidUri || !gitHubUrl.IsHypertextTransferProtocol)
             {
                 return;
             }
 
-            var repository = new UrlRepositoryModel(url);
-            var targetDir = await dialogService.Value.ShowReCloneDialog(repository);
-            if (targetDir == null)
-            {
-                return;
-            }
+            // Keep repos in unique dir while testing
+            var defaultSubPath = "GitHubCache";
 
-            await repositoryCloneService.Value.CloneRepository(repository.CloneUrl, repository.Name, targetDir);
-            var repositoryDir = Path.Combine(targetDir, repository.Name);
+            var cloneUrl = gitHubUrl.ToRepositoryUrl().ToString();
+            var targetDir = Path.Combine(repositoryCloneService.Value.DefaultClonePath, defaultSubPath, gitHubUrl.Owner);
+            var repositoryDirName = gitHubUrl.RepositoryName;
+            var repositoryDir = Path.Combine(targetDir, repositoryDirName);
+
             if (!Directory.Exists(repositoryDir))
             {
-                return;
+                await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
             }
 
             dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
             dte.Value.ExecuteCommand("View.TfsTeamExplorer");
 
             TryOpenFile(url, repositoryDir);
-        }
-
-        static string FindClipboardUrl()
-        {
-            var clipboardText = Clipboard.GetText(TextDataFormat.Text);
-            var uriString = new UriString(clipboardText);
-
-            if (!uriString.IsValidUri || !uriString.IsHypertextTransferProtocol)
-            {
-                return null;
-            }
-
-            return uriString;
         }
 
         bool TryOpenFile(string url, string repositoryDir)
@@ -127,24 +109,6 @@ namespace GitHub.Commands
 
             var path = cloneUrl.Substring(prefix.Length, endIndex - prefix.Length);
             return path;
-        }
-
-        class UrlRepositoryModel : IRepositoryModel
-        {
-            public UrlRepositoryModel(string url)
-            {
-                var repositoryUrl = new UriString(url).ToRepositoryUrl();
-                CloneUrl = new UriString(repositoryUrl.ToString());
-            }
-
-            public void SetIcon(bool isPrivate, bool isFork)
-            {
-            }
-
-            public UriString CloneUrl { get; }
-            public string Name => CloneUrl.RepositoryName;
-            public string Owner => CloneUrl.Owner;
-            public Octicon Icon { get; }
         }
     }
 }
