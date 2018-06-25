@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
     <ProjectReference Include="..\..\src\GitHub.UI\GitHub.UI.csproj" />
     <ProjectReference Include="..\..\src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj" />
     <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj" />

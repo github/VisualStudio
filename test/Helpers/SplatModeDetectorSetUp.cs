@@ -12,7 +12,7 @@ public class SplatModeDetectorSetUp
         var ncrunchAsms = Environment.GetEnvironmentVariable("NCrunch.AllAssemblyLocations")?.Split(';');
         if (ncrunchAsms != null)
         {
-            ncrunchAsms.Where(x => x.EndsWith(@"\Net45\Splat.dll")).Select(Assembly.LoadFrom).FirstOrDefault();
+            ncrunchAsms.Where(x => x.EndsWith(@"\Net45\Splat.dll", StringComparison.OrdinalIgnoreCase)).Select(Assembly.LoadFrom).FirstOrDefault();
         }
     }
 

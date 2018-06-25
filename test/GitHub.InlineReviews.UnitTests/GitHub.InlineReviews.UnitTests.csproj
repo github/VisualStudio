@@ -21,6 +21,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
     <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj" />
   </ItemGroup>
 
