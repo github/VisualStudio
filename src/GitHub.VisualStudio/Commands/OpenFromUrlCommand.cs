@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.Primitives;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
+using Microsoft.VisualStudio;
 
 namespace GitHub.VisualStudio.Commands
 {
@@ -15,6 +16,7 @@ namespace GitHub.VisualStudio.Commands
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
+        readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
         readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
         readonly Lazy<DTE> dte;
 
@@ -31,10 +33,12 @@ namespace GitHub.VisualStudio.Commands
         [ImportingConstructor]
         public OpenFromUrlCommand(
             Lazy<IRepositoryCloneService> repositoryCloneService,
+            Lazy<IPullRequestEditorService> pullRequestEditorService,
             [Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))] IServiceProvider sp) :
             base(CommandSet, CommandId)
         {
             this.repositoryCloneService = repositoryCloneService;
+            this.pullRequestEditorService = pullRequestEditorService;
             dte = new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE)));
             gitHubToolWindowManager = new Lazy<IGitHubToolWindowManager>(
                 () => (IGitHubToolWindowManager)sp.GetService(typeof(IGitHubToolWindowManager)));
@@ -128,6 +132,15 @@ namespace GitHub.VisualStudio.Commands
             }
 
             dte.Value.ItemOperations.OpenFile(fullPath);
+
+            var lineNumber = FindLineNumber(gitHubUrl);
+            if (lineNumber != -1)
+            {
+                var activeView = pullRequestEditorService.Value.FindActiveView();
+                ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(lineNumber, 0));
+                ErrorHandler.ThrowOnFailure(activeView.CenterLines(lineNumber, 1));
+            }
+
             return true;
         }
 
@@ -166,6 +179,24 @@ namespace GitHub.VisualStudio.Commands
 
             var path = url.Substring(prefix.Length, endIndex - prefix.Length);
             return path;
+        }
+
+        static int FindLineNumber(UriString gitHubUrl)
+        {
+            var prefix = "#L";
+            var url = gitHubUrl.ToString();
+            var index = url.LastIndexOf(prefix);
+            if (index == -1)
+            {
+                return -1;
+            }
+
+            if (!int.TryParse(url.Substring(index + prefix.Length), out int lineNumber))
+            {
+                return -1;
+            }
+
+            return lineNumber - 1;
         }
     }
 }
