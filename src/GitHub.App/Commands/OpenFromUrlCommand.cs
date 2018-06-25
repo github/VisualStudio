@@ -67,10 +67,31 @@ namespace GitHub.Commands
                 await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
             }
 
-            dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
-            dte.Value.ExecuteCommand("View.TfsTeamExplorer");
+            var solutionDir = FindSolutionDirectory(dte.Value.Solution);
+            if (solutionDir == null || !repositoryDir.StartsWith(solutionDir + '\\', StringComparison.OrdinalIgnoreCase))
+            {
+                // Open if current solution isn't in repository directory
+                dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
+                dte.Value.ExecuteCommand("View.TfsTeamExplorer");
+            }
 
             TryOpenFile(url, repositoryDir);
+        }
+
+        static string FindSolutionDirectory(Solution solution)
+        {
+            var solutionPath = solution.FileName;
+            if (File.Exists(solutionPath))
+            {
+                return Path.GetDirectoryName(solutionPath);
+            }
+
+            if (Directory.Exists(solutionPath))
+            {
+                return solutionPath;
+            }
+
+            return null;
         }
 
         bool TryOpenFile(string url, string repositoryDir)
