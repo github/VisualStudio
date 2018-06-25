@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using System.Threading.Tasks;
 using System.ComponentModel.Composition;
+using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Primitives;
-using GitHub.VisualStudio;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
 
-namespace GitHub.Commands
+namespace GitHub.VisualStudio.Commands
 {
     [Export(typeof(IOpenFromUrlCommand))]
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
+        readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
         readonly Lazy<DTE> dte;
 
         /// <summary>
@@ -31,11 +31,13 @@ namespace GitHub.Commands
         [ImportingConstructor]
         public OpenFromUrlCommand(
             Lazy<IRepositoryCloneService> repositoryCloneService,
-            [Import(typeof(SVsServiceProvider))] IServiceProvider sp) :
+            [Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))] IServiceProvider sp) :
             base(CommandSet, CommandId)
         {
             this.repositoryCloneService = repositoryCloneService;
             dte = new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE)));
+            gitHubToolWindowManager = new Lazy<IGitHubToolWindowManager>(
+                () => (IGitHubToolWindowManager)sp.GetService(typeof(IGitHubToolWindowManager)));
 
             // See https://code.msdn.microsoft.com/windowsdesktop/AllowParams-2005-9442298f
             ParametersDescription = "u";    // accept a single url
@@ -68,14 +70,30 @@ namespace GitHub.Commands
             }
 
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
-            if (solutionDir == null || !repositoryDir.StartsWith(solutionDir + '\\', StringComparison.OrdinalIgnoreCase))
+            if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
                 // Open if current solution isn't in repository directory
                 dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
                 dte.Value.ExecuteCommand("View.TfsTeamExplorer");
             }
 
-            TryOpenFile(url, repositoryDir);
+            await TryOpenPullRequest(gitHubUrl);
+            TryOpenFile(gitHubUrl, repositoryDir);
+        }
+
+        static bool ContainsDirectory(string repositoryDir, string solutionDir)
+        {
+            if (solutionDir.Equals(repositoryDir, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (solutionDir.StartsWith(repositoryDir + '\\', StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         static string FindSolutionDirectory(Solution solution)
@@ -94,9 +112,9 @@ namespace GitHub.Commands
             return null;
         }
 
-        bool TryOpenFile(string url, string repositoryDir)
+        bool TryOpenFile(UriString gitHubUrl, string repositoryDir)
         {
-            var path = FindPath(url);
+            var path = FindSubPath(gitHubUrl, "/blob/master/");
             if (path == null)
             {
                 return false;
@@ -113,22 +131,40 @@ namespace GitHub.Commands
             return true;
         }
 
-        static string FindPath(string cloneUrl, string matchPath = "/blob/master/")
+        async Task<bool> TryOpenPullRequest(UriString gitHubUrl)
         {
-            var uriString = new UriString(cloneUrl);
-            var prefix = uriString.ToRepositoryUrl() + matchPath;
-            if (!cloneUrl.StartsWith(prefix))
+            var pullRequest = FindSubPath(gitHubUrl, "/pull/");
+            if (pullRequest == null)
+            {
+                return false;
+            }
+
+            if (!int.TryParse(pullRequest, out int number))
+            {
+                return false;
+            }
+
+            var host = await gitHubToolWindowManager.Value.ShowGitHubPane();
+            await host.ShowPullRequest(gitHubUrl.Owner, gitHubUrl.RepositoryName, number);
+            return true;
+        }
+
+        static string FindSubPath(UriString gitHubUrl, string matchPath)
+        {
+            var url = gitHubUrl.ToString();
+            var prefix = gitHubUrl.ToRepositoryUrl() + matchPath;
+            if (!url.StartsWith(prefix))
             {
                 return null;
             }
 
-            var endIndex = cloneUrl.IndexOf('#');
+            var endIndex = url.IndexOf('#');
             if (endIndex == -1)
             {
-                endIndex = cloneUrl.Length;
+                endIndex = gitHubUrl.Length;
             }
 
-            var path = cloneUrl.Substring(prefix.Length, endIndex - prefix.Length);
+            var path = url.Substring(prefix.Length, endIndex - prefix.Length);
             return path;
         }
     }
