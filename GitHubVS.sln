@@ -97,11 +97,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.UI", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.StartPage", "src\GitHub.StartPage\GitHub.StartPage.csproj", "{50E277B8-8580-487A-8F8E-5C3B9FBF0F77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI.UnitTests", "test\GitHub.UI.UnitTests\GitHub.UI.UnitTests.csproj", "{110B206F-8554-4B51-BF86-94DAA32F5E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI.UnitTests", "test\GitHub.UI.UnitTests\GitHub.UI.UnitTests.csproj", "{110B206F-8554-4B51-BF86-94DAA32F5E26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews", "src\GitHub.InlineReviews\GitHub.InlineReviews.csproj", "{7F5ED78B-74A3-4406-A299-70CFB5885B8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews.UnitTests", "test\GitHub.InlineReviews.UnitTests\GitHub.InlineReviews.UnitTests.csproj", "{17EB676B-BB91-48B5-AA59-C67695C647C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.InlineReviews.UnitTests", "test\GitHub.InlineReviews.UnitTests\GitHub.InlineReviews.UnitTests.csproj", "{17EB676B-BB91-48B5-AA59-C67695C647C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Logging", "src\GitHub.Logging\GitHub.Logging.csproj", "{8D73575A-A89F-47CC-B153-B47DD06837F0}"
 EndProject
@@ -113,21 +113,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsServer", "test\Metri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsTests", "test\MetricsTests\MetricsTests\MetricsTests.csproj", "{09313E65-7ADB-48C1-AD3A-572020C5BDCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Api.UnitTests", "test\GitHub.Api.UnitTests\GitHub.Api.UnitTests.csproj", "{EFDE0798-ACDB-431D-B7F1-548A7231C853}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Api.UnitTests", "test\GitHub.Api.UnitTests\GitHub.Api.UnitTests.csproj", "{EFDE0798-ACDB-431D-B7F1-548A7231C853}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.App.UnitTests", "test\GitHub.App.UnitTests\GitHub.App.UnitTests.csproj", "{3525D819-6AEC-4879-89FB-56B41F026571}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.App.UnitTests", "test\GitHub.App.UnitTests\GitHub.App.UnitTests.csproj", "{3525D819-6AEC-4879-89FB-56B41F026571}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Exports.UnitTests", "test\GitHub.Exports.UnitTests\GitHub.Exports.UnitTests.csproj", "{94509FCB-6C97-4ED6-AED6-6E74AB3CA336}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Exports.UnitTests", "test\GitHub.Exports.UnitTests\GitHub.Exports.UnitTests.csproj", "{94509FCB-6C97-4ED6-AED6-6E74AB3CA336}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Exports.Reactive.UnitTests", "test\GitHub.Exports.Reactive.UnitTests\GitHub.Exports.Reactive.UnitTests.csproj", "{C59868FC-D8BC-4D47-B4F3-16908D2641C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Exports.Reactive.UnitTests", "test\GitHub.Exports.Reactive.UnitTests\GitHub.Exports.Reactive.UnitTests.csproj", "{C59868FC-D8BC-4D47-B4F3-16908D2641C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Extensions.UnitTests", "test\GitHub.Extensions.UnitTests\GitHub.Extensions.UnitTests.csproj", "{DE704BBB-6EC6-4173-B695-D9EBF5AEB092}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Extensions.UnitTests", "test\GitHub.Extensions.UnitTests\GitHub.Extensions.UnitTests.csproj", "{DE704BBB-6EC6-4173-B695-D9EBF5AEB092}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Primitives.UnitTests", "test\GitHub.Primitives.UnitTests\GitHub.Primitives.UnitTests.csproj", "{E687457A-BEDC-422D-8D9D-2DA58099EBBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.TeamFoundation.UnitTests", "test\GitHub.TeamFoundation.UnitTests\GitHub.TeamFoundation.UnitTests.csproj", "{93778A89-3E58-4853-B772-948EBB3F17BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.UnitTests", "test\GitHub.TeamFoundation.UnitTests\GitHub.TeamFoundation.UnitTests.csproj", "{93778A89-3E58-4853-B772-948EBB3F17BE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.UnitTests", "test\GitHub.VisualStudio.UnitTests\GitHub.VisualStudio.UnitTests.csproj", "{8B14F90B-0781-465D-AB94-19C8C56E3A94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.VisualStudio.UnitTests", "test\GitHub.VisualStudio.UnitTests\GitHub.VisualStudio.UnitTests.csproj", "{8B14F90B-0781-465D-AB94-19C8C56E3A94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -498,16 +496,6 @@ Global
 		{DE704BBB-6EC6-4173-B695-D9EBF5AEB092}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE704BBB-6EC6-4173-B695-D9EBF5AEB092}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{DE704BBB-6EC6-4173-B695-D9EBF5AEB092}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 		{93778A89-3E58-4853-B772-948EBB3F17BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{93778A89-3E58-4853-B772-948EBB3F17BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93778A89-3E58-4853-B772-948EBB3F17BE}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
@@ -558,7 +546,6 @@ Global
 		{94509FCB-6C97-4ED6-AED6-6E74AB3CA336} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{C59868FC-D8BC-4D47-B4F3-16908D2641C6} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{DE704BBB-6EC6-4173-B695-D9EBF5AEB092} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
-		{E687457A-BEDC-422D-8D9D-2DA58099EBBA} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{93778A89-3E58-4853-B772-948EBB3F17BE} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 	EndGlobalSection

@@ -17,9 +17,7 @@ internal static class Args
     public static SnapshotPoint SnapshotPoint { get { return Arg.Any<SnapshotPoint>(); } }
     public static NewRepository NewRepository { get { return Arg.Any<NewRepository>(); } }
     public static IAccount Account { get { return Arg.Any<IAccount>(); } }
-    public static IApiClient ApiClient { get { return Arg.Any<IApiClient>(); } }
     public static IServiceProvider ServiceProvider { get { return Arg.Any<IServiceProvider>(); } }
-    public static IAvatarProvider AvatarProvider { get { return Arg.Any<IAvatarProvider>(); } }
     public static HostAddress HostAddress { get { return Arg.Any<HostAddress>(); } } 
     public static Uri Uri { get { return Arg.Any<Uri>(); } }
     public static LibGit2Sharp.IRepository LibGit2Repo { get { return Arg.Any<LibGit2Sharp.IRepository>(); } }

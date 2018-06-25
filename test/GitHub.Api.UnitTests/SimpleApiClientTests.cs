@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 public class SimpleApiClientTests
 {
-    public class TheCtor : TestBaseClass
+    public class TheCtor
     {
         public void Throws()
         {

@@ -30,11 +30,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
         const string OwnerCloneUrl = "https://github.com/owner/repo";
         static readonly ActorModel CurrentUser = new ActorModel { Login = "currentUser" };
 
-        public PullRequestSessionManagerTests()
-        {
-            Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-        }
-
         public class TheConstructor : PullRequestSessionManagerTests
         {
             [Test]

@@ -16,7 +16,7 @@ using Task = System.Threading.Tasks.Task;
 
 public class VSGitExtTests
 {
-    public class TheConstructor : TestBaseClass
+    public class TheConstructor
     {
         [TestCase(true, 1)]
         [TestCase(false, 0)]
@@ -62,7 +62,7 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesChangedEvent : TestBaseClass
+    public class TheActiveRepositoriesChangedEvent
     {
         [Test]
         public void GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
@@ -132,7 +132,7 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesProperty : TestBaseClass
+    public class TheActiveRepositoriesProperty
     {
         [Test]
         public void SccProviderContextNotActive_IsEmpty()
