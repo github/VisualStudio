@@ -25,7 +25,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
         }
 
         [Test]
-        public void ReturnsCheckingWhenProbeNotFinished()
+        public async Task ReturnsCheckingWhenProbeNotFinished()
         {
             var scheduler = new TestScheduler();
             var caps = Substitute.For<IEnterpriseCapabilitiesService>();
@@ -37,7 +37,13 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
             Assert.That(EnterpriseProbeStatus.Checking, Is.EqualTo(target.ProbeStatus));
-            task.SetCanceled();
+
+            try
+            {
+                task.SetCanceled();
+                await task.Task;
+            }
+            catch (TaskCanceledException) { }
         }
 
         [Test]
@@ -126,7 +132,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
         public void GivesPrecedenceToUsernameAndPasswordOverToken()
         {
             var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.Token | 
+            var caps = CreateCapabilties(EnterpriseLoginMethods.Token |
                 EnterpriseLoginMethods.UsernameAndPassword |
                 EnterpriseLoginMethods.OAuth);
             var target = CreateTarget(scheduler, caps);
