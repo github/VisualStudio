@@ -43,11 +43,17 @@ namespace GitHub.Primitives
                 SetFilePath(uriString);
             }
 
-            if (RepositoryName != null)
+            if (Owner != null && RepositoryName != null)
             {
-                NameWithOwner = Owner != null
-                    ? string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName)
-                    : RepositoryName;
+                NameWithOwner = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName);
+            }
+            else if (Owner != null)
+            {
+                NameWithOwner = Owner;
+            }
+            else if (RepositoryName != null)
+            {
+                NameWithOwner = RepositoryName;
             }
         }
 
@@ -67,13 +73,6 @@ namespace GitHub.Primitives
         {
             var ownerSegment = FindSegment(uri.Segments, 0);
             var repositorySegment = FindSegment(uri.Segments, 1);
-
-            if (repositorySegment == null)
-            {
-                // Prioritize having a RepositoryName over an Owner
-                repositorySegment = ownerSegment;
-                ownerSegment = null;
-            }
 
             Host = uri.Host;
             Owner = ownerSegment;
@@ -148,7 +147,7 @@ namespace GitHub.Primitives
                 ? url.Scheme
                 : Uri.UriSchemeHttps;
 
-            var nameWithOwner = owner != null && Owner != null ?
+            var nameWithOwner = owner != null && RepositoryName != null ?
                 string.Format(CultureInfo.InvariantCulture, "{0}/{1}", owner, RepositoryName) :
                 NameWithOwner;
 

@@ -25,12 +25,15 @@ public class UriStringTests
         [TestCase("jane;fingerprint=9e:1a:5e:27:16:4d:2a:13:90:2c:64:41:bd:25:fd:35@foo.com:github/Windows.git",
             "foo.com", "github", "Windows")]
         [TestCase("https://haacked@bitbucket.org/haacked/test-mytest.git", "bitbucket.org", "haacked", "test-mytest")]
-        [TestCase("https://git01.codeplex.com/nuget", "git01.codeplex.com", null, "nuget")]
+        [TestCase("https://git01.codeplex.com/nuget", "git01.codeplex.com", "nuget", null,
+            Description = "We assume the first component is the owner")]
         [TestCase("https://example.com/vpath/foo/bar", "example.com", "vpath", "foo")]
         [TestCase("https://example.com/vpath/foo/bar.git", "example.com", "vpath", "foo")]
         [TestCase("https://github.com/github/Windows.git?pr=24&branch=pr/23&filepath=relative/to/the/path.md",
             "github.com", "github", "Windows")]
         [TestCase("https://github.com/github/VisualStudio/blob/master/src/code.cs", "github.com", "github", "VisualStudio")]
+        [TestCase("https://github.com/github", "github.com", "github", null)]
+        [TestCase("https://github.com", "github.com", null, null)]
         public void ParsesWellFormedUrlComponents(string url, string expectedHost, string owner, string repositoryName)
         {
             var cloneUrl = new UriString(url);
@@ -71,13 +74,17 @@ public class UriStringTests
         [TestCase("http://example.com", "example.com", null, null)]
         [TestCase("http://example.com?bar", "example.com", null, null)]
         [TestCase("https://example.com?bar", "example.com", null, null)]
-        [TestCase("ssh://git@example.com/Windows.git", "example.com", null, "Windows")]
+        [TestCase("ssh://git@example.com/Windows.git", "example.com", "Windows.git", null,
+            Description = "We assume the first component is the owner even if it ends with .git")]
         [TestCase("blah@bar.com:/", "bar.com", null, null)]
         [TestCase("blah@bar.com/", "bar.com", null, null)]
         [TestCase("blah@bar.com", "bar.com", null, null)]
         [TestCase("blah@bar.com:/Windows.git", "bar.com", null, "Windows")]
         [TestCase("blah@baz.com/Windows.git", "baz.com", null, "Windows")]
         [TestCase("ssh://git@github.com:github/Windows.git", "github.com", "github", "Windows")]
+
+        // NOTE: Used by LocalRepositoryModelTests.GenerateUrl but I don't think it's a legal URL
+        [TestCase("git@github.com/foo/bar", "github.com", null, "foo/bar")]
         public void ParsesWeirdUrlsAsWellAsPossible(string url, string expectedHost, string owner, string repositoryName)
         {
             var cloneUrl = new UriString(url);
@@ -202,21 +209,6 @@ public class UriStringTests
         [TestCase("git@example.com:org/repo.git", "https://example.com/org/repo")]
         [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/shana/cef")]
         [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
-
-        [TestCase("asdf", null)]
-        [TestCase("", null)]
-        [TestCase("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
-        [TestCase("http://example.com/", "http://example.com/")]
-        [TestCase("http://haacked@example.com/foo/bar", "http://example.com/foo/bar")]
-        [TestCase("https://github.com/github/Windows", "https://github.com/github/Windows")]
-        [TestCase("https://github.com/github/Windows.git", "https://github.com/github/Windows")]
-        [TestCase("https://haacked@github.com/github/Windows.git", "https://github.com/github/Windows")]
-        [TestCase("http://example.com:4000/github/Windows", "http://example.com:4000/github/Windows")]
-        [TestCase("git@192.168.1.2:github/Windows.git", "https://192.168.1.2/github/Windows")]
-        [TestCase("git@example.com:org/repo.git", "https://example.com/org/repo")]
-        [TestCase("ssh://git@github.com:443/shana/cef", "https://github.com/shana/cef")]
-        [TestCase("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
-
         public void ShouldNeverThrow(string url, string expected)
         {
             Uri uri;
