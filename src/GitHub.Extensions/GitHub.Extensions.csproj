@@ -3,8 +3,8 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
   </PropertyGroup>
-  
-  <Import Project="$(SolutionDir)\src\common\signing.props" />
+
+  <Import Project="$(SolutionDir)\src\common\extension.props" />
 
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">

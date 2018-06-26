@@ -1,11 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Windows.Markup;
-
-[assembly: AssemblyTitle("GitHub.VisualStudio.UI")]
-[assembly: AssemblyDescription("GitHub.VisualStudio.UI")]
-[assembly: Guid("d1dfbb0c-b570-4302-8f1e-2e3a19c41961")]
+﻿using System.Windows.Markup;
 
 [assembly: XmlnsDefinition("https://github.com/github/VisualStudio", "GitHub.VisualStudio.UI")]
 [assembly: XmlnsDefinition("https://github.com/github/VisualStudio", "GitHub.VisualStudio.UI.Controls")]

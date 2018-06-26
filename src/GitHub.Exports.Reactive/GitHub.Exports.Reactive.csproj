@@ -4,7 +4,7 @@
     <RootNamespace>GitHub</RootNamespace>
   </PropertyGroup>
 
-  <Import Project="$(SolutionDir)\src\common\signing.props" />
+  <Import Project="$(SolutionDir)\src\common\extension.props" />
 
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />

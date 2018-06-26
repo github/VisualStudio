@@ -3,7 +3,7 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
 
-  <Import Project="$(SolutionDir)\src\common\signing.props" />
+  <Import Project="$(SolutionDir)\src\common\extension.props" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />

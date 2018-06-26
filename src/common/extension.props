@@ -1,0 +1,5 @@
+<!-- MSBuild props for GHfVS extension libraries -->
+<Project DefaultTargets="Build">
+  <Import Project="signing.props" />
+  <Import Project="xaml.props" />
+</Project>
