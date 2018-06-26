@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -61,11 +59,11 @@ namespace GitHub.InlineReviews.Services
 
             Observable.FromEventPattern(teamExplorerContext, nameof(teamExplorerContext.StatusChanged))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => StatusChanged().Forget());
+                .Subscribe(_ => StatusChanged().Forget(log));
 
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => RepoChanged(x).Forget());
+                .Subscribe(x => RepoChanged(x).Forget(log));
         }
 
         /// <inheritdoc/>
@@ -198,36 +196,29 @@ namespace GitHub.InlineReviews.Services
 
         async Task StatusChanged()
         {
-            try
+            var session = CurrentSession;
+
+            var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
+            if (pr != null)
             {
-                var session = CurrentSession;
+                var changePR =
+                    pr.Item1 != (session?.PullRequest.BaseRepositoryOwner) ||
+                    pr.Item2 != (session?.PullRequest.Number);
 
-                var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
-                if (pr != null)
+                if (changePR)
                 {
-                    var changePR =
-                        pr.Item1 != (session?.PullRequest.BaseRepositoryOwner) ||
-                        pr.Item2 != (session?.PullRequest.Number);
-
-                    if (changePR)
-                    {
-                        var newSession = await GetSessionInternal(pr.Item1, repository.Name, pr.Item2);
-                        if (newSession != null) newSession.IsCheckedOut = true;
-                        session = newSession;
-                    }
+                    var newSession = await GetSessionInternal(pr.Item1, repository.Name, pr.Item2);
+                    if (newSession != null) newSession.IsCheckedOut = true;
+                    session = newSession;
                 }
-                else
-                {
-                    session = null;
-                }
-
-                CurrentSession = session;
-                initialized.TrySetResult(null);
             }
-            catch (Exception e)
+            else
             {
-                log.Error(e, "Error changing repository");
+                session = null;
             }
+
+            CurrentSession = session;
+            initialized.TrySetResult(null);
         }
 
         async Task<PullRequestSession> GetSessionInternal(string owner, string name, int number)
