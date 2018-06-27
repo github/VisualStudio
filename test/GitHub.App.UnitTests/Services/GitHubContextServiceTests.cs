@@ -163,5 +163,16 @@ public class GitHubContextServiceTests
 
             Assert.That(context.Issue, Is.EqualTo(expectIssue));
         }
+
+        [TestCase("VisualStudio/mark_github.xaml at master · github/VisualStudio - Google Chrome", "mark_github.xaml")]
+        [TestCase("VisualStudio/src/GitHub.VisualStudio/Resources/icons at master · github/VisualStudio - Google Chrome", "src/GitHub.VisualStudio/Resources/icons")]
+        public void Path(string windowTitle, string expectPath)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromWindowTitle(windowTitle);
+
+            Assert.That(context?.Path, Is.EqualTo(expectPath));
+        }
     }
 }

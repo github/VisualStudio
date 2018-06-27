@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
@@ -64,10 +65,11 @@ namespace GitHub.VisualStudio.Commands
                 gitHubUrl = null;
             }
 
+            GitHubContext context = null;
             if (gitHubUrl == null)
             {
                 // HACK: Reconstruct a GitHub URL from the topmost browser window
-                var context = gitHubContextService.Value.FindContextFromBrowser();
+                context = gitHubContextService.Value.FindContextFromBrowser();
                 if (context != null)
                 {
                     gitHubUrl = $"https://github.com/{context.Owner}/{context.RepositoryName}";
@@ -101,7 +103,7 @@ namespace GitHub.VisualStudio.Commands
             }
 
             await TryOpenPullRequest(gitHubUrl);
-            TryOpenFile(gitHubUrl, repositoryDir);
+            TryOpenFile(gitHubUrl, context, repositoryDir);
         }
 
         static bool ContainsDirectory(string repositoryDir, string solutionDir)
@@ -135,9 +137,9 @@ namespace GitHub.VisualStudio.Commands
             return null;
         }
 
-        bool TryOpenFile(UriString gitHubUrl, string repositoryDir)
+        bool TryOpenFile(UriString gitHubUrl, GitHubContext context, string repositoryDir)
         {
-            var path = FindSubPath(gitHubUrl, "/blob/master/");
+            var path = FindSubPath(gitHubUrl, "/blob/master/") ?? context?.Path;
             if (path == null)
             {
                 return false;
@@ -146,6 +148,13 @@ namespace GitHub.VisualStudio.Commands
             var windowsPath = path.Replace('/', '\\');
             var fullPath = Path.Combine(repositoryDir, windowsPath);
             if (!File.Exists(fullPath))
+            {
+                // Search by filename only
+                var fileName = Path.GetFileName(path);
+                fullPath = Directory.EnumerateFiles(repositoryDir, fileName, SearchOption.AllDirectories).FirstOrDefault();
+            }
+
+            if (fullPath == null)
             {
                 return false;
             }
