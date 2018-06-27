@@ -6,6 +6,7 @@ using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Primitives;
+using GitHub.App.Services;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
 using Microsoft.VisualStudio;
@@ -15,6 +16,7 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromUrlCommand))]
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
+        readonly Lazy<GitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
         readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
         readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
@@ -32,11 +34,13 @@ namespace GitHub.VisualStudio.Commands
 
         [ImportingConstructor]
         public OpenFromUrlCommand(
+            Lazy<GitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
             Lazy<IPullRequestEditorService> pullRequestEditorService,
             [Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))] IServiceProvider sp) :
             base(CommandSet, CommandId)
         {
+            this.gitHubContextService = gitHubContextService;
             this.repositoryCloneService = repositoryCloneService;
             this.pullRequestEditorService = pullRequestEditorService;
             dte = new Lazy<DTE>(() => (DTE)sp.GetService(typeof(DTE)));
@@ -56,6 +60,21 @@ namespace GitHub.VisualStudio.Commands
 
             var gitHubUrl = new UriString(url);
             if (!gitHubUrl.IsValidUri || !gitHubUrl.IsHypertextTransferProtocol)
+            {
+                gitHubUrl = null;
+            }
+
+            if (gitHubUrl == null)
+            {
+                // HACK: Reconstruct a GitHub URL from the topmost browser window
+                var context = gitHubContextService.Value.FindContextFromBrowser();
+                if (context != null)
+                {
+                    gitHubUrl = $"https://github.com/{context.Owner}/{context.RepositoryName}";
+                }
+            }
+
+            if (gitHubUrl == null)
             {
                 return;
             }

@@ -2,12 +2,14 @@
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using GitHub.Primitives;
 
 namespace GitHub.App.Services
 {
+    [Export(typeof(GitHubContextService))]
     public class GitHubContextService
     {
         // USERID_REGEX = /[a-z0-9][a-z0-9\-\_]*/i
@@ -37,7 +39,7 @@ namespace GitHub.App.Services
             {
                 Host = url.Host,
                 Owner = url.Owner,
-                RepositoryName = url.RepositoryName
+                RepositoryName = url.RepositoryName,
             };
         }
 
