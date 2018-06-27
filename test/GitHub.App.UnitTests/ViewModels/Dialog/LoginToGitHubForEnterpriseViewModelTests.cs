@@ -47,7 +47,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
         }
 
         [Test]
-        public void ReturnsValidWhenProbeReturnsOk()
+        public async Task ReturnsValidWhenProbeReturnsOk()
         {
             var scheduler = new TestScheduler();
             var caps = CreateCapabilties(EnterpriseProbeResult.Ok);
@@ -56,12 +56,13 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             scheduler.Stop();
+            await target.UpdatingProbeStatus;
 
             Assert.That(EnterpriseProbeStatus.Valid, Is.EqualTo(target.ProbeStatus));
         }
 
         [Test]
-        public void ReturnsInvalidWhenProbeReturnsFailed()
+        public async Task ReturnsInvalidWhenProbeReturnsFailed()
         {
             var scheduler = new TestScheduler();
             var caps = CreateCapabilties(EnterpriseProbeResult.Failed);
@@ -70,12 +71,13 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             scheduler.Stop();
+            await target.UpdatingProbeStatus;
 
             Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
         }
 
         [Test]
-        public void ReturnsInvalidWhenProbeReturnsNotFound()
+        public async Task ReturnsInvalidWhenProbeReturnsNotFound()
         {
             var scheduler = new TestScheduler();
             var caps = CreateCapabilties(EnterpriseProbeResult.NotFound);
@@ -84,6 +86,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.EnterpriseUrl = "https://foo.bar";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             scheduler.Stop();
+            await target.UpdatingProbeStatus;
 
             Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
         }
