@@ -85,9 +85,9 @@
                     by
                     <Run Text="{Binding Author.Login, Mode=OneWay}"/>
                 </TextBlock>
-                <TextBlock Grid.Column="1" Margin="4 0" HorizontalAlignment="Right" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
-                    <ghfvs:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>
-                    <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top" />
+                <TextBlock Grid.Column="1" Margin="4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
+                    <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+                    <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
                 </TextBlock>
             </Grid>
         </DockPanel>
