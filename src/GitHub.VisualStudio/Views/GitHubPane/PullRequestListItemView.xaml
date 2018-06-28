@@ -77,7 +77,7 @@
                     Opacity="0.5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition MinWidth="35" Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0">
                     <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
