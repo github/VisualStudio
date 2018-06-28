@@ -82,7 +82,7 @@ namespace GitHub.VisualStudio.Commands
 
             if (!Directory.Exists(repositoryDir))
             {
-                var result = ShowInfoMessage($"Clone '{cloneUrl}' to '{repositoryDir}'?");
+                var result = ShowInfoMessage($"Clone {cloneUrl} to '{repositoryDir}'?");
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:
@@ -109,7 +109,7 @@ namespace GitHub.VisualStudio.Commands
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
             if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
-                var result = ShowInfoMessage($"Open repository fiolder at '{repositoryDir}'?");
+                var result = ShowInfoMessage($"Open repository at '{repositoryDir}'?");
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:
@@ -190,7 +190,7 @@ namespace GitHub.VisualStudio.Commands
             dte.Value.ItemOperations.OpenFile(fullPath);
 
             var lineNumber = context.Line;
-            if (lineNumber == null)
+            if (lineNumber != null)
             {
                 var number = lineNumber.Value - 1;
                 var activeView = pullRequestEditorService.Value.FindActiveView();
