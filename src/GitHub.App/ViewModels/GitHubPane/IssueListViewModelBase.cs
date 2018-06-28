@@ -16,6 +16,9 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A view model which implements the functionality common to issue and pull request lists.
+    /// </summary>
     public abstract class IssueListViewModelBase : PanePageViewModelBase, IIssueListViewModelBase
     {
         readonly IRepositoryService repositoryService;
@@ -31,66 +34,82 @@ namespace GitHub.ViewModels.GitHubPane
         int numberFilter;
         IUserFilterViewModel authorFilter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IssueListViewModelBase"/> class.
+        /// </summary>
+        /// <param name="repositoryService">The repository service.</param>
         public IssueListViewModelBase(IRepositoryService repositoryService)
         {
             this.repositoryService = repositoryService;
             OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
         }
 
+        /// <inheritdoc/>
         public IUserFilterViewModel AuthorFilter
         {
             get { return authorFilter; }
             private set { this.RaiseAndSetIfChanged(ref authorFilter, value); }
         }
 
+        /// <inheritdoc/>
         public IReadOnlyList<IRepositoryModel> Forks
         {
             get { return forks; }
             set { this.RaiseAndSetIfChanged(ref forks, value); }
         }
 
+        /// <inheritdoc/>
         public IReadOnlyList<IIssueListItemViewModelBase> Items
         {
             get { return items; }
             private set { this.RaiseAndSetIfChanged(ref items, value); }
         }
 
+        /// <inheritdoc/>
         public ICollectionView ItemsView
         {
             get { return itemsView; }
             private set { this.RaiseAndSetIfChanged(ref itemsView, value); }
         }
 
+        /// <inheritdoc/>
         public ILocalRepositoryModel LocalRepository { get; private set; }
 
+        /// <inheritdoc/>
         public IssueListMessage Message
         {
             get { return message; }
             private set { this.RaiseAndSetIfChanged(ref message, value); }
         }
 
+        /// <inheritdoc/>
         public IRepositoryModel RemoteRepository
         {
             get { return remoteRepository; }
             set { this.RaiseAndSetIfChanged(ref remoteRepository, value); }
         }
 
+        /// <inheritdoc/>
         public string SearchQuery
         {
             get { return searchQuery; }
             set { this.RaiseAndSetIfChanged(ref searchQuery, value); }
         }
 
+        /// <inheritdoc/>
         public string SelectedState
         {
             get { return selectedState; }
             set { this.RaiseAndSetIfChanged(ref selectedState, value); }
         }
 
+        /// <inheritdoc/>
         public abstract IReadOnlyList<string> States { get; }
 
+        /// <inheritdoc/>
         public ReactiveCommand<Unit> OpenItem { get; }
 
+        /// <inheritdoc/>
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
             LocalRepository = repository;
@@ -132,6 +151,10 @@ namespace GitHub.ViewModels.GitHubPane
             await Refresh();
         }
 
+        /// <summary>
+        /// Refreshes the view model.
+        /// </summary>
+        /// <returns>A task tracking the operation.</returns>
         public override Task Refresh()
         {
             subscription?.Dispose();
@@ -157,8 +180,24 @@ namespace GitHub.ViewModels.GitHubPane
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// When overridden in a derived class, creates the <see cref="IVirtualizingListSource{T}"/>
+        /// that will act as the source for <see cref="Items"/>.
+        /// </summary>
         protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource();
+
+        /// <summary>
+        /// When overridden in a derived class, navigates to the specified item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>A task tracking the operation.</returns>
         protected abstract Task DoOpenItem(IIssueListItemViewModelBase item);
+
+        /// <summary>
+        /// Loads a page of authors for the <see cref="AuthorFilter"/>.
+        /// </summary>
+        /// <param name="after">The GraphQL "after" cursor.</param>
+        /// <returns>A task that returns a page of authors.</returns>
         protected abstract Task<Page<ActorModel>> LoadAuthors(string after);
 
         void FilterChanged()

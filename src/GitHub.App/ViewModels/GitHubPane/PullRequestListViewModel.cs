@@ -13,6 +13,9 @@ using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A view model which displays a pull request list.
+    /// </summary>
     [Export(typeof(IPullRequestListViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : IssueListViewModelBase, IPullRequestListViewModel
@@ -22,6 +25,12 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService service;
         readonly IDisposable subscription;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestListViewModel"/> class.
+        /// </summary>
+        /// <param name="sessionManager">The session manager.</param>
+        /// <param name="repositoryService">The repository service.</param>
+        /// <param name="service">The pull request service.</param>
         [ImportingConstructor]
         public PullRequestListViewModel(
             IPullRequestSessionManager sessionManager,
@@ -39,15 +48,19 @@ namespace GitHub.ViewModels.GitHubPane
             CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
         }
 
+        /// <inheritdoc/>
         public override IReadOnlyList<string> States => states;
 
+        /// <inheritdoc/>
         public ReactiveCommand<object> CreatePullRequest { get; }
 
+        /// <inheritdoc/>
         protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
         {
             return new ItemSource(this);
         }
 
+        /// <inheritdoc/>
         protected override Task DoOpenItem(IIssueListItemViewModelBase item)
         {
             var i = (IPullRequestListItemViewModel)item;
@@ -55,6 +68,7 @@ namespace GitHub.ViewModels.GitHubPane
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         protected override Task<Page<ActorModel>> LoadAuthors(string after)
         {
             return service.ReadAssignableUsers(

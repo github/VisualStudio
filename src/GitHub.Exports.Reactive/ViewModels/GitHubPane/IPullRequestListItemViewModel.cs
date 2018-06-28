@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -9,12 +8,12 @@ namespace GitHub.ViewModels.GitHubPane
     public interface IPullRequestListItemViewModel : IIssueListItemViewModelBase
     {
         /// <summary>
-        /// Gets the ID of the issue or pull request.
+        /// Gets the ID of the pull request.
         /// </summary>
         string Id { get; }
 
         /// <summary>
-        /// Gets the number of comments in the issue or pull request.
+        /// Gets the number of comments in the pull request.
         /// </summary>
         int CommentCount { get; }
 
@@ -25,12 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool IsCurrent { get; }
 
         /// <summary>
-        /// Gets the labels applied to the issue or pull request.
-        /// </summary>
-        IReadOnlyList<ILabelViewModel> Labels { get; }
-
-        /// <summary>
-        /// Gets the last updated time of the issue or pull request.
+        /// Gets the last updated time of the pull request.
         /// </summary>
         DateTimeOffset UpdatedAt { get; }
     }

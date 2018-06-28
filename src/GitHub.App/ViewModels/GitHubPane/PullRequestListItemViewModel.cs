@@ -1,14 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using GitHub.Models;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A view model which displays an item in a <see cref="PullRequestListViewModel"/>.
+    /// </summary>
     public class PullRequestListItemViewModel : ViewModelBase, IPullRequestListItemViewModel
     {
         bool isCurrent;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestListItemViewModel"/> class.
+        /// </summary>
+        /// <param name="model">The underlying pull request item model.</param>
         public PullRequestListItemViewModel(PullRequestListItemModel model)
         {
             Id = model.Id;
@@ -19,24 +25,29 @@ namespace GitHub.ViewModels.GitHubPane
             UpdatedAt = model.UpdatedAt;
         }
 
+        /// <inheritdoc/>
         public string Id { get; protected set; }
 
+        /// <inheritdoc/>
         public IActorViewModel Author { get; protected set; }
 
+        /// <inheritdoc/>
         public int CommentCount { get; protected set; }
 
+        /// <inheritdoc/>
         public bool IsCurrent
         {
             get { return isCurrent; }
             internal set { this.RaiseAndSetIfChanged(ref isCurrent, value); }
         }
 
-        public IReadOnlyList<ILabelViewModel> Labels { get; protected set; }
-
+        /// <inheritdoc/>
         public int Number { get; protected set; }
 
+        /// <inheritdoc/>
         public string Title { get; protected set; }
 
+        /// <inheritdoc/>
         public DateTimeOffset UpdatedAt { get; protected set; }
     }
 }
