@@ -1,13 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
   <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
-  
   <!-- When StartProgram is set to Visual Studio 2015 in .user file, install extension in the same version  -->
   <Import Project="GitHub.VisualStudio.csproj.user" Condition=" Exists('GitHub.VisualStudio.csproj.user') " />
   <PropertyGroup Condition=" $(StartProgram.Contains('Microsoft Visual Studio 14.0')) ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
-  
   <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.215\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="'$(VisualStudioVersion)' == '15.0' And Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
   <PropertyGroup>
@@ -255,11 +253,9 @@
     </Reference>
     <Reference Include="Octokit.GraphQL, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Octokit.GraphQL.Core, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
