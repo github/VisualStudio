@@ -670,7 +670,7 @@ namespace GitHub.Services
         {
             foreach (var remote in repo.Network.Remotes)
             {
-                if (remote.Url == cloneUri)
+                if (UriString.RepositoryUrlsAreEqual(new UriString(remote.Url), cloneUri))
                 {
                     return remote.Name;
                 }
@@ -704,7 +704,7 @@ namespace GitHub.Services
             string tempFilePath)
         {
             string contents;
-            
+
             try
             {
                 contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
@@ -787,7 +787,7 @@ namespace GitHub.Services
         {
             var before = InvalidBranchCharsRegex.Replace(name, "-").TrimEnd('-');
 
-            for (;;)
+            for (; ; )
             {
                 string after = before.Replace("--", "-");
 
