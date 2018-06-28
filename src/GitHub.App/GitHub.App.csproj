@@ -204,6 +204,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\IVirtualizingListSource.cs" />
     <Compile Include="Collections\SequentialListSource.cs" />
     <Compile Include="Collections\VirtualizingList.cs" />
     <Compile Include="Collections\VirtualizingListCollectionView.cs" />

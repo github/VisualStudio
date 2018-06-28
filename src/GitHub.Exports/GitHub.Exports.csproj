@@ -144,7 +144,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\IVirtualizingListSource.cs" />
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
     <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
