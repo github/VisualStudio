@@ -576,7 +576,7 @@ public class ModelServiceTests
 
     static ModelService CreateTarget(
         IApiClient apiClient = null,
-        Octokit.GraphQL.IConnection graphql = null,
+        Octokit.IConnection graphql = null,
         IBlobCache hostCache = null,
         IAvatarProvider avatarProvider = null)
     {
