@@ -67,7 +67,19 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio", null)]
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "README.md")]
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md#notices", "README.md")]
+        [TestCase("https://github.com/github/VisualStudio/blob/0d264d50c57d701fa62d202f481075a6c6dbdce8/src/Code.cs#L86", "src/Code.cs")]
         public void Path(string url, string expectPath)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.Path, Is.EqualTo(expectPath));
+        }
+
+        // HACK: We're assuming that branches don't contain a '/' (sic)
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/branch/buggy.cs", "branch/buggy.cs")]
+        public void ProblemPath(string url, string expectPath)
         {
             var target = new GitHubContextService();
 
@@ -82,6 +94,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", null)]
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md#notices", null)]
         [TestCase("https://github.com/github/VisualStudio/blob/master/src/GitHub.VisualStudio/GitHubPackage.cs#L38", 38)]
+        [TestCase("https://github.com/github/VisualStudio/blob/0d264d50c57d701fa62d202f481075a6c6dbdce8/src/Code.cs#L86", 86)]
         public void Line(string url, int? expectLine)
         {
             var target = new GitHubContextService();

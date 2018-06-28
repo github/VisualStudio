@@ -53,7 +53,7 @@ namespace GitHub.App.Services
                 Host = uri.Host,
                 Owner = uri.Owner,
                 RepositoryName = uri.RepositoryName,
-                Path = FindSubPath(uri, "/blob/master/"),
+                Path = FindPath(uri),
                 PullRequest = FindPullRequest(uri),
                 Line = FindLine(uri)
             };
@@ -168,6 +168,23 @@ namespace GitHub.App.Services
             }
 
             return lineNumber; // 1 based
+        }
+
+        string FindPath(UriString uri)
+        {
+            var blob = FindSubPath(uri, "/blob/");
+            if (blob == null)
+            {
+                return null;
+            }
+
+            var pathIndex = blob.IndexOf('/');
+            if (pathIndex == -1)
+            {
+                return null;
+            }
+
+            return blob.Substring(pathIndex + 1);
         }
 
         static int? FindPullRequest(UriString gitHubUrl)
