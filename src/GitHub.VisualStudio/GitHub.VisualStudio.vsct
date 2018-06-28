@@ -117,7 +117,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>AllowParams</CommandFlag>
         <Strings>
-          <ButtonText>Open from GitHub</ButtonText>
+          <ButtonText>Open from GitHub...</ButtonText>
           <CanonicalName>.GitHub.OpenFromUrl</CanonicalName>
           <LocCanonicalName>.GitHub.OpenFromUrl</LocCanonicalName>
         </Strings>
