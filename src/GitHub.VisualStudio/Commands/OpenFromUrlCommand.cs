@@ -192,9 +192,10 @@ namespace GitHub.VisualStudio.Commands
             var lineNumber = context.Line;
             if (lineNumber == null)
             {
+                var number = lineNumber.Value - 1;
                 var activeView = pullRequestEditorService.Value.FindActiveView();
-                ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(lineNumber.Value, 0));
-                ErrorHandler.ThrowOnFailure(activeView.CenterLines(lineNumber.Value, 1));
+                ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(number, 0));
+                ErrorHandler.ThrowOnFailure(activeView.CenterLines(number, 1));
             }
 
             return true;
