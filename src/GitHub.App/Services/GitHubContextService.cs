@@ -35,13 +35,27 @@ namespace GitHub.App.Services
         static readonly Regex windowTitlePathRegex = new Regex($"{path} at {branch} · {owner}/{repo} - ", RegexOptions.Compiled);
         static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo} - ", RegexOptions.Compiled);
 
-        public GitHubContext FindContextFromUrl(UriString url)
+        public GitHubContext FindContextFromUrl(string url)
         {
+            var uri = new UriString(url);
+            if (!uri.IsValidUri)
+            {
+                return null;
+            }
+
+            if (!uri.IsHypertextTransferProtocol)
+            {
+                return null;
+            }
+
             return new GitHubContext
             {
-                Host = url.Host,
-                Owner = url.Owner,
-                RepositoryName = url.RepositoryName,
+                Host = uri.Host,
+                Owner = uri.Owner,
+                RepositoryName = uri.RepositoryName,
+                Path = FindSubPath(uri, "/blob/master/"),
+                PullRequest = FindPullRequest(uri),
+                Line = FindLine(uri)
             };
         }
 
@@ -66,6 +80,13 @@ namespace GitHub.App.Services
                 User32.GetWindowText(handleWin, titleBuilder, titleBuilder.Capacity);
                 yield return titleBuilder.ToString();
             }
+        }
+
+        public Uri ToRepositoryUrl(GitHubContext context)
+        {
+            var builder = new UriBuilder("https", context.Host ?? "github.com");
+            builder.Path = $"{context.Owner}/{context.RepositoryName}";
+            return builder.Uri;
         }
 
         public GitHubContext FindContextFromWindowTitle(string windowTitle)
@@ -128,6 +149,60 @@ namespace GitHub.App.Services
             }
 
             return (match.Success, null, null, null, null, null, null);
+        }
+
+
+        static int? FindLine(UriString gitHubUrl)
+        {
+            var prefix = "#L";
+            var url = gitHubUrl.ToString();
+            var index = url.LastIndexOf(prefix);
+            if (index == -1)
+            {
+                return null;
+            }
+
+            if (!int.TryParse(url.Substring(index + prefix.Length), out int lineNumber))
+            {
+                return null;
+            }
+
+            return lineNumber; // 1 based
+        }
+
+        static int? FindPullRequest(UriString gitHubUrl)
+        {
+            var pullRequest = FindSubPath(gitHubUrl, "/pull/")?.Split('/').First();
+            if (pullRequest == null)
+            {
+                return null;
+            }
+
+            if (!int.TryParse(pullRequest, out int number))
+            {
+                return null;
+            }
+
+            return number;
+        }
+
+        static string FindSubPath(UriString gitHubUrl, string matchPath)
+        {
+            var url = gitHubUrl.ToString();
+            var prefix = gitHubUrl.ToRepositoryUrl() + matchPath;
+            if (!url.StartsWith(prefix))
+            {
+                return null;
+            }
+
+            var endIndex = url.IndexOf('#');
+            if (endIndex == -1)
+            {
+                endIndex = gitHubUrl.Length;
+            }
+
+            var path = url.Substring(prefix.Length, endIndex - prefix.Length);
+            return path;
         }
 
         static class User32

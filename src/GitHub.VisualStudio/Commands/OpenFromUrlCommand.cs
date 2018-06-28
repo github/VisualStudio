@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
-using GitHub.Primitives;
 using GitHub.App.Services;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
@@ -65,24 +64,10 @@ namespace GitHub.VisualStudio.Commands
                 url = Clipboard.GetText(TextDataFormat.Text);
             }
 
-            var gitHubUrl = new UriString(url);
-            if (!gitHubUrl.IsValidUri || !gitHubUrl.IsHypertextTransferProtocol)
-            {
-                gitHubUrl = null;
-            }
+            var context = gitHubContextService.Value.FindContextFromUrl(url);
+            context = context ?? gitHubContextService.Value.FindContextFromBrowser();
 
-            GitHubContext context = null;
-            if (gitHubUrl == null)
-            {
-                // HACK: Reconstruct a GitHub URL from the topmost browser window
-                context = gitHubContextService.Value.FindContextFromBrowser();
-                if (context != null)
-                {
-                    gitHubUrl = $"https://github.com/{context.Owner}/{context.RepositoryName}";
-                }
-            }
-
-            if (gitHubUrl == null)
+            if (context == null)
             {
                 return;
             }
@@ -90,9 +75,9 @@ namespace GitHub.VisualStudio.Commands
             // Keep repos in unique dir while testing
             var defaultSubPath = "GitHubCache";
 
-            var cloneUrl = gitHubUrl.ToRepositoryUrl().ToString();
-            var targetDir = Path.Combine(repositoryCloneService.Value.DefaultClonePath, defaultSubPath, gitHubUrl.Owner);
-            var repositoryDirName = gitHubUrl.RepositoryName;
+            var cloneUrl = gitHubContextService.Value.ToRepositoryUrl(context).ToString();
+            var targetDir = Path.Combine(repositoryCloneService.Value.DefaultClonePath, defaultSubPath, context.Owner);
+            var repositoryDirName = context.RepositoryName;
             var repositoryDir = Path.Combine(targetDir, repositoryDirName);
 
             if (!Directory.Exists(repositoryDir))
@@ -139,8 +124,8 @@ namespace GitHub.VisualStudio.Commands
                 }
             }
 
-            await TryOpenPullRequest(gitHubUrl);
-            TryOpenFile(gitHubUrl, context, repositoryDir);
+            await TryOpenPullRequest(context);
+            TryOpenFile(context, repositoryDir);
         }
 
         VSConstants.MessageBoxResult ShowInfoMessage(string message)
@@ -180,9 +165,9 @@ namespace GitHub.VisualStudio.Commands
             return null;
         }
 
-        bool TryOpenFile(UriString gitHubUrl, GitHubContext context, string repositoryDir)
+        bool TryOpenFile(GitHubContext context, string repositoryDir)
         {
-            var path = FindSubPath(gitHubUrl, "/blob/master/") ?? context?.Path;
+            var path = context.Path;
             if (path == null)
             {
                 return false;
@@ -204,70 +189,28 @@ namespace GitHub.VisualStudio.Commands
 
             dte.Value.ItemOperations.OpenFile(fullPath);
 
-            var lineNumber = FindLineNumber(gitHubUrl);
-            if (lineNumber != -1)
+            var lineNumber = context.Line;
+            if (lineNumber == null)
             {
                 var activeView = pullRequestEditorService.Value.FindActiveView();
-                ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(lineNumber, 0));
-                ErrorHandler.ThrowOnFailure(activeView.CenterLines(lineNumber, 1));
+                ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(lineNumber.Value, 0));
+                ErrorHandler.ThrowOnFailure(activeView.CenterLines(lineNumber.Value, 1));
             }
 
             return true;
         }
 
-        async Task<bool> TryOpenPullRequest(UriString gitHubUrl)
+        async Task<bool> TryOpenPullRequest(GitHubContext context)
         {
-            var pullRequest = FindSubPath(gitHubUrl, "/pull/");
+            var pullRequest = context.PullRequest;
             if (pullRequest == null)
             {
                 return false;
             }
 
-            if (!int.TryParse(pullRequest, out int number))
-            {
-                return false;
-            }
-
             var host = await gitHubToolWindowManager.Value.ShowGitHubPane();
-            await host.ShowPullRequest(gitHubUrl.Owner, gitHubUrl.RepositoryName, number);
+            await host.ShowPullRequest(context.Owner, context.RepositoryName, pullRequest.Value);
             return true;
-        }
-
-        static string FindSubPath(UriString gitHubUrl, string matchPath)
-        {
-            var url = gitHubUrl.ToString();
-            var prefix = gitHubUrl.ToRepositoryUrl() + matchPath;
-            if (!url.StartsWith(prefix))
-            {
-                return null;
-            }
-
-            var endIndex = url.IndexOf('#');
-            if (endIndex == -1)
-            {
-                endIndex = gitHubUrl.Length;
-            }
-
-            var path = url.Substring(prefix.Length, endIndex - prefix.Length);
-            return path;
-        }
-
-        static int FindLineNumber(UriString gitHubUrl)
-        {
-            var prefix = "#L";
-            var url = gitHubUrl.ToString();
-            var index = url.LastIndexOf(prefix);
-            if (index == -1)
-            {
-                return -1;
-            }
-
-            if (!int.TryParse(url.Substring(index + prefix.Length), out int lineNumber))
-            {
-                return -1;
-            }
-
-            return lineNumber - 1;
         }
     }
 }

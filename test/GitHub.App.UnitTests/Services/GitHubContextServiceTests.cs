@@ -1,4 +1,5 @@
-﻿using GitHub.App.Services;
+﻿using System;
+using GitHub.App.Services;
 using NUnit.Framework;
 
 public class GitHubContextServiceTests
@@ -42,6 +43,78 @@ public class GitHubContextServiceTests
             var context = target.FindContextFromUrl(url);
 
             Assert.That(context.Host, Is.EqualTo(expectHost));
+        }
+
+        [TestCase("https://github.com", null)]
+        [TestCase("https://github.com/github", null)]
+        [TestCase("https://github.com/github/VisualStudio", null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", null)]
+        [TestCase("https://github.com/github/VisualStudio/pull/1763", 1763)]
+        [TestCase("https://github.com/github/VisualStudio/pull/1763/commits", 1763)]
+        [TestCase("https://github.com/github/VisualStudio/pull/1763/files#diff-7384294e6c288e13bad0293bae232754R1", 1763)]
+        [TestCase("https://github.com/github/VisualStudio/pull/NaN", null)]
+        public void PullRequest(string url, int? expectPullRequest)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context?.PullRequest, Is.EqualTo(expectPullRequest));
+        }
+
+        [TestCase("https://github.com", null)]
+        [TestCase("https://github.com/github", null)]
+        [TestCase("https://github.com/github/VisualStudio", null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "README.md")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md#notices", "README.md")]
+        public void Path(string url, string expectPath)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.Path, Is.EqualTo(expectPath));
+        }
+
+        [TestCase("https://github.com", null)]
+        [TestCase("https://github.com/github", null)]
+        [TestCase("https://github.com/github/VisualStudio", null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md#notices", null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/GitHub.VisualStudio/GitHubPackage.cs#L38", 38)]
+        public void Line(string url, int? expectLine)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.Line, Is.EqualTo(expectLine));
+        }
+
+        [TestCase("foo", true)]
+        [TestCase("ssh://git@github.com:443/benstraub/libgit2", true)]
+        [TestCase("https://github.com/github/VisualStudio", false)]
+        public void IsNull(string url, bool expectNull)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context, expectNull ? Is.Null : Is.Not.Null);
+        }
+    }
+
+    public class TheToMethod
+    {
+        [Test]
+        public void DefaultGitHubDotCom()
+        {
+            var context = new GitHubContext { Host = "github.com", Owner = "github", RepositoryName = "VisualStudio" };
+            var target = new GitHubContextService();
+
+            var uri = target.ToRepositoryUrl(context);
+
+            Assert.That(uri, Is.EqualTo(new Uri("https://github.com/github/VisualStudio")));
         }
     }
 

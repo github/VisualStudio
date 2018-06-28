@@ -1,4 +1,6 @@
-﻿namespace GitHub.App.Services
+﻿using System;
+
+namespace GitHub.App.Services
 {
     public class GitHubContext
     {
@@ -9,5 +11,6 @@
         public int? PullRequest { get; set; }
         public int? Issue { get; set; }
         public string Path { get; set; }
+        public int? Line { get; set; }
     }
 }
