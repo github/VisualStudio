@@ -69,9 +69,19 @@
 
             <TextBlock DockPanel.Dock="Top"
                        Margin="0,-1,5,0"
-                       Text="{Binding Title}"
-                       TextTrimming="CharacterEllipsis"/>
+                       TextTrimming="CharacterEllipsis">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsCurrent, Converter={ghfvs:BooleanToVisibilityConverter}, Mode=OneWay}" Value="True">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
 
+                <Run Text="{Binding Title}" />
+            </TextBlock>
             <Grid DockPanel.Dock="Top"
                     Margin="0,2,5,0"
                     Opacity="0.5">
