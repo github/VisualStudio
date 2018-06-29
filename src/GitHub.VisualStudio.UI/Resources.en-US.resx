@@ -518,4 +518,7 @@
   <data name="Author" xml:space="preserve">
     <value>Author</value>
   </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>Sign in with your browser</value>
+  </data>
 </root>

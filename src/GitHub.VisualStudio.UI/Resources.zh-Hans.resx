@@ -385,16 +385,16 @@
     <value>令牌</value>
   </data>
   <data name="ContinueYourReview" xml:space="preserve">
-    <value>继续您的复审</value>
+    <value>继续复审</value>
   </data>
   <data name="AddYourReview" xml:space="preserve">
-    <value>添加你的复审</value>
+    <value>添加复审</value>
   </data>
   <data name="Reviewers" xml:space="preserve">
-    <value>审阅者</value>
+    <value>复审人员</value>
   </data>
   <data name="AddReviewComment" xml:space="preserve">
-    <value>添加复审意见</value>
+    <value>添加复审注释</value>
   </data>
   <data name="AddSingleComment" xml:space="preserve">
     <value>添加评论</value>
@@ -424,7 +424,7 @@
     <value>无效主机或不是GitHub企业服务器，请检查地址并重试。</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>欢迎使用 GitHub for Visual Studio! 为什么没有看这里 [training](show-training) 或[documentation](show-docs)?
+    <value>欢迎使用 GitHub for Visual Studio！ 您可以先看看这里 [培训](show-training) 或[文档](show-docs)?
 
 [不再显示](dont-show-again)</value>
   </data>
@@ -517,5 +517,8 @@
   </data>
   <data name="Author" xml:space="preserve">
     <value>作者</value>
+  </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>使用浏览器登录</value>
   </data>
 </root>

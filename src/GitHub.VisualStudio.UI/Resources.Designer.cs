@@ -1033,6 +1033,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 Sign in with your browser 的本地化字符串。
+        /// </summary>
+        public static string SignInWithYourBrowser {
+            get {
+                return ResourceManager.GetString("SignInWithYourBrowser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Sign out 的本地化字符串。
         /// </summary>
         public static string SignOutLink {
