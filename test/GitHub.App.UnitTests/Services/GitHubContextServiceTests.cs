@@ -230,7 +230,33 @@ public class GitHubContextServiceTests
             Assert.That(context.Branch, Is.EqualTo(expectBranch));
         }
 
-        [TestCase("[spike] Open from GitHub URL by jcansdale · Pull Request #1763 · github/VisualStudio - Google Chrome", 1763)]
+        [TestCase("github/VisualStudio at build/appveyor-fixes - Google Chrome", "github", "VisualStudio", "build/appveyor-fixes", Description = "Chrome")]
+        [TestCase("GitHub - github/VisualStudio at refactor/pr-list - Mozilla Firefox", "github", "VisualStudio", "refactor/pr-list", Description = "Firefox")]
+        public void TreeBranch(string windowTitle, string expectOwner, string expectRepositoryName, string expectBranch)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromWindowTitle(windowTitle);
+
+            Assert.That(context.Owner, Is.EqualTo(expectOwner));
+            Assert.That(context.RepositoryName, Is.EqualTo(expectRepositoryName));
+            Assert.That(context.Branch, Is.EqualTo(expectBranch));
+        }
+
+        [TestCase("Branches · github/VisualStudio - Google Chrome", "github", "VisualStudio", Description = "Chrome")]
+        [TestCase("Branches · github/VisualStudio · GitHub - Mozilla Firefox", "github", "VisualStudio", Description = "Firefox")]
+        public void Branches(string windowTitle, string expectOwner, string expectRepositoryName)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromWindowTitle(windowTitle);
+
+            Assert.That(context.Owner, Is.EqualTo(expectOwner));
+            Assert.That(context.RepositoryName, Is.EqualTo(expectRepositoryName));
+        }
+
+        [TestCase("Description · Pull Request #1763 · github/VisualStudio - Google Chrome", 1763)]
+        [TestCase("Description · Pull Request #1763 · github/VisualStudio · GitHub - Mozilla Firefox", 1763, Description = "Firefox")]
         public void PullRequest(string windowTitle, int expectPullRequest)
         {
             var target = new GitHubContextService();
@@ -241,6 +267,8 @@ public class GitHubContextServiceTests
         }
 
         [TestCase("Consider adding C# code style preferences to editorconfig · Issue #1750 · github/VisualStudio - Google Chrome", 1750)]
+        [TestCase("Scrape browser titles · Issue #4 · jcansdale/VisualStudio · GitHub - Mozilla Firefox", 4, Description = "Firefox")]
+
         public void Issue(string windowTitle, int expectIssue)
         {
             var target = new GitHubContextService();
@@ -252,6 +280,7 @@ public class GitHubContextServiceTests
 
         [TestCase("VisualStudio/mark_github.xaml at master · github/VisualStudio - Google Chrome", "mark_github.xaml")]
         [TestCase("VisualStudio/src/GitHub.VisualStudio/Resources/icons at master · github/VisualStudio - Google Chrome", "src/GitHub.VisualStudio/Resources/icons")]
+        [TestCase("VisualStudio/README.md at master · jcansdale/VisualStudio · GitHub - Mozilla Firefox", "README.md", Description = "Firefox")]
         public void Path(string windowTitle, string expectPath)
         {
             var target = new GitHubContextService();
@@ -259,6 +288,18 @@ public class GitHubContextServiceTests
             var context = target.FindContextFromWindowTitle(windowTitle);
 
             Assert.That(context?.Path, Is.EqualTo(expectPath));
+        }
+
+        [TestCase("jcansdale/VisualStudio: GitHub Extension for Visual Studio - Google Chrome", "jcansdale", "VisualStudio", Description = "Chrome")]
+        [TestCase("GitHub - jcansdale/VisualStudio: GitHub Extension for Visual Studio - Mozilla Firefox", "jcansdale", "VisualStudio", Description = "Firefox")]
+        public void RepositoryHome(string windowTitle, string expectOwner, string expectRepositoryName)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromWindowTitle(windowTitle);
+
+            Assert.That(context.Owner, Is.EqualTo(expectOwner));
+            Assert.That(context.RepositoryName, Is.EqualTo(expectRepositoryName));
         }
     }
 }

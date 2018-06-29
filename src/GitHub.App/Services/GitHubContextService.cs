@@ -28,12 +28,12 @@ namespace GitHub.App.Services
 
         static readonly string path = $"^{repo}/(?<path>[^ ]+)";
 
-        static readonly Regex windowTitleRepositoryRegex = new Regex($"^{owner}/{repo}: ", RegexOptions.Compiled);
-        static readonly Regex windowTitleBranchRegex = new Regex($"^{owner}/{repo} at {branch} ", RegexOptions.Compiled);
-        static readonly Regex windowTitlePullRequestRegex = new Regex($" · Pull Request #{pull} · {owner}/{repo} - ", RegexOptions.Compiled);
-        static readonly Regex windowTitleIssueRegex = new Regex($" · Issue #{issue} · {owner}/{repo} - ", RegexOptions.Compiled);
-        static readonly Regex windowTitlePathRegex = new Regex($"{path} at {branch} · {owner}/{repo} - ", RegexOptions.Compiled);
-        static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo} - ", RegexOptions.Compiled);
+        static readonly Regex windowTitleRepositoryRegex = new Regex($"^(GitHub - )?{owner}/{repo}: ", RegexOptions.Compiled);
+        static readonly Regex windowTitleBranchRegex = new Regex($"^(GitHub - )?{owner}/{repo} at {branch} ", RegexOptions.Compiled);
+        static readonly Regex windowTitlePullRequestRegex = new Regex($" · Pull Request #{pull} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
+        static readonly Regex windowTitleIssueRegex = new Regex($" · Issue #{issue} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
+        static readonly Regex windowTitlePathRegex = new Regex($"{path} at {branch} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
+        static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
 
         public GitHubContext FindContextFromUrl(string url)
         {
@@ -61,10 +61,14 @@ namespace GitHub.App.Services
 
         public GitHubContext FindContextFromBrowser()
         {
-            return FindWindowTitlesForClass("Chrome_WidgetWin_1").Select(FindContextFromWindowTitle).Where(x => x != null).FirstOrDefault();
+            return
+                FindWindowTitlesForClass("Chrome_WidgetWin_1")              // Chrome
+                .Concat(FindWindowTitlesForClass("MozillaWindowClass"))     // Firefox
+                .Select(FindContextFromWindowTitle).Where(x => x != null)
+                .FirstOrDefault();
         }
 
-        public IEnumerable<string> FindWindowTitlesForClass(string className = "Chrome_WidgetWin_1")
+        public IEnumerable<string> FindWindowTitlesForClass(string className = "MozillaWindowClass")
         {
             IntPtr handleWin = IntPtr.Zero;
             while (IntPtr.Zero != (handleWin = User32.FindWindowEx(IntPtr.Zero, handleWin, className, IntPtr.Zero)))
