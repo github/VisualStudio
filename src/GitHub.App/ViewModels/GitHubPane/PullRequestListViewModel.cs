@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Extensions;
@@ -24,6 +25,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestService service;
         readonly IDisposable subscription;
+        ObservableAsPropertyHelper<Uri> webUrl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestListViewModel"/> class.
@@ -45,11 +47,17 @@ namespace GitHub.ViewModels.GitHubPane
             this.service = service;
 
             subscription = sessionManager.WhenAnyValue(x => x.CurrentSession.PullRequest.Number).Subscribe(UpdateCurrent);
+            webUrl = this.WhenAnyValue(x => x.RemoteRepository)
+                .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("pulls"))
+                .ToProperty(this, x => x.WebUrl);
             CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
         }
 
         /// <inheritdoc/>
         public override IReadOnlyList<string> States => states;
+
+        /// <inheritdoc/>
+        public Uri WebUrl => webUrl.Value;
 
         /// <inheritdoc/>
         public ReactiveCommand<object> CreatePullRequest { get; }

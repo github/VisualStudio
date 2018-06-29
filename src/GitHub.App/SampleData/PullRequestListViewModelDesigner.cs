@@ -60,6 +60,7 @@ namespace GitHub.SampleData
         public string SearchQuery { get; set; }
         public string SelectedState { get; set; }
         public IReadOnlyList<string> States { get; }
+        public Uri WebUrl => null;
         public ReactiveCommand<object> CreatePullRequest { get; }
         public ReactiveCommand<Unit> OpenItem { get; }
 
