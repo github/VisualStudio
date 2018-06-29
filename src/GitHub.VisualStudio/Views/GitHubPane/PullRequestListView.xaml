@@ -59,6 +59,7 @@
                                   Padding="2"
                                   ToolTip="Filter by Author"
                                   VerticalAlignment="Center"
+                                  Visibility="{Binding Items.Count, Converter={ghfvs:CountToVisibilityConverter}}"
                                   PopupOpened="authorFilterDropDown_PopupOpened">
                 <ghfvs:OcticonImage Icon="person" Height="12" Width="12"/>
                 <ghfvs:DropDownButton.DropDownContent>
