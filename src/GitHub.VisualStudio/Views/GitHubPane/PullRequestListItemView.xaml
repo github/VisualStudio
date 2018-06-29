@@ -58,30 +58,10 @@
                                    Height="30"
                                    VerticalAlignment="Top"/>
 
-            <!--
-            <ghfvs:OcticonImage DockPanel.Dock="Right"
-                                Background="Transparent"
-                                Icon="git_pull_request"
-                                ToolTip="This is the current branch"
-                                VerticalAlignment="Stretch"
-                                Visibility="{Binding IsCurrent, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
-                                -->
-
             <TextBlock DockPanel.Dock="Top"
                        Margin="0,-1,5,0"
-                       TextTrimming="CharacterEllipsis">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsCurrent, Converter={ghfvs:BooleanToVisibilityConverter}, Mode=OneWay}" Value="True">
-                                <Setter Property="FontWeight" Value="Bold" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-
-                <Run Text="{Binding Title}" />
-            </TextBlock>
+                       TextTrimming="CharacterEllipsis"
+                       Text="{Binding Title}" />
             <Grid DockPanel.Dock="Top"
                     Margin="0,2,5,0"
                     Opacity="0.5">
