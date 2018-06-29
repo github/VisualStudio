@@ -180,6 +180,7 @@
     <Compile Include="ViewModels\Dialog\RepositoryCloneViewModelTests.cs" />
     <Compile Include="ViewModels\Dialog\RepositoryCreationViewModelTests.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModelTests.cs" />
+    <Compile Include="ViewModels\GitHubPane\IssueListViewModelBaseTests.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModelTests.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestDetailViewModelTests.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModelTests.cs" />

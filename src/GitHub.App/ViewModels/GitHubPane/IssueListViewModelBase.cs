@@ -173,7 +173,10 @@ namespace GitHub.ViewModels.GitHubPane
                 Observable.CombineLatest(
                     itemSource.WhenAnyValue(x => x.IsLoading),
                     view.WhenAnyValue(x => x.Count),
-                    (loading, count) => Tuple.Create(loading, count))
+                    this.WhenAnyValue(x => x.SearchQuery),
+                    this.WhenAnyValue(x => x.SelectedState),
+                    this.WhenAnyValue(x => x.AuthorFilter.Selected),
+                    (loading, count, _, __, ___) => Tuple.Create(loading, count))
                 .Subscribe(x => UpdateState(x.Item1, x.Item2)));
             subscription = dispose;
 
