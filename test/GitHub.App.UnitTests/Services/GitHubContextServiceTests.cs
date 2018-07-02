@@ -268,7 +268,6 @@ public class GitHubContextServiceTests
 
         [TestCase("Consider adding C# code style preferences to editorconfig · Issue #1750 · github/VisualStudio - Google Chrome", 1750)]
         [TestCase("Scrape browser titles · Issue #4 · jcansdale/VisualStudio · GitHub - Mozilla Firefox", 4, Description = "Firefox")]
-
         public void Issue(string windowTitle, int expectIssue)
         {
             var target = new GitHubContextService();
@@ -292,14 +291,16 @@ public class GitHubContextServiceTests
 
         [TestCase("jcansdale/VisualStudio: GitHub Extension for Visual Studio - Google Chrome", "jcansdale", "VisualStudio", Description = "Chrome")]
         [TestCase("GitHub - jcansdale/VisualStudio: GitHub Extension for Visual Studio - Mozilla Firefox", "jcansdale", "VisualStudio", Description = "Firefox")]
+        [TestCase("jcansdale/GhostAssemblies - Google Chrome", "jcansdale", "GhostAssemblies", Description = "No description, Chrome")]
+        [TestCase("GitHub - jcansdale/GhostAssemblies - Mozilla Firefox", "jcansdale", "GhostAssemblies", Description = "No description, Firefox")]
         public void RepositoryHome(string windowTitle, string expectOwner, string expectRepositoryName)
         {
             var target = new GitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
-            Assert.That(context.Owner, Is.EqualTo(expectOwner));
-            Assert.That(context.RepositoryName, Is.EqualTo(expectRepositoryName));
+            Assert.That(context?.Owner, Is.EqualTo(expectOwner));
+            Assert.That(context?.RepositoryName, Is.EqualTo(expectRepositoryName));
         }
     }
 }
