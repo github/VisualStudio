@@ -189,13 +189,21 @@ namespace GitHub.VisualStudio.Commands
 
             dte.Value.ItemOperations.OpenFile(fullPath);
 
-            var lineNumber = context.Line;
-            if (lineNumber != null)
+            var line = context.Line;
+            var lineEnd = context.LineEnd;
+            if (line != null)
             {
-                var number = lineNumber.Value - 1;
                 var activeView = pullRequestEditorService.Value.FindActiveView();
-                ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(number, 0));
-                ErrorHandler.ThrowOnFailure(activeView.CenterLines(number, 1));
+                if (lineEnd != null)
+                {
+                    ErrorHandler.ThrowOnFailure(activeView.SetSelection(line.Value - 1, 0, lineEnd.Value, 0));
+                    ErrorHandler.ThrowOnFailure(activeView.CenterLines(line.Value - 1, lineEnd.Value - line.Value));
+                }
+                else
+                {
+                    ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(line.Value - 1, 0));
+                    ErrorHandler.ThrowOnFailure(activeView.CenterLines(line.Value - 1, 1));
+                }
             }
 
             return true;
