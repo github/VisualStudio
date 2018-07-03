@@ -6,8 +6,6 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              mc:Ignorable="d" d:DesignWidth="300"
-             BorderBrush="#ffaaaaaa"
-             BorderThickness="0 1 0 1"
              Padding="0 4">
     <d:DesignData.DataContext>
         <ghfvs:PullRequestListItemViewModelDesigner Number="399"
