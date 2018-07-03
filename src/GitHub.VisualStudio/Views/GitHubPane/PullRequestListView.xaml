@@ -109,7 +109,8 @@
                      BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}"
-                     ContextMenuOpening="ListBox_ContextMenuOpening">
+                     ContextMenuOpening="ListBox_ContextMenuOpening"
+                     KeyDown="ListBox_KeyDown">
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static prop:Resources.Open}" Command="{Binding OpenItem}"/>

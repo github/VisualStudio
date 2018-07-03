@@ -58,6 +58,18 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
+        void ListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            var listBox = (ListBox)sender;
+
+            if (listBox.SelectedItem != null && e.Key == Key.Enter)
+            {
+                var vm = DataContext as IPullRequestListViewModel;
+                var pr = (IPullRequestListItemViewModel)listBox.SelectedItem;
+                vm.OpenItem.Execute(pr);
+            }
+        }
+
         void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var control = sender as ListBoxItem;
@@ -100,7 +112,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        private Visual GetVisual(object element)
+        Visual GetVisual(object element)
         {
             if (element is Visual v)
             {
