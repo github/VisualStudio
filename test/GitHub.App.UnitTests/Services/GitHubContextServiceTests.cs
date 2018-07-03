@@ -63,6 +63,22 @@ public class GitHubContextServiceTests
             Assert.That(context?.PullRequest, Is.EqualTo(expectPullRequest));
         }
 
+        [TestCase("https://github.com/github/VisualStudio/blob/master", null, null, null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", null, "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/path/foo.cs", "master", null, "path/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/path/foo.cs", null, "ee863ce265fc6217f589e66766125fed1b5b8256", "path/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/not_master/foo.cs", null, null, null, Description = "We currently only match SHA and master")]
+        public void Blob(string url, string expectBranch, string expectCommitSha, string expectPath)
+        {
+            var target = CreateGitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.BranchName, Is.EqualTo(expectBranch));
+            Assert.That(context.CommitSha, Is.EqualTo(expectCommitSha));
+            Assert.That(context.Path, Is.EqualTo(expectPath));
+        }
+
         [TestCase("https://github.com", null)]
         [TestCase("https://github.com/github", null)]
         [TestCase("https://github.com/github/VisualStudio", null)]
@@ -222,7 +238,7 @@ public class GitHubContextServiceTests
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
-            Assert.That(context?.Branch, Is.EqualTo(expectBranch));
+            Assert.That(context?.BranchName, Is.EqualTo(expectBranch));
         }
 
         [TestCase("github/VisualStudio: GitHub Extension for Visual Studio - Google Chrome", "github", "VisualStudio", null)]
@@ -241,7 +257,7 @@ public class GitHubContextServiceTests
 
             Assert.That(context.Owner, Is.EqualTo(expectOwner));
             Assert.That(context.RepositoryName, Is.EqualTo(expectRepositoryName));
-            Assert.That(context.Branch, Is.EqualTo(expectBranch));
+            Assert.That(context.BranchName, Is.EqualTo(expectBranch));
         }
 
         [TestCase("github/VisualStudio at build/appveyor-fixes - Google Chrome", "github", "VisualStudio", "build/appveyor-fixes", Description = "Chrome")]
@@ -254,7 +270,7 @@ public class GitHubContextServiceTests
 
             Assert.That(context.Owner, Is.EqualTo(expectOwner));
             Assert.That(context.RepositoryName, Is.EqualTo(expectRepositoryName));
-            Assert.That(context.Branch, Is.EqualTo(expectBranch));
+            Assert.That(context.BranchName, Is.EqualTo(expectBranch));
         }
 
         [TestCase("Branches · github/VisualStudio - Google Chrome", "github", "VisualStudio", Description = "Chrome")]

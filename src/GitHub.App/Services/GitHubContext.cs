@@ -7,7 +7,8 @@ namespace GitHub.App.Services
         public string Owner { get; set; }
         public string RepositoryName { get; set; }
         public string Host { get; set; }
-        public string Branch { get; set; }
+        public string BranchName { get; set; }
+        public string CommitSha { get; set; }
         public int? PullRequest { get; set; }
         public int? Issue { get; set; }
         public string Path { get; set; }

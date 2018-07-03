@@ -43,6 +43,8 @@ namespace GitHub.App.Services
         static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
 
         static readonly Regex urlLineRegex = new Regex($"#L(?<line>[0-9]+)(-L(?<lineEnd>[0-9]+))?$", RegexOptions.Compiled);
+        static readonly Regex urlBlobCommitRegex = new Regex($"blob/(?<commit>[a-z0-9]{{40}})/(?<path>[^#]*)", RegexOptions.Compiled);
+        static readonly Regex urlBlobBranchRegex = new Regex($"blob/(?<branch>master)/(?<path>[^#]*)", RegexOptions.Compiled);
 
         [ImportingConstructor]
         public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -63,17 +65,42 @@ namespace GitHub.App.Services
                 return null;
             }
 
-            var (line, lineEnd) = FindLine(uri);
-            return new GitHubContext
+            var context = new GitHubContext
             {
                 Host = uri.Host,
                 Owner = uri.Owner,
                 RepositoryName = uri.RepositoryName,
-                Path = FindPath(uri),
-                PullRequest = FindPullRequest(uri),
-                Line = line,
-                LineEnd = lineEnd
             };
+
+            var repositoryPrefix = uri.ToRepositoryUrl().ToString() + "/";
+            if (!url.StartsWith(repositoryPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return context;
+            }
+
+            var subpath = url.Substring(repositoryPrefix.Length);
+
+            (context.Line, context.LineEnd) = FindLine(subpath);
+
+            context.PullRequest = FindPullRequest(url);
+
+            var match = urlBlobCommitRegex.Match(subpath);
+            if (match.Success)
+            {
+                context.CommitSha = match.Groups["commit"].Value;
+                context.Path = match.Groups["path"].Value;
+                return context;
+            }
+
+            match = urlBlobBranchRegex.Match(subpath);
+            if (match.Success)
+            {
+                context.BranchName = match.Groups["branch"].Value;
+                context.Path = match.Groups["path"].Value;
+                return context;
+            }
+
+            return context;
         }
 
         public GitHubContext FindContextFromBrowser()
@@ -119,7 +146,7 @@ namespace GitHub.App.Services
                 {
                     Owner = match.Groups["owner"].Value,
                     RepositoryName = match.Groups["repo"].Value,
-                    Branch = match.Groups["branch"].Value,
+                    BranchName = match.Groups["branch"].Value,
                     Path = match.Groups["path"].Value
                 };
             }
@@ -141,7 +168,7 @@ namespace GitHub.App.Services
                 {
                     Owner = match.Groups["owner"].Value,
                     RepositoryName = match.Groups["repo"].Value,
-                    Branch = match.Groups["branch"].Value,
+                    BranchName = match.Groups["branch"].Value,
                 };
             }
 
@@ -254,23 +281,6 @@ namespace GitHub.App.Services
             }
 
             return (null, null);
-        }
-
-        string FindPath(UriString uri)
-        {
-            var blob = FindSubPath(uri, "/blob/");
-            if (blob == null)
-            {
-                return null;
-            }
-
-            var pathIndex = blob.IndexOf('/');
-            if (pathIndex == -1)
-            {
-                return null;
-            }
-
-            return blob.Substring(pathIndex + 1);
         }
 
         static int? FindPullRequest(UriString gitHubUrl)
