@@ -63,46 +63,20 @@ public class GitHubContextServiceTests
             Assert.That(context?.PullRequest, Is.EqualTo(expectPullRequest));
         }
 
-        [TestCase("https://github.com/github/VisualStudio/blob/master", null, null, null)]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", null, "foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/path/foo.cs", "master", null, "path/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/path/foo.cs", null, "ee863ce265fc6217f589e66766125fed1b5b8256", "path/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/not_master/foo.cs", null, null, null, Description = "We currently only match SHA and master")]
-        public void Blob(string url, string expectBranch, string expectCommitSha, string expectPath)
+        [TestCase("https://github.com/github/VisualStudio/blob/master", null, null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/path/foo.cs", "master/path", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/foo.cs", "ee863ce265fc6217f589e66766125fed1b5b8256", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/path/foo.cs", "ee863ce265fc6217f589e66766125fed1b5b8256/path", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/bar.cs#stuff", "master", "bar.cs")]
+        public void Blob(string url, string expectTreeish, string expectBlobName)
         {
             var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
-            Assert.That(context.BranchName, Is.EqualTo(expectBranch));
-            Assert.That(context.CommitSha, Is.EqualTo(expectCommitSha));
-            Assert.That(context.Path, Is.EqualTo(expectPath));
-        }
-
-        [TestCase("https://github.com", null)]
-        [TestCase("https://github.com/github", null)]
-        [TestCase("https://github.com/github/VisualStudio", null)]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "README.md")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md#notices", "README.md")]
-        [TestCase("https://github.com/github/VisualStudio/blob/0d264d50c57d701fa62d202f481075a6c6dbdce8/src/Code.cs#L86", "src/Code.cs")]
-        public void Path(string url, string expectPath)
-        {
-            var target = CreateGitHubContextService();
-
-            var context = target.FindContextFromUrl(url);
-
-            Assert.That(context.Path, Is.EqualTo(expectPath));
-        }
-
-        // HACK: We're assuming that branches don't contain a '/' (sic)
-        [TestCase("https://github.com/github/VisualStudio/blob/fixes/branch/buggy.cs", "branch/buggy.cs")]
-        public void ProblemPath(string url, string expectPath)
-        {
-            var target = CreateGitHubContextService();
-
-            var context = target.FindContextFromUrl(url);
-
-            Assert.That(context.Path, Is.EqualTo(expectPath));
+            Assert.That(context.Treeish, Is.EqualTo(expectTreeish));
+            Assert.That(context.BlobName, Is.EqualTo(expectBlobName));
         }
 
         [TestCase("https://github.com", null)]
@@ -307,16 +281,29 @@ public class GitHubContextServiceTests
             Assert.That(context.Issue, Is.EqualTo(expectIssue));
         }
 
-        [TestCase("VisualStudio/mark_github.xaml at master · github/VisualStudio - Google Chrome", "mark_github.xaml")]
-        [TestCase("VisualStudio/src/GitHub.VisualStudio/Resources/icons at master · github/VisualStudio - Google Chrome", "src/GitHub.VisualStudio/Resources/icons")]
-        [TestCase("VisualStudio/README.md at master · jcansdale/VisualStudio · GitHub - Mozilla Firefox", "README.md", Description = "Firefox")]
-        public void Path(string windowTitle, string expectPath)
+        [TestCase("VisualStudio/mark_github.xaml at master · github/VisualStudio - Google Chrome", "mark_github.xaml", "master")]
+        [TestCase("VisualStudio/src/GitHub.VisualStudio/Resources/icons at master · github/VisualStudio - Google Chrome", null, "master")]
+        [TestCase("VisualStudio/src at master · github/VisualStudio - Google Chrome", "src", "master", Description = "Can't differentiate between single level tree and blob")]
+        [TestCase("VisualStudio/README.md at master · jcansdale/VisualStudio · GitHub - Mozilla Firefox", "README.md", "master", Description = "Firefox")]
+        public void Blob(string windowTitle, string expectBlobName, string expectBranchName)
         {
             var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
-            Assert.That(context?.Path, Is.EqualTo(expectPath));
+            Assert.That(context?.BlobName, Is.EqualTo(expectBlobName));
+            Assert.That(context?.BranchName, Is.EqualTo(expectBranchName));
+        }
+
+        [TestCase("VisualStudio/src/GitHub.VisualStudio/Resources/icons at master · github/VisualStudio - Google Chrome", "master/src/GitHub.VisualStudio/Resources/icons", "master")]
+        public void Tree(string windowTitle, string expectTreeish, string expectBranch)
+        {
+            var target = CreateGitHubContextService();
+
+            var context = target.FindContextFromWindowTitle(windowTitle);
+
+            Assert.That(context?.Treeish, Is.EqualTo(expectTreeish));
+            Assert.That(context?.BranchName, Is.EqualTo(expectBranch));
         }
 
         [TestCase("jcansdale/VisualStudio: GitHub Extension for Visual Studio - Google Chrome", "jcansdale", "VisualStudio", Description = "Chrome")]
@@ -331,6 +318,27 @@ public class GitHubContextServiceTests
 
             Assert.That(context?.Owner, Is.EqualTo(expectOwner));
             Assert.That(context?.RepositoryName, Is.EqualTo(expectRepositoryName));
+        }
+    }
+
+    public class TheResolvePathMethod
+    {
+        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/foo.cs", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/dir/foo.cs", @"dir\foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/dir/subdir/foo.cs", @"dir\subdir\foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/dir/foo.cs", @"dir\foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/dir/subdir/foo.cs", @"dir\subdir\foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/unknown-branch/dir/subdir/foo.cs", null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/unknown/branch/dir/subdir/foo.cs", null)]
+        public void ResolvePath(string url, string expectPath)
+        {
+            var target = CreateGitHubContextService();
+            var context = target.FindContextFromUrl(url);
+
+            var path = target.ResolvePath(context);
+
+            Assert.That(path, Is.EqualTo(expectPath));
         }
     }
 

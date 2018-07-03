@@ -33,18 +33,22 @@ namespace GitHub.App.Services
 
         const string issue = "(?<issue>[0-9]+)";
 
-        static readonly string path = $"^{repo}/(?<path>[^ ]+)";
+        static readonly string tree = $"^{repo}/(?<tree>[^ ]+)";
+        static readonly string blobName = $"^{repo}/(?<blobName>[^ /]+)";
 
         static readonly Regex windowTitleRepositoryRegex = new Regex($"^(GitHub - )?{owner}/{repo}(: .*)? - ", RegexOptions.Compiled);
         static readonly Regex windowTitleBranchRegex = new Regex($"^(GitHub - )?{owner}/{repo} at {branch} ", RegexOptions.Compiled);
         static readonly Regex windowTitlePullRequestRegex = new Regex($" · Pull Request #{pull} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
         static readonly Regex windowTitleIssueRegex = new Regex($" · Issue #{issue} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
-        static readonly Regex windowTitlePathRegex = new Regex($"{path} at {branch} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
+        static readonly Regex windowTitleBlobRegex = new Regex($"{blobName} at {branch} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
+        static readonly Regex windowTitleTreeRegex = new Regex($"{tree} at {branch} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
         static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
 
         static readonly Regex urlLineRegex = new Regex($"#L(?<line>[0-9]+)(-L(?<lineEnd>[0-9]+))?$", RegexOptions.Compiled);
-        static readonly Regex urlBlobCommitRegex = new Regex($"blob/(?<commit>[a-z0-9]{{40}})/(?<path>[^#]*)", RegexOptions.Compiled);
-        static readonly Regex urlBlobBranchRegex = new Regex($"blob/(?<branch>master)/(?<path>[^#]*)", RegexOptions.Compiled);
+        static readonly Regex urlBlobRegex = new Regex($"blob/(?<treeish>[^/]+(/[^/]+)*)/(?<blobName>[^/#]+)", RegexOptions.Compiled);
+
+        static readonly Regex treeishCommitRegex = new Regex($"(?<commit>[a-z0-9]{{40}})(/(?<tree>.+))?", RegexOptions.Compiled);
+        static readonly Regex treeishBranchRegex = new Regex($"(?<branch>master)(/(?<tree>.+))?", RegexOptions.Compiled);
 
         [ImportingConstructor]
         public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -84,19 +88,11 @@ namespace GitHub.App.Services
 
             context.PullRequest = FindPullRequest(url);
 
-            var match = urlBlobCommitRegex.Match(subpath);
+            var match = urlBlobRegex.Match(subpath);
             if (match.Success)
             {
-                context.CommitSha = match.Groups["commit"].Value;
-                context.Path = match.Groups["path"].Value;
-                return context;
-            }
-
-            match = urlBlobBranchRegex.Match(subpath);
-            if (match.Success)
-            {
-                context.BranchName = match.Groups["branch"].Value;
-                context.Path = match.Groups["path"].Value;
+                context.Treeish = match.Groups["treeish"].Value;
+                context.BlobName = match.Groups["blobName"].Value;
                 return context;
             }
 
@@ -139,7 +135,7 @@ namespace GitHub.App.Services
 
         public GitHubContext FindContextFromWindowTitle(string windowTitle)
         {
-            var match = windowTitlePathRegex.Match(windowTitle);
+            var match = windowTitleBlobRegex.Match(windowTitle);
             if (match.Success)
             {
                 return new GitHubContext
@@ -147,7 +143,19 @@ namespace GitHub.App.Services
                     Owner = match.Groups["owner"].Value,
                     RepositoryName = match.Groups["repo"].Value,
                     BranchName = match.Groups["branch"].Value,
-                    Path = match.Groups["path"].Value
+                    BlobName = match.Groups["blobName"].Value
+                };
+            }
+
+            match = windowTitleTreeRegex.Match(windowTitle);
+            if (match.Success)
+            {
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value,
+                    BranchName = match.Groups["branch"].Value,
+                    Treeish = $"{match.Groups["branch"].Value}/{match.Groups["tree"].Value}"
                 };
             }
 
@@ -213,24 +221,30 @@ namespace GitHub.App.Services
 
         public bool TryOpenFile(GitHubContext context, string repositoryDir)
         {
-            var path = context.Path;
-            if (path == null)
+            var fileName = context.BlobName;
+            if (fileName == null)
             {
                 return false;
             }
 
-            var windowsPath = path.Replace('/', '\\');
-            var fullPath = Path.Combine(repositoryDir, windowsPath);
-            if (!File.Exists(fullPath))
+            string fullPath;
+            var resolvedPath = ResolvePath(context);
+            if (resolvedPath != null)
+            {
+                fullPath = Path.Combine(repositoryDir, resolvedPath);
+                if (!File.Exists(fullPath))
+                {
+                    return false;
+                }
+            }
+            else
             {
                 // Search by filename only
-                var fileName = Path.GetFileName(path);
                 fullPath = Directory.EnumerateFiles(repositoryDir, fileName, SearchOption.AllDirectories).FirstOrDefault();
-            }
-
-            if (fullPath == null)
-            {
-                return false;
+                if (fullPath == null)
+                {
+                    return false;
+                }
             }
 
             var textView = OpenDocument(fullPath);
@@ -248,6 +262,37 @@ namespace GitHub.App.Services
             }
 
             return true;
+        }
+
+        public string ResolvePath(GitHubContext context)
+        {
+            var treeish = context.Treeish;
+            if (treeish == null)
+            {
+                return null;
+            }
+
+            var blobName = context.BlobName;
+            if (blobName == null)
+            {
+                return null;
+            }
+
+            var match = treeishCommitRegex.Match(treeish);
+            if (match.Success)
+            {
+                var tree = match.Groups["tree"].Value.Replace('/', '\\');
+                return Path.Combine(tree, blobName);
+            }
+
+            match = treeishBranchRegex.Match(treeish);
+            if (match.Success)
+            {
+                var tree = match.Groups["tree"].Value.Replace('/', '\\');
+                return Path.Combine(tree, blobName);
+            }
+
+            return null;
         }
 
         IVsTextView OpenDocument(string fullPath)
