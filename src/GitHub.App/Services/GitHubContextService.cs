@@ -158,7 +158,10 @@ namespace GitHub.App.Services
             {
                 var lineEnd = context.LineEnd ?? line;
 
-                ErrorHandler.ThrowOnFailure(textView.SetSelection(line.Value - 1, 0, lineEnd.Value, 0));
+                ErrorHandler.ThrowOnFailure(textView.GetBuffer(out IVsTextLines buffer));
+                buffer.GetLengthOfLine(lineEnd.Value - 1, out int lineEndLength);
+
+                ErrorHandler.ThrowOnFailure(textView.SetSelection(line.Value - 1, 0, lineEnd.Value - 1, lineEndLength));
                 ErrorHandler.ThrowOnFailure(textView.CenterLines(line.Value - 1, lineEnd.Value - line.Value + 1));
             }
 
