@@ -1,5 +1,6 @@
 ﻿using System;
 using GitHub.App.Services;
+using NSubstitute;
 using NUnit.Framework;
 
 public class GitHubContextServiceTests
@@ -12,7 +13,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "github")]
         public void Owner(string url, string expectOwner)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -25,7 +26,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "VisualStudio")]
         public void RepositoryName(string url, string expectRepositoryName)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -38,7 +39,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "github.com")]
         public void Host(string url, string expectHost)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -55,7 +56,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/pull/NaN", null)]
         public void PullRequest(string url, int? expectPullRequest)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -70,7 +71,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/0d264d50c57d701fa62d202f481075a6c6dbdce8/src/Code.cs#L86", "src/Code.cs")]
         public void Path(string url, string expectPath)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -81,7 +82,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/fixes/branch/buggy.cs", "branch/buggy.cs")]
         public void ProblemPath(string url, string expectPath)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -97,7 +98,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/0d264d50c57d701fa62d202f481075a6c6dbdce8/src/Code.cs#L86", 86)]
         public void Line(string url, int? expectLine)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -109,7 +110,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/master/Code.cs#L115-L116", 115, 116)]
         public void LineEnd(string url, int? expectLine, int? expectLineEnd)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -122,7 +123,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio", false)]
         public void IsNull(string url, bool expectNull)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
@@ -136,7 +137,7 @@ public class GitHubContextServiceTests
         public void DefaultGitHubDotCom()
         {
             var context = new GitHubContext { Host = "github.com", Owner = "github", RepositoryName = "VisualStudio" };
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var uri = target.ToRepositoryUrl(context);
 
@@ -155,7 +156,7 @@ public class GitHubContextServiceTests
         [TestCase("github/$: Description - Google Chrome", null, Description = "Must contain only letters, numbers, `_`, `.` or `-`")]
         public void RepositoryName(string windowTitle, string expectRepositoryName)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -171,7 +172,7 @@ public class GitHubContextServiceTests
         [TestCase("-/Repository: Description - Google Chrome", null, Description = "Must start with letter or number")]
         public void Owner(string windowTitle, string expectOwner)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -217,7 +218,7 @@ public class GitHubContextServiceTests
         public void Branch(string branch, string expectBranch)
         {
             var windowTitle = $"VisualStudio/src/GitHub.VisualStudio/Resources/icons at {branch} · github/VisualStudio - Google Chrome";
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -234,7 +235,7 @@ public class GitHubContextServiceTests
         [TestCase("VisualStudio/GitHub.Exports.csproj at 89484dc25a3a475d3253afdc3bd3ddd6c6999c3b · github/VisualStudio - Google Chrome", "github", "VisualStudio", "89484dc25a3a475d3253afdc3bd3ddd6c6999c3b")]
         public void OwnerRepositoryBranch(string windowTitle, string expectOwner, string expectRepositoryName, string expectBranch)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -247,7 +248,7 @@ public class GitHubContextServiceTests
         [TestCase("GitHub - github/VisualStudio at refactor/pr-list - Mozilla Firefox", "github", "VisualStudio", "refactor/pr-list", Description = "Firefox")]
         public void TreeBranch(string windowTitle, string expectOwner, string expectRepositoryName, string expectBranch)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -260,7 +261,7 @@ public class GitHubContextServiceTests
         [TestCase("Branches · github/VisualStudio · GitHub - Mozilla Firefox", "github", "VisualStudio", Description = "Firefox")]
         public void Branches(string windowTitle, string expectOwner, string expectRepositoryName)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -272,7 +273,7 @@ public class GitHubContextServiceTests
         [TestCase("Description · Pull Request #1763 · github/VisualStudio · GitHub - Mozilla Firefox", 1763, Description = "Firefox")]
         public void PullRequest(string windowTitle, int expectPullRequest)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -283,7 +284,7 @@ public class GitHubContextServiceTests
         [TestCase("Scrape browser titles · Issue #4 · jcansdale/VisualStudio · GitHub - Mozilla Firefox", 4, Description = "Firefox")]
         public void Issue(string windowTitle, int expectIssue)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -295,7 +296,7 @@ public class GitHubContextServiceTests
         [TestCase("VisualStudio/README.md at master · jcansdale/VisualStudio · GitHub - Mozilla Firefox", "README.md", Description = "Firefox")]
         public void Path(string windowTitle, string expectPath)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
@@ -308,12 +309,18 @@ public class GitHubContextServiceTests
         [TestCase("GitHub - jcansdale/GhostAssemblies - Mozilla Firefox", "jcansdale", "GhostAssemblies", Description = "No description, Firefox")]
         public void RepositoryHome(string windowTitle, string expectOwner, string expectRepositoryName)
         {
-            var target = new GitHubContextService();
+            var target = CreateGitHubContextService();
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
             Assert.That(context?.Owner, Is.EqualTo(expectOwner));
             Assert.That(context?.RepositoryName, Is.EqualTo(expectRepositoryName));
         }
+    }
+
+    static GitHubContextService CreateGitHubContextService()
+    {
+        var sp = Substitute.For<IServiceProvider>();
+        return new GitHubContextService(sp);
     }
 }

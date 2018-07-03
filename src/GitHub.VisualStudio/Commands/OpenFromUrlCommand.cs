@@ -125,7 +125,7 @@ namespace GitHub.VisualStudio.Commands
             }
 
             await TryOpenPullRequest(context);
-            TryOpenFile(context, repositoryDir);
+            gitHubContextService.Value.TryOpenFile(context, repositoryDir);
         }
 
         VSConstants.MessageBoxResult ShowInfoMessage(string message)
@@ -163,50 +163,6 @@ namespace GitHub.VisualStudio.Commands
             }
 
             return null;
-        }
-
-        bool TryOpenFile(GitHubContext context, string repositoryDir)
-        {
-            var path = context.Path;
-            if (path == null)
-            {
-                return false;
-            }
-
-            var windowsPath = path.Replace('/', '\\');
-            var fullPath = Path.Combine(repositoryDir, windowsPath);
-            if (!File.Exists(fullPath))
-            {
-                // Search by filename only
-                var fileName = Path.GetFileName(path);
-                fullPath = Directory.EnumerateFiles(repositoryDir, fileName, SearchOption.AllDirectories).FirstOrDefault();
-            }
-
-            if (fullPath == null)
-            {
-                return false;
-            }
-
-            dte.Value.ItemOperations.OpenFile(fullPath);
-
-            var line = context.Line;
-            var lineEnd = context.LineEnd;
-            if (line != null)
-            {
-                var activeView = pullRequestEditorService.Value.FindActiveView();
-                if (lineEnd != null)
-                {
-                    ErrorHandler.ThrowOnFailure(activeView.SetSelection(line.Value - 1, 0, lineEnd.Value, 0));
-                    ErrorHandler.ThrowOnFailure(activeView.CenterLines(line.Value - 1, lineEnd.Value - line.Value));
-                }
-                else
-                {
-                    ErrorHandler.ThrowOnFailure(activeView.SetCaretPos(line.Value - 1, 0));
-                    ErrorHandler.ThrowOnFailure(activeView.CenterLines(line.Value - 1, 1));
-                }
-            }
-
-            return true;
         }
 
         async Task<bool> TryOpenPullRequest(GitHubContext context)

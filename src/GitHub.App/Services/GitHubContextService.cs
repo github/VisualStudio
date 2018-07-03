@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
@@ -6,12 +7,18 @@ using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using GitHub.Primitives;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.App.Services
 {
     [Export(typeof(GitHubContextService))]
     public class GitHubContextService
     {
+        readonly IServiceProvider serviceProvider;
+
         // USERID_REGEX = /[a-z0-9][a-z0-9\-\_]*/i
         const string owner = "(?<owner>[a-zA-Z0-9][a-zA-Z0-9-_]*)";
 
@@ -36,6 +43,12 @@ namespace GitHub.App.Services
         static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
 
         static readonly Regex urlLineRegex = new Regex($"#L(?<line>[0-9]+)(-L(?<lineEnd>[0-9]+))?$", RegexOptions.Compiled);
+
+        [ImportingConstructor]
+        public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
 
         public GitHubContext FindContextFromUrl(string url)
         {
@@ -114,6 +127,53 @@ namespace GitHub.App.Services
                 Issue = issue,
                 Path = path
             };
+        }
+
+        public bool TryOpenFile(GitHubContext context, string repositoryDir)
+        {
+            var path = context.Path;
+            if (path == null)
+            {
+                return false;
+            }
+
+            var windowsPath = path.Replace('/', '\\');
+            var fullPath = Path.Combine(repositoryDir, windowsPath);
+            if (!File.Exists(fullPath))
+            {
+                // Search by filename only
+                var fileName = Path.GetFileName(path);
+                fullPath = Directory.EnumerateFiles(repositoryDir, fileName, SearchOption.AllDirectories).FirstOrDefault();
+            }
+
+            if (fullPath == null)
+            {
+                return false;
+            }
+
+            var textView = OpenDocument(fullPath);
+
+            var line = context.Line;
+            if (line != null)
+            {
+                var lineEnd = context.LineEnd ?? line;
+
+                ErrorHandler.ThrowOnFailure(textView.SetSelection(line.Value - 1, 0, lineEnd.Value, 0));
+                ErrorHandler.ThrowOnFailure(textView.CenterLines(line.Value - 1, lineEnd.Value - line.Value + 1));
+            }
+
+            return true;
+        }
+
+        IVsTextView OpenDocument(string fullPath)
+        {
+            var logicalView = VSConstants.LOGVIEWID.TextView_guid;
+            IVsUIHierarchy hierarchy;
+            uint itemID;
+            IVsWindowFrame windowFrame;
+            IVsTextView view;
+            VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
+            return view;
         }
 
         static (bool success, string owner, string repo, string branch, int? pullRequest, int? issue, string path) MatchWindowTitle(string windowTitle)
