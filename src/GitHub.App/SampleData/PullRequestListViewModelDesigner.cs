@@ -63,6 +63,7 @@ namespace GitHub.SampleData
         public Uri WebUrl => null;
         public ReactiveCommand<object> CreatePullRequest { get; }
         public ReactiveCommand<Unit> OpenItem { get; }
+        public ReactiveCommand<object> OpenItemInBrowser { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }

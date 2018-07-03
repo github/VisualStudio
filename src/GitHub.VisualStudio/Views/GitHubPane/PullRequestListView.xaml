@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestListView"
+             Name="root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,6 +7,7 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
     <d:DesignProperties.DataContext>
@@ -107,7 +109,14 @@
             <ListBox ItemsSource="{Binding ItemsView}"
                      BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}">
+                     Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}"
+                     ContextMenuOpening="ListBox_ContextMenuOpening">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static prop:Resources.Open}" Command="{Binding OpenItem}"/>
+                        <MenuItem Header="{x:Static prop:Resources.openInBrowser}" Command="{Binding OpenItemInBrowser}"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

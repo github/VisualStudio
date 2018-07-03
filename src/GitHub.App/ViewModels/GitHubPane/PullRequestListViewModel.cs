@@ -51,6 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("pulls"))
                 .ToProperty(this, x => x.WebUrl);
             CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
+            OpenItemInBrowser = ReactiveCommand.Create();
         }
 
         /// <inheritdoc/>
@@ -61,6 +62,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<object> CreatePullRequest { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<object> OpenItemInBrowser { get; }
 
         /// <inheritdoc/>
         protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
