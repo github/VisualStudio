@@ -6,6 +6,8 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              mc:Ignorable="d" d:DesignWidth="300"
+             BorderBrush="#ffaaaaaa"
+             BorderThickness="0 1 0 1"
              Padding="0 4">
     <d:DesignData.DataContext>
         <ghfvs:PullRequestListItemViewModelDesigner Number="399"
@@ -30,9 +32,9 @@
 
     <Grid>
         <Image HorizontalAlignment="Left"
-               Stretch="None"
-               Opacity="0.2"
-               Visibility="{Binding Converter={ghfvs:EqualsToVisibilityConverter {x:Null}}}">
+           Stretch="None"
+           Opacity="0.2"
+           Visibility="{Binding Converter={ghfvs:EqualsToVisibilityConverter {x:Null}}}">
             <Image.Source>
                 <DrawingImage>
                     <DrawingImage.Drawing>
@@ -50,36 +52,36 @@
             </Image.Source>
         </Image>
 
-        <DockPanel Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
-            <views:ActorAvatarView DockPanel.Dock="Left"
-                                   ViewModel="{Binding Author}"
-                                   Margin="0,1,10,0"
-                                   Width="30"
-                                   Height="30"
-                                   VerticalAlignment="Top"/>
+        <Grid Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition MinWidth="35" Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-            <TextBlock DockPanel.Dock="Top"
+            <views:ActorAvatarView Grid.Column="0"
+                               ViewModel="{Binding Author}"
+                               Margin="0,1,4,0"
+                               Width="30"
+                               Height="30"
+                               VerticalAlignment="Top"/>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock DockPanel.Dock="Top"
                        Margin="0,-1,5,0"
                        TextTrimming="CharacterEllipsis"
                        Text="{Binding Title}" />
-            <Grid DockPanel.Dock="Top"
-                    Margin="0,2,5,0"
-                    Opacity="0.5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition MinWidth="35" Width="Auto" />
-                </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0">
-                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
-                    <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-                    by
-                    <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                by
+                <Run Text="{Binding Author.Login, Mode=OneWay}"/>
                 </TextBlock>
-                <TextBlock Grid.Column="1" Margin="4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
-                    <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
-                    <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
-                </TextBlock>
-            </Grid>
-        </DockPanel>
+            </StackPanel>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
+            <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+            <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
+            </TextBlock>
+        </Grid>
     </Grid>
 </UserControl>
