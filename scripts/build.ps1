@@ -80,5 +80,9 @@ if ($Package) {
 }
 
 Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package
+if ($AppVeyor) {
+{
+    Push-AppveyorArtifact "build.log" -FileName "build.log" -DeploymentName build
+}
 
 Pop-Location

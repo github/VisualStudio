@@ -38,13 +38,16 @@ function Build-Solution([string]$solution,[string]$target,[string]$configuration
     Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
     $flag1 = ""
     $flag2 = ""
+    $flag3 = ""
     if ($ForVSInstaller) {
         $flag1 = "/p:IsProductComponent=true"
         $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
         new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
+    } else {
+        $flag3 = "/fileLogger /flp:logfile=build.log" 
     }
 
-    Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2"
+    Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal $flag3 /p:VisualStudioVersion=14.0 $flag1 $flag2"
     Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2 }
 }
 
