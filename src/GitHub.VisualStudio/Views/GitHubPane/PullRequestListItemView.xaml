@@ -69,16 +69,16 @@
                        Margin="0,-1,5,0"
                        TextTrimming="CharacterEllipsis"
                        Text="{Binding Title}" />
-                <TextBlock Grid.Column="0">
-                <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
-                <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-                by
-                <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                <TextBlock Opacity="0.5">
+                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                    <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                    by
+                    <Run Text="{Binding Author.Login, Mode=OneWay}"/>
                 </TextBlock>
             </StackPanel>
-            <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
-            <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
-            <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
+            <TextBlock Opacity="0.5" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
+                <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+                <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
             </TextBlock>
         </Grid>
     </Grid>
