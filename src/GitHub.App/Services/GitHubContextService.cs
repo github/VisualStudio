@@ -35,6 +35,8 @@ namespace GitHub.App.Services
         static readonly Regex windowTitlePathRegex = new Regex($"{path} at {branch} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
         static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
 
+        static readonly Regex urlLineRegex = new Regex($"#L(?<line>[0-9]+)$", RegexOptions.Compiled);
+
         public GitHubContext FindContextFromUrl(string url)
         {
             var uri = new UriString(url);
@@ -158,20 +160,16 @@ namespace GitHub.App.Services
 
         static int? FindLine(UriString gitHubUrl)
         {
-            var prefix = "#L";
             var url = gitHubUrl.ToString();
-            var index = url.LastIndexOf(prefix);
-            if (index == -1)
+
+            var match = urlLineRegex.Match(url);
+            if (match.Success)
             {
-                return null;
+                int.TryParse(match.Groups["line"].Value, out int line);
+                return line;
             }
 
-            if (!int.TryParse(url.Substring(index + prefix.Length), out int lineNumber))
-            {
-                return null;
-            }
-
-            return lineNumber; // 1 based
+            return null;
         }
 
         string FindPath(UriString uri)
