@@ -45,8 +45,8 @@ function Build-Solution([string]$solution,[string]$target,[string]$configuration
         new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
     }
 
-    Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fileLogger /flp:logfile=build.log /p:VisualStudioVersion=14.0 $flag1 $flag2"
-    Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fileLogger /flp:logfile=build.log /p:VisualStudioVersion=14.0 $flag1 $flag2 }
+    Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fl /flp:logfile=build.log;verbosity=diagnostic /p:VisualStudioVersion=14.0 $flag1 $flag2"
+    Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fl /flp:logfile=build.log;verbosity=diagnostic /p:VisualStudioVersion=14.0 $flag1 $flag2 }
 }
 
 function Push-Changes([string]$branch) {
