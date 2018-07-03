@@ -112,21 +112,76 @@ namespace GitHub.App.Services
 
         public GitHubContext FindContextFromWindowTitle(string windowTitle)
         {
-            var (success, owner, repo, branch, pullRequest, issue, path) = MatchWindowTitle(windowTitle);
-            if (!success)
+            var match = windowTitlePathRegex.Match(windowTitle);
+            if (match.Success)
             {
-                return null;
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value,
+                    Branch = match.Groups["branch"].Value,
+                    Path = match.Groups["path"].Value
+                };
             }
 
-            return new GitHubContext
+            match = windowTitleRepositoryRegex.Match(windowTitle);
+            if (match.Success)
             {
-                Owner = owner,
-                RepositoryName = repo,
-                Branch = branch,
-                PullRequest = pullRequest,
-                Issue = issue,
-                Path = path
-            };
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value,
+                };
+            }
+
+            match = windowTitleBranchRegex.Match(windowTitle);
+            if (match.Success)
+            {
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value,
+                    Branch = match.Groups["branch"].Value,
+                };
+            }
+
+            match = windowTitleBranchesRegex.Match(windowTitle);
+            if (match.Success)
+            {
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value
+                };
+            }
+
+            match = windowTitlePullRequestRegex.Match(windowTitle);
+            if (match.Success)
+            {
+                int.TryParse(match.Groups["pull"].Value, out int pullRequest);
+
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value,
+                    PullRequest = pullRequest
+                };
+            }
+
+            match = windowTitleIssueRegex.Match(windowTitle);
+            if (match.Success)
+            {
+                int.TryParse(match.Groups["issue"].Value, out int issue);
+
+                return new GitHubContext
+                {
+                    Owner = match.Groups["owner"].Value,
+                    RepositoryName = match.Groups["repo"].Value,
+                    Issue = issue
+                };
+            }
+
+            return null;
         }
 
         public bool TryOpenFile(GitHubContext context, string repositoryDir)
@@ -178,50 +233,6 @@ namespace GitHub.App.Services
             VsShellUtilities.OpenDocument(serviceProvider, fullPath, logicalView, out hierarchy, out itemID, out windowFrame, out view);
             return view;
         }
-
-        static (bool success, string owner, string repo, string branch, int? pullRequest, int? issue, string path) MatchWindowTitle(string windowTitle)
-        {
-            var match = windowTitlePathRegex.Match(windowTitle);
-            if (match.Success)
-            {
-                return (match.Success, match.Groups["owner"].Value, match.Groups["repo"].Value, match.Groups["branch"].Value, null, null, match.Groups["path"].Value);
-            }
-
-            match = windowTitleRepositoryRegex.Match(windowTitle);
-            if (match.Success)
-            {
-                return (match.Success, match.Groups["owner"].Value, match.Groups["repo"].Value, null, null, null, null);
-            }
-
-            match = windowTitleBranchRegex.Match(windowTitle);
-            if (match.Success)
-            {
-                return (match.Success, match.Groups["owner"].Value, match.Groups["repo"].Value, match.Groups["branch"].Value, null, null, null);
-            }
-
-            match = windowTitleBranchesRegex.Match(windowTitle);
-            if (match.Success)
-            {
-                return (match.Success, match.Groups["owner"].Value, match.Groups["repo"].Value, null, null, null, null);
-            }
-
-            match = windowTitlePullRequestRegex.Match(windowTitle);
-            if (match.Success)
-            {
-                int.TryParse(match.Groups["pull"].Value, out int pullRequest);
-                return (match.Success, match.Groups["owner"].Value, match.Groups["repo"].Value, null, pullRequest, null, null);
-            }
-
-            match = windowTitleIssueRegex.Match(windowTitle);
-            if (match.Success)
-            {
-                int.TryParse(match.Groups["issue"].Value, out int issue);
-                return (match.Success, match.Groups["owner"].Value, match.Groups["repo"].Value, null, null, issue, null);
-            }
-
-            return (match.Success, null, null, null, null, null, null);
-        }
-
 
         static (int? lineStart, int? lineEnd) FindLine(UriString gitHubUrl)
         {
