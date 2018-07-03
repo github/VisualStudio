@@ -190,6 +190,7 @@
     <Compile Include="ViewModels\GitHubPane\PullRequestUserReviewsViewModelTests.cs" />
     <Compile Include="ViewModels\TeamExplorer\RepositoryPublishViewModelTests.cs" />
     <Compile Include="Substitutes.cs" />
+    <Compile Include="ViewModels\UserFilterViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
