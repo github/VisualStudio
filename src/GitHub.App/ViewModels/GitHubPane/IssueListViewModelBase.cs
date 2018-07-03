@@ -30,6 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IRepositoryModel> forks;
         string searchQuery;
         string selectedState;
+        ObservableAsPropertyHelper<string> stateCaption;
         string stringFilter;
         int numberFilter;
         IUserFilterViewModel authorFilter;
@@ -42,6 +43,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             this.repositoryService = repositoryService;
             OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
+            stateCaption = this.WhenAnyValue(
+                x => x.Items.Count,
+                x => x.SelectedState,
+                x => x.IsBusy,
+                x => x.IsLoading,
+                (count, state, busy, loading) => busy || loading ? state : count + " " + state)
+                .ToProperty(this, x => x.StateCaption);
         }
 
         /// <inheritdoc/>
@@ -105,6 +113,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public abstract IReadOnlyList<string> States { get; }
+
+        /// <inheritdoc/>
+        public string StateCaption => stateCaption.Value;
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> OpenItem { get; }

@@ -11,7 +11,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
     <d:DesignProperties.DataContext>
-        <ghfvs:PullRequestListViewModelDesigner Message="None"/>
+        <ghfvs:PullRequestListViewModelDesigner Message="None" StateCaption="3 Open"/>
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>
@@ -40,8 +40,7 @@
                 </ghfvs:DropDownButton.DropDownContent>
                 <TextBlock>
                     <Hyperlink Foreground="{DynamicResource GitHubActionLinkItemBrush}">
-                        <Run Text="{Binding Items.Count, Mode=OneWay}"/>
-                        <Run Text="{Binding SelectedState, Mode=OneWay}"/>
+                        <Run Text="{Binding StateCaption, Mode=OneWay}"/>
                     </Hyperlink>
                 </TextBlock>
             </ghfvs:DropDownButton>

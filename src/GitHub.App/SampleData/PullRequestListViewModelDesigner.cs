@@ -59,6 +59,7 @@ namespace GitHub.SampleData
         public IReadOnlyList<IRepositoryModel> Forks { get; }
         public string SearchQuery { get; set; }
         public string SelectedState { get; set; }
+        public string StateCaption { get; set; }
         public IReadOnlyList<string> States { get; }
         public Uri WebUrl => null;
         public ReactiveCommand<object> CreatePullRequest { get; }

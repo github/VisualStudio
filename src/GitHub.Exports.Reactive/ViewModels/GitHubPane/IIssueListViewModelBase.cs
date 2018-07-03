@@ -90,6 +90,11 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<string> States { get; }
 
         /// <summary>
+        /// Gets the caption to display as the header on the <see cref="States"/> dropdown.
+        /// </summary>
+        string StateCaption { get; }
+
+        /// <summary>
         /// Gets a command which opens the item passed as a parameter.
         /// </summary>
         ReactiveCommand<Unit> OpenItem { get; }
