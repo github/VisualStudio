@@ -104,6 +104,19 @@ public class GitHubContextServiceTests
             Assert.That(context.Line, Is.EqualTo(expectLine));
         }
 
+        [TestCase("https://github.com/github/VisualStudio", null, null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/Code.cs#L115", 115, null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/Code.cs#L115-L116", 115, 116)]
+        public void LineEnd(string url, int? expectLine, int? expectLineEnd)
+        {
+            var target = new GitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.Line, Is.EqualTo(expectLine));
+            Assert.That(context.LineEnd, Is.EqualTo(expectLineEnd));
+        }
+
         [TestCase("foo", true)]
         [TestCase("ssh://git@github.com:443/benstraub/libgit2", true)]
         [TestCase("https://github.com/github/VisualStudio", false)]

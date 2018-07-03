@@ -12,5 +12,6 @@ namespace GitHub.App.Services
         public int? Issue { get; set; }
         public string Path { get; set; }
         public int? Line { get; set; }
+        public int? LineEnd { get; set; }
     }
 }

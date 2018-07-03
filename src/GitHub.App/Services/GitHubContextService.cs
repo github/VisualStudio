@@ -35,7 +35,7 @@ namespace GitHub.App.Services
         static readonly Regex windowTitlePathRegex = new Regex($"{path} at {branch} · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
         static readonly Regex windowTitleBranchesRegex = new Regex($"Branches · {owner}/{repo}( · GitHub)? - ", RegexOptions.Compiled);
 
-        static readonly Regex urlLineRegex = new Regex($"#L(?<line>[0-9]+)$", RegexOptions.Compiled);
+        static readonly Regex urlLineRegex = new Regex($"#L(?<line>[0-9]+)(-L(?<lineEnd>[0-9]+))?$", RegexOptions.Compiled);
 
         public GitHubContext FindContextFromUrl(string url)
         {
@@ -50,6 +50,7 @@ namespace GitHub.App.Services
                 return null;
             }
 
+            var (line, lineEnd) = FindLine(uri);
             return new GitHubContext
             {
                 Host = uri.Host,
@@ -57,7 +58,8 @@ namespace GitHub.App.Services
                 RepositoryName = uri.RepositoryName,
                 Path = FindPath(uri),
                 PullRequest = FindPullRequest(uri),
-                Line = FindLine(uri)
+                Line = line,
+                LineEnd = lineEnd
             };
         }
 
@@ -158,7 +160,7 @@ namespace GitHub.App.Services
         }
 
 
-        static int? FindLine(UriString gitHubUrl)
+        static (int? lineStart, int? lineEnd) FindLine(UriString gitHubUrl)
         {
             var url = gitHubUrl.ToString();
 
@@ -166,10 +168,18 @@ namespace GitHub.App.Services
             if (match.Success)
             {
                 int.TryParse(match.Groups["line"].Value, out int line);
-                return line;
+
+                var lineEndGroup = match.Groups["lineEnd"];
+                if (string.IsNullOrEmpty(lineEndGroup.Value))
+                {
+                    return (line, null);
+                }
+
+                int.TryParse(lineEndGroup.Value, out int lineEnd);
+                return (line, lineEnd);
             }
 
-            return null;
+            return (null, null);
         }
 
         string FindPath(UriString uri)
