@@ -127,7 +127,7 @@ New-Module -ScriptBlock {
         $msbuild = Find-MSBuild
 
         Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fl /flp:logfile=build.log;verbosity=normal /p:VisualStudioVersion=14.0 $flag1 $flag2"
-        Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fl /flp:logfile=build.log;verbosity=normal /p:VisualStudioVersion=14.0 $flag1 $flag2 }
+        Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /fl /flp:logfile=build.log\;verbosity=normal /p:VisualStudioVersion=14.0 $flag1 $flag2 }
     }
 
     Export-ModuleMember -Function Find-MSBuild,Build-Solution
