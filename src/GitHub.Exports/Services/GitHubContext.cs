@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GitHub.App.Services
+﻿namespace GitHub.Services
 {
     public class GitHubContext
     {

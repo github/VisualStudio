@@ -1,12 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using GitHub.Logging;
-using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.VisualStudio.Shell;
@@ -48,6 +44,12 @@ namespace GitHub.Services
                     vsVersion = GetVSVersion();
                 return vsVersion;
             }
+        }
+
+        public VSConstants.MessageBoxResult ShowMessageBoxInfo(string message)
+        {
+            return (VSConstants.MessageBoxResult)VsShellUtilities.ShowMessageBox(serviceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         /// <summary>Open a repository in Team Explorer</summary>

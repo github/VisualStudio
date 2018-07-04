@@ -224,7 +224,6 @@
     <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
-    <Compile Include="Services\GitHubContext.cs" />
     <Compile Include="Services\GitHubContextService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\RepositoryForkService.cs" />

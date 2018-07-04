@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
-using GitHub.App.Services;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
 using Microsoft.VisualStudio;
@@ -20,7 +18,7 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromUrlCommand))]
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
-        readonly Lazy<GitHubContextService> gitHubContextService;
+        readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
         readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -40,7 +38,7 @@ namespace GitHub.VisualStudio.Commands
 
         [ImportingConstructor]
         public OpenFromUrlCommand(
-            Lazy<GitHubContextService> gitHubContextService,
+            Lazy<IGitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
             Lazy<IPullRequestEditorService> pullRequestEditorService,
             Lazy<ITeamExplorerContext> teamExplorerContext,

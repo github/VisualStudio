@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using GitHub.Models;
+using Microsoft.VisualStudio;
 
 namespace GitHub.Services
 {
@@ -7,5 +6,6 @@ namespace GitHub.Services
     {
         string VSVersion { get; }
         bool TryOpenRepository(string directory);
+        VSConstants.MessageBoxResult ShowMessageBoxInfo(string message);
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Windows;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
-using GitHub.App.Services;
 using GitHub.Services.Vssdk.Commands;
 using Task = System.Threading.Tasks.Task;
 
@@ -12,8 +10,11 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromClipboardCommand))]
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {
-        readonly Lazy<GitHubContextService> gitHubContextService;
+        public const string NoGitHubUrlMessage = "Couldn't a find a GitHub URL in clipboard";
+
+        readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
+        readonly Lazy<IVSServices> vsServices;
 
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -27,12 +28,14 @@ namespace GitHub.VisualStudio.Commands
 
         [ImportingConstructor]
         public OpenFromClipboardCommand(
-            Lazy<GitHubContextService> gitHubContextService,
-            Lazy<ITeamExplorerContext> teamExplorerContext)
+            Lazy<IGitHubContextService> gitHubContextService,
+            Lazy<ITeamExplorerContext> teamExplorerContext,
+            Lazy<IVSServices> vsServices)
             : base(CommandSet, CommandId)
         {
             this.gitHubContextService = gitHubContextService;
             this.teamExplorerContext = teamExplorerContext;
+            this.vsServices = vsServices;
 
             // See https://code.msdn.microsoft.com/windowsdesktop/AllowParams-2005-9442298f
             ParametersDescription = "u";    // accept a single url
@@ -40,15 +43,10 @@ namespace GitHub.VisualStudio.Commands
 
         public override Task Execute(string url)
         {
-            if (string.IsNullOrEmpty(url))
-            {
-                url = Clipboard.GetText(TextDataFormat.Text);
-            }
-
-            var context = gitHubContextService.Value.FindContextFromUrl(url);
+            var context = gitHubContextService.Value.FindContextFromClipboard();
             if (context == null)
             {
-                // Couldn't find URL in clipboard
+                vsServices.Value.ShowMessageBoxInfo(NoGitHubUrlMessage);
                 return Task.CompletedTask;
             }
 

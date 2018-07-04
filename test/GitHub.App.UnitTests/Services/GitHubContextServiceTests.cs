@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Services;
 using GitHub.App.Services;
 using NSubstitute;
 using NUnit.Framework;

@@ -2,10 +2,12 @@
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Windows;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using GitHub.Services;
 using GitHub.Primitives;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -14,8 +16,8 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.App.Services
 {
-    [Export(typeof(GitHubContextService))]
-    public class GitHubContextService
+    [Export(typeof(IGitHubContextService))]
+    public class GitHubContextService : IGitHubContextService
     {
         readonly IServiceProvider serviceProvider;
 
@@ -54,6 +56,12 @@ namespace GitHub.App.Services
         public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+        }
+
+        public GitHubContext FindContextFromClipboard()
+        {
+            var text = Clipboard.GetText(TextDataFormat.Text);
+            return FindContextFromUrl(text);
         }
 
         public GitHubContext FindContextFromUrl(string url)
