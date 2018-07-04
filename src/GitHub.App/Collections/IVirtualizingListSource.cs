@@ -10,7 +10,7 @@ namespace GitHub.Collections
     /// </summary>
     /// <typeparam name="T">The item type.</typeparam>
     /// <remarks>
-    /// This interface is used the the <see cref="VirtualizingList{T}"/> class to load pages of data.
+    /// This interface is used by the <see cref="VirtualizingList{T}"/> class to load pages of data.
     /// </remarks>
     public interface IVirtualizingListSource<T> : IDisposable, INotifyPropertyChanged
     {
