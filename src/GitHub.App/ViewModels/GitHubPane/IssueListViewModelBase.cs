@@ -127,20 +127,21 @@ namespace GitHub.ViewModels.GitHubPane
             SelectedState = States.FirstOrDefault();
             AuthorFilter = new UserFilterViewModel(LoadAuthors);
 
-            var parentOwner = await repositoryService.ReadParentOwnerLogin(
+            var parent = await repositoryService.FindParent(
                 HostAddress.Create(repository.CloneUrl),
                 repository.Owner,
                 repository.Name);
 
-            if (parentOwner == null)
+            if (parent == null)
             {
                 RemoteRepository = repository;
             }
             else
             {
+                // TODO: Handle forks with different names.
                 RemoteRepository = new RepositoryModel(
                     repository.Name,
-                    UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parentOwner)));
+                    UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parent.Value.owner)));
 
                 Forks = new IRepositoryModel[]
                 {
