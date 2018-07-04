@@ -8,7 +8,10 @@ namespace GitHub.App.Services
         public string RepositoryName { get; set; }
         public string Host { get; set; }
         public string BranchName { get; set; }
-        public string Treeish { get; set; }
+        /// <summary>
+        /// Like a tree-ish but with ':' changed to '/' (e.g. "master/src" not "master:src").
+        /// </summary>
+        public string TreeishPath { get; set; }
         public string BlobName { get; set; }
         public int? PullRequest { get; set; }
         public int? Issue { get; set; }

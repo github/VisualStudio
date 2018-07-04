@@ -91,7 +91,7 @@ namespace GitHub.App.Services
             var match = urlBlobRegex.Match(subpath);
             if (match.Success)
             {
-                context.Treeish = match.Groups["treeish"].Value;
+                context.TreeishPath = match.Groups["treeish"].Value;
                 context.BlobName = match.Groups["blobName"].Value;
                 return context;
             }
@@ -155,7 +155,7 @@ namespace GitHub.App.Services
                     Owner = match.Groups["owner"].Value,
                     RepositoryName = match.Groups["repo"].Value,
                     BranchName = match.Groups["branch"].Value,
-                    Treeish = $"{match.Groups["branch"].Value}/{match.Groups["tree"].Value}"
+                    TreeishPath = $"{match.Groups["branch"].Value}/{match.Groups["tree"].Value}"
                 };
             }
 
@@ -266,7 +266,7 @@ namespace GitHub.App.Services
 
         public string ResolvePath(GitHubContext context)
         {
-            var treeish = context.Treeish;
+            var treeish = context.TreeishPath;
             if (treeish == null)
             {
                 return null;

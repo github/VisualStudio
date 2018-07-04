@@ -69,13 +69,13 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/foo.cs", "ee863ce265fc6217f589e66766125fed1b5b8256", "foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/path/foo.cs", "ee863ce265fc6217f589e66766125fed1b5b8256/path", "foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/master/bar.cs#stuff", "master", "bar.cs")]
-        public void Blob(string url, string expectTreeish, string expectBlobName)
+        public void Blob(string url, string expectTreeishPath, string expectBlobName)
         {
             var target = CreateGitHubContextService();
 
             var context = target.FindContextFromUrl(url);
 
-            Assert.That(context.Treeish, Is.EqualTo(expectTreeish));
+            Assert.That(context.TreeishPath, Is.EqualTo(expectTreeishPath));
             Assert.That(context.BlobName, Is.EqualTo(expectBlobName));
         }
 
@@ -302,7 +302,7 @@ public class GitHubContextServiceTests
 
             var context = target.FindContextFromWindowTitle(windowTitle);
 
-            Assert.That(context?.Treeish, Is.EqualTo(expectTreeish));
+            Assert.That(context?.TreeishPath, Is.EqualTo(expectTreeish));
             Assert.That(context?.BranchName, Is.EqualTo(expectBranch));
         }
 
