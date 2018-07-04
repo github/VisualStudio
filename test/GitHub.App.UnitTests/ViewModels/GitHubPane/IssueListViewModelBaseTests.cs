@@ -133,7 +133,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         protected static IRepositoryService CreateRepositoryService(string parentOwnerLogin = null)
         {
             var result = Substitute.For<IRepositoryService>();
-            result.ReadParentOwnerLogin(null, null, null).ReturnsForAnyArgs(parentOwnerLogin);
+            var parent = parentOwnerLogin != null ? (parentOwnerLogin, "name") : ((string, string)?)null;
+            result.FindParent(null, null, null).ReturnsForAnyArgs(parent);
             return result;
         }
 
