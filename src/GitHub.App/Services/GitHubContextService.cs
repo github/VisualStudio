@@ -219,7 +219,7 @@ namespace GitHub.App.Services
             return null;
         }
 
-        public bool TryOpenFile(GitHubContext context, string repositoryDir)
+        public bool TryOpenFile(string repositoryDir, GitHubContext context)
         {
             var fileName = context.BlobName;
             if (fileName == null)

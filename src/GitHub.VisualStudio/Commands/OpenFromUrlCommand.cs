@@ -23,6 +23,7 @@ namespace GitHub.VisualStudio.Commands
         readonly Lazy<GitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
         readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
+        readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
         readonly Lazy<DTE> dte;
         readonly IServiceProvider serviceProvider;
@@ -42,12 +43,14 @@ namespace GitHub.VisualStudio.Commands
             Lazy<GitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
             Lazy<IPullRequestEditorService> pullRequestEditorService,
+            Lazy<ITeamExplorerContext> teamExplorerContext,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider) :
             base(CommandSet, CommandId)
         {
             this.gitHubContextService = gitHubContextService;
             this.repositoryCloneService = repositoryCloneService;
             this.pullRequestEditorService = pullRequestEditorService;
+            this.teamExplorerContext = teamExplorerContext;
             this.serviceProvider = serviceProvider;
             dte = new Lazy<DTE>(() => (DTE)serviceProvider.GetService(typeof(DTE)));
             gitHubToolWindowManager = new Lazy<IGitHubToolWindowManager>(
@@ -70,6 +73,16 @@ namespace GitHub.VisualStudio.Commands
             if (context == null)
             {
                 return;
+            }
+
+            var activeDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
+            if (activeDir != null)
+            {
+                // Try opening file in current context
+                if (gitHubContextService.Value.TryOpenFile(activeDir, context))
+                {
+                    return;
+                }
             }
 
             // Keep repos in unique dir while testing
@@ -125,7 +138,7 @@ namespace GitHub.VisualStudio.Commands
             }
 
             await TryOpenPullRequest(context);
-            gitHubContextService.Value.TryOpenFile(context, repositoryDir);
+            gitHubContextService.Value.TryOpenFile(repositoryDir, context);
         }
 
         VSConstants.MessageBoxResult ShowInfoMessage(string message)
