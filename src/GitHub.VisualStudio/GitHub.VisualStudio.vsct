@@ -123,6 +123,17 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubCmdSet" id="openFromClipboardCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>Open from clipboard</ButtonText>
+          <CanonicalName>.GitHub.OpenFromClipboard</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFromClipboard</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
         <Icon guid="guidImages" id="arrow_left" />
@@ -282,11 +293,15 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x102">
+    <CommandPlacement guid="guidGitHubCmdSet" id="openFromClipboardCommand" priority="0x0102">
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x103">
+    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x103">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x104">
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
@@ -349,7 +364,8 @@
       <IDSymbol name="showGitHubPaneCommand" value="0x200"/>
       <IDSymbol name="showCurrentPullRequestCommand" value="0x202"/>
       <IDSymbol name="syncSubmodulesCommand" value="0x0203" />
-      <IDSymbol name="openFromUrlCommand" value="0x0204" />    
+      <IDSymbol name="openFromUrlCommand" value="0x0204" />
+      <IDSymbol name="openFromClipboardCommand" value="0x0205" />      
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->

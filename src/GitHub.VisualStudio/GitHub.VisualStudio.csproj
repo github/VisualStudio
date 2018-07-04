@@ -328,6 +328,7 @@
     <Compile Include="AssemblyResolverPackage.cs" />
     <Compile Include="Commands\BlameLinkCommand.cs" />
     <Compile Include="Commands\CreateGistCommand.cs" />
+    <Compile Include="Commands\OpenFromClipboardCommand.cs" />
     <Compile Include="Commands\OpenFromUrlCommand.cs" />
     <Compile Include="Commands\ShowMessageBoxCommand.cs" />
     <Compile Include="Commands\LinkCommandBase.cs" />

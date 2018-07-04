@@ -12,6 +12,7 @@ namespace GitHub.VisualStudio
         public const int showCurrentPullRequestCommand = 0x202;
         public const int syncSubmodulesCommand = 0x203;
         public const int openFromUrlCommand = 0x204;
+        public const int openFromClipboardCommand = 0x205;
 
         public const int backCommand = 0x300;
         public const int forwardCommand = 0x301;
