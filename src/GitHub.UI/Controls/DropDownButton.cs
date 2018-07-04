@@ -8,7 +8,11 @@ namespace GitHub.UI
     public class DropDownButton : ContentControl
     {
         public static readonly DependencyProperty AutoCloseOnClickProperty =
-            DependencyProperty.Register("AutoCloseOnClick", typeof(bool), typeof(DropDownButton));
+            DependencyProperty.Register(
+                "AutoCloseOnClick",
+                typeof(bool),
+                typeof(DropDownButton),
+                new FrameworkPropertyMetadata(true));
         public static readonly DependencyProperty DropDownContentProperty =
             DependencyProperty.Register(nameof(DropDownContent), typeof(object), typeof(DropDownButton));
         public static readonly DependencyProperty IsOpenProperty =
@@ -42,14 +46,17 @@ namespace GitHub.UI
             set { SetValue(IsOpenProperty, value); }
         }
 
+        public event EventHandler PopupOpened;
+        public event EventHandler PopupClosed;
+
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             button = (Button)Template.FindName("PART_Button", this);
             popup = (Popup)Template.FindName("PART_Popup", this);
             button.Click += ButtonClick;
-            popup.Opened += PopupOpened;
-            popup.Closed += PopupClosed;
+            popup.Opened += OnPopupOpened;
+            popup.Closed += OnPopupClosed;
             popup.AddHandler(MouseUpEvent, new RoutedEventHandler(PopupMouseUp), true);
         }
 
@@ -58,15 +65,17 @@ namespace GitHub.UI
             IsOpen = true;
         }
 
-        private void PopupOpened(object sender, EventArgs e)
+        private void OnPopupOpened(object sender, EventArgs e)
         {
             IsHitTestVisible = false;
+            PopupOpened?.Invoke(this, e);
         }
 
-        private void PopupClosed(object sender, EventArgs e)
+        private void OnPopupClosed(object sender, EventArgs e)
         {
             IsOpen = false;
             IsHitTestVisible = true;
+            PopupClosed?.Invoke(this, e);
         }
 
         private void PopupMouseUp(object sender, RoutedEventArgs e)

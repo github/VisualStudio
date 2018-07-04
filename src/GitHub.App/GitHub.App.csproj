@@ -145,13 +145,11 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.14.3.25407\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Octokit.GraphQL, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -196,6 +194,9 @@
       <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -206,23 +207,31 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\IVirtualizingListSource.cs" />
+    <Compile Include="Collections\SequentialListSource.cs" />
+    <Compile Include="Collections\VirtualizingList.cs" />
+    <Compile Include="Collections\VirtualizingListCollectionView.cs" />
     <Compile Include="Commands\UsageTrackingCommand.cs" />
     <Compile Include="Factories\ViewViewModelFactory.cs" />
     <Compile Include="Factories\ModelServiceFactory.cs" />
     <Compile Include="Models\PullRequestDetailArgument.cs" />
     <Compile Include="Models\PullRequestModel.cs" />
+    <Compile Include="SampleData\ActorViewModelDesigner.cs" />
     <Compile Include="SampleData\ForkRepositoryExecuteViewModelDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
     <Compile Include="SampleData\GitServiceDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySwitchViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestListItemViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewFileCommentViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />
+    <Compile Include="SampleData\UserFilterViewModelDesigner.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\RepositoryForkService.cs" />
+    <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="ViewModels\ActorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositoryExecuteViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ForkRepositorySwitchViewModel.cs" />
@@ -244,10 +253,12 @@
     <Compile Include="ViewModels\Dialog\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PagedDialogViewModelBase.cs" />
     <Compile Include="ViewModels\Dialog\RepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IssueListViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\LoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PanePageViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestDetailViewModel.cs" />
@@ -293,6 +304,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ViewModels\UserFilterViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AkavacheSqliteLinkerOverride.cs" />
