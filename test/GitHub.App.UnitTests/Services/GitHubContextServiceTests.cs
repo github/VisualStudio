@@ -3,6 +3,7 @@ using GitHub.Services;
 using GitHub.App.Services;
 using NSubstitute;
 using NUnit.Framework;
+using LibGit2Sharp;
 
 public class GitHubContextServiceTests
 {
@@ -322,6 +323,28 @@ public class GitHubContextServiceTests
         }
     }
 
+    public class TheResolveGitObjectMethod
+    {
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master:foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/foo.cs", "master:src/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/branch-name/src/foo.cs", "branch-name:src/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "fixes/666-bug:src/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "fixes/666-bug:A/B/foo.cs")]
+        public void ResolveGitObject(string url, string treeish)
+        {
+            var repositoryDir = "repositoryDir";
+            var repository = Substitute.For<IRepository>();
+            var expectGitObject = Substitute.For<GitObject>();
+            repository.Lookup(treeish).Returns(expectGitObject);
+            var target = CreateGitHubContextService(repositoryDir, repository);
+            var context = target.FindContextFromUrl(url);
+
+            var gitObject = target.ResolveGitObject(repositoryDir, context);
+
+            Assert.That(gitObject, Is.EqualTo(expectGitObject));
+        }
+    }
+
     public class TheResolvePathMethod
     {
         [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/foo.cs", "foo.cs")]
@@ -343,9 +366,12 @@ public class GitHubContextServiceTests
         }
     }
 
-    static GitHubContextService CreateGitHubContextService()
+    static GitHubContextService CreateGitHubContextService(string repositoryDir = null, IRepository repository = null)
     {
         var sp = Substitute.For<IServiceProvider>();
-        return new GitHubContextService(sp);
+        var gitService = Substitute.For<IGitService>();
+        gitService.GetRepository(repositoryDir).Returns(repository);
+
+        return new GitHubContextService(sp, gitService);
     }
 }

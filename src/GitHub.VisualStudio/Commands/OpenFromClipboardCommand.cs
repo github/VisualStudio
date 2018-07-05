@@ -11,6 +11,7 @@ namespace GitHub.VisualStudio.Commands
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {
         public const string NoGitHubUrlMessage = "Couldn't a find a GitHub URL in clipboard";
+        public const string NoResolveMessage = "Couldn't resolve Git object";
 
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -50,14 +51,21 @@ namespace GitHub.VisualStudio.Commands
                 return Task.CompletedTask;
             }
 
-            var activeDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
+            var repositoryDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
             if (context == null)
             {
                 // No active repository
                 return Task.CompletedTask;
             }
 
-            if (!gitHubContextService.Value.TryOpenFile(activeDir, context))
+            var gitObject = gitHubContextService.Value.ResolveGitObject(repositoryDir, context);
+            if (gitObject == null)
+            {
+                vsServices.Value.ShowMessageBoxInfo(NoResolveMessage);
+                return Task.CompletedTask;
+            }
+
+            if (!gitHubContextService.Value.TryOpenFile(repositoryDir, context))
             {
                 // Couldn't open file
                 return Task.CompletedTask;

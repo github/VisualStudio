@@ -13,6 +13,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
+using LibGit2Sharp;
 
 namespace GitHub.App.Services
 {
@@ -20,6 +21,7 @@ namespace GitHub.App.Services
     public class GitHubContextService : IGitHubContextService
     {
         readonly IServiceProvider serviceProvider;
+        readonly IGitService gitService;
 
         // USERID_REGEX = /[a-z0-9][a-z0-9\-\_]*/i
         const string owner = "(?<owner>[a-zA-Z0-9][a-zA-Z0-9-_]*)";
@@ -53,9 +55,10 @@ namespace GitHub.App.Services
         static readonly Regex treeishBranchRegex = new Regex($"(?<branch>master)(/(?<tree>.+))?", RegexOptions.Compiled);
 
         [ImportingConstructor]
-        public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IGitService gitService)
         {
             this.serviceProvider = serviceProvider;
+            this.gitService = gitService;
         }
 
         public GitHubContext FindContextFromClipboard()
@@ -301,6 +304,42 @@ namespace GitHub.App.Services
             }
 
             return null;
+        }
+
+        public GitObject ResolveGitObject(string repositoryDir, GitHubContext context)
+        {
+            using (var repository = gitService.GetRepository(repositoryDir))
+            {
+                var path = context.TreeishPath;
+                if (context.BlobName != null)
+                {
+                    path += '/' + context.BlobName;
+                }
+
+                foreach (var treeish in ToTreeish(path))
+                {
+                    var gitObject = repository.Lookup(treeish);
+                    if (gitObject != null)
+                    {
+                        return gitObject;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        static IEnumerable<string> ToTreeish(string treeishPath)
+        {
+            yield return treeishPath;
+
+            var index = 0;
+            while ((index = treeishPath.IndexOf('/', index + 1)) != -1)
+            {
+                var commitish = treeishPath.Substring(0, index);
+                var path = treeishPath.Substring(index + 1);
+                yield return $"{commitish}:{path}";
+            }
         }
 
         IVsTextView OpenDocument(string fullPath)
