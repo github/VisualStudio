@@ -59,8 +59,8 @@ namespace GitHub.VisualStudio.Commands
                 return Task.CompletedTask;
             }
 
-            var gitObject = gitHubContextService.Value.ResolveGitObject(repositoryDir, context);
-            if (gitObject == null)
+            var (commitish, path) = gitHubContextService.Value.ResolveGitObject(repositoryDir, context);
+            if (path == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoResolveMessage);
                 return Task.CompletedTask;

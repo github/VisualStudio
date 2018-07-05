@@ -5,7 +5,6 @@ using GitHub.VisualStudio.Commands;
 using Microsoft.VisualStudio;
 using NSubstitute;
 using NUnit.Framework;
-using LibGit2Sharp;
 
 public class OpenFromClipboardCommandTests
 {
@@ -41,7 +40,7 @@ public class OpenFromClipboardCommandTests
         {
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            var gitObject = null as GitObject;
+            (string, string)? gitObject = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject);
@@ -56,7 +55,7 @@ public class OpenFromClipboardCommandTests
         {
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            var gitObject = Substitute.For<GitObject>();
+            var gitObject = ("master", "foo.cs");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject);
@@ -72,7 +71,7 @@ public class OpenFromClipboardCommandTests
             IVSServices vsServices = null,
             GitHubContext contextFromClipboard = null,
             string repositoryDir = null,
-            GitObject gitObject = null)
+            (string, string)? gitObject = null)
         {
             var sp = Substitute.For<IServiceProvider>();
             gitHubContextService = gitHubContextService ?? Substitute.For<IGitHubContextService>();
@@ -80,8 +79,11 @@ public class OpenFromClipboardCommandTests
             vsServices = vsServices ?? Substitute.For<IVSServices>();
 
             gitHubContextService.FindContextFromClipboard().Returns(contextFromClipboard);
-            gitHubContextService.ResolveGitObject(repositoryDir, contextFromClipboard).Returns(gitObject);
             teamExplorerContext.ActiveRepository.LocalPath.Returns(repositoryDir);
+            if (gitObject != null)
+            {
+                gitHubContextService.ResolveGitObject(repositoryDir, contextFromClipboard).Returns(gitObject.Value);
+            }
 
             return new OpenFromClipboardCommand(
                 new Lazy<IGitHubContextService>(() => gitHubContextService),

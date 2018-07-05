@@ -325,12 +325,12 @@ public class GitHubContextServiceTests
 
     public class TheResolveGitObjectMethod
     {
-        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master:foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/src/foo.cs", "master:src/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/branch-name/src/foo.cs", "branch-name:src/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "fixes/666-bug:src/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "fixes/666-bug:A/B/foo.cs")]
-        public void ResolveGitObject(string url, string treeish)
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master:foo.cs", "master", "foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/foo.cs", "master:src/foo.cs", "master", "src/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/branch-name/src/foo.cs", "branch-name:src/foo.cs", "branch-name", "src/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "fixes/666-bug:src/foo.cs", "fixes/666-bug", "src/foo.cs")]
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "fixes/666-bug:A/B/foo.cs", "fixes/666-bug", "A/B/foo.cs")]
+        public void ResolveGitObject(string url, string treeish, string expectCommitish, string expectPath)
         {
             var repositoryDir = "repositoryDir";
             var repository = Substitute.For<IRepository>();
@@ -339,9 +339,10 @@ public class GitHubContextServiceTests
             var target = CreateGitHubContextService(repositoryDir, repository);
             var context = target.FindContextFromUrl(url);
 
-            var gitObject = target.ResolveGitObject(repositoryDir, context);
+            var (commitish, path) = target.ResolveGitObject(repositoryDir, context);
 
-            Assert.That(gitObject, Is.EqualTo(expectGitObject));
+            Assert.That(commitish, Is.EqualTo(expectCommitish));
+            Assert.That(path, Is.EqualTo(expectPath));
         }
     }
 

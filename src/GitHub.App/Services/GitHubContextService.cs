@@ -307,42 +307,40 @@ namespace GitHub.App.Services
             return null;
         }
 
-        public GitObject ResolveGitObject(string repositoryDir, GitHubContext context)
+        public (string commitish, string path) ResolveGitObject(string repositoryDir, GitHubContext context)
         {
             Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
             Guard.ArgumentNotNull(context, nameof(context));
 
             using (var repository = gitService.GetRepository(repositoryDir))
             {
-                var path = context.TreeishPath;
+                var objectishPath = context.TreeishPath;
                 if (context.BlobName != null)
                 {
-                    path += '/' + context.BlobName;
+                    objectishPath += '/' + context.BlobName;
                 }
 
-                foreach (var treeish in ToTreeish(path))
+                foreach (var objectish in ToObjectish(objectishPath))
                 {
-                    var gitObject = repository.Lookup(treeish);
+                    var gitObject = repository.Lookup($"{objectish.commitish}:{objectish.path}");
                     if (gitObject != null)
                     {
-                        return gitObject;
+                        return objectish;
                     }
                 }
 
-                return null;
+                return (null, null);
             }
         }
 
-        static IEnumerable<string> ToTreeish(string treeishPath)
+        static IEnumerable<(string commitish, string path)> ToObjectish(string treeishPath)
         {
-            yield return treeishPath;
-
             var index = 0;
             while ((index = treeishPath.IndexOf('/', index + 1)) != -1)
             {
                 var commitish = treeishPath.Substring(0, index);
                 var path = treeishPath.Substring(index + 1);
-                yield return $"{commitish}:{path}";
+                yield return (commitish, path);
             }
         }
 

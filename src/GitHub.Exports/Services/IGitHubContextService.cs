@@ -14,6 +14,6 @@ namespace GitHub.Services
         string ResolvePath(GitHubContext context);
         Uri ToRepositoryUrl(GitHubContext context);
         bool TryOpenFile(string repositoryDir, GitHubContext context);
-        GitObject ResolveGitObject(string repositoryDir, GitHubContext context);
+        (string commitish, string path) ResolveGitObject(string repositoryDir, GitHubContext context);
     }
 }
