@@ -313,7 +313,7 @@
     <value>没有存储库</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>我们在这里找不到 git 存储库。打开一个 git 项目或单击项目中的 "文件-&amp;gt;&amp;gt; 添加到源代码管理" 以开始.!</value>
+    <value>我们在这里找不到 git 存储库。打开一个 git 项目或单击项目中的 "文件"-&gt; "添加到源代码管理" 以开始.</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
     <value>创建帐户</value>
@@ -337,10 +337,10 @@
     <value>本地分支最新!</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
-    <value>更改:({0}）</value>
+    <value>变更:({0}）</value>
   </data>
   <data name="ViewChanges" xml:space="preserve">
-    <value>查看更改</value>
+    <value>查看变更</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
     <value>将比较文件作为默认操作</value>
@@ -412,7 +412,7 @@
     <value>更新注释</value>
   </data>
   <data name="BlurbText" xml:space="preserve">
-    <value>强大的协作、代码审查、和代码管理，一切为您开源和私有项目。</value>
+    <value>让您的开源和私有项目拥有强大的协作、代码审查、以及代码管理。</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
     <value>这个存储库没有托管至远程。填写表单，将其发布到Github。</value>
@@ -489,10 +489,10 @@
     <value>已写</value>
   </data>
   <data name="SubmitYourReviewFor" xml:space="preserve">
-    <value>提交你的复审</value>
+    <value>提交你的批注</value>
   </data>
   <data name="YourReviewSummary" xml:space="preserve">
-    <value>你的复审概要</value>
+    <value>你的批注概要</value>
   </data>
   <data name="CommentOnly" xml:space="preserve">
     <value>仅批注</value>
@@ -501,7 +501,7 @@
     <value>批准</value>
   </data>
   <data name="RequestChanges" xml:space="preserve">
-    <value>请求更改</value>
+    <value>请求变更</value>
   </data>
   <data name="Comments" xml:space="preserve">
     <value>批注</value>
@@ -520,5 +520,29 @@
   </data>
   <data name="SignInWithYourBrowser" xml:space="preserve">
     <value>使用浏览器登录</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>按作者过滤</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>选择Fork</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>这里没有任何打开的推送请求</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>通过推送请求告诉其他人关于你推送到一个GitHub存储库的变更</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>您的搜索没有匹配结果</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>现在开始你可以</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>创建拉取请求</value>
   </data>
 </root>

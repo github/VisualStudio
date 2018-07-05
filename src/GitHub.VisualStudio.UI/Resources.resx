@@ -524,4 +524,25 @@
   <data name="Open" xml:space="preserve">
     <value>Open</value>
   </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>Filter by Author</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>Select Fork</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>There aren't any open pull requests</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>Pull requests let you tell others about changes you've pushed to a repository on GitHub</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>No results matched your search.</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>To get started you can</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>create a pull request</value>
+  </data>
 </root>

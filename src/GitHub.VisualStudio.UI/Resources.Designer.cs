@@ -19,7 +19,6 @@ namespace GitHub.VisualStudio.UI {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -287,6 +286,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 create a pull request 的本地化字符串。
+        /// </summary>
+        public static string CreateAPullRequest {
+            get {
+                return ResourceManager.GetString("CreateAPullRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Create 的本地化字符串。
         /// </summary>
         public static string CreateLink {
@@ -400,6 +408,15 @@ namespace GitHub.VisualStudio.UI {
         public static string filterBranchesText {
             get {
                 return ResourceManager.GetString("filterBranchesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Filter by Author 的本地化字符串。
+        /// </summary>
+        public static string FilterByAuthor {
+            get {
+                return ResourceManager.GetString("FilterByAuthor", resourceCulture);
             }
         }
         
@@ -656,6 +673,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 No results matched your search. 的本地化字符串。
+        /// </summary>
+        public static string NoResultsMatchedYourSearch {
+            get {
+                return ResourceManager.GetString("NoResultsMatchedYourSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 This repository is not on GitHub 的本地化字符串。
         /// </summary>
         public static string NotAGitHubRepository {
@@ -701,7 +727,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open.
+        ///   查找类似 Open 的本地化字符串。
         /// </summary>
         public static string Open {
             get {
@@ -710,7 +736,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open File as Default Action.
+        ///   查找类似 Open File as Default Action 的本地化字符串。
         /// </summary>
         public static string OpenFileAsDefaultAction {
             get {
@@ -926,6 +952,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 Pull requests let you tell others about changes you&apos;ve pushed to a repository on GitHub 的本地化字符串。
+        /// </summary>
+        public static string PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub {
+            get {
+                return ResourceManager.GetString("PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Pull Requests 的本地化字符串。
         /// </summary>
         public static string PullRequestsNavigationItemText {
@@ -1012,6 +1047,15 @@ namespace GitHub.VisualStudio.UI {
         public static string Reviewers {
             get {
                 return ResourceManager.GetString("Reviewers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select Fork 的本地化字符串。
+        /// </summary>
+        public static string SelectFork {
+            get {
+                return ResourceManager.GetString("SelectFork", resourceCulture);
             }
         }
         
@@ -1126,11 +1170,29 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 There aren&apos;t any open pull requests 的本地化字符串。
+        /// </summary>
+        public static string ThereArenTAnyOpenPullRequests {
+            get {
+                return ResourceManager.GetString("ThereArenTAnyOpenPullRequests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Title (required) 的本地化字符串。
         /// </summary>
         public static string TitleRequired {
             get {
                 return ResourceManager.GetString("TitleRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 To get started you can 的本地化字符串。
+        /// </summary>
+        public static string ToGetStartedYouCan {
+            get {
+                return ResourceManager.GetString("ToGetStartedYouCan", resourceCulture);
             }
         }
         
