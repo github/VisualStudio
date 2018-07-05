@@ -14,6 +14,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
+using LibGit2Sharp;
 
 namespace GitHub.App.Services
 {
@@ -337,6 +338,17 @@ namespace GitHub.App.Services
                 }
 
                 return (null, null);
+            }
+        }
+
+        public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path)
+        {
+            using (var repo = gitService.GetRepository(repositoryDir))
+            {
+                var commit = repo.Lookup<Commit>(commitish);
+                var paths = new[] { path };
+
+                return repo.Diff.Compare<Patch>(commit.Tree, DiffTargets.WorkingDirectory, paths).Count() > 0;
             }
         }
 

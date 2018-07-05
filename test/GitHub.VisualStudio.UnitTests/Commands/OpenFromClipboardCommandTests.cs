@@ -65,13 +65,48 @@ public class OpenFromClipboardCommandTests
             vsServices.DidNotReceiveWithAnyArgs().ShowMessageBoxInfo(null);
         }
 
+        [Test]
+        public async Task NoChangesInWorkingDirectory()
+        {
+            var gitHubContextService = Substitute.For<IGitHubContextService>();
+            var context = new GitHubContext();
+            var repositoryDir = "repositoryDir";
+            var gitObject = ("master", "foo.cs");
+            var vsServices = Substitute.For<IVSServices>();
+            var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
+                contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject, hasChanges: false);
+
+            await target.Execute(null);
+
+            vsServices.DidNotReceiveWithAnyArgs().ShowMessageBoxInfo(null);
+            gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
+        }
+
+        [Test]
+        public async Task HasChangesInWorkingDirectory()
+        {
+            var gitHubContextService = Substitute.For<IGitHubContextService>();
+            var context = new GitHubContext();
+            var repositoryDir = "repositoryDir";
+            var gitObject = ("master", "foo.cs");
+            var vsServices = Substitute.For<IVSServices>();
+            var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
+                contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject, hasChanges: true);
+
+            await target.Execute(null);
+
+            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.ChangesInWorkingDirectoryMessage);
+            gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
+        }
+
         static OpenFromClipboardCommand CreateOpenFromClipboardCommand(
             IGitHubContextService gitHubContextService = null,
             ITeamExplorerContext teamExplorerContext = null,
             IVSServices vsServices = null,
             GitHubContext contextFromClipboard = null,
             string repositoryDir = null,
-            (string, string)? gitObject = null)
+            (string, string)? gitObject = null,
+            bool? hasChanges = null)
         {
             var sp = Substitute.For<IServiceProvider>();
             gitHubContextService = gitHubContextService ?? Substitute.For<IGitHubContextService>();
@@ -83,6 +118,11 @@ public class OpenFromClipboardCommandTests
             if (gitObject != null)
             {
                 gitHubContextService.ResolveGitObject(repositoryDir, contextFromClipboard).Returns(gitObject.Value);
+            }
+
+            if (hasChanges != null)
+            {
+                gitHubContextService.HasChangesInWorkingDirectory(repositoryDir, gitObject.Value.Item1, gitObject.Value.Item2).Returns(hasChanges.Value);
             }
 
             return new OpenFromClipboardCommand(

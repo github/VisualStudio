@@ -15,5 +15,6 @@ namespace GitHub.Services
         Uri ToRepositoryUrl(GitHubContext context);
         bool TryOpenFile(string repositoryDir, GitHubContext context);
         (string commitish, string path) ResolveGitObject(string repositoryDir, GitHubContext context);
+        bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path);
     }
 }

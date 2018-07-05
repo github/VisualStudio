@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.Commands
         public const string NoGitHubUrlMessage = "Couldn't a find a GitHub URL in clipboard";
         public const string NoResolveMessage = "Couldn't resolve Git object";
         public const string NoActiveRepositoryMessage = "There is no active repository to navigate";
+        public const string ChangesInWorkingDirectoryMessage = "This file has changed since the permalink was created";
 
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -64,6 +65,12 @@ namespace GitHub.VisualStudio.Commands
             {
                 vsServices.Value.ShowMessageBoxInfo(NoResolveMessage);
                 return Task.CompletedTask;
+            }
+
+            var hasChanges = gitHubContextService.Value.HasChangesInWorkingDirectory(repositoryDir, commitish, path);
+            if (hasChanges)
+            {
+                vsServices.Value.ShowMessageBoxInfo(ChangesInWorkingDirectoryMessage);
             }
 
             if (!gitHubContextService.Value.TryOpenFile(repositoryDir, context))
