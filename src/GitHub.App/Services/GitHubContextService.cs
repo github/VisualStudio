@@ -8,6 +8,7 @@ using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using GitHub.Services;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -308,6 +309,9 @@ namespace GitHub.App.Services
 
         public GitObject ResolveGitObject(string repositoryDir, GitHubContext context)
         {
+            Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
+            Guard.ArgumentNotNull(context, nameof(context));
+
             using (var repository = gitService.GetRepository(repositoryDir))
             {
                 var path = context.TreeishPath;

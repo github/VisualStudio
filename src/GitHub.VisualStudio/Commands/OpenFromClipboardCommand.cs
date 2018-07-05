@@ -12,6 +12,7 @@ namespace GitHub.VisualStudio.Commands
     {
         public const string NoGitHubUrlMessage = "Couldn't a find a GitHub URL in clipboard";
         public const string NoResolveMessage = "Couldn't resolve Git object";
+        public const string NoActiveRepositoryMessage = "There is no active repository to navigate";
 
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -52,9 +53,9 @@ namespace GitHub.VisualStudio.Commands
             }
 
             var repositoryDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
-            if (context == null)
+            if (repositoryDir == null)
             {
-                // No active repository
+                vsServices.Value.ShowMessageBoxInfo(NoActiveRepositoryMessage);
                 return Task.CompletedTask;
             }
 

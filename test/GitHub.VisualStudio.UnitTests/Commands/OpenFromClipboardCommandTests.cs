@@ -24,6 +24,19 @@ public class OpenFromClipboardCommandTests
         }
 
         [Test]
+        public async Task NoLocalRepository()
+        {
+            var context = new GitHubContext();
+            var repositoryDir = null as string;
+            var vsServices = Substitute.For<IVSServices>();
+            var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: repositoryDir);
+
+            await target.Execute(null);
+
+            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoActiveRepositoryMessage);
+        }
+
+        [Test]
         public async Task CouldNotResolve()
         {
             var context = new GitHubContext();
