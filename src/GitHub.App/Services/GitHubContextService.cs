@@ -14,7 +14,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
-using LibGit2Sharp;
 
 namespace GitHub.App.Services
 {
@@ -322,11 +321,19 @@ namespace GitHub.App.Services
 
                 foreach (var objectish in ToObjectish(objectishPath))
                 {
-                    var gitObject = repository.Lookup($"{objectish.commitish}:{objectish.path}");
-                    if (gitObject != null)
+                    var commit = repository.Lookup(objectish.commitish);
+                    if (commit == null)
                     {
-                        return objectish;
+                        continue;
                     }
+
+                    var blob = repository.Lookup($"{objectish.commitish}:{objectish.path}");
+                    if (blob == null)
+                    {
+                        return (objectish.commitish, null);
+                    }
+
+                    return objectish;
                 }
 
                 return (null, null);
