@@ -15,6 +15,7 @@ using NSubstitute;
 using Rothko;
 using UnitTests;
 using NUnit.Framework;
+using GitHub.Api;
 
 public class PullRequestServiceTests : TestBaseClass
 {
@@ -574,6 +575,7 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IGitClient>(),
             gitService,
             Substitute.For<IVSGitExt>(),
+            Substitute.For<IGraphQLClientFactory>(),
             serviceProvider.GetOperatingSystem(),
             Substitute.For<IUsageTracker>());
         return service;
@@ -682,6 +684,7 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IGitClient>(),
             serviceProvider.GetGitService(),
             Substitute.For<IVSGitExt>(),
+            Substitute.For<IGraphQLClientFactory>(),
             serviceProvider.GetOperatingSystem(),
             Substitute.For<IUsageTracker>());
 
@@ -861,6 +864,7 @@ public class PullRequestServiceTests : TestBaseClass
                 MockGitClient(),
                 MockGitService(),
                 Substitute.For<IVSGitExt>(),
+                Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
 
@@ -999,12 +1003,14 @@ public class PullRequestServiceTests : TestBaseClass
         IGitClient gitClient = null,
         IGitService gitService = null,
         IVSGitExt gitExt = null,
+        IGraphQLClientFactory graphqlFactory = null,
         IOperatingSystem os = null,
         IUsageTracker usageTracker = null)
     {
         gitClient = gitClient ?? Substitute.For<IGitClient>();
         gitService = gitService ?? Substitute.For<IGitService>();
         gitExt = gitExt ?? Substitute.For<IVSGitExt>();
+        graphqlFactory = graphqlFactory ?? Substitute.For<IGraphQLClientFactory>();
         os = os ?? Substitute.For<IOperatingSystem>();
         usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
 
@@ -1012,6 +1018,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient,
             gitService,
             gitExt,
+            graphqlFactory,
             os,
             usageTracker);
     }

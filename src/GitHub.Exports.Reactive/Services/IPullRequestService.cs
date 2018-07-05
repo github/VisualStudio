@@ -4,12 +4,42 @@ using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Primitives;
 using LibGit2Sharp;
 
 namespace GitHub.Services
 {
     public interface IPullRequestService
     {
+        /// <summary>
+        /// Reads a page of pull request items.
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="after">The end cursor of the previous page, or null for the first page.</param>
+        /// <returns>A page of pull request item models.</returns>
+        Task<Page<PullRequestListItemModel>> ReadPullRequests(
+            HostAddress address,
+            string owner,
+            string name,
+            string after,
+            PullRequestStateEnum[] states);
+
+        /// <summary>
+        /// Reads a page of users that can be assigned to pull requests.
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="after">The end cursor of the previous page, or null for the first page.</param>
+        /// <returns>A page of author models.</returns>
+        Task<Page<ActorModel>> ReadAssignableUsers(
+            HostAddress address,
+            string owner,
+            string name,
+            string after);
+
         IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,

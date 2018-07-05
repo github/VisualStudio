@@ -259,13 +259,11 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Octokit.GraphQL, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
     </Reference>
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
@@ -418,6 +416,9 @@
     <Compile Include="Views\GitHubPane\PullRequestFileCommentsView.xaml.cs">
       <DependentUpon>PullRequestFileCommentsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestListItemView.xaml.cs">
+      <DependentUpon>PullRequestListItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\PullRequestReviewAuthoringView.xaml.cs">
       <DependentUpon>PullRequestReviewAuthoringView.xaml</DependentUpon>
     </Compile>
@@ -447,6 +448,9 @@
     </Compile>
     <Compile Include="Views\TeamExplorer\RepositoryPublishView.xaml.cs">
       <DependentUpon>RepositoryPublishView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserFilterView.xaml.cs">
+      <DependentUpon>UserFilterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewLocator.cs" />
   </ItemGroup>
@@ -609,6 +613,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\GitHubPane\PullRequestListItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\GitHubPane\PullRequestReviewAuthoringView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -641,10 +649,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\GitHubPane\PullRequestListItem.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\GitHubPane\PullRequestUserReviewsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -652,6 +656,10 @@
     <Page Include="Views\TeamExplorer\RepositoryPublishView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserFilterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -93,11 +93,11 @@
       <HintPath>..\..\packages\NSubstitute.2.0.3\lib\net45\NSubstitute.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+    <Reference Include="Octokit.GraphQL, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.0.4.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.0.4-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+    <Reference Include="Octokit.GraphQL.Core, Version=0.0.5.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Octokit.GraphQL.0.0.5-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -134,6 +134,9 @@
     <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="Microsoft.CSharp" />
@@ -180,6 +183,7 @@
     <Compile Include="ViewModels\Dialog\RepositoryCloneViewModelTests.cs" />
     <Compile Include="ViewModels\Dialog\RepositoryCreationViewModelTests.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModelTests.cs" />
+    <Compile Include="ViewModels\GitHubPane\IssueListViewModelBaseTests.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModelTests.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestDetailViewModelTests.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModelTests.cs" />
@@ -189,6 +193,7 @@
     <Compile Include="ViewModels\GitHubPane\PullRequestUserReviewsViewModelTests.cs" />
     <Compile Include="ViewModels\TeamExplorer\RepositoryPublishViewModelTests.cs" />
     <Compile Include="Substitutes.cs" />
+    <Compile Include="ViewModels\UserFilterViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
