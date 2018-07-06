@@ -110,9 +110,6 @@
                      Visibility="{Binding Message, Converter={ghfvs:EqualsToVisibilityConverter None}}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                        <Setter Property="BorderBrush" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
-                        <Setter Property="BorderThickness" Value="0 1 0 1" />
-                        <Setter Property="Margin" Value="0 0 0 -1" />
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
                     </Style>
