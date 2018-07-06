@@ -52,9 +52,6 @@
 
         <StackPanel Orientation="Vertical" Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
             <DockPanel>
-                <TextBlock Margin="0 0 4 0">
-                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
-                </TextBlock>
                 <TextBlock DockPanel.Dock="Left"
                        Margin="0,0,4,0"
                        TextTrimming="CharacterEllipsis"
@@ -62,14 +59,12 @@
             </DockPanel>
 
             <DockPanel>
-                <views:ActorAvatarView
-                                   ViewModel="{Binding Author}"
-                                   Margin="0,1,4,0"
-                                   Width="16"
-                                   Height="16"
-                                   VerticalAlignment="Top"/>
+                <TextBlock Opacity="0.5" Margin="0 0 4 0">
+                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                </TextBlock>
 
                 <TextBlock Opacity="0.5">
+                    <Run Text="updated"/>
                     <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
                     by
                     <Run Text="{Binding Author.Login, Mode=OneWay}"/>
