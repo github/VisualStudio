@@ -51,6 +51,10 @@
         </Image>
 
         <StackPanel Orientation="Vertical" Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
+            <TextBlock DockPanel.Dock="Left"
+                   TextTrimming="CharacterEllipsis"
+                   Text="{Binding Title}" />
+
             <DockPanel>
                 <views:ActorAvatarView
                                    ViewModel="{Binding Author}"
@@ -59,13 +63,6 @@
                                    Height="16"
                                    VerticalAlignment="Top"/> 
 
-                <TextBlock DockPanel.Dock="Left"
-                       Margin="0,0,4,0"
-                       TextTrimming="CharacterEllipsis"
-                       Text="{Binding Title}" />
-            </DockPanel>
-
-            <DockPanel>
                 <TextBlock Opacity="0.5" Margin="0 0 4 0">
                     <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
                 </TextBlock>
