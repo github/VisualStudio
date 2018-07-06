@@ -330,7 +330,8 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/branch-name/src/foo.cs", "branch-name", "branch-name:src/foo.cs", "branch-name", "src/foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "fixes/666-bug", "fixes/666-bug:src/foo.cs", "fixes/666-bug", "src/foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "fixes/666-bug", "fixes/666-bug:A/B/foo.cs", "fixes/666-bug", "A/B/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", "", "master", null, Description = "Resolve commit only")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", null, "master", null, Description = "Resolve commit only")]
+        [TestCase("https://github.com/github/VisualStudio/commit/8cf9a268c497adb4fc0a14572253165e179dd11e", "8cf9a268c497adb4fc0a14572253165e179dd11e", null, null, null)]
         public void ResolveGitObject(string url, string commitish, string objectish, string expectCommitish, string expectPath)
         {
             var repositoryDir = "repositoryDir";

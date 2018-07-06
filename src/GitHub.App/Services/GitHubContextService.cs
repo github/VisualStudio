@@ -308,12 +308,19 @@ namespace GitHub.App.Services
 
             using (var repository = gitService.GetRepository(repositoryDir))
             {
-                var objectishPath = context.TreeishPath;
-                if (context.BlobName != null)
+                if (context.TreeishPath == null)
                 {
-                    objectishPath += '/' + context.BlobName;
+                    // Blobs without a TreeishPath aren't currently supported
+                    return (null, null);
                 }
 
+                if (context.BlobName == null)
+                {
+                    // Not a blob
+                    return (null, null);
+                }
+
+                var objectishPath = $"{context.TreeishPath}/{context.BlobName}";
                 foreach (var objectish in ToObjectish(objectishPath))
                 {
                     var commit = repository.Lookup(objectish.commitish);
