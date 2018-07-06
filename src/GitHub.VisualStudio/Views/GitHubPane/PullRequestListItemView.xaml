@@ -52,6 +52,13 @@
 
         <StackPanel Orientation="Vertical" Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
             <DockPanel>
+                <views:ActorAvatarView
+                                   ViewModel="{Binding Author}"
+                                   Margin="0,0,4,0"
+                                   Width="16"
+                                   Height="16"
+                                   VerticalAlignment="Top"/> 
+
                 <TextBlock DockPanel.Dock="Left"
                        Margin="0,0,4,0"
                        TextTrimming="CharacterEllipsis"
