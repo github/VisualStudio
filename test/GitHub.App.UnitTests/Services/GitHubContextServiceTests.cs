@@ -372,7 +372,7 @@ public class GitHubContextServiceTests
 
     static GitHubContextService CreateGitHubContextService(string repositoryDir = null, IRepository repository = null)
     {
-        var sp = Substitute.For<IServiceProvider>();
+        var sp = Substitute.For<IGitHubServiceProvider>();
         var gitService = Substitute.For<IGitService>();
         gitService.GetRepository(repositoryDir).Returns(repository);
 

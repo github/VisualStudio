@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Windows;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
@@ -15,14 +16,16 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using LibGit2Sharp;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.App.Services
 {
     [Export(typeof(IGitHubContextService))]
     public class GitHubContextService : IGitHubContextService
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IGitService gitService;
+        readonly Lazy<IVsTextManager2> textManager;
 
         // USERID_REGEX = /[a-z0-9][a-z0-9\-\_]*/i
         const string owner = "(?<owner>[a-zA-Z0-9][a-zA-Z0-9-_]*)";
@@ -56,10 +59,11 @@ namespace GitHub.App.Services
         static readonly Regex treeishBranchRegex = new Regex($"(?<branch>master)(/(?<tree>.+))?", RegexOptions.Compiled);
 
         [ImportingConstructor]
-        public GitHubContextService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IGitService gitService)
+        public GitHubContextService(IGitHubServiceProvider serviceProvider, IGitService gitService)
         {
             this.serviceProvider = serviceProvider;
             this.gitService = gitService;
+            textManager = new Lazy<IVsTextManager2>(() => serviceProvider.GetService<SVsTextManager, IVsTextManager2>());
         }
 
         public GitHubContext FindContextFromClipboard()
@@ -261,17 +265,7 @@ namespace GitHub.App.Services
 
             var textView = OpenDocument(fullPath);
 
-            var line = context.Line;
-            if (line != null)
-            {
-                var lineEnd = context.LineEnd ?? line;
-
-                ErrorHandler.ThrowOnFailure(textView.GetBuffer(out IVsTextLines buffer));
-                buffer.GetLengthOfLine(lineEnd.Value - 1, out int lineEndLength);
-
-                ErrorHandler.ThrowOnFailure(textView.SetSelection(line.Value - 1, 0, lineEnd.Value - 1, lineEndLength));
-                ErrorHandler.ThrowOnFailure(textView.CenterLines(line.Value - 1, lineEnd.Value - line.Value + 1));
-            }
+            SetSelection(textView, context);
 
             return true;
         }
@@ -339,6 +333,17 @@ namespace GitHub.App.Services
 
                 return (null, null);
             }
+
+            IEnumerable<(string commitish, string path)> ToObjectish(string treeishPath)
+            {
+                var index = 0;
+                while ((index = treeishPath.IndexOf('/', index + 1)) != -1)
+                {
+                    var commitish = treeishPath.Substring(0, index);
+                    var path = treeishPath.Substring(index + 1);
+                    yield return (commitish, path);
+                }
+            }
         }
 
         public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path)
@@ -352,14 +357,69 @@ namespace GitHub.App.Services
             }
         }
 
-        static IEnumerable<(string commitish, string path)> ToObjectish(string treeishPath)
+        public async Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context)
         {
-            var index = 0;
-            while ((index = treeishPath.IndexOf('/', index + 1)) != -1)
+            var (commitish, path) = ResolveGitObject(repositoryDir, context);
+            if (path == null)
             {
-                var commitish = treeishPath.Substring(0, index);
-                var path = treeishPath.Substring(index + 1);
-                yield return (commitish, path);
+                return false;
+            }
+
+            if (!AnnotateFile(repositoryDir, currentBranch, path, commitish))
+            {
+                return false;
+            }
+
+            if (context.Line != null)
+            {
+                await Task.Delay(1000);
+                var activeView = FindActiveView();
+                SetSelection(activeView, context);
+            }
+
+            return true;
+        }
+
+        IVsTextView FindActiveView()
+        {
+            if (!ErrorHandler.Succeeded(textManager.Value.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftToolWindow, out IVsTextView textView)))
+            {
+                return null;
+            }
+
+            return textView;
+        }
+
+        bool AnnotateFile(string repositoryPath, string branchName, string relativePath, string versionSha)
+        {
+            var gitExt2Type = Type.GetType("Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt2, Microsoft.TeamFoundation.Git.Provider", false);
+            if (gitExt2Type == null)
+            {
+                return false;
+            }
+
+            InvokeService(gitExt2Type, "AnnotateFile", repositoryPath, branchName, relativePath, versionSha);
+            return true;
+        }
+
+        void InvokeService<T1, T2, T3, T4>(Type serviceType, string method, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            var service = serviceProvider.GetService(serviceType);
+            var action = (Action<T1, T2, T3, T4>)Delegate.CreateDelegate(typeof(Action<T1, T2, T3, T4>), service, method);
+            action.Invoke(arg1, arg2, arg3, arg4);
+        }
+
+        static void SetSelection(IVsTextView textView, GitHubContext context)
+        {
+            var line = context.Line;
+            var lineEnd = context.LineEnd ?? line;
+
+            if (line != null)
+            {
+                ErrorHandler.ThrowOnFailure(textView.GetBuffer(out IVsTextLines buffer));
+                buffer.GetLengthOfLine(lineEnd.Value - 1, out int lineEndLength);
+                ErrorHandler.ThrowOnFailure(textView.SetSelection(line.Value - 1, 0, lineEnd.Value - 1, lineEndLength));
+                ErrorHandler.ThrowOnFailure(textView.CenterLines(line.Value - 1, lineEnd.Value - line.Value + 1));
             }
         }
 

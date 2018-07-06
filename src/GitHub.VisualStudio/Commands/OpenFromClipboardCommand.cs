@@ -44,42 +44,45 @@ namespace GitHub.VisualStudio.Commands
             ParametersDescription = "u";    // accept a single url
         }
 
-        public override Task Execute(string url)
+        public override async Task Execute(string url)
         {
             var context = gitHubContextService.Value.FindContextFromClipboard();
             if (context == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoGitHubUrlMessage);
-                return Task.CompletedTask;
+                return;
             }
 
-            var repositoryDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
+            var activeRepository = teamExplorerContext.Value.ActiveRepository;
+            var repositoryDir = activeRepository?.LocalPath;
             if (repositoryDir == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoActiveRepositoryMessage);
-                return Task.CompletedTask;
+                return;
             }
 
             var (commitish, path) = gitHubContextService.Value.ResolveGitObject(repositoryDir, context);
             if (path == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoResolveMessage);
-                return Task.CompletedTask;
+                return;
             }
 
             var hasChanges = gitHubContextService.Value.HasChangesInWorkingDirectory(repositoryDir, commitish, path);
             if (hasChanges)
             {
+                // AnnotateFile expects a branch name so we use the current branch
+                var branchName = activeRepository.CurrentBranch.Name;
+
+                if (await gitHubContextService.Value.TryAnnotateFile(repositoryDir, branchName, context))
+                {
+                    return;
+                }
+
                 vsServices.Value.ShowMessageBoxInfo(ChangesInWorkingDirectoryMessage);
             }
 
-            if (!gitHubContextService.Value.TryOpenFile(repositoryDir, context))
-            {
-                // Couldn't open file
-                return Task.CompletedTask;
-            }
-
-            return Task.CompletedTask;
+            gitHubContextService.Value.TryOpenFile(repositoryDir, context);
         }
     }
 }

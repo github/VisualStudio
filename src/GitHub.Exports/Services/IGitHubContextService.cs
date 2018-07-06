@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using LibGit2Sharp;
 
 namespace GitHub.Services
 {
@@ -10,10 +10,11 @@ namespace GitHub.Services
         GitHubContext FindContextFromBrowser();
         GitHubContext FindContextFromUrl(string url);
         GitHubContext FindContextFromWindowTitle(string windowTitle);
-        IEnumerable<string> FindWindowTitlesForClass(string className = "MozillaWindowClass");
+        IEnumerable<string> FindWindowTitlesForClass(string className);
         string ResolvePath(GitHubContext context);
         Uri ToRepositoryUrl(GitHubContext context);
         bool TryOpenFile(string repositoryDir, GitHubContext context);
+        Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context);
         (string commitish, string path) ResolveGitObject(string repositoryDir, GitHubContext context);
         bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path);
     }

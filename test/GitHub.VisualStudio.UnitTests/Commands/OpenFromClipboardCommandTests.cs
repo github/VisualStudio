@@ -82,21 +82,34 @@ public class OpenFromClipboardCommandTests
             gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
         }
 
-        [Test]
-        public async Task HasChangesInWorkingDirectory()
+        [TestCase(true, null, 1, 0)]
+        [TestCase(false, OpenFromClipboardCommand.ChangesInWorkingDirectoryMessage, 1, 1)]
+        public async Task HasChangesInWorkingDirectory(bool annotateFileSupported, string message,
+            int receivedTryAnnotateFile, int receivedTryOpenFile)
         {
             var gitHubContextService = Substitute.For<IGitHubContextService>();
+            gitHubContextService.TryAnnotateFile(null, null, null).ReturnsForAnyArgs(annotateFileSupported);
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
+            var currentBranch = "currentBranch";
             var gitObject = ("master", "foo.cs");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject, hasChanges: true);
+                contextFromClipboard: context, repositoryDir: repositoryDir, currentBranch: currentBranch, gitObject: gitObject, hasChanges: true);
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.ChangesInWorkingDirectoryMessage);
-            gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
+            if (message != null)
+            {
+                vsServices.Received(1).ShowMessageBoxInfo(message);
+            }
+            else
+            {
+                vsServices.DidNotReceiveWithAnyArgs().ShowMessageBoxInfo(null);
+            }
+
+            await gitHubContextService.Received(receivedTryAnnotateFile).TryAnnotateFile(repositoryDir, currentBranch, context);
+            gitHubContextService.Received(receivedTryOpenFile).TryOpenFile(repositoryDir, context);
         }
 
         static OpenFromClipboardCommand CreateOpenFromClipboardCommand(
@@ -105,6 +118,7 @@ public class OpenFromClipboardCommandTests
             IVSServices vsServices = null,
             GitHubContext contextFromClipboard = null,
             string repositoryDir = null,
+            string currentBranch = null,
             (string, string)? gitObject = null,
             bool? hasChanges = null)
         {
@@ -115,6 +129,7 @@ public class OpenFromClipboardCommandTests
 
             gitHubContextService.FindContextFromClipboard().Returns(contextFromClipboard);
             teamExplorerContext.ActiveRepository.LocalPath.Returns(repositoryDir);
+            teamExplorerContext.ActiveRepository.CurrentBranch.Name.Returns(currentBranch);
             if (gitObject != null)
             {
                 gitHubContextService.ResolveGitObject(repositoryDir, contextFromClipboard).Returns(gitObject.Value);
