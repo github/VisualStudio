@@ -132,7 +132,7 @@ public class OpenFromClipboardCommandTests
             teamExplorerContext.ActiveRepository.CurrentBranch.Name.Returns(currentBranch);
             if (gitObject != null)
             {
-                gitHubContextService.ResolveGitObject(repositoryDir, contextFromClipboard).Returns(gitObject.Value);
+                gitHubContextService.ResolveBlob(repositoryDir, contextFromClipboard).Returns(gitObject.Value);
             }
 
             if (hasChanges != null)

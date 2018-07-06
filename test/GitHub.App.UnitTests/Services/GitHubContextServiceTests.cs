@@ -323,7 +323,7 @@ public class GitHubContextServiceTests
         }
     }
 
-    public class TheResolveGitObjectMethod
+    public class TheResolveBlobMethod
     {
         [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", "master:foo.cs", "master", "foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/master/src/foo.cs", "master", "master:src/foo.cs", "master", "src/foo.cs")]
@@ -332,7 +332,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "fixes/666-bug", "fixes/666-bug:A/B/foo.cs", "fixes/666-bug", "A/B/foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", null, "master", null, Description = "Resolve commit only")]
         [TestCase("https://github.com/github/VisualStudio/commit/8cf9a268c497adb4fc0a14572253165e179dd11e", "8cf9a268c497adb4fc0a14572253165e179dd11e", null, null, null)]
-        public void ResolveGitObject(string url, string commitish, string objectish, string expectCommitish, string expectPath)
+        public void ResolveBlob(string url, string commitish, string objectish, string expectCommitish, string expectPath)
         {
             var repositoryDir = "repositoryDir";
             var repository = Substitute.For<IRepository>();
@@ -343,7 +343,7 @@ public class GitHubContextServiceTests
             var target = CreateGitHubContextService(repositoryDir, repository);
             var context = target.FindContextFromUrl(url);
 
-            var (resolvedCommitish, resolvedPath) = target.ResolveGitObject(repositoryDir, context);
+            var (resolvedCommitish, resolvedPath) = target.ResolveBlob(repositoryDir, context);
 
             Assert.That(resolvedCommitish, Is.EqualTo(expectCommitish));
             Assert.That(resolvedPath, Is.EqualTo(expectPath));

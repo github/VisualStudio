@@ -301,7 +301,7 @@ namespace GitHub.App.Services
             return null;
         }
 
-        public (string commitish, string path) ResolveGitObject(string repositoryDir, GitHubContext context)
+        public (string commitish, string path) ResolveBlob(string repositoryDir, GitHubContext context)
         {
             Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
             Guard.ArgumentNotNull(context, nameof(context));
@@ -366,7 +366,7 @@ namespace GitHub.App.Services
 
         public async Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context)
         {
-            var (commitish, path) = ResolveGitObject(repositoryDir, context);
+            var (commitish, path) = ResolveBlob(repositoryDir, context);
             if (path == null)
             {
                 return false;
