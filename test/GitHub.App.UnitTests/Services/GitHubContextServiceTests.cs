@@ -350,27 +350,6 @@ public class GitHubContextServiceTests
         }
     }
 
-    public class TheResolvePathMethod
-    {
-        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/foo.cs", "foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/dir/foo.cs", @"dir\foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/ee863ce265fc6217f589e66766125fed1b5b8256/dir/subdir/foo.cs", @"dir\subdir\foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/dir/foo.cs", @"dir\foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/dir/subdir/foo.cs", @"dir\subdir\foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/unknown-branch/dir/subdir/foo.cs", null)]
-        [TestCase("https://github.com/github/VisualStudio/blob/unknown/branch/dir/subdir/foo.cs", null)]
-        public void ResolvePath(string url, string expectPath)
-        {
-            var target = CreateGitHubContextService();
-            var context = target.FindContextFromUrl(url);
-
-            var path = target.ResolvePath(context);
-
-            Assert.That(path, Is.EqualTo(expectPath));
-        }
-    }
-
     static GitHubContextService CreateGitHubContextService(string repositoryDir = null, IRepository repository = null)
     {
         var sp = Substitute.For<IGitHubServiceProvider>();

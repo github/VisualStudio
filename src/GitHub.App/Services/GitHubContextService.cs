@@ -237,68 +237,16 @@ namespace GitHub.App.Services
 
         public bool TryOpenFile(string repositoryDir, GitHubContext context)
         {
-            var fileName = context.BlobName;
-            if (fileName == null)
+            var (commitish, path) = ResolveBlob(repositoryDir, context);
+            if (path == null)
             {
                 return false;
             }
 
-            string fullPath;
-            var resolvedPath = ResolvePath(context);
-            if (resolvedPath != null)
-            {
-                fullPath = Path.Combine(repositoryDir, resolvedPath);
-                if (!File.Exists(fullPath))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                // Search by filename only
-                fullPath = Directory.EnumerateFiles(repositoryDir, fileName, SearchOption.AllDirectories).FirstOrDefault();
-                if (fullPath == null)
-                {
-                    return false;
-                }
-            }
-
+            var fullPath = Path.Combine(repositoryDir, path.Replace('/', '\\'));
             var textView = OpenDocument(fullPath);
-
             SetSelection(textView, context);
-
             return true;
-        }
-
-        public string ResolvePath(GitHubContext context)
-        {
-            var treeish = context.TreeishPath;
-            if (treeish == null)
-            {
-                return null;
-            }
-
-            var blobName = context.BlobName;
-            if (blobName == null)
-            {
-                return null;
-            }
-
-            var match = treeishCommitRegex.Match(treeish);
-            if (match.Success)
-            {
-                var tree = match.Groups["tree"].Value.Replace('/', '\\');
-                return Path.Combine(tree, blobName);
-            }
-
-            match = treeishBranchRegex.Match(treeish);
-            if (match.Success)
-            {
-                var tree = match.Groups["tree"].Value.Replace('/', '\\');
-                return Path.Combine(tree, blobName);
-            }
-
-            return null;
         }
 
         public (string commitish, string path) ResolveBlob(string repositoryDir, GitHubContext context)

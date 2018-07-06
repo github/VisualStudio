@@ -11,7 +11,6 @@ namespace GitHub.Services
         GitHubContext FindContextFromUrl(string url);
         GitHubContext FindContextFromWindowTitle(string windowTitle);
         IEnumerable<string> FindWindowTitlesForClass(string className);
-        string ResolvePath(GitHubContext context);
         Uri ToRepositoryUrl(GitHubContext context);
         bool TryOpenFile(string repositoryDir, GitHubContext context);
         Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context);
