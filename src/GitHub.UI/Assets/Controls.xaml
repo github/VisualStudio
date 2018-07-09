@@ -19,13 +19,6 @@
     Styles for standard windows controls
     -->
 
-     <ContextMenu x:Key="DefaultContextMenu">
-        <MenuItem Header="Cut" Command="ApplicationCommands.Cut"/>
-        <MenuItem Header="Copy" Command="ApplicationCommands.Copy"/>
-        <MenuItem Header="Paste" Command="ApplicationCommands.Paste"/>
-    </ContextMenu>
-    <!--End ContextMenu-->
-    
     <!-- ProgressBar -->
     <Style x:Key="GitHubProgressBar" TargetType="{x:Type ui:GitHubProgressBar}">
         <Setter Property="Foreground" Value="#999999" />
