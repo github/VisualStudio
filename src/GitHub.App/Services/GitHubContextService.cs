@@ -249,7 +249,7 @@ namespace GitHub.App.Services
             return true;
         }
 
-        public (string commitish, string path, bool isSha) ResolveBlob(string repositoryDir, GitHubContext context)
+        public (string commitish, string path, bool isSha) ResolveBlob(string repositoryDir, GitHubContext context, string remoteName = "origin")
         {
             Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
             Guard.ArgumentNotNull(context, nameof(context));
@@ -269,29 +269,31 @@ namespace GitHub.App.Services
                 }
 
                 var objectishPath = $"{context.TreeishPath}/{context.BlobName}";
-                foreach (var (commitish, path) in ToObjectish(objectishPath))
+                var objectish = ToObjectish(objectishPath);
+                var (commitSha, pathSha) = objectish.First();
+                if (ObjectId.TryParse(commitSha, out ObjectId objectId) && repository.Lookup(objectId) != null)
                 {
-                    bool isSha;
-                    if (ObjectId.TryParse(commitish, out ObjectId objectId) && repository.Lookup(objectId) != null)
+                    if (repository.Lookup($"{commitSha}:{pathSha}") != null)
                     {
-                        isSha = true;
+                        return (commitSha, pathSha, true);
                     }
-                    else if (repository.Lookup(commitish) != null)
-                    {
-                        isSha = false;
-                    }
-                    else
+                }
+
+                foreach (var (commitish, path) in objectish)
+                {
+                    var remoteRef = $"refs/remotes/{remoteName}/{commitish}";
+                    if (repository.Lookup(remoteRef) == null)
                     {
                         continue;
                     }
 
-                    if (repository.Lookup($"{commitish}:{path}") == null)
+                    if (repository.Lookup($"{remoteRef}:{path}") == null)
                     {
                         // Resolved commitish but not path
-                        return (commitish, null, isSha);
+                        return (remoteRef, null, false);
                     }
 
-                    return (commitish, path, isSha);
+                    return (remoteRef, path, false);
                 }
 
                 return (null, null, false);
