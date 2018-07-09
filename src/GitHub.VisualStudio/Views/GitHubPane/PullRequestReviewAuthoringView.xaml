@@ -46,7 +46,8 @@
                      MinHeight="120"
                      Padding="0 4"
                      TextWrapping="Wrap"
-                     Text="{Binding Body}"/>
+                     Text="{Binding Body}"
+                     SpellCheck.IsEnabled="True"/>
             
             <StackPanel Margin="0 4" Orientation="Horizontal">
                 <ui:DropDownButton AutoCloseOnClick="True" Content="Submit review">
