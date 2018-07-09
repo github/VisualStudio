@@ -14,6 +14,7 @@ namespace GitHub.VisualStudio.Commands
         public const string NoResolveMessage = "Couldn't resolve Git object";
         public const string NoActiveRepositoryMessage = "There is no active repository to navigate";
         public const string ChangesInWorkingDirectoryMessage = "This file has changed since the permalink was created";
+        public const string DifferentRepositoryMessage = "Please open the repository '{0}' and try again";
 
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -58,6 +59,12 @@ namespace GitHub.VisualStudio.Commands
             if (repositoryDir == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoActiveRepositoryMessage);
+                return;
+            }
+
+            if (activeRepository.Name != context.RepositoryName)
+            {
+                vsServices.Value.ShowMessageBoxInfo(string.Format(DifferentRepositoryMessage, context.RepositoryName));
                 return;
             }
 

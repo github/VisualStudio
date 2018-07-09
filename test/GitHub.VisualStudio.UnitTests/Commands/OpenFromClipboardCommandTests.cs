@@ -36,6 +36,23 @@ public class OpenFromClipboardCommandTests
         }
 
         [Test]
+        public async Task DifferentLocalRepository()
+        {
+            var targetRepositoryName = "targetRepositoryName";
+            var activeRepositoryName = "activeRepositoryName";
+            var activeRepositoryDir = "activeRepositoryDir";
+            var context = new GitHubContext { RepositoryName = targetRepositoryName };
+            (string, string)? gitObject = null;
+            var vsServices = Substitute.For<IVSServices>();
+            var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
+                contextFromClipboard: context, repositoryDir: activeRepositoryDir, repositoryName: activeRepositoryName, gitObject: gitObject);
+
+            await target.Execute(null);
+
+            vsServices.Received(1).ShowMessageBoxInfo(string.Format(OpenFromClipboardCommand.DifferentRepositoryMessage, context.RepositoryName));
+        }
+
+        [Test]
         public async Task CouldNotResolve()
         {
             var context = new GitHubContext();
@@ -118,6 +135,7 @@ public class OpenFromClipboardCommandTests
             IVSServices vsServices = null,
             GitHubContext contextFromClipboard = null,
             string repositoryDir = null,
+            string repositoryName = null,
             string currentBranch = null,
             (string, string)? gitObject = null,
             bool? hasChanges = null)
@@ -129,6 +147,7 @@ public class OpenFromClipboardCommandTests
 
             gitHubContextService.FindContextFromClipboard().Returns(contextFromClipboard);
             teamExplorerContext.ActiveRepository.LocalPath.Returns(repositoryDir);
+            teamExplorerContext.ActiveRepository.Name.Returns(repositoryName);
             teamExplorerContext.ActiveRepository.CurrentBranch.Name.Returns(currentBranch);
             if (gitObject != null)
             {
