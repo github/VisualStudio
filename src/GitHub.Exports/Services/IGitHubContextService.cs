@@ -14,7 +14,7 @@ namespace GitHub.Services
         Uri ToRepositoryUrl(GitHubContext context);
         bool TryOpenFile(string repositoryDir, GitHubContext context);
         Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context);
-        (string commitish, string path) ResolveBlob(string repositoryDir, GitHubContext context);
+        (string commitish, string path, bool isSha) ResolveBlob(string repositoryDir, GitHubContext context);
         bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path);
     }
 }

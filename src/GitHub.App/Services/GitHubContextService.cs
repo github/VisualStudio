@@ -237,7 +237,7 @@ namespace GitHub.App.Services
 
         public bool TryOpenFile(string repositoryDir, GitHubContext context)
         {
-            var (commitish, path) = ResolveBlob(repositoryDir, context);
+            var (commitish, path, isSha) = ResolveBlob(repositoryDir, context);
             if (path == null)
             {
                 return false;
@@ -249,7 +249,7 @@ namespace GitHub.App.Services
             return true;
         }
 
-        public (string commitish, string path) ResolveBlob(string repositoryDir, GitHubContext context)
+        public (string commitish, string path, bool isSha) ResolveBlob(string repositoryDir, GitHubContext context)
         {
             Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
             Guard.ArgumentNotNull(context, nameof(context));
@@ -259,34 +259,42 @@ namespace GitHub.App.Services
                 if (context.TreeishPath == null)
                 {
                     // Blobs without a TreeishPath aren't currently supported
-                    return (null, null);
+                    return (null, null, false);
                 }
 
                 if (context.BlobName == null)
                 {
                     // Not a blob
-                    return (null, null);
+                    return (null, null, false);
                 }
 
                 var objectishPath = $"{context.TreeishPath}/{context.BlobName}";
-                foreach (var objectish in ToObjectish(objectishPath))
+                foreach (var (commitish, path) in ToObjectish(objectishPath))
                 {
-                    var commit = repository.Lookup(objectish.commitish);
-                    if (commit == null)
+                    bool isSha;
+                    if (ObjectId.TryParse(commitish, out ObjectId objectId) && repository.Lookup(objectId) != null)
+                    {
+                        isSha = true;
+                    }
+                    else if (repository.Lookup(commitish) != null)
+                    {
+                        isSha = false;
+                    }
+                    else
                     {
                         continue;
                     }
 
-                    var blob = repository.Lookup($"{objectish.commitish}:{objectish.path}");
-                    if (blob == null)
+                    if (repository.Lookup($"{commitish}:{path}") == null)
                     {
-                        return (objectish.commitish, null);
+                        // Resolved commitish but not path
+                        return (commitish, null, isSha);
                     }
 
-                    return objectish;
+                    return (commitish, path, isSha);
                 }
 
-                return (null, null);
+                return (null, null, false);
             }
 
             IEnumerable<(string commitish, string path)> ToObjectish(string treeishPath)
@@ -314,7 +322,7 @@ namespace GitHub.App.Services
 
         public async Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context)
         {
-            var (commitish, path) = ResolveBlob(repositoryDir, context);
+            var (commitish, path, isSha) = ResolveBlob(repositoryDir, context);
             if (path == null)
             {
                 return false;

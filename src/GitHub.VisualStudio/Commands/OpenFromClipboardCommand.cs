@@ -68,7 +68,7 @@ namespace GitHub.VisualStudio.Commands
                 return;
             }
 
-            var (commitish, path) = gitHubContextService.Value.ResolveBlob(repositoryDir, context);
+            var (commitish, path, isSha) = gitHubContextService.Value.ResolveBlob(repositoryDir, context);
             if (path == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoResolveMessage);

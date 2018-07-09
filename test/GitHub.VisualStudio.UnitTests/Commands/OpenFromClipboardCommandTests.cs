@@ -42,10 +42,10 @@ public class OpenFromClipboardCommandTests
             var activeRepositoryName = "activeRepositoryName";
             var activeRepositoryDir = "activeRepositoryDir";
             var context = new GitHubContext { RepositoryName = targetRepositoryName };
-            (string, string)? gitObject = null;
+            (string, string, bool)? resolveBlobResult = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: activeRepositoryDir, repositoryName: activeRepositoryName, gitObject: gitObject);
+                contextFromClipboard: context, repositoryDir: activeRepositoryDir, repositoryName: activeRepositoryName, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
@@ -57,10 +57,10 @@ public class OpenFromClipboardCommandTests
         {
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            (string, string)? gitObject = null;
+            (string, string, bool)? resolveBlobResult = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject);
+                contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
@@ -72,10 +72,10 @@ public class OpenFromClipboardCommandTests
         {
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            var gitObject = ("master", "foo.cs");
+            var resolveBlobResult = ("master", "foo.cs", false);
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject);
+                contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
@@ -88,10 +88,10 @@ public class OpenFromClipboardCommandTests
             var gitHubContextService = Substitute.For<IGitHubContextService>();
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            var gitObject = ("master", "foo.cs");
+            var resolveBlobResult = ("master", "foo.cs", false);
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, gitObject: gitObject, hasChanges: false);
+                contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult, hasChanges: false);
 
             await target.Execute(null);
 
@@ -109,10 +109,10 @@ public class OpenFromClipboardCommandTests
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
             var currentBranch = "currentBranch";
-            var gitObject = ("master", "foo.cs");
+            var resolveBlobResult = ("master", "foo.cs", false);
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, currentBranch: currentBranch, gitObject: gitObject, hasChanges: true);
+                contextFromClipboard: context, repositoryDir: repositoryDir, currentBranch: currentBranch, resolveBlobResult: resolveBlobResult, hasChanges: true);
 
             await target.Execute(null);
 
@@ -137,7 +137,7 @@ public class OpenFromClipboardCommandTests
             string repositoryDir = null,
             string repositoryName = null,
             string currentBranch = null,
-            (string, string)? gitObject = null,
+            (string, string, bool)? resolveBlobResult = null,
             bool? hasChanges = null)
         {
             var sp = Substitute.For<IServiceProvider>();
@@ -149,14 +149,14 @@ public class OpenFromClipboardCommandTests
             teamExplorerContext.ActiveRepository.LocalPath.Returns(repositoryDir);
             teamExplorerContext.ActiveRepository.Name.Returns(repositoryName);
             teamExplorerContext.ActiveRepository.CurrentBranch.Name.Returns(currentBranch);
-            if (gitObject != null)
+            if (resolveBlobResult != null)
             {
-                gitHubContextService.ResolveBlob(repositoryDir, contextFromClipboard).Returns(gitObject.Value);
+                gitHubContextService.ResolveBlob(repositoryDir, contextFromClipboard).Returns(resolveBlobResult.Value);
             }
 
             if (hasChanges != null)
             {
-                gitHubContextService.HasChangesInWorkingDirectory(repositoryDir, gitObject.Value.Item1, gitObject.Value.Item2).Returns(hasChanges.Value);
+                gitHubContextService.HasChangesInWorkingDirectory(repositoryDir, resolveBlobResult.Value.Item1, resolveBlobResult.Value.Item2).Returns(hasChanges.Value);
             }
 
             return new OpenFromClipboardCommand(

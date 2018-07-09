@@ -331,8 +331,9 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "fixes/666-bug", "fixes/666-bug:src/foo.cs", "fixes/666-bug", "src/foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "fixes/666-bug", "fixes/666-bug:A/B/foo.cs", "fixes/666-bug", "A/B/foo.cs")]
         [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "master", null, "master", null, Description = "Resolve commit only")]
+        [TestCase("https://github.com/github/VisualStudio/blob/36d6b0bb6e319337180d523281c42d9611744e66/src/code.cs", "36d6b0bb6e319337180d523281c42d9611744e66", "36d6b0bb6e319337180d523281c42d9611744e66:src/code.cs", "36d6b0bb6e319337180d523281c42d9611744e66", "src/code.cs", true, Description = "Resolve commit only")]
         [TestCase("https://github.com/github/VisualStudio/commit/8cf9a268c497adb4fc0a14572253165e179dd11e", "8cf9a268c497adb4fc0a14572253165e179dd11e", null, null, null)]
-        public void ResolveBlob(string url, string commitish, string objectish, string expectCommitish, string expectPath)
+        public void ResolveBlob(string url, string commitish, string objectish, string expectCommitish, string expectPath, bool expectIsSha = false)
         {
             var repositoryDir = "repositoryDir";
             var repository = Substitute.For<IRepository>();
@@ -340,13 +341,19 @@ public class GitHubContextServiceTests
             var blob = Substitute.For<Blob>();
             repository.Lookup(commitish).Returns(commit);
             repository.Lookup(objectish).Returns(blob);
+            if (ObjectId.TryParse(commitish, out ObjectId objectId))
+            {
+                // If it looks like a SHA, allow lookup using its ObjectId
+                repository.Lookup(objectId).Returns(blob);
+            }
             var target = CreateGitHubContextService(repositoryDir, repository);
             var context = target.FindContextFromUrl(url);
 
-            var (resolvedCommitish, resolvedPath) = target.ResolveBlob(repositoryDir, context);
+            var (resolvedCommitish, resolvedPath, isSha) = target.ResolveBlob(repositoryDir, context);
 
             Assert.That(resolvedCommitish, Is.EqualTo(expectCommitish));
             Assert.That(resolvedPath, Is.EqualTo(expectPath));
+            Assert.That(isSha, Is.EqualTo(expectIsSha));
         }
     }
 
