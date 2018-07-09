@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.ViewModels;
 using ReactiveUI;
 using Serilog;
 
@@ -31,39 +32,37 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="commentId">The ID of the comment.</param>
-        /// <param name="commentNodeId">The GraphQL ID of the comment.</param>
+        /// <param name="commentId">The GraphQL ID of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
-        /// <param name="user">The author of the comment.</param>
+        /// <param name="author">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
         protected CommentViewModel(
             ICommentThreadViewModel thread,
-            IAccount currentUser,
-            int commentId,
-            string commentNodeId,
+            IActorViewModel currentUser,
+            string commentId,
             string body,
             CommentEditState state,
-            IAccount user,
-            DateTimeOffset updatedAt)
+            IActorViewModel author,
+            DateTimeOffset updatedAt,
+            Uri webUrl)
         {
             Guard.ArgumentNotNull(thread, nameof(thread));
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
-            Guard.ArgumentNotNull(body, nameof(body));
-            Guard.ArgumentNotNull(user, nameof(user));
+            Guard.ArgumentNotNull(author, nameof(author));
 
             Thread = thread;
             CurrentUser = currentUser;
             Id = commentId;
-            NodeId = commentNodeId;
             Body = body;
             EditState = state;
-            User = user;
+            Author = author;
             UpdatedAt = updatedAt;
+            WebUrl = webUrl;
 
             var canDeleteObservable = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.None && user.Login.Equals(currentUser.Login));
+                x => x == CommentEditState.None && author.Login == currentUser.Login);
 
             canDelete = canDeleteObservable.ToProperty(this, x => x.CanDelete);
 
@@ -71,7 +70,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && user.Login.Equals(currentUser.Login)));
+                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && author.Login == currentUser.Login));
 
             BeginEdit = ReactiveCommand.Create(canEdit);
             BeginEdit.Subscribe(DoBeginEdit);
@@ -90,7 +89,7 @@ namespace GitHub.InlineReviews.ViewModels
             CancelEdit.Subscribe(DoCancelEdit);
             AddErrorHandler(CancelEdit);
 
-            OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id, x => x != 0));
+            OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id).Select(x => x != null));
         }
 
         /// <summary>
@@ -101,9 +100,17 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="model">The comment model.</param>
         protected CommentViewModel(
             ICommentThreadViewModel thread,
-            IAccount currentUser,
-            ICommentModel model)
-            : this(thread, currentUser, model.Id, model.NodeId, model.Body, CommentEditState.None, model.User, model.CreatedAt)
+            ActorModel currentUser,
+            CommentModel model)
+            : this(
+                  thread, 
+                  new ActorViewModel(currentUser), 
+                  model.Id, 
+                  model.Body, 
+                  CommentEditState.None, 
+                  new ActorViewModel(model.Author), 
+                  model.CreatedAt,
+                  new Uri(model.Url))
         {
         }
 
@@ -161,21 +168,14 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                ICommentModel model;
-
-                if (Id == 0)
+                if (Id == null)
                 {
-                    model = await Thread.PostComment.ExecuteAsyncTask(Body);
+                    await Thread.PostComment.ExecuteAsyncTask(Body);
                 }
                 else
                 {
-                    model = await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(NodeId, Body));
+                    await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(Id, Body));
                 }
-
-                Id = model.Id;
-                NodeId = model.NodeId;
-                EditState = CommentEditState.None;
-                UpdatedAt = DateTimeOffset.Now;
             }
             catch (Exception e)
             {
@@ -190,10 +190,7 @@ namespace GitHub.InlineReviews.ViewModels
         }
 
         /// <inheritdoc/>
-        public int Id { get; private set; }
-
-        /// <inheritdoc/>
-        public string NodeId { get; private set; }
+        public string Id { get; private set; }
 
         /// <inheritdoc/>
         public string Body
@@ -243,13 +240,16 @@ namespace GitHub.InlineReviews.ViewModels
         }
 
         /// <inheritdoc/>
-        public IAccount CurrentUser { get; }
+        public IActorViewModel CurrentUser { get; }
 
         /// <inheritdoc/>
         public ICommentThreadViewModel Thread { get; }
 
         /// <inheritdoc/>
-        public IAccount User { get; }
+        public IActorViewModel Author { get; }
+
+        /// <inheritdoc/>
+        public Uri WebUrl { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<object> BeginEdit { get; }

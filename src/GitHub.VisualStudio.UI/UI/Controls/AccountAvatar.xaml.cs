@@ -11,7 +11,7 @@ namespace GitHub.VisualStudio.UI.Controls
         public static readonly DependencyProperty AccountProperty =
             DependencyProperty.Register(
                 nameof(Account),
-                typeof(IAccount),
+                typeof(object),
                 typeof(AccountAvatar));
         public static readonly DependencyProperty CommandProperty =
             ButtonBase.CommandProperty.AddOwner(typeof(AccountAvatar));
@@ -25,9 +25,9 @@ namespace GitHub.VisualStudio.UI.Controls
             InitializeComponent();
         }
 
-        public IAccount Account
+        public object Account
         {
-            get { return (IAccount)GetValue(AccountProperty); }
+            get { return GetValue(AccountProperty); }
             set { SetValue(AccountProperty, value); }
         }
 
