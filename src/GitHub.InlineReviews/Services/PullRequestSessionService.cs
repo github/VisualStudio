@@ -756,7 +756,6 @@ namespace GitHub.InlineReviews.Services
                     if (commentsByReplyId.TryGetValue(comment.ReplyTo, out thread))
                     {
                         thread.Add(comment);
-                        break;
                     }
                 }
             }
