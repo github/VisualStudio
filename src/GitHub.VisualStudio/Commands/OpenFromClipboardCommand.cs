@@ -63,7 +63,7 @@ namespace GitHub.VisualStudio.Commands
                 return;
             }
 
-            if (activeRepository.Name != context.RepositoryName)
+            if (!string.Equals(activeRepository.Name, context.RepositoryName, StringComparison.OrdinalIgnoreCase))
             {
                 vsServices.Value.ShowMessageBoxInfo(string.Format(DifferentRepositoryMessage, context.RepositoryName));
                 return;

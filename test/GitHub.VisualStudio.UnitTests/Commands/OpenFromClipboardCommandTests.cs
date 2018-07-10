@@ -35,21 +35,28 @@ public class OpenFromClipboardCommandTests
             vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoActiveRepositoryMessage);
         }
 
-        [Test]
-        public async Task DifferentLocalRepository()
+        [TestCase("targetRepositoryName", "activeRepositoryName", OpenFromClipboardCommand.DifferentRepositoryMessage)]
+        [TestCase("SameRepositoryName", "SameRepositoryName", null)]
+        [TestCase("same_repository_name", "SAME_REPOSITORY_NAME", null)]
+        public async Task DifferentLocalRepository(string targetRepositoryName, string activeRepositoryName, string expectMessage)
         {
-            var targetRepositoryName = "targetRepositoryName";
-            var activeRepositoryName = "activeRepositoryName";
             var activeRepositoryDir = "activeRepositoryDir";
             var context = new GitHubContext { RepositoryName = targetRepositoryName };
-            (string, string, string)? resolveBlobResult = null;
+            var resolveBlobResult = ("commitish", "path", "SHA");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: activeRepositoryDir, repositoryName: activeRepositoryName, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(string.Format(OpenFromClipboardCommand.DifferentRepositoryMessage, context.RepositoryName));
+            if (expectMessage != null)
+            {
+                vsServices.Received(1).ShowMessageBoxInfo(string.Format(expectMessage, context.RepositoryName));
+            }
+            else
+            {
+                vsServices.DidNotReceiveWithAnyArgs().ShowMessageBoxInfo(null);
+            }
         }
 
         [TestCase("TargetOwner", "CurrentOwner", OpenFromClipboardCommand.NoResolveDifferentOwnerMessage)]
