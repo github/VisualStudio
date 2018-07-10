@@ -434,23 +434,12 @@ namespace GitHub.InlineReviews.Services
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var graphql = await graphqlFactory.CreateConnection(address);
+            var (_, owner, number) = await CreatePendingReviewCore(localRepository, pullRequestId);
+            var detail = await ReadPullRequestDetail(address, owner, localRepository.Name, number);
 
-            var review = new AddPullRequestReviewInput
-            {
-                PullRequestId = new ID(pullRequestId),
-            };
-
-            var mutation = new Mutation()
-                .AddPullRequestReview(review)
-                .Select(x => new
-                {
-                    x.PullRequestReview.Repository.Owner.Login,
-                    x.PullRequestReview.PullRequest.Number
-                });
-
-            var result = await graphql.Run(mutation);
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentStartReview);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+
+            return detail;
         }
 
         /// <inheritdoc/>
@@ -652,9 +641,9 @@ namespace GitHub.InlineReviews.Services
             string body,
             string inReplyTo)
         {
-            var review = await CreatePendingReview(localRepository, pullRequestId);
-            var comment = await PostPendingReviewCommentReply(localRepository, review.Id, body, inReplyTo);
-            return await SubmitPendingReview(localRepository, review.Id, null, PullRequestReviewEvent.Comment);
+            var (id, _, _) = await CreatePendingReviewCore(localRepository, pullRequestId);
+            var comment = await PostPendingReviewCommentReply(localRepository, id, body, inReplyTo);
+            return await SubmitPendingReview(localRepository, id, null, PullRequestReviewEvent.Comment);
         }
 
         /// <inheritdoc/>
@@ -702,6 +691,29 @@ namespace GitHub.InlineReviews.Services
             return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
+        async Task<(string id, string owner, int number)> CreatePendingReviewCore(ILocalRepositoryModel localRepository, string pullRequestId)
+        {
+            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            var input = new AddPullRequestReviewInput
+            {
+                PullRequestId = new ID(pullRequestId),
+            };
+
+            var mutation = new Mutation()
+                .AddPullRequestReview(input)
+                .Select(x => new
+                {
+                    Id = x.PullRequestReview.Id.Value,
+                    Owner = x.PullRequestReview.Repository.Owner.Login,
+                    x.PullRequestReview.PullRequest.Number
+                });
+
+            var result = await graphql.Run(mutation);
+            return (result.Id, result.Owner, result.Number);
+        }
+
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
         {
             var line = DiffUtilities.Match(diff, thread.DiffMatch);
@@ -724,7 +736,7 @@ namespace GitHub.InlineReviews.Services
         static void BuildPullRequestThreads(PullRequestDetailModel model)
         {
             var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
-
+           
             // Get all comments that are not replies.
             foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
             {
