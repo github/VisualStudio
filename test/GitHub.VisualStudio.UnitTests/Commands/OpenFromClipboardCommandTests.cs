@@ -42,7 +42,7 @@ public class OpenFromClipboardCommandTests
             var activeRepositoryName = "activeRepositoryName";
             var activeRepositoryDir = "activeRepositoryDir";
             var context = new GitHubContext { RepositoryName = targetRepositoryName };
-            (string, string, bool)? resolveBlobResult = null;
+            (string, string, string)? resolveBlobResult = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: activeRepositoryDir, repositoryName: activeRepositoryName, resolveBlobResult: resolveBlobResult);
@@ -57,7 +57,7 @@ public class OpenFromClipboardCommandTests
         {
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            (string, string, bool)? resolveBlobResult = null;
+            (string, string, string)? resolveBlobResult = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult);
@@ -72,7 +72,7 @@ public class OpenFromClipboardCommandTests
         {
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            var resolveBlobResult = ("master", "foo.cs", false);
+            var resolveBlobResult = ("master", "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult);
@@ -88,7 +88,7 @@ public class OpenFromClipboardCommandTests
             var gitHubContextService = Substitute.For<IGitHubContextService>();
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
-            var resolveBlobResult = ("master", "foo.cs", false);
+            var resolveBlobResult = ("master", "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult, hasChanges: false);
@@ -109,7 +109,7 @@ public class OpenFromClipboardCommandTests
             var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
             var currentBranch = "currentBranch";
-            var resolveBlobResult = ("master", "foo.cs", false);
+            var resolveBlobResult = ("master", "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
                 contextFromClipboard: context, repositoryDir: repositoryDir, currentBranch: currentBranch, resolveBlobResult: resolveBlobResult, hasChanges: true);
@@ -137,7 +137,7 @@ public class OpenFromClipboardCommandTests
             string repositoryDir = null,
             string repositoryName = null,
             string currentBranch = null,
-            (string, string, bool)? resolveBlobResult = null,
+            (string, string, string)? resolveBlobResult = null,
             bool? hasChanges = null)
         {
             var sp = Substitute.For<IServiceProvider>();

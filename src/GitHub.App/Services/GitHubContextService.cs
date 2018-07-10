@@ -249,7 +249,7 @@ namespace GitHub.App.Services
             return true;
         }
 
-        public (string commitish, string path, bool isSha) ResolveBlob(string repositoryDir, GitHubContext context, string remoteName = "origin")
+        public (string commitish, string path, string commitSha) ResolveBlob(string repositoryDir, GitHubContext context, string remoteName = "origin")
         {
             Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
             Guard.ArgumentNotNull(context, nameof(context));
@@ -259,13 +259,13 @@ namespace GitHub.App.Services
                 if (context.TreeishPath == null)
                 {
                     // Blobs without a TreeishPath aren't currently supported
-                    return (null, null, false);
+                    return (null, null, null);
                 }
 
                 if (context.BlobName == null)
                 {
                     // Not a blob
-                    return (null, null, false);
+                    return (null, null, null);
                 }
 
                 var objectishPath = $"{context.TreeishPath}/{context.BlobName}";
@@ -275,28 +275,30 @@ namespace GitHub.App.Services
                 {
                     if (repository.Lookup($"{commitSha}:{pathSha}") != null)
                     {
-                        return (commitSha, pathSha, true);
+                        return (commitSha, pathSha, commitSha);
                     }
                 }
 
                 foreach (var (commitish, path) in objectish)
                 {
                     var remoteRef = $"refs/remotes/{remoteName}/{commitish}";
-                    if (repository.Lookup(remoteRef) == null)
+                    var commit = repository.Lookup(remoteRef);
+                    if (commit == null)
                     {
                         continue;
                     }
 
-                    if (repository.Lookup($"{remoteRef}:{path}") == null)
+                    var blob = repository.Lookup($"{remoteRef}:{path}");
+                    if (blob == null)
                     {
                         // Resolved commitish but not path
-                        return (remoteRef, null, false);
+                        return (remoteRef, null, commit.Sha);
                     }
 
-                    return (remoteRef, path, false);
+                    return (remoteRef, path, commit.Sha);
                 }
 
-                return (null, null, false);
+                return (null, null, null);
             }
 
             IEnumerable<(string commitish, string path)> ToObjectish(string treeishPath)
@@ -324,13 +326,13 @@ namespace GitHub.App.Services
 
         public async Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context)
         {
-            var (commitish, path, isSha) = ResolveBlob(repositoryDir, context);
+            var (commitish, path, commitSha) = ResolveBlob(repositoryDir, context);
             if (path == null)
             {
                 return false;
             }
 
-            if (!AnnotateFile(repositoryDir, currentBranch, path, commitish))
+            if (!AnnotateFile(repositoryDir, currentBranch, path, commitSha))
             {
                 return false;
             }

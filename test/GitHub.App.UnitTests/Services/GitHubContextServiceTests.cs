@@ -325,19 +325,22 @@ public class GitHubContextServiceTests
 
     public class TheResolveBlobMethod
     {
-        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "refs/remotes/origin/master", "refs/remotes/origin/master:foo.cs", "refs/remotes/origin/master", "foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/src/foo.cs", "refs/remotes/origin/master", "refs/remotes/origin/master:src/foo.cs", "refs/remotes/origin/master", "src/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/branch-name/src/foo.cs", "refs/remotes/origin/branch-name", "refs/remotes/origin/branch-name:src/foo.cs", "refs/remotes/origin/branch-name", "src/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "refs/remotes/origin/fixes/666-bug", "refs/remotes/origin/fixes/666-bug:src/foo.cs", "refs/remotes/origin/fixes/666-bug", "src/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "refs/remotes/origin/fixes/666-bug", "refs/remotes/origin/fixes/666-bug:A/B/foo.cs", "refs/remotes/origin/fixes/666-bug", "A/B/foo.cs")]
-        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "refs/remotes/origin/master", null, "refs/remotes/origin/master", null, Description = "Resolve commit only")]
-        [TestCase("https://github.com/github/VisualStudio/blob/36d6b0bb6e319337180d523281c42d9611744e66/src/code.cs", "36d6b0bb6e319337180d523281c42d9611744e66", "36d6b0bb6e319337180d523281c42d9611744e66:src/code.cs", "36d6b0bb6e319337180d523281c42d9611744e66", "src/code.cs", true, Description = "Resolve commit only")]
-        [TestCase("https://github.com/github/VisualStudio/commit/8cf9a268c497adb4fc0a14572253165e179dd11e", "8cf9a268c497adb4fc0a14572253165e179dd11e", null, null, null)]
-        public void ResolveBlob(string url, string commitish, string objectish, string expectCommitish, string expectPath, bool expectIsSha = false)
+        const string CommitSha = "36d6b0bb6e319337180d523281c42d9611744e66";
+
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "refs/remotes/origin/master", "refs/remotes/origin/master:foo.cs", "refs/remotes/origin/master", "foo.cs", CommitSha)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/src/foo.cs", "refs/remotes/origin/master", "refs/remotes/origin/master:src/foo.cs", "refs/remotes/origin/master", "src/foo.cs", CommitSha)]
+        [TestCase("https://github.com/github/VisualStudio/blob/branch-name/src/foo.cs", "refs/remotes/origin/branch-name", "refs/remotes/origin/branch-name:src/foo.cs", "refs/remotes/origin/branch-name", "src/foo.cs", CommitSha)]
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/src/foo.cs", "refs/remotes/origin/fixes/666-bug", "refs/remotes/origin/fixes/666-bug:src/foo.cs", "refs/remotes/origin/fixes/666-bug", "src/foo.cs", CommitSha)]
+        [TestCase("https://github.com/github/VisualStudio/blob/fixes/666-bug/A/B/foo.cs", "refs/remotes/origin/fixes/666-bug", "refs/remotes/origin/fixes/666-bug:A/B/foo.cs", "refs/remotes/origin/fixes/666-bug", "A/B/foo.cs", CommitSha)]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "refs/remotes/origin/master", null, "refs/remotes/origin/master", null, CommitSha, Description = "Resolve commit only")]
+        [TestCase("https://github.com/github/VisualStudio/blob/36d6b0bb6e319337180d523281c42d9611744e66/src/code.cs", CommitSha, CommitSha + ":src/code.cs", CommitSha, "src/code.cs", CommitSha, Description = "Resolve commit only")]
+        [TestCase("https://github.com/github/VisualStudio/commit/8cf9a268c497adb4fc0a14572253165e179dd11e", "8cf9a268c497adb4fc0a14572253165e179dd11e", null, null, null, null)]
+        public void ResolveBlob(string url, string commitish, string objectish, string expectCommitish, string expectPath, string expectCommitSha)
         {
             var repositoryDir = "repositoryDir";
             var repository = Substitute.For<IRepository>();
             var commit = Substitute.For<Commit>();
+            commit.Sha.Returns(expectCommitSha);
             var blob = Substitute.For<Blob>();
             repository.Lookup(commitish).Returns(commit);
             repository.Lookup(objectish).Returns(blob);
@@ -349,11 +352,11 @@ public class GitHubContextServiceTests
             var target = CreateGitHubContextService(repositoryDir, repository);
             var context = target.FindContextFromUrl(url);
 
-            var (resolvedCommitish, resolvedPath, isSha) = target.ResolveBlob(repositoryDir, context);
+            var (resolvedCommitish, resolvedPath, commitSha) = target.ResolveBlob(repositoryDir, context);
 
             Assert.That(resolvedCommitish, Is.EqualTo(expectCommitish));
             Assert.That(resolvedPath, Is.EqualTo(expectPath));
-            Assert.That(isSha, Is.EqualTo(expectIsSha));
+            Assert.That(commitSha, Is.EqualTo(expectCommitSha));
         }
     }
 
