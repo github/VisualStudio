@@ -11,7 +11,8 @@ namespace GitHub.VisualStudio.Commands
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {
         public const string NoGitHubUrlMessage = "Couldn't a find a GitHub URL in clipboard";
-        public const string NoResolveMessage = "Couldn't resolve Git object";
+        public const string NoResolveSameOwnerMessage = "Couldn't find target URL in current repository. Try again after doing a fetch.";
+        public const string NoResolveDifferentOwnerMessage = "The target URL has a different owner to the current repository.";
         public const string NoActiveRepositoryMessage = "There is no active repository to navigate";
         public const string ChangesInWorkingDirectoryMessage = "This file has changed since the permalink was created";
         public const string DifferentRepositoryMessage = "Please open the repository '{0}' and try again";
@@ -71,7 +72,15 @@ namespace GitHub.VisualStudio.Commands
             var (commitish, path, isSha) = gitHubContextService.Value.ResolveBlob(repositoryDir, context);
             if (path == null)
             {
-                vsServices.Value.ShowMessageBoxInfo(NoResolveMessage);
+                if (!string.Equals(activeRepository.Owner, context.Owner, StringComparison.OrdinalIgnoreCase))
+                {
+                    vsServices.Value.ShowMessageBoxInfo(NoResolveDifferentOwnerMessage);
+                }
+                else
+                {
+                    vsServices.Value.ShowMessageBoxInfo(NoResolveSameOwnerMessage);
+                }
+
                 return;
             }
 

@@ -52,19 +52,21 @@ public class OpenFromClipboardCommandTests
             vsServices.Received(1).ShowMessageBoxInfo(string.Format(OpenFromClipboardCommand.DifferentRepositoryMessage, context.RepositoryName));
         }
 
-        [Test]
-        public async Task CouldNotResolve()
+        [TestCase("TargetOwner", "CurrentOwner", OpenFromClipboardCommand.NoResolveDifferentOwnerMessage)]
+        [TestCase("SameOwner", "SameOwner", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
+        [TestCase("sameowner", "SAMEOWNER", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
+        public async Task CouldNotResolve(string targetOwner, string currentOwner, string expectMessage)
         {
-            var context = new GitHubContext();
+            var context = new GitHubContext { Owner = targetOwner };
             var repositoryDir = "repositoryDir";
             (string, string, string)? resolveBlobResult = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult);
+                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryOwner: currentOwner, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoResolveMessage);
+            vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
         }
 
         [Test]
@@ -136,6 +138,7 @@ public class OpenFromClipboardCommandTests
             GitHubContext contextFromClipboard = null,
             string repositoryDir = null,
             string repositoryName = null,
+            string repositoryOwner = null,
             string currentBranch = null,
             (string, string, string)? resolveBlobResult = null,
             bool? hasChanges = null)
@@ -148,6 +151,7 @@ public class OpenFromClipboardCommandTests
             gitHubContextService.FindContextFromClipboard().Returns(contextFromClipboard);
             teamExplorerContext.ActiveRepository.LocalPath.Returns(repositoryDir);
             teamExplorerContext.ActiveRepository.Name.Returns(repositoryName);
+            teamExplorerContext.ActiveRepository.Owner.Returns(repositoryOwner);
             teamExplorerContext.ActiveRepository.CurrentBranch.Name.Returns(currentBranch);
             if (resolveBlobResult != null)
             {
