@@ -126,6 +126,7 @@ namespace GitHub.ViewModels.GitHubPane
             LocalRepository = repository;
             SelectedState = States.FirstOrDefault();
             AuthorFilter = new UserFilterViewModel(LoadAuthors);
+            IsLoading = true;
 
             var parent = await repositoryService.FindParent(
                 HostAddress.Create(repository.CloneUrl),
@@ -159,7 +160,6 @@ namespace GitHub.ViewModels.GitHubPane
                 AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
                 .Subscribe(_ => FilterChanged());
 
-            IsLoading = true;
             await Refresh();
         }
 
