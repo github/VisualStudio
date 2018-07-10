@@ -281,21 +281,22 @@ namespace GitHub.App.Services
 
                 foreach (var (commitish, path) in objectish)
                 {
-                    var remoteRef = $"refs/remotes/{remoteName}/{commitish}";
-                    var commit = repository.Lookup(remoteRef);
-                    if (commit == null)
+                    var resolveRefs = new[] { $"refs/remotes/{remoteName}/{commitish}", $"refs/tags/{commitish}" };
+                    foreach (var resolveRef in resolveRefs)
                     {
-                        continue;
-                    }
+                        var commit = repository.Lookup(resolveRef);
+                        if (commit != null)
+                        {
+                            var blob = repository.Lookup($"{resolveRef}:{path}");
+                            if (blob != null)
+                            {
+                                return (resolveRef, path, commit.Sha);
+                            }
 
-                    var blob = repository.Lookup($"{remoteRef}:{path}");
-                    if (blob == null)
-                    {
-                        // Resolved commitish but not path
-                        return (remoteRef, null, commit.Sha);
+                            // Resolved commitish but not path
+                            return (resolveRef, null, commit.Sha);
+                        }
                     }
-
-                    return (remoteRef, path, commit.Sha);
                 }
 
                 return (null, null, null);

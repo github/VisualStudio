@@ -335,6 +335,7 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio/blob/master/foo.cs", "refs/remotes/origin/master", null, "refs/remotes/origin/master", null, CommitSha, Description = "Resolve commit only")]
         [TestCase("https://github.com/github/VisualStudio/blob/36d6b0bb6e319337180d523281c42d9611744e66/src/code.cs", CommitSha, CommitSha + ":src/code.cs", CommitSha, "src/code.cs", CommitSha, Description = "Resolve commit only")]
         [TestCase("https://github.com/github/VisualStudio/commit/8cf9a268c497adb4fc0a14572253165e179dd11e", "8cf9a268c497adb4fc0a14572253165e179dd11e", null, null, null, null)]
+        [TestCase("https://github.com/github/VisualStudio/blob/v2.5.3.2888/build.cmd", "refs/tags/v2.5.3.2888", "refs/tags/v2.5.3.2888:build.cmd", "refs/tags/v2.5.3.2888", "build.cmd", CommitSha)]
         public void ResolveBlob(string url, string commitish, string objectish, string expectCommitish, string expectPath, string expectCommitSha)
         {
             var repositoryDir = "repositoryDir";
