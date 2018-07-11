@@ -146,7 +146,12 @@ namespace GitHub.Collections
                     }
                 }
 
-                await Task.WhenAny(loading, pageLoaded).ConfigureAwait(false);
+                var completed = await Task.WhenAny(loading, pageLoaded).ConfigureAwait(false);
+
+                if (completed.IsFaulted)
+                {
+                    throw completed.Exception;
+                }
 
                 if (pageLoaded.IsCompleted)
                 {
