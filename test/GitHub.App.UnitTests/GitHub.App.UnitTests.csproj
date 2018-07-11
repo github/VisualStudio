@@ -232,6 +232,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="GitHub.App.UnitTests.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
