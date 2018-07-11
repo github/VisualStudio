@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Models;
@@ -57,14 +61,38 @@ namespace GitHub.App.UnitTests.Collections
             Assert.That(target.IsLoading, Is.False);
         }
 
+        [Test]
+        public async Task Should_Not_Load_Duplicate_Pages()
+        {
+            var trigger = new Subject<Unit>();
+            var target = new TestSource(loadTrigger: trigger);
+
+            var task1 = target.GetPage(1);
+            var task2 = target.GetPage(1);
+
+            Assert.That(target.PagesLoaded, Is.Empty);
+
+            trigger.OnNext(Unit.Default);
+            trigger.OnNext(Unit.Default);
+
+            await task1;
+            await task2;
+
+            Assert.That(target.PagesLoaded, Is.EqualTo(new[] { 0, 1 }));
+        }
+
         class TestSource : SequentialListSource<string, string>
         {
             const int PageCount = 10;
             readonly int? throwAtPage;
+            readonly ISubject<Unit> loadTrigger;
 
-            public TestSource(int? throwAtPage = null)
+            public TestSource(
+                int? throwAtPage = null,
+                ISubject<Unit> loadTrigger = null)
             {
                 this.throwAtPage = throwAtPage;
+                this.loadTrigger = loadTrigger;
             }
 
             public override int PageSize => 10;
@@ -75,9 +103,14 @@ namespace GitHub.App.UnitTests.Collections
                 return model + " loaded";
             }
 
-            protected override Task<Page<string>> LoadPage(string after)
+            protected override async Task<Page<string>> LoadPage(string after)
             {
                 var page = after != null ? int.Parse(after) : 0;
+
+                if (loadTrigger != null)
+                {
+                    await loadTrigger.Take(1).ToTask().ConfigureAwait(false);
+                }
 
                 if (page == throwAtPage)
                 {
@@ -86,13 +119,13 @@ namespace GitHub.App.UnitTests.Collections
 
                 PagesLoaded.Add(page);
 
-                return Task.FromResult(new Page<string>
+                return new Page<string>
                 {
                     EndCursor = (page + 1).ToString(),
                     HasNextPage = page < PageCount,
                     Items = Enumerable.Range(page * PageSize, PageSize).Select(x => "Item " + x).ToList(),
                     TotalCount = PageSize * PageCount,
-                });
+                };
             }
         }
     }

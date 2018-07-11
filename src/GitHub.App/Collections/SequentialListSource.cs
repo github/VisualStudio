@@ -155,7 +155,9 @@ namespace GitHub.Collections
 
                 if (pageLoaded.IsCompleted)
                 {
-                    return pages[pageNumber];
+                    // A previous waiting task may have already returned the page. If so, return null.
+                    pages.TryGetValue(pageNumber, out var result);
+                    return result;
                 }
             }
 
