@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Extensions;
@@ -13,6 +14,9 @@ using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A view model which displays a pull request list.
+    /// </summary>
     [Export(typeof(IPullRequestListViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : IssueListViewModelBase, IPullRequestListViewModel
@@ -21,7 +25,14 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestService service;
         readonly IDisposable subscription;
+        ObservableAsPropertyHelper<Uri> webUrl;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestListViewModel"/> class.
+        /// </summary>
+        /// <param name="sessionManager">The session manager.</param>
+        /// <param name="repositoryService">The repository service.</param>
+        /// <param name="service">The pull request service.</param>
         [ImportingConstructor]
         public PullRequestListViewModel(
             IPullRequestSessionManager sessionManager,
@@ -36,18 +47,32 @@ namespace GitHub.ViewModels.GitHubPane
             this.service = service;
 
             subscription = sessionManager.WhenAnyValue(x => x.CurrentSession.PullRequest.Number).Subscribe(UpdateCurrent);
+            webUrl = this.WhenAnyValue(x => x.RemoteRepository)
+                .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("pulls"))
+                .ToProperty(this, x => x.WebUrl);
             CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
+            OpenItemInBrowser = ReactiveCommand.Create();
         }
 
+        /// <inheritdoc/>
         public override IReadOnlyList<string> States => states;
 
+        /// <inheritdoc/>
+        public Uri WebUrl => webUrl.Value;
+
+        /// <inheritdoc/>
         public ReactiveCommand<object> CreatePullRequest { get; }
 
+        /// <inheritdoc/>
+        public ReactiveCommand<object> OpenItemInBrowser { get; }
+
+        /// <inheritdoc/>
         protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
         {
             return new ItemSource(this);
         }
 
+        /// <inheritdoc/>
         protected override Task DoOpenItem(IIssueListItemViewModelBase item)
         {
             var i = (IPullRequestListItemViewModel)item;
@@ -55,6 +80,7 @@ namespace GitHub.ViewModels.GitHubPane
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         protected override Task<Page<ActorModel>> LoadAuthors(string after)
         {
             return service.ReadAssignableUsers(

@@ -7,11 +7,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using GitHub.Logging;
+using Serilog;
 
 namespace GitHub.Collections
 {
+    /// <summary>
+    /// A virtualizing list that loads data only when needed.
+    /// </summary>
+    /// <typeparam name="T">The list item type.</typeparam>
+    /// <remarks>
+    /// This class exposes a read-only list where the data is fetched as needed. When the indexer
+    /// getter is called, if the requested item is not yet available it calls the associated 
+    /// <see cref="IVirtualizingListSource{T}"/> to load the page of data containing the requested
+    /// item. While the data is being read, <see cref="Placeholder"/> is returned and when the
+    /// data is read <see cref="CollectionChanged"/> is raised.
+    /// 
+    /// Note that this implementation currently represents the minimum required for interaction
+    /// with WPF and as such many members are not yet implemented. In addition, if filtering is
+    /// required in the UI then the collection can be wrapped in a
+    /// <see cref="VirtualizingListCollectionView{T}"/>.
+    /// </remarks>
     public class VirtualizingList<T> : IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged
     {
+        static readonly ILogger log = LogManager.ForContext<VirtualizingList<T>>();
         readonly Dictionary<int, IReadOnlyList<T>> pages = new Dictionary<int, IReadOnlyList<T>>();
         readonly IVirtualizingListSource<T> source;
         readonly IList<T> emptyPage;
@@ -19,6 +38,11 @@ namespace GitHub.Collections
         readonly Dispatcher dispatcher;
         int? count;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VirtualizingList{T}"/> class.
+        /// </summary>
+        /// <param name="source">The list source.</param>
+        /// <param name="placeholder">The placeholder item.</param>
         public VirtualizingList(
             IVirtualizingListSource<T> source,
             T placeholder)
@@ -30,6 +54,11 @@ namespace GitHub.Collections
             dispatcher = Application.Current?.Dispatcher;
         }
 
+        /// <summary>
+        /// Gets an item by index.
+        /// </summary>
+        /// <param name="index">The index of the item.</param>
+        /// <returns>The item, or <see cref="Placeholder"/> if the item is not yet loaded.</returns>
         public T this[int index]
         {
             get
@@ -60,6 +89,13 @@ namespace GitHub.Collections
             set { throw new NotImplementedException(); }
         }
 
+        /// <summary>
+        /// Gets the total count of the collection, including not-yet-loaded items.
+        /// </summary>
+        /// <remarks>
+        /// If the count has not yet been loaded, this will return 0 and then raise a
+        /// <see cref="PropertyChanged"/> event when the count is loaded.
+        /// </remarks>
         public int Count
         {
             get
@@ -74,8 +110,19 @@ namespace GitHub.Collections
             }
         }
 
+        /// <summary>
+        /// Gets the placeholder item that will be displayed while an item is loading.
+        /// </summary>
         public T Placeholder { get; }
+
+        /// <summary>
+        /// Gets the loaded pages of data.
+        /// </summary>
         public IReadOnlyDictionary<int, IReadOnlyList<T>> Pages => pages;
+
+        /// <summary>
+        /// Gets the page size of the associated <see cref="IVirtualizingListSource{T}"/>.
+        /// </summary>
         public int PageSize => source.PageSize;
 
         object IList.this[int index]
@@ -99,45 +146,14 @@ namespace GitHub.Collections
             while (i < Count) yield return this[i++];
         }
 
-        int IList.Add(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IList.Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        bool IList.Contains(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IList.IndexOf(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IList.Insert(int index, object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IList.Remove(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IList.RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        void ICollection.CopyTo(Array array, int index)
-        {
-            throw new NotImplementedException();
-        }
+        int IList.Add(object value) => throw new NotImplementedException();
+        void IList.Clear() => throw new NotImplementedException();
+        bool IList.Contains(object value) => throw new NotImplementedException();
+        int IList.IndexOf(object value) => throw new NotImplementedException();
+        void IList.Insert(int index, object value) => throw new NotImplementedException();
+        void IList.Remove(object value) => throw new NotImplementedException();
+        void IList.RemoveAt(int index) => throw new NotImplementedException();
+        void ICollection.CopyTo(Array array, int index) => throw new NotImplementedException();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -166,9 +182,9 @@ namespace GitHub.Collections
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Handle exception.
+                log.Error(ex, "Error loading virtualizing list count");
             }
         }
 
@@ -187,9 +203,9 @@ namespace GitHub.Collections
                     SendReset();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Handle exception.
+                log.Error(ex, "Error loading virtualizing list page {Number}", number);
             }
         }
 
