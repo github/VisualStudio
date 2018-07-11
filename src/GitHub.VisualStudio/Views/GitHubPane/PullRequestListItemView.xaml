@@ -50,40 +50,47 @@
             </Image.Source>
         </Image>
 
-        <StackPanel Orientation="Vertical" Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
-            <TextBlock DockPanel.Dock="Left"
-                   TextTrimming="CharacterEllipsis"
-                   Text="{Binding Title}" />
+        <Grid Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <views:ActorAvatarView
+                               Grid.Column="0"
+                               ViewModel="{Binding Author}"
+                               Margin="0,1,4,0"
+                               Width="32"
+                               Height="32"
+                               VerticalAlignment="Top"/>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <views:ActorAvatarView
-                                       ViewModel="{Binding Author}"
-                                       Margin="0,1,4,0"
-                                       Width="16"
-                                       Height="16"
-                                       VerticalAlignment="Top"/> 
+            <StackPanel Grid.Column="1">
+                <TextBlock DockPanel.Dock="Left"
+                       TextTrimming="CharacterEllipsis"
+                       Text="{Binding Title}" />
 
-                    <TextBlock Opacity="0.5" Margin="0 0 4 0">
-                        <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Opacity="0.5" Margin="0 0 4 0">
+                            <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                        </TextBlock>
+
+                        <TextBlock Opacity="0.5" TextTrimming="CharacterEllipsis">
+                            <Run Text="updated"/>
+                            <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                            by
+                            <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Opacity="0.5"  Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8 0 0 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+                        <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
                     </TextBlock>
-
-                    <TextBlock Opacity="0.5" TextTrimming="CharacterEllipsis">
-                        <Run Text="updated"/>
-                        <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-                        by
-                        <Run Text="{Binding Author.Login, Mode=OneWay}"/>
-                    </TextBlock>
-                </StackPanel>
-
-                <TextBlock Opacity="0.5"  Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8 0 0 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
-                    <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
-                </TextBlock>
-            </Grid>
-        </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
