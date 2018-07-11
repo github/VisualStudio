@@ -30,6 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IRepositoryModel> forks;
         string searchQuery;
         string selectedState;
+        ObservableAsPropertyHelper<string> stateCaption;
         string stringFilter;
         int numberFilter;
         IUserFilterViewModel authorFilter;
@@ -42,6 +43,13 @@ namespace GitHub.ViewModels.GitHubPane
         {
             this.repositoryService = repositoryService;
             OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
+            stateCaption = this.WhenAnyValue(
+                x => x.Items.Count,
+                x => x.SelectedState,
+                x => x.IsBusy,
+                x => x.IsLoading,
+                (count, state, busy, loading) => busy || loading ? state : count + " " + state)
+                .ToProperty(this, x => x.StateCaption);
         }
 
         /// <inheritdoc/>
@@ -107,6 +115,9 @@ namespace GitHub.ViewModels.GitHubPane
         public abstract IReadOnlyList<string> States { get; }
 
         /// <inheritdoc/>
+        public string StateCaption => stateCaption.Value;
+
+        /// <inheritdoc/>
         public ReactiveCommand<Unit> OpenItem { get; }
 
         /// <inheritdoc/>
@@ -116,20 +127,21 @@ namespace GitHub.ViewModels.GitHubPane
             SelectedState = States.FirstOrDefault();
             AuthorFilter = new UserFilterViewModel(LoadAuthors);
 
-            var parentOwner = await repositoryService.ReadParentOwnerLogin(
+            var parent = await repositoryService.FindParent(
                 HostAddress.Create(repository.CloneUrl),
                 repository.Owner,
                 repository.Name);
 
-            if (parentOwner == null)
+            if (parent == null)
             {
                 RemoteRepository = repository;
             }
             else
             {
+                // TODO: Handle forks with different names.
                 RemoteRepository = new RepositoryModel(
                     repository.Name,
-                    UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parentOwner)));
+                    UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parent.Value.owner)));
 
                 Forks = new IRepositoryModel[]
                 {

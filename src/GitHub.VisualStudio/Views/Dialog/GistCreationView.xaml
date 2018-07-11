@@ -74,7 +74,7 @@
                 <ghfvs:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistFileNameTextBox}" />
 
                 <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.Description}"/>
-                <ghfvs:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistDescriptionTextBlock}"/>
+                <ghfvs:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1" SpellCheck.IsEnabled="True" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistDescriptionTextBlock}"/>
 
                 <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
                     <Image

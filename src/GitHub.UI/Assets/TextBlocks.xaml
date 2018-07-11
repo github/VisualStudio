@@ -15,7 +15,6 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="ToolTipService.ShowDuration" Value="30000" />
         <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
-        <Setter Property="ContextMenu" Value="{DynamicResource DefaultContextMenu}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">

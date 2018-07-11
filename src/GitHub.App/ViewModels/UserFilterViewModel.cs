@@ -25,8 +25,11 @@ namespace GitHub.ViewModels
 
         public UserFilterViewModel(LoadPageDelegate load)
         {
+            Guard.ArgumentNotNull(load, nameof(load));
+
             this.load = load;
             this.WhenAnyValue(x => x.Filter).Subscribe(FilterChanged);
+            this.WhenAnyValue(x => x.Selected).Subscribe(_ => Filter = null);
             ClearSelection = ReactiveCommand.Create(
                 this.WhenAnyValue(x => x.Selected).Select(x => x != null))
                 .OnExecuteCompleted(_ => Selected = null);
@@ -96,7 +99,7 @@ namespace GitHub.ViewModels
                 }
             }
 
-            usersView.Refresh();
+            UsersView.Refresh();
         }
 
         bool FilterUsers(object obj)

@@ -14,7 +14,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryService : IRepositoryService
     {
-        static ICompiledQuery<string> readParentOwnerLogin;
+        static ICompiledQuery<Tuple<string, string>> readParentOwnerLogin;
         readonly IGraphQLClientFactory graphqlFactory;
 
         [ImportingConstructor]
@@ -25,7 +25,7 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
         }
 
-        public async Task<string> ReadParentOwnerLogin(HostAddress address, string owner, string name)
+        public async Task<(string owner, string name)?> FindParent(HostAddress address, string owner, string name)
         {
             Guard.ArgumentNotNull(address, nameof(address));
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
@@ -35,7 +35,7 @@ namespace GitHub.Services
             {
                 readParentOwnerLogin = new Query()
                     .Repository(Var(nameof(owner)), Var(nameof(name)))
-                    .Select(r => r.Parent != null ? r.Parent.Owner.Login : null)
+                    .Select(r => r.Parent != null ? Tuple.Create(r.Parent.Owner.Login, r.Parent.Name) : null)
                     .Compile();
             }
 
@@ -46,7 +46,8 @@ namespace GitHub.Services
             };
 
             var graphql = await graphqlFactory.CreateConnection(address);
-            return await graphql.Run(readParentOwnerLogin, vars);
+            var result = await graphql.Run(readParentOwnerLogin, vars);
+            return result != null ? (result.Item1, result.Item2) : ((string, string)?)null;
         }
     }
 }
