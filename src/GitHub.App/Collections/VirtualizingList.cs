@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -139,6 +141,7 @@ namespace GitHub.Collections
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<ErrorEventArgs> InitializationError;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -176,14 +179,22 @@ namespace GitHub.Collections
                 {
                     countTask.ContinueWith(x =>
                     {
-                        count = x.Result;
-                        SendReset();
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+                        if (x.IsFaulted)
+                        {
+                            RaiseInitializationError(x.Exception);
+                        }
+                        else if (!x.IsCanceled)
+                        {
+                            count = x.Result;
+                            SendReset();
+                            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
             catch (Exception ex)
             {
+                RaiseInitializationError(ex);
                 log.Error(ex, "Error loading virtualizing list count");
             }
         }
@@ -207,6 +218,24 @@ namespace GitHub.Collections
             {
                 log.Error(ex, "Error loading virtualizing list page {Number}", number);
                 pages.Remove(number);
+            }
+        }
+
+        void RaiseInitializationError(Exception e)
+        {
+            if (InitializationError != null)
+            {
+                if (e is AggregateException ae)
+                {
+                    e = ae = ae.Flatten();
+
+                    if (ae.InnerExceptions.Count == 1)
+                    {
+                        e = ae.InnerException;
+                    }
+                }
+
+                InitializationError(this, new ErrorEventArgs(e));
             }
         }
 
