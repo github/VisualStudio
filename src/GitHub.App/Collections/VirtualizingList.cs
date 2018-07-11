@@ -206,6 +206,7 @@ namespace GitHub.Collections
             catch (Exception ex)
             {
                 log.Error(ex, "Error loading virtualizing list page {Number}", number);
+                pages.Remove(number);
             }
         }
 
