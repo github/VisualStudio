@@ -46,6 +46,17 @@ namespace GitHub.App.UnitTests.Collections
             Assert.That(target.PagesLoaded, Is.EqualTo(new[] { 0, 1 }));
         }
 
+        [Test]
+        public void IsLoading_Should_Be_Set_To_False_When_LoadPage_Throws()
+        {
+            var target = new TestSource(2);
+
+            Assert.That(target.PagesLoaded, Is.Empty);
+
+            Assert.ThrowsAsync<AggregateException>(() => target.GetPage(3));
+            Assert.That(target.IsLoading, Is.False);
+        }
+
         class TestSource : SequentialListSource<string, string>
         {
             const int PageCount = 10;

@@ -182,13 +182,18 @@ namespace GitHub.Collections
         {
             OnBeginLoading();
 
-            while (nextPage <= loadTo && !disposed)
+            try
             {
-                await LoadNextPage().ConfigureAwait(false);
-                PageLoaded?.Invoke(this, EventArgs.Empty);
+                while (nextPage <= loadTo && !disposed)
+                {
+                    await LoadNextPage().ConfigureAwait(false);
+                    PageLoaded?.Invoke(this, EventArgs.Empty);
+                }
             }
-
-            OnEndLoading();
+            finally
+            {
+                OnEndLoading();
+            }
         }
 
         async Task LoadNextPage()
