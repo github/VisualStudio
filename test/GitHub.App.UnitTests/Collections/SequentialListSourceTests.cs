@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
@@ -32,6 +33,17 @@ namespace GitHub.App.UnitTests.Collections
             var count = await target.GetPage(3);
 
             Assert.That(target.PagesLoaded, Is.EqualTo(new[] { 0, 1, 2, 3 }));
+        }
+
+        [Test]
+        public void GetPage_Should_Stop_Loading_Pages_When_LoadPage_Throws()
+        {
+            var target = new TestSource(2);
+
+            Assert.That(target.PagesLoaded, Is.Empty);
+
+            Assert.ThrowsAsync<AggregateException>(() => target.GetPage(3));
+            Assert.That(target.PagesLoaded, Is.EqualTo(new[] { 0, 1 }));
         }
 
         class TestSource : SequentialListSource<string, string>
