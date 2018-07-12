@@ -360,23 +360,47 @@ namespace GitHub.Services
             return textView;
         }
 
+        /// <summary>
+        /// Call AnnotateFile of the IGitExt2 service if it can be found.
+        /// </summary>
+        /// <remarks>
+        /// The IGitExt2 interface was introduced in an update of Visual Studio 2017.
+        /// The <see cref="branchName"/> must exist but doesn't appear to be used in the UI.
+        /// </remarks>
+        /// <param name="repositoryPath">Path of the target repository</param>
+        /// <param name="branchName">A branch of the target repository</param>
+        /// <param name="relativePath">A path the the target blob</param>
+        /// <param name="versionSha">The commit version of the blob</param>
+        /// <returns></returns>
         bool AnnotateFile(string repositoryPath, string branchName, string relativePath, string versionSha)
         {
-            var gitExt2Type = Type.GetType("Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt2, Microsoft.TeamFoundation.Git.Provider", false);
-            if (gitExt2Type == null)
+            var serviceType = Type.GetType("Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt2, Microsoft.TeamFoundation.Git.Provider", false);
+            if (serviceType == null)
             {
                 return false;
             }
 
-            InvokeService(gitExt2Type, "AnnotateFile", repositoryPath, branchName, relativePath, versionSha);
-            return true;
-        }
-
-        void InvokeService<T1, T2, T3, T4>(Type serviceType, string method, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
             var service = serviceProvider.GetService(serviceType);
-            var action = (Action<T1, T2, T3, T4>)Delegate.CreateDelegate(typeof(Action<T1, T2, T3, T4>), service, method);
-            action.Invoke(arg1, arg2, arg3, arg4);
+            if (service == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                Invoke(service, "AnnotateFile", repositoryPath, branchName, relativePath, versionSha);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            void Invoke<T1, T2, T3, T4>(object target, string method, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+                var action = (Action<T1, T2, T3, T4>)Delegate.CreateDelegate(typeof(Action<T1, T2, T3, T4>), target, method);
+                action.Invoke(arg1, arg2, arg3, arg4);
+            }
         }
 
         static void SetSelection(IVsTextView textView, GitHubContext context)
