@@ -93,6 +93,35 @@ namespace GitHub.Services
                         Items = page.Nodes.Select(pr => new ListItemAdapter
                         {
                             Id = pr.Id.Value,
+                            CheckSuites = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                commit.Commit.CheckSuites(null, null, null, null, null).AllPages()
+                                    .Select(suite => new
+                                    {
+                                        suite.Conclusion,
+                                        suite.Status,
+                                        CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages()
+                                            .Select(run => new
+                                            {
+                                                run.Title,
+                                                run.Name,
+                                                run.Summary,
+                                                run.Conclusion,
+                                                run.Status,
+                                                run.Text,
+                                                Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                    .Select(annotation => new
+                                                    {
+                                                        annotation.Title,
+                                                        annotation.Message,
+                                                        annotation.WarningLevel,
+                                                        annotation.Filename,
+                                                        annotation.BlobUrl,
+                                                        annotation.StartLine,
+                                                        annotation.EndLine,
+                                                        annotation.RawDetails
+                                                    }).ToList()
+                                            }).ToList()
+                                    })).ToList(),
                             Author = new ActorModel
                             {
                                 Login = pr.Author.Login,
@@ -840,6 +869,8 @@ namespace GitHub.Services
         class ListItemAdapter : PullRequestListItemModel
         {
             public IList<ReviewAdapter> Reviews { get; set; }
+
+            public object CheckSuites { get; set; }
         }
 
         class ReviewAdapter
