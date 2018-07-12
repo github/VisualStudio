@@ -1,7 +1,6 @@
 ﻿using System;
 using GitHub.Exports;
 using GitHub.Services;
-using GitHub.App.Services;
 using NSubstitute;
 using NUnit.Framework;
 using LibGit2Sharp;

@@ -9,7 +9,6 @@ using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using GitHub.Exports;
-using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using Microsoft.VisualStudio;
@@ -19,7 +18,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using LibGit2Sharp;
 using Task = System.Threading.Tasks.Task;
 
-namespace GitHub.App.Services
+namespace GitHub.Services
 {
     [Export(typeof(IGitHubContextService))]
     public class GitHubContextService : IGitHubContextService

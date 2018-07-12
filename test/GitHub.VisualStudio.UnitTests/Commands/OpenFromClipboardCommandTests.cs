@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using GitHub.Exports;
 using GitHub.Primitives;
-using GitHub.App.Services;
 using GitHub.Services;
 using GitHub.VisualStudio.Commands;
 using Microsoft.VisualStudio;
@@ -160,8 +159,8 @@ public class OpenFromClipboardCommandTests
             gitHubContextService.Received(receivedTryOpenFile).TryOpenFile(repositoryDir, context);
         }
 
-        static GitHubContext CreateGitHubContext(UriString uri = null, string owner = "github", string repositoryName = "VisualStudio"
-            string branch = "master")
+        static GitHubContext CreateGitHubContext(UriString uri = null, string owner = "github",
+            string repositoryName = "VisualStudio", string branch = "master")
         {
             uri = uri ?? new UriString($"https://github.com/{owner}/{repositoryName}/blob/{branch}/README.md");
 
