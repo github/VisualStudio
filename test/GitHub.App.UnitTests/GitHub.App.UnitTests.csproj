@@ -155,6 +155,7 @@
     <Compile Include="..\Helpers\TestSharedCache.cs" />
     <Compile Include="Args.cs" />
     <Compile Include="Caches\ImageCacheTests.cs" />
+    <Compile Include="Collections\SequentialListSourceTests.cs" />
     <Compile Include="Factories\ModelServiceFactoryTests.cs" />
     <Compile Include="Models\AccountModelTests.cs" />
     <Compile Include="Models\ModelServiceTests.cs" />

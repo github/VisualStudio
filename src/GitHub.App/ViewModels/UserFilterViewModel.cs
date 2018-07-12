@@ -120,7 +120,13 @@ namespace GitHub.ViewModels
             while (true)
             {
                 var page = await load(after);
-                users.AddRange(page.Items.Select(x => new ActorViewModel(x)));
+
+                foreach (var item in page.Items)
+                {
+                    var vm = new ActorViewModel(item);
+                    users.Add(vm);
+                }
+
                 after = page.EndCursor;
                 if (!page.HasNextPage) break;
             }

@@ -146,11 +146,18 @@ namespace GitHub.Collections
                     }
                 }
 
-                await Task.WhenAny(loading, pageLoaded).ConfigureAwait(false);
+                var completed = await Task.WhenAny(loading, pageLoaded).ConfigureAwait(false);
+
+                if (completed.IsFaulted)
+                {
+                    throw completed.Exception;
+                }
 
                 if (pageLoaded.IsCompleted)
                 {
-                    return pages[pageNumber];
+                    // A previous waiting task may have already returned the page. If so, return null.
+                    pages.TryGetValue(pageNumber, out var result);
+                    return result;
                 }
             }
 
@@ -177,13 +184,18 @@ namespace GitHub.Collections
         {
             OnBeginLoading();
 
-            while (nextPage <= loadTo && !disposed)
+            try
             {
-                await LoadNextPage().ConfigureAwait(false);
-                PageLoaded?.Invoke(this, EventArgs.Empty);
+                while (nextPage <= loadTo && !disposed)
+                {
+                    await LoadNextPage().ConfigureAwait(false);
+                    PageLoaded?.Invoke(this, EventArgs.Empty);
+                }
             }
-
-            OnEndLoading();
+            finally
+            {
+                OnEndLoading();
+            }
         }
 
         async Task LoadNextPage()
