@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GitHub.Exports;
+using GitHub.Primitives;
+using GitHub.App.Services;
 using GitHub.Services;
 using GitHub.VisualStudio.Commands;
 using Microsoft.VisualStudio;
@@ -25,7 +28,7 @@ public class OpenFromClipboardCommandTests
         [Test]
         public async Task NoLocalRepository()
         {
-            var context = new GitHubContext();
+            var context = CreateGitHubContext();
             var repositoryDir = null as string;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: repositoryDir);
@@ -35,13 +38,27 @@ public class OpenFromClipboardCommandTests
             vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoActiveRepositoryMessage);
         }
 
+        [Test]
+        public async Task UnknownLinkType()
+        {
+            var context = new GitHubContext { LinkType = LinkType.Unknown };
+            var expectMessage = string.Format(OpenFromClipboardCommand.UnknownLinkTypeMessage, context.Url);
+            var activeRepositoryDir = "activeRepositoryDir";
+            var vsServices = Substitute.For<IVSServices>();
+            var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: activeRepositoryDir);
+
+            await target.Execute(null);
+
+            vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
+        }
+
         [TestCase("targetRepositoryName", "activeRepositoryName", OpenFromClipboardCommand.DifferentRepositoryMessage)]
         [TestCase("SameRepositoryName", "SameRepositoryName", null)]
         [TestCase("same_repository_name", "SAME_REPOSITORY_NAME", null)]
         public async Task DifferentLocalRepository(string targetRepositoryName, string activeRepositoryName, string expectMessage)
         {
             var activeRepositoryDir = "activeRepositoryDir";
-            var context = new GitHubContext { RepositoryName = targetRepositoryName };
+            var context = CreateGitHubContext(repositoryName: targetRepositoryName);
             var resolveBlobResult = ("commitish", "path", "SHA");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
@@ -64,12 +81,13 @@ public class OpenFromClipboardCommandTests
         [TestCase("sameowner", "SAMEOWNER", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
         public async Task CouldNotResolve(string targetOwner, string currentOwner, string expectMessage)
         {
-            var context = new GitHubContext { Owner = targetOwner };
             var repositoryDir = "repositoryDir";
+            var repositoryName = "repositoryName";
+            var context = CreateGitHubContext(repositoryName: repositoryName, owner: targetOwner);
             (string, string, string)? resolveBlobResult = null;
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryOwner: currentOwner, resolveBlobResult: resolveBlobResult);
+                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryOwner: currentOwner, repositoryName: repositoryName, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
@@ -79,12 +97,13 @@ public class OpenFromClipboardCommandTests
         [Test]
         public async Task CouldResolve()
         {
-            var context = new GitHubContext();
+            var repositoryName = "repositoryName";
+            var context = CreateGitHubContext(repositoryName: repositoryName);
             var repositoryDir = "repositoryDir";
             var resolveBlobResult = ("master", "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult);
+                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryName: repositoryName, resolveBlobResult: resolveBlobResult);
 
             await target.Execute(null);
 
@@ -94,13 +113,14 @@ public class OpenFromClipboardCommandTests
         [Test]
         public async Task NoChangesInWorkingDirectory()
         {
-            var gitHubContextService = Substitute.For<IGitHubContextService>();
-            var context = new GitHubContext();
             var repositoryDir = "repositoryDir";
+            var repositoryName = "repositoryName";
+            var context = CreateGitHubContext(repositoryName: repositoryName);
+            var gitHubContextService = Substitute.For<IGitHubContextService>();
             var resolveBlobResult = ("master", "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, resolveBlobResult: resolveBlobResult, hasChanges: false);
+                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryName: repositoryName, resolveBlobResult: resolveBlobResult, hasChanges: false);
 
             await target.Execute(null);
 
@@ -113,15 +133,17 @@ public class OpenFromClipboardCommandTests
         public async Task HasChangesInWorkingDirectory(bool annotateFileSupported, string message,
             int receivedTryAnnotateFile, int receivedTryOpenFile)
         {
+            var repositoryDir = "repositoryDir";
+            var repositoryName = "repositoryName";
+            var targetBranch = "targetBranch";
+            var context = CreateGitHubContext(repositoryName: repositoryName, branch: targetBranch);
             var gitHubContextService = Substitute.For<IGitHubContextService>();
             gitHubContextService.TryAnnotateFile(null, null, null).ReturnsForAnyArgs(annotateFileSupported);
-            var context = new GitHubContext();
-            var repositoryDir = "repositoryDir";
             var currentBranch = "currentBranch";
-            var resolveBlobResult = ("master", "foo.cs", "");
+            var resolveBlobResult = (targetBranch, "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, currentBranch: currentBranch, resolveBlobResult: resolveBlobResult, hasChanges: true);
+                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryName: repositoryName, currentBranch: currentBranch, resolveBlobResult: resolveBlobResult, hasChanges: true);
 
             await target.Execute(null);
 
@@ -136,6 +158,14 @@ public class OpenFromClipboardCommandTests
 
             await gitHubContextService.Received(receivedTryAnnotateFile).TryAnnotateFile(repositoryDir, currentBranch, context);
             gitHubContextService.Received(receivedTryOpenFile).TryOpenFile(repositoryDir, context);
+        }
+
+        static GitHubContext CreateGitHubContext(UriString uri = null, string owner = "github", string repositoryName = "VisualStudio"
+            string branch = "master")
+        {
+            uri = uri ?? new UriString($"https://github.com/{owner}/{repositoryName}/blob/{branch}/README.md");
+
+            return new GitHubContextService(null, null).FindContextFromUrl(uri);
         }
 
         static OpenFromClipboardCommand CreateOpenFromClipboardCommand(

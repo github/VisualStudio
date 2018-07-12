@@ -1,4 +1,7 @@
-﻿namespace GitHub.Services
+﻿using GitHub.Exports;
+using GitHub.Primitives;
+
+namespace GitHub.Services
 {
     public class GitHubContext
     {
@@ -15,5 +18,7 @@
         public int? Issue { get; set; }
         public int? Line { get; set; }
         public int? LineEnd { get; set; }
+        public UriString Url { get; set; }
+        public LinkType LinkType { get; set; }
     }
 }

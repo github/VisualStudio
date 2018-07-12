@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.App.Services;
 using NSubstitute;
@@ -120,6 +121,27 @@ public class GitHubContextServiceTests
             var context = target.FindContextFromUrl(url);
 
             Assert.That(context, expectNull ? Is.Null : Is.Not.Null);
+        }
+
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "https://github.com/github/VisualStudio/blob/master/README.md")]
+        public void Url_EqualTo(string url, string expectUrl)
+        {
+            var target = CreateGitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.Url?.ToString(), Is.EqualTo(expectUrl));
+        }
+
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", LinkType.Blob)]
+        [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
+        public void LinkType_EqualTo(string url, LinkType expectLinkType)
+        {
+            var target = CreateGitHubContextService();
+
+            var context = target.FindContextFromUrl(url);
+
+            Assert.That(context.LinkType, Is.EqualTo(expectLinkType));
         }
     }
 

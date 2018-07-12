@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
 using Task = System.Threading.Tasks.Task;
@@ -16,6 +17,7 @@ namespace GitHub.VisualStudio.Commands
         public const string NoActiveRepositoryMessage = "There is no active repository to navigate";
         public const string ChangesInWorkingDirectoryMessage = "This file has changed since the permalink was created";
         public const string DifferentRepositoryMessage = "Please open the repository '{0}' and try again";
+        public const string UnknownLinkTypeMessage = "Couldn't open from '{0}'. Only URLs that link to repository files are currently supported.";
 
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -52,6 +54,13 @@ namespace GitHub.VisualStudio.Commands
             if (context == null)
             {
                 vsServices.Value.ShowMessageBoxInfo(NoGitHubUrlMessage);
+                return;
+            }
+
+            if (context.LinkType != LinkType.Blob)
+            {
+                var message = string.Format(UnknownLinkTypeMessage, context.Url);
+                vsServices.Value.ShowMessageBoxInfo(message);
                 return;
             }
 

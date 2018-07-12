@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.Primitives;
@@ -90,6 +91,7 @@ namespace GitHub.App.Services
                 Host = uri.Host,
                 Owner = uri.Owner,
                 RepositoryName = uri.RepositoryName,
+                Url = uri
             };
 
             var repositoryPrefix = uri.ToRepositoryUrl().ToString() + "/";
@@ -109,6 +111,7 @@ namespace GitHub.App.Services
             {
                 context.TreeishPath = match.Groups["treeish"].Value;
                 context.BlobName = match.Groups["blobName"].Value;
+                context.LinkType = LinkType.Blob;
                 return context;
             }
 
