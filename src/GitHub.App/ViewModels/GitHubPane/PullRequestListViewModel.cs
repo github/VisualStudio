@@ -122,7 +122,7 @@ namespace GitHub.ViewModels.GitHubPane
                 return result;
             }
 
-            protected override Task<Page<PullRequestListItemModel>> LoadPage(string after)
+            protected override async Task<Page<PullRequestListItemModel>> LoadPage(string after)
             {
                 PullRequestStateEnum[] states;
 
@@ -139,15 +139,12 @@ namespace GitHub.ViewModels.GitHubPane
                         break;
                 }
 
-                var sw = Stopwatch.StartNew();
-                var result = owner.service.ReadPullRequests(
+                var result = await owner.service.ReadPullRequests(
                     HostAddress.Create(owner.RemoteRepository.CloneUrl),
                     owner.RemoteRepository.Owner,
                     owner.RemoteRepository.Name,
                     after,
-                    states);
-                sw.Stop();
-                System.Diagnostics.Debug.WriteLine("Read PR page in " + sw.Elapsed);
+                    states).ConfigureAwait(false);
                 return result;
             }
         }
