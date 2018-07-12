@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace GitHub.Services
 {
@@ -10,7 +9,6 @@ namespace GitHub.Services
         GitHubContext FindContextFromBrowser();
         GitHubContext FindContextFromUrl(string url);
         GitHubContext FindContextFromWindowTitle(string windowTitle);
-        IEnumerable<string> FindWindowTitlesForClass(string className);
         Uri ToRepositoryUrl(GitHubContext context);
         bool TryOpenFile(string repositoryDir, GitHubContext context);
         Task<bool> TryAnnotateFile(string repositoryDir, string currentBranch, GitHubContext context);
