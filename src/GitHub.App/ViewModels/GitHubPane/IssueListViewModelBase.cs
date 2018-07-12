@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -9,10 +10,12 @@ using System.Threading.Tasks;
 using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -21,6 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public abstract class IssueListViewModelBase : PanePageViewModelBase, IIssueListViewModelBase
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubPaneViewModel>();
         readonly IRepositoryService repositoryService;
         IReadOnlyList<IIssueListItemViewModelBase> items;
         ICollectionView itemsView;
@@ -123,44 +127,53 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {
-            LocalRepository = repository;
-            SelectedState = States.FirstOrDefault();
-            AuthorFilter = new UserFilterViewModel(LoadAuthors);
-
-            var parent = await repositoryService.FindParent(
-                HostAddress.Create(repository.CloneUrl),
-                repository.Owner,
-                repository.Name);
-
-            if (parent == null)
+            try
             {
-                RemoteRepository = repository;
-            }
-            else
-            {
-                // TODO: Handle forks with different names.
-                RemoteRepository = new RepositoryModel(
-                    repository.Name,
-                    UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parent.Value.owner)));
+                LocalRepository = repository;
+                SelectedState = States.FirstOrDefault();
+                AuthorFilter = new UserFilterViewModel(LoadAuthors);
+                IsLoading = true;
 
-                Forks = new IRepositoryModel[]
+                var parent = await repositoryService.FindParent(
+                    HostAddress.Create(repository.CloneUrl),
+                    repository.Owner,
+                    repository.Name);
+
+                if (parent == null)
                 {
+                    RemoteRepository = repository;
+                }
+                else
+                {
+                    // TODO: Handle forks with different names.
+                    RemoteRepository = new RepositoryModel(
+                        repository.Name,
+                        UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parent.Value.owner)));
+
+                    Forks = new IRepositoryModel[]
+                    {
                     RemoteRepository,
                     repository,
-                };
+                    };
+                }
+
+                this.WhenAnyValue(x => x.SelectedState, x => x.RemoteRepository)
+                    .Skip(1)
+                    .Subscribe(_ => Refresh().Forget());
+
+                Observable.Merge(
+                    this.WhenAnyValue(x => x.SearchQuery).Skip(1).SelectUnit(),
+                    AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
+                    .Subscribe(_ => FilterChanged());
+
+                await Refresh();
             }
-
-            this.WhenAnyValue(x => x.SelectedState, x => x.RemoteRepository)
-                .Skip(1)
-                .Subscribe(_ => Refresh().Forget());
-
-            Observable.Merge(
-                this.WhenAnyValue(x => x.SearchQuery).Skip(1).SelectUnit(),
-                AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
-                .Subscribe(_ => FilterChanged());
-
-            IsLoading = true;
-            await Refresh();
+            catch (Exception ex)
+            {
+                Error = ex;
+                IsLoading = false;
+                log.Error(ex, "Error initializing IssueListViewModelBase");
+            }
         }
 
         /// <summary>
@@ -169,6 +182,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// <returns>A task tracking the operation.</returns>
         public override Task Refresh()
         {
+            if (RemoteRepository == null)
+            {
+                // If an exception occurred reading the parent repository, do nothing.
+                return Task.CompletedTask;
+            }
+
             subscription?.Dispose();
 
             var dispose = new CompositeDisposable();
@@ -179,6 +198,7 @@ namespace GitHub.ViewModels.GitHubPane
             view.Filter = FilterItem;
             Items = items;
             ItemsView = view;
+            Error = null;
 
             dispose.Add(itemSource);
             dispose.Add(
@@ -190,6 +210,11 @@ namespace GitHub.ViewModels.GitHubPane
                     this.WhenAnyValue(x => x.AuthorFilter.Selected),
                     (loading, count, _, __, ___) => Tuple.Create(loading, count))
                 .Subscribe(x => UpdateState(x.Item1, x.Item2)));
+            dispose.Add(
+                Observable.FromEventPattern<ErrorEventArgs>(
+                    x => items.InitializationError += x,
+                    x => items.InitializationError -= x)
+                .Subscribe(x => Error = x.EventArgs.GetException()));
             subscription = dispose;
 
             return Task.CompletedTask;
