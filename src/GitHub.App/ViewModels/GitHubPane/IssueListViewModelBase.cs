@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -197,6 +198,7 @@ namespace GitHub.ViewModels.GitHubPane
             view.Filter = FilterItem;
             Items = items;
             ItemsView = view;
+            Error = null;
 
             dispose.Add(itemSource);
             dispose.Add(
@@ -208,6 +210,11 @@ namespace GitHub.ViewModels.GitHubPane
                     this.WhenAnyValue(x => x.AuthorFilter.Selected),
                     (loading, count, _, __, ___) => Tuple.Create(loading, count))
                 .Subscribe(x => UpdateState(x.Item1, x.Item2)));
+            dispose.Add(
+                Observable.FromEventPattern<ErrorEventArgs>(
+                    x => items.InitializationError += x,
+                    x => items.InitializationError -= x)
+                .Subscribe(x => Error = x.EventArgs.GetException()));
             subscription = dispose;
 
             return Task.CompletedTask;
