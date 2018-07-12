@@ -251,10 +251,10 @@
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Octokit.GraphQL, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.0-alpha\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
+      <HintPath>..\..\packages\Octokit.GraphQL.0.1.0-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
     </Reference>
     <Reference Include="Octokit.GraphQL.Core, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.0-alpha\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
+      <HintPath>..\..\packages\Octokit.GraphQL.0.1.0-beta\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
     </Reference>
     <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
