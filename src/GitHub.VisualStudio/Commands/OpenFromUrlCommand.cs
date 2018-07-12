@@ -60,16 +60,15 @@ namespace GitHub.VisualStudio.Commands
 
         public override async Task Execute(string url)
         {
-            if (string.IsNullOrEmpty(url))
+            var context = string.IsNullOrEmpty(url) ? null : gitHubContextService.Value.FindContextFromUrl(url);
+            if (context == null)
             {
-                url = Clipboard.GetText(TextDataFormat.Text);
+                context = gitHubContextService.Value.FindContextFromClipboard();
             }
-
-            var context = gitHubContextService.Value.FindContextFromUrl(url);
-            context = context ?? gitHubContextService.Value.FindContextFromBrowser();
 
             if (context == null)
             {
+                // Couldn't find a URL to open
                 return;
             }
 
