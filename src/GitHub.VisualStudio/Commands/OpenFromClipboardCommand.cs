@@ -9,6 +9,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Commands
 {
+    /// <inheritdoc/>
     [Export(typeof(IOpenFromClipboardCommand))]
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {

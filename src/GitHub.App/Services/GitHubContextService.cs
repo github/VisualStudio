@@ -20,6 +20,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
+    /// <inheritdoc/>
     [Export(typeof(IGitHubContextService))]
     public class GitHubContextService : IGitHubContextService
     {
