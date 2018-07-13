@@ -99,29 +99,16 @@ namespace GitHub.Services
                                     {
                                         suite.Conclusion,
                                         suite.Status,
-                                        CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages()
-                                            .Select(run => new
-                                            {
-                                                run.Title,
-                                                run.Name,
-                                                run.Summary,
-                                                run.Conclusion,
-                                                run.Status,
-                                                run.Text,
-                                                Annotations = run.Annotations(null, null, null, null).AllPages()
-                                                    .Select(annotation => new
-                                                    {
-                                                        annotation.Title,
-                                                        annotation.Message,
-                                                        annotation.WarningLevel,
-                                                        annotation.Filename,
-                                                        annotation.BlobUrl,
-                                                        annotation.StartLine,
-                                                        annotation.EndLine,
-                                                        annotation.RawDetails
-                                                    }).ToList()
-                                            }).ToList()
-                                    })).ToList(),
+                                    }).ToList()
+                                ).ToList().FirstOrDefault(),
+                            Statuses = pr.Commits(null, null, 1, null).Nodes.Select(commit => 
+                                commit.Commit.Status.Contexts
+                                    .Select(context => new
+                                    {
+                                        context.Context,
+                                        context.State,
+                                    }).ToList()
+                                ).ToList().FirstOrDefault(),
                             Author = new ActorModel
                             {
                                 Login = pr.Author.Login,
@@ -871,6 +858,7 @@ namespace GitHub.Services
             public IList<ReviewAdapter> Reviews { get; set; }
 
             public object CheckSuites { get; set; }
+            public object Statuses { get; set; }
         }
 
         class ReviewAdapter
