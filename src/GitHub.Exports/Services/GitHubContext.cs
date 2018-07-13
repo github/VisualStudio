@@ -4,10 +4,12 @@ using GitHub.Primitives;
 namespace GitHub.Services
 {
     /// <summary>
-    /// Information used to map betwen a GitHub URL and some other context. This might be used to navigate
-    /// between a GitHub URL and the location a repository file. Alternatively it might be used to map between
-    /// the line a in a blame view and GitHub URL.
+    /// Information used to map betwen a GitHub URL and some other context.
     /// </summary>
+    /// <remarks>
+    /// This might be used to navigate between a GitHub URL and the location a repository file. Alternatively it
+    /// might be used to map between the line in a blame view and GitHub URL.
+    /// </remarks>
     public class GitHubContext
     {
         /// <summary>

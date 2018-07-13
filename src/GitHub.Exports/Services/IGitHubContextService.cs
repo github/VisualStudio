@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
+    /// <summary>
+    /// Methods for constructing a <see cref="GitHubContext"/> and navigating based on a <see cref="GitHubContext"/>.
+    /// </summary>
     public interface IGitHubContextService
     {
         /// <summary>
