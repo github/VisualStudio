@@ -65,8 +65,18 @@
 
             <StackPanel Grid.Column="1">
                 <TextBlock DockPanel.Dock="Left"
-                       TextTrimming="CharacterEllipsis"
-                       Text="{Binding Title}" />
+                           TextTrimming="CharacterEllipsis"
+                           Text="{Binding Title}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
