@@ -15,7 +15,6 @@ using SVsServiceProvider = Microsoft.VisualStudio.Shell.SVsServiceProvider;
 
 namespace GitHub.VisualStudio.Commands
 {
-    /// <inheritdoc/>
     [Export(typeof(IOpenFromUrlCommand))]
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {

@@ -36,6 +36,7 @@ namespace GitHub.Services
         }
 
         string vsVersion;
+        /// <inheritdoc/>
         public string VSVersion
         {
             get
@@ -46,6 +47,7 @@ namespace GitHub.Services
             }
         }
 
+        /// <inheritdoc/>
         public VSConstants.MessageBoxResult ShowMessageBoxInfo(string message)
         {
             return (VSConstants.MessageBoxResult)VsShellUtilities.ShowMessageBox(serviceProvider, message, null,
