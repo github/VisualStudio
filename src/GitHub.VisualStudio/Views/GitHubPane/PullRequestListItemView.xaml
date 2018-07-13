@@ -30,9 +30,9 @@
 
     <Grid>
         <Image HorizontalAlignment="Left"
-               Stretch="None"
-               Opacity="0.2"
-               Visibility="{Binding Converter={ghfvs:EqualsToVisibilityConverter {x:Null}}}">
+           Stretch="None"
+           Opacity="0.2"
+           Visibility="{Binding Converter={ghfvs:EqualsToVisibilityConverter {x:Null}}}">
             <Image.Source>
                 <DrawingImage>
                     <DrawingImage.Drawing>
@@ -50,41 +50,57 @@
             </Image.Source>
         </Image>
 
-        <DockPanel Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
-            <views:ActorAvatarView DockPanel.Dock="Left"
-                                   ViewModel="{Binding Author}"
-                                   Margin="0,1,10,0"
-                                   Width="30"
-                                   Height="30"
-                                   VerticalAlignment="Top"/>
+        <Grid Visibility="{Binding Converter={ghfvs:NullToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <views:ActorAvatarView
+                               Grid.Column="0"
+                               ViewModel="{Binding Author}"
+                               Margin="0,1,4,0"
+                               Width="32"
+                               Height="32"
+                               VerticalAlignment="Top"/>
 
-            <ghfvs:OcticonImage DockPanel.Dock="Right"
-                                Background="Transparent"
-                                Icon="git_pull_request"
-                                ToolTip="This is the current branch"
-                                VerticalAlignment="Stretch"
-                                Visibility="{Binding IsCurrent, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
-
-            <TextBlock DockPanel.Dock="Top"
-                       Margin="0,-1,5,0"
-                       Text="{Binding Title}"
-                       TextTrimming="CharacterEllipsis"/>
-
-            <StackPanel DockPanel.Dock="Top"
-                    Margin="0,2,5,0"
-                    Orientation="Horizontal"
-                    Opacity="0.5">
-                <TextBlock>
-                    <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
-                    <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-                    by
-                    <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+            <StackPanel Grid.Column="1">
+                <TextBlock DockPanel.Dock="Left"
+                           TextTrimming="CharacterEllipsis"
+                           Text="{Binding Title}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
                 </TextBlock>
-                <TextBlock Margin="4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}">
-                <ghfvs:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>
-                <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top"/>
-                </TextBlock>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Opacity="0.5" Margin="0 0 4 0">
+                            <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
+                        </TextBlock>
+
+                        <TextBlock Opacity="0.5" TextTrimming="CharacterEllipsis">
+                            <Run Text="updated"/>
+                            <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                            by
+                            <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Opacity="0.5"  Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8 0 0 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+                        <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
+                    </TextBlock>
+                </Grid>
             </StackPanel>
-        </DockPanel>
+        </Grid>
     </Grid>
 </UserControl>
