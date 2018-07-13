@@ -199,6 +199,9 @@
       <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
@@ -217,6 +220,7 @@
     <Compile Include="..\Helpers\TestImageCache.cs" />
     <Compile Include="..\Helpers\TestSharedCache.cs" />
     <Compile Include="Args.cs" />
+    <Compile Include="Commands\OpenFromClipboardCommandTests.cs" />
     <Compile Include="Services\ConnectionManagerTests.cs" />
     <Compile Include="Services\JsonConnectionCacheTests.cs" />
     <Compile Include="Services\MetricsTests.cs" />
@@ -226,6 +230,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2D3D2834-33BE-45CA-B3CC-12F853557D7B}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
       <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
       <Name>Akavache_Net45</Name>

@@ -228,6 +228,7 @@
     <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />
     <Compile Include="SampleData\UserFilterViewModelDesigner.cs" />
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
+    <Compile Include="Services\GitHubContextService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
     <Compile Include="Services\RepositoryForkService.cs" />
     <Compile Include="Services\RepositoryService.cs" />
