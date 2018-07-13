@@ -4,6 +4,7 @@ using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
+using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Commands
@@ -22,6 +23,7 @@ namespace GitHub.VisualStudio.Commands
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IVSServices> vsServices;
+        readonly UIContext uiContext;
 
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -46,6 +48,9 @@ namespace GitHub.VisualStudio.Commands
 
             // See https://code.msdn.microsoft.com/windowsdesktop/AllowParams-2005-9442298f
             ParametersDescription = "u";    // accept a single url
+
+            // This command is only visible when in the context of a Git repository
+            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
         }
 
         public override async Task Execute(string url)
@@ -108,6 +113,11 @@ namespace GitHub.VisualStudio.Commands
             }
 
             gitHubContextService.Value.TryOpenFile(repositoryDir, context);
+        }
+
+        protected override void QueryStatus()
+        {
+            Visible = uiContext.IsActive;
         }
     }
 }

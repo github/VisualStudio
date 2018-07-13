@@ -127,6 +127,8 @@
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>AllowParams</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Open from clipboard</ButtonText>
           <CanonicalName>.GitHub.OpenFromClipboard</CanonicalName>
