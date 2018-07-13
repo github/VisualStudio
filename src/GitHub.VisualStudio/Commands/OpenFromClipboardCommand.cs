@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio.Commands
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IVSServices> vsServices;
-        readonly UIContext uiContext;
+        readonly Lazy<UIContext> uiContext;
 
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -51,7 +51,7 @@ namespace GitHub.VisualStudio.Commands
             ParametersDescription = "u";    // accept a single url
 
             // This command is only visible when in the context of a Git repository
-            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
+            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git)));
         }
 
         public override async Task Execute(string url)
@@ -118,7 +118,7 @@ namespace GitHub.VisualStudio.Commands
 
         protected override void QueryStatus()
         {
-            Visible = uiContext.IsActive;
+            Visible = uiContext.Value.IsActive;
         }
     }
 }
