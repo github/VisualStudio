@@ -43,11 +43,17 @@ namespace GitHub.Primitives
                 SetFilePath(uriString);
             }
 
-            if (RepositoryName != null)
+            if (Owner != null && RepositoryName != null)
             {
-                NameWithOwner = Owner != null
-                    ? string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName)
-                    : RepositoryName;
+                NameWithOwner = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName);
+            }
+            else if (Owner != null)
+            {
+                NameWithOwner = Owner;
+            }
+            else if (RepositoryName != null)
+            {
+                NameWithOwner = RepositoryName;
             }
         }
 
@@ -65,18 +71,16 @@ namespace GitHub.Primitives
 
         void SetUri(Uri uri)
         {
+            var ownerSegment = FindSegment(uri.Segments, 0);
+            var repositorySegment = FindSegment(uri.Segments, 1);
+
             Host = uri.Host;
-            if (uri.Segments.Any())
-            {
-                RepositoryName = GetRepositoryName(uri.Segments.Last());
-            }
-
-            if (uri.Segments.Length > 2)
-            {
-                Owner = (uri.Segments[uri.Segments.Length - 2] ?? "").TrimEnd('/').ToNullIfEmpty();
-            }
-
+            Owner = ownerSegment;
+            RepositoryName = GetRepositoryName(repositorySegment);
             IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
+
+            string FindSegment(string[] segments, int number)
+                => segments.Skip(number + 1).FirstOrDefault()?.TrimEnd("/");
         }
 
         void SetFilePath(Uri uri)
@@ -143,7 +147,7 @@ namespace GitHub.Primitives
                 ? url.Scheme
                 : Uri.UriSchemeHttps;
 
-            var nameWithOwner = owner != null && Owner != null ?
+            var nameWithOwner = owner != null && RepositoryName != null ?
                 string.Format(CultureInfo.InvariantCulture, "{0}/{1}", owner, RepositoryName) :
                 NameWithOwner;
 
