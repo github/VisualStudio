@@ -72,6 +72,30 @@ namespace GitHub.Services
         (string commitish, string path, string commitSha) ResolveBlob(string repositoryDir, GitHubContext context, string remoteName = "origin");
 
         /// <summary>
+        /// Find the object-ish (first 8 chars of a blob SHA) from the path to historical blob created by Team Explorer.
+        /// </summary>
+        /// <remarks>
+        /// Team Explorer creates temporary blob files in the following format:
+        /// C:\Users\me\AppData\Local\Temp\TFSTemp\vctmp21996_181282.IOpenFromClipboardCommand.783ac965.cs
+        /// The object-ish appears immediately before the file extension and the path contains the folder "TFSTemp".
+        /// <remarks>
+        /// <param name="tempFile">The path to a possible Team Explorer temporary blob file.</param>
+        /// <returns>The target file's object-ish (blob SHA fragment) or null if the path isn't recognized as a Team Explorer blob file.</returns>
+        string FindObjectishForTFSTempFile(string tempFile);
+
+        /// <summary>
+        /// Find a tree entry in the commit log where a blob appears and return its commit SHA and path.
+        /// </summary>
+        /// <remarks>
+        /// Search back through the commit log for the first tree entry where a blob appears. This operation only takes
+        /// a fraction of a seond on the `github/VisualStudio` repository even if a tree entry casn't be found.
+        /// </remarks>
+        /// <param name="repositoryDir">The target repository directory.</param>
+        /// <param name="objectish">The fragment of a blob SHA to find.</param>
+        /// <returns>The commit SHA and blob path or null if the blob can't be found.</returns>
+        (string commitSha, string blobPath) ResolveBlobFromHistory(string repositoryDir, string objectish);
+
+        /// <summary>
         /// Check if a file in the working directory has changed since a specified commit-ish.
         /// </summary>
         /// <remarks>
