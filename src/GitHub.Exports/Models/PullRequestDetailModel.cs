@@ -91,5 +91,7 @@ namespace GitHub.Models
         /// into threads, as such each pull request review comment will appear in both collections.
         /// </remarks>
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
+
+        public List<CheckSuiteModel> CheckSuites { get; set; }
     }
 }

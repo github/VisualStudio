@@ -38,6 +38,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
+        private IChecksService checksService;
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -73,7 +74,8 @@ namespace GitHub.ViewModels.GitHubPane
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files,
-            ISyncSubmodulesCommand syncSubmodulesCommand)
+            ISyncSubmodulesCommand syncSubmodulesCommand,
+            IChecksService checksService)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -88,6 +90,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
             this.syncSubmodulesCommand = syncSubmodulesCommand;
+            this.checksService = checksService;
             Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(

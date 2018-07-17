@@ -38,6 +38,7 @@ namespace GitHub.InlineReviews.Services
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
         static ICompiledQuery<PullRequestDetailModel> readPullRequest;
+        static ICompiledQuery<IEnumerable<List<CheckSuiteModel>>> readCheckSuites;
         static ICompiledQuery<ActorModel> readViewer;
 
         readonly IGitService gitService;
@@ -339,6 +340,9 @@ namespace GitHub.InlineReviews.Services
 
             var apiClient = await apiClientFactory.Create(address);
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
+            var checkSuites = await GetPullRequestCheckSuites(address, owner, name, number);
+
+            result.CheckSuites = checkSuites;
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -349,6 +353,56 @@ namespace GitHub.InlineReviews.Services
 
             BuildPullRequestThreads(result);
             return result;
+        }
+
+        private async Task<List<CheckSuiteModel>> GetPullRequestCheckSuites(HostAddress address, string owner, string name, int number)
+        {
+            if(readCheckSuites == null)
+            {
+                readCheckSuites = new Query()
+                .Repository(Var(nameof(owner)), Var(nameof(name)))
+                .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                    commit => commit.Commit.CheckSuites(null, null, null, null, null).AllPages()
+                        .Select(suite => new CheckSuiteModel
+                        {
+                            Conclusion = (CheckConclusionStateEnum?) suite.Conclusion,
+                            Status = (CheckStatusStateEnum) suite.Status,
+                            CreatedAt = suite.CreatedAt,
+                            UpdatedAt = suite.UpdatedAt,
+                            CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages()
+                                .Select(run => new CheckRunModel
+                                {
+                                    Conclusion = (CheckConclusionStateEnum?) run.Conclusion,
+                                    Status = (CheckStatusStateEnum) run.Status,
+                                    StartedAt = run.StartedAt,
+                                    CompletedAt = run.CompletedAt,
+                                    Annotations = run.Annotations(null, null, null, null).AllPages()
+                                        .Select(annotation => new CheckRunAnnotationModel
+                                        {
+                                            BlobUrl = annotation.BlobUrl,
+                                            StartLine = annotation.StartLine,
+                                            EndLine = annotation.EndLine,
+                                            Filename = annotation.Filename,
+                                            Message = annotation.Message,
+                                            Title = annotation.Title,
+                                            WarningLevel = (CheckAnnotationLevelEnum?) annotation.WarningLevel,
+                                            RawDetails = annotation.RawDetails
+                                        }).ToList()
+                                }).ToList()
+                        }).ToList()
+                ).Compile();
+            }
+
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(number), number },
+            };
+
+            var connection = await graphqlFactory.CreateConnection(address);
+            var result = await connection.Run(readCheckSuites, vars);
+            return result.First();
         }
 
         public virtual async Task<ActorModel> ReadViewer(HostAddress address)

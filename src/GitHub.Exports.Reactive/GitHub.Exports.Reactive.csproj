@@ -175,6 +175,7 @@
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
     <Compile Include="Models\PullRequestTextBufferInfo.cs" />
+    <Compile Include="Services\IChecksService.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />
     <Compile Include="Services\IPullRequestEditorService.cs" />

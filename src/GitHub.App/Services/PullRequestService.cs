@@ -93,22 +93,28 @@ namespace GitHub.Services
                         Items = page.Nodes.Select(pr => new ListItemAdapter
                         {
                             Id = pr.Id.Value,
-                            CheckSuites = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
-                                commit.Commit.CheckSuites(null, null, null, null, null).AllPages()
-                                    .Select(suite => new
-                                    {
-                                        suite.Conclusion,
-                                        suite.Status,
-                                    }).ToList()
-                                ).ToList().FirstOrDefault(),
-                            Statuses = pr.Commits(null, null, 1, null).Nodes.Select(commit => 
-                                commit.Commit.Status.Contexts
-                                    .Select(context => new
-                                    {
-                                        context.Context,
-                                        context.State,
-                                    }).ToList()
-                                ).ToList().FirstOrDefault(),
+                            LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                new
+                                {
+                                    Checks = commit.Commit.CheckSuites(null, null, null, null, null).AllPages()
+                                        .Select(suite => new
+                                        {
+                                            suite.Conclusion,
+                                            suite.Status,
+                                        }).ToList(),
+                                    
+                                    /*
+                                    TODO: Resolve https://github.com/octokit/octokit.graphql.net/pull/122
+                                    Contexts can be null
+
+                                    Statuses = commit.Commit.Status.Contexts
+                                            .Select(context => new
+                                            {
+                                                context.Context,
+                                                context.State,
+                                            }).ToList()
+                                    */
+                                }).ToList().FirstOrDefault(),
                             Author = new ActorModel
                             {
                                 Login = pr.Author.Login,
@@ -857,8 +863,7 @@ namespace GitHub.Services
         {
             public IList<ReviewAdapter> Reviews { get; set; }
 
-            public object CheckSuites { get; set; }
-            public object Statuses { get; set; }
+            public object LastCommit { get; set; }
         }
 
         class ReviewAdapter

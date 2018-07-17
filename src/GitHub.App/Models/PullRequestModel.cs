@@ -3,7 +3,6 @@ using System.Globalization;
 using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
 using System.Diagnostics;
-using System.Collections.Generic;
 using GitHub.Extensions;
 
 namespace GitHub.Models
