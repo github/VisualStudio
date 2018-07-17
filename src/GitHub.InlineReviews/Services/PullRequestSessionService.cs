@@ -362,14 +362,14 @@ namespace GitHub.InlineReviews.Services
                 readCheckSuites = new Query()
                 .Repository(Var(nameof(owner)), Var(nameof(name)))
                 .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
-                    commit => commit.Commit.CheckSuites(null, null, null, null, null).AllPages()
+                    commit => commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                         .Select(suite => new CheckSuiteModel
                         {
                             Conclusion = (CheckConclusionStateEnum?) suite.Conclusion,
                             Status = (CheckStatusStateEnum) suite.Status,
                             CreatedAt = suite.CreatedAt,
                             UpdatedAt = suite.UpdatedAt,
-                            CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages()
+                            CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                 .Select(run => new CheckRunModel
                                 {
                                     Conclusion = (CheckConclusionStateEnum?) run.Conclusion,

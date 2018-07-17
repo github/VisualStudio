@@ -94,13 +94,14 @@ namespace GitHub.Services
                         {
                             Id = pr.Id.Value,
                             LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
-                                new
+                                new LastCommitSummaryModel
                                 {
-                                    Checks = commit.Commit.CheckSuites(null, null, null, null, null).AllPages()
-                                        .Select(suite => new
+                                    Id = commit.Id,
+                                    Checks = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                        .Select(suite => new CheckSuiteSummaryModel
                                         {
-                                            suite.Conclusion,
-                                            suite.Status,
+                                            Conclusion = (CheckConclusionStateEnum?) suite.Conclusion,
+                                            Status = (CheckStatusStateEnum) suite.Status,
                                         }).ToList(),
                                     
                                     /*
@@ -863,7 +864,7 @@ namespace GitHub.Services
         {
             public IList<ReviewAdapter> Reviews { get; set; }
 
-            public object LastCommit { get; set; }
+            public LastCommitSummaryModel LastCommit { get; set; }
         }
 
         class ReviewAdapter
@@ -871,6 +872,20 @@ namespace GitHub.Services
             public string Body { get; set; }
             public int CommentCount { get; set; }
             public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
+        }
+
+        class LastCommitSummaryModel
+        {
+            public ID Id { get; set; }
+
+            public List<CheckSuiteSummaryModel> Checks { get; set; }
+        }
+
+        class CheckSuiteSummaryModel
+        {
+            public CheckConclusionStateEnum? Conclusion { get; set; }
+
+            public CheckStatusStateEnum Status { get; set; }
         }
     }
 }
