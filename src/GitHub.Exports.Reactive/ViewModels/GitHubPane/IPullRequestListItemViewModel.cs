@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Models;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -27,5 +28,10 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the last updated time of the pull request.
         /// </summary>
         DateTimeOffset UpdatedAt { get; }
+
+        /// <summary>
+        /// Gets the pull request checks and statuses summary
+        /// </summary>
+        PullRequestChecksEnum Checks { get; }
     }
 }

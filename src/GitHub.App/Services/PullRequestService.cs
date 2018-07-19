@@ -96,25 +96,19 @@ namespace GitHub.Services
                             LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                 new LastCommitSummaryModel
                                 {
-                                    Id = commit.Id,
-                                    Checks = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-                                        .Select(suite => new CheckSuiteSummaryModel
-                                        {
-                                            Conclusion = (CheckConclusionStateEnum?) suite.Conclusion,
-                                            Status = (CheckStatusStateEnum) suite.Status,
-                                        }).ToList(),
-                                    
-                                    /*
-                                    TODO: Resolve https://github.com/octokit/octokit.graphql.net/pull/122
-                                    Contexts can be null
-
-                                    Statuses = commit.Commit.Status.Contexts
-                                            .Select(context => new
-                                            {
-                                                context.Context,
-                                                context.State,
-                                            }).ToList()
-                                    */
+//                                    CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+//                                        .Select(suite => new CheckSuiteSummaryModel
+//                                        {
+//                                            Conclusion = (CheckConclusionStateEnum?)suite.Conclusion,
+//                                            Status = (CheckStatusStateEnum)suite.Status,
+//                                        }).ToList(),
+                                    Statuses = commit.Commit.Status
+                                            .Select(context =>
+                                                context.Contexts.Select(statusContext => new StatusSummaryModel
+                                                {
+                                                    State = (StatusStateEnum)statusContext.State,
+                                                }).ToList()
+                                            ).SingleOrDefault()
                                 }).ToList().FirstOrDefault(),
                             Author = new ActorModel
                             {
@@ -150,6 +144,71 @@ namespace GitHub.Services
             {
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
+
+                var hasCheckSuites = item.LastCommit.CheckSuites != null 
+                                     && item.LastCommit.CheckSuites.Any();
+
+                var hasStatuses = item.LastCommit.Statuses != null 
+                                  && item.LastCommit.Statuses.Any();
+
+                if (!hasCheckSuites && !hasStatuses)
+                {
+                    item.Checks = PullRequestChecksEnum.None;
+                }
+                else
+                {
+                    var checksHasFailure = false;
+                    var checksHasCompleteSuccess = true;
+
+                    if (hasCheckSuites)
+                    {
+                        checksHasFailure = item.LastCommit
+                            .CheckSuites.Any(model => model.Conclusion.HasValue
+                                                      && (model.Conclusion.Value == CheckConclusionStateEnum.Failure
+                                                          || model.Conclusion.Value ==
+                                                          CheckConclusionStateEnum.ActionRequired));
+
+                        if (!checksHasFailure)
+                        {
+                            checksHasCompleteSuccess = item.LastCommit
+                                .CheckSuites.All(model => model.Conclusion.HasValue
+                                                          && (model.Conclusion.Value == CheckConclusionStateEnum.Success
+                                                              || model.Conclusion.Value ==
+                                                              CheckConclusionStateEnum.Neutral));
+                        }
+                    }
+
+                    var statusHasFailure = false;
+                    var statusHasCompleteSuccess = true;
+
+                    if (!checksHasFailure && hasStatuses)
+                    {
+                        statusHasFailure = item.LastCommit
+                            .Statuses
+                            .Any(status => status.State == StatusStateEnum.Failure);
+
+                        if (!statusHasFailure)
+                        {
+                            statusHasCompleteSuccess =
+                                item.LastCommit.Statuses.All(status => status.State == StatusStateEnum.Success);
+                        }
+                    }
+
+                    if (checksHasFailure || statusHasFailure)
+                    {
+                        item.Checks = PullRequestChecksEnum.Failure;
+                    }
+                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
+                    {
+                        item.Checks = PullRequestChecksEnum.Success;
+                    }
+                    else
+                    {
+                        item.Checks = PullRequestChecksEnum.Pending;
+                    }
+                }
+
+                item.LastCommit = null;
             }
 
             return result;
@@ -876,9 +935,9 @@ namespace GitHub.Services
 
         class LastCommitSummaryModel
         {
-            public ID Id { get; set; }
+            public List<CheckSuiteSummaryModel> CheckSuites { get; set; }
 
-            public List<CheckSuiteSummaryModel> Checks { get; set; }
+            public List<StatusSummaryModel> Statuses { get; set; }
         }
 
         class CheckSuiteSummaryModel
@@ -887,5 +946,10 @@ namespace GitHub.Services
 
             public CheckStatusStateEnum Status { get; set; }
         }
+    }
+
+    public class StatusSummaryModel
+    {
+        public StatusStateEnum State { get; set; }
     }
 }

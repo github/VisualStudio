@@ -38,6 +38,11 @@ namespace GitHub.Models
         public PullRequestStateEnum State { get; set; }
 
         /// <summary>
+        /// Gets the pull request checks and statuses summary
+        /// </summary>
+        public PullRequestChecksEnum Checks { get; set; }
+
+        /// <summary>
         /// Gets or sets the date/time at which the pull request was last updated.
         /// </summary>
         public DateTimeOffset UpdatedAt { get; set; }

@@ -124,6 +124,17 @@ namespace GitHub.Models
             }
         }
 
+        PullRequestChecksEnum checks;
+        public PullRequestChecksEnum Checks
+        {
+            get { return checks; }
+            set
+            {
+                checks = value;
+                this.RaisePropertyChange();
+            }
+        }
+
         // TODO: Remove these property once maintainer workflow has been merged to master.
         public bool IsOpen => State == PullRequestStateEnum.Open;
         public bool Merged => State == PullRequestStateEnum.Merged;

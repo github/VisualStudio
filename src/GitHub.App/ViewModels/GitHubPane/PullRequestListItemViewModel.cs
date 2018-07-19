@@ -19,6 +19,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             Id = model.Id;
             Author = new ActorViewModel(model.Author);
+            Checks = model.Checks;
             CommentCount = model.CommentCount;
             Number = model.Number;
             Title = model.Title;
@@ -30,6 +31,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public IActorViewModel Author { get; protected set; }
+
+        /// <inheritdoc/>
+        public PullRequestChecksEnum Checks { get; protected set; }
 
         /// <inheritdoc/>
         public int CommentCount { get; protected set; }

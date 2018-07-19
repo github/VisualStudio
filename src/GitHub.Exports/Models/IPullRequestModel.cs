@@ -13,12 +13,21 @@ namespace GitHub.Models
         Merged,
     }
 
+    public enum PullRequestChecksEnum
+    {
+        None,
+        Pending,
+        Success,
+        Failure
+    }
+
     public interface IPullRequestModel : ICopyable<IPullRequestModel>,
         IEquatable<IPullRequestModel>, IComparable<IPullRequestModel>
     {
         int Number { get; }
         string Title { get; }
         PullRequestStateEnum State { get; }
+        PullRequestChecksEnum Checks { get; }
         int CommentCount { get; }
         int CommitCount { get; }
         bool IsOpen { get; }

@@ -12,7 +12,8 @@
                                                     Title="Let's try doing this differently"
                                                     CommentCount="4"
                                                     IsCurrent="True"
-                                                    UpdatedAt="2018-01-29">
+                                                    UpdatedAt="2018-01-29"
+                                                    Checks="Success">
             <ghfvs:PullRequestListItemViewModelDesigner.Author>
                 <ghfvs:ActorViewModelDesigner Login="shana"/>
             </ghfvs:PullRequestListItemViewModelDesigner.Author>
@@ -84,6 +85,12 @@
                 <ghfvs:OcticonImage Icon="comment" Width="16" Height="16" Margin="0 0 0 -4"/>
                 <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Top"/>
                 </TextBlock>
+
+                <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+                <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                <ghfvs:OcticonImage Icon="clock" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+
+
             </StackPanel>
         </DockPanel>
     </Grid>
