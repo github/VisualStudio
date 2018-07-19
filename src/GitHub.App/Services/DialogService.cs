@@ -5,6 +5,7 @@ using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.ViewModels.Dialog;
+using GitHub.ViewModels.Dialog.Clone;
 
 namespace GitHub.Services
 {

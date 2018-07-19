@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Reactive;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitHub.Models;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -32,5 +34,16 @@ namespace GitHub.Services
             string repositoryName,
             string repositoryPath,
             object progress = null);
+
+        /// <summary>
+        /// Checks whether the specified destination path already exists.
+        /// </summary>
+        /// <param name="path">The destination path.</param>
+        /// <returns>
+        /// true if a file or directory is already present at <paramref name="path"/>; otherwise false.
+        /// </returns>
+        bool DestinationExists(string path);
+
+        Task<IEnumerable<RepositoryListItemModel>> ReadViewerRepositories(HostAddress address);
     }
 }

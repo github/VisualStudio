@@ -97,7 +97,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clone a {0} Repository.
+        ///   Looks up a localized string similar to Clone a Repository.
         /// </summary>
         public static string CloneTitle {
             get {
@@ -159,6 +159,15 @@ namespace GitHub.App {
         public static string DefaultGistFileName {
             get {
                 return ResourceManager.GetString("DefaultGistFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The destination already exists..
+        /// </summary>
+        public static string DestinationAlreadyExists {
+            get {
+                return ResourceManager.GetString("DestinationAlreadyExists", resourceCulture);
             }
         }
         

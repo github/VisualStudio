@@ -7,6 +7,7 @@ using GitHub.Services;
 using System.Linq.Expressions;
 using System;
 using GitHub.Models;
+using GitHub.Api;
 
 public class RepositoryCloneServiceTests
 {
@@ -32,8 +33,9 @@ public class RepositoryCloneServiceTests
             var serviceProvider = Substitutes.ServiceProvider;
             var operatingSystem = serviceProvider.GetOperatingSystem();
             var vsGitServices = serviceProvider.GetVSGitServices();
+            var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
             var usageTracker = Substitute.For<IUsageTracker>();
-            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, usageTracker);
+            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, graphqlFactory, usageTracker);
 
             await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
             var model = UsageModel.Create(Guid.NewGuid());

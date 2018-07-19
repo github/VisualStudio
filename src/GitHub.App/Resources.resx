@@ -121,7 +121,7 @@
     <value>Select a containing folder for your new repository.</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>Clone a {0} Repository</value>
+    <value>Clone a Repository</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>Could not connect to github.com</value>
@@ -320,5 +320,8 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
     <value>Switch Origin</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>The destination already exists.</value>
   </data>
 </root>

@@ -144,7 +144,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
                         result.Repository.Name,
-                        result.BasePath);
+                        result.Path);
 
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
