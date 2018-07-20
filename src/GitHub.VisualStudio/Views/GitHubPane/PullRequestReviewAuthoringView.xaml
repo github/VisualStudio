@@ -50,7 +50,8 @@
                      SpellCheck.IsEnabled="True"/>
             
             <StackPanel Margin="0 4" Orientation="Horizontal">
-                <ui:DropDownButton AutoCloseOnClick="True" Content="Submit review">
+                <ui:DropDownButton AutoCloseOnClick="True" Foreground="{DynamicResource GHBlueLinkButtonTextBrush}">
+                    <ui:GitHubActionLink>Submit review</ui:GitHubActionLink>
                     <ui:DropDownButton.DropDownContent>
                         <Border Background="{DynamicResource GitHubVsToolWindowBackground}"
                                 BorderBrush="{DynamicResource GitHubComboBoxBorderBrush}"
