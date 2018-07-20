@@ -80,31 +80,27 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Opacity="0.5" Margin="0 0 4 0">
-                            <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
-                        </TextBlock>
-
-                        <TextBlock Opacity="0.5" TextTrimming="CharacterEllipsis">
-                            <Run Text="updated"/>
-                            <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
-                            by
-                            <Run Text="{Binding Author.Login, Mode=OneWay}"/>
-                        </TextBlock>
-                    </StackPanel>
-
-                    <TextBlock Opacity="0.5"  Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8 0 0 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
-                        <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Opacity="0.5" Margin="0 0 4 0">
+                        <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}"/>
                     </TextBlock>
-                    <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
-                    <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-                    <ghfvs:OcticonImage Icon="clock" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
-                </Grid>
+
+                    <TextBlock Opacity="0.5" TextTrimming="CharacterEllipsis">
+                        <Run Text="updated"/>
+                        <Run Text="{Binding UpdatedAt, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                        by
+                        <Run Text="{Binding Author.Login, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <TextBlock Opacity="0.5"  Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+                    <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
+                </TextBlock>
+                <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+                <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                <ghfvs:OcticonImage Icon="clock" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
             </StackPanel>
         </Grid>
     </Grid>
