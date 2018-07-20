@@ -11,6 +11,16 @@ namespace GitHub.Models
         /// Gets the ID of the comment.
         /// </summary>
         public string Id { get; set; }
+        
+        /// <summary>
+        /// Gets the DatabaseId of the comment.
+        /// </summary>
+        public int DatabaseId { get; set; }
+
+        /// <summary>
+        /// Gets the PullRequestId of the comment
+        /// </summary>
+        public int PullRequestId { get; set; }
 
         /// <summary>
         /// Gets the author of the comment.

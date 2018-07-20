@@ -138,9 +138,10 @@ namespace GitHub.Services
         /// <summary>
         /// Deletes a pull request comment.
         /// </summary>
-        /// <param name="number">The number of the pull request comment to delete</param>
+        /// <param name="pullRequestId">The number of the pull request id of the comment</param>
+        /// <param name="commentDatabaseId">The number of the pull request comment to delete</param>
         /// <returns>A task which completes when the session has completed updating.</returns>
-        Task DeleteComment(int number);
+        Task DeleteComment(int pullRequestId, int commentDatabaseId);
 
         /// <summary>
         /// Edit a PR review comment reply.

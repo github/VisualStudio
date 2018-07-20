@@ -32,15 +32,20 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
+        /// <param name="pullRequestId">The pull request id of the comment.</param>
         /// <param name="commentId">The GraphQL ID of the comment.</param>
+        /// <param name="databaseId">The database id of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
         /// <param name="author">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
+        /// <param name="webUrl"></param>
         protected CommentViewModel(
             ICommentThreadViewModel thread,
             IActorViewModel currentUser,
+            int pullRequestId,
             string commentId,
+            int databaseId,
             string body,
             CommentEditState state,
             IActorViewModel author,
@@ -54,6 +59,8 @@ namespace GitHub.InlineReviews.ViewModels
             Thread = thread;
             CurrentUser = currentUser;
             Id = commentId;
+            DatabaseId = databaseId;
+            PullRequestId = pullRequestId;
             Body = body;
             EditState = state;
             Author = author;
@@ -104,8 +111,10 @@ namespace GitHub.InlineReviews.ViewModels
             CommentModel model)
             : this(
                   thread, 
-                  new ActorViewModel(currentUser), 
+                  new ActorViewModel(currentUser),
+                  model.PullRequestId, 
                   model.Id, 
+                  model.DatabaseId, 
                   model.Body, 
                   CommentEditState.None, 
                   new ActorViewModel(model.Author), 
@@ -126,7 +135,7 @@ namespace GitHub.InlineReviews.ViewModels
                 ErrorMessage = null;
                 IsSubmitting = true;
 
-                await Thread.DeleteComment.ExecuteAsyncTask(Id);
+                await Thread.DeleteComment.ExecuteAsyncTask(new Tuple<int, int>(PullRequestId, DatabaseId));
             }
             catch (Exception e)
             {
@@ -191,6 +200,12 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public string Id { get; private set; }
+
+        /// <inheritdoc/>
+        public int DatabaseId { get; private set; }
+    
+        /// <inheritdoc/>
+        public int PullRequestId { get; private set; }
 
         /// <inheritdoc/>
         public string Body
