@@ -109,8 +109,15 @@ namespace GitHub.ViewModels.Dialog.Clone
             try
             {
                 var results = await service.ReadViewerRepositories(connection.HostAddress).ConfigureAwait(true);
-                Items = results.Select(x => new RepositoryItemViewModel(x)).ToList();
+
+                var yourRepositories = results.Repositories
+                    .Select(x => new RepositoryItemViewModel(x, "Your repositories"));
+                var orgRepositories = results.OrganizationRepositories
+                    .OrderBy(x => x.Key)
+                    .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, x.Key)));
+                Items = yourRepositories.Concat(orgRepositories).ToList();
                 ItemsView = CollectionViewSource.GetDefaultView(Items);
+                ItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RepositoryItemViewModel.Group)));
                 ItemsView.Filter = FilterItem;
             }
             catch (Exception ex)

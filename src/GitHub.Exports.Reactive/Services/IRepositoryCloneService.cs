@@ -44,6 +44,6 @@ namespace GitHub.Services
         /// </returns>
         bool DestinationExists(string path);
 
-        Task<IEnumerable<RepositoryListItemModel>> ReadViewerRepositories(HostAddress address);
+        Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address);
     }
 }

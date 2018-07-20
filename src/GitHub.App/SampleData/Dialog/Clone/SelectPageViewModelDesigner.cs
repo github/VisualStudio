@@ -26,8 +26,9 @@ namespace GitHub.SampleData.Dialog.Clone
                     new RepositoryListItemModel { Name = "github", Owner = "github", IsPrivate = true }
                 };
 
-            Items = items.Select(x => new RepositoryItemViewModel(x)).ToList();
+            Items = items.Select(x => new RepositoryItemViewModel(x, x.Owner)).ToList();
             ItemsView = CollectionViewSource.GetDefaultView(Items);
+            ItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RepositoryItemViewModel.Group)));
         }
 
         public Exception Error { get; set; }

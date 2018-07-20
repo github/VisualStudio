@@ -13,6 +13,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using Microsoft.VisualStudio.Shell;
 using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
 using Rothko;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
@@ -35,7 +36,7 @@ namespace GitHub.Services
         readonly IVSGitServices vsGitServices;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
-        ICompiledQuery<IEnumerable<OrganizationAdapter>> readViewerRepositories;
+        ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
         [ImportingConstructor]
         public RepositoryCloneService(
@@ -53,28 +54,52 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<RepositoryListItemModel>> ReadViewerRepositories(HostAddress address)
+        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address)
         {
             if (readViewerRepositories == null)
             {
+                var order = new RepositoryOrder
+                {
+                    Field = RepositoryOrderField.Name,
+                    Direction = OrderDirection.Asc
+                };
+
+                // TODO: Use fragments for the repository selections.
                 readViewerRepositories = new Query()
                     .Viewer
-                    .Organizations().AllPages().Select(org => new OrganizationAdapter
+                    .Select(viewer => new ViewerRepositoriesModel
                     {
-                        Repositories = org.Repositories(null, null, null, null, null, null, null, null, null).AllPages().Select(repo => new RepositoryListItemModel
+                        Repositories = viewer.Repositories(null, null, null, null, null, order, null, null, null)
+                            .AllPages()
+                            .Select(repo => new RepositoryListItemModel
+                            {
+                                IsFork = repo.IsFork,
+                                IsPrivate = repo.IsPrivate,
+                                Name = repo.Name,
+                                Owner = repo.Owner.Login,
+                                Url = new Uri(repo.Url),
+                            }).ToList(),
+                        // TODO: Use AllPages() below once octokit/octokit.graphql.net#132 is fixed.
+                        OrganizationRepositories = viewer.Organizations(100, null, null, null).Nodes.Select(org => new
                         {
-                            IsFork = repo.IsFork,
-                            IsPrivate = repo.IsPrivate,
-                            Name = repo.Name,
-                            Owner = repo.Owner.Login,
-                            Url = new Uri(repo.Url),
-                        }).ToList(),
+                            org.Login,
+                            Repositories = org.Repositories(null, null, null, null, null, order, null, null, null)
+                                .AllPages()
+                                .Select(repo => new RepositoryListItemModel
+                                {
+                                    IsFork = repo.IsFork,
+                                    IsPrivate = repo.IsPrivate,
+                                    Name = repo.Name,
+                                    Owner = repo.Owner.Login,
+                                    Url = new Uri(repo.Url),
+                                }).ToList()
+                        }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();
             }
 
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
             var result = await graphql.Run(readViewerRepositories).ConfigureAwait(false);
-            return result.SelectMany(x => x.Repositories);
+            return result;
         }
 
         /// <inheritdoc/>

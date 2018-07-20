@@ -27,17 +27,31 @@
                              Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
 
         <Grid>
-            <ListBox ItemsSource="{Binding ItemsView}"
-                     SelectedItem="{Binding SelectedItem}">
-                <ListBox.ItemTemplate>
+            <ListView BorderThickness="0"
+                      ItemsSource="{Binding ItemsView}"
+                      SelectedItem="{Binding SelectedItem}"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock FontWeight="Bold"
+                                           Margin="0 4"
+                                           Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+                <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <ghfvs:OcticonImage Icon="{Binding Icon}"/>
                             <TextBlock Margin="4" Text="{Binding Caption}"/>
                         </StackPanel>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ListView.ItemTemplate>
+            </ListView>
             <ghfvs:Spinner Visibility="{Binding IsLoading, Converter={ghfvs:BooleanToVisibilityConverter}}"
                            Width="32"
                            Height="32"/>
