@@ -11,6 +11,19 @@ namespace GitHub.Models
         /// Gets the ID of the comment.
         /// </summary>
         public string Id { get; set; }
+        
+        /// <summary>
+        /// Gets the DatabaseId of the comment.
+        /// </summary>
+        public int DatabaseId { get; set; }
+
+        /// <summary>
+        /// Gets the PullRequestId of the comment.
+        /// </summary>
+        public int PullRequestId { get; set; }
+        // The GraphQL Api does not allow for deleting of pull request comments.
+        // REST Api must be used, and PullRequestId is needed to reload the pull request.
+        // This field should be removed with better GraphQL support.
 
         /// <summary>
         /// Gets the author of the comment.

@@ -80,8 +80,8 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            var number = (int)parameter;
-            await Session.DeleteComment(number);
+            var item = (Tuple<int, int>)parameter;
+            await Session.DeleteComment(item.Item1, item.Item2);
         }
     }
 }
