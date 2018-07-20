@@ -55,7 +55,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" MinWidth="40"/>
             </Grid.ColumnDefinitions>
             <views:ActorAvatarView
                                Grid.Column="0"
