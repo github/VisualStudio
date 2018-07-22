@@ -12,11 +12,13 @@ namespace GitHub.SampleData
     {
         public PullRequestReviewAuthoringViewModelDesigner()
         {
-            PullRequestModel = new PullRequestModel(
-                419,
-                "Fix a ton of potential crashers, odd code and redundant calls in ModelService",
-                new AccountDesigner { Login = "Haacked", IsUser = true },
-                DateTimeOffset.Now - TimeSpan.FromDays(2));
+            PullRequestModel = new PullRequestDetailModel
+            {
+                Number = 419,
+                Title = "Fix a ton of potential crashers, odd code and redundant calls in ModelService",
+                Author = new ActorModel { Login = "Haacked" },
+                UpdatedAt =  DateTimeOffset.Now - TimeSpan.FromDays(2),
+            };
 
             Files = new PullRequestFilesViewModelDesigner();
 
@@ -42,10 +44,10 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; }
         public IPullRequestFilesViewModel Files { get; }
         public ILocalRepositoryModel LocalRepository { get; set; }
-        public IPullRequestReviewModel Model { get; set; }
+        public PullRequestReviewModel Model { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public string OperationError { get; set; }
-        public IPullRequestModel PullRequestModel { get; set; }
+        public PullRequestDetailModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public ReactiveCommand<Unit> Approve { get; }
         public ReactiveCommand<Unit> Comment { get; }

@@ -6,8 +6,8 @@ namespace GitHub.Models
 {
     public enum DiffSide
     {
-        Right,
         Left,
+        Right,
     }
 
     /// <summary>

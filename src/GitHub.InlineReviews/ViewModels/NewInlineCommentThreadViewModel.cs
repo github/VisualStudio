@@ -45,11 +45,11 @@ namespace GitHub.InlineReviews.ViewModels
                 this.WhenAnyValue(x => x.NeedsPush, x => !x),
                 DoPostComment);
 
-            EditComment = ReactiveCommand.CreateAsyncTask<ICommentModel>(
+            EditComment = ReactiveCommand.CreateAsyncTask<Unit>(
                 Observable.Return(false),
                 o => null);
 
-            DeleteComment = ReactiveCommand.CreateAsyncTask<object>(
+            DeleteComment = ReactiveCommand.CreateAsyncTask<Unit>(
                 Observable.Return(false),
                 o => null);
 
@@ -91,13 +91,7 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref needsPush, value); }
         }
 
-        /// <inheritdoc/>
-        public override Uri GetCommentUrl(int id)
-        {
-            throw new NotSupportedException("Cannot navigate to a non-posted comment.");
-        }
-
-        async Task<ICommentModel> DoPostComment(object parameter)
+        async Task DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
@@ -115,14 +109,12 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             var body = (string)parameter;
-            var model = await Session.PostReviewComment(
+            await Session.PostReviewComment(
                 body,
                 File.CommitSha,
                 File.RelativePath.Replace("\\", "/"),
                 File.Diff,
                 diffPosition.DiffLineNumber);
-
-            return model;
         }
     }
 }

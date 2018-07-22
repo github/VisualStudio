@@ -19,14 +19,19 @@ namespace GitHub.InlineReviews.ViewModels
     public interface ICommentViewModel : IViewModel
     {
         /// <summary>
-        /// Gets the ID of the comment.
-        /// </summary>
-        int Id { get; }
-
-        /// <summary>
         /// Gets the GraphQL ID of the comment.
         /// </summary>
-        string NodeId { get; }
+        string Id { get; }
+
+        /// <summary>
+        /// Gets the Database ID of the comment.
+        /// </summary>
+        int DatabaseId { get; }
+
+        /// <summary>
+        /// The pull request id of the comment
+        /// </summary>
+        int PullRequestId { get; }
 
         /// <summary>
         /// Gets or sets the body of the comment.
@@ -67,12 +72,17 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets the author of the comment.
         /// </summary>
-        IAccount User { get; }
+        IActorViewModel Author { get; }
 
         /// <summary>
         /// Gets the thread that the comment is a part of.
         /// </summary>
         ICommentThreadViewModel Thread { get; }
+
+        /// <summary>
+        /// Gets the URL of the comment on the web.
+        /// </summary>
+        Uri WebUrl { get; }
 
         /// <summary>
         /// Gets a command which will begin editing of the comment.

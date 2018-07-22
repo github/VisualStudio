@@ -434,4 +434,7 @@
   <data name="UpdateComment" xml:space="preserve">
     <value>Update comment</value>
   </data>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
 </root>

@@ -107,7 +107,8 @@
                Foreground="{DynamicResource GitHubVsWindowText}"
                MaxLength="{x:Static ghfvs:Constants.MaxRepositoryNameLength}"
                Text="{Binding RepositoryName}"
-               PromptText="{x:Static prop:Resources.RepoNameText}" 
+               PromptText="{x:Static prop:Resources.RepoNameText}"
+               SpellCheck.IsEnabled="True"
                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryNameTextBox}"
                VerticalContentAlignment="Center"/>
     </Grid>
@@ -121,7 +122,8 @@
                Foreground="{DynamicResource GitHubVsWindowText}"
                Text="{Binding Description}"
                TextWrapping="WrapWithOverflow"
-               PromptText="{x:Static prop:Resources.DescriptionOptional}" 
+               PromptText="{x:Static prop:Resources.DescriptionOptional}"
+               SpellCheck.IsEnabled="True"
                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}" />
     </Grid>
 

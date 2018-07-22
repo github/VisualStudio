@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -24,7 +22,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="comments">The comments to display in this inline review.</param>
         public InlineCommentThreadViewModel(
             IPullRequestSession session,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            IEnumerable<InlineCommentModel> comments)
             : base(session.User)
         {
             Guard.ArgumentNotNull(session, nameof(session));
@@ -45,7 +43,12 @@ namespace GitHub.InlineReviews.ViewModels
 
             foreach (var comment in comments)
             {
-                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment));
+                Comments.Add(new PullRequestReviewCommentViewModel(
+                    session,
+                    this,
+                    CurrentUser,
+                    comment.Review,
+                    comment.Comment));
             }
 
             Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
@@ -56,42 +59,29 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
-        /// <inheritdoc/>
-        public override Uri GetCommentUrl(int id)
-        {
-            return new Uri(string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}/pull/{1}#discussion_r{2}",
-                Session.LocalRepository.CloneUrl.ToRepositoryUrl(Session.RepositoryOwner),
-                Session.PullRequest.Number,
-                id));
-        }
-
-        async Task<ICommentModel> DoPostComment(object parameter)
+        async Task DoPostComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var body = (string)parameter;
-            var nodeId = Comments[0].NodeId;
-            return await Session.PostReviewComment(body, nodeId);
+            var replyId = Comments[0].Id;
+            await Session.PostReviewComment(body, replyId);
         }
 
-        async Task<ICommentModel> DoEditComment(object parameter)
+        async Task DoEditComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
             var item = (Tuple<string, string>)parameter;
-            return await Session.EditComment(item.Item1, item.Item2);
+            await Session.EditComment(item.Item1, item.Item2);
         }
 
-        async Task<object> DoDeleteComment(object parameter)
+        async Task DoDeleteComment(object parameter)
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            var number = (int)parameter;
-            await Session.DeleteComment(number);
-
-            return new object();
+            var item = (Tuple<int, int>)parameter;
+            await Session.DeleteComment(item.Item1, item.Item2);
         }
     }
 }

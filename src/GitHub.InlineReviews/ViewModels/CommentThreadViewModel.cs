@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.ViewModels;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -11,27 +13,27 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
-        ReactiveCommand<ICommentModel> postComment;
-        private ReactiveCommand<ICommentModel> editComment;
-        private ReactiveCommand<object> deleteComment;
+        ReactiveCommand<Unit> postComment;
+        ReactiveCommand<Unit> editComment;
+        ReactiveCommand<Unit> deleteComment;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
-        protected CommentThreadViewModel(IAccount currentUser)
+        protected CommentThreadViewModel(ActorModel currentUser)
         {
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
             Comments = new ObservableCollection<ICommentViewModel>();
-            CurrentUser = currentUser;
+            CurrentUser = new ActorViewModel(currentUser);
         }
 
         /// <inheritdoc/>
         public ObservableCollection<ICommentViewModel> Comments { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<ICommentModel> PostComment
+        public ReactiveCommand<Unit> PostComment
         {
             get { return postComment; }
             protected set
@@ -45,7 +47,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<ICommentModel> EditComment
+        public ReactiveCommand<Unit> EditComment
         {
             get { return editComment; }
             protected set
@@ -57,7 +59,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<object> DeleteComment
+        public ReactiveCommand<Unit> DeleteComment
         {
             get { return deleteComment; }
             protected set
@@ -70,9 +72,6 @@ namespace GitHub.InlineReviews.ViewModels
         }
 
         /// <inheritdoc/>
-        public IAccount CurrentUser { get; }
-
-        /// <inheritdoc/>
-        public abstract Uri GetCommentUrl(int id);
+        public IActorViewModel CurrentUser { get; }
     }
 }

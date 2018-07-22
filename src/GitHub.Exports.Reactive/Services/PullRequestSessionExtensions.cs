@@ -18,7 +18,10 @@ namespace GitHub.Services
         public static string GetHeadBranchDisplay(this IPullRequestSession session)
         {
             Guard.ArgumentNotNull(session, nameof(session));
-            return GetBranchDisplay(session.IsPullRequestFromFork(), session.PullRequest?.Head?.Label);
+            return GetBranchDisplay(
+                session.IsPullRequestFromFork(),
+                session.PullRequest?.HeadRepositoryOwner, 
+                session.PullRequest?.HeadRefName);
         }
 
         /// <summary>
@@ -30,7 +33,10 @@ namespace GitHub.Services
         public static string GetBaseBranchDisplay(this IPullRequestSession session)
         {
             Guard.ArgumentNotNull(session, nameof(session));
-            return GetBranchDisplay(session.IsPullRequestFromFork(), session.PullRequest?.Base?.Label);
+            return GetBranchDisplay(
+                session.IsPullRequestFromFork(),
+                session.PullRequest?.BaseRepositoryOwner,
+                session.PullRequest?.BaseRefName);
         }
 
         /// <summary>
@@ -42,16 +48,15 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            var headUrl = session.PullRequest.Head.RepositoryCloneUrl?.ToRepositoryUrl();
-            var localUrl = session.LocalRepository.CloneUrl?.ToRepositoryUrl();
-            return headUrl != null && localUrl != null ? headUrl != localUrl : false;
+            return session.PullRequest != null &&
+                session.PullRequest.HeadRepositoryOwner != session.PullRequest.BaseRepositoryOwner;
         }
 
-        static string GetBranchDisplay(bool fork, string label)
+        static string GetBranchDisplay(bool fork, string owner, string label)
         {
-            if (label != null)
+            if (owner != null && label != null)
             {
-                return fork ? label : label.Split(':').Last();
+                return fork ? owner + ':' + label : label;
             }
 
             return "[invalid]";

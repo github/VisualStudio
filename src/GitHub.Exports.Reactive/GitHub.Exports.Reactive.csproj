@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub</RootNamespace>
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -171,6 +171,7 @@
     <Compile Include="Factories\IModelServiceFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
+    <Compile Include="Models\InlineCommentModel.cs" />
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
     <Compile Include="Models\PullRequestTextBufferInfo.cs" />
@@ -198,10 +199,13 @@
     <Compile Include="ViewModels\Dialog\IRepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IRepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IRepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IIssueListItemViewModelBase.cs" />
+    <Compile Include="ViewModels\GitHubPane\IIssueListViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestFilesViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestReviewAuthoringViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestReviewFileCommentViewModel.cs" />
@@ -225,6 +229,7 @@
     <Compile Include="ViewModels\Dialog\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\Dialog\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ILoginToGitHubViewModel.cs" />
+    <Compile Include="ViewModels\IActorViewModel.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
@@ -234,6 +239,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ViewModels\IUserFilterViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\TeamExplorer\IRepositoryPublishViewModel.cs" />
   </ItemGroup>

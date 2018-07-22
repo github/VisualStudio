@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using Serilog;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
+using System.Windows;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -14,6 +18,8 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
+        static readonly ILogger log = LogManager.ForContext<TeamExplorerServiceHolder>();
+
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
@@ -21,26 +27,34 @@ namespace GitHub.VisualStudio.Base
         IServiceProvider serviceProvider;
         readonly IVSGitExt gitService;
 
-        // ActiveRepositories PropertyChanged event comes in on a non-main thread
-        readonly SynchronizationContext syncContext;
-
         /// <summary>
         /// This class relies on IVSGitExt that provides information when VS switches repositories.
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         [ImportingConstructor]
-        public TeamExplorerServiceHolder(IVSGitExt gitService)
+        TeamExplorerServiceHolder(IVSGitExt gitService) : this(gitService, ThreadHelper.JoinableTaskContext)
         {
-            this.gitService = gitService;
-            syncContext = SynchronizationContext.Current;
+        }
 
-            UpdateActiveRepo();
+        /// <summary>
+        /// This constructor can be used for unit testing.
+        /// </summary>
+        /// <param name="gitService">Used for monitoring the active repository.</param>
+        /// <param name="joinableTaskFactory">Used for switching to the Main thread.</param>
+        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskContext joinableTaskContext)
+        {
+            JoinableTaskCollection = joinableTaskContext.CreateCollection();
+            JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
+            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
+
+            // This might be null in Blend or SafeMode
             if (gitService != null)
             {
+                this.gitService = gitService;
+                UpdateActiveRepo();
                 gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
             }
         }
-
 
         // set by the sections when they get initialized
         public IServiceProvider ServiceProvider
@@ -138,12 +152,17 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateActiveRepo()
         {
-            // NOTE: gitService might be null in Blend or Safe Mode
-            var repo = gitService?.ActiveRepositories.FirstOrDefault();
+            var repo = gitService.ActiveRepositories.FirstOrDefault();
 
             if (!Equals(repo, ActiveRepo))
-                // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
+            {
+                // Fire property change events on Main thread
+                JoinableTaskFactory.RunAsync(async () =>
+                {
+                    await JoinableTaskFactory.SwitchToMainThreadAsync();
+                    ActiveRepo = repo;
+                }).Task.Forget(log);
+            }
         }
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -171,5 +190,8 @@ namespace GitHub.VisualStudio.Base
         {
             get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
         }
+
+        public JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

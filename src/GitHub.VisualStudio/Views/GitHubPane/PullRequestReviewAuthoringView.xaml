@@ -10,8 +10,10 @@
                                              xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
                                              xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.App"
                                              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                             xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
                                              Background="{DynamicResource GitHubVsToolWindowBackground}"
                                              Foreground="{DynamicResource GitHubVsWindowText}"
+                                             theming:ImageThemingUtilities.ImageBackgroundColor="{Binding RelativeSource={RelativeSource Self}, Path=Background.Color}"
                                              mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="800">
     <d:DesignProperties.DataContext>
         <sampleData:PullRequestReviewAuthoringViewModelDesigner/>
@@ -46,10 +48,12 @@
                      MinHeight="120"
                      Padding="0 4"
                      TextWrapping="Wrap"
-                     Text="{Binding Body}"/>
+                     Text="{Binding Body}"
+                     SpellCheck.IsEnabled="True"/>
             
             <StackPanel Margin="0 4" Orientation="Horizontal">
-                <ui:DropDownButton AutoCloseOnClick="True" Content="Submit review">
+                <ui:DropDownButton AutoCloseOnClick="True" Foreground="{DynamicResource GHBlueLinkButtonTextBrush}">
+                    <ui:GitHubActionLink>Submit review</ui:GitHubActionLink>
                     <ui:DropDownButton.DropDownContent>
                         <Border Background="{DynamicResource GitHubVsToolWindowBackground}"
                                 BorderBrush="{DynamicResource GitHubComboBoxBorderBrush}"

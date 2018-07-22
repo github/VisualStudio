@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
@@ -63,6 +64,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             peekSession.Dismissed += (s, e) => Dispose();
 
+            Close = this.WhenAnyValue(x => x.Thread)
+                .SelectMany(x => x is NewInlineCommentThreadViewModel
+                    ? x.Comments.Single().CancelEdit.SelectUnit()
+                    : Observable.Never<Unit>());
+
             NextComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(nextCommentCommand.Enabled),
                 _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
@@ -97,6 +103,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public ReactiveCommand<Unit> PreviousComment { get; }
 
+        public IObservable<Unit> Close { get; }
+
         public void Dispose()
         {
             threadSubscription?.Dispose();
@@ -124,6 +132,7 @@ namespace GitHub.InlineReviews.ViewModels
             else
             {
                 relativePath = sessionManager.GetRelativePath(buffer);
+                side = DiffSide.Right;
                 file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer);
                 await SessionChanged(sessionManager.CurrentSession);
                 sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)

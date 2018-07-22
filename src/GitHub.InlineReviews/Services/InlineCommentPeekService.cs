@@ -107,12 +107,7 @@ namespace GitHub.InlineReviews.Services
 
             var session = peekBroker.TriggerPeekSession(options);
             var item = session.PeekableItems.OfType<InlineCommentPeekableItem>().FirstOrDefault();
-
-            if (item != null)
-            {
-                var placeholder = item.ViewModel.Thread.Comments.Last();
-                placeholder.CancelEdit.Take(1).Subscribe(_ => session.Dismiss());
-            }
+            item?.ViewModel.Close.Take(1).Subscribe(_ => session.Dismiss());
 
             return trackingPoint;
         }
@@ -134,7 +129,9 @@ namespace GitHub.InlineReviews.Services
 
             ExpandCollapsedRegions(textView, line.Extent);
 
-            peekBroker.TriggerPeekSession(options);
+            var session = peekBroker.TriggerPeekSession(options);
+            var item = session.PeekableItems.OfType<InlineCommentPeekableItem>().FirstOrDefault();
+            item?.ViewModel.Close.Take(1).Subscribe(_ => session.Dismiss());
 
             return trackingPoint;
         }

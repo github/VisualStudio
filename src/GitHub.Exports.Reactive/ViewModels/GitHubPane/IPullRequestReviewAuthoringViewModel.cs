@@ -30,12 +30,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the underlying pull request review model.
         /// </summary>
-        IPullRequestReviewModel Model { get; }
+        PullRequestReviewModel Model { get; }
 
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
-        IPullRequestModel PullRequestModel { get; }
+        PullRequestDetailModel PullRequestModel { get; }
 
         /// <summary>
         /// Gets or sets the body of the pull request review to be submitted.
