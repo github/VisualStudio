@@ -92,6 +92,8 @@ namespace GitHub.Models
         /// </remarks>
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
 
-        public LastCommitModel LastCommit { get; set; }
+        public List<CheckSuiteModel> CheckSuites { get; set; }
+
+        public List<StatusModel> Statuses { get; set; }
     }
 }

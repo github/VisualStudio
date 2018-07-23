@@ -175,6 +175,8 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         ReactiveCommand<object> ShowReview { get; }
 
+        IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
+
         /// <summary>
         /// Initializes the view model.
         /// </summary>

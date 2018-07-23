@@ -245,6 +245,21 @@
                     </ItemsControl>
                 </ghfvs:SectionControl>
 
+                <ghfvs:SectionControl Name="checksSection"
+                                      HeaderText="Checks"
+                                      IsExpanded="True"
+                                      Margin="0 8 0 0"
+                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
+                    <ItemsControl ItemsSource="{Binding Checks}" Margin="0 4 12 4">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <local:PullRequestCheckView/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                   
+                </ghfvs:SectionControl>
+
                 <!-- Files changed -->
                 <ghfvs:SectionControl Name="changesSection" 
                                       Grid.Row="4"

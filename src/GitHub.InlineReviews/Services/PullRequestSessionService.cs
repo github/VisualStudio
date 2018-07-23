@@ -38,7 +38,7 @@ namespace GitHub.InlineReviews.Services
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
         static ICompiledQuery<PullRequestDetailModel> readPullRequest;
-        static ICompiledQuery<IEnumerable<LastCommitModel>> readCheckSuites;
+        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCheckSuites;
         static ICompiledQuery<ActorModel> readViewer;
 
         readonly IGitService gitService;
@@ -340,9 +340,10 @@ namespace GitHub.InlineReviews.Services
 
             var apiClient = await apiClientFactory.Create(address);
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
-            var lastCommitModel = await GetPullRequestLastCommitModel(address, owner, name, number);
+            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
 
-            result.LastCommit = lastCommitModel;
+            result.Statuses = lastCommitModel.Statuses;
+            result.CheckSuites = lastCommitModel.CheckSuites;
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -355,16 +356,15 @@ namespace GitHub.InlineReviews.Services
             return result;
         }
 
-        private async Task<LastCommitModel> GetPullRequestLastCommitModel(HostAddress address, string owner, string name, int number)
+        private async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
         {
             if(readCheckSuites == null)
             {
                 readCheckSuites = new Query()
                 .Repository(Var(nameof(owner)), Var(nameof(name)))
                 .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
-                    commit => new LastCommitModel
+                    commit => new LastCommitAdapter
                     {
-                        Id = commit.Commit.Id.Value,
 //                        CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
 //                            .Select(suite => new CheckSuiteModel
 //                            {
@@ -400,7 +400,8 @@ namespace GitHub.InlineReviews.Services
                                     State = (StatusStateEnum)statusContext.State,
                                     Context = statusContext.Context,
                                     TargetUrl = statusContext.TargetUrl,
-                                    Description = statusContext.Description
+                                    Description = statusContext.Description,
+                                    AvatarUrl = statusContext.Creator.AvatarUrl(null)
                                 }).ToList()
                             ).SingleOrDefault()
                     }
@@ -890,5 +891,12 @@ namespace GitHub.InlineReviews.Services
             public string OriginalCommitId { get; set; }
             public string ReplyTo { get; set; }
         }
-    }
+
+        class LastCommitAdapter
+        {
+            public List<CheckSuiteModel> CheckSuites { get; set; }
+
+            public List<StatusModel> Statuses { get; set; }
+        }
+    }   
 }

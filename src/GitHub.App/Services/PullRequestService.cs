@@ -164,17 +164,17 @@ namespace GitHub.Services
                     {
                         checksHasFailure = item.LastCommit
                             .CheckSuites.Any(model => model.Conclusion.HasValue
-                                                      && (model.Conclusion.Value == CheckConclusionStateEnum.Failure
+                                                      && (model.Conclusion.Value == CheckSuiteConclusionStateEnum.Failure
                                                           || model.Conclusion.Value ==
-                                                          CheckConclusionStateEnum.ActionRequired));
+                                                          CheckSuiteConclusionStateEnum.ActionRequired));
 
                         if (!checksHasFailure)
                         {
                             checksHasCompleteSuccess = item.LastCommit
                                 .CheckSuites.All(model => model.Conclusion.HasValue
-                                                          && (model.Conclusion.Value == CheckConclusionStateEnum.Success
+                                                          && (model.Conclusion.Value == CheckSuiteConclusionStateEnum.Success
                                                               || model.Conclusion.Value ==
-                                                              CheckConclusionStateEnum.Neutral));
+                                                              CheckSuiteConclusionStateEnum.Neutral));
                         }
                     }
 
@@ -942,9 +942,9 @@ namespace GitHub.Services
 
         class CheckSuiteSummaryModel
         {
-            public CheckConclusionStateEnum? Conclusion { get; set; }
+            public CheckSuiteConclusionStateEnum? Conclusion { get; set; }
 
-            public CheckStatusStateEnum Status { get; set; }
+            public CheckSuiteStatusStateEnum Status { get; set; }
         }
     }
 

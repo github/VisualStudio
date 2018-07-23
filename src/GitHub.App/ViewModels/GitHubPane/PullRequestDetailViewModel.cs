@@ -56,6 +56,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
+        IReadOnlyList<IPullRequestCheckViewModel> checks;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -305,6 +306,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         public ReactiveCommand<object> ShowReview { get; }
 
+        public IReadOnlyList<IPullRequestCheckViewModel> Checks
+        {
+            get { return checks; }
+            private set { this.RaiseAndSetIfChanged(ref checks, value); }
+        }
+
         /// <summary>
         /// Initializes the view model.
         /// </summary>
@@ -379,6 +386,8 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.BaseRepositoryOwner, pullRequest.BaseRefName);
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
+
+                Checks = PullRequestCheckViewModel.Build(pullRequest)?.ToList();
 
                 await Files.InitializeAsync(Session);
 

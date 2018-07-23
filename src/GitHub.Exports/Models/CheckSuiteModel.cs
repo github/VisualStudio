@@ -3,14 +3,6 @@ using System.Collections.Generic;
 
 namespace GitHub.Models
 {
-    public class LastCommitModel
-    {
-        public string Id { get; set; }
-        public List<CheckSuiteModel> CheckSuites { get; set; }
-
-        public List<StatusModel> Statuses { get; set; }
-    }
-
     public enum StatusStateEnum
     {
         Expected,
@@ -29,13 +21,15 @@ namespace GitHub.Models
         public string TargetUrl { get; set; }
 
         public string Description { get; set; }
+
+        public string AvatarUrl { get; set; }
     }
 
     public class CheckSuiteModel
     {
-        public CheckConclusionStateEnum? Conclusion { get; set; }
+        public CheckSuiteConclusionStateEnum? Conclusion { get; set; }
 
-        public CheckStatusStateEnum Status { get; set; }
+        public CheckSuiteStatusStateEnum Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
 

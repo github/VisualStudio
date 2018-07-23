@@ -95,6 +95,36 @@ This requires that errors be propagated from the viewmodel to the view and from 
             };
 
             Files = new PullRequestFilesViewModelDesigner();
+
+            var defaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
+
+            Checks = new[]
+            {
+                new PullRequestCheckViewModel
+                {
+                    Title = "continuous-integration/appveyor/branch",
+                    Description = "AppVeyor build succeeded",
+                    Status = PullRequestCheckStatusEnum.Success,
+                    AvatarUrl = defaultAvatar,
+                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
+                },
+                new PullRequestCheckViewModel
+                {
+                    Title = "continuous-integration/appveyor/pr",
+                    Description = "AppVeyor building",
+                    Status = PullRequestCheckStatusEnum.Pending,
+                    AvatarUrl = defaultAvatar,
+                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
+                },
+                new PullRequestCheckViewModel
+                {
+                    Title = "continuous-integration/appveyor/other",
+                    Description = "AppVeyor build failed",
+                    Status = PullRequestCheckStatusEnum.Failure,
+                    AvatarUrl = defaultAvatar,
+                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
+                },
+            };
         }
 
         public PullRequestDetailModel Model { get; }
@@ -122,6 +152,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> ShowReview { get; }
+
+        public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 

@@ -71,15 +71,15 @@ namespace GitHub.Services
                         commit => commit.Commit.CheckSuites(null,null, null,null, null).AllPages()
                             .Select(suite => new CheckSuiteModel
                             {
-                                Conclusion = (CheckConclusionStateEnum?) suite.Conclusion,
-                                Status = (CheckStatusStateEnum) suite.Status,
+                                Conclusion = (CheckSuiteConclusionStateEnum?) suite.Conclusion,
+                                Status = (CheckSuiteStatusStateEnum) suite.Status,
                                 CreatedAt = suite.CreatedAt,
                                 UpdatedAt = suite.UpdatedAt,
                                 CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages()
                                     .Select(run => new CheckRunModel
                                     {
-                                        Conclusion = (CheckConclusionStateEnum?) run.Conclusion,
-                                        Status = (CheckStatusStateEnum) run.Status,
+                                        Conclusion = (CheckSuiteConclusionStateEnum?) run.Conclusion,
+                                        Status = (CheckSuiteStatusStateEnum) run.Status,
                                         StartedAt = run.StartedAt,
                                         CompletedAt = run.CompletedAt,
                                         Annotations = run.Annotations(null, null, null, null).AllPages()
