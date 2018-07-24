@@ -38,7 +38,7 @@ namespace GitHub.InlineReviews.Services
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
         static ICompiledQuery<PullRequestDetailModel> readPullRequest;
-        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCheckSuites;
+        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCommitStatuses;
         static ICompiledQuery<ActorModel> readViewer;
 
         readonly IGitService gitService;
@@ -359,9 +359,9 @@ namespace GitHub.InlineReviews.Services
 
         private async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
         {
-            if(readCheckSuites == null)
+            if(readCommitStatuses == null)
             {
-                readCheckSuites = new Query()
+                readCommitStatuses = new Query()
                 .Repository(Var(nameof(owner)), Var(nameof(name)))
                 .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                     commit => new LastCommitAdapter
@@ -389,7 +389,7 @@ namespace GitHub.InlineReviews.Services
             };
 
             var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(readCheckSuites, vars);
+            var result = await connection.Run(readCommitStatuses, vars);
             return result.First();
         }
 

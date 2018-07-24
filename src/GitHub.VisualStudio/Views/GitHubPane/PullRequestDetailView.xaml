@@ -257,7 +257,6 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                   
                 </ghfvs:SectionControl>
 
                 <!-- Files changed -->
