@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
@@ -63,6 +64,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             peekSession.Dismissed += (s, e) => Dispose();
 
+            Close = this.WhenAnyValue(x => x.Thread)
+                .SelectMany(x => x is NewInlineCommentThreadViewModel
+                    ? x.Comments.Single().CancelEdit.SelectUnit()
+                    : Observable.Never<Unit>());
+
             NextComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(nextCommentCommand.Enabled),
                 _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
@@ -96,6 +102,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets a command which moves to the previous inline comment in the file.
         /// </summary>
         public ReactiveCommand<Unit> PreviousComment { get; }
+
+        public IObservable<Unit> Close { get; }
 
         public void Dispose()
         {
