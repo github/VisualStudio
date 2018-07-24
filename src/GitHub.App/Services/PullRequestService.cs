@@ -96,6 +96,12 @@ namespace GitHub.Services
                             LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                 new LastCommitSummaryModel
                                 {
+//                                    CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+//                                        .Select(suite => new CheckSuiteSummaryModel
+//                                        {
+//                                            Conclusion = (CheckConclusionStateEnum?)suite.Conclusion,
+//                                            Status = (CheckStatusStateEnum)suite.Status,
+//                                        }).ToList(),
                                     Statuses = commit.Commit.Status
                                             .Select(context =>
                                                 context.Contexts.Select(statusContext => new StatusSummaryModel
@@ -134,36 +140,65 @@ namespace GitHub.Services
 
             var result = await graphql.Run(readPullRequests, vars);
 
-            foreach (var item in result.Items.Cast<ListItemAdapter>())
+            foreach (ListItemAdapter item in result.Items)
             {
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
 
+                var hasCheckSuites = item.LastCommit.CheckSuites != null 
+                                     && item.LastCommit.CheckSuites.Any();
+
                 var hasStatuses = item.LastCommit.Statuses != null 
                                   && item.LastCommit.Statuses.Any();
 
-                if (!hasStatuses)
+                if (!hasCheckSuites && !hasStatuses)
                 {
                     item.Checks = PullRequestChecksEnum.None;
                 }
                 else
                 {
-                    var statusHasFailure = item.LastCommit
-                        .Statuses
-                        .Any(status => status.State == StatusStateEnum.Failure);
+                    var checksHasFailure = false;
+                    var checksHasCompleteSuccess = true;
 
-                    var statusHasCompleteSuccess = true;
-                    if (!statusHasFailure)
+                    if (hasCheckSuites)
                     {
-                        statusHasCompleteSuccess =
-                            item.LastCommit.Statuses.All(status => status.State == StatusStateEnum.Success);
+                        checksHasFailure = item.LastCommit
+                            .CheckSuites.Any(model => model.Conclusion.HasValue
+                                                      && (model.Conclusion.Value == CheckSuiteConclusionStateEnum.Failure
+                                                          || model.Conclusion.Value ==
+                                                          CheckSuiteConclusionStateEnum.ActionRequired));
+
+                        if (!checksHasFailure)
+                        {
+                            checksHasCompleteSuccess = item.LastCommit
+                                .CheckSuites.All(model => model.Conclusion.HasValue
+                                                          && (model.Conclusion.Value == CheckSuiteConclusionStateEnum.Success
+                                                              || model.Conclusion.Value ==
+                                                              CheckSuiteConclusionStateEnum.Neutral));
+                        }
                     }
 
-                    if (statusHasFailure)
+                    var statusHasFailure = false;
+                    var statusHasCompleteSuccess = true;
+
+                    if (!checksHasFailure && hasStatuses)
+                    {
+                        statusHasFailure = item.LastCommit
+                            .Statuses
+                            .Any(status => status.State == StatusStateEnum.Failure);
+
+                        if (!statusHasFailure)
+                        {
+                            statusHasCompleteSuccess =
+                                item.LastCommit.Statuses.All(status => status.State == StatusStateEnum.Success);
+                        }
+                    }
+
+                    if (checksHasFailure || statusHasFailure)
                     {
                         item.Checks = PullRequestChecksEnum.Failure;
                     }
-                    else if (statusHasCompleteSuccess)
+                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
                     {
                         item.Checks = PullRequestChecksEnum.Success;
                     }
@@ -900,7 +935,16 @@ namespace GitHub.Services
 
         class LastCommitSummaryModel
         {
+            public List<CheckSuiteSummaryModel> CheckSuites { get; set; }
+
             public List<StatusSummaryModel> Statuses { get; set; }
+        }
+
+        class CheckSuiteSummaryModel
+        {
+            public CheckSuiteConclusionStateEnum? Conclusion { get; set; }
+
+            public CheckSuiteStatusStateEnum Status { get; set; }
         }
     }
 

@@ -345,6 +345,7 @@ namespace GitHub.InlineReviews.Services
             var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
 
             result.Statuses = lastCommitModel.Statuses;
+            result.CheckSuites = lastCommitModel.CheckSuites;
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -366,6 +367,34 @@ namespace GitHub.InlineReviews.Services
                 .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                     commit => new LastCommitAdapter
                     {
+//                        CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+//                            .Select(suite => new CheckSuiteModel
+//                            {
+//                                Conclusion = (CheckConclusionStateEnum?)suite.Conclusion,
+//                                Status = (CheckStatusStateEnum)suite.Status,
+//                                CreatedAt = suite.CreatedAt,
+//                                UpdatedAt = suite.UpdatedAt,
+//                                CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+//                                    .Select(run => new CheckRunModel
+//                                    {
+//                                        Conclusion = (CheckConclusionStateEnum?)run.Conclusion,
+//                                        Status = (CheckStatusStateEnum)run.Status,
+//                                        StartedAt = run.StartedAt,
+//                                        CompletedAt = run.CompletedAt,
+//                                        Annotations = run.Annotations(null, null, null, null).AllPages()
+//                                            .Select(annotation => new CheckRunAnnotationModel
+//                                            {
+//                                                BlobUrl = annotation.BlobUrl,
+//                                                StartLine = annotation.StartLine,
+//                                                EndLine = annotation.EndLine,
+//                                                Filename = annotation.Filename,
+//                                                Message = annotation.Message,
+//                                                Title = annotation.Title,
+//                                                WarningLevel = (CheckAnnotationLevelEnum?)annotation.WarningLevel,
+//                                                RawDetails = annotation.RawDetails
+//                                            }).ToList()
+//                                    }).ToList()
+//                            }).ToList(),
                         Statuses = commit.Commit.Status
                             .Select(context =>
                                 context.Contexts.Select(statusContext => new StatusModel
@@ -868,6 +897,8 @@ namespace GitHub.InlineReviews.Services
 
         class LastCommitAdapter
         {
+            public List<CheckSuiteModel> CheckSuites { get; set; }
+
             public List<StatusModel> Statuses { get; set; }
         }
     }   
