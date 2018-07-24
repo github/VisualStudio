@@ -38,7 +38,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
         </Grid.RowDefinitions>
 
         <Image Grid.Column="0" Source="{Binding Avatar}" />
