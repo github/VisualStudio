@@ -322,21 +322,20 @@ namespace GitHub.InlineReviews.Services
         /// Delete a PR review comment.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to delete from.</param>
-        /// <param name="user">The user deleting the comment.</param>
-        /// <param name="number">The pull request comment number.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository.</param>
+        /// <param name="pullRequestId">The pull request id of the comment</param>
+        /// <param name="commentDatabaseId">The pull request comment number.</param>
         /// <returns>The updated state of the pull request.</returns>
-        Task<PullRequestDetailModel> DeleteComment(
-            ILocalRepositoryModel localRepository,
+        Task<PullRequestDetailModel> DeleteComment(ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
-            int number);
+            int pullRequestId,
+            int commentDatabaseId);
 
         /// <summary>
         /// Edit a PR review comment.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to delete from.</param>
-        /// <param name="user">The user deleting the comment.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository.</param>
         /// <param name="commentNodeId">The pull request comment node id.</param>
         /// <param name="body">The replacement comment body.</param>
         /// <returns>The updated state of the pull request.</returns>

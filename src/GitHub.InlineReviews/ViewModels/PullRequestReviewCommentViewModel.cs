@@ -30,24 +30,28 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
+        /// <param name="pullRequestId">The pull request id of the comment.</param>
         /// <param name="commentId">The GraphQL ID of the comment.</param>
+        /// <param name="databaseId">The database id of the comment.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="state">The comment edit state.</param>
         /// <param name="author">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
         /// <param name="isPending">Whether this is a pending comment.</param>
-        public PullRequestReviewCommentViewModel(
-            IPullRequestSession session,
+        /// <param name="webUrl"></param>
+        public PullRequestReviewCommentViewModel(IPullRequestSession session,
             ICommentThreadViewModel thread,
             IActorViewModel currentUser,
+            int pullRequestId,
             string commentId,
+            int databaseId,
             string body,
             CommentEditState state,
             IActorViewModel author,
             DateTimeOffset updatedAt,
             bool isPending,
             Uri webUrl)
-            : base(thread, currentUser, commentId, body, state, author, updatedAt, webUrl)
+            : base(thread, currentUser, pullRequestId, commentId, databaseId, body, state, author, updatedAt, webUrl)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
@@ -87,14 +91,16 @@ namespace GitHub.InlineReviews.ViewModels
             PullRequestReviewModel review,
             PullRequestReviewCommentModel model)
             : this(
-                  session, 
-                  thread, 
-                  currentUser, 
-                  model.Id, 
-                  model.Body, 
-                  CommentEditState.None, 
-                  new ActorViewModel(model.Author), 
-                  model.CreatedAt, 
+                  session,
+                  thread,
+                  currentUser,
+                  model.PullRequestId,
+                  model.Id,
+                  model.DatabaseId,
+                  model.Body,
+                  CommentEditState.None,
+                  new ActorViewModel(model.Author),
+                  model.CreatedAt,
                   review.State == PullRequestReviewState.Pending,
                   model.Url != null ? new Uri(model.Url) : null)
         {
@@ -116,7 +122,9 @@ namespace GitHub.InlineReviews.ViewModels
                 session,
                 thread,
                 currentUser,
+                0,
                 null,
+                0,
                 string.Empty,
                 CommentEditState.Placeholder,
                 currentUser,
