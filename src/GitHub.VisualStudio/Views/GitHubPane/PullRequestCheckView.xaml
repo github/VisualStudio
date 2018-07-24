@@ -32,8 +32,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
@@ -43,7 +43,11 @@
 
         <Image Grid.Column="0" Source="{Binding Avatar}" />
         <Label Grid.Column="1" Content="{Binding Title}"  />
-        <Label Grid.Column="2" Content="{Binding Description}" />
+        <Label Grid.Column="2" HorizontalAlignment="Right" >
+            <Hyperlink ToolTip="{Binding DetailsUrl}" NavigateUri="{Binding DetailsUrl}">
+                <TextBlock Text="{Binding Description}"></TextBlock>
+            </Hyperlink>
+        </Label>
         <ghfvs:OcticonImage Grid.Column="3" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
         <ghfvs:OcticonImage Grid.Column="3" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
         <ghfvs:OcticonImage Grid.Column="3" Icon="clock" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
