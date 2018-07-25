@@ -2,10 +2,8 @@
 using System.Threading;
 using System.Runtime.InteropServices;
 using GitHub.Exports;
-using GitHub.Logging;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
-using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
@@ -20,13 +18,11 @@ namespace GitHub.VisualStudio
     [ProvideAutoLoad(Guids.GitSccProviderId, PackageAutoLoadFlags.BackgroundLoad)]
     public class GitContextPackage : AsyncPackage
     {
-        static readonly ILogger log = LogManager.ForContext<GitContextPackage>();
-
         protected async override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             if (!ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
-                log.Warning("Don't activate 'UIContext_Git' for non-Visual Studio process");
+                // Don't activate 'UIContext_Git' for non-Visual Studio process
                 return;
             }
 
