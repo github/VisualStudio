@@ -1,17 +1,20 @@
-﻿<Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-         Width="1024" Height="1024">
+﻿<Viewbox
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+        Width="1024" Height="1024">
+
+    <Viewbox.Resources>
+        <ResourceDictionary>
+            <Color x:Key="GitHubContextMenuIconColor">#424242</Color>
+            <SolidColorBrush x:Key="GitHubContextMenuIconBrush" Color="{StaticResource GitHubContextMenuIconColor}" PresentationOptions:Freeze="true" />
+        </ResourceDictionary>
+    </Viewbox.Resources>
+
     <Border BorderBrush="Transparent" BorderThickness="1">
-        <ghfvs:OcticonImage xmlns:ghfvs="https://github.com/github/VisualStudio"
-                     Foreground="{DynamicResource GitHubContextMenuIconBrush}"
-                     Icon="mark_github">
-            <ghfvs:OcticonImage.Resources>
-                <ResourceDictionary>
-                    <ResourceDictionary.MergedDictionaries>
-                        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-                        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                    </ResourceDictionary.MergedDictionaries>
-                </ResourceDictionary>
-            </ghfvs:OcticonImage.Resources>
-        </ghfvs:OcticonImage>
+        <StackPanel>
+            <!-- TODO: Can we replace this with an inline GitHub logo? -->
+            <Ellipse Fill="{StaticResource GitHubContextMenuIconBrush}" Height="100" Width="100"/>
+        </StackPanel>
     </Border>
 </Viewbox>
