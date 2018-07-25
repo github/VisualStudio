@@ -27,15 +27,15 @@ namespace GitHub.InlineReviews.Margins
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
-            Lazy<IGitHubServiceProvider> serviceProvider,
+            Lazy<IPullRequestSessionManager> sessionManager,
             Lazy<IEditorFormatMapService> editorFormatMapService,
             Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory,
             Lazy<IInlineCommentPeekService> peekService)
         {
+            this.sessionManager = sessionManager;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.Value.GetService<IPullRequestSessionManager>());
 
             uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
         }
