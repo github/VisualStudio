@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
@@ -16,6 +18,9 @@ namespace GitHub.ViewModels.GitHubPane
     {
         const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
 
+        [Import]
+        public IVisualStudioBrowser VisualStudioBrowser { get; set; }
+
         private string title;
         private string description;
         private PullRequestCheckStatusEnum status;
@@ -23,7 +28,8 @@ namespace GitHub.ViewModels.GitHubPane
         private string avatarUrl;
         private BitmapImage avatar;
 
-        public static IEnumerable<PullRequestCheckViewModel> Build(PullRequestDetailModel pullRequest)
+        public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory,
+            PullRequestDetailModel pullRequest)
         {
             return pullRequest.Statuses?.Select(model =>
             {
@@ -46,25 +52,30 @@ namespace GitHub.ViewModels.GitHubPane
                     default:
                         throw new InvalidOperationException("Unkown PullRequestCheckStatusEnum");
                 }
-                
-                return new PullRequestCheckViewModel
-                {
-                    Title = model.Context,
-                    Description = model.Description,
-                    Status = checkStatus,
-                    DetailsUrl = new Uri(model.TargetUrl),
-                    AvatarUrl = model.AvatarUrl ?? DefaultAvatar,
-                    Avatar = model.AvatarUrl != null
-                        ? new BitmapImage(new Uri(model.AvatarUrl))
-                        : AvatarProvider.CreateBitmapImage(DefaultAvatar)
-                };
+
+                var pullRequestCheckViewModel = viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                pullRequestCheckViewModel.Title = model.Context;
+                pullRequestCheckViewModel.Description = model.Description;
+                pullRequestCheckViewModel.Status = checkStatus;
+                pullRequestCheckViewModel.DetailsUrl = new Uri(model.TargetUrl);
+                pullRequestCheckViewModel.AvatarUrl = model.AvatarUrl ?? DefaultAvatar;
+                pullRequestCheckViewModel.Avatar = model.AvatarUrl != null
+                    ? new BitmapImage(new Uri(model.AvatarUrl))
+                    : AvatarProvider.CreateBitmapImage(DefaultAvatar);
+
+                return pullRequestCheckViewModel;
 
             }) ?? new PullRequestCheckViewModel[0];
         }
 
         public PullRequestCheckViewModel()
         {
-            OpenDetailsUrl = ReactiveCommand.Create();
+            OpenDetailsUrl = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
+        }
+
+        private void DoOpenDetailsUrl(object obj)
+        {
+            VisualStudioBrowser.OpenUrl(DetailsUrl);
         }
 
         public string Title

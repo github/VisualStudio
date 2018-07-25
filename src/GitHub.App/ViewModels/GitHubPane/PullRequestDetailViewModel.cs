@@ -55,6 +55,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
+        IViewViewModelFactory viewViewModelFactory;
         IReadOnlyList<IPullRequestCheckViewModel> checks;
 
         /// <summary>
@@ -74,7 +75,8 @@ namespace GitHub.ViewModels.GitHubPane
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files,
-            ISyncSubmodulesCommand syncSubmodulesCommand)
+            ISyncSubmodulesCommand syncSubmodulesCommand,
+            IViewViewModelFactory viewViewModelFactory)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -82,6 +84,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
+            Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -89,6 +92,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
             this.syncSubmodulesCommand = syncSubmodulesCommand;
+            this.viewViewModelFactory = viewViewModelFactory;
             Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -384,7 +388,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
-                Checks = PullRequestCheckViewModel.Build(pullRequest)?.ToList();
+                Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
 
                 await Files.InitializeAsync(Session);
 
