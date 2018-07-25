@@ -197,6 +197,7 @@
     <Compile Include="Services\IUsageService.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\GitHubPane\IGitHubPaneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IGitHubToolWindowManager.cs" />
     <Compile Include="ViewModels\IConnectionInitializedViewModel.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
