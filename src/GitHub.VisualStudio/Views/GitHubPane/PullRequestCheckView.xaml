@@ -33,8 +33,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
@@ -42,15 +42,15 @@
             <RowDefinition Height="32"/>
         </Grid.RowDefinitions>
 
-        <Image Grid.Column="0" Source="{Binding Avatar}"/>
-        <Label Grid.Column="1" Content="{Binding Title}"/>
-        <Label Grid.Column="2" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
-        <Label Grid.Column="3" HorizontalAlignment="Right">
+        <ghfvs:OcticonImage Grid.Column="0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Icon="clock" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+        <Image Grid.Column="1" Source="{Binding Avatar}"/>
+        <Label Grid.Column="2" Content="{Binding Title}"/>
+        <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
+        <Label Grid.Column="4" HorizontalAlignment="Right">
             <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>
-        <ghfvs:OcticonImage Grid.Column="4" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
-        <ghfvs:OcticonImage Grid.Column="4" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-        <ghfvs:OcticonImage Grid.Column="4" Icon="clock" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
     </Grid>
 </local:GenericPullRequestCheckView>
 
