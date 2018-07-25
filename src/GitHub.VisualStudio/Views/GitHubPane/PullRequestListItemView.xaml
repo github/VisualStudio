@@ -65,7 +65,7 @@
                                Height="32"
                                VerticalAlignment="Top"/>
 
-            <StackPanel Grid.Column="1">
+            <StackPanel Grid.Column="1" Margin="2 0 0 0">
                 <TextBlock DockPanel.Dock="Left"
                            TextTrimming="CharacterEllipsis"
                            Text="{Binding Title}">
