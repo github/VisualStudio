@@ -900,6 +900,19 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
+        public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepositoryOwnerCaseMismatchAsync()
+        {
+            var service = CreateTarget(MockGitClient(), MockGitService());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://github.com/Foo/bar"));
+
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
+
+            Assert.That("source", Is.EqualTo(result.Name));
+        }
+
+        [Test]
         public async Task ShouldReturnMarkedBranchForPullRequestFromForkAsync()
         {
             var repo = Substitute.For<IRepository>();
