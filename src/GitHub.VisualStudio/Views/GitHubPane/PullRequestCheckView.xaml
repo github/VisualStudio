@@ -42,9 +42,9 @@
             <RowDefinition MaxHeight="32"/>
         </Grid.RowDefinitions>
 
-        <ghfvs:OcticonImage Grid.Column="0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
-        <ghfvs:OcticonImage Grid.Column="0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-        <ghfvs:OcticonImage Grid.Column="0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
         <Image Grid.Column="1" Source="{Binding Avatar}" Height="16" Width="16" />
         <Label Grid.Column="2" Content="{Binding Title}"/>
         <!--
