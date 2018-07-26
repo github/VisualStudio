@@ -65,8 +65,8 @@ This is the basis for converting view models to views.
 
 There are currently two top-level controls for our UI:
 
-- [GitHubDialogWindow](../src/GitHub.VisualStudio/Views/Dialog/GitHubDialogWindow.xaml) for the dialog which shows the login, clone, etc views
-- [GitHubPaneView](../src/GitHub.VisualStudio/Views/GitHubPane/GitHubPaneView.xaml) for the GitHub pane
+- [GitHubDialogWindow](../../src/GitHub.VisualStudio/Views/Dialog/GitHubDialogWindow.xaml) for the dialog which shows the login, clone, etc views
+- [GitHubPaneView](../../src/GitHub.VisualStudio/Views/GitHubPane/GitHubPaneView.xaml) for the GitHub pane
 
 In the resources for each of these top-level controls we define a `DataTemplate` like so:
 
@@ -77,9 +77,9 @@ In the resources for each of these top-level controls we define a `DataTemplate`
 </DataTemplate>
 ```
 
-The `DataTemplate.DataType` here applies the template to all classes inherited from [`GitHub.ViewModels.ViewModelBase`](../src/GitHub.Exports.Reactive/ViewModels/ViewModelBase.cs) [1]. The template defines a single `ContentControl` whose contents are created by a `ViewLocator`.
+The `DataTemplate.DataType` here applies the template to all classes inherited from [`GitHub.ViewModels.ViewModelBase`](../../src/GitHub.Exports.Reactive/ViewModels/ViewModelBase.cs) [1]. The template defines a single `ContentControl` whose contents are created by a `ViewLocator`.
 
-The [`ViewLocator`](../src/GitHub.VisualStudio/Views/ViewLocator.cs) class is an `IValueConverter` which then creates an instance of the appropriate view for the view model using MEF.
+The [`ViewLocator`](../../src/GitHub.VisualStudio/Views/ViewLocator.cs) class is an `IValueConverter` which then creates an instance of the appropriate view for the view model using MEF.
 
 And thus a view model becomes a view.
 
