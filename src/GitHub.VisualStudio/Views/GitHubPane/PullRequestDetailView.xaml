@@ -43,6 +43,8 @@
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <v:ViewLocator x:Key="viewLocator"/>
+        
             <Style x:Key="Separator" TargetType="Rectangle">
                 <Setter Property="Fill" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
             </Style>
@@ -257,8 +259,8 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <local:PullRequestCheckView/>
+                            <DataTemplate DataType="ghfvs:PullRequestCheckViewModel">
+                                <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

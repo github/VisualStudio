@@ -20,9 +20,6 @@ namespace GitHub.ViewModels.GitHubPane
         private readonly IUsageTracker usageTracker;
         const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
 
-        [Import]
-        public IVisualStudioBrowser VisualStudioBrowser { get; set; }
-
         private string title;
         private string description;
         private PullRequestCheckStatusEnum status;
@@ -30,8 +27,7 @@ namespace GitHub.ViewModels.GitHubPane
         private string avatarUrl;
         private BitmapImage avatar;
 
-        public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory,
-            PullRequestDetailModel pullRequest)
+        public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
             return pullRequest.Statuses?.Select(model =>
             {
@@ -79,7 +75,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         private void DoOpenDetailsUrl(object obj)
         {
-            VisualStudioBrowser.OpenUrl(DetailsUrl);
             usageTracker.IncrementCounter(x => x.NumberOfPRCheckStatusesOpenInGitHub).Forget();
         }
 
