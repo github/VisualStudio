@@ -35,11 +35,11 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition MinWidth="50" Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
+            <RowDefinition MaxHeight="32"/>
         </Grid.RowDefinitions>
 
         <ghfvs:OcticonImage Grid.Column="0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
