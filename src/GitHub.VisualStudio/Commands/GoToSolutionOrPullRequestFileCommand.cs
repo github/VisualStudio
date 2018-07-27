@@ -216,65 +216,49 @@ namespace GitHub.Commands
             Visible = false;
         }
 
+        // Set command Text/Visible properties and return true when active
         bool TryNavigateFromHistoryFileQueryStatus(IVsTextView sourceView)
         {
-            if (teamExplorerContext.Value.ActiveRepository?.LocalPath == null)
+            if (teamExplorerContext.Value.ActiveRepository?.LocalPath is string && // Check there is an active repo
+                FindObjectishForTFSTempFile(sourceView) is string) // Looks like a history file
             {
-                // Only available when there's an active repository
-                return false;
+                // Navigate from history file is active
+                Text = "Open File in Solution";
+                Visible = true;
+                return true;
             }
 
-            var filePath = FindPath(sourceView);
-            if (filePath == null)
-            {
-                return false;
-            }
-
-            var objectish = gitHubContextService.Value.FindObjectishForTFSTempFile(filePath);
-            if (objectish == null)
-            {
-                // Not a temporary Team Explorer blob file
-                return false;
-            }
-
-            // Navigate from history file is active
-            Text = "Open File in Solution";
-            Visible = true;
-            return true;
+            return false;
         }
 
+        // Attempt navigation to historical file
         bool TryNavigateFromHistoryFile(IVsTextView sourceView)
         {
-            var repositoryDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
-            if (repositoryDir == null)
+            if (teamExplorerContext.Value.ActiveRepository?.LocalPath is string repositoryDir &&
+                FindObjectishForTFSTempFile(sourceView) is string objectish)
             {
-                return false;
+                var (commitSha, blobPath) = gitHubContextService.Value.ResolveBlobFromHistory(repositoryDir, objectish);
+                if (blobPath is string)
+                {
+                    var workingFile = Path.Combine(repositoryDir, blobPath);
+                    VsShellUtilities.OpenDocument(serviceProvider, workingFile, VSConstants.LOGVIEWID.TextView_guid,
+                        out IVsUIHierarchy hierarchy, out uint itemID, out IVsWindowFrame windowFrame, out IVsTextView targetView);
+
+                    pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, targetView);
+                    return true;
+                }
             }
 
-            var path = FindPath(sourceView);
-            if (path == null)
-            {
-                return false;
-            }
+            return false;
+        }
 
-            var objectish = gitHubContextService.Value.FindObjectishForTFSTempFile(path);
-            if (objectish == null)
-            {
-                return false;
-            }
-
-            var (commitSha, blobPath) = gitHubContextService.Value.ResolveBlobFromHistory(repositoryDir, objectish);
-            if (blobPath == null)
-            {
-                return false;
-            }
-
-            var workingFile = Path.Combine(repositoryDir, blobPath);
-            VsShellUtilities.OpenDocument(serviceProvider, workingFile, VSConstants.LOGVIEWID.TextView_guid,
-                out IVsUIHierarchy hierarchy, out uint itemID, out IVsWindowFrame windowFrame, out IVsTextView targetView);
-
-            pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, targetView);
-            return true;
+        // Find the blob SHA in a file name if any
+        string FindObjectishForTFSTempFile(IVsTextView sourceView)
+        {
+            return
+                FindPath(sourceView) is string path &&
+                gitHubContextService.Value.FindObjectishForTFSTempFile(path) is string objectish ?
+                objectish : null;
         }
 
         // See http://microsoft.public.vstudio.extensibility.narkive.com/agfoD1GO/full-pathname-of-file-shown-in-current-view-of-core-editor#post2
