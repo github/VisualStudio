@@ -307,6 +307,8 @@ namespace GitHub.InlineReviews.Services
                             Comments = review.Comments(null, null, null, null).AllPages().Select(comment => new CommentAdapter
                             {
                                 Id = comment.Id.Value,
+                                PullRequestId = comment.PullRequest.Number,
+                                DatabaseId = comment.DatabaseId.Value,
                                 Author = new ActorModel
                                 {
                                     Login = comment.Author.Login,
@@ -650,7 +652,8 @@ namespace GitHub.InlineReviews.Services
         public async Task<PullRequestDetailModel> DeleteComment(
             ILocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
-            int number)
+            int pullRequestId,
+            int commentDatabaseId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var apiClient = await apiClientFactory.Create(address);
@@ -658,10 +661,10 @@ namespace GitHub.InlineReviews.Services
             await apiClient.DeletePullRequestReviewComment(
                 remoteRepositoryOwner,
                 localRepository.Name,
-                number);
+                commentDatabaseId);
 
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete);
-            return await ReadPullRequestDetail(address, remoteRepositoryOwner, localRepository.Name, number);
+            return await ReadPullRequestDetail(address, remoteRepositoryOwner, localRepository.Name, pullRequestId);
         }
 
         /// <inheritdoc/>
