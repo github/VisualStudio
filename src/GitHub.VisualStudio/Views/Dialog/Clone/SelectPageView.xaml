@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="400">
     <d:DesignData.DataContext>
         <ghfvs:SelectPageViewModelDesigner/>
@@ -56,10 +57,7 @@
             <ghfvs:Spinner Visibility="{Binding IsLoading, Converter={ghfvs:BooleanToVisibilityConverter}}"
                            Width="32"
                            Height="32"/>
-            <TextBlock Text="{Binding Error.Message}"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"
-                       TextWrapping="Wrap"/>
+            <markdig:MarkdownViewer Markdown="{Binding Error.Message}"/>
         </Grid>
     </DockPanel>
 </UserControl>
