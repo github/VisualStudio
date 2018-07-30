@@ -22,13 +22,13 @@
 
     <DockPanel>
         <ghfvs:PromptTextBox DockPanel.Dock="Top"
-                             Margin="4"
+                             Margin="8"
                              PromptText="Filter"
                              Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
 
         <Grid>
             <ListView BorderThickness="0"
-                      Padding="8 4 4 0"
+                      Padding="8 2 0 0"
                       ItemsSource="{Binding ItemsView}"
                       SelectedItem="{Binding SelectedItem}"
                       VirtualizingPanel.IsVirtualizing="True"
