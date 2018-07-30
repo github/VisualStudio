@@ -29,7 +29,6 @@
         </ResourceDictionary>
     </Control.Resources>
 
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnZero" />
