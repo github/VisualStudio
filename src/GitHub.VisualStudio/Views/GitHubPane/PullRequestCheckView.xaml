@@ -29,13 +29,14 @@
         </ResourceDictionary>
     </Control.Resources>
 
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnZero" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnOne" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnTwo" />
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition MinWidth="50" Width="Auto"/>
+            <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFour" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
