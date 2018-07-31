@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
+using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
@@ -16,6 +17,7 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCheckViewModel: ViewModelBase, IPullRequestCheckViewModel
     {
+        private readonly IUsageTracker usageTracker;
         const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
 
         [Import]
@@ -68,14 +70,17 @@ namespace GitHub.ViewModels.GitHubPane
             }) ?? new PullRequestCheckViewModel[0];
         }
 
-        public PullRequestCheckViewModel()
+        [ImportingConstructor]
+        public PullRequestCheckViewModel(IUsageTracker usageTracker)
         {
+            this.usageTracker = usageTracker;
             OpenDetailsUrl = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
         }
 
         private void DoOpenDetailsUrl(object obj)
         {
             VisualStudioBrowser.OpenUrl(DetailsUrl);
+            usageTracker.IncrementCounter(x => x.NumberOfPRCheckStatusesOpenInGitHub).Forget();
         }
 
         public string Title

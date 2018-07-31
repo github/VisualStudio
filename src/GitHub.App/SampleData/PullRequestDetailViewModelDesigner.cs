@@ -100,7 +100,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Checks = new[]
             {
-                new PullRequestCheckViewModel
+                new PullRequestCheckViewModel(null)
                 {
                     Title = "continuous-integration/appveyor/branch",
                     Description = "AppVeyor build succeeded",
@@ -108,7 +108,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
-                new PullRequestCheckViewModel
+                new PullRequestCheckViewModel(null)
                 {
                     Title = "continuous-integration/appveyor/pr",
                     Description = "AppVeyor building",
@@ -116,7 +116,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
-                new PullRequestCheckViewModel
+                new PullRequestCheckViewModel(null)
                 {
                     Title = "continuous-integration/appveyor/other",
                     Description = "AppVeyor build failed",

@@ -125,7 +125,9 @@ namespace GitHub.ViewModels.GitHubPane
             SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
-            OpenOnGitHub = ReactiveCommand.Create();
+            OpenOnGitHub = ReactiveCommand.Create().OnExecuteCompleted(o => {
+                usageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenInGitHub).Forget();
+            });
             ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
         }
 
