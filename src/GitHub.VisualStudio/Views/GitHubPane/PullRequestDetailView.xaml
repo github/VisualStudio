@@ -251,6 +251,11 @@
                                       Margin="0 8 0 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <ItemsControl ItemsSource="{Binding Checks}" Margin="0 4 12 4">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Grid.IsSharedSizeScope="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <local:PullRequestCheckView/>
