@@ -90,7 +90,9 @@ namespace GitHub.VisualStudio
                     exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
                     exports.GetExportedValue<IShowGitHubPaneCommand>(),
                     exports.GetExportedValue<IGoToSolutionOrPullRequestFileCommand>(),
-                    exports.GetExportedValue<ISyncSubmodulesCommand>()
+                    exports.GetExportedValue<ISyncSubmodulesCommand>(),
+                    exports.GetExportedValue<IOpenFromUrlCommand>(),
+                    exports.GetExportedValue<IOpenFromClipboardCommand>()
                 };
             }
             else

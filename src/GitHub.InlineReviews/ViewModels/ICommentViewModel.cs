@@ -24,6 +24,16 @@ namespace GitHub.InlineReviews.ViewModels
         string Id { get; }
 
         /// <summary>
+        /// Gets the Database ID of the comment.
+        /// </summary>
+        int DatabaseId { get; }
+
+        /// <summary>
+        /// The pull request id of the comment
+        /// </summary>
+        int PullRequestId { get; }
+
+        /// <summary>
         /// Gets or sets the body of the comment.
         /// </summary>
         string Body { get; set; }

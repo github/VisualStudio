@@ -27,6 +27,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         public PullRequestListView()
         {
             InitializeComponent();
+
             DataContextChanged += (s, e) =>
             {
                 var vm = DataContext as IPullRequestListViewModel;
@@ -41,6 +42,12 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                             .Subscribe(_ => authorFilterDropDown.IsOpen = false),
                         vm.OpenItemInBrowser.Subscribe(x => OpenInBrowser((IPullRequestListItemViewModel)x)));
                 }
+            };
+
+            Unloaded += (s, e) =>
+            {
+                subscription?.Dispose();
+                subscription = null;
             };
         }
 

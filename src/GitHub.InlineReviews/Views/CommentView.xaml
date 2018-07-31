@@ -154,7 +154,8 @@
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
-                              GotFocus="ReplyPlaceholder_GotFocus">
+                              GotFocus="ReplyPlaceholder_GotFocus"
+                              SpellCheck.IsEnabled="True">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
                         <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />

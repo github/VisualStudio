@@ -19,6 +19,7 @@ namespace GitHub.Exports
     /// </summary>
     public enum LinkType
     {
+        Unknown,
         Blob,
         Blame
     }

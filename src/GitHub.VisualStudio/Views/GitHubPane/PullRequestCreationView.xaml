@@ -146,7 +146,8 @@
                             Margin="10,5"
                             Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
                             PromptText="{x:Static prop:Resources.TitleRequired}"
-                            Style="{DynamicResource GitHubVsPromptTextBox}" 
+                            Style="{DynamicResource GitHubVsPromptTextBox}"
+                            SpellCheck.IsEnabled="True"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationTitleTextBox}"/>
 
         <ghfvs:PromptTextBox Grid.Row="2"
@@ -158,6 +159,7 @@
                             Style="{DynamicResource GitHubVsPromptTextBox}"
                             VerticalScrollBarVisibility="Auto"
                             TextWrapping="Wrap"
+                            SpellCheck.IsEnabled="True"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationDescriptionTextBox}"/>
         
         <ghfvs:ValidationMessage x:Name="titleValidationMessage"

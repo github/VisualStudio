@@ -54,9 +54,8 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-
-                        <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Background="Red" Height="16" Width="16" />
-                        <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap" Text="{x:Static prop:Resources.ForkTheRepository}"></TextBlock>
+                        <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Height="16" Width="16" />
+                        <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap">Fork the repository</TextBlock>
                     </Grid>
 
                     <Grid Margin="0 16 0 0">
