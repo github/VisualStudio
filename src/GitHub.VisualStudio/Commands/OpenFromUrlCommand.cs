@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Windows;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
+using GitHub.ViewModels.GitHubPane;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
 using Microsoft.VisualStudio;
