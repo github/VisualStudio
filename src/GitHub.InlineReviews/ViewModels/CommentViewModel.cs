@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
@@ -130,22 +131,41 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task DoDelete(object unused)
         {
-            try
-            {
-                ErrorMessage = null;
-                IsSubmitting = true;
+            string deleteCommentMessageBoxText = "Are you sure you want to delete this comment?";
+            string deleteCommentCaption = "Delete Comment";
+            MessageBoxButton deleteCommentButton = MessageBoxButton.YesNo;
+            MessageBoxImage deleteCommentImage = MessageBoxImage.Question;
 
-                await Thread.DeleteComment.ExecuteAsyncTask(new Tuple<int, int>(PullRequestId, DatabaseId));
-            }
-            catch (Exception e)
+            MessageBoxResult result = MessageBox.Show(deleteCommentMessageBoxText, deleteCommentCaption, deleteCommentButton, deleteCommentImage);
+
+            switch(result)
             {
-                var message = e.Message;
-                ErrorMessage = message;
-                log.Error(e, "Error Deleting comment");
-            }
-            finally
-            {
-                IsSubmitting = false;
+                case (MessageBoxResult.Yes):
+                {
+                    try
+                    {
+                        ErrorMessage = null;
+                        IsSubmitting = true;
+
+                        await Thread.DeleteComment.ExecuteAsyncTask(new Tuple<int, int>(PullRequestId, DatabaseId));
+                    }
+                    catch (Exception e)
+                    {
+                        var message = e.Message;
+                        ErrorMessage = message;
+                        log.Error(e, "Error Deleting comment");
+                    }
+                    finally
+                    {
+                        IsSubmitting = false;
+                    }
+                        break;
+                }
+
+                case (MessageBoxResult.No):
+                {
+                    break;
+                }
             }
         }
 
