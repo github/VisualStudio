@@ -214,6 +214,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 This file has changed since the permalink was created 的本地化字符串。
+        /// </summary>
+        public static string ChangesInWorkingDirectoryMessage {
+            get {
+                return ResourceManager.GetString("ChangesInWorkingDirectoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Clone 的本地化字符串。
         /// </summary>
         public static string CloneLink {
@@ -336,6 +345,15 @@ namespace GitHub.VisualStudio.UI {
         public static string DescriptionOptional {
             get {
                 return ResourceManager.GetString("DescriptionOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Please open the repository &apos;{0}&apos; and try again 的本地化字符串。
+        /// </summary>
+        public static string DifferentRepositoryMessage {
+            get {
+                return ResourceManager.GetString("DifferentRepositoryMessage", resourceCulture);
             }
         }
         
@@ -664,11 +682,47 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 There is no active repository to navigate 的本地化字符串。
+        /// </summary>
+        public static string NoActiveRepositoryMessage {
+            get {
+                return ResourceManager.GetString("NoActiveRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Couldn&apos;t a find a GitHub URL in clipboard 的本地化字符串。
+        /// </summary>
+        public static string NoGitHubUrlMessage {
+            get {
+                return ResourceManager.GetString("NoGitHubUrlMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 No repositories 的本地化字符串。
         /// </summary>
         public static string noRepositoriesMessageText {
             get {
                 return ResourceManager.GetString("noRepositoriesMessageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The target URL has a different owner to the current repository. 的本地化字符串。
+        /// </summary>
+        public static string NoResolveDifferentOwnerMessage {
+            get {
+                return ResourceManager.GetString("NoResolveDifferentOwnerMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Couldn&apos;t find target URL in current repository. Try again after doing a fetch. 的本地化字符串。
+        /// </summary>
+        public static string NoResolveSameOwnerMessage {
+            get {
+                return ResourceManager.GetString("NoResolveSameOwnerMessage", resourceCulture);
             }
         }
         
@@ -768,6 +822,15 @@ namespace GitHub.VisualStudio.UI {
         public static string OpenPROnGitHubToolTip {
             get {
                 return ResourceManager.GetString("OpenPROnGitHubToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open repository at &apos;{0}&apos;? 的本地化字符串。
+        /// </summary>
+        public static string OpenRepositoryAtDir {
+            get {
+                return ResourceManager.GetString("OpenRepositoryAtDir", resourceCulture);
             }
         }
         
@@ -1220,6 +1283,15 @@ namespace GitHub.VisualStudio.UI {
         public static string twoFactorAuthText {
             get {
                 return ResourceManager.GetString("twoFactorAuthText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Couldn&apos;t open from &apos;{0}&apos;. Only URLs that link to repository files are currently supported. 的本地化字符串。
+        /// </summary>
+        public static string UnknownLinkTypeMessage {
+            get {
+                return ResourceManager.GetString("UnknownLinkTypeMessage", resourceCulture);
             }
         }
         

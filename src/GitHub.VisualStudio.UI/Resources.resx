@@ -520,7 +520,7 @@
   </data>
   <data name="SignInWithYourBrowser" xml:space="preserve">
     <value>Sign in with your browser</value>
-   </data>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
   </data>
@@ -544,5 +544,29 @@
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
     <value>create a pull request</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>Open repository at '{0}'?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>The target URL has a different owner to the current repository.</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>There is no active repository to navigate</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>This file has changed since the permalink was created</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>Please open the repository '{0}' and try again</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>Couldn't open from '{0}'. Only URLs that link to repository files are currently supported.</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>Couldn't a find a GitHub URL in clipboard</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
   </data>
 </root>
