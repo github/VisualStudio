@@ -52,7 +52,7 @@ public class OpenFromClipboardCommandTests
             vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
         }
         [Test]
-        public  async void  DifferentLocalRepository_DifferentRepositoryMessage()
+        public  async Task DifferentLocalRepository_DifferentRepositoryMessage()
         {
             await DifferentLocalRepository("targetRepositoryName", "activeRepositoryName", Resources.DifferentRepositoryMessage);
         }
@@ -82,17 +82,17 @@ public class OpenFromClipboardCommandTests
 
 
         [Test]
-        public async void CouldNotResolve_NoResolveDifferentOwnerMessage()
+        public async Task CouldNotResolve_NoResolveDifferentOwnerMessage()
         {
             await CouldNotResolve("TargetOwner", "CurrentOwner", Resources.NoResolveDifferentOwnerMessage);
         }
         [Test]
-        public async void CouldNotResolve_NoResolveSameOwnerMessage_SameOwner_SameOwner()
+        public async Task CouldNotResolve_NoResolveSameOwnerMessage_SameOwner_SameOwner()
         {
             await CouldNotResolve("SameOwner", "SameOwner", Resources.NoResolveSameOwnerMessage);
         }
         [Test]
-        public async void CouldNotResolve_NoResolveSameOwnerMessage_sameowner_SAMEOWNER()
+        public async Task CouldNotResolve_NoResolveSameOwnerMessage_sameowner_SAMEOWNER()
         {
             await CouldNotResolve("sameowner", "SAMEOWNER", Resources.NoResolveSameOwnerMessage);
         }
@@ -145,7 +145,7 @@ public class OpenFromClipboardCommandTests
             gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
         }
         [Test]
-        public async void  HasChangesInWorkingDirectorye_ChangesInWorkingDirectoryMessage()
+        public async Task HasChangesInWorkingDirectorye_ChangesInWorkingDirectoryMessage()
         {
           await  HasChangesInWorkingDirectory(false, Resources.ChangesInWorkingDirectoryMessage, 1, 1);
         }
