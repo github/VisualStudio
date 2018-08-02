@@ -13,16 +13,16 @@ This project adheres to the [Open Code of Conduct][code-of-conduct]. By particip
 
 ## Submitting a pull request
 
-0. [Fork][] and clone the repository (see Build Instructions in the [README][readme])
-0. Create a new branch: `git checkout -b my-branch-name`
-0. Make your change, add tests, and make sure the tests still pass
-0. Push to your fork and [submit a pull request][pr]
-0. Pat your self on the back and wait for your pull request to be reviewed and merged.
+1. [Fork][] and clone the repository (see Build Instructions in the [README][readme])
+2. Create a new branch: `git checkout -b my-branch-name`
+3. Make your change, add tests, and make sure the tests still pass
+4. Push to your fork and [submit a pull request][pr]
+5. Pat your self on the back and wait for your pull request to be reviewed and merged.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
-- Follow the existing code's style.
-- Write tests.
+- Follow the style/format of the existing code.
+- Write tests for your changes.
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
@@ -38,7 +38,7 @@ There are certain areas of the extension that are restricted in what they can do
 ### Bug Reporting
 
 Here are a few helpful tips when reporting a bug:
-- Verify the bug resides in the GitHub for Visual Studio extension
+- Verify that the bug resides in the GitHub for Visual Studio extension
   - A lot of functionality provided by this extension resides in the Team Explorer pane, alongside other non-GitHub tools to manage and collaborate on source code, including Visual Studio's Git support, which is owned by Microsoft.
   - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
 - Screenshots are very helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems. Please include them whenever possible.
