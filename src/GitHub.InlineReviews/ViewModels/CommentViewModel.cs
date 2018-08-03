@@ -131,13 +131,11 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task DoDelete(object unused)
         {
-            string deleteCommentMessageBoxText = VisualStudio.UI.Resources.DeleteCommentConfirmation;
-            string deleteCommentCaption = VisualStudio.UI.Resources.DeleteCommentConfirmationCaption;
-            
-            MessageBoxButton deleteCommentButton = MessageBoxButton.YesNo;
-            MessageBoxImage deleteCommentImage = MessageBoxImage.Question;
-
-            MessageBoxResult result = MessageBox.Show(deleteCommentMessageBoxText, deleteCommentCaption, deleteCommentButton, deleteCommentImage);
+            var result = MessageBox.Show(
+                VisualStudio.UI.Resources.DeleteCommentConfirmation, 
+                VisualStudio.UI.Resources.DeleteCommentConfirmationCaption, 
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
 
             switch(result)
             {
