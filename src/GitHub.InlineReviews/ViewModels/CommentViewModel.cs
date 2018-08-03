@@ -131,8 +131,9 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task DoDelete(object unused)
         {
-            string deleteCommentMessageBoxText = "Are you sure you want to delete this comment?";
-            string deleteCommentCaption = "Delete Comment";
+            string deleteCommentMessageBoxText = VisualStudio.UI.Resources.DeleteCommentConfirmation;
+            string deleteCommentCaption = VisualStudio.UI.Resources.DeleteCommentConfirmationCaption;
+            
             MessageBoxButton deleteCommentButton = MessageBoxButton.YesNo;
             MessageBoxImage deleteCommentImage = MessageBoxImage.Question;
 
