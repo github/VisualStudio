@@ -246,10 +246,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 numberFilter = 0;
 
-                if (SearchQuery.StartsWith('#'))
-                {
-                    int.TryParse(SearchQuery.Substring(1), out numberFilter);
-                }
+                int.TryParse(SearchQuery.Substring(SearchQuery.StartsWith('#') ? 1 : 0), out numberFilter);
 
                 if (numberFilter == 0)
                 {
