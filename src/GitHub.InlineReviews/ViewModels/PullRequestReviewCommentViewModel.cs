@@ -61,14 +61,8 @@ namespace GitHub.InlineReviews.ViewModels
             var pendingReviewAndCommentDataObservable = Observable.CombineLatest(
                 session.WhenAnyValue(x => x.HasPendingReview, x => !x),
                 this.WhenAnyValue(model => model.Id).Select(i => i == null),
-                thread.Comments.ToObservable().ToList(),
-                (hasPendingReview, isNewComment, threadComments) => new
-                {
-                    hasPendingReview,
-                    isNewComment,
-                    hasCommentsInThread
-                        = threadComments.Any(model => model.EditState == CommentEditState.None)
-                });
+                thread.Comments.ToObservable().ToList().Select(list => list.Any(model => model.EditState == CommentEditState.None)),
+                (hasPendingReview, isNewComment, hasCommentsInThread) => new { hasPendingReview, isNewComment, hasCommentsInThread });
 
             var canStartReviewObservable = pendingReviewAndCommentDataObservable
                 .Select(arg => arg.hasPendingReview && arg.isNewComment && !arg.hasCommentsInThread);
