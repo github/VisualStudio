@@ -58,7 +58,7 @@ namespace GitHub.InlineReviews.ViewModels
             this.session = session;
             IsPending = isPending;
 
-            var pendingReviewAndIdObservable = Observable.CombineLatest(
+            var pendingReviewAndIdAndCommentCountObservable = Observable.CombineLatest(
                 session.WhenAnyValue(x => x.HasPendingReview, x => !x),
                 this.WhenAnyValue(model => model.Id).Select(i => i == null),
                 thread.Comments.ToObservable().ToList(),
@@ -70,13 +70,13 @@ namespace GitHub.InlineReviews.ViewModels
                         = threadComments.Count(model => model.EditState == CommentEditState.None)
                 });
 
-            var canStartReviewObservable = pendingReviewAndIdObservable
+            var canStartReviewObservable = pendingReviewAndIdAndCommentCountObservable
                 .Select(arg => arg.hasPendingReview && arg.isNewComment && arg.threadCommentCount == 0);
 
             canStartReview = canStartReviewObservable
                     .ToProperty(this, x => x.CanStartReview);
 
-            commitCaption = pendingReviewAndIdObservable
+            commitCaption = pendingReviewAndIdAndCommentCountObservable
                 .Select(arg => !arg.isNewComment ? Resources.UpdateComment : arg.hasPendingReview ? Resources.AddSingleComment : Resources.AddReviewComment)
                 .ToProperty(this, x => x.CommitCaption);
 
