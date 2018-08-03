@@ -61,10 +61,19 @@ namespace GitHub.InlineReviews.ViewModels
             var pendingReviewAndIdObservable = Observable.CombineLatest(
                 session.WhenAnyValue(x => x.HasPendingReview, x => !x),
                 this.WhenAnyValue(model => model.Id).Select(i => i == null),
-                (hasPendingReview, isNewComment) => new { hasPendingReview, isNewComment });
+                thread.Comments.ToObservable().ToList(),
+                (hasPendingReview, isNewComment, threadComments) => new
+                {
+                    hasPendingReview,
+                    isNewComment,
+                    threadCommentCount
+                        = threadComments.Count(model => model.EditState == CommentEditState.None)
+                });
 
-            canStartReview = pendingReviewAndIdObservable
-                    .Select(arg => arg.hasPendingReview && arg.isNewComment)
+            var canStartReviewObservable = pendingReviewAndIdObservable
+                .Select(arg => arg.hasPendingReview && arg.isNewComment && arg.threadCommentCount == 0);
+
+            canStartReview = canStartReviewObservable
                     .ToProperty(this, x => x.CanStartReview);
 
             commitCaption = pendingReviewAndIdObservable
@@ -72,7 +81,7 @@ namespace GitHub.InlineReviews.ViewModels
                 .ToProperty(this, x => x.CommitCaption);
 
             StartReview = ReactiveCommand.CreateAsyncTask(
-                CommitEdit.CanExecuteObservable,
+                canStartReviewObservable,
                 DoStartReview);
             AddErrorHandler(StartReview);
         }
