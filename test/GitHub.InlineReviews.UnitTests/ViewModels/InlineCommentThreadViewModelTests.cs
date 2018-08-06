@@ -16,8 +16,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesComments()
         {
             var target = new InlineCommentThreadViewModel(
-                Substitute.For<ICommentService>()
-                , CreateSession(),
+                Substitute.For<ICommentService>(),
+                CreateSession(),
                 CreateComments("Comment 1", "Comment 2"));
 
             Assert.That(3, Is.EqualTo(target.Comments.Count));
