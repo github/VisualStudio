@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.InlineReviews.ViewModels;
@@ -31,6 +32,24 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var target = CreateTarget(session);
 
                 Assert.That(target.CanStartReview, Is.True);
+            }
+
+            [Test]
+            public void IsFalseWhenThreadHasPreexistingComments()
+            {
+                var session = CreateSession();
+
+                var commentViewModel = Substitute.For<ICommentViewModel>();
+                commentViewModel.EditState.Returns(CommentEditState.None);
+
+                var commentThreadViewModel = CreateThread();
+                commentThreadViewModel.Comments.Returns(new ObservableCollection<ICommentViewModel>(
+                    new[] {commentViewModel}
+                ));
+
+                var target = CreateTarget(session, commentThreadViewModel);
+
+                Assert.That(target.CanStartReview, Is.False);
             }
 
             [Test]
@@ -247,6 +266,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var result = Substitute.For<ICommentThreadViewModel>();
             result.PostComment.Returns(ReactiveCommand.CreateAsyncTask(_ => Task.CompletedTask));
+            result.Comments.Returns(new ObservableCollection<ICommentViewModel>());
             return result;
         }
     }
