@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,7 +16,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesComments()
         {
             var target = new InlineCommentThreadViewModel(
-                CreateSession(),
+                Substitute.For<ICommentService>()
+                , CreateSession(),
                 CreateComments("Comment 1", "Comment 2"));
 
             Assert.That(3, Is.EqualTo(target.Comments.Count));
@@ -42,6 +44,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
             var target = new InlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
                 CreateSession(),
                 CreateComments("Comment 1"));
 
@@ -56,6 +59,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var session = CreateSession();
             var target = new InlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
                 session,
                 CreateComments("Comment 1", "Comment 2"));
 
