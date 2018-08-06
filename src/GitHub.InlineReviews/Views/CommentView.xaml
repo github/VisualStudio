@@ -74,9 +74,9 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
                           Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
                 <ui:OcticonButton Command="{Binding BeginEdit}"
-                                  Width="16"
                                   Height="16"
-                                  Margin="0"
+                                  Width="20"
+                                  Margin="0 0 4 0"
                                   Background="Transparent"
                                   Foreground="{DynamicResource GitHubVsToolWindowText}"
                                   Icon="pencil"/>
