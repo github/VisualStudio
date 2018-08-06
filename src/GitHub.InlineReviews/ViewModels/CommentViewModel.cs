@@ -137,33 +137,24 @@ namespace GitHub.InlineReviews.ViewModels
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
-            switch(result)
+            if (result == MessageBoxResult.Yes)
             {
-                case (MessageBoxResult.Yes):
+                try
                 {
-                    try
-                    {
-                        ErrorMessage = null;
-                        IsSubmitting = true;
+                    ErrorMessage = null;
+                    IsSubmitting = true;
 
-                        await Thread.DeleteComment.ExecuteAsyncTask(new Tuple<int, int>(PullRequestId, DatabaseId));
-                    }
-                    catch (Exception e)
-                    {
-                        var message = e.Message;
-                        ErrorMessage = message;
-                        log.Error(e, "Error Deleting comment");
-                    }
-                    finally
-                    {
-                        IsSubmitting = false;
-                    }
-                        break;
+                    await Thread.DeleteComment.ExecuteAsyncTask(new Tuple<int, int>(PullRequestId, DatabaseId));
                 }
-
-                case (MessageBoxResult.No):
+                catch (Exception e)
                 {
-                    break;
+                    var message = e.Message;
+                    ErrorMessage = message;
+                    log.Error(e, "Error Deleting comment");
+                }
+                finally
+                {
+                    IsSubmitting = false;
                 }
             }
         }
