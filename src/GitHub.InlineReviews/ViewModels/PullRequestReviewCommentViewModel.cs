@@ -58,19 +58,21 @@ namespace GitHub.InlineReviews.ViewModels
             this.session = session;
             IsPending = isPending;
 
-            var pendingReviewAndCommentDataObservable = Observable.CombineLatest(
+            var commentDataObservable = Observable.CombineLatest(
+                this.WhenAnyValue(x => x.IsReadOnly),
+                this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
                 session.WhenAnyValue(x => x.HasPendingReview, x => !x),
                 this.WhenAnyValue(model => model.Id).Select(i => i == null),
                 thread.Comments.ToObservable().ToList().Select(list => list.Any(model => model.EditState == CommentEditState.None)),
-                (hasPendingReview, isNewComment, hasCommentsInThread) => new { hasPendingReview, isNewComment, hasCommentsInThread });
+                (isReadOnly, hasBody, hasPendingReview, isNewComment, hasCommentsInThread) => new { isReadOnly, hasBody, hasPendingReview, isNewComment, hasCommentsInThread });
 
-            var canStartReviewObservable = pendingReviewAndCommentDataObservable
-                .Select(arg => arg.hasPendingReview && arg.isNewComment && !arg.hasCommentsInThread);
+            var canStartReviewObservable = commentDataObservable
+                .Select(arg => !arg.isReadOnly && arg.hasBody && arg.hasPendingReview && arg.isNewComment && !arg.hasCommentsInThread);
 
             canStartReview = canStartReviewObservable
                     .ToProperty(this, x => x.CanStartReview);
 
-            commitCaption = pendingReviewAndCommentDataObservable
+            commitCaption = commentDataObservable
                 .Select(arg => !arg.isNewComment ? Resources.UpdateComment : arg.hasPendingReview ? Resources.AddSingleComment : Resources.AddReviewComment)
                 .ToProperty(this, x => x.CommitCaption);
 

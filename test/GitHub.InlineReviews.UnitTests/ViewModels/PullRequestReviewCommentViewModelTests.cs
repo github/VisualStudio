@@ -191,12 +191,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             }
 
             [Test]
-            public void IsEnabledWhenSessionHasNoPendingReview()
+            public void IsDisabledWhenSessionHasNoPendingReview()
             {
                 var session = CreateSession(false);
                 var target = CreateTarget(session);
 
-                Assert.That(target.StartReview.CanExecute(null), Is.True);
+                Assert.That(target.StartReview.CanExecute(null), Is.False);
             }
 
             [Test]
