@@ -61,13 +61,13 @@
                                    Opacity="0"
                                    SnapsToDevicePixels="True"/>
                         <Border x:Name="MouseOverBorder"
-                                Background="#FFDDDDE6"
+                                Background="{DynamicResource VsBrush.CommandBarHover}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1"
                                 Opacity="0"
                                 SnapsToDevicePixels="True"/>
                         <Border x:Name="PressedBorder"
-                                Background="#FFCFCFDB"
+                                Background="{DynamicResource VsBrush.CommandBarMouseDownBackgroundBegin}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1"
                                 Opacity="0"

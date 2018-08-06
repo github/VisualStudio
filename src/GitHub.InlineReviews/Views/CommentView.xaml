@@ -56,7 +56,7 @@
                                         Height="16" 
                                         Account="{Binding Author}"/>
 
-                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding User.Login}" Margin="4 0"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
                 <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
                                      Command="{Binding OpenOnGitHub}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
@@ -74,9 +74,9 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
                           Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
                 <ui:OcticonButton Command="{Binding BeginEdit}"
-                                  Width="16"
                                   Height="16"
-                                  Margin="0"
+                                  Width="20"
+                                  Margin="0 0 4 0"
                                   Background="Transparent"
                                   Foreground="{DynamicResource GitHubVsToolWindowText}"
                                   Icon="pencil"/>
@@ -154,7 +154,8 @@
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
-                              GotFocus="ReplyPlaceholder_GotFocus">
+                              GotFocus="ReplyPlaceholder_GotFocus"
+                              SpellCheck.IsEnabled="True">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
                         <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />

@@ -125,7 +125,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     public async Task TargetBranchDisplayNameIncludesRepoOwnerWhenForkAsync()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
-        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
@@ -161,7 +161,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var targetBranch = data.TargetBranch;
         var ms = data.ModelService;
 
-        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 

@@ -135,6 +135,9 @@
     <Reference Include="System.Management" />
     <Reference Include="System.Management.Instrumentation" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -146,6 +149,8 @@
   <ItemGroup>
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\IOpenFromClipboardCommand.cs" />
+    <Compile Include="Commands\IOpenFromUrlCommand.cs" />
     <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
     <Compile Include="Commands\IOpenLinkCommand.cs" />
     <Compile Include="Commands\ICreateGistCommand.cs" />
@@ -173,20 +178,26 @@
     <Compile Include="Models\CommentModel.cs" />
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
+    <Compile Include="Models\Page.cs" />
     <Compile Include="Models\PullRequestFileModel.cs" />
     <Compile Include="Models\PullRequestDetailModel.cs" />
+    <Compile Include="Models\PullRequestListItemModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="Models\PullRequestReviewThreadModel.cs" />
+    <Compile Include="Services\GitHubContext.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
+    <Compile Include="Services\IGitHubContextService.cs" />
     <Compile Include="Services\IGlobalConnection.cs" />
     <Compile Include="Services\ILocalRepositories.cs" />
+    <Compile Include="Services\IRepositoryService.cs" />
     <Compile Include="Services\ITeamExplorerContext.cs" />
     <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Models\UsageData.cs" />
     <Compile Include="Services\IUsageService.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\GitHubPane\IGitHubPaneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IGitHubToolWindowManager.cs" />
     <Compile Include="ViewModels\IConnectionInitializedViewModel.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
