@@ -440,7 +440,6 @@ namespace GitHub.Services
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
                 Head = Create(prCacheItem.Head),
-                Checks = prCacheItem.Checks ?? PullRequestChecksEnum.None,
                 State = prCacheItem.State.HasValue ?
                     prCacheItem.State.Value :
                     prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,

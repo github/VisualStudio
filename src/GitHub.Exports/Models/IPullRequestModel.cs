@@ -27,7 +27,6 @@ namespace GitHub.Models
         int Number { get; }
         string Title { get; }
         PullRequestStateEnum State { get; }
-        PullRequestChecksEnum Checks { get; }
         int CommentCount { get; }
         int CommitCount { get; }
         bool IsOpen { get; }
