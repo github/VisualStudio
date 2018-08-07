@@ -202,6 +202,13 @@ namespace GitHub.InlineReviews.Services
             ILocalRepositoryModel localRepository,
             string pullRequestId);
 
+
+        /// <summary>
+        /// Displays a confirmation diaglog to ask if the user wants to cancel a pending review.
+        /// </summary>
+        /// <returns></returns>
+        bool ConfirmCancelPendingReview();
+
         /// <summary>
         /// Cancels a pending review on the server.
         /// </summary>
@@ -343,7 +350,5 @@ namespace GitHub.InlineReviews.Services
             string remoteRepositoryOwner,
             string commentNodeId,
             string body);
-
-        bool ConfirmCancelPendingReview();
     }
 }
