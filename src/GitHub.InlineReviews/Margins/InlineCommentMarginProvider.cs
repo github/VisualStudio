@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
-using GitHub.InlineReviews.Services;
 using GitHub.Services;
+using GitHub.VisualStudio;
+using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Margins
 {
@@ -17,28 +19,41 @@ namespace GitHub.InlineReviews.Margins
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     internal sealed class InlineCommentMarginProvider : IWpfTextViewMarginProvider
     {
-        readonly IEditorFormatMapService editorFormatMapService;
-        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
-        readonly IInlineCommentPeekService peekService;
+        readonly Lazy<IEditorFormatMapService> editorFormatMapService;
+        readonly Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory;
+        readonly Lazy<IInlineCommentPeekService> peekService;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
+        readonly UIContext uiContext;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
-            IGitHubServiceProvider serviceProvider,
-            IEditorFormatMapService editorFormatMapService,
-            IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService)
+            Lazy<IPullRequestSessionManager> sessionManager,
+            Lazy<IEditorFormatMapService> editorFormatMapService,
+            Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory,
+            Lazy<IInlineCommentPeekService> peekService)
         {
+            this.sessionManager = sessionManager;
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-            sessionManager = new Lazy<IPullRequestSessionManager>(() => serviceProvider.GetService<IPullRequestSessionManager>());
+
+            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
+            if (!uiContext.IsActive)
+            {
+                // Only create margin when in the context of a Git repository
+                return null;
+            }
+
             return new InlineCommentMargin(
-                wpfTextViewHost, peekService, editorFormatMapService, tagAggregatorFactory, sessionManager);
+                wpfTextViewHost,
+                peekService.Value,
+                editorFormatMapService.Value,
+                tagAggregatorFactory.Value,
+                sessionManager);
         }
     }
 }
