@@ -343,5 +343,7 @@ namespace GitHub.InlineReviews.Services
             string remoteRepositoryOwner,
             string commentNodeId,
             string body);
+
+        bool ConfirmCancelPendingReview();
     }
 }

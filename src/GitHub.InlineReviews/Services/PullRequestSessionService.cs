@@ -24,6 +24,7 @@ using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
+using System.Windows.Forms;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 
@@ -442,6 +443,15 @@ namespace GitHub.InlineReviews.Services
             await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentStartReview);
 
             return detail;
+        }
+
+        public bool ConfirmCancelPendingReview()
+        {
+            return MessageBox.Show(
+                       VisualStudio.UI.Resources.CancelPendingReviewConfirmation,
+                       VisualStudio.UI.Resources.CancelPendingReviewConfirmationCaption,
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
         /// <inheritdoc/>

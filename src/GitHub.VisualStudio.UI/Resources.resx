@@ -443,4 +443,10 @@
   <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
     <value>Delete Comment</value>
   </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>Cancel Review</value>
+  </data>
 </root>

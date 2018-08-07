@@ -11,6 +11,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using NSubstitute;
+using NSubstitute.Exceptions;
 using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.Services
@@ -145,8 +146,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var review = CreateReview(author: currentUser, state: PullRequestReviewState.Pending);
                 var pr = CreatePullRequest(review);
 
+                var service = Substitute.For<IPullRequestSessionService>();
+                service.ConfirmCancelPendingReview().Returns(true);
+
                 var target = new PullRequestSession(
-                    Substitute.For<IPullRequestSessionService>(),
+                    service,
                     currentUser,
                     pr,
                     Substitute.For<ILocalRepositoryModel>(),
@@ -327,6 +331,8 @@ Line 4";
             public async Task CallsServiceWithNodeId()
             {
                 var service = Substitute.For<IPullRequestSessionService>();
+                service.ConfirmCancelPendingReview().Returns(true);
+
                 var target = CreateTargetWithPendingReview(service);
 
                 await target.CancelReview();
@@ -340,6 +346,8 @@ Line 4";
             public async Task RemovesReviewFromModel()
             {
                 var service = Substitute.For<IPullRequestSessionService>();
+                service.ConfirmCancelPendingReview().Returns(true);
+
                 var target = CreateTargetWithPendingReview(service);
 
                 await target.CancelReview();
