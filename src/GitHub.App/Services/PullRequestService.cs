@@ -144,7 +144,7 @@ namespace GitHub.Services
 
                 if (!hasStatuses)
                 {
-                    item.Checks = PullRequestChecksEnum.None;
+                    item.Checks = PullRequestChecksState.None;
                 }
                 else
                 {
@@ -161,15 +161,15 @@ namespace GitHub.Services
 
                     if (statusHasFailure)
                     {
-                        item.Checks = PullRequestChecksEnum.Failure;
+                        item.Checks = PullRequestChecksState.Failure;
                     }
                     else if (statusHasCompleteSuccess)
                     {
-                        item.Checks = PullRequestChecksEnum.Success;
+                        item.Checks = PullRequestChecksState.Success;
                     }
                     else
                     {
-                        item.Checks = PullRequestChecksEnum.Pending;
+                        item.Checks = PullRequestChecksState.Pending;
                     }
                 }
 

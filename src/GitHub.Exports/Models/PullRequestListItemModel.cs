@@ -40,7 +40,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the pull request checks and statuses summary
         /// </summary>
-        public PullRequestChecksEnum Checks { get; set; }
+        public PullRequestChecksState Checks { get; set; }
 
         /// <summary>
         /// Gets or sets the date/time at which the pull request was last updated.

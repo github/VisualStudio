@@ -13,7 +13,7 @@ namespace GitHub.Models
         Merged,
     }
 
-    public enum PullRequestChecksEnum
+    public enum PullRequestChecksState
     {
         None,
         Pending,
