@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
@@ -20,13 +21,14 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
+        /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
         /// <param name="file">The file being commented on.</param>
         /// <param name="lineNumber">The 0-based line number in the file.</param>
         /// <param name="leftComparisonBuffer">
-        /// True if the comment is being left on the left-hand-side of a diff; otherwise false.
+        ///     True if the comment is being left on the left-hand-side of a diff; otherwise false.
         /// </param>
-        public NewInlineCommentThreadViewModel(
+        public NewInlineCommentThreadViewModel(ICommentService commentService,
             IPullRequestSession session,
             IPullRequestSessionFile file,
             int lineNumber,
@@ -53,7 +55,7 @@ namespace GitHub.InlineReviews.ViewModels
                 Observable.Return(false),
                 o => null);
 
-            var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser);
+            var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, this, CurrentUser);
             placeholder.BeginEdit.Execute(null);
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);

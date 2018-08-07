@@ -84,6 +84,8 @@
     <Compile Include="Margins\InlineCommentMargin.cs" />
     <Compile Include="Margins\InlineCommentMarginVisible.cs" />
     <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
+    <Compile Include="Services\CommentService.cs" />
+    <Compile Include="Services\ICommentService.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
