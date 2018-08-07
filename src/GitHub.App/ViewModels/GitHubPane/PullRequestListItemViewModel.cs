@@ -27,16 +27,16 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public string Id { get; protected set; }
+        public string Id { get; }
 
         /// <inheritdoc/>
-        public IActorViewModel Author { get; protected set; }
+        public IActorViewModel Author { get; }
 
         /// <inheritdoc/>
-        public PullRequestChecksState Checks { get; protected set; }
+        public PullRequestChecksState Checks { get; }
 
         /// <inheritdoc/>
-        public int CommentCount { get; protected set; }
+        public int CommentCount { get; }
 
         /// <inheritdoc/>
         public bool IsCurrent
@@ -46,12 +46,12 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public int Number { get; protected set; }
+        public int Number { get; }
 
         /// <inheritdoc/>
-        public string Title { get; protected set; }
+        public string Title { get; }
 
         /// <inheritdoc/>
-        public DateTimeOffset UpdatedAt { get; protected set; }
+        public DateTimeOffset UpdatedAt { get; }
     }
 }
