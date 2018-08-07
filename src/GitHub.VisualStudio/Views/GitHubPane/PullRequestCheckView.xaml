@@ -13,10 +13,11 @@
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:sampleData1="clr-namespace:GitHub.App.SampleData;assembly=GitHub.App"
              mc:Ignorable="d" d:DesignWidth="600">
 
     <d:DesignData.DataContext>
-        <ghfvs:PullRequestCheckViewModelDesigner />
+        <sampleData1:PullRequestCheckViewModelDesigner />
     </d:DesignData.DataContext>
 
     <Control.Resources>

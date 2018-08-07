@@ -1,9 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows.Media.Imaging;
+using GitHub.ViewModels;
+using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
-namespace GitHub.ViewModels.GitHubPane
+namespace GitHub.App.SampleData
 {
     public sealed class PullRequestCheckViewModelDesigner : ViewModelBase, IPullRequestCheckViewModel
     {

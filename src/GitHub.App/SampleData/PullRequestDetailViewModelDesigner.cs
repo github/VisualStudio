@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
+using GitHub.App.SampleData;
 
 namespace GitHub.SampleData
 {
@@ -95,35 +96,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Files = new PullRequestFilesViewModelDesigner();
 
-            var defaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
-
-            Checks = new[]
-            {
-                new PullRequestCheckViewModelDesigner
-                {
-                    Title = "continuous-integration/appveyor/branch",
-                    Description = "AppVeyor build succeeded",
-                    Status = PullRequestCheckStatus.Success,
-                    AvatarUrl = defaultAvatar,
-                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
-                },
-                new PullRequestCheckViewModelDesigner
-                {
-                    Title = "continuous-integration/appveyor/pr",
-                    Description = "AppVeyor building",
-                    Status = PullRequestCheckStatus.Pending,
-                    AvatarUrl = defaultAvatar,
-                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
-                },
-                new PullRequestCheckViewModelDesigner
-                {
-                    Title = "continuous-integration/appveyor/other",
-                    Description = "AppVeyor build failed",
-                    Status = PullRequestCheckStatus.Failure,
-                    AvatarUrl = defaultAvatar,
-                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
-                },
-            };
+            Checks = new PullRequestCheckViewModelDesigner[0];
         }
 
         public PullRequestDetailModel Model { get; }
