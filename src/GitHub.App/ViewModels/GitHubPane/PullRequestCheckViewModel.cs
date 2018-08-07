@@ -27,15 +27,15 @@ namespace GitHub.ViewModels.GitHubPane
                 PullRequestCheckStatus checkStatus;
                 switch (model.State)
                 {
-                    case StatusStateEnum.Expected:
-                    case StatusStateEnum.Error:
-                    case StatusStateEnum.Failure:
+                    case StatusState.Expected:
+                    case StatusState.Error:
+                    case StatusState.Failure:
                         checkStatus = PullRequestCheckStatus.Failure;
                         break;
-                    case StatusStateEnum.Pending:
+                    case StatusState.Pending:
                         checkStatus = PullRequestCheckStatus.Pending;
                         break;
-                    case StatusStateEnum.Success:
+                    case StatusState.Success:
                         checkStatus = PullRequestCheckStatus.Success;
                         break;
                     default:

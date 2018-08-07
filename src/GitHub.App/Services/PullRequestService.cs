@@ -22,6 +22,7 @@ using Octokit.GraphQL.Model;
 using Rothko;
 using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
+using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
 {
@@ -100,7 +101,7 @@ namespace GitHub.Services
                                             .Select(context =>
                                                 context.Contexts.Select(statusContext => new StatusSummaryModel
                                                 {
-                                                    State = (StatusStateEnum)statusContext.State,
+                                                    State = (StatusState)statusContext.State,
                                                 }).ToList()
                                             ).SingleOrDefault()
                                 }).ToList().FirstOrDefault(),
@@ -150,13 +151,13 @@ namespace GitHub.Services
                 {
                     var statusHasFailure = item.LastCommit
                         .Statuses
-                        .Any(status => status.State == StatusStateEnum.Failure);
+                        .Any(status => status.State == StatusState.Failure);
 
                     var statusHasCompleteSuccess = true;
                     if (!statusHasFailure)
                     {
                         statusHasCompleteSuccess =
-                            item.LastCommit.Statuses.All(status => status.State == StatusStateEnum.Success);
+                            item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
                     }
 
                     if (statusHasFailure)
@@ -900,7 +901,7 @@ namespace GitHub.Services
 
         class StatusSummaryModel
         {
-            public StatusStateEnum State { get; set; }
+            public StatusState State { get; set; }
         }
 
         class LastCommitSummaryModel

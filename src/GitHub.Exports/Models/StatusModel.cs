@@ -2,7 +2,7 @@
 {
     public class StatusModel
     {
-        public StatusStateEnum State { get; set; }
+        public StatusState State { get; set; }
 
         public string Context { get; set; }
 

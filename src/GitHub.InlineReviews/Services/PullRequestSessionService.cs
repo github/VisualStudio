@@ -24,6 +24,7 @@ using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
+using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 
@@ -370,7 +371,7 @@ namespace GitHub.InlineReviews.Services
                             .Select(context =>
                                 context.Contexts.Select(statusContext => new StatusModel
                                 {
-                                    State = (StatusStateEnum)statusContext.State,
+                                    State = (StatusState)statusContext.State,
                                     Context = statusContext.Context,
                                     TargetUrl = statusContext.TargetUrl,
                                     Description = statusContext.Description,
