@@ -26,19 +26,19 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 var statusStateEnum = model.State;
 
-                PullRequestCheckStatusEnum checkStatus;
+                PullRequestCheckStatus checkStatus;
                 switch (statusStateEnum)
                 {
                     case StatusStateEnum.Expected:
                     case StatusStateEnum.Error:
                     case StatusStateEnum.Failure:
-                        checkStatus = PullRequestCheckStatusEnum.Failure;
+                        checkStatus = PullRequestCheckStatus.Failure;
                         break;
                     case StatusStateEnum.Pending:
-                        checkStatus = PullRequestCheckStatusEnum.Pending;
+                        checkStatus = PullRequestCheckStatus.Pending;
                         break;
                     case StatusStateEnum.Success:
-                        checkStatus = PullRequestCheckStatusEnum.Success;
+                        checkStatus = PullRequestCheckStatus.Success;
                         break;
                     default:
                         throw new InvalidOperationException("Unkown PullRequestCheckStatusEnum");
@@ -75,7 +75,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public string Description { get; private set; }
 
-        public PullRequestCheckStatusEnum Status{ get; private set; }
+        public PullRequestCheckStatus Status{ get; private set; }
 
         public Uri DetailsUrl { get; private set; }
 

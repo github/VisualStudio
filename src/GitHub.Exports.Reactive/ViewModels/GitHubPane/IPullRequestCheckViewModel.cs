@@ -9,14 +9,14 @@ namespace GitHub.ViewModels.GitHubPane
     {
         string Title { get; }
         string Description { get; }
-        PullRequestCheckStatusEnum Status { get; }
+        PullRequestCheckStatus Status { get; }
         Uri DetailsUrl { get; }
         string AvatarUrl { get; }
         BitmapImage Avatar { get; }
         ReactiveCommand<object> OpenDetailsUrl { get; }
     }
 
-    public enum PullRequestCheckStatusEnum
+    public enum PullRequestCheckStatus
     {
         Pending,
         Success,

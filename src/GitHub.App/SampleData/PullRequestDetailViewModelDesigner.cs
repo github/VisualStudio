@@ -104,7 +104,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                 {
                     Title = "continuous-integration/appveyor/branch",
                     Description = "AppVeyor build succeeded",
-                    Status = PullRequestCheckStatusEnum.Success,
+                    Status = PullRequestCheckStatus.Success,
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
@@ -112,7 +112,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                 {
                     Title = "continuous-integration/appveyor/pr",
                     Description = "AppVeyor building",
-                    Status = PullRequestCheckStatusEnum.Pending,
+                    Status = PullRequestCheckStatus.Pending,
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
@@ -120,7 +120,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                 {
                     Title = "continuous-integration/appveyor/other",
                     Description = "AppVeyor build failed",
-                    Status = PullRequestCheckStatusEnum.Failure,
+                    Status = PullRequestCheckStatus.Failure,
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
