@@ -225,7 +225,7 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequestSession session = null;
             WeakReference<PullRequestSession> weakSession;
-            var key = Tuple.Create(owner, number);
+            var key = Tuple.Create(owner.ToLowerInvariant(), number);
 
             if (sessions.TryGetValue(key, out weakSession))
             {

@@ -392,7 +392,7 @@ namespace GitHub.Services
                     {
                         await gitClient.Checkout(repo, localBranchName);
                     }
-                    else if (repository.CloneUrl.Owner == pullRequest.HeadRepositoryOwner)
+                    else if (string.Equals(repository.CloneUrl.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase))
                     {
                         var remote = await gitClient.GetHttpRemote(repo, "origin");
                         await gitClient.Fetch(repo, remote.Name);
@@ -524,7 +524,7 @@ namespace GitHub.Services
 
         public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
-            return pullRequest.HeadRepositoryOwner == repository.CloneUrl.Owner;
+            return string.Equals(repository.CloneUrl?.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase);
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
