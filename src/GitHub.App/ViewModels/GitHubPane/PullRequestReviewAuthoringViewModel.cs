@@ -68,7 +68,7 @@ namespace GitHub.ViewModels.GitHubPane
                 _ => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges));
             Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
-                NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestModel.Number}")));
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{PullRequestModel.Number}")));
         }
 
         /// <inheritdoc/>
