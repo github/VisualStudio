@@ -140,7 +140,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             }
 
             [Test]
-            public async Task IsFalseWhenReviewCancelled()
+            public async Task IsFalseWhenReviewCancelledAndConfirmed()
             {
                 var currentUser = CreateActor();
                 var review = CreateReview(author: currentUser, state: PullRequestReviewState.Pending);
@@ -162,6 +162,31 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 await target.CancelReview();
 
                 Assert.That(target.HasPendingReview, Is.False);
+            }
+
+            [Test]
+            public async Task IsTrueWhenReviewCancelledAndNotConfirmed()
+            {
+                var currentUser = CreateActor();
+                var review = CreateReview(author: currentUser, state: PullRequestReviewState.Pending);
+                var pr = CreatePullRequest(review);
+
+                var service = Substitute.For<IPullRequestSessionService>();
+                service.ConfirmCancelPendingReview().Returns(false);
+
+                var target = new PullRequestSession(
+                    service,
+                    currentUser,
+                    pr,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    "owner",
+                    true);
+
+                Assert.That(target.HasPendingReview, Is.True);
+
+                await target.CancelReview();
+
+                Assert.That(target.HasPendingReview, Is.True);
             }
         }
 
