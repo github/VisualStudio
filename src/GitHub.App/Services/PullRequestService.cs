@@ -898,14 +898,14 @@ namespace GitHub.Services
             public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
         }
 
+        class StatusSummaryModel
+        {
+            public StatusStateEnum State { get; set; }
+        }
+
         class LastCommitSummaryModel
         {
             public List<StatusSummaryModel> Statuses { get; set; }
         }
-    }
-
-    public class StatusSummaryModel
-    {
-        public StatusStateEnum State { get; set; }
     }
 }
