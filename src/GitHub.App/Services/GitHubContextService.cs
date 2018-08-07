@@ -58,6 +58,8 @@ namespace GitHub.Services
         static readonly Regex treeishCommitRegex = new Regex($"(?<commit>[a-z0-9]{{40}})(/(?<tree>.+))?", RegexOptions.Compiled);
         static readonly Regex treeishBranchRegex = new Regex($"(?<branch>master)(/(?<tree>.+))?", RegexOptions.Compiled);
 
+        static readonly Regex tempFileObjectishRegex = new Regex(@"\\TFSTemp\\[^\\]*[.](?<objectish>[a-z0-9]{8})[.][^.\\]*$", RegexOptions.Compiled);
+
         [ImportingConstructor]
         public GitHubContextService(IGitHubServiceProvider serviceProvider, IGitService gitService)
         {
@@ -302,6 +304,55 @@ namespace GitHub.Services
                     var path = treeishPath.Substring(index + 1);
                     yield return (commitish, path);
                 }
+            }
+        }
+
+        /// <inheritdoc/>
+        public string FindObjectishForTFSTempFile(string tempFile)
+        {
+            var match = tempFileObjectishRegex.Match(tempFile);
+            if (match.Success)
+            {
+                return match.Groups["objectish"].Value;
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public (string commitSha, string blobPath) ResolveBlobFromHistory(string repositoryDir, string objectish)
+        {
+            using (var repo = gitService.GetRepository(repositoryDir))
+            {
+                var blob = repo.Lookup<Blob>(objectish);
+                if (blob == null)
+                {
+                    return (null, null);
+                }
+
+                foreach (var commit in repo.Commits)
+                {
+                    var trees = new Stack<Tree>();
+                    trees.Push(commit.Tree);
+
+                    while (trees.Count > 0)
+                    {
+                        foreach (var treeEntry in trees.Pop())
+                        {
+                            if (treeEntry.Target == blob)
+                            {
+                                return (commit.Sha, treeEntry.Path);
+                            }
+
+                            if (treeEntry.TargetType == TreeEntryTargetType.Tree)
+                            {
+                                trees.Push((Tree)treeEntry.Target);
+                            }
+                        }
+                    }
+                }
+
+                return (null, null);
             }
         }
 

@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Services;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -28,6 +29,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="PullRequestReviewCommentViewModel"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
+        /// <param name="commentService">The comment service</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="pullRequestId">The pull request id of the comment.</param>
@@ -39,7 +41,9 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="updatedAt">The modified date of the comment.</param>
         /// <param name="isPending">Whether this is a pending comment.</param>
         /// <param name="webUrl"></param>
-        public PullRequestReviewCommentViewModel(IPullRequestSession session,
+        public PullRequestReviewCommentViewModel(
+            IPullRequestSession session,
+            ICommentService commentService,
             ICommentThreadViewModel thread,
             IActorViewModel currentUser,
             int pullRequestId,
@@ -51,7 +55,7 @@ namespace GitHub.InlineReviews.ViewModels
             DateTimeOffset updatedAt,
             bool isPending,
             Uri webUrl)
-            : base(thread, currentUser, pullRequestId, commentId, databaseId, body, state, author, updatedAt, webUrl)
+            : base(commentService, thread, currentUser, pullRequestId, commentId, databaseId, body, state, author, updatedAt, webUrl)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
@@ -81,17 +85,20 @@ namespace GitHub.InlineReviews.ViewModels
         /// Initializes a new instance of the <see cref="PullRequestReviewCommentViewModel"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
+        /// <param name="commentService">Comment Service</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="model">The comment model.</param>
         public PullRequestReviewCommentViewModel(
             IPullRequestSession session,
+            ICommentService commentService,
             ICommentThreadViewModel thread,
             IActorViewModel currentUser,
             PullRequestReviewModel review,
             PullRequestReviewCommentModel model)
             : this(
                   session,
+                  commentService,
                   thread,
                   currentUser,
                   model.PullRequestId,
@@ -110,16 +117,19 @@ namespace GitHub.InlineReviews.ViewModels
         /// Creates a placeholder comment which can be used to add a new comment to a thread.
         /// </summary>
         /// <param name="session">The pull request session.</param>
+        /// <param name="commentService">Comment Service</param>
         /// <param name="thread">The comment thread.</param>
         /// <param name="currentUser">The current user.</param>
         /// <returns>THe placeholder comment.</returns>
         public static CommentViewModel CreatePlaceholder(
             IPullRequestSession session,
+            ICommentService commentService,
             ICommentThreadViewModel thread,
             IActorViewModel currentUser)
         {
             return new PullRequestReviewCommentViewModel(
                 session,
+                commentService,
                 thread,
                 currentUser,
                 0,

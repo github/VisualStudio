@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
@@ -19,6 +20,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesReplyPlaceholder()
         {
             var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
                 CreateSession(),
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
@@ -34,6 +36,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
                 CreateSession(),
                 file,
                 10,
@@ -58,6 +61,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
                 CreateSession(),
                 file,
                 10,
@@ -80,7 +84,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
+            var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
+                session, file, 10, false);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
@@ -110,7 +116,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }
             });
 
-            var target = new NewInlineCommentThreadViewModel(session, file, 16, true);
+            var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
+                session, file, 16, true);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
