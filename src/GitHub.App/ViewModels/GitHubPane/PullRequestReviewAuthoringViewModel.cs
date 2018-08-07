@@ -271,10 +271,16 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (Model?.Id != null)
                 {
-                    await session.CancelReview();
+                    if (await session.CancelReview())
+                    {
+                        Close();
+                    }
+                }
+                else
+                {
+                    Close();
                 }
 
-                Close();
             }
             catch (Exception ex)
             {

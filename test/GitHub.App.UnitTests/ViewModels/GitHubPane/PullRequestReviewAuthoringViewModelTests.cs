@@ -361,11 +361,12 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         }
 
         [Test]
-        public async Task Cancel_Calls_Session_CancelReview_And_Closes_When_Has_Pending_Review_Async()
+        public async Task Cancel_Calls_Session_CancelReview_And_Closes_When_Has_Pending_Review_And_Confirmation_Async()
         {
             var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
             var model = CreatePullRequest("shana", review);
             var session = CreateSession(model: model);
+            session.CancelReview().Returns(true);
             var closed = false;
 
             var target = CreateTarget(model, session);
@@ -376,6 +377,25 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             await session.Received(1).CancelReview();
             Assert.True(closed);
+        }
+
+        [Test]
+        public async Task Cancel_Calls_Session_CancelReview_And_DoesNotClose_When_Has_Pending_Review_And_Confirmation_Is_Denied_Async()
+        {
+            var review = CreateReview("12", "grokys", state: PullRequestReviewState.Pending);
+            var model = CreatePullRequest("shana", review);
+            var session = CreateSession(model: model);
+            session.CancelReview().Returns(false);
+            var closed = false;
+
+            var target = CreateTarget(model, session);
+            await InitializeAsync(target);
+
+            target.CloseRequested.Subscribe(_ => closed = true);
+            target.Cancel.Execute(null);
+
+            await session.Received(1).CancelReview();
+            Assert.False(closed);
         }
 
         [Test]

@@ -223,7 +223,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task CancelReview()
+        public async Task<bool> CancelReview()
         {
             if (!HasPendingReview)
             {
@@ -239,7 +239,11 @@ namespace GitHub.InlineReviews.Services
                     .ToList();
 
                 await Update(PullRequest);
+
+                return true;
             }
+
+            return false;
         }
 
         /// <inheritdoc/>
