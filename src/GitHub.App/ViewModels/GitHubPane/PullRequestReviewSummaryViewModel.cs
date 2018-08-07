@@ -90,6 +90,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 case PullRequestReviewState.Approved:
                 case PullRequestReviewState.ChangesRequested:
+                case PullRequestReviewState.Dismissed:
                     return 1;
                 case PullRequestReviewState.Pending:
                     return 2;
