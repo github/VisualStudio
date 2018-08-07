@@ -6,6 +6,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
 
@@ -59,11 +60,11 @@ namespace GitHub.ViewModels.Dialog
         }
 
         /// <inheritdoc/>
-        public async Task StartWithConnection<T>(T viewModel)
+        public async Task StartWithConnection<T>(T viewModel, HostAddress hostAddress = null)
             where T : IDialogContentViewModel, IConnectionInitializedViewModel
         {
             var connections = await connectionManager.Value.GetLoadedConnections();
-            var connection = connections.FirstOrDefault(x => x.IsLoggedIn);
+            var connection = connections.FirstOrDefault(x => x.IsLoggedIn && (hostAddress == null || x.HostAddress == hostAddress));
 
             if (connection == null)
             {
@@ -80,7 +81,7 @@ namespace GitHub.ViewModels.Dialog
                     }
                     else
                     {
-                       done.OnNext(null);
+                        done.OnNext(null);
                     }
                 });
 
