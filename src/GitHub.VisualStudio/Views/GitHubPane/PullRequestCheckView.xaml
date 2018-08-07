@@ -16,9 +16,7 @@
              mc:Ignorable="d" d:DesignWidth="600">
 
     <d:DesignData.DataContext>
-        <vm:PullRequestCheckViewModel Title="continuous-integration/appveyor/branch"
-                                      Description="AppVeyor build succeeded"
-                                      Status="Success" />
+        <ghfvs:PullRequestCheckViewModelDesigner />
     </d:DesignData.DataContext>
 
     <Control.Resources>

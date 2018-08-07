@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Threading.Tasks;
 
 namespace GitHub.SampleData
 {
@@ -100,7 +99,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Checks = new[]
             {
-                new PullRequestCheckViewModel(null)
+                new PullRequestCheckViewModelDesigner
                 {
                     Title = "continuous-integration/appveyor/branch",
                     Description = "AppVeyor build succeeded",
@@ -108,7 +107,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
-                new PullRequestCheckViewModel(null)
+                new PullRequestCheckViewModelDesigner
                 {
                     Title = "continuous-integration/appveyor/pr",
                     Description = "AppVeyor building",
@@ -116,7 +115,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
                     AvatarUrl = defaultAvatar,
                     Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
                 },
-                new PullRequestCheckViewModel(null)
+                new PullRequestCheckViewModelDesigner
                 {
                     Title = "continuous-integration/appveyor/other",
                     Description = "AppVeyor build failed",

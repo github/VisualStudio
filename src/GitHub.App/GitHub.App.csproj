@@ -257,6 +257,7 @@
     <Compile Include="ViewModels\GitHubPane\LoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />
+    <Compile Include="SampleData\PullRequestCheckViewModelDesigner.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListViewModel.cs" />
