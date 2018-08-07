@@ -38,6 +38,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
+        readonly IViewViewModelFactory viewViewModelFactory;
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -55,7 +56,6 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
-        IViewViewModelFactory viewViewModelFactory;
         IReadOnlyList<IPullRequestCheckViewModel> checks;
 
         /// <summary>
