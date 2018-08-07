@@ -778,6 +778,35 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Test]
+        public async Task ShouldCheckoutLocalBranchOwnerCaseMismatchAsync()
+        {
+            var gitClient = MockGitClient();
+            var service = CreateTarget(gitClient, MockGitService());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://foo.bar/Owner/repo"));
+
+            var pr = new PullRequestDetailModel
+            {
+                Number = 5,
+                BaseRefName = "master",
+                BaseRefSha = "123",
+                BaseRepositoryOwner = "owner",
+                HeadRefName = "prbranch",
+                HeadRefSha = "123",
+                HeadRepositoryOwner = "owner",
+            };
+
+            await service.Checkout(localRepo, pr, "prbranch");
+
+            gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
+            gitClient.Received().Checkout(Arg.Any<IRepository>(), "prbranch").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.prbranch.ghfvs-pr-owner-number", "owner#5").Forget();
+
+            Assert.That(4, Is.EqualTo(gitClient.ReceivedCalls().Count()));
+        }
+
+        [Test]
         public async Task ShouldCheckoutBranchFromForkAsync()
         {
             var gitClient = MockGitClient();
@@ -893,6 +922,19 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar"));
+
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
+
+            Assert.That("source", Is.EqualTo(result.Name));
+        }
+
+        [Test]
+        public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepositoryOwnerCaseMismatchAsync()
+        {
+            var service = CreateTarget(MockGitClient(), MockGitService());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://github.com/Foo/bar"));
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
 

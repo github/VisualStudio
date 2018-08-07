@@ -7,6 +7,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
@@ -209,6 +210,7 @@ namespace GitHub.ViewModels.GitHubPane
                     this.WhenAnyValue(x => x.SelectedState),
                     this.WhenAnyValue(x => x.AuthorFilter.Selected),
                     (loading, count, _, __, ___) => Tuple.Create(loading, count))
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => UpdateState(x.Item1, x.Item2)));
             dispose.Add(
                 Observable.FromEventPattern<ErrorEventArgs>(
