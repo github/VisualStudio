@@ -20,18 +20,21 @@ namespace GitHub.InlineReviews.Peek
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
+        readonly ICommentService commentService;
 
         [ImportingConstructor]
         public InlineCommentPeekableItemSourceProvider(
             IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
-            IPreviousInlineCommentCommand previousCommentCommand)
+            IPreviousInlineCommentCommand previousCommentCommand,
+            ICommentService commentService)
         {
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.nextCommentCommand = nextCommentCommand;
             this.previousCommentCommand = previousCommentCommand;
+            this.commentService = commentService;
         }
 
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
@@ -40,7 +43,8 @@ namespace GitHub.InlineReviews.Peek
                 peekService,
                 sessionManager,
                 nextCommentCommand,
-                previousCommentCommand);
+                previousCommentCommand,
+                commentService);
         }
     }
 }

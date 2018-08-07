@@ -41,7 +41,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             var existing = new Dictionary<string, PullRequestReviewSummaryViewModel>();
 
-            foreach (var review in pullRequest.Reviews.OrderBy(x => x.Id))
+            foreach (var review in pullRequest.Reviews.OrderBy(x => x.SubmittedAt))
             {
                 if (review.State == PullRequestReviewState.Pending && review.Author.Login != currentUser.Login)
                     continue;
