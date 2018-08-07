@@ -24,10 +24,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             return pullRequest.Statuses?.Select(model =>
             {
-                var statusStateEnum = model.State;
-
                 PullRequestCheckStatus checkStatus;
-                switch (statusStateEnum)
+                switch (model.State)
                 {
                     case StatusStateEnum.Expected:
                     case StatusStateEnum.Error:
