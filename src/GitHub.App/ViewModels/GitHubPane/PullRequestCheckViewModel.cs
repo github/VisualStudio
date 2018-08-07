@@ -20,13 +20,6 @@ namespace GitHub.ViewModels.GitHubPane
         private readonly IUsageTracker usageTracker;
         const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
 
-        private string title;
-        private string description;
-        private PullRequestCheckStatusEnum status;
-        private Uri detailsUrl;
-        private string avatarUrl;
-        private BitmapImage avatar;
-
         public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
             return pullRequest.Statuses?.Select(model =>
@@ -51,7 +44,7 @@ namespace GitHub.ViewModels.GitHubPane
                         throw new InvalidOperationException("Unkown PullRequestCheckStatusEnum");
                 }
 
-                var pullRequestCheckViewModel = viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                var pullRequestCheckViewModel = (PullRequestCheckViewModel) viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                 pullRequestCheckViewModel.Title = model.Context;
                 pullRequestCheckViewModel.Description = model.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
@@ -78,41 +71,17 @@ namespace GitHub.ViewModels.GitHubPane
             usageTracker.IncrementCounter(x => x.NumberOfPRCheckStatusesOpenInGitHub).Forget();
         }
 
-        public string Title
-        {
-            get { return title; }
-            set { this.RaiseAndSetIfChanged(ref title, value); }
-        }
+        public string Title { get; private set; }
 
-        public string Description
-        {
-            get { return description; }
-            set { this.RaiseAndSetIfChanged(ref description, value); }
-        }
+        public string Description { get; private set; }
 
-        public PullRequestCheckStatusEnum Status
-        {
-            get { return status; }
-            set { this.RaiseAndSetIfChanged(ref status, value); }
-        }
+        public PullRequestCheckStatusEnum Status{ get; private set; }
 
-        public Uri DetailsUrl
-        {
-            get { return detailsUrl; }
-            set { this.RaiseAndSetIfChanged(ref detailsUrl, value); }
-        }
+        public Uri DetailsUrl { get; private set; }
 
-        public string AvatarUrl
-        {
-            get { return avatarUrl; }
-            set { this.RaiseAndSetIfChanged(ref avatarUrl, value); }
-        }
+        public string AvatarUrl { get; private set; }
 
-        public BitmapImage Avatar
-        {
-            get { return avatar; }
-            set { this.RaiseAndSetIfChanged(ref avatar, value); }
-        }
+        public BitmapImage Avatar { get; private set; }
 
         public ReactiveCommand<object> OpenDetailsUrl { get; }
     }

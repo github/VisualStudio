@@ -7,12 +7,12 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public interface IPullRequestCheckViewModel: IViewModel
     {
-        string Title { get; set; }
-        string Description { get; set; }
-        PullRequestCheckStatusEnum Status { get; set; }
-        Uri DetailsUrl { get; set; }
-        string AvatarUrl { get; set; }
-        BitmapImage Avatar { get; set; }
+        string Title { get; }
+        string Description { get; }
+        PullRequestCheckStatusEnum Status { get; }
+        Uri DetailsUrl { get; }
+        string AvatarUrl { get; }
+        BitmapImage Avatar { get; }
         ReactiveCommand<object> OpenDetailsUrl { get; }
     }
 
