@@ -43,9 +43,8 @@
               MouseDoubleClick="changesTree_MouseDoubleClick"
               MouseRightButtonDown="changesTree_MouseRightButtonDown">
         <TreeView.ItemContainerStyle>
-            <Style TargetType="TreeViewItem">
+            <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                 <Setter Property="IsExpanded" Value="True"/>
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>
