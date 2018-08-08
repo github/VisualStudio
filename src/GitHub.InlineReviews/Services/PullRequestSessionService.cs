@@ -445,15 +445,6 @@ namespace GitHub.InlineReviews.Services
             return detail;
         }
 
-        public bool ConfirmCancelPendingReview()
-        {
-            return MessageBox.Show(
-                       VisualStudio.UI.Resources.CancelPendingReviewConfirmation,
-                       VisualStudio.UI.Resources.CancelPendingReviewConfirmationCaption,
-                       MessageBoxButtons.YesNo,
-                       MessageBoxIcon.Question) == DialogResult.Yes;
-        }
-
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> CancelPendingReview(
             ILocalRepositoryModel localRepository,

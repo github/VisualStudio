@@ -223,27 +223,20 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<bool> CancelReview()
+        public async Task CancelReview()
         {
             if (!HasPendingReview)
             {
                 throw new InvalidOperationException("There is no pending review to cancel.");
             }
 
-            if (service.ConfirmCancelPendingReview())
-            {
-                await service.CancelPendingReview(LocalRepository, PendingReviewId);
+            await service.CancelPendingReview(LocalRepository, PendingReviewId);
 
-                PullRequest.Reviews = PullRequest.Reviews
-                    .Where(x => x.Id != PendingReviewId)
-                    .ToList();
+            PullRequest.Reviews = PullRequest.Reviews
+                .Where(x => x.Id != PendingReviewId)
+                .ToList();
 
-                await Update(PullRequest);
-
-                return true;
-            }
-
-            return false;
+            await Update(PullRequest);
         }
 
         /// <inheritdoc/>

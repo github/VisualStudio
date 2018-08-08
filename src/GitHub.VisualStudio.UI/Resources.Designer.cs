@@ -160,24 +160,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to cancel this review? You will lose all your pending comments..
-        /// </summary>
-        public static string CancelPendingReviewConfirmation {
-            get {
-                return ResourceManager.GetString("CancelPendingReviewConfirmation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cancel Review.
-        /// </summary>
-        public static string CancelPendingReviewConfirmationCaption {
-            get {
-                return ResourceManager.GetString("CancelPendingReviewConfirmationCaption", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Changes ({0}).
         /// </summary>
         public static string ChangesCountFormat {

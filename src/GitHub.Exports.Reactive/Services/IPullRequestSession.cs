@@ -122,11 +122,10 @@ namespace GitHub.Services
         /// <summary>
         /// Cancels the currently pending review.
         /// </summary>
-        /// <returns>True if a review was confirmed to be cancelled, False if not.</returns>
         /// <exception cref="InvalidOperationException">
         /// There is no pending review.
         /// </exception>
-        Task<bool> CancelReview();
+        Task CancelReview();
 
         /// <summary>
         /// Posts the currently pending review.

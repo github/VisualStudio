@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -286,6 +287,15 @@ namespace GitHub.Services
             dte.ItemOperations.OpenFile(fullPath, EnvDTE.Constants.vsViewKindCode);
             var codeView = FindActiveView();
             NavigateToEquivalentPosition(sourceView, codeView);
+        }
+
+        public bool ConfirmCancelPendingReview()
+        {
+            return MessageBox.Show(
+                       GitHub.App.Resources.CancelPendingReviewConfirmation,
+                       GitHub.App.Resources.CancelPendingReviewConfirmationCaption,
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
         public bool IsEditableDiff(ITextView textView)

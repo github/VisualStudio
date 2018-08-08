@@ -271,8 +271,9 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (Model?.Id != null)
                 {
-                    if (await session.CancelReview())
+                    if (editorService.ConfirmCancelPendingReview())
                     {
+                        await session.CancelReview();
                         Close();
                     }
                 }
