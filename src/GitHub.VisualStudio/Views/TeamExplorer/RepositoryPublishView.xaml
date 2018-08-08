@@ -115,9 +115,8 @@
     
     <Grid>
       <ghfvs:PromptTextBox x:Name="description"
-               Height="52"
+               Height="23"
                Margin="0,8,0,0"
-               AcceptsReturn="True"
                Background="{DynamicResource GitHubVsSearchBoxBackground}"
                Foreground="{DynamicResource GitHubVsWindowText}"
                Text="{Binding Description}"
