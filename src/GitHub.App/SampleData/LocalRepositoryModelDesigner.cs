@@ -6,7 +6,7 @@ using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.Exports;
 
-namespace GitHub.App.SampleData
+namespace GitHub.SampleData
 {
     public class LocalRepositoryModelDesigner : ILocalRepositoryModel
     {

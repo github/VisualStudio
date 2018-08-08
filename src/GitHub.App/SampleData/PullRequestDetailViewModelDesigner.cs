@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
-using GitHub.App.SampleData;
+using GitHub.SampleData;
 
 namespace GitHub.SampleData
 {

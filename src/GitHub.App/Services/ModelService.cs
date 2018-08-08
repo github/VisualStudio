@@ -577,7 +577,6 @@ namespace GitHub.Services
             
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
-            public PullRequestChecksState? Checks { get; set; }
 
             // This fields exists only for compatibility with old caches. The State property should be used.
             public bool? IsOpen { get; set; }

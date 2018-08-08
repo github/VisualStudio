@@ -11,13 +11,12 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vm="clr-namespace:GitHub.ViewModels.GitHubPane;assembly=GitHub.App"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
-             xmlns:sampleData1="clr-namespace:GitHub.App.SampleData;assembly=GitHub.App"
+             xmlns:ghvs="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              mc:Ignorable="d" d:DesignWidth="600">
 
     <d:DesignData.DataContext>
-        <sampleData1:PullRequestCheckViewModelDesigner />
+        <ghvs:PullRequestCheckViewModelDesigner />
     </d:DesignData.DataContext>
 
     <Control.Resources>

@@ -4,7 +4,7 @@ using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
-namespace GitHub.App.SampleData
+namespace GitHub.SampleData
 {
     public sealed class PullRequestCheckViewModelDesigner : ViewModelBase, IPullRequestCheckViewModel
     {
