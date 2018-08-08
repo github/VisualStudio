@@ -66,7 +66,7 @@
                             KeyboardNavigation.DirectionalNavigation="None">
 
                     <imaging:CrispImage Moniker="{Binding Converter={StaticResource FileNameToImageMonikerConverter}, Path=FileName}"
-                                        Width="16" Height="16" Margin="0,0,0,2"/>
+                                        Width="16" Height="16" Margin="0,2"/>
 
                     <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
                         <TextBlock.Style>
