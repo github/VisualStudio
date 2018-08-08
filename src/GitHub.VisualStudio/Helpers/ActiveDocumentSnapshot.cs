@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using GitHub.Logging;
 
 namespace GitHub.VisualStudio
@@ -32,6 +31,17 @@ namespace GitHub.VisualStudio
             if (ErrorHandler.Succeeded(textManager.GetActiveView(0, null, out view)) &&
                 ErrorHandler.Succeeded(view.GetSelection(out anchorLine, out anchorCol, out endLine, out endCol)))
             {
+                // Ignore the bottom anchor or end line if it has zero width (starts on column 0)
+                // This prevents non-visible parts of the selection from being inclused in the range
+                if (anchorLine < endLine && endCol == 0)
+                {
+                    endLine--;
+                }
+                else if (anchorLine > endLine && anchorCol == 0)
+                {
+                    anchorLine--;
+                }
+
                 StartLine = anchorLine + 1;
                 EndLine = endLine + 1;
             }
