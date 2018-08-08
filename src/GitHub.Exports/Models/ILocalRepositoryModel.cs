@@ -29,6 +29,7 @@ namespace GitHub.Models
         /// Generates a http(s) url to the repository in the remote server, optionally
         /// pointing to a specific file and specific line range in it.
         /// </summary>
+        /// <param name="linkType"></param>
         /// <param name="path">The file to generate an url to. Optional.</param>
         /// <param name="startLine">A specific line, or (if specifying the <paramref name="endLine"/> as well) the start of a range</param>
         /// <param name="endLine">The end of a line range on the specified file.</param>

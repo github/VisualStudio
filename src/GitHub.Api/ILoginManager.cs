@@ -72,6 +72,7 @@ namespace GitHub.Api
         /// Logs out of GitHub server.
         /// </summary>
         /// <param name="hostAddress">The address of the server.</param>
+        /// <param name="client">An octokit client configured to access the server.</param>
         Task Logout(HostAddress hostAddress, IGitHubClient client);
     }
 }

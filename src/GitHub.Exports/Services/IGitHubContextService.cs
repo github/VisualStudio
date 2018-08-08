@@ -30,14 +30,14 @@ namespace GitHub.Services
         /// <summary>
         /// Convert a context to a repository URL.
         /// </summary>
-        /// <param name="context">The context to convert.</param>
+        /// <param name="windowTitle">A browser window title.</param>
         /// <returns>A repository URL</returns>
         GitHubContext FindContextFromWindowTitle(string windowTitle);
 
         /// <summary>
         /// Find a context from a browser window title.
         /// </summary>
-        /// <param name="windowTitle">A browser window title.</param>
+        /// <param name="context"></param>
         /// <returns>The context or null if none can be found</returns>
         Uri ToRepositoryUrl(GitHubContext context);
 
@@ -78,7 +78,7 @@ namespace GitHub.Services
         /// Team Explorer creates temporary blob files in the following format:
         /// C:\Users\me\AppData\Local\Temp\TFSTemp\vctmp21996_181282.IOpenFromClipboardCommand.783ac965.cs
         /// The object-ish appears immediately before the file extension and the path contains the folder "TFSTemp".
-        /// <remarks>
+        /// </remarks>
         /// <param name="tempFile">The path to a possible Team Explorer temporary blob file.</param>
         /// <returns>The target file's object-ish (blob SHA fragment) or null if the path isn't recognized as a Team Explorer blob file.</returns>
         string FindObjectishForTFSTempFile(string tempFile);

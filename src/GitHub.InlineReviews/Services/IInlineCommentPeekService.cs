@@ -15,6 +15,7 @@ namespace GitHub.InlineReviews.Services
         /// Gets the line number for a peek session tracking point.
         /// </summary>
         /// <param name="session">The peek session.</param>
+        /// <param name="point"></param>
         /// <returns>
         /// A tuple containing the line number and whether the line number represents a line in the
         /// left hand side of a diff view.
