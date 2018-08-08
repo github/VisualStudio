@@ -92,6 +92,9 @@ namespace GitHub.Models
         /// </remarks>
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
 
+        /// <summary>
+        /// Gets or sets a collection of pull request Checks & Statuses
+        /// </summary>
         public List<StatusModel> Statuses { get; set; }
     }
 }
