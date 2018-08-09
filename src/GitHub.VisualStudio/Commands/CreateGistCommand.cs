@@ -14,12 +14,8 @@ namespace GitHub.VisualStudio.Commands
     /// Creates a GitHub Gist from the currently selected text.
     /// </summary>
     [Export(typeof(ICreateGistCommand))]
-    public class CreateGistCommand : CreateGistCommandBase
+    public class CreateGistCommand : CreateGistCommandBase, ICreateGistCommand
     {
-        readonly Lazy<IDialogService> dialogService;
-        readonly Lazy<ISelectedTextProvider> selectedTextProvider;
-        readonly Lazy<IConnectionManager> connectionManager;
-
         [ImportingConstructor]
         protected CreateGistCommand(
             Lazy<IDialogService> dialogService,
@@ -41,10 +37,35 @@ namespace GitHub.VisualStudio.Commands
     }
 
     /// <summary>
+    /// Creates a GitHub Enterprise Gist from the currently selected text.
+    /// </summary>
+    [Export(typeof(ICreateGistEnterpriseCommand))]
+    public class CreateGistEnterpriseCommand : CreateGistCommandBase, ICreateGistEnterpriseCommand
+    {
+        [ImportingConstructor]
+        protected CreateGistEnterpriseCommand(
+            Lazy<IDialogService> dialogService,
+            Lazy<ISelectedTextProvider> selectedTextProvider,
+            Lazy<IConnectionManager> connectionManager)
+            : base(CommandSet, CommandId, dialogService, selectedTextProvider, connectionManager, false)
+        {
+        }
+
+        /// <summary>
+        /// Gets the GUID of the group the command belongs to.
+        /// </summary>
+        public static readonly Guid CommandSet = Guids.guidContextMenuSet;
+
+        /// <summary>
+        /// Gets the numeric identifier of the command.
+        /// </summary>
+        public const int CommandId = PkgCmdIDList.createGistEnterpriseCommand;
+    }
+
+    /// <summary>
     /// Creates a GitHub or GitHub Enterprise Gist from the currently selected text.
     /// </summary>
-    [Export(typeof(ICreateGistCommand))]
-    public abstract class CreateGistCommandBase : VsCommand, ICreateGistCommand
+    public abstract class CreateGistCommandBase : VsCommand
     {
         readonly bool isGitHubDotCom;
         readonly Lazy<IDialogService> dialogService;

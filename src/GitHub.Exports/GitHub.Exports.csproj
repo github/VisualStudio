@@ -149,6 +149,7 @@
   <ItemGroup>
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\ICreateGistEnterpriseCommand.cs" />
     <Compile Include="Commands\IOpenFromClipboardCommand.cs" />
     <Compile Include="Commands\IOpenFromUrlCommand.cs" />
     <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
