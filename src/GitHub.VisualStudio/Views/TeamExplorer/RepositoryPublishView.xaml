@@ -123,7 +123,8 @@
                TextWrapping="WrapWithOverflow"
                PromptText="{x:Static prop:Resources.DescriptionOptional}"
                SpellCheck.IsEnabled="True"
-               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}" />
+               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}"
+               VerticalContentAlignment="Center" />
     </Grid>
 
         <CheckBox x:Name="makePrivate"
