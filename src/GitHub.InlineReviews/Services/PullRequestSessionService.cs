@@ -24,6 +24,7 @@ using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
+using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 
@@ -38,6 +39,7 @@ namespace GitHub.InlineReviews.Services
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
         static ICompiledQuery<PullRequestDetailModel> readPullRequest;
+        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCommitStatuses;
         static ICompiledQuery<ActorModel> readViewer;
 
         readonly IGitService gitService;
@@ -341,6 +343,9 @@ namespace GitHub.InlineReviews.Services
 
             var apiClient = await apiClientFactory.Create(address);
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
+            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
+
+            result.Statuses = lastCommitModel.Statuses;
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -736,6 +741,42 @@ namespace GitHub.InlineReviews.Services
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
 
+        async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
+        {
+            if (readCommitStatuses == null)
+            {
+                readCommitStatuses = new Query()
+                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                        commit => new LastCommitAdapter
+                        {
+                            Statuses = commit.Commit.Status
+                                .Select(context =>
+                                    context.Contexts.Select(statusContext => new StatusModel
+                                    {
+                                        State = (StatusState)statusContext.State,
+                                        Context = statusContext.Context,
+                                        TargetUrl = statusContext.TargetUrl,
+                                        Description = statusContext.Description,
+                                        AvatarUrl = statusContext.Creator.AvatarUrl(null)
+                                    }).ToList()
+                                ).SingleOrDefault()
+                        }
+                    ).Compile();
+            }
+
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(number), number },
+            };
+
+            var connection = await graphqlFactory.CreateConnection(address);
+            var result = await connection.Run(readCommitStatuses, vars);
+            return result.First();
+        }
+
         static void BuildPullRequestThreads(PullRequestDetailModel model)
         {
             var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
@@ -825,5 +866,10 @@ namespace GitHub.InlineReviews.Services
             public string OriginalCommitId { get; set; }
             public string ReplyTo { get; set; }
         }
-    }
+
+        class LastCommitAdapter
+        {
+            public List<StatusModel> Statuses { get; set; }
+        }
+    }   
 }

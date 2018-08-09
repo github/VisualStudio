@@ -19,7 +19,7 @@ namespace GitHub.App {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -84,6 +84,24 @@ namespace GitHub.App {
         public static string BrowseForDirectory {
             get {
                 return ResourceManager.GetString("BrowseForDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to cancel this review? You will lose all your pending comments..
+        /// </summary>
+        public static string CancelPendingReviewConfirmation {
+            get {
+                return ResourceManager.GetString("CancelPendingReviewConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel Review.
+        /// </summary>
+        public static string CancelPendingReviewConfirmationCaption {
+            get {
+                return ResourceManager.GetString("CancelPendingReviewConfirmationCaption", resourceCulture);
             }
         }
         
@@ -210,7 +228,7 @@ namespace GitHub.App {
         /// <summary>
         ///   Looks up a localized string similar to Fork Repository.
         /// </summary>
-        internal static string ForkRepositoryTitle {
+        public static string ForkRepositoryTitle {
             get {
                 return ResourceManager.GetString("ForkRepositoryTitle", resourceCulture);
             }
@@ -588,7 +606,7 @@ namespace GitHub.App {
         /// <summary>
         ///   Looks up a localized string similar to Switch Origin.
         /// </summary>
-        internal static string SwitchOriginTitle {
+        public static string SwitchOriginTitle {
             get {
                 return ResourceManager.GetString("SwitchOriginTitle", resourceCulture);
             }
