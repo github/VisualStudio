@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using GitHub.Models;
 using GitHub.Commands;
 using GitHub.Logging;
 using GitHub.Services;
@@ -16,13 +18,18 @@ namespace GitHub.VisualStudio.Commands
     {
         readonly Lazy<IDialogService> dialogService;
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
+        readonly Lazy<IConnectionManager> connectionManager;
 
         [ImportingConstructor]
-        protected CreateGistCommand(Lazy<IDialogService> dialogService, Lazy<ISelectedTextProvider> selectedTextProvider)
+        protected CreateGistCommand(
+            Lazy<IDialogService> dialogService,
+            Lazy<ISelectedTextProvider> selectedTextProvider,
+            Lazy<IConnectionManager> connectionManager)
             : base(CommandSet, CommandId)
         {
             this.dialogService = dialogService;
             this.selectedTextProvider = selectedTextProvider;
+            this.connectionManager = connectionManager;
         }
 
         /// <summary>
@@ -40,15 +47,28 @@ namespace GitHub.VisualStudio.Commands
         /// <summary>
         /// Shows the Create Gist dialog.
         /// </summary>
-        public override Task Execute()
+        public override async Task Execute()
         {
-            return dialogService.Value.ShowCreateGist();
+            var connection = await FindConnectionAsync();
+            await dialogService.Value.ShowCreateGist(connection);
         }
 
         protected override void QueryStatus()
         {
             Log.Assert(SelectedTextProvider != null, "Could not get an instance of ISelectedTextProvider");
-            Visible = !string.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText());
+            Visible = !string.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText()) && HasConnection();
+        }
+
+        bool HasConnection()
+        {
+            var task = FindConnectionAsync();
+            return task.IsCompleted && task.Result != null;
+        }
+
+        async Task<IConnection> FindConnectionAsync()
+        {
+            var connections = await connectionManager.Value.GetLoadedConnections();
+            return connections.FirstOrDefault(x => x.IsLoggedIn && x.HostAddress.IsGitHubDotCom());
         }
     }
 }
