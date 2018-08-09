@@ -6,6 +6,7 @@ using GitHub.Models;
 using GitHub.Commands;
 using GitHub.Logging;
 using GitHub.Services;
+using GitHub.Extensions;
 using GitHub.Services.Vssdk.Commands;
 
 namespace GitHub.VisualStudio.Commands
@@ -21,7 +22,8 @@ namespace GitHub.VisualStudio.Commands
             Lazy<IDialogService> dialogService,
             Lazy<ISelectedTextProvider> selectedTextProvider,
             Lazy<IConnectionManager> connectionManager)
-            : base(CommandSet, CommandId, dialogService, selectedTextProvider, connectionManager, true)
+            : base(CommandSet, CommandId, dialogService, selectedTextProvider, connectionManager, true,
+                  isNotLoggedInDefault: true)
         {
         }
 
@@ -68,6 +70,7 @@ namespace GitHub.VisualStudio.Commands
     public abstract class CreateGistCommandBase : VsCommand
     {
         readonly bool isGitHubDotCom;
+        readonly bool isNotLoggedInDefault;
         readonly Lazy<IDialogService> dialogService;
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
         readonly Lazy<IConnectionManager> connectionManager;
@@ -77,13 +80,15 @@ namespace GitHub.VisualStudio.Commands
             Lazy<IDialogService> dialogService,
             Lazy<ISelectedTextProvider> selectedTextProvider,
             Lazy<IConnectionManager> connectionManager,
-            bool isGitHubDotCom)
+            bool isGitHubDotCom,
+            bool isNotLoggedInDefault = false)
             : base(commandSet, commandId)
         {
-            this.isGitHubDotCom = isGitHubDotCom;
             this.dialogService = dialogService;
             this.selectedTextProvider = selectedTextProvider;
             this.connectionManager = connectionManager;
+            this.isGitHubDotCom = isGitHubDotCom;
+            this.isNotLoggedInDefault = isNotLoggedInDefault;
         }
 
         ISelectedTextProvider SelectedTextProvider => selectedTextProvider.Value;
@@ -100,7 +105,8 @@ namespace GitHub.VisualStudio.Commands
         protected override void QueryStatus()
         {
             Log.Assert(SelectedTextProvider != null, "Could not get an instance of ISelectedTextProvider");
-            Visible = !string.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText()) && HasConnection();
+            Visible = !string.IsNullOrWhiteSpace(SelectedTextProvider?.GetSelectedText()) &&
+                (HasConnection() || isNotLoggedInDefault && IsLoggedIn() == false);
         }
 
         bool HasConnection()
@@ -113,6 +119,17 @@ namespace GitHub.VisualStudio.Commands
         {
             var connections = await connectionManager.Value.GetLoadedConnections();
             return connections.FirstOrDefault(x => x.IsLoggedIn && x.HostAddress.IsGitHubDotCom() == isGitHubDotCom);
+        }
+
+        bool? IsLoggedIn()
+        {
+            var task = connectionManager.Value.IsLoggedIn();
+            if (task.IsCompleted)
+            {
+                return task.Result;
+            }
+
+            return null;
         }
     }
 }
