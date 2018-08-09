@@ -22,6 +22,7 @@ using Octokit.GraphQL.Model;
 using Rothko;
 using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
+using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
 {
@@ -93,6 +94,17 @@ namespace GitHub.Services
                         Items = page.Nodes.Select(pr => new ListItemAdapter
                         {
                             Id = pr.Id.Value,
+                            LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                new LastCommitSummaryModel
+                                {
+                                    Statuses = commit.Commit.Status
+                                            .Select(context =>
+                                                context.Contexts.Select(statusContext => new StatusSummaryModel
+                                                {
+                                                    State = (StatusState)statusContext.State,
+                                                }).ToList()
+                                            ).SingleOrDefault()
+                                }).ToList().FirstOrDefault(),
                             Author = new ActorModel
                             {
                                 Login = pr.Author.Login,
@@ -123,10 +135,46 @@ namespace GitHub.Services
 
             var result = await graphql.Run(readPullRequests, vars);
 
-            foreach (ListItemAdapter item in result.Items)
+            foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
+
+                var hasStatuses = item.LastCommit.Statuses != null 
+                                  && item.LastCommit.Statuses.Any();
+
+                if (!hasStatuses)
+                {
+                    item.Checks = PullRequestChecksState.None;
+                }
+                else
+                {
+                    var statusHasFailure = item.LastCommit
+                        .Statuses
+                        .Any(status => status.State == StatusState.Failure);
+
+                    var statusHasCompleteSuccess = true;
+                    if (!statusHasFailure)
+                    {
+                        statusHasCompleteSuccess =
+                            item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
+                    }
+
+                    if (statusHasFailure)
+                    {
+                        item.Checks = PullRequestChecksState.Failure;
+                    }
+                    else if (statusHasCompleteSuccess)
+                    {
+                        item.Checks = PullRequestChecksState.Success;
+                    }
+                    else
+                    {
+                        item.Checks = PullRequestChecksState.Pending;
+                    }
+                }
+
+                item.LastCommit = null;
             }
 
             return result;
@@ -840,6 +888,8 @@ namespace GitHub.Services
         class ListItemAdapter : PullRequestListItemModel
         {
             public IList<ReviewAdapter> Reviews { get; set; }
+
+            public LastCommitSummaryModel LastCommit { get; set; }
         }
 
         class ReviewAdapter
@@ -847,6 +897,16 @@ namespace GitHub.Services
             public string Body { get; set; }
             public int CommentCount { get; set; }
             public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
+        }
+
+        class StatusSummaryModel
+        {
+            public StatusState State { get; set; }
+        }
+
+        class LastCommitSummaryModel
+        {
+            public List<StatusSummaryModel> Statuses { get; set; }
         }
     }
 }
