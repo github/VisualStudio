@@ -101,6 +101,7 @@
     <Compile Include="Converters\BranchNameConverter.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />
     <Compile Include="Converters\DefaultValueConverter.cs" />
+    <Compile Include="Converters\PositiveDurationToStringConverter.cs" />
     <Compile Include="Converters\StickieListItemConverter.cs" />
     <Compile Include="Converters\TrimNewlinesConverter.cs" />
     <Compile Include="Helpers\LoadingResourceDictionary.cs" />
