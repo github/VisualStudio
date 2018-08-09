@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Threading.Tasks;
+using GitHub.SampleData;
 
 namespace GitHub.SampleData
 {
@@ -95,6 +95,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
             };
 
             Files = new PullRequestFilesViewModelDesigner();
+
+            Checks = new PullRequestCheckViewModelDesigner[0];
         }
 
         public PullRequestDetailModel Model { get; }
@@ -122,6 +124,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> ShowReview { get; }
+
+        public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
