@@ -40,7 +40,7 @@ namespace GitHub.UI
                 return string.Format(culture, (int)(duration.TotalMinutes / hour) > 1 ? Resources.hours : Resources.hour, (int)(duration.TotalMinutes / hour));
             else if (duration.TotalSeconds >= minute)
                 return string.Format(culture, (int)(duration.TotalSeconds / minute) > 1 ? Resources.minutes : Resources.minute, (int)(duration.TotalSeconds / minute));
-            return string.Format(culture, duration.TotalSeconds > 1 ? Resources.seconds : Resources.second, duration.TotalSeconds);
+            return string.Format(culture, duration.TotalSeconds > 1 || duration.Ticks == 0 ? Resources.seconds : Resources.second, duration.TotalSeconds);
         }
     }
 }
