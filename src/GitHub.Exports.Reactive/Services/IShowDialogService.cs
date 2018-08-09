@@ -31,15 +31,16 @@ namespace GitHub.Services
         /// Shows a view model that requires a connection in the dialog.
         /// </summary>
         /// <param name="viewModel">The view model to show.</param>
+        /// <param name="hostAddress">An optional specific <see cref="HostAddress"/> to show.</param>
         /// <returns>
         /// The value returned by the <paramref name="viewModel"/>'s 
         /// <see cref="IDialogContentViewModel.Done"/> observable, or null if the dialog was
         /// canceled.
         /// <remarks>
-        /// The first existing connection will be used. If there is no existing connection, the
-        /// login dialog will be shown first.
+        /// The first existing connection will be used unless a specific <see cref="HostAddress"/> is specified.
+        /// If there is no existing connection, the login dialog will be shown first.
         /// </remarks>
-        Task<object> ShowWithFirstConnection<TViewModel>(TViewModel viewModel)
+        Task<object> ShowWithFirstConnection<TViewModel>(TViewModel viewModel, HostAddress hostAddress = null)
             where TViewModel : IDialogContentViewModel, IConnectionInitializedViewModel;
     }
 }

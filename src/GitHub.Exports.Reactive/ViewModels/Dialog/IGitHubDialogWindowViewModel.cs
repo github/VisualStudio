@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GitHub.Primitives;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -31,7 +32,8 @@ namespace GitHub.ViewModels.Dialog
         /// Starts displaying a view model that requires a connection.
         /// </summary>
         /// <param name="viewModel">The view model to display.</param>
-        Task StartWithConnection<T>(T viewModel)
+        /// <param name="hostAddress">An optional specific <see cref="HostAddress"/> to show.</param>
+        Task StartWithConnection<T>(T viewModel, HostAddress hostAddress = null)
             where T : IDialogContentViewModel, IConnectionInitializedViewModel;
     }
 }

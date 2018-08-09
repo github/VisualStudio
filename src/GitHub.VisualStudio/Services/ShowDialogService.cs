@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
@@ -21,6 +22,7 @@ namespace GitHub.VisualStudio.UI.Services
             this.serviceProvider = serviceProvider;
         }
 
+        /// <inheritdoc/>
         public Task<object> Show(IDialogContentViewModel viewModel)
         {
             var result = default(object);
@@ -37,7 +39,8 @@ namespace GitHub.VisualStudio.UI.Services
             return Task.FromResult(result);
         }
 
-        public async Task<object> ShowWithFirstConnection<TViewModel>(TViewModel viewModel)
+        /// <inheritdoc/>
+        public async Task<object> ShowWithFirstConnection<TViewModel>(TViewModel viewModel, HostAddress hostAddress = null)
             where TViewModel : IDialogContentViewModel, IConnectionInitializedViewModel
         {
             var result = default(object);
@@ -45,7 +48,7 @@ namespace GitHub.VisualStudio.UI.Services
             using (var dialogViewModel = CreateViewModel())
             using (dialogViewModel.Done.Take(1).Subscribe(x => result = x))
             {
-                await dialogViewModel.StartWithConnection(viewModel);
+                await dialogViewModel.StartWithConnection(viewModel, hostAddress);
 
                 var window = new GitHubDialogWindow(dialogViewModel);
                 window.ShowModal();

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.ViewModels.Dialog;
 
 namespace GitHub.Services
@@ -54,7 +55,7 @@ namespace GitHub.Services
         public async Task ShowCreateGist()
         {
             var viewModel = factory.CreateViewModel<IGistCreationViewModel>();
-            await showDialog.ShowWithFirstConnection(viewModel);
+            await showDialog.ShowWithFirstConnection(viewModel, HostAddress.GitHubDotComHostAddress);
         }
 
         public async Task ShowCreateRepositoryDialog(IConnection connection)
