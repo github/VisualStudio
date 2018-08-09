@@ -6,7 +6,7 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              KeyboardNavigation.TabNavigation="Local"
              DataContext="{Binding ViewModel}"
              Background="{DynamicResource GitHubVsToolWindowBackground}" >
@@ -236,15 +236,32 @@
                Visibility="{Binding IsLoggingIn, Converter={ghfvs:BooleanToVisibilityConverter}}">
       Logging in...
     </TextBlock>
-    
-    <DockPanel Grid.Row="1"
-               Visibility="{Binding ErrorMessage, Converter={ghfvs:NotEqualsToVisibilityConverter {x:Null}}}">
-      <ghfvs:OcticonImage DockPanel.Dock="Left"
-                          Icon="alert"
-                          Margin="8"
-                          VerticalAlignment="Top"/>
 
-      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+    <Grid Grid.Row="1"
+          Visibility="{Binding ErrorMessage, Converter={ghfvs:NotEqualsToVisibilityConverter {x:Null}}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <ghfvs:OcticonImage Grid.Column="0"
+                          Grid.RowSpan="3"
+                          Icon="alert"
+                          Margin="8"/>
+
+      <TextBlock Grid.Column="1"
+                 Grid.Row="0"
+                 Text="{Binding ErrorMessage}"
+                 TextWrapping="Wrap"/>
+
+      <StackPanel Grid.Column="1"
+                  Grid.Row="1"
+                  Margin="0,8,0,0"
+                  Orientation="Horizontal">
         <Button Style="{StaticResource ActionLinkButton}"
                 Content="{x:Static prop:Resources.Retry}"
                 Click="retry_Click"
@@ -255,12 +272,7 @@
                 Content="{x:Static prop:Resources.SignOutLink}"
                 Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
       </StackPanel>
-      
-      <TextBlock DockPanel.Dock="Top"
-                 Margin="0,0,0,8"
-                 Text="{x:Static prop:Resources.LoginFailedText}"/>
-      <TextBlock Margin="0,0,0,8"
-                 Text="{Binding ErrorMessage}"/>
-    </DockPanel>
+    </Grid>
+    
   </Grid>
 </UserControl>

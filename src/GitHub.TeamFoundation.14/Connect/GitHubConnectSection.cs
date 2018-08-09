@@ -186,7 +186,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             InitializeInvitationSection();
 
-            ErrorMessage = connection?.ConnectionError?.Message?.Trim();
+            ErrorMessage = connection?.ConnectionError?.GetUserFriendlyErrorMessage(ErrorType.LoginFailed);
             IsLoggingIn = connection?.IsLoggingIn ?? false;
             IsVisible = connection != null || (invitationSection?.IsVisible == false);
 
