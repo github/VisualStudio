@@ -289,15 +289,6 @@ namespace GitHub.Services
             NavigateToEquivalentPosition(sourceView, codeView);
         }
 
-        public bool ConfirmCancelPendingReview()
-        {
-            return MessageBox.Show(
-                       GitHub.App.Resources.CancelPendingReviewConfirmation,
-                       GitHub.App.Resources.CancelPendingReviewConfirmationCaption,
-                       MessageBoxButtons.YesNo,
-                       MessageBoxIcon.Question) == DialogResult.Yes;
-        }
-
         public bool IsEditableDiff(ITextView textView)
         {
             var readOnly = textView.Options.GetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId);

@@ -11,6 +11,7 @@ using System.Reactive.Threading.Tasks;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Logging;
@@ -664,6 +665,16 @@ namespace GitHub.Services
                     return Observable.Return(Unit.Default);
                 }
             });
+        }
+
+        /// <inheritdoc />
+        public bool ConfirmCancelPendingReview()
+        {
+            return MessageBox.Show(
+                       GitHub.App.Resources.CancelPendingReviewConfirmation,
+                       GitHub.App.Resources.CancelPendingReviewConfirmationCaption,
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
         async Task<string> CreateRemote(IRepository repo, UriString cloneUri)

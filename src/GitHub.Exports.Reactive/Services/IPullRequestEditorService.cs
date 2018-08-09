@@ -74,12 +74,5 @@ namespace GitHub.Services
         /// </remarks>
         /// <param name="sourceView">The source view to use the line and position from.</param>
         void OpenActiveDocumentInCodeView(IVsTextView sourceView);
-
-
-        /// <summary>
-        /// Displays a confirmation diaglog to ask if the user wants to cancel a pending review.
-        /// </summary>
-        /// <returns></returns>
-        bool ConfirmCancelPendingReview();
     }
 }
