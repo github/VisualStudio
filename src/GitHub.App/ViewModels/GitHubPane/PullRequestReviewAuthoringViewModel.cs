@@ -24,6 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestService pullRequestService;
         IPullRequestSession session;
         IDisposable sessionSubscription;
         PullRequestReviewModel model;
@@ -35,6 +36,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         [ImportingConstructor]
         public PullRequestReviewAuthoringViewModel(
+            IPullRequestService pullRequestService,
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
             IPullRequestFilesViewModel files)
@@ -43,6 +45,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(files, nameof(files));
 
+            this.pullRequestService = pullRequestService;
             this.editorService = editorService;
             this.sessionManager = sessionManager;
 
@@ -271,10 +274,17 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (Model?.Id != null)
                 {
-                    await session.CancelReview();
+                    if (pullRequestService.ConfirmCancelPendingReview())
+                    {
+                        await session.CancelReview();
+                        Close();
+                    }
+                }
+                else
+                {
+                    Close();
                 }
 
-                Close();
             }
             catch (Exception ex)
             {
