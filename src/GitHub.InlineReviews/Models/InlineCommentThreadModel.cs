@@ -23,7 +23,7 @@ namespace GitHub.InlineReviews.Models
         /// <param name="diffMatch">
         /// The last five lines of the thread's diff hunk, in reverse order.
         /// </param>
-        /// <param name="comments"></param>
+        /// <param name="comments">The comments in the thread</param>
         public InlineCommentThreadModel(
             string relativePath,
             string commitSha,

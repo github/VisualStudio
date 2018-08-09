@@ -61,11 +61,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
-        /// <param name="modelServiceFactory"></param>
+        /// <param name="modelServiceFactory">The model service factory</param>
         /// <param name="usageTracker">The usage tracker.</param>
         /// <param name="teamExplorerContext">The context for tracking repo changes</param>
-        /// <param name="files"></param>
-        /// <param name="syncSubmodulesCommand"></param>
+        /// <param name="files">The view model which will display the changed files</param>
+        /// <param name="syncSubmodulesCommand">A command that will be run when <see cref="SyncSubmodules"/> is executed</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,

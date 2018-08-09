@@ -85,7 +85,7 @@ namespace GitHub.Services
         /// Sync submodules on the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="progress"></param>
+        /// <param name="progress">A method that will be called with progress messages</param>
         Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress);
 
         /// <summary>
