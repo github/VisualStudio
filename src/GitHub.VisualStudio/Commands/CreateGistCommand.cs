@@ -11,10 +11,10 @@ using GitHub.Services.Vssdk.Commands;
 namespace GitHub.VisualStudio.Commands
 {
     /// <summary>
-    /// Creates a gist from the currently selected text.
+    /// Creates a GitHub Gist from the currently selected text.
     /// </summary>
     [Export(typeof(ICreateGistCommand))]
-    public class CreateGistCommand : VsCommand, ICreateGistCommand
+    public class CreateGistCommand : CreateGistCommandBase
     {
         readonly Lazy<IDialogService> dialogService;
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
@@ -25,11 +25,8 @@ namespace GitHub.VisualStudio.Commands
             Lazy<IDialogService> dialogService,
             Lazy<ISelectedTextProvider> selectedTextProvider,
             Lazy<IConnectionManager> connectionManager)
-            : base(CommandSet, CommandId)
+            : base(CommandSet, CommandId, dialogService, selectedTextProvider, connectionManager, true)
         {
-            this.dialogService = dialogService;
-            this.selectedTextProvider = selectedTextProvider;
-            this.connectionManager = connectionManager;
         }
 
         /// <summary>
@@ -41,6 +38,32 @@ namespace GitHub.VisualStudio.Commands
         /// Gets the numeric identifier of the command.
         /// </summary>
         public const int CommandId = PkgCmdIDList.createGistCommand;
+    }
+
+    /// <summary>
+    /// Creates a GitHub or GitHub Enterprise Gist from the currently selected text.
+    /// </summary>
+    [Export(typeof(ICreateGistCommand))]
+    public abstract class CreateGistCommandBase : VsCommand, ICreateGistCommand
+    {
+        readonly bool isGitHubDotCom;
+        readonly Lazy<IDialogService> dialogService;
+        readonly Lazy<ISelectedTextProvider> selectedTextProvider;
+        readonly Lazy<IConnectionManager> connectionManager;
+
+        protected CreateGistCommandBase(
+            Guid commandSet, int commandId,
+            Lazy<IDialogService> dialogService,
+            Lazy<ISelectedTextProvider> selectedTextProvider,
+            Lazy<IConnectionManager> connectionManager,
+            bool isGitHubDotCom)
+            : base(commandSet, commandId)
+        {
+            this.isGitHubDotCom = isGitHubDotCom;
+            this.dialogService = dialogService;
+            this.selectedTextProvider = selectedTextProvider;
+            this.connectionManager = connectionManager;
+        }
 
         ISelectedTextProvider SelectedTextProvider => selectedTextProvider.Value;
 
@@ -68,7 +91,7 @@ namespace GitHub.VisualStudio.Commands
         async Task<IConnection> FindConnectionAsync()
         {
             var connections = await connectionManager.Value.GetLoadedConnections();
-            return connections.FirstOrDefault(x => x.IsLoggedIn && x.HostAddress.IsGitHubDotCom());
+            return connections.FirstOrDefault(x => x.IsLoggedIn && x.HostAddress.IsGitHubDotCom() == isGitHubDotCom);
         }
     }
 }
