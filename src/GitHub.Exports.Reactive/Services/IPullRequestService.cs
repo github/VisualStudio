@@ -225,8 +225,6 @@ namespace GitHub.Services
             string compareBranch,
             int maxCommits);
 
-
-
         /// <summary>
         /// Displays a confirmation diaglog to ask if the user wants to cancel a pending review.
         /// </summary>
