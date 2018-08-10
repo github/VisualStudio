@@ -91,5 +91,10 @@ namespace GitHub.Models
         /// into threads, as such each pull request review comment will appear in both collections.
         /// </remarks>
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
+
+        /// <summary>
+        /// Gets or sets a collection of pull request Checks & Statuses
+        /// </summary>
+        public List<StatusModel> Statuses { get; set; }
     }
 }

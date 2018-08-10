@@ -115,16 +115,16 @@
     
     <Grid>
       <ghfvs:PromptTextBox x:Name="description"
-               Height="52"
+               Height="23"
                Margin="0,8,0,0"
-               AcceptsReturn="True"
                Background="{DynamicResource GitHubVsSearchBoxBackground}"
                Foreground="{DynamicResource GitHubVsWindowText}"
                Text="{Binding Description}"
                TextWrapping="WrapWithOverflow"
                PromptText="{x:Static prop:Resources.DescriptionOptional}"
                SpellCheck.IsEnabled="True"
-               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}" />
+               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}"
+               VerticalContentAlignment="Center" />
     </Grid>
 
         <CheckBox x:Name="makePrivate"
