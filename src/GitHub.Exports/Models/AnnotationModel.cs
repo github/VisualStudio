@@ -14,7 +14,7 @@
 
         public string Title { get; set; }
 
-        public CheckAnnotationLevelEnum? WarningLevel { get; set; }
+        public CheckAnnotationLevel? WarningLevel { get; set; }
 
         public string RawDetails { get; set; }
     }

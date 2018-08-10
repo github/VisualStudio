@@ -1,6 +1,6 @@
 ﻿namespace GitHub.Models
 {
-    public enum CheckAnnotationLevelEnum
+    public enum CheckAnnotationLevel
     {
         Failure,
         Notice,

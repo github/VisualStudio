@@ -23,6 +23,7 @@ using Octokit.GraphQL.Model;
 using Rothko;
 using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
+using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
 
 namespace GitHub.Services
 {
@@ -71,27 +72,27 @@ namespace GitHub.Services
                         commit => commit.Commit.CheckSuites(null,null, null,null, null).AllPages()
                             .Select(suite => new CheckSuiteModel
                             {
-                                Conclusion = (CheckSuiteConclusionStateEnum?) suite.Conclusion,
-                                Status = (CheckSuiteStatusStateEnum) suite.Status,
+                                Conclusion = (CheckSuiteConclusionState?) suite.Conclusion,
+                                Status = (CheckSuiteStatusState) suite.Status,
                                 CreatedAt = suite.CreatedAt,
                                 UpdatedAt = suite.UpdatedAt,
                                 CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages()
                                     .Select(run => new CheckRunModel
                                     {
-                                        Conclusion = (CheckSuiteConclusionStateEnum?) run.Conclusion,
-                                        Status = (CheckSuiteStatusStateEnum) run.Status,
+                                        Conclusion = (CheckSuiteConclusionState?) run.Conclusion,
+                                        Status = (CheckSuiteStatusState) run.Status,
                                         StartedAt = run.StartedAt,
                                         CompletedAt = run.CompletedAt,
                                         Annotations = run.Annotations(null, null, null, null).AllPages()
                                             .Select(annotation => new CheckRunAnnotationModel
                                             {
                                                 BlobUrl = annotation.BlobUrl,
-                                                StartLine = annotation.StartLine,
-                                                EndLine = annotation.EndLine,
-                                                Filename = annotation.Filename,
+                                                StartLine = annotation.Location.Start.Line,
+                                                EndLine = annotation.Location.End.Line,
+                                                Filename = annotation.Path,
                                                 Message = annotation.Message,
                                                 Title = annotation.Title,
-                                                WarningLevel = (CheckAnnotationLevelEnum?) annotation.WarningLevel,
+                                                WarningLevel = (CheckAnnotationLevel?) annotation.AnnotationLevel,
                                                 RawDetails = annotation.RawDetails
                                             }).ToList()
                                     }).ToList()

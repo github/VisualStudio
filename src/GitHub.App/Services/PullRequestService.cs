@@ -933,9 +933,9 @@ namespace GitHub.Services
 
         class CheckSuiteSummaryModel
         {
-            public CheckSuiteConclusionStateEnum? Conclusion { get; set; }
+            public CheckSuiteConclusionState? Conclusion { get; set; }
 
-            public CheckSuiteStatusStateEnum Status { get; set; }
+            public CheckSuiteStatusState Status { get; set; }
         }
     }
 }

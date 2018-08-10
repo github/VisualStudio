@@ -5,9 +5,9 @@ namespace GitHub.Models
 {
     public class CheckRunModel
     {
-        public CheckSuiteConclusionStateEnum? Conclusion { get; set; }
+        public CheckSuiteConclusionState? Conclusion { get; set; }
 
-        public CheckSuiteStatusStateEnum Status { get; set; }
+        public CheckSuiteStatusState Status { get; set; }
 
         public DateTimeOffset? StartedAt { get; set; }
 
