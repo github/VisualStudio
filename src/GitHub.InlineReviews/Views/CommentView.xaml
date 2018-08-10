@@ -67,8 +67,8 @@
                         CornerRadius="3"
                         Padding="2 1"
                         Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                        <TextBlock FontSize="10" Text="{x:Static prop:Resources.Pending}"></TextBlock>
-                </Border>
+                        <TextBlock FontSize="10" Text="{x:Static prop:Resources.Pending}" />
+                    </Border>
               </StackPanel>
 
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"

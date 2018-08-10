@@ -46,13 +46,12 @@ public class OpenFromClipboardCommandTests
             var activeRepositoryDir = "activeRepositoryDir";
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: activeRepositoryDir);
-
             await target.Execute(null);
-
             vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
         }
+
         [Test]
-        public  async Task DifferentLocalRepository_DifferentRepositoryMessage()
+        public async Task DifferentLocalRepository_DifferentRepositoryMessage()
         {
             await DifferentLocalRepository("targetRepositoryName", "activeRepositoryName", Resources.DifferentRepositoryMessage);
         }
@@ -86,16 +85,19 @@ public class OpenFromClipboardCommandTests
         {
             await CouldNotResolve("TargetOwner", "CurrentOwner", Resources.NoResolveDifferentOwnerMessage);
         }
+
         [Test]
         public async Task CouldNotResolve_NoResolveSameOwnerMessage_SameOwner_SameOwner()
         {
             await CouldNotResolve("SameOwner", "SameOwner", Resources.NoResolveSameOwnerMessage);
         }
+
         [Test]
         public async Task CouldNotResolve_NoResolveSameOwnerMessage_sameowner_SAMEOWNER()
         {
             await CouldNotResolve("sameowner", "SAMEOWNER", Resources.NoResolveSameOwnerMessage);
         }
+
         public async Task CouldNotResolve(string targetOwner, string currentOwner, string expectMessage)
         {
             var repositoryDir = "repositoryDir";
@@ -147,8 +149,9 @@ public class OpenFromClipboardCommandTests
         [Test]
         public async Task HasChangesInWorkingDirectorye_ChangesInWorkingDirectoryMessage()
         {
-          await  HasChangesInWorkingDirectory(false, Resources.ChangesInWorkingDirectoryMessage, 1, 1);
+            await HasChangesInWorkingDirectory(false, Resources.ChangesInWorkingDirectoryMessage, 1, 1);
         }
+
         [TestCase(true, null, 1, 0)]
         public async Task HasChangesInWorkingDirectory(bool annotateFileSupported, string message,
             int receivedTryAnnotateFile, int receivedTryOpenFile)

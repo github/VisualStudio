@@ -55,7 +55,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Height="16" Width="16" />
-                        <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap">Fork the repository</TextBlock>
+                        <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap" Text="Fork the repository" />
                     </Grid>
 
                     <Grid Margin="0 16 0 0">
