@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using System.Windows.Controls;
 using GitHub.VisualStudio.UI.Helpers;
+using Microsoft.VisualStudio.Editor;
 
 namespace GitHub.InlineReviews.Views
 {
@@ -17,6 +18,7 @@ namespace GitHub.InlineReviews.Views
             desiredHeight = new Subject<double>();
             threadView.LayoutUpdated += ThreadViewLayoutUpdated;
             threadScroller.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
+            CommandRouting.SetInterceptsCommandRouting(this, true);
         }
 
         public IObservable<double> DesiredHeight => desiredHeight;
