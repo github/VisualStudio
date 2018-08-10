@@ -48,8 +48,8 @@
             <Separator DockPanel.Dock="Left" Style="{StaticResource VerticalSeparator}" Margin="4 0" />
 
             <ghfvs:GitHubActionLink DockPanel.Dock="Left"
-                                    Command="{Binding CreatePullRequest}">
-                Create New
+                                    Command="{Binding CreatePullRequest}" Content="{x:Static prop:Resources.CreateNew}">
+               
             </ghfvs:GitHubActionLink>
 
             <ghfvs:DropDownButton Name="authorFilterDropDown"
@@ -58,7 +58,7 @@
                                   Cursor="Hand"
                                   Foreground="{DynamicResource GitHubActionLinkItemBrush}"
                                   Padding="2"
-                                  ToolTip="Filter by Author"
+                                  ToolTip="{x:Static prop:Resources.FilterByAuthor}"
                                   VerticalAlignment="Center"
                                   Visibility="{Binding Items.Count, Converter={ghfvs:CountToVisibilityConverter}}"
                                   PopupOpened="authorFilterDropDown_PopupOpened">
@@ -79,7 +79,7 @@
                                   Cursor="Hand"
                                   Foreground="{DynamicResource GitHubActionLinkItemBrush}"
                                   Padding="2"
-                                  ToolTip="Select Fork"
+                                  ToolTip="{x:Static prop:Resources.SelectFork}"
                                   VerticalAlignment="Center"
                                   Visibility="{Binding Forks, Converter={ghfvs:NullToVisibilityConverter}}">
                 <ghfvs:OcticonImage Icon="repo_forked" Height="12" Width="12"/>
@@ -141,22 +141,23 @@
                            HorizontalAlignment="Center"
                            FontSize="16"
                            Margin="4"
-                           Text="There aren't any open pull requests"/>
+                           Text="{x:Static prop:Resources.ThereArenTAnyOpenPullRequests}"/>
                 <TextBlock TextWrapping="Wrap"
                            TextAlignment="Center"
                            HorizontalAlignment="Center"
                            Margin="4"
                            Opacity="0.75"
-                           Text="Pull requests let you tell others about changes you've pushed to a repository on GitHub"/>
+                           Text="{x:Static prop:Resources.PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub}"/>
                 <TextBlock TextWrapping="Wrap"
                            TextAlignment="Center"
                            HorizontalAlignment="Center"
                            Margin="4"
                            Opacity="0.75">
-                    To get started you can
+                    <Run Text="{x:Static prop:Resources.ToGetStartedYouCan}"></Run>
+                     
                     <Hyperlink Command="{Binding CreatePullRequest}"
-                               Foreground="{DynamicResource GitHubActionLinkItemBrush}">
-                        create a pull request
+                               Foreground="{DynamicResource GitHubActionLinkItemBrush}" >
+                        <Run Text="{x:Static prop:Resources.CreateAPullRequest}"></Run>
                     </Hyperlink>
                 </TextBlock>
             </StackPanel>
@@ -172,8 +173,9 @@
                            HorizontalAlignment="Center"
                            FontSize="16"
                            Margin="4"
-                           Text="No results matched your search."/>
+                           Text="{x:Static prop:Resources.NoResultsMatchedYourSearch}"/>
             </StackPanel>
         </Grid>
     </DockPanel>
 </UserControl>
+

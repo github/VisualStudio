@@ -530,12 +530,6 @@
   <data name="SelectFork" xml:space="preserve">
     <value>Select Fork</value>
   </data>
-  <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>Are you sure you want to delete this comment?</value>
-  </data>
-  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
-    <value>Delete Comment</value>
-  </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
     <value>There aren't any open pull requests</value>
   </data>
@@ -550,6 +544,12 @@
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
     <value>create a pull request</value>
+  </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete this comment?</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>Delete Comment</value>
   </data>
   <data name="OpenRepositoryAtDir" xml:space="preserve">
     <value>Open repository at '{0}'?</value>
