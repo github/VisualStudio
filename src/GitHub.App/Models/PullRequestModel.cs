@@ -3,6 +3,7 @@ using System.Globalization;
 using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
 using System.Diagnostics;
+using System.Collections.Generic;
 using GitHub.Extensions;
 
 namespace GitHub.Models
@@ -121,17 +122,6 @@ namespace GitHub.Models
                 // TODO: These notifications will be removed once maintainer workflow has been merged to master.
                 this.RaisePropertyChange(nameof(IsOpen));
                 this.RaisePropertyChange(nameof(Merged));
-            }
-        }
-
-        PullRequestChecksEnum checks;
-        public PullRequestChecksEnum Checks
-        {
-            get { return checks; }
-            set
-            {
-                checks = value;
-                this.RaisePropertyChange();
             }
         }
 

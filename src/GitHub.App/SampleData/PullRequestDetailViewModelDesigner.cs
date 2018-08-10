@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Threading.Tasks;
+using GitHub.SampleData;
 
 namespace GitHub.SampleData
 {
@@ -96,35 +96,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Files = new PullRequestFilesViewModelDesigner();
 
-            var defaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
-
-            Checks = new[]
-            {
-                new PullRequestCheckViewModel
-                {
-                    Title = "continuous-integration/appveyor/branch",
-                    Description = "AppVeyor build succeeded",
-                    Status = PullRequestCheckStatusEnum.Success,
-                    AvatarUrl = defaultAvatar,
-                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
-                },
-                new PullRequestCheckViewModel
-                {
-                    Title = "continuous-integration/appveyor/pr",
-                    Description = "AppVeyor building",
-                    Status = PullRequestCheckStatusEnum.Pending,
-                    AvatarUrl = defaultAvatar,
-                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
-                },
-                new PullRequestCheckViewModel
-                {
-                    Title = "continuous-integration/appveyor/other",
-                    Description = "AppVeyor build failed",
-                    Status = PullRequestCheckStatusEnum.Failure,
-                    AvatarUrl = defaultAvatar,
-                    Avatar = AvatarProvider.CreateBitmapImage(defaultAvatar),
-                },
-            };
+            Checks = new PullRequestCheckViewModelDesigner[0];
         }
 
         public PullRequestDetailModel Model { get; }

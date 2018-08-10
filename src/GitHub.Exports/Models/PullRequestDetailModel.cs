@@ -94,6 +94,9 @@ namespace GitHub.Models
 
         public List<CheckSuiteModel> CheckSuites { get; set; }
 
+        /// <summary>
+        /// Gets or sets a collection of pull request Checks & Statuses
+        /// </summary>
         public List<StatusModel> Statuses { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using System.Reactive.Threading.Tasks;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Logging;
@@ -22,6 +23,7 @@ using Octokit.GraphQL.Model;
 using Rothko;
 using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
+using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
 {
@@ -106,7 +108,7 @@ namespace GitHub.Services
                                             .Select(context =>
                                                 context.Contexts.Select(statusContext => new StatusSummaryModel
                                                 {
-                                                    State = (StatusStateEnum)statusContext.State,
+                                                    State = (StatusState)statusContext.State,
                                                 }).ToList()
                                             ).SingleOrDefault()
                                 }).ToList().FirstOrDefault(),
@@ -151,60 +153,34 @@ namespace GitHub.Services
                 var hasStatuses = item.LastCommit.Statuses != null 
                                   && item.LastCommit.Statuses.Any();
 
-                if (!hasCheckSuites && !hasStatuses)
+                if (!hasStatuses)
                 {
-                    item.Checks = PullRequestChecksEnum.None;
+                    item.Checks = PullRequestChecksState.None;
                 }
                 else
                 {
-                    var checksHasFailure = false;
-                    var checksHasCompleteSuccess = true;
+                    var statusHasFailure = item.LastCommit
+                        .Statuses
+                        .Any(status => status.State == StatusState.Failure);
 
-                    if (hasCheckSuites)
-                    {
-                        checksHasFailure = item.LastCommit
-                            .CheckSuites.Any(model => model.Conclusion.HasValue
-                                                      && (model.Conclusion.Value == CheckSuiteConclusionStateEnum.Failure
-                                                          || model.Conclusion.Value ==
-                                                          CheckSuiteConclusionStateEnum.ActionRequired));
-
-                        if (!checksHasFailure)
-                        {
-                            checksHasCompleteSuccess = item.LastCommit
-                                .CheckSuites.All(model => model.Conclusion.HasValue
-                                                          && (model.Conclusion.Value == CheckSuiteConclusionStateEnum.Success
-                                                              || model.Conclusion.Value ==
-                                                              CheckSuiteConclusionStateEnum.Neutral));
-                        }
-                    }
-
-                    var statusHasFailure = false;
                     var statusHasCompleteSuccess = true;
-
-                    if (!checksHasFailure && hasStatuses)
+                    if (!statusHasFailure)
                     {
-                        statusHasFailure = item.LastCommit
-                            .Statuses
-                            .Any(status => status.State == StatusStateEnum.Failure);
-
-                        if (!statusHasFailure)
-                        {
-                            statusHasCompleteSuccess =
-                                item.LastCommit.Statuses.All(status => status.State == StatusStateEnum.Success);
-                        }
+                        statusHasCompleteSuccess =
+                            item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
                     }
 
-                    if (checksHasFailure || statusHasFailure)
+                    if (statusHasFailure)
                     {
-                        item.Checks = PullRequestChecksEnum.Failure;
+                        item.Checks = PullRequestChecksState.Failure;
                     }
-                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
+                    else if (statusHasCompleteSuccess)
                     {
-                        item.Checks = PullRequestChecksEnum.Success;
+                        item.Checks = PullRequestChecksState.Success;
                     }
                     else
                     {
-                        item.Checks = PullRequestChecksEnum.Pending;
+                        item.Checks = PullRequestChecksState.Pending;
                     }
                 }
 
@@ -474,7 +450,7 @@ namespace GitHub.Services
                     {
                         await gitClient.Checkout(repo, localBranchName);
                     }
-                    else if (repository.CloneUrl.Owner == pullRequest.HeadRepositoryOwner)
+                    else if (string.Equals(repository.CloneUrl.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase))
                     {
                         var remote = await gitClient.GetHttpRemote(repo, "origin");
                         await gitClient.Fetch(repo, remote.Name);
@@ -606,7 +582,7 @@ namespace GitHub.Services
 
         public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
-            return pullRequest.HeadRepositoryOwner == repository.CloneUrl.Owner;
+            return string.Equals(repository.CloneUrl?.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase);
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
@@ -746,6 +722,16 @@ namespace GitHub.Services
                     return Observable.Return(Unit.Default);
                 }
             });
+        }
+
+        /// <inheritdoc />
+        public bool ConfirmCancelPendingReview()
+        {
+            return MessageBox.Show(
+                       GitHub.App.Resources.CancelPendingReviewConfirmation,
+                       GitHub.App.Resources.CancelPendingReviewConfirmationCaption,
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
         async Task<string> CreateRemote(IRepository repo, UriString cloneUri)
@@ -933,6 +919,11 @@ namespace GitHub.Services
             public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
         }
 
+        class StatusSummaryModel
+        {
+            public StatusState State { get; set; }
+        }
+
         class LastCommitSummaryModel
         {
             public List<CheckSuiteSummaryModel> CheckSuites { get; set; }
@@ -946,10 +937,5 @@ namespace GitHub.Services
 
             public CheckSuiteStatusStateEnum Status { get; set; }
         }
-    }
-
-    public class StatusSummaryModel
-    {
-        public StatusStateEnum State { get; set; }
     }
 }

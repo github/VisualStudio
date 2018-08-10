@@ -1,6 +1,6 @@
 ﻿namespace GitHub.Models
 {
-    public enum StatusStateEnum
+    public enum StatusState
     {
         Expected,
         Error,

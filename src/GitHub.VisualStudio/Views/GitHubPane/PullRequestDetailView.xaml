@@ -251,11 +251,11 @@
                                       Margin="0 8 0 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <ItemsControl ItemsSource="{Binding Checks}" Margin="0 4 12 4">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <local:PullRequestCheckView/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Grid.IsSharedSizeScope="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </ghfvs:SectionControl>
 
@@ -270,6 +270,7 @@
                 <!-- Put the changes tree outside its expander, so it can scroll horizontally 
                      while the header remains fixed -->
                 <local:PullRequestFilesView DataContext="{Binding Files}"
+                                            Margin="8,0,0,0"
                                             Visibility="{Binding ElementName=changesSection, Path=IsExpanded, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
             </ghfvs:ScrollingVerticalStackPanel>
         </ScrollViewer>

@@ -440,7 +440,6 @@ namespace GitHub.Services
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
                 Head = Create(prCacheItem.Head),
-                Checks = prCacheItem.Checks ?? PullRequestChecksEnum.None,
                 State = prCacheItem.State.HasValue ?
                     prCacheItem.State.Value :
                     prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,
@@ -578,7 +577,6 @@ namespace GitHub.Services
             
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
-            public PullRequestChecksEnum? Checks { get; set; }
 
             // This fields exists only for compatibility with old caches. The State property should be used.
             public bool? IsOpen { get; set; }
