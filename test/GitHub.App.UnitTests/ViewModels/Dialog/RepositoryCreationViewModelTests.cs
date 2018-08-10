@@ -378,7 +378,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel(provider, modelService: modelService);
 
             // this is how long the default collection waits to process about 5 things with the default UI settings
-            await Task.Delay(100);
+            await Task.Delay(200);
 
             var result = vm.GitIgnoreTemplates;
 
@@ -483,57 +483,7 @@ public class RepositoryCreationViewModelTests
     public class TheCreateRepositoryCommand : TestBaseClass
     {
         [Test]
-        public async Task DisplaysUserErrorWhenCreationFailsAsync()
-        {
-            var creationService = Substitutes.RepositoryCreationService;
-            var provider = Substitutes.GetServiceProvider(creationService: creationService);
-
-            creationService.CreateRepository(Args.NewRepository, Args.Account, Args.String, Args.ApiClient)
-                .Returns(Observable.Throw<Unit>(new InvalidOperationException("Could not create a repository on GitHub")));
-            var vm = GetMeAViewModel(provider);
-
-            vm.RepositoryName = "my-repo";
-
-            using (var handlers = ReactiveTestHelper.OverrideHandlersForTesting())
-            {
-                await vm.CreateRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
-
-                Assert.That("Could not create a repository on GitHub", Is.EqualTo(handlers.LastError.ErrorMessage));
-            }
-        }
-
-        [Test]
-        public void CreatesARepositoryUsingTheCreationService()
-        {
-            var creationService = Substitutes.RepositoryCreationService;
-            var provider = Substitutes.GetServiceProvider(creationService: creationService);
-
-            var account = Substitute.For<IAccount>();
-            var modelService = Substitute.For<IModelService>();
-            modelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
-            var vm = GetMeAViewModel(provider, modelService: modelService);
-            vm.RepositoryName = "Krieger";
-            vm.BaseRepositoryPath = @"c:\dev";
-            vm.SelectedAccount = account;
-            vm.KeepPrivate = true;
-
-            vm.CreateRepository.Execute(null);
-
-            creationService
-                .Received()
-                .CreateRepository(
-                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
-                        && r.Private == true
-                        && r.AutoInit == null
-                        && r.LicenseTemplate == null
-                        && r.GitignoreTemplate == null),
-                    account,
-                    @"c:\dev",
-                    Args.ApiClient);
-        }
-
-        [Test]
-        public void SetsAutoInitToTrueWhenLicenseSelected()
+        public async Task SetsAutoInitToTrueWhenLicenseSelected()
         {
             var creationService = Substitutes.RepositoryCreationService;
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
@@ -547,23 +497,13 @@ public class RepositoryCreationViewModelTests
             vm.KeepPrivate = false;
             vm.SelectedLicense = new LicenseItem("mit", "MIT");
 
-            vm.CreateRepository.Execute(null);
+            var result = await vm.CreateRepository.ExecuteAsync(null);
 
-            creationService
-                .Received()
-                .CreateRepository(
-                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
-                        && r.Private == false
-                        && r.AutoInit == true
-                        && r.LicenseTemplate == "mit"
-                        && r.GitignoreTemplate == null),
-                    account,
-                    @"c:\dev",
-                    Args.ApiClient);
+            Assert.True(result.NewRepository.AutoInit);
         }
 
         [Test]
-        public void SetsAutoInitToTrueWhenGitIgnore()
+        public async Task SetsAutoInitToTrueWhenGitIgnore()
         {
             var creationService = Substitutes.RepositoryCreationService;
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
@@ -577,19 +517,9 @@ public class RepositoryCreationViewModelTests
             vm.KeepPrivate = false;
             vm.SelectedGitIgnoreTemplate = GitIgnoreItem.Create("VisualStudio");
 
-            vm.CreateRepository.Execute(null);
+            var result = await vm.CreateRepository.ExecuteAsync(null);
 
-            creationService
-                .Received()
-                .CreateRepository(
-                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
-                        && r.Private == false
-                        && r.AutoInit == true
-                        && r.LicenseTemplate == null
-                        && r.GitignoreTemplate == "VisualStudio"),
-                    account,
-                    @"c:\dev",
-                    Args.ApiClient);
+            Assert.True(result.NewRepository.AutoInit);
         }
 
         [TestCase("", "", false)]
@@ -604,7 +534,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel();
             vm.RepositoryName = repositoryName;
             vm.BaseRepositoryPath = baseRepositoryPath;
-            var reactiveCommand = vm.CreateRepository as ReactiveUI.ReactiveCommand<Unit>;
+            var reactiveCommand = vm.CreateRepository as ReactiveUI.ReactiveCommand<CreateRepositoryDialogResult>;
 
             bool result = reactiveCommand.CanExecute(null);
 

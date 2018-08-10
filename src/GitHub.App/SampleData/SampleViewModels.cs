@@ -84,7 +84,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IReactiveCommand<Unit> CreateRepository
+        public IReactiveCommand<CreateRepositoryDialogResult> CreateRepository
         {
             get;
             private set;
@@ -409,8 +409,9 @@ namespace GitHub.SampleData
             get; set;
         }
 
-        public void DoCreate()
+        public Task DoCreate()
         {
+            return Task.CompletedTask;
         }
 
         public void SignOut()

@@ -13,7 +13,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Command that creates the repository.
         /// </summary>
-        IReactiveCommand<Unit> CreateRepository { get; }
+        IReactiveCommand<CreateRepositoryDialogResult> CreateRepository { get; }
 
         /// <summary>
         /// True when creation is in progress.

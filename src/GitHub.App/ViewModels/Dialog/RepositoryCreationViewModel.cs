@@ -35,7 +35,6 @@ namespace GitHub.ViewModels.Dialog
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly IModelServiceFactory modelServiceFactory;
-        readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly IOperatingSystem operatingSystem;
@@ -57,7 +56,6 @@ namespace GitHub.ViewModels.Dialog
 
             this.modelServiceFactory = modelServiceFactory;
             this.operatingSystem = operatingSystem;
-            this.repositoryCreationService = repositoryCreationService;
             this.usageTracker = usageTracker;
 
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
@@ -169,9 +167,9 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Fires off the process of creating the repository remotely and then cloning it locally
         /// </summary>
-        public IReactiveCommand<Unit> CreateRepository { get; private set; }
+        public IReactiveCommand<CreateRepositoryDialogResult> CreateRepository { get; private set; }
 
-        public IObservable<object> Done => CreateRepository.Select(_ => (object)null);
+        public IObservable<object> Done => CreateRepository;
 
         public async Task InitializeAsync(IConnection connection)
         {
@@ -267,35 +265,24 @@ namespace GitHub.ViewModels.Dialog
             return isAlreadyRepoAtPath;
         }
 
-        IObservable<Unit> OnCreateRepository(object state)
+        Task<CreateRepositoryDialogResult> OnCreateRepository(object state)
         {
             var newRepository = GatherRepositoryInfo();
-
-            return repositoryCreationService.CreateRepository(
+            var result = new CreateRepositoryDialogResult(
                 newRepository,
                 SelectedAccount,
-                BaseRepositoryPath,
-                modelService.ApiClient)
-                .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposCreated).Forget());
+                BaseRepositoryPath);
+            return Task.FromResult(result);
         }
 
-        ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
+        ReactiveCommand<CreateRepositoryDialogResult> InitializeCreateRepositoryCommand()
         {
             var canCreate = this.WhenAny(
                 x => x.RepositoryNameValidator.ValidationResult.IsValid,
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value && y.Value);
-            var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
-            createCommand.ThrownExceptions.Subscribe(ex =>
-            {
-                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
-                {
-                    log.Error(ex, "Error creating repository");
-                    UserError.Throw(TranslateRepositoryCreateException(ex));
-                }
-            });
 
-            return createCommand;
+            return ReactiveCommand.CreateAsyncTask(canCreate, OnCreateRepository);
         }
 
         static string StripSurroundingQuotes(string path)
@@ -311,27 +298,6 @@ namespace GitHub.ViewModels.Dialog
             }
 
             return path.Substring(1, path.Length - 2);
-        }
-
-        PublishRepositoryUserError TranslateRepositoryCreateException(Exception ex)
-        {
-            Guard.ArgumentNotNull(ex, nameof(ex));
-
-            var existsException = ex as RepositoryExistsException;
-            if (existsException != null && SelectedAccount != null)
-            {
-                string message = string.Format(
-                    CultureInfo.InvariantCulture,
-                    Resources.RepositoryCreationFailedAlreadyExists,
-                    SelectedAccount.Login, RepositoryName);
-                return new PublishRepositoryUserError(message, Resources.RepositoryCreationFailedAlreadyExistsMessage);
-            }
-            var quotaExceededException = ex as PrivateRepositoryQuotaExceededException;
-            if (quotaExceededException != null && SelectedAccount != null)
-            {
-                return new PublishRepositoryUserError(Resources.RepositoryCreationFailedQuota, quotaExceededException.Message);
-            }
-            return new PublishRepositoryUserError(ex.Message);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace GitHub.Services
         /// <param name="connection">
         /// The connection to use. May not be null.
         /// </param>
-        Task ShowCreateRepositoryDialog(IConnection connection);
+        Task<CreateRepositoryDialogResult> ShowCreateRepositoryDialog(IConnection connection);
 
         /// <summary>
         /// Shows the Login dialog.

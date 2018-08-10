@@ -172,6 +172,7 @@
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\ActorModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
+    <Compile Include="Models\CreateRepositoryDialogResult.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />

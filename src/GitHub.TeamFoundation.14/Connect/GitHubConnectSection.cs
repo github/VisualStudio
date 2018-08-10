@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
+using GitHub.UserErrors;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI;
@@ -139,6 +141,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 try
                 {
+                    isCloning = true;
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
                     await cloneService.CloneRepository(
@@ -261,9 +264,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
                     SelectedRepository = newrepo;
                     if (isCreating)
-                        HandleCreatedRepo(newrepo);
+                        HandleCreatedRepo(newrepo).Forget();
                     else
-                        HandleClonedRepo(newrepo);
+                        HandleClonedRepo(newrepo).Forget();
 
                     isCreating = isCloning = false;
 
@@ -311,16 +314,21 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        async Task HandleCreatedRepo(ILocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
             var msg = string.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
             msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+
+            // The creation involves a clone, and the clone will show a notification that we don't want.
+            // Put a small pause in here to make sure that it's appeared so we can clear it.
+            await Task.Delay(100);
+
             ShowNotification(newrepo, msg);
         }
 
-        void HandleClonedRepo(ILocalRepositoryModel newrepo)
+        async Task HandleClonedRepo(ILocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -329,6 +337,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_OpenProject, newrepo.LocalPath);
             else
                 msg += " " + string.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+
+            // Team Explorer will show a notification that we want to override.
+            // Put a small pause in here to make sure that it's appeared so we can clear it.
+            await Task.Delay(100);
+
             ShowNotification(newrepo, msg);
         }
 
@@ -377,11 +390,37 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
-        public void DoCreate()
+        public async Task DoCreate()
         {
             ServiceProvider.GitServiceProvider = TEServiceProvider;
             var dialogService = ServiceProvider.GetService<IDialogService>();
-            dialogService.ShowCreateRepositoryDialog(SectionConnection);
+            var result = await dialogService.ShowCreateRepositoryDialog(SectionConnection);
+
+            if (result != null)
+            {
+                try
+                {
+                    isCreating = true;
+                    ServiceProvider.GitServiceProvider = TEServiceProvider;
+                    var createService = ServiceProvider.GetService<IRepositoryCreationService>();
+                    var apiClientFactory = ServiceProvider.GetService<IApiClientFactory>();
+                    var apiClient = await apiClientFactory.Create(SectionConnection.HostAddress);
+
+                    await createService.CreateRepository(
+                        result.NewRepository,
+                        result.Account,
+                        result.BaseRepositoryPath,
+                        apiClient);
+
+                    usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
+                }
+                catch (Exception e)
+                {
+                    var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+                    var error = TranslateRepositoryCreateException(e, result.Account, result.NewRepository.Name);
+                    teServices.ShowError(error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution);
+                }
+            }
         }
 
         public void SignOut()
@@ -432,6 +471,29 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 }
             }
             base.Dispose(disposing);
+        }
+
+        PublishRepositoryUserError TranslateRepositoryCreateException(Exception ex, IAccount account, string repositoryName)
+        {
+            Guard.ArgumentNotNull(ex, nameof(ex));
+
+            if (ex is Octokit.RepositoryExistsException existsException)
+            {
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    App.Resources.RepositoryCreationFailedAlreadyExists,
+                    account.Login, repositoryName);
+                return new PublishRepositoryUserError(
+                    message,
+                    App.Resources.RepositoryCreationFailedAlreadyExistsMessage);
+            }
+
+            if (ex is Octokit.PrivateRepositoryQuotaExceededException quotaExceededException)
+            {
+                return new PublishRepositoryUserError(App.Resources.RepositoryCreationFailedQuota, quotaExceededException.Message);
+            }
+
+            return new PublishRepositoryUserError(ex.Message);
         }
 
         /// <summary>
