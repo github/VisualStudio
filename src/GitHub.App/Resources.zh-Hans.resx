@@ -320,4 +320,10 @@
   <data name="SwitchOriginTitle" xml:space="preserve">
     <value>原始开关</value>
   </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>您确定要取消此评审吗？您将丢失所有待处理的评论。</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>取消评审</value>
+  </data>
 </root>

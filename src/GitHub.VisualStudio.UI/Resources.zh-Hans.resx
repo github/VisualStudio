@@ -545,4 +545,34 @@
   <data name="CreateAPullRequest" xml:space="preserve">
     <value>创建拉取请求</value>
   </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>在“{0}”打开存储库?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>目标URL与当前存储库拥有者不同。</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>没有活动的存储库可以导航</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>自创建固定链接以来，此文件已更改！</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>请打开存储库“{0}”，然后重试！</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>无法从“{0}”打开。目前仅支持链接到存储库文件的URL。</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>无法在剪贴板中找到GitHub网址！</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>无法在当前存储库中找到目标URL。在进行提取后再试一次。</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>删除注释</value>
+  </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>您确定要删除此注释吗?</value>
+  </data>
 </root>
