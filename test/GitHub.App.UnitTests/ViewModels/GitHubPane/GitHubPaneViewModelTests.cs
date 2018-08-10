@@ -58,7 +58,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         public async Task NotAGitHubRepositoryShownWhenRepositoryIsADeletedGitHubRepoAsync()
         {
             var te = CreateTeamExplorerContext("https://github.com/invalid/repo");
-            var target = CreateTarget(teamExplorerContext: te);
+            var cm = CreateConnectionManager("https://github.com");
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
 
             await InitializeAsync(target);
 
@@ -75,6 +76,19 @@ public class GitHubPaneViewModelTests : TestBaseClass
             await InitializeAsync(target);
 
             Assert.That(target.Content, Is.InstanceOf<ILoggedOutViewModel>());
+        }
+
+        [Test]
+        public async Task LoginFailedShownWhenConnectionHasError()
+        {
+            var te = CreateTeamExplorerContext(ValidGitHubRepo);
+            var exception = new Exception();
+            var cm = CreateConnectionManager(exception, "https://github.com");
+            var target = CreateTarget(teamExplorerContext: te, connectionManager: cm);
+
+            await InitializeAsync(target);
+
+            Assert.That(target.Content, Is.InstanceOf<ILoginFailedViewModel>());
         }
 
         [Test]
@@ -175,7 +189,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
         INavigationViewModel navigator = null,
         ILoggedOutViewModel loggedOut = null,
         INotAGitHubRepositoryViewModel notAGitHubRepository = null,
-        INotAGitRepositoryViewModel notAGitRepository = null)
+        INotAGitRepositoryViewModel notAGitRepository = null,
+        ILoginFailedViewModel loginFailed = null)
     {
         viewModelFactory = viewModelFactory ?? Substitute.For<IViewViewModelFactory>();
         connectionManager = connectionManager ?? Substitute.For<IConnectionManager>();
@@ -185,6 +200,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         loggedOut = loggedOut ?? Substitute.For<ILoggedOutViewModel>();
         notAGitHubRepository = notAGitHubRepository ?? Substitute.For<INotAGitHubRepositoryViewModel>();
         notAGitRepository = notAGitRepository ?? Substitute.For<INotAGitRepositoryViewModel>();
+        loginFailed = loginFailed ?? Substitute.For<ILoginFailedViewModel>();
 
         if (navigator == null)
         {
@@ -218,10 +234,16 @@ public class GitHubPaneViewModelTests : TestBaseClass
             navigator,
             loggedOut,
             notAGitHubRepository,
-            notAGitRepository);
+            notAGitRepository,
+            loginFailed);
     }
 
     static IConnectionManager CreateConnectionManager(params string[] addresses)
+    {
+        return CreateConnectionManager(null, addresses);
+    }
+
+    static IConnectionManager CreateConnectionManager(Exception loginError, params string[] addresses)
     {
         var result = Substitute.For<IConnectionManager>();
         var connections = new ObservableCollectionEx<IConnection>();
@@ -232,19 +254,20 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
         foreach (var address in addresses)
         {
-            AddConnection(result, address);
+            AddConnection(result, address, loginError);
         }
 
         return result;
     }
 
-    static void AddConnection(IConnectionManager connectionManager, string address)
+    static void AddConnection(IConnectionManager connectionManager, string address, Exception loginError = null)
     {
         var connection = Substitute.For<IConnection>();
         var hostAddress = HostAddress.Create(address);
         var connections = (ObservableCollectionEx<IConnection>)connectionManager.Connections;
         connection.HostAddress.Returns(hostAddress);
-        connection.IsLoggedIn.Returns(true);
+        connection.IsLoggedIn.Returns(loginError == null);
+        connection.ConnectionError.Returns(loginError);
         connectionManager.GetConnection(hostAddress).Returns(connection);
         connections.Add(connection);
     }

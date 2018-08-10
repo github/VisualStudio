@@ -409,6 +409,9 @@
     <Compile Include="Views\GitHubPane\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\LoginFailedView.xaml.cs">
+      <DependentUpon>LoginFailedView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\PullRequestFileCommentsView.xaml.cs">
       <DependentUpon>PullRequestFileCommentsView.xaml</DependentUpon>
     </Compile>
@@ -591,6 +594,9 @@
     </Page>
     <Page Include="Views\GitHubPane\GitHubPaneView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GitHubPane\LoginFailedView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GitHubPane\PullRequestFileCommentsView.xaml">

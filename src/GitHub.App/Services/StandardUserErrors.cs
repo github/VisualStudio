@@ -209,7 +209,7 @@ namespace GitHub.Services
             return userError.Throw();
         }
 
-        static UserError GetUserFriendlyError(this Exception exception, ErrorType errorType, params object[] messageArgs)
+        public static UserError GetUserFriendlyError(this Exception exception, ErrorType errorType, params object[] messageArgs)
         {
             return Translator.Value.GetUserError(errorType, exception, messageArgs);
         }
