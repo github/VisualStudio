@@ -331,6 +331,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   查找类似 Are you sure you want to delete this comment? 的本地化字符串。
+        /// </summary>
+        public static string DeleteCommentConfirmation {
+            get {
+                return ResourceManager.GetString("DeleteCommentConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Delete Comment 的本地化字符串。
+        /// </summary>
+        public static string DeleteCommentConfirmationCaption {
+            get {
+                return ResourceManager.GetString("DeleteCommentConfirmationCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Description 的本地化字符串。
         /// </summary>
         public static string Description {

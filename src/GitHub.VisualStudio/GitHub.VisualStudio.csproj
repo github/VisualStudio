@@ -426,6 +426,9 @@
     <Compile Include="Views\GitHubPane\PullRequestReviewAuthoringView.xaml.cs">
       <DependentUpon>PullRequestReviewAuthoringView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GitHubPane\PullRequestCheckView.xaml.cs">
+      <DependentUpon>PullRequestCheckView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GitHubPane\PullRequestReviewSummaryView.xaml.cs">
       <DependentUpon>PullRequestReviewSummaryView.xaml</DependentUpon>
     </Compile>
@@ -622,6 +625,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GitHubPane\PullRequestReviewAuthoringView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GitHubPane\PullRequestCheckView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
