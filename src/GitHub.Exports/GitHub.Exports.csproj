@@ -172,9 +172,9 @@
     <Compile Include="Models\ActorModel.cs" />
     <Compile Include="Models\AnnotationModel.cs" />
     <Compile Include="Models\CheckAnnotationLevel.cs" />
-    <Compile Include="Models\CheckConclusionStateEnum.cs" />
+    <Compile Include="Models\CheckConclusionState.cs" />
     <Compile Include="Models\CheckRunModel.cs" />
-    <Compile Include="Models\CheckStatusStateEnum.cs" />
+    <Compile Include="Models\CheckStatusState.cs" />
     <Compile Include="Models\CheckSuiteModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />

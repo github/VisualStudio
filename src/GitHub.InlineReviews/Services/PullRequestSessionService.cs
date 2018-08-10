@@ -24,6 +24,9 @@ using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
+using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
+using CheckConclusionState = GitHub.Models.CheckConclusionState;
+using CheckStatusState = GitHub.Models.CheckStatusState;
 using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
@@ -751,34 +754,37 @@ namespace GitHub.InlineReviews.Services
                     .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                         commit => new LastCommitAdapter
                         {
-//                        CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-//                            .Select(suite => new CheckSuiteModel
-//                            {
-//                                Conclusion = (CheckConclusionStateEnum?)suite.Conclusion,
-//                                Status = (CheckStatusStateEnum)suite.Status,
-//                                CreatedAt = suite.CreatedAt,
-//                                UpdatedAt = suite.UpdatedAt,
-//                                CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
-//                                    .Select(run => new CheckRunModel
-//                                    {
-//                                        Conclusion = (CheckConclusionStateEnum?)run.Conclusion,
-//                                        Status = (CheckStatusStateEnum)run.Status,
-//                                        StartedAt = run.StartedAt,
-//                                        CompletedAt = run.CompletedAt,
-//                                        Annotations = run.Annotations(null, null, null, null).AllPages()
-//                                            .Select(annotation => new CheckRunAnnotationModel
-//                                            {
-//                                                BlobUrl = annotation.BlobUrl,
-//                                                StartLine = annotation.StartLine,
-//                                                EndLine = annotation.EndLine,
-//                                                Filename = annotation.Filename,
-//                                                Message = annotation.Message,
-//                                                Title = annotation.Title,
-//                                                WarningLevel = (CheckAnnotationLevelEnum?)annotation.WarningLevel,
-//                                                RawDetails = annotation.RawDetails
-//                                            }).ToList()
-//                                    }).ToList()
-//                            }).ToList(),
+                            CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                .Select(suite => new CheckSuiteModel
+                                {
+                                    Conclusion = (CheckConclusionState?) suite.Conclusion,
+                                    Status = (CheckStatusState) suite.Status,
+                                    CreatedAt = suite.CreatedAt,
+                                    UpdatedAt = suite.UpdatedAt,
+                                    CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                        .Select(run => new CheckRunModel
+                                        {
+                                            Conclusion = (CheckConclusionState?) run.Conclusion,
+                                            Status = (CheckStatusState) run.Status,
+                                            Name = run.Name,
+                                            DetailsUrl = run.Url,
+                                            Summary = run.Summary,
+                                            StartedAt = run.StartedAt,
+                                            CompletedAt = run.CompletedAt,
+                                            Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                .Select(annotation => new CheckRunAnnotationModel
+                                                {
+                                                    BlobUrl = annotation.BlobUrl,
+                                                    StartLine = annotation.Location.Start.Line,
+                                                    EndLine = annotation.Location.End.Line,
+                                                    Filename = annotation.Path,
+                                                    Message = annotation.Message,
+                                                    Title = annotation.Title,
+                                                    AnnotationLevel = (CheckAnnotationLevel?) annotation.AnnotationLevel,
+                                                    RawDetails = annotation.RawDetails
+                                                }).ToList()
+                                        }).ToList()
+                                }).ToList(),
                             Statuses = commit.Commit.Status
                                 .Select(context =>
                                     context.Contexts.Select(statusContext => new StatusModel

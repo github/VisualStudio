@@ -1,6 +1,6 @@
 ﻿namespace GitHub.Models
 {
-    public enum CheckSuiteConclusionState
+    public enum CheckConclusionState
     {
         ActionRequired,
         TimedOut,

@@ -5,9 +5,9 @@ namespace GitHub.Models
 {
     public class CheckSuiteModel
     {
-        public CheckSuiteConclusionState? Conclusion { get; set; }
+        public CheckConclusionState? Conclusion { get; set; }
 
-        public CheckSuiteStatusState Status { get; set; }
+        public CheckStatusState Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
 

@@ -231,7 +231,6 @@
     <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\GitHubContextService.cs" />
     <Compile Include="Services\GlobalConnection.cs" />
-    <Compile Include="Services\ChecksService.cs" />
     <Compile Include="Services\RepositoryForkService.cs" />
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="ViewModels\ActorViewModel.cs" />

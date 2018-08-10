@@ -22,7 +22,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
-            return pullRequest.Statuses?.Select(model =>
+            var statuses = pullRequest.Statuses?.Select(model =>
             {
                 PullRequestCheckStatus checkStatus;
                 switch (model.State)
@@ -53,8 +53,54 @@ namespace GitHub.ViewModels.GitHubPane
                     : AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                 return pullRequestCheckViewModel;
-
             }) ?? new PullRequestCheckViewModel[0];
+
+            var checks = pullRequest.CheckSuites?.SelectMany(model => model.CheckRuns)
+                .Select(model =>
+                {
+                    PullRequestCheckStatus checkStatus;
+                    switch (model.Status)
+                    {
+                        case CheckStatusState.Requested:
+                        case CheckStatusState.Queued:
+                        case CheckStatusState.InProgress:
+                            checkStatus = PullRequestCheckStatus.Pending;
+                            break;
+
+                        case CheckStatusState.Completed:
+                            switch (model.Conclusion)
+                            {
+                                case CheckConclusionState.Success:
+                                    checkStatus = PullRequestCheckStatus.Success;
+                                    break;
+
+                                case CheckConclusionState.ActionRequired:
+                                case CheckConclusionState.TimedOut:
+                                case CheckConclusionState.Cancelled:
+                                case CheckConclusionState.Failure:
+                                case CheckConclusionState.Neutral:
+                                    checkStatus = PullRequestCheckStatus.Failure;
+                                    break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                    pullRequestCheckViewModel.Title = model.Name;
+                    pullRequestCheckViewModel.Description = model.Summary;
+                    pullRequestCheckViewModel.Status = checkStatus;
+                    pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
+
+                    return pullRequestCheckViewModel;
+                }) ?? new PullRequestCheckViewModel[0];
+
+            return statuses.Union(checks).OrderBy(model => model.Title);
         }
 
         [ImportingConstructor]

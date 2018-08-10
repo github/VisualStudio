@@ -1,10 +1,10 @@
 ﻿namespace GitHub.Models
 {
-    public enum CheckSuiteStatusState
+    public enum CheckStatusState
     {
-        Requested,
         Queued,
         InProgress,
         Completed,
+        Requested,
     }
 }

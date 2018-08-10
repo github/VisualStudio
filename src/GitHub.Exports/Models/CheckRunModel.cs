@@ -5,14 +5,20 @@ namespace GitHub.Models
 {
     public class CheckRunModel
     {
-        public CheckSuiteConclusionState? Conclusion { get; set; }
+        public CheckConclusionState? Conclusion { get; set; }
 
-        public CheckSuiteStatusState Status { get; set; }
+        public CheckStatusState Status { get; set; }
 
         public DateTimeOffset? StartedAt { get; set; }
 
         public DateTimeOffset? CompletedAt { get; set; }
 
         public List<CheckRunAnnotationModel> Annotations { get; set; }
+
+        public string Name { get; set; }
+
+        public string DetailsUrl { get; set; }
+
+        public string Summary { get; set; }
     }
 }

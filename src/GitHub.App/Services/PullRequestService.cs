@@ -23,6 +23,8 @@ using Octokit.GraphQL.Model;
 using Rothko;
 using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
+using CheckConclusionState = GitHub.Models.CheckConclusionState;
+using CheckStatusState = GitHub.Models.CheckStatusState;
 using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
@@ -98,12 +100,12 @@ namespace GitHub.Services
                             LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                 new LastCommitSummaryModel
                                 {
-//                                    CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-//                                        .Select(suite => new CheckSuiteSummaryModel
-//                                        {
-//                                            Conclusion = (CheckConclusionStateEnum?)suite.Conclusion,
-//                                            Status = (CheckStatusStateEnum)suite.Status,
-//                                        }).ToList(),
+                                    CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                        .Select(suite => new CheckSuiteSummaryModel
+                                        {
+                                            Conclusion = (CheckConclusionState?)suite.Conclusion,
+                                            Status = (CheckStatusState)suite.Status,
+                                        }).ToList(),
                                     Statuses = commit.Commit.Status
                                             .Select(context =>
                                                 context.Contexts.Select(statusContext => new StatusSummaryModel
@@ -147,34 +149,58 @@ namespace GitHub.Services
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
 
-                var hasCheckSuites = item.LastCommit.CheckSuites != null 
+                var hasCheckSuites = item.LastCommit.CheckSuites != null
                                      && item.LastCommit.CheckSuites.Any();
 
-                var hasStatuses = item.LastCommit.Statuses != null 
+                var hasStatuses = item.LastCommit.Statuses != null
                                   && item.LastCommit.Statuses.Any();
 
-                if (!hasStatuses)
+                if (!hasCheckSuites && !hasStatuses)
                 {
                     item.Checks = PullRequestChecksState.None;
                 }
                 else
                 {
-                    var statusHasFailure = item.LastCommit
-                        .Statuses
-                        .Any(status => status.State == StatusState.Failure);
+                    var checksHasFailure = false;
+                    var checksHasCompleteSuccess = true;
 
-                    var statusHasCompleteSuccess = true;
-                    if (!statusHasFailure)
+                    if (hasCheckSuites)
                     {
-                        statusHasCompleteSuccess =
-                            item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
+                        checksHasFailure = item.LastCommit
+                            .CheckSuites.Any(model => model.Conclusion.HasValue
+                                                      && (model.Conclusion.Value == CheckConclusionState.Failure
+                                                          || model.Conclusion.Value == CheckConclusionState.ActionRequired));
+
+                        if (!checksHasFailure)
+                        {
+                            checksHasCompleteSuccess = item.LastCommit
+                                .CheckSuites.All(model => model.Conclusion.HasValue
+                                                          && (model.Conclusion.Value == CheckConclusionState.Success
+                                                              || model.Conclusion.Value == CheckConclusionState.Neutral));
+                        }
                     }
 
-                    if (statusHasFailure)
+                    var statusHasFailure = false;
+                    var statusHasCompleteSuccess = true;
+
+                    if (!checksHasFailure && hasStatuses)
+                    {
+                        statusHasFailure = item.LastCommit
+                            .Statuses
+                            .Any(status => status.State == StatusState.Failure);
+
+                        if (!statusHasFailure)
+                        {
+                            statusHasCompleteSuccess =
+                                item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
+                        }
+                    }
+
+                    if (checksHasFailure || statusHasFailure)
                     {
                         item.Checks = PullRequestChecksState.Failure;
                     }
-                    else if (statusHasCompleteSuccess)
+                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
                     {
                         item.Checks = PullRequestChecksState.Success;
                     }
@@ -933,9 +959,9 @@ namespace GitHub.Services
 
         class CheckSuiteSummaryModel
         {
-            public CheckSuiteConclusionState? Conclusion { get; set; }
+            public CheckConclusionState? Conclusion { get; set; }
 
-            public CheckSuiteStatusState Status { get; set; }
+            public CheckStatusState Status { get; set; }
         }
     }
 }
