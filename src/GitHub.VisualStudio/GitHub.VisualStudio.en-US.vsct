@@ -206,6 +206,18 @@
         </Strings>
       </Button>
 
+      <Button guid="guidContextMenuSet" id="idCreateGistEnterpriseCommand" priority="0x0101" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Create an Enterprise Gist</ButtonText>
+          <CanonicalName>.GitHub.CreateGistEnterprise</CanonicalName>
+          <LocCanonicalName>.GitHub.CreateGistEnterprise</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <Button guid="guidContextMenuSet" id="openLinkCommand" type="Button">
         <Icon guid="guidImages" id="link_external" />
         <CommandFlag>IconIsMoniker</CommandFlag>

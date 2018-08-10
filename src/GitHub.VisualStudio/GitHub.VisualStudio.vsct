@@ -62,7 +62,11 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x104">
+    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistEnterpriseCommand" priority="0x104">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x105">
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
@@ -169,6 +173,7 @@
       <IDSymbol name="copyLinkCommand" value="0x101"/>
       <IDSymbol name="goToSolutionOrPullRequestFileCommand" value="0x0102" />
       <IDSymbol name="idCreateGistCommand" value="0x0400" />
+      <IDSymbol name="idCreateGistEnterpriseCommand" value="0x0401" />
       <IDSymbol name="idBlameCommand" value="0x0500" />
     </GuidSymbol>
 
