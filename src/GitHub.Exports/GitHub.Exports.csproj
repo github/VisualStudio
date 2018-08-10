@@ -186,6 +186,8 @@
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="Models\PullRequestReviewThreadModel.cs" />
+    <Compile Include="Models\StatusModel.cs" />
+    <Compile Include="Models\StatusState.cs" />
     <Compile Include="Services\GitHubContext.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\IGitHubContextService.cs" />
