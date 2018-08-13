@@ -57,7 +57,7 @@
                                         Account="{Binding Author}"/>
 
                 <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
-                <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:PositiveDurationToStringConverter}}"
+                <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
                                      Command="{Binding OpenOnGitHub}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
                                      Opacity="0.75" />

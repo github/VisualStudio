@@ -120,7 +120,6 @@
       <DependentUpon>AutomationIDs.resx</DependentUpon>
     </Compile>
     <Compile Include="Controls\GitHubProgressBar.cs" />
-    <Compile Include="Converters\DurationToStringConverter.cs" />
     <Compile Include="Converters\HasItemsVisibilityConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
