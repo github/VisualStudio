@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
@@ -43,6 +44,7 @@ namespace GitHub.ViewModels.GitHubPane
                 }
 
                 var pullRequestCheckViewModel = (PullRequestCheckViewModel) viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                pullRequestCheckViewModel.CheckType = PullRequestCheckType.StatusApi;
                 pullRequestCheckViewModel.Title = model.Context;
                 pullRequestCheckViewModel.Description = model.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
@@ -92,6 +94,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                    pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
                     pullRequestCheckViewModel.Title = model.Name;
                     pullRequestCheckViewModel.Description = model.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
@@ -112,12 +115,24 @@ namespace GitHub.ViewModels.GitHubPane
 
         private void DoOpenDetailsUrl(object obj)
         {
-            usageTracker.IncrementCounter(x => x.NumberOfPRCheckStatusesOpenInGitHub).Forget();
+            Expression<Func<UsageModel.MeasuresModel, int>> expression;
+            if (CheckType == PullRequestCheckType.StatusApi)
+            {
+                expression = x => x.NumberOfPRStatusesOpenInGitHub;
+            }
+            else
+            {
+                expression = x => x.NumberOfPRChecksOpenInGitHub;
+            }
+
+            usageTracker.IncrementCounter(expression).Forget();
         }
 
         public string Title { get; private set; }
 
         public string Description { get; private set; }
+
+        public PullRequestCheckType CheckType { get; private set; }
 
         public PullRequestCheckStatus Status{ get; private set; }
 
