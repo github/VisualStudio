@@ -34,8 +34,10 @@ namespace GitHub.Api
         /// </summary>
         /// <param name="keychain">The keychain in which to store credentials.</param>
         /// <param name="twoFactorChallengeHandler">The handler for 2FA challenges.</param>
+        /// <param name="oauthListener">The callback listener to signal successful login.</param>
         /// <param name="clientId">The application's client API ID.</param>
         /// <param name="clientSecret">The application's client API secret.</param>
+        /// <param name="scopes">List of scopes to authenticate for</param>
         /// <param name="authorizationNote">An note to store with the authorization.</param>
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
