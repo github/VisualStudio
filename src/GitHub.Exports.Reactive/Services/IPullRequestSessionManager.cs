@@ -14,7 +14,7 @@ namespace GitHub.Services
     /// If the currently checked out branch represents a pull request then <see cref="CurrentSession"/>
     /// will return an <see cref="IPullRequestSession"/> containing the details of that pull request.
     /// A session for any other pull request can also be retrieved by calling
-    /// <see cref="GetSession(IPullRequestModel)"/>.
+    /// <see cref="GetSession(string, string, int)"/>.
     /// 
     /// Calling <see cref="GetLiveFile(string, ITextView, ITextBuffer)"/> will return an
     /// <see cref="IPullRequestSessionFile"/> which tracks both the contents of a text buffer and the

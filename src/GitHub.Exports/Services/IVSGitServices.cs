@@ -17,9 +17,11 @@ namespace GitHub.Services
         /// <param name="recurseSubmodules">Whether to recursively clone submodules.</param>
         /// <param name="progress">
         /// An object through which to report progress. This must be of type
-        /// <see cref="System.IProgress{Microsoft.VisualStudio.Shell.ServiceProgressData}"/>, but
+        /// System.IProgress&lt;Microsoft.VisualStudio.Shell.ServiceProgressData&gt;, but
         /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
         /// </param>
+        /// <seealso cref="System.IProgress{T}"/>
+        /// <seealso cref="Microsoft.VisualStudio.Shell.ServiceProgressData"/>
         Task Clone(
             string cloneUrl,
             string clonePath,
