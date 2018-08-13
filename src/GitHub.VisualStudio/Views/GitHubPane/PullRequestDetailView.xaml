@@ -154,7 +154,7 @@
                                     Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ghfvs:BooleanToInverseVisibilityConverter}}">
                         <ghfvs:OcticonImage Icon="arrow_down"/>
                         <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
-                        <ghfvs:GitHubActionLink Content="Pull"
+                        <ghfvs:GitHubActionLink Content="{x:Static prop:Resources.Pull}"
                                                 Command="{Binding Pull}"
                                                 Margin="4,0"
                                                 ToolTip="{Binding UpdateState.PullToolTip}"
@@ -162,7 +162,7 @@
                                                 VerticalAlignment="Center"/>
                         <ghfvs:OcticonImage Icon="arrow_up"/>
                         <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
-                        <ghfvs:GitHubActionLink Content="Push"
+                        <ghfvs:GitHubActionLink Content="{x:Static prop:Resources.Push}"
                                                 Command="{Binding Push}"
                                                 Margin="4,0"
                                                 ToolTip="{Binding UpdateState.PushToolTip}"
@@ -173,7 +173,7 @@
                                             Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
                         <TextBlock  Margin="4 0 0 0" Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"
                                     Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
-                        <ghfvs:GitHubActionLink Content="Sync"
+                        <ghfvs:GitHubActionLink Content="{x:Static prop:Resources.Sync}"
                                                 Command="{Binding SyncSubmodules}"
                                                 Margin="4 0"
                                                 ToolTip="{Binding UpdateState.SyncSubmodulesToolTip}"
@@ -207,7 +207,7 @@
 
                 <!-- Author and open time -->
                 <ghfvs:SectionControl Name="descriptionSection"
-                                      HeaderText="Description"
+                                      HeaderText="{x:Static prop:Resources.Description}"
                                       IsExpanded="True"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <StackPanel Orientation="Vertical">
@@ -221,7 +221,7 @@
 
                             <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
                                 <Run FontWeight="SemiBold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
-                                <Run Text="wrote" />
+                                <Run Text="{x:Static prop:Resources.Wrote}" />
                             </TextBlock>
                         </StackPanel>
                         <!-- PR Body -->
@@ -232,7 +232,7 @@
                 </ghfvs:SectionControl>
 
                 <ghfvs:SectionControl Name="reviewsSection"
-                                      HeaderText="Reviewers"
+                                      HeaderText="{x:Static prop:Resources.Reviewers}"
                                       IsExpanded="True"
                                       Margin="0 8 0 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
@@ -270,6 +270,7 @@
                 <!-- Put the changes tree outside its expander, so it can scroll horizontally 
                      while the header remains fixed -->
                 <local:PullRequestFilesView DataContext="{Binding Files}"
+                                            Margin="8,0,0,0"
                                             Visibility="{Binding ElementName=changesSection, Path=IsExpanded, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
             </ghfvs:ScrollingVerticalStackPanel>
         </ScrollViewer>

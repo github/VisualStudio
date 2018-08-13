@@ -39,7 +39,11 @@ namespace GitHub.Services
         /// <summary>
         /// Shows the Create Gist dialog.
         /// </summary>
-        Task ShowCreateGist();
+        /// <param name="connection">
+        /// The connection to use. If null, the first connection will be used, or the user promted
+        /// to log in if there are no connections.
+        /// </param>
+        Task ShowCreateGist(IConnection connection);
 
         /// <summary>
         /// Shows the Create Repository dialog.

@@ -67,8 +67,8 @@
                         CornerRadius="3"
                         Padding="2 1"
                         Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                    <TextBlock FontSize="10">Pending</TextBlock>
-                </Border>
+                        <TextBlock FontSize="10" Text="{x:Static prop:Resources.Pending}" />
+                    </Border>
               </StackPanel>
 
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
@@ -216,10 +216,11 @@
                 <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
                 <Button Margin="4 0 0 0"
                         Command="{Binding StartReview}"
-                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}">
-                    Start a review
+                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}"
+                         Content="{x:Static prop:Resources.StartAReview}">
+                    
                 </Button>
-                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
+                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}" Content="{x:Static prop:Resources.Cancel}"></Button>
             </StackPanel>
         </Grid>
     </Grid>
