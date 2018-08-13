@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageLanguagePackManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
+  <Metadata>
+    <DisplayName>GitHub.VisualStudio</DisplayName>
+    <Description>一个将GitHub工作流带入到Visual Studio中的扩展。</Description>
+  </Metadata>
+</PackageLanguagePackManifest>
