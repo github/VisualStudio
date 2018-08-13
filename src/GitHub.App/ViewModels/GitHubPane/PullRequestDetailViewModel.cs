@@ -61,12 +61,13 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
-        /// <param name="localRepository">The local repository.</param>
-        /// <param name="modelService">The model service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="modelServiceFactory">The model service factory</param>
         /// <param name="usageTracker">The usage tracker.</param>
         /// <param name="teamExplorerContext">The context for tracking repo changes</param>
+        /// <param name="files">The view model which will display the changed files</param>
+        /// <param name="syncSubmodulesCommand">A command that will be run when <see cref="SyncSubmodules"/> is executed</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
@@ -206,6 +207,7 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
         }
 
+        /// <summary>
         /// Gets a value indicating whether the pull request branch is checked out.
         /// </summary>
         public bool IsCheckedOut

@@ -27,7 +27,7 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="repo">The repository</param>
         /// <param name="baseSha">The base commit SHA.</param>
-        /// <param name="headSha">The head commit SHA.</param
+        /// <param name="headSha">The head commit SHA.</param>
         /// <param name="relativePath">The path to the file in the repository.</param>
         /// <param name="contents">The byte array to compare with the base SHA.</param>
         /// <returns>

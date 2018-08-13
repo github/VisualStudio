@@ -35,6 +35,7 @@ namespace GitHub.Services
         /// The value returned by the <paramref name="viewModel"/>'s 
         /// <see cref="IDialogContentViewModel.Done"/> observable, or null if the dialog was
         /// canceled.
+        /// </returns>
         /// <remarks>
         /// The first existing connection will be used. If there is no existing connection, the
         /// login dialog will be shown first.

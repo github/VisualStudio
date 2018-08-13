@@ -129,6 +129,9 @@
   <data name="hours" xml:space="preserve">
     <value>{0:N0} hours ago</value>
   </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>just now</value>
+  </data>
   <data name="minute" xml:space="preserve">
     <value>{0:N0} minute ago</value>
   </data>
