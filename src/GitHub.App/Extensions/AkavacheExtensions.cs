@@ -252,7 +252,7 @@ namespace GitHub.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="blobCache">The cache to retrieve the object from.</param>
         /// <param name="key">The key to look up the cache value with.</param>
-        /// <param name="fetchFunc"></param>
+        /// <param name="fetchFunc">The fetch function.</param>
         /// <param name="maxCacheDuration">
         /// The maximum age of a cache object before the object is treated as
         /// expired and unusable. Cache objects older than this will be treated

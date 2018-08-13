@@ -88,7 +88,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="commentService">Comment Service</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="review"></param>
+        /// <param name="review">The associated pull request review.</param>
         /// <param name="model">The comment model.</param>
         public PullRequestReviewCommentViewModel(
             IPullRequestSession session,
