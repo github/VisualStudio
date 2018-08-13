@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable
+  xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!--  This is the file that defines the actual layout and type of the commands.
+        It is divided in different sections (e.g. command definition, command
+        placement, ...), with each defining a specific set of properties.
+        See the comment before each section for more details about how to
+        use it. -->
+
+  <!--  The VSCT compiler (the tool that translates this file into the binary
+        format that VisualStudio will consume) has the ability to run a preprocessor
+        on the vsct file; this preprocessor is (usually) the C++ preprocessor, so
+        it is possible to define includes and macros with the same syntax used
+        in C++ files. Using this ability of the compiler here, we include some files
+        defining some of the constants that we will use inside the file. -->
+
+  <Include href="GitHub.VisualStudio.vsct" />
+
+  <!--The Commands section is where we the commands, menus and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidGitHubPkg">
+    <Menus>
+      <Menu guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" priority="0x0000" type="ToolWindowToolbar">
+        <Strings>
+          <ButtonText>WindowToolBar</ButtonText>
+          <CommandName>Window Toolbar</CommandName>
+        </Strings>
+      </Menu>
+      <Menu guid="guidContextMenuSet" id="idGitHubContextMenu" priority="0x200" type="Menu">
+        <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
+        <Strings>
+          <ButtonText>GitHub</ButtonText>
+          <CommandName>GitHub</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
+    <Groups>
+      <Group guid="guidGitHubCmdSet" id="idGitHubMenuGroup" priority="0x0500">
+        <Parent guid="guidManageConnections" id="idManageConnections" />
+      </Group>
+
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" priority="0x0500">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
+
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" priority="0x0501">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
+
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup" priority="0x0502">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
+
+      <Group guid="guidContextMenuSet" id="idGitHubContextMenuGroup">
+      </Group>
+
+      <Group guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup" priority="0x0000">
+        <Parent guid="guidContextMenuSet" id="idGitHubContextMenu"/>
+      </Group>
+
+    </Groups>
+    <!-- Parenting of buttons is done in the CommandPlacements section -->
+    <Buttons>
+
+      <Button guid="guidGitHubCmdSet" id="addConnectionCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>连接至GitHub(&amp;C)</ButtonText>
+          <CanonicalName>.GitHub.ConnectToGitHub</CanonicalName>
+          <LocCanonicalName>.GitHub.ConnectToGitHub</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubCmdSet" id="showGitHubPaneCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>GitHub</ButtonText>
+          <CanonicalName>.GitHub.ShowGitHubPane</CanonicalName>
+          <LocCanonicalName>.GitHub.ShowGitHubPane</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubCmdSet" id="showCurrentPullRequestCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>显示当前推送请求</ButtonText>
+          <CanonicalName>.GitHub.ShowCurrentPullRequest</CanonicalName>
+          <LocCanonicalName>.GitHub.ShowCurrentPullRequest</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubCmdSet" id="syncSubmodulesCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>同步子模块</ButtonText>
+          <CanonicalName>.GitHub.SyncSubmodules</CanonicalName>
+          <LocCanonicalName>.GitHub.SyncSubmodules</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubCmdSet" id="openFromUrlCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>从GitHub打开...</ButtonText>
+          <CanonicalName>.GitHub.OpenFromUrl</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFromUrl</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubCmdSet" id="openFromClipboardCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>AllowParams</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>从剪贴板打开</ButtonText>
+          <CanonicalName>.GitHub.OpenFromClipboard</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFromClipboard</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <!--- Toolbar buttons -->
+      <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
+        <Icon guid="guidImages" id="arrow_left" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>后退</ButtonText>
+          <CanonicalName>.GitHub.Back</CanonicalName>
+          <LocCanonicalName>.GitHub.Back</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" type="Button">
+        <Icon guid="guidImages" id="arrow_right" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>前进</ButtonText>
+          <CanonicalName>.GitHub.Forward</CanonicalName>
+          <LocCanonicalName>.GitHub.Forward</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" type="Button">
+        <Icon guid="guidImages" id="pullrequest" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>推送请求</ButtonText>
+          <CanonicalName>.GitHub.PullRequests</CanonicalName>
+          <LocCanonicalName>.GitHub.PullRequests</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
+        <Icon guid="guidImages" id="refresh" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>刷新</ButtonText>
+          <CanonicalName>.GitHub.Refresh</CanonicalName>
+          <LocCanonicalName>.GitHub.Refresh</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
+        <Icon guid="guidImages" id="logo_toolbar" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>在GitHub查看</ButtonText>
+          <CanonicalName>.GitHub.ViewOnGitHub</CanonicalName>
+          <LocCanonicalName>.GitHub.ViewOnGitHub</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="helpCommand" type="Button">
+        <Icon guid="guidImages" id="question" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>帮助</ButtonText>
+          <CanonicalName>.GitHub.Help</CanonicalName>
+          <LocCanonicalName>.GitHub.Help</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>创建GitHub Gist</ButtonText>
+          <CanonicalName>.GitHub.CreateGist</CanonicalName>
+          <LocCanonicalName>.GitHub.CreateGist</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="idCreateGistEnterpriseCommand" priority="0x0101" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>创建企业 Gist</ButtonText>
+          <CanonicalName>.GitHub.CreateGistEnterprise</CanonicalName>
+          <LocCanonicalName>.GitHub.CreateGistEnterprise</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="openLinkCommand" type="Button">
+        <Icon guid="guidImages" id="link_external" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>在GitHub打开</ButtonText>
+          <CanonicalName>.GitHub.OpenLink</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenLink</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="copyLinkCommand" type="Button">
+        <Icon guid="guidImages" id="clippy" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>复制链接</ButtonText>
+          <CanonicalName>.GitHub.CopyLink</CanonicalName>
+          <LocCanonicalName>.GitHub.CopyLink</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="idBlameCommand" type="Button">
+        <Icon guid="guidImages" id="link_external" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>追溯</ButtonText>
+          <CanonicalName>.GitHub.Blame</CanonicalName>
+          <LocCanonicalName>.GitHub.Blame</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="goToSolutionOrPullRequestFileCommand" type="Button">
+        <Icon guid="guidImages" id="pullrequest" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText> 转到解决方案/PR文件</ButtonText>
+          <CanonicalName>.GitHub.GoToSolutionOrPRFile</CanonicalName>
+          <LocCanonicalName>.GitHub.GoToSolutionOrPRFile</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+</CommandTable>
