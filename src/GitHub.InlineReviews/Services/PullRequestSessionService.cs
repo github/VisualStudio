@@ -767,7 +767,7 @@ namespace GitHub.InlineReviews.Services
                                             Conclusion = (CheckConclusionState?) run.Conclusion,
                                             Status = (CheckStatusState) run.Status,
                                             Name = run.Name,
-                                            DetailsUrl = run.Url,
+                                            DetailsUrl = run.Permalink,
                                             Summary = run.Summary,
                                             StartedAt = run.StartedAt,
                                             CompletedAt = run.CompletedAt,
