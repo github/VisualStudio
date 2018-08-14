@@ -149,11 +149,8 @@ namespace GitHub.Services
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
 
-                var hasCheckSuites = item.LastCommit.CheckSuites != null
-                                     && item.LastCommit.CheckSuites.Any();
-
-                var hasStatuses = item.LastCommit.Statuses != null
-                                  && item.LastCommit.Statuses.Any();
+                var hasCheckSuites = item.LastCommit?.CheckSuites.Any() ?? false;
+                var hasStatuses = item.LastCommit?.Statuses.Any() ?? false;
 
                 if (!hasCheckSuites && !hasStatuses)
                 {

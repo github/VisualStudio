@@ -103,7 +103,7 @@ namespace GitHub.ViewModels.GitHubPane
                     return pullRequestCheckViewModel;
                 }) ?? new PullRequestCheckViewModel[0];
 
-            return statuses.Union(checks).OrderBy(model => model.Title);
+            return statuses.Concat(checks).OrderBy(model => model.Title);
         }
 
         [ImportingConstructor]
