@@ -21,6 +21,9 @@ namespace GitHub.Models
         /// </summary>
         public DateTimeOffset? CompletedAt { get; set; }
 
+        /// <summary>The check run's annotations.</summary>
+        public List<CheckRunAnnotationModel> Annotations { get; set; }
+
         /// <summary>The name of the check for this check run.</summary>
         public string Name { get; set; }
 

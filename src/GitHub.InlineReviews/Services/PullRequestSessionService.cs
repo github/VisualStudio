@@ -770,6 +770,18 @@ namespace GitHub.InlineReviews.Services
                                             Name = run.Name,
                                             DetailsUrl = run.Permalink,
                                             Summary = run.Summary,
+                                            Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                .Select(annotation => new CheckRunAnnotationModel
+                                                {
+                                                    BlobUrl = annotation.BlobUrl,
+                                                    StartLine = annotation.Location.Start.Line,
+                                                    EndLine = annotation.Location.End.Line,
+                                                    Filename = annotation.Path,
+                                                    Message = annotation.Message,
+                                                    Title = annotation.Title,
+                                                    AnnotationLevel = FromGraphQl(annotation.AnnotationLevel),
+                                                    RawDetails = annotation.RawDetails
+                                                }).ToList()
                                         }).ToList()
                                 }).ToList(),
                             Statuses = commit.Commit.Status
@@ -885,6 +897,23 @@ namespace GitHub.InlineReviews.Services
                     return GitHub.Models.PullRequestReviewState.ChangesRequested;
                 case PullRequestReviewState.Dismissed:
                     return GitHub.Models.PullRequestReviewState.Dismissed;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        static CheckAnnotationLevel? FromGraphQl(Octokit.GraphQL.Model.CheckAnnotationLevel? value)
+        {
+            switch (value)
+            {
+                case null:
+                    return null;
+                case Octokit.GraphQL.Model.CheckAnnotationLevel.Failure:
+                    return CheckAnnotationLevel.Failure;
+                case Octokit.GraphQL.Model.CheckAnnotationLevel.Notice:
+                    return CheckAnnotationLevel.Notice;
+                case Octokit.GraphQL.Model.CheckAnnotationLevel.Warning:
+                    return CheckAnnotationLevel.Warning;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
