@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.App.Services;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -300,14 +301,14 @@ namespace GitHub.InlineReviews.Services
                         HeadRefName = pr.HeadRefName,
                         HeadRefSha = pr.HeadRefOid,
                         HeadRepositoryOwner = pr.HeadRepositoryOwner != null ? pr.HeadRepositoryOwner.Login : null,
-                        State = FromGraphQl(pr.State),
+                        State = pr.State.FromGraphQl(),
                         UpdatedAt = pr.UpdatedAt,
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
                             Id = review.Id.Value,
                             Body = review.Body,
                             CommitId = review.Commit.Oid,
-                            State = FromGraphQl(review.State),
+                            State = review.State.FromGraphQl(),
                             SubmittedAt = review.SubmittedAt,
                             Author = new ActorModel
                             {
@@ -765,8 +766,8 @@ namespace GitHub.InlineReviews.Services
                                     CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                         .Select(run => new CheckRunModel
                                         {
-                                            Conclusion = (CheckConclusionState?) run.Conclusion,
-                                            Status = (CheckStatusState) run.Status,
+                                            Conclusion = run.Conclusion.FromGraphQl(),
+                                            Status = run.Status.FromGraphQl(),
                                             Name = run.Name,
                                             DetailsUrl = run.Permalink,
                                             Summary = run.Summary,
@@ -779,7 +780,7 @@ namespace GitHub.InlineReviews.Services
                                                     Filename = annotation.Path,
                                                     Message = annotation.Message,
                                                     Title = annotation.Title,
-                                                    AnnotationLevel = FromGraphQl(annotation.AnnotationLevel),
+                                                    AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
                                                     RawDetails = annotation.RawDetails
                                                 }).ToList()
                                         }).ToList()
@@ -788,7 +789,7 @@ namespace GitHub.InlineReviews.Services
                                 .Select(context =>
                                     context.Contexts.Select(statusContext => new StatusModel
                                     {
-                                        State = (StatusState)statusContext.State,
+                                        State = statusContext.State.FromGraphQl(),
                                         Context = statusContext.Context,
                                         TargetUrl = statusContext.TargetUrl,
                                         Description = statusContext.Description,
@@ -868,55 +869,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             model.Threads = threads;
-        }
-
-        static PullRequestStateEnum FromGraphQl(PullRequestState value)
-        {
-            switch (value) {
-                case PullRequestState.Open:
-                    return PullRequestStateEnum.Open;
-                case PullRequestState.Closed:
-                    return PullRequestStateEnum.Closed;
-                case PullRequestState.Merged:
-                    return PullRequestStateEnum.Merged;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-        }
-
-        static GitHub.Models.PullRequestReviewState FromGraphQl(PullRequestReviewState value)
-        {
-            switch (value) {
-                case PullRequestReviewState.Pending:
-                    return GitHub.Models.PullRequestReviewState.Pending;
-                case PullRequestReviewState.Commented:
-                    return GitHub.Models.PullRequestReviewState.Commented;
-                case PullRequestReviewState.Approved:
-                    return GitHub.Models.PullRequestReviewState.Approved;
-                case PullRequestReviewState.ChangesRequested:
-                    return GitHub.Models.PullRequestReviewState.ChangesRequested;
-                case PullRequestReviewState.Dismissed:
-                    return GitHub.Models.PullRequestReviewState.Dismissed;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-        }
-
-        static CheckAnnotationLevel? FromGraphQl(Octokit.GraphQL.Model.CheckAnnotationLevel? value)
-        {
-            switch (value)
-            {
-                case null:
-                    return null;
-                case Octokit.GraphQL.Model.CheckAnnotationLevel.Failure:
-                    return CheckAnnotationLevel.Failure;
-                case Octokit.GraphQL.Model.CheckAnnotationLevel.Notice:
-                    return CheckAnnotationLevel.Notice;
-                case Octokit.GraphQL.Model.CheckAnnotationLevel.Warning:
-                    return CheckAnnotationLevel.Warning;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
         }
 
         static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)
