@@ -17,6 +17,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
+using Octokit;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Core;
 using Octokit.GraphQL.Model;
@@ -27,6 +28,10 @@ using static Octokit.GraphQL.Variable;
 using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
 using CheckConclusionState = GitHub.Models.CheckConclusionState;
 using CheckStatusState = GitHub.Models.CheckStatusState;
+using DraftPullRequestReviewComment = Octokit.GraphQL.Model.DraftPullRequestReviewComment;
+using FileMode = System.IO.FileMode;
+using NotFoundException = LibGit2Sharp.NotFoundException;
+using PullRequestReviewState = Octokit.GraphQL.Model.PullRequestReviewState;
 using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
@@ -295,14 +300,14 @@ namespace GitHub.InlineReviews.Services
                         HeadRefName = pr.HeadRefName,
                         HeadRefSha = pr.HeadRefOid,
                         HeadRepositoryOwner = pr.HeadRepositoryOwner != null ? pr.HeadRepositoryOwner.Login : null,
-                        State = (PullRequestStateEnum)pr.State,
+                        State = FromGraphQl(pr.State),
                         UpdatedAt = pr.UpdatedAt,
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
                             Id = review.Id.Value,
                             Body = review.Body,
                             CommitId = review.Commit.Oid,
-                            State = (GitHub.Models.PullRequestReviewState)review.State,
+                            State = FromGraphQl(review.State),
                             SubmittedAt = review.SubmittedAt,
                             Author = new ActorModel
                             {
@@ -853,9 +858,36 @@ namespace GitHub.InlineReviews.Services
             model.Threads = threads;
         }
 
-        static GitHub.Models.PullRequestReviewState FromGraphQL(Octokit.GraphQL.Model.PullRequestReviewState s)
+        static PullRequestStateEnum FromGraphQl(PullRequestState value)
         {
-            return (GitHub.Models.PullRequestReviewState)s;
+            switch (value) {
+                case PullRequestState.Open:
+                    return PullRequestStateEnum.Open;
+                case PullRequestState.Closed:
+                    return PullRequestStateEnum.Closed;
+                case PullRequestState.Merged:
+                    return PullRequestStateEnum.Merged;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        static GitHub.Models.PullRequestReviewState FromGraphQl(PullRequestReviewState value)
+        {
+            switch (value) {
+                case PullRequestReviewState.Pending:
+                    return GitHub.Models.PullRequestReviewState.Pending;
+                case PullRequestReviewState.Commented:
+                    return GitHub.Models.PullRequestReviewState.Commented;
+                case PullRequestReviewState.Approved:
+                    return GitHub.Models.PullRequestReviewState.Approved;
+                case PullRequestReviewState.ChangesRequested:
+                    return GitHub.Models.PullRequestReviewState.ChangesRequested;
+                case PullRequestReviewState.Dismissed:
+                    return GitHub.Models.PullRequestReviewState.Dismissed;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
         }
 
         static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)

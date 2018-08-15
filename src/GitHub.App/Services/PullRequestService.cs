@@ -106,15 +106,15 @@ namespace GitHub.Services
                                             CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                                 .Select(run => new CheckRunSummaryModel
                                                 {
-                                                    Conclusion = (CheckConclusionState?)run.Conclusion,
-                                                    Status = (CheckStatusState)run.Status
+                                                    Conclusion = FromGraphQl(run.Conclusion),
+                                                    Status = FromGraphQl(run.Status)
                                                 }).ToList()
                                         }).ToList(),
                                     Statuses = commit.Commit.Status
                                             .Select(context =>
                                                 context.Contexts.Select(statusContext => new StatusSummaryModel
                                                 {
-                                                    State = (StatusState)statusContext.State,
+                                                    State = FromGraphQl(statusContext.State),
                                                 }).ToList()
                                             ).SingleOrDefault()
                                 }).ToList().FirstOrDefault(),
@@ -130,7 +130,7 @@ namespace GitHub.Services
                                 Body = review.Body,
                                 CommentCount = review.Comments(null, null, null, null).TotalCount,
                             }).ToList(),
-                            State = (PullRequestStateEnum)pr.State,
+                            State = FromGraphQl(pr.State),
                             Title = pr.Title,
                             UpdatedAt = pr.UpdatedAt,
                         }).ToList(),
@@ -932,6 +932,80 @@ namespace GitHub.Services
             }
 
             return null;
+        }
+
+        static PullRequestStateEnum FromGraphQl(PullRequestState value)
+        {
+            switch (value)
+            {
+                case PullRequestState.Open:
+                    return PullRequestStateEnum.Open;
+                case PullRequestState.Closed:
+                    return PullRequestStateEnum.Closed;
+                case PullRequestState.Merged:
+                    return PullRequestStateEnum.Merged;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        static StatusState FromGraphQl(Octokit.GraphQL.Model.StatusState value)
+        {
+            switch (value)
+            {
+                case Octokit.GraphQL.Model.StatusState.Expected:
+                    return StatusState.Expected;
+                case Octokit.GraphQL.Model.StatusState.Error:
+                    return StatusState.Error;
+                case Octokit.GraphQL.Model.StatusState.Failure:
+                    return StatusState.Failure;
+                case Octokit.GraphQL.Model.StatusState.Pending:
+                    return StatusState.Pending;
+                case Octokit.GraphQL.Model.StatusState.Success:
+                    return StatusState.Success;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        static CheckStatusState FromGraphQl(Octokit.GraphQL.Model.CheckStatusState value)
+        {
+            switch (value)
+            {
+                case Octokit.GraphQL.Model.CheckStatusState.Queued:
+                    return CheckStatusState.Queued;
+                case Octokit.GraphQL.Model.CheckStatusState.InProgress:
+                    return CheckStatusState.InProgress;
+                case Octokit.GraphQL.Model.CheckStatusState.Completed:
+                    return CheckStatusState.Completed;
+                case Octokit.GraphQL.Model.CheckStatusState.Requested:
+                    return CheckStatusState.Requested;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        static CheckConclusionState? FromGraphQl(Octokit.GraphQL.Model.CheckConclusionState? value)
+        {
+            switch (value)
+            {
+                case null:
+                    return null;
+                case Octokit.GraphQL.Model.CheckConclusionState.ActionRequired:
+                    return CheckConclusionState.ActionRequired;
+                case Octokit.GraphQL.Model.CheckConclusionState.TimedOut:
+                    return CheckConclusionState.TimedOut;
+                case Octokit.GraphQL.Model.CheckConclusionState.Cancelled:
+                    return CheckConclusionState.Cancelled;
+                case Octokit.GraphQL.Model.CheckConclusionState.Failure:
+                    return CheckConclusionState.Failure;
+                case Octokit.GraphQL.Model.CheckConclusionState.Success:
+                    return CheckConclusionState.Success;
+                case Octokit.GraphQL.Model.CheckConclusionState.Neutral:
+                    return CheckConclusionState.Neutral;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
         }
 
         class ListItemAdapter : PullRequestListItemModel
