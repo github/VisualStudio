@@ -97,6 +97,23 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+            PullRequestDetailModel pullRequest,
+            string relativePath)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            return pullRequest.CheckSuites
+                .SelectMany(checkSuite => checkSuite.CheckRuns)
+                .SelectMany(checkRun =>
+                    checkRun.Annotations
+                        .Where(model => model.Filename == relativePath)
+                        .Select(annotation => new InlineAnnotationModel(checkRun, annotation)))
+                .OrderBy(tuple => tuple.Annotation.StartLine)
+                .ToArray();
+        }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             PullRequestDetailModel pullRequest,
             string relativePath,
@@ -903,5 +920,5 @@ namespace GitHub.InlineReviews.Services
 
             public List<StatusModel> Statuses { get; set; }
         }
-    }   
+    }
 }

@@ -13,6 +13,8 @@ namespace GitHub.ViewModels.GitHubPane
     public class PullRequestFileNode : ReactiveObject, IPullRequestFileNode
     {
         int commentCount;
+        int annotationWarningCount;
+        int annotationErrorCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestFileNode"/> class.
@@ -98,6 +100,24 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return commentCount; }
             set { this.RaiseAndSetIfChanged(ref commentCount, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of annotation errors on the file.
+        /// </summary>
+        public int AnnotationWarningCount
+        {
+            get { return annotationWarningCount; }
+            set { this.RaiseAndSetIfChanged(ref annotationWarningCount, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of annotation errors on the file.
+        /// </summary>
+        public int AnnotationErrorCount
+        {
+            get { return annotationErrorCount; }
+            set { this.RaiseAndSetIfChanged(ref annotationErrorCount, value); }
         }
     }
 }
