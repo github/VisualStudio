@@ -103,8 +103,12 @@ namespace GitHub.Services
                                     CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                         .Select(suite => new CheckSuiteSummaryModel
                                         {
-                                            Conclusion = (CheckConclusionState?)suite.Conclusion,
-                                            Status = (CheckStatusState)suite.Status,
+                                            CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                                .Select(run => new CheckRunSummaryModel
+                                                {
+                                                    Conclusion = (CheckConclusionState?)run.Conclusion,
+                                                    Status = (CheckStatusState)run.Status
+                                                }).ToList()
                                         }).ToList(),
                                     Statuses = commit.Commit.Status
                                             .Select(context =>
@@ -144,15 +148,17 @@ namespace GitHub.Services
 
             var result = await graphql.Run(readPullRequests, vars);
 
-            foreach (ListItemAdapter item in result.Items)
+            foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
 
-                var hasCheckSuites = item.LastCommit?.CheckSuites.Any() ?? false;
+                var checkRuns = item.LastCommit?.CheckSuites.SelectMany(model => model.CheckRuns).ToArray();
+
+                var hasCheckRuns = checkRuns?.Any() ?? false;
                 var hasStatuses = item.LastCommit?.Statuses.Any() ?? false;
 
-                if (!hasCheckSuites && !hasStatuses)
+                if (!hasCheckRuns && !hasStatuses)
                 {
                     item.Checks = PullRequestChecksState.None;
                 }
@@ -161,19 +167,19 @@ namespace GitHub.Services
                     var checksHasFailure = false;
                     var checksHasCompleteSuccess = true;
 
-                    if (hasCheckSuites)
+                    if (hasCheckRuns)
                     {
-                        checksHasFailure = item.LastCommit
-                            .CheckSuites.Any(model => model.Conclusion.HasValue
-                                                      && (model.Conclusion.Value == CheckConclusionState.Failure
-                                                          || model.Conclusion.Value == CheckConclusionState.ActionRequired));
+                        checksHasFailure = checkRuns
+                            .Any(model => model.Conclusion.HasValue 
+                                          && (model.Conclusion.Value == CheckConclusionState.Failure 
+                                              || model.Conclusion.Value == CheckConclusionState.ActionRequired));
 
                         if (!checksHasFailure)
                         {
-                            checksHasCompleteSuccess = item.LastCommit
-                                .CheckSuites.All(model => model.Conclusion.HasValue
-                                                          && (model.Conclusion.Value == CheckConclusionState.Success
-                                                              || model.Conclusion.Value == CheckConclusionState.Neutral));
+                            checksHasCompleteSuccess = checkRuns
+                                .All(model => model.Conclusion.HasValue
+                                              && (model.Conclusion.Value == CheckConclusionState.Success
+                                                  || model.Conclusion.Value == CheckConclusionState.Neutral));
                         }
                     }
 
@@ -942,11 +948,6 @@ namespace GitHub.Services
             public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
         }
 
-        class StatusSummaryModel
-        {
-            public StatusState State { get; set; }
-        }
-
         class LastCommitSummaryModel
         {
             public List<CheckSuiteSummaryModel> CheckSuites { get; set; }
@@ -956,9 +957,18 @@ namespace GitHub.Services
 
         class CheckSuiteSummaryModel
         {
-            public CheckConclusionState? Conclusion { get; set; }
+            public List<CheckRunSummaryModel> CheckRuns { get; set; }
+        }
 
+        class CheckRunSummaryModel
+        {
+            public CheckConclusionState? Conclusion { get; set; }
             public CheckStatusState Status { get; set; }
+        }
+
+        class StatusSummaryModel
+        {
+            public StatusState State { get; set; }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace GitHub.Models
 {
     /// <summary>
-    /// Holds details about a pull request Status
+    /// Model for a single pull request Status.
     /// </summary>
     public class StatusModel
     {

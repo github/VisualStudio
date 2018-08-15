@@ -757,10 +757,6 @@ namespace GitHub.InlineReviews.Services
                             CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                 .Select(suite => new CheckSuiteModel
                                 {
-                                    Conclusion = (CheckConclusionState?) suite.Conclusion,
-                                    Status = (CheckStatusState) suite.Status,
-                                    CreatedAt = suite.CreatedAt,
-                                    UpdatedAt = suite.UpdatedAt,
                                     CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                         .Select(run => new CheckRunModel
                                         {
@@ -769,20 +765,6 @@ namespace GitHub.InlineReviews.Services
                                             Name = run.Name,
                                             DetailsUrl = run.Permalink,
                                             Summary = run.Summary,
-                                            StartedAt = run.StartedAt,
-                                            CompletedAt = run.CompletedAt,
-                                            Annotations = run.Annotations(null, null, null, null).AllPages()
-                                                .Select(annotation => new CheckRunAnnotationModel
-                                                {
-                                                    BlobUrl = annotation.BlobUrl,
-                                                    StartLine = annotation.Location.Start.Line,
-                                                    EndLine = annotation.Location.End.Line,
-                                                    Filename = annotation.Path,
-                                                    Message = annotation.Message,
-                                                    Title = annotation.Title,
-                                                    AnnotationLevel = (CheckAnnotationLevel?) annotation.AnnotationLevel,
-                                                    RawDetails = annotation.RawDetails
-                                                }).ToList()
                                         }).ToList()
                                 }).ToList(),
                             Statuses = commit.Commit.Status
