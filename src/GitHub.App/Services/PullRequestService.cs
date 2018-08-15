@@ -157,7 +157,7 @@ namespace GitHub.Services
                 var checkRuns = item.LastCommit?.CheckSuites.SelectMany(model => model.CheckRuns).ToArray();
 
                 var hasCheckRuns = checkRuns?.Any() ?? false;
-                var hasStatuses = item.LastCommit?.Statuses.Any() ?? false;
+                var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
 
                 if (!hasCheckRuns && !hasStatuses)
                 {
