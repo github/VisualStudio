@@ -190,7 +190,8 @@ namespace GitHub.Services
                     {
                         statusHasFailure = item.LastCommit
                             .Statuses
-                            .Any(status => status.State == StatusState.Failure);
+                            .Any(status => status.State == StatusState.Failure
+                                           || status.State == StatusState.Error);
 
                         if (!statusHasFailure)
                         {
