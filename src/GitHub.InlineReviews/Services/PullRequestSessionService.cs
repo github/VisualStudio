@@ -755,37 +755,61 @@ namespace GitHub.InlineReviews.Services
         {
             if (readCommitStatuses == null)
             {
-                readCommitStatuses = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
-                    .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
-                        commit => new LastCommitAdapter
-                        {
-                            CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-                                .Select(suite => new CheckSuiteModel
-                                {
-                                    CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
-                                        .Select(run => new CheckRunModel
-                                        {
-                                            Conclusion = run.Conclusion.FromGraphQl(),
-                                            Status = run.Status.FromGraphQl(),
-                                            Name = run.Name,
-                                            DetailsUrl = run.Permalink,
-                                            Summary = run.Summary,
-                                        }).ToList()
-                                }).ToList(),
-                            Statuses = commit.Commit.Status
-                                .Select(context =>
-                                    context.Contexts.Select(statusContext => new StatusModel
+                if(address.IsGitHubDotCom())
+                {
+                    readCommitStatuses = new Query()
+                        .Repository(Var(nameof(owner)), Var(nameof(name)))
+                        .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                            commit => new LastCommitAdapter
+                            {
+                                CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                    .Select(suite => new CheckSuiteModel
                                     {
-                                        State = statusContext.State.FromGraphQl(),
-                                        Context = statusContext.Context,
-                                        TargetUrl = statusContext.TargetUrl,
-                                        Description = statusContext.Description,
-                                        AvatarUrl = statusContext.Creator.AvatarUrl(null)
-                                    }).ToList()
-                                ).SingleOrDefault()
-                        }
-                    ).Compile();
+                                        CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                            .Select(run => new CheckRunModel
+                                            {
+                                                Conclusion = run.Conclusion.FromGraphQl(),
+                                                Status = run.Status.FromGraphQl(),
+                                                Name = run.Name,
+                                                DetailsUrl = run.Permalink,
+                                                Summary = run.Summary,
+                                            }).ToList()
+                                    }).ToList(),
+                                Statuses = commit.Commit.Status
+                                    .Select(context =>
+                                        context.Contexts.Select(statusContext => new StatusModel
+                                        {
+                                            State = statusContext.State.FromGraphQl(),
+                                            Context = statusContext.Context,
+                                            TargetUrl = statusContext.TargetUrl,
+                                            Description = statusContext.Description,
+                                            AvatarUrl = statusContext.Creator.AvatarUrl(null)
+                                        }).ToList()
+                                    ).SingleOrDefault()
+                            }
+                        ).Compile();
+                }
+                else
+                {
+                    readCommitStatuses = new Query()
+                       .Repository(Var(nameof(owner)), Var(nameof(name)))
+                       .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                           commit => new LastCommitAdapter
+                           {
+                               Statuses = commit.Commit.Status
+                                   .Select(context =>
+                                       context.Contexts.Select(statusContext => new StatusModel
+                                       {
+                                           State = statusContext.State.FromGraphQl(),
+                                           Context = statusContext.Context,
+                                           TargetUrl = statusContext.TargetUrl,
+                                           Description = statusContext.Description,
+                                           AvatarUrl = statusContext.Creator.AvatarUrl(null)
+                                       }).ToList()
+                                   ).SingleOrDefault()
+                           }
+                       ).Compile();
+                }
             }
 
             var vars = new Dictionary<string, object>
