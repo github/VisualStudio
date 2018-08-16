@@ -28,7 +28,7 @@
             <!-- <ColumnDefinition Width="*" SharedSizeGroup="ColumnOne" /> -->
             <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnTwo" />
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFour" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnFour" />
             <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFive" />
         </Grid.ColumnDefinitions>
 
