@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,364 +117,364 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="GitHubPublishSectionTitle" xml:space="preserve">
-    <value>发布至GitHub</value>
-  </data>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
-    <value>无效的验证码</value>
+    <value>不正確身份驗證代碼</value>
   </data>
   <data name="authenticationFailedLabelMessage" xml:space="preserve">
-    <value>尝试再次输入代码或单击【重新发送】按钮以获取新的验证码。</value>
+    <value>請嘗試再次輸入代碼或按一下 "重新發送" 按鈕以獲取新的身份驗證代碼。</value>
   </data>
   <data name="authenticationSentLabelContent" xml:space="preserve">
-    <value>验证码已发送！</value>
+    <value>已發送身份驗證代碼!</value>
   </data>
   <data name="authenticationSentLabelMessage" xml:space="preserve">
-    <value>如果您没有收到验证码，请联系 support@github.com 。</value>
+    <value>如果您沒有收到身份驗證代碼, 請聯繫 support@github.com support@github。</value>
   </data>
   <data name="browsePathButtonContent" xml:space="preserve">
-    <value>浏览</value>
+    <value>瀏覽</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
-    <value>无法连接到github.com</value>
+    <value>無法連接到 github.com</value>
   </data>
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
-    <value>无法连接服务器</value>
+    <value>無法連接到伺服器。</value>
   </data>
   <data name="CreateLink" xml:space="preserve">
-    <value>创建</value>
+    <value>創建</value>
   </data>
   <data name="DescriptionOptional" xml:space="preserve">
-    <value>说明(可选)</value>
+    <value>說明 (可選)</value>
   </data>
   <data name="openInBrowser" xml:space="preserve">
-    <value>在浏览器中打开</value>
+    <value>在瀏覽器中打開</value>
   </data>
   <data name="CancelLink" xml:space="preserve">
     <value>取消</value>
   </data>
   <data name="gistCreatedMessage" xml:space="preserve">
-    <value>Gist已创建</value>
+    <value>Gist已創建</value>
   </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
-    <value>创建Gist失败</value>
+    <value>未能創建Gist</value>
   </data>
   <data name="prUpdatedByText" xml:space="preserve">
-    <value>由</value>
+    <value>的</value>
   </data>
   <data name="Options_PrivacyTitle" xml:space="preserve">
-    <value>隐私</value>
+    <value>隱私</value>
   </data>
   <data name="Options_MetricsLabel" xml:space="preserve">
-    <value>通过发送匿名使用数据来帮助我们改进!</value>
+    <value>發送匿名使用資料幫助我們改進</value>
   </data>
   <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
-    <value>无法复制到剪贴板，请重试。</value>
+    <value>無法複製到剪貼簿。請重試。</value>
   </data>
   <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
-    <value>链接已经复制到剪贴板</value>
+    <value>複製到剪貼簿的連結</value>
   </data>
   <data name="RepositoryPublishedMessage" xml:space="preserve">
-    <value>版本库创建成功。</value>
+    <value>已成功創建存儲庫。</value>
   </data>
   <data name="makePrivateGist" xml:space="preserve">
-    <value>私有Gist</value>
+    <value>私人Gist</value>
   </data>
   <data name="fileNameText" xml:space="preserve">
-    <value>文件名</value>
+    <value>檔案名</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>你没有登录到 {0},因此操作可能才会失败. [立即登录]({1})</value>
+    <value>您沒有登錄到 {0}, 因此某些 git 操作可能會失敗。[立即登錄]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
-    <value>维基</value>
+    <value>Wiki</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>动态</value>
+    <value>Pulse</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>拉取请求</value>
+    <value>合併請求</value>
   </data>
   <data name="pathText" xml:space="preserve">
-    <value>路径</value>
+    <value>路徑</value>
   </data>
   <data name="IssuesNavigationItemText" xml:space="preserve">
-    <value>问题</value>
+    <value>問題</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
-    <value>图表</value>
+    <value>圖表</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>發佈到 GitHub</value>
+  </data>
+  <data name="BlurbText" xml:space="preserve">
+    <value>為開源和私有專案提供強大的協作、代碼評審和代碼管理。</value>
   </data>
   <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
-    <value>连接...</value>
+    <value>連線中</value>
   </data>
   <data name="CloneLink" xml:space="preserve">
     <value>克隆</value>
   </data>
   <data name="verifyText" xml:space="preserve">
-    <value>验证</value>
+    <value>驗證</value>
   </data>
   <data name="twoFactorAuthText" xml:space="preserve">
-    <value>双重身份验证</value>
+    <value>雙因素身份驗證</value>
   </data>
   <data name="SignUpLink" xml:space="preserve">
-    <value>注册</value>
+    <value>註冊</value>
   </data>
   <data name="SignOutLink" xml:space="preserve">
-    <value>注销</value>
+    <value>登出</value>
   </data>
   <data name="resendCodeButtonToolTip" xml:space="preserve">
-    <value>再次将验证码短信发送至您的注册手机中</value>
+    <value>再次將代碼發送到註冊的 SMS 設備</value>
   </data>
   <data name="resendCodeButtonContent" xml:space="preserve">
-    <value>重新发送</value>
+    <value>重送</value>
   </data>
   <data name="RepoNameText" xml:space="preserve">
-    <value>存储库名称</value>
+    <value>存儲庫名稱</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>此存儲庫沒有遠端。填寫表單以將其發佈到 GitHub。</value>
   </data>
   <data name="publishText" xml:space="preserve">
-    <value>发布</value>
+    <value>發佈</value>
   </data>
   <data name="orText" xml:space="preserve">
     <value>或</value>
   </data>
   <data name="openTwoFactorAuthAppText" xml:space="preserve">
-    <value>在你的手机上打开双重身份验证App查看验证码。</value>
+    <value>打開設備上的雙因素身份驗證應用程式以查看您的身份驗證代碼。</value>
   </data>
   <data name="noRepositoriesMessageText" xml:space="preserve">
-    <value>没有存储库</value>
+    <value>無存儲庫</value>
   </data>
   <data name="nameText" xml:space="preserve">
-    <value>名称</value>
+    <value>名字</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
-    <value>私有存储库</value>
+    <value>專用存儲庫</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>登录失败。</value>
+    <value>登入失敗！</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>本地路径</value>
+    <value>本地路徑</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
-    <value>许可证</value>
+    <value>授權許可</value>
   </data>
   <data name="learnMoreLink" xml:space="preserve">
-    <value>了解详细信息</value>
+    <value>瞭解更多資訊</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
-    <value>Git忽略</value>
+    <value>Git 忽略</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
-    <value>搜索存储库</value>
+    <value>搜索資料庫</value>
+  </data>
+  <data name="loadingFailedMessageContent" xml:space="preserve">
+    <value>某些或所有存儲庫可能未載入。請關閉對話方塊並重試。</value>
   </data>
   <data name="loadingFailedMessageMessage" xml:space="preserve">
-    <value>加载存储库时发送意外。</value>
+    <value>載入存儲庫時出錯</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>GitHub企业服务器地址</value>
+    <value>GitHub 企業伺服器位址</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>主機不可用或不是 GitHub 企業伺服器。請檢查位址並重試。</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
-    <value>用户名或电子邮件</value>
+    <value>用戶名或電子信箱</value>
   </data>
   <data name="PasswordPrompt" xml:space="preserve">
-    <value>密码</value>
+    <value>密碼</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>检查您的用户名和密码然后重试</value>
+    <value>請檢查您的使用者名和密碼, 然後重試</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>登录</value>
+    <value>登入</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>是否忘记了您的密码?</value>
+    <value>(忘記密碼？)</value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
-    <value>请检查你的 Internet 连接，然后重试。</value>
+    <value>請檢查您的網路連線，然後再試一次。</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>没有GitHub企业版？</value>
+    <value>沒有 GitHub 企業？ </value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>没有帐户?</value>
+    <value>沒有帳戶？ </value>
   </data>
   <data name="TitleRequired" xml:space="preserve">
-    <value>标题(必须)</value>
+    <value>標題 (必需)</value>
   </data>
   <data name="Description" xml:space="preserve">
     <value>描述</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>将此存储库发布到 GitHub, 并为开源和私有项目获得强大的协作、代码审阅和代码管理。</value>
+    <value>將此存儲庫發佈到 GitHub, 並為開源和私有專案獲得強大的協作、代碼審閱和代碼管理。</value>
   </data>
   <data name="NotAGitHubRepository" xml:space="preserve">
-    <value>此存储库未托管至Github</value>
+    <value>此存儲庫不在 GitHub 上</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>没有存储库</value>
+    <value>無存儲庫</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>我们在这里找不到 git 存储库。打开一个 git 项目或单击项目中的 "文件"-&gt; "添加到源代码管理" 以开始.</value>
+    <value>我們在這裡找不到 git 存儲庫。打開 git 專案或按一下 "檔-&gt; 在專案中添加到原始程式碼管理以開始。</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
-    <value>创建帐户</value>
+    <value>創建帳戶</value>
   </data>
   <data name="filterBranchesText" xml:space="preserve">
-    <value>筛选分支</value>
+    <value>篩選分支</value>
   </data>
   <data name="PublishToGitHubButton" xml:space="preserve">
-    <value>发布到 GitHub</value>
+    <value>發佈到 GitHub</value>
   </data>
   <data name="GetStartedText" xml:space="preserve">
-    <value>入门</value>
+    <value>入門</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>登录</value>
+    <value>登錄</value>
   </data>
   <data name="SignInCallToAction" xml:space="preserve">
-    <value>登录...</value>
+    <value>登錄...</value>
   </data>
   <data name="LocalBranchUpToDate" xml:space="preserve">
-    <value>本地分支最新!</value>
+    <value>本地分支最新</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
-    <value>变更:({0}）</value>
+    <value>變化 ({0})</value>
   </data>
   <data name="ViewChanges" xml:space="preserve">
-    <value>查看变更</value>
+    <value>查看更改</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
-    <value>将比较文件作为默认操作</value>
+    <value>將檔比較為預設操作</value>
   </data>
   <data name="ViewFile" xml:space="preserve">
-    <value>查看文件</value>
+    <value>查看檔</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
-    <value>将打开文件作为默认操作</value>
+    <value>打開檔作為預設操作</value>
   </data>
   <data name="SwitchToListView" xml:space="preserve">
-    <value>切换到列表视图</value>
+    <value>切換到清單視圖</value>
   </data>
   <data name="SwitchToTreeView" xml:space="preserve">
-    <value>切换到树视图</value>
+    <value>切換到樹狀檢視</value>
   </data>
   <data name="UpdatedFormat" xml:space="preserve">
-    <value>已更新“{0}”</value>
+    <value>更新 {0}</value>
   </data>
   <data name="OpenPROnGitHubToolTip" xml:space="preserve">
-    <value>在GitHub上查看拉取请求</value>
-  </data>
-  <data name="prUpdatedText" xml:space="preserve">
-    <value>已更新</value>
-  </data>
-  <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>在编辑器边缘显示PR注释</value>
-  </data>
-  <data name="Options_ExperimentalTitle" xml:space="preserve">
-    <value>实验性功能</value>
-  </data>
-  <data name="Options_ExperimentalNote" xml:space="preserve">
-    <value>我们将在未来的版本中改变此功能。</value>
-  </data>
-  <data name="ViewChangesInSolution" xml:space="preserve">
-    <value>在解决方案中查看更新</value>
-  </data>
-  <data name="OpenFileInSolution" xml:space="preserve">
-    <value>解决方案中打开文件</value>
-  </data>
-  <data name="TokenPrompt" xml:space="preserve">
-    <value>令牌</value>
-  </data>
-  <data name="ContinueYourReview" xml:space="preserve">
-    <value>继续复审</value>
-  </data>
-  <data name="AddYourReview" xml:space="preserve">
-    <value>添加复审</value>
-  </data>
-  <data name="Reviewers" xml:space="preserve">
-    <value>复审人员</value>
-  </data>
-  <data name="AddReviewComment" xml:space="preserve">
-    <value>添加复审注释</value>
-  </data>
-  <data name="AddSingleComment" xml:space="preserve">
-    <value>添加评论</value>
-  </data>
-  <data name="ForkNavigationItemText" xml:space="preserve">
-    <value>Fork</value>
-  </data>
-  <data name="Options_DebuggingTitle" xml:space="preserve">
-    <value>正在调试</value>
-  </data>
-  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
-    <value>启用日志跟踪</value>
-  </data>
-  <data name="UpdateComment" xml:space="preserve">
-    <value>更新注释</value>
-  </data>
-  <data name="BlurbText" xml:space="preserve">
-    <value>让您的开源和私有项目拥有强大的协作、代码审查、以及代码管理。</value>
-  </data>
-  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>这个存储库没有托管至远程。填写表单，将其发布到Github。</value>
-  </data>
-  <data name="loadingFailedMessageContent" xml:space="preserve">
-    <value>部分或全部存储库没有加载，请关闭对话框重试。</value>
-  </data>
-  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>无效主机或不是GitHub企业服务器，请检查地址并重试。</value>
+    <value>查看 GitHub 的請求</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>欢迎使用 GitHub for Visual Studio！ 您可以先看看这里 [培训](show-training) 或[文档](show-docs)?
+    <value>歡迎光臨  GitHub for Visual Studio! 為什麼不看看我們的 [training](顯示-訓練) 或 [documentation](顯示文檔)？
 
-[不再显示](dont-show-again)</value>
+[不再顯示此項](dont-show-again)</value>
+  </data>
+  <data name="prUpdatedText" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>在編輯邊距上顯示 PR 注釋</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>實驗特點</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>這些功能在將來的版本中可能會發生變化</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>查看解決方案中的更改</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>在解決方案中打開檔</value>
+  </data>
+  <data name="TokenPrompt" xml:space="preserve">
+    <value>令 牌</value>
+  </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>繼續您的審閱</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>添加審閱</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>評論家</value>
+  </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>添加審閱注釋</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>添加單個注釋</value>
+  </data>
+  <data name="ForkNavigationItemText" xml:space="preserve">
+    <value>叉</value>
+  </data>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>調試</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>啟用跟蹤日誌記錄</value>
   </data>
   <data name="BlendDialogText" xml:space="preserve">
-    <value>GitHub括在在Blend内部无效</value>
+    <value>GitHub 擴展在Blend中不可用</value>
   </data>
   <data name="Options_ForkButtonLabel" xml:space="preserve">
-    <value>在团队管理中显示【Fork】按钮</value>
+    <value>在 Team Explorer中顯示[Fork]按鈕</value>
+  </data>
+  <data name="UpdateComment" xml:space="preserve">
+    <value>更新注釋</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>取消</value>
   </data>
   <data name="Pending" xml:space="preserve">
-    <value>挂起</value>
+    <value>等待</value>
   </data>
   <data name="StartAReview" xml:space="preserve">
-    <value>开始复审</value>
+    <value>開始審閱</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>您必须提交和推送更改, 才能在此添加注释。</value>
+    <value>您必須提交和推送更改, 才能在此添加注釋。</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
-    <value>上一个评论</value>
+    <value>上一個評論</value>
   </data>
   <data name="NextComment" xml:space="preserve">
-    <value>下一个评论</value>
+    <value>下一篇評論</value>
   </data>
   <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
-    <value>查看、签出或创建拉取请求</value>
+    <value>查看、簽出或創建拉動請求</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>返回</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>Fork存储库</value>
+    <value>分叉庫</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
-    <value>Fork此存储库</value>
+    <value>將存儲庫分叉</value>
   </data>
   <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
-    <value>更新本地存储库的</value>
+    <value> 更新本機存放區庫的</value>
   </data>
   <data name="ToPointTo" xml:space="preserve">
     <value>要指向</value>
   </data>
   <data name="CreatePullRequest" xml:space="preserve">
-    <value>创建拉取请求</value>
+    <value>創建拉動請求</value>
   </data>
   <data name="SignInToGitHub" xml:space="preserve">
-    <value>登录GitHub</value>
+    <value>登錄 GitHub</value>
   </data>
   <data name="Pull" xml:space="preserve">
     <value>拉取</value>
@@ -486,93 +486,93 @@
     <value>同步</value>
   </data>
   <data name="Wrote" xml:space="preserve">
-    <value>已写</value>
+    <value>寫</value>
   </data>
   <data name="SubmitYourReviewFor" xml:space="preserve">
-    <value>提交你的批注</value>
+    <value>提交您的審閱</value>
   </data>
   <data name="YourReviewSummary" xml:space="preserve">
-    <value>你的批注概要</value>
+    <value>您的審閱摘要</value>
   </data>
   <data name="CommentOnly" xml:space="preserve">
-    <value>仅批注</value>
+    <value>僅注釋</value>
   </data>
   <data name="Approve" xml:space="preserve">
     <value>批准</value>
   </data>
   <data name="RequestChanges" xml:space="preserve">
-    <value>请求变更</value>
+    <value>請求更改</value>
   </data>
   <data name="Comments" xml:space="preserve">
-    <value>批注</value>
+    <value>評論</value>
   </data>
   <data name="OutdatedComments" xml:space="preserve">
-    <value>过期批注</value>
+    <value>過時的評論</value>
   </data>
   <data name="CreateNew" xml:space="preserve">
-    <value>创建</value>
+    <value>創建新</value>
   </data>
   <data name="Assignee" xml:space="preserve">
-    <value>分配</value>
+    <value>受</value>
   </data>
   <data name="Author" xml:space="preserve">
     <value>作者</value>
   </data>
   <data name="SignInWithYourBrowser" xml:space="preserve">
-    <value>使用浏览器登录</value>
+    <value>使用瀏覽器登錄</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>打开</value>
+    <value>打開</value>
   </data>
   <data name="FilterByAuthor" xml:space="preserve">
     <value>按作者过滤</value>
   </data>
   <data name="SelectFork" xml:space="preserve">
-    <value>选择Fork</value>
-  </data>
-  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
-    <value>这里没有任何打开的推送请求</value>
-  </data>
-  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
-    <value>通过推送请求告诉其他人关于你推送到一个GitHub存储库的变更</value>
-  </data>
-  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
-    <value>您的搜索没有匹配结果</value>
-  </data>
-  <data name="ToGetStartedYouCan" xml:space="preserve">
-    <value>现在开始你可以</value>
-  </data>
-  <data name="CreateAPullRequest" xml:space="preserve">
-    <value>创建拉取请求</value>
-  </data>
-  <data name="OpenRepositoryAtDir" xml:space="preserve">
-    <value>在“{0}”打开存储库?</value>
-  </data>
-  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
-    <value>目标URL与当前存储库拥有者不同。</value>
-  </data>
-  <data name="NoActiveRepositoryMessage" xml:space="preserve">
-    <value>没有活动的存储库可以导航</value>
-  </data>
-  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>自创建固定链接以来，此文件已更改！</value>
-  </data>
-  <data name="DifferentRepositoryMessage" xml:space="preserve">
-    <value>请打开存储库“{0}”，然后重试！</value>
-  </data>
-  <data name="UnknownLinkTypeMessage" xml:space="preserve">
-    <value>无法从“{0}”打开。目前仅支持链接到存储库文件的URL。</value>
-  </data>
-  <data name="NoGitHubUrlMessage" xml:space="preserve">
-    <value>无法在剪贴板中找到GitHub网址！</value>
-  </data>
-  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
-    <value>无法在当前存储库中找到目标URL。在进行提取后再试一次。</value>
-  </data>
-  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
-    <value>删除注释</value>
+    <value>選擇分叉</value>
   </data>
   <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>您确定要删除此注释吗?</value>
+    <value>確實要刪除此注釋嗎？</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>刪除評論</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>沒有打開的請求</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>請求允許您告訴其他人您已將所做的更改推送到存儲庫上 GitHub</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>沒有與您的搜索匹配的結果。</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>要開始, 您可以</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>創建合併請求</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>在"{0}'打開存儲庫?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>目標 URL 的擁有者與當前存儲庫不同。</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>沒有要導航的活動存儲庫</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>自創建固定連結後, 此檔已更改</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>請打開存儲庫 "{0}"並重試</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>無法打開 "{0}'. 當前只支援連結到存儲庫檔的 url。</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>在剪貼簿中找不到 GitHub 的 URL</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>在當前存儲庫中找不到目標 URL。請在進行回遷後重試。</value>
   </data>
 </root>

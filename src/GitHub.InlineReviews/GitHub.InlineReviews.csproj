@@ -434,21 +434,26 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="VSPackage.en-US.resx" >
-	   <MergeWithCTO>true</MergeWithCTO>
+    <EmbeddedResource Include="VSPackage.en-US.resx">
+      <MergeWithCTO>true</MergeWithCTO>
       <LogicalName>VSPackage.en-US.resources</LogicalName>
       <DependentUpon>VSPackage.resx</DependentUpon>
-	  </EmbeddedResource>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.zh-Hant.resx" >
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.zh-Hant.resources</LogicalName>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+    </EmbeddedResource>
     <None Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </None>
-    <EmbeddedResource Include="VSPackage.zh-Hans.resx" >
-	   <MergeWithCTO>true</MergeWithCTO>
+    <EmbeddedResource Include="VSPackage.zh-Hans.resx">
+      <MergeWithCTO>true</MergeWithCTO>
       <LogicalName>VSPackage.zh-Hans.resources</LogicalName>
       <DependentUpon>VSPackage.resx</DependentUpon>
-	  </EmbeddedResource>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
