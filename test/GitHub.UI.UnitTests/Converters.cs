@@ -9,6 +9,10 @@ using System.Globalization;
 
 public class Converters
 {
+    [TestCase(0, 0, -23, 0, "just now")]
+    [TestCase(-2, 0, 0, 0, "just now")]
+    [TestCase(-1, 0, 0, 0, "just now")]
+    [TestCase(0, 0, 0, 0, "just now")]
     [TestCase(1, 0, 0, 0, "1 second ago")]
     [TestCase(2, 0, 0, 0, "2 seconds ago")]
     [TestCase(59, 0, 0, 0, "59 seconds ago")]
@@ -30,11 +34,11 @@ public class Converters
     [TestCase(0, 0, 0, 365, "1 year ago")]
     [TestCase(0, 0, 0, 365*2-1, "1 year ago")]
     [TestCase(0, 0, 0, 365*2, "2 years ago")]
-    public void TimespanConversion(int sec, int min, int hou, int day, string expected)
+    public void DurationToStringConversion(int sec, int min, int hou, int day, string expected)
     {
         var ts = new TimeSpan(day, hou, min, sec);
         var conv = new DurationToStringConverter();
         var ret = (string)conv.Convert(ts, typeof(string), null, CultureInfo.CurrentCulture);
-        Assert.That(expected, Is.EqualTo(ret));
+        Assert.That(ret, Is.EqualTo(expected));
     }
 }

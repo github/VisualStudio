@@ -34,6 +34,7 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentNavigationCommand"/> class.
         /// </summary>
+        /// <param name="serviceProvider"></param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         /// <param name="commandSet">The GUID of the group the command belongs to.</param>
@@ -74,7 +75,7 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the text buffer position for the specified line.
         /// </summary>
-        /// <param name="parameter">The parameters.</param>
+        /// <param name="textView">The text view containing the buffer</param>
         /// <param name="lineNumber">The 0-based line number.</param>
         /// <returns></returns>
         protected int GetCursorPoint(ITextView textView, int lineNumber)
@@ -217,7 +218,10 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Shows the inline comments for the specified tag in a peek view.
         /// </summary>
-        /// <param name="tag"></param>
+        /// <param name="textView">The text view containing the tag</param>
+        /// <param name="tag">The inline comment tag</param>
+        /// <param name="parameter">The navigation parameter detailing a search from the specified tag</param>
+        /// <param name="allTextViews">The full list of text views</param>
         protected void ShowPeekComments(
             InlineCommentNavigationParams parameter,
             ITextView textView,
