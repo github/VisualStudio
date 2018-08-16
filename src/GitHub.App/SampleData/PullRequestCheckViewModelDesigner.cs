@@ -25,6 +25,8 @@ namespace GitHub.SampleData
 
         public PullRequestCheckType CheckType { get; }
 
+        public int CheckRunId { get; }
+
         public bool HasAnnotations { get; } = true;
     }
 }

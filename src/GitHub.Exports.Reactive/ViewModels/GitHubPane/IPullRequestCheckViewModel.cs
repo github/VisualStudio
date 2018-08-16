@@ -43,10 +43,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// A command that opens the DetailsUrl in a browser
         /// </summary>
-
         ReactiveCommand<object> OpenDetailsUrl { get; }
 
         PullRequestCheckType CheckType { get; }
+
+        int CheckRunId { get; }
 
         bool HasAnnotations { get; }
     }

@@ -95,6 +95,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
+                    pullRequestCheckViewModel.CheckRunId = checkRunModel.DatabaseId;
                     pullRequestCheckViewModel.HasAnnotations = checkRunModel.Annotations?.Any() ?? false;
                     pullRequestCheckViewModel.Title = checkRunModel.Name;
                     pullRequestCheckViewModel.Description = checkRunModel.Summary;
@@ -128,12 +129,14 @@ namespace GitHub.ViewModels.GitHubPane
 
             usageTracker.IncrementCounter(expression).Forget();
         }
-
+        
         public string Title { get; private set; }
 
         public string Description { get; private set; }
 
         public PullRequestCheckType CheckType { get; private set; }
+
+        public int CheckRunId { get; private set; }
 
         public bool HasAnnotations { get; private set; }
 

@@ -38,5 +38,7 @@ namespace GitHub.Models
         /// The summary of a Check Run.
         /// </summary>
         public string Summary { get; set; }
+
+        public int DatabaseId { get; set; }
     }
 }

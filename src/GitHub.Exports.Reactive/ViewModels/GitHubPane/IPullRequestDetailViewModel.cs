@@ -175,6 +175,8 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         ReactiveCommand<object> ShowReview { get; }
 
+        ReactiveCommand<object> ShowAnnotations { get; }
+
         /// <summary>
         /// Gets the latest pull request Checks & Statuses
         /// </summary>

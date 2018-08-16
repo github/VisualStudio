@@ -221,6 +221,7 @@
     <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
     <Compile Include="SampleData\GitServiceDesigner.cs" />
     <Compile Include="SampleData\ForkRepositorySwitchViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestAnnotationsViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestListItemViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
@@ -260,6 +261,7 @@
     <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />
     <Compile Include="SampleData\PullRequestCheckViewModelDesigner.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestAnnotationsViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListViewModel.cs" />

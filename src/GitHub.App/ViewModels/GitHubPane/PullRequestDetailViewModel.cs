@@ -127,8 +127,10 @@ namespace GitHub.ViewModels.GitHubPane
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
-        
+
             ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
+
+            ShowAnnotations = ReactiveCommand.Create().OnExecuteCompleted(DoShowAnnotations);
         }
 
         private void DoOpenDetailsUrl(object obj)
@@ -314,6 +316,8 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that navigates to a pull request review.
         /// </summary>
         public ReactiveCommand<object> ShowReview { get; }
+
+        public ReactiveCommand<object> ShowAnnotations { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks
         {
@@ -653,6 +657,12 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/reviews/{review.User.Login}"));
             }
+        }
+
+        void DoShowAnnotations(object item)
+        {
+            var checkView = (PullRequestCheckViewModel)item;
+            NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/checkruns/{checkView.CheckRunId}"));
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
