@@ -1,10 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using Octokit;
 
@@ -27,7 +25,7 @@ namespace GitHub.Services
             get { return cloneService.DefaultClonePath; }
         }
 
-        public IObservable<Unit> CreateRepository(
+        public IObservable<ILocalRepositoryModel> CreateRepository(
             NewRepository newRepository,
             IAccount account,
             string directory,
@@ -36,8 +34,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(directory, nameof(directory));
 
             return apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                .Select(repository => cloneService.CloneRepository(repository.CloneUrl, repository.Name, directory))
-                .SelectUnit();
+                .SelectMany(repository => cloneService.CloneRepository(repository.CloneUrl, repository.Name, directory));
         }
     }
 }

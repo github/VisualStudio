@@ -25,7 +25,7 @@ namespace GitHub.Services
         /// </param>
         /// <param name="apiClient">The API client associated with the host where this repository is created.</param>
         /// <returns></returns>
-        IObservable<Unit> CreateRepository(
+        IObservable<ILocalRepositoryModel> CreateRepository(
             Octokit.NewRepository newRepository,
             IAccount account,
             string directory,

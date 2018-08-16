@@ -9,7 +9,8 @@ using Microsoft.VisualStudio.Shell;
 using Serilog;
 using Rothko;
 using GitHub.Helpers;
-using Task = System.Threading.Tasks.Task;
+using System.Threading.Tasks;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -26,16 +27,19 @@ namespace GitHub.Services
 
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
+        readonly IGitService gitService;
         readonly IVSGitServices vsGitServices;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public RepositoryCloneService(
             IOperatingSystem operatingSystem,
+            IGitService gitService,
             IVSGitServices vsGitServices,
             IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
+            this.gitService = gitService;
             this.vsGitServices = vsGitServices;
             this.usageTracker = usageTracker;
 
@@ -43,7 +47,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task CloneRepository(
+        public async Task<ILocalRepositoryModel> CloneRepository(
             string cloneUrl,
             string repositoryName,
             string repositoryPath,
@@ -65,6 +69,7 @@ namespace GitHub.Services
             {
                 await vsGitServices.Clone(cloneUrl, path, true, progress);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
+                return new LocalRepositoryModel(path, gitService);
             }
             catch (Exception ex)
             {

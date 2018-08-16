@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Threading.Tasks;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -27,7 +28,7 @@ namespace GitHub.Services
         /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
         /// </param>
         /// <returns></returns>
-        Task CloneRepository(
+        Task<ILocalRepositoryModel> CloneRepository(
             string cloneUrl,
             string repositoryName,
             string repositoryPath,

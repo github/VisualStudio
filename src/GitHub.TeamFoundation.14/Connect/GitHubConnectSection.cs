@@ -36,9 +36,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly int sectionIndex;
         readonly ILocalRepositories localRepositories;
         readonly IUsageTracker usageTracker;
-
-        bool isCloning;
-        bool isCreating;
         GitHubConnectSectionState settings;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
@@ -141,14 +138,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 try
                 {
-                    isCloning = true;
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
-                    await cloneService.CloneRepository(
+                    var repo = await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
                         result.Repository.Name,
                         result.BasePath);
-
+                    await HandleClonedRepo(repo);
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
                 catch (Exception e)
@@ -252,30 +248,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 settings.IsExpanded = IsExpanded;
         }
 
-        async void UpdateRepositoryList(object sender, NotifyCollectionChangedEventArgs e)
+        void UpdateRepositoryList(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                // if we're cloning or creating, only one repo will be added to the list
-                // so we can handle just one new entry separately
-                if (isCloning || isCreating)
+                e.NewItems
+                    .Cast<ILocalRepositoryModel>()
+                    .ForEach(async r =>
                 {
-                    var newrepo = e.NewItems.Cast<ILocalRepositoryModel>().First();
-
-                    SelectedRepository = newrepo;
-                    if (isCreating)
-                        HandleCreatedRepo(newrepo).Forget();
-                    else
-                        HandleClonedRepo(newrepo).Forget();
-
-                    isCreating = isCloning = false;
+                    if (Equals(Holder.ActiveRepo, r))
+                        SelectedRepository = r;
 
                     try
                     {
                         // TODO: Cache the icon state.
-                        var api = await ApiFactory.Create(newrepo.CloneUrl);
+                        var api = await ApiFactory.Create(r.CloneUrl);
                         var repo = await api.GetRepository();
-                        newrepo.SetIcon(repo.Private, repo.Fork);
+                        r.SetIcon(repo.Private, repo.Fork);
                     }
                     catch (Exception ex)
                     {
@@ -284,33 +273,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         // profile, or their permissions have changed remotely)
                         log.Error(ex, "Error updating repository list");
                     }
-                }
-                // looks like it's just a refresh with new stuff on the list, update the icons
-                else
-                {
-                    e.NewItems
-                        .Cast<ILocalRepositoryModel>()
-                        .ForEach(async r =>
-                    {
-                        if (Equals(Holder.ActiveRepo, r))
-                            SelectedRepository = r;
-
-                        try
-                        {
-                            // TODO: Cache the icon state.
-                            var api = await ApiFactory.Create(r.CloneUrl);
-                            var repo = await api.GetRepository();
-                            r.SetIcon(repo.Private, repo.Fork);
-                        }
-                        catch (Exception ex)
-                        {
-                            // GetRepository() may throw if the user doesn't have permissions to access the repo
-                            // (because the repo no longer exists, or because the user has logged in on a different
-                            // profile, or their permissions have changed remotely)
-                            log.Error(ex, "Error updating repository list");
-                        }
-                    });
-                }
+                });
             }
         }
 
@@ -400,18 +363,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 try
                 {
-                    isCreating = true;
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var createService = ServiceProvider.GetService<IRepositoryCreationService>();
                     var apiClientFactory = ServiceProvider.GetService<IApiClientFactory>();
                     var apiClient = await apiClientFactory.Create(SectionConnection.HostAddress);
-
-                    await createService.CreateRepository(
+                    var repo = await createService.CreateRepository(
                         result.NewRepository,
                         result.Account,
                         result.BaseRepositoryPath,
                         apiClient);
-
+                    await HandleCreatedRepo(repo);
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
                 catch (Exception e)
