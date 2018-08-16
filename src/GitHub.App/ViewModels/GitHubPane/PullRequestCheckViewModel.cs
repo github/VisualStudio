@@ -23,10 +23,10 @@ namespace GitHub.ViewModels.GitHubPane
 
         public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
-            var statuses = pullRequest.Statuses?.Select(model =>
+            var statuses = pullRequest.Statuses?.Select(statusModel =>
             {
                 PullRequestCheckStatus checkStatus;
-                switch (model.State)
+                switch (statusModel.State)
                 {
                     case StatusState.Expected:
                     case StatusState.Error:
@@ -45,23 +45,23 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var pullRequestCheckViewModel = (PullRequestCheckViewModel) viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                 pullRequestCheckViewModel.CheckType = PullRequestCheckType.StatusApi;
-                pullRequestCheckViewModel.Title = model.Context;
-                pullRequestCheckViewModel.Description = model.Description;
+                pullRequestCheckViewModel.Title = statusModel.Context;
+                pullRequestCheckViewModel.Description = statusModel.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
-                pullRequestCheckViewModel.DetailsUrl = new Uri(model.TargetUrl);
-                pullRequestCheckViewModel.AvatarUrl = model.AvatarUrl ?? DefaultAvatar;
-                pullRequestCheckViewModel.Avatar = model.AvatarUrl != null
-                    ? new BitmapImage(new Uri(model.AvatarUrl))
+                pullRequestCheckViewModel.DetailsUrl = new Uri(statusModel.TargetUrl);
+                pullRequestCheckViewModel.AvatarUrl = statusModel.AvatarUrl ?? DefaultAvatar;
+                pullRequestCheckViewModel.Avatar = statusModel.AvatarUrl != null
+                    ? new BitmapImage(new Uri(statusModel.AvatarUrl))
                     : AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                 return pullRequestCheckViewModel;
             }) ?? new PullRequestCheckViewModel[0];
 
-            var checks = pullRequest.CheckSuites?.SelectMany(model => model.CheckRuns)
-                .Select(model =>
+            var checks = pullRequest.CheckSuites?.SelectMany(checkSuiteModel => checkSuiteModel.CheckRuns)
+                .Select(checkRunModel =>
                 {
                     PullRequestCheckStatus checkStatus;
-                    switch (model.Status)
+                    switch (checkRunModel.Status)
                     {
                         case CheckStatusState.Requested:
                         case CheckStatusState.Queued:
@@ -70,7 +70,7 @@ namespace GitHub.ViewModels.GitHubPane
                             break;
 
                         case CheckStatusState.Completed:
-                            switch (model.Conclusion)
+                            switch (checkRunModel.Conclusion)
                             {
                                 case CheckConclusionState.Success:
                                     checkStatus = PullRequestCheckStatus.Success;
@@ -95,10 +95,11 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
-                    pullRequestCheckViewModel.Title = model.Name;
-                    pullRequestCheckViewModel.Description = model.Summary;
+                    pullRequestCheckViewModel.HasAnnotations = checkRunModel.Annotations?.Any() ?? false;
+                    pullRequestCheckViewModel.Title = checkRunModel.Name;
+                    pullRequestCheckViewModel.Description = checkRunModel.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
-                    pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
+                    pullRequestCheckViewModel.DetailsUrl = new Uri(checkRunModel.DetailsUrl);
 
                     return pullRequestCheckViewModel;
                 }) ?? new PullRequestCheckViewModel[0];
@@ -133,6 +134,8 @@ namespace GitHub.ViewModels.GitHubPane
         public string Description { get; private set; }
 
         public PullRequestCheckType CheckType { get; private set; }
+
+        public bool HasAnnotations { get; private set; }
 
         public PullRequestCheckStatus Status{ get; private set; }
 

@@ -8,7 +8,9 @@ namespace GitHub.Models
     /// </summary>
     public class CheckRunModel
     {
-        /// <summary>The conclusion of the check run.</summary>
+        /// <summary>
+        /// The conclusion of the check run.
+        /// </summary>
         public CheckConclusionState? Conclusion { get; set; }
 
         /// <summary>

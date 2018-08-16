@@ -186,6 +186,7 @@
     <Compile Include="Models\ILocalRepositoryModelFactory.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
     <Compile Include="Models\Page.cs" />
+    <Compile Include="Models\PullRequestCheckType.cs" />
     <Compile Include="Models\PullRequestFileModel.cs" />
     <Compile Include="Models\PullRequestDetailModel.cs" />
     <Compile Include="Models\PullRequestListItemModel.cs" />

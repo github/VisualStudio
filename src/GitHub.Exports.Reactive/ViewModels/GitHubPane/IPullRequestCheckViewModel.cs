@@ -45,6 +45,10 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
 
         ReactiveCommand<object> OpenDetailsUrl { get; }
+
+        PullRequestCheckType CheckType { get; }
+
+        bool HasAnnotations { get; }
     }
 
     public enum PullRequestCheckStatus

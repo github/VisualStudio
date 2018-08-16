@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Media.Imaging;
+using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -21,5 +22,9 @@ namespace GitHub.SampleData
         public BitmapImage Avatar { get; set; } = null;
 
         public ReactiveCommand<object> OpenDetailsUrl { get; set; } = null;
+
+        public PullRequestCheckType CheckType { get; }
+
+        public bool HasAnnotations { get; }
     }
 }
