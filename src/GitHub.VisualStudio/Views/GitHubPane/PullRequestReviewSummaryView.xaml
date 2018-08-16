@@ -16,7 +16,7 @@
              Name="root">
 
     <d:DesignData.DataContext>
-        <vm:PullRequestReviewSummaryViewModel Id="1" State="Pending" FileCommentCount="2">
+        <vm:PullRequestReviewSummaryViewModel Id="1" State="Commented" FileCommentCount="2">
             <vm:PullRequestReviewSummaryViewModel.User>
                 <ghfvs:ActorViewModel Login="meaghanlewis"/>
             </vm:PullRequestReviewSummaryViewModel.User>
