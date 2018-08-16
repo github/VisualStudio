@@ -29,6 +29,7 @@
             <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnTwo" />
             <ColumnDefinition Width="*"/>
             <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFour" />
+            <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFive" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -46,6 +47,9 @@
             <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
         -->
         <Label Grid.Column="3" HorizontalAlignment="Right">
+            <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 0 0" Icon="file_code" Foreground="Black" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
+        </Label>
+        <Label Grid.Column="4" HorizontalAlignment="Right">
             <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>
     </Grid>
