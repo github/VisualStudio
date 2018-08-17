@@ -104,7 +104,7 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             return pullRequest.CheckSuites
-                .SelectMany(checkSuite => checkSuite.CheckRuns)
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns)
                 .SelectMany(checkRun =>
                     checkRun.Annotations
                         .Where(model => model.Filename == relativePath)
