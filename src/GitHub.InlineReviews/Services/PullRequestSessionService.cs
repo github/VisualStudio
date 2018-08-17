@@ -794,14 +794,12 @@ namespace GitHub.InlineReviews.Services
                                                 Annotations = run.Annotations(null, null, null, null).AllPages()
                                                     .Select(annotation => new CheckRunAnnotationModel
                                                     {
-                                                        BlobUrl = annotation.BlobUrl,
+                                                        Title = annotation.Title,
+                                                        Message = annotation.Message,
+                                                        Filename = annotation.Path,
+                                                        AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
                                                         StartLine = annotation.Location.Start.Line,
                                                         EndLine = annotation.Location.End.Line,
-                                                        Filename = annotation.Path,
-                                                        Message = annotation.Message,
-                                                        Title = annotation.Title,
-                                                        AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
-                                                        RawDetails = annotation.RawDetails
                                                     }).ToList()
                                             }).ToList()
                                     }).ToList(),

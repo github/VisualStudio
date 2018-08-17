@@ -256,6 +256,7 @@
     <Compile Include="ViewModels\Dialog\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PagedDialogViewModelBase.cs" />
     <Compile Include="ViewModels\Dialog\RepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestAnnotationItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IssueListViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\LoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />

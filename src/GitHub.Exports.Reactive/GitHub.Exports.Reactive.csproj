@@ -201,6 +201,7 @@
     <Compile Include="ViewModels\Dialog\IRepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IRepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\Dialog\IRepositoryRecloneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestAnnotationItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IIssueListItemViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\IIssueListViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />

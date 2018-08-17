@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -25,6 +27,10 @@ namespace GitHub.ViewModels.GitHubPane
         int PullRequestNumber { get; }
 
         int CheckRunId { get; }
+        ReactiveCommand<object> NavigateToPullRequest { get; }
+        string PullRequestTitle { get; }
+        string CheckRunName { get; }
+        IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; }
 
         Task InitializeAsync(
             ILocalRepositoryModel localRepository,
