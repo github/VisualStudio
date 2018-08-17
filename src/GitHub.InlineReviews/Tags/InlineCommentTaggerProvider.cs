@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
-    /// Factory class for <see cref="InlineCommentTagger"/>s.
+    /// Factory class for <see cref="InlineTagger"/>s.
     /// </summary>
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
@@ -32,7 +32,7 @@ namespace GitHub.InlineReviews.Tags
         public ITagger<T> CreateTagger<T>(ITextView view, ITextBuffer buffer) where T : ITag
         {
             return buffer.Properties.GetOrCreateSingletonProperty(() =>
-                new InlineCommentTagger(
+                new InlineTagger(
                     view,
                     buffer,
                     sessionManager)) as ITagger<T>;

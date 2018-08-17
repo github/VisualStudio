@@ -111,7 +111,7 @@ namespace GitHub.InlineReviews.Models
             {
                 var lines = (inlineAnnotations ?? Enumerable.Empty<IInlineAnnotationModel>())?
                     .Concat(value ?? Enumerable.Empty<IInlineAnnotationModel>())
-                    .Select(x => Tuple.Create(x.Annotation.StartLine, DiffSide.Right))
+                    .Select(x => Tuple.Create(x.StartLine, DiffSide.Right))
                     .Where(x => x.Item1 >= 0)
                     .Distinct()
                     .ToList();

@@ -5,14 +5,8 @@
     /// </summary>
     public interface IInlineAnnotationModel
     {
-        /// <summary>
-        /// Gets the associated check run
-        /// </summary>
-        CheckRunModel CheckRun { get; }
-
-        /// <summary>
-        /// Gets the annotation
-        /// </summary>
-        CheckRunAnnotationModel Annotation { get; }
+        int StartLine { get; }
+        int EndLine { get; }
+        CheckAnnotationLevel AnnotationLevel { get; }
     }
 }

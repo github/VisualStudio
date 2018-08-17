@@ -10,22 +10,16 @@ namespace GitHub.InlineReviews.Tags
     /// </summary>
     /// <seealso cref="AddInlineCommentTag"/>
     /// <seealso cref="ShowInlineCommentTag"/>
-    public abstract class InlineCommentTag : ITag
+    public abstract class InlineCommentTag : InlineTagBase
     {
         protected InlineCommentTag(
             IPullRequestSession session,
             int lineNumber,
-            DiffChangeType diffChangeType)
+            DiffChangeType diffChangeType): base(session, lineNumber)
         {
-            Guard.ArgumentNotNull(session, nameof(session));
-
-            LineNumber = lineNumber;
-            Session = session;
             DiffChangeType = diffChangeType;
         }
 
-        public int LineNumber { get; }
-        public IPullRequestSession Session { get; }
         public DiffChangeType DiffChangeType { get; }
     }
 }

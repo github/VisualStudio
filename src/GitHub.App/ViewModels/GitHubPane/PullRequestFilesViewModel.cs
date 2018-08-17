@@ -127,9 +127,7 @@ namespace GitHub.ViewModels.GitHubPane
                         subscriptions.Add(file.WhenAnyValue(x => x.InlineAnnotations)
                             .Subscribe(x =>
                             {
-                                var count = x.Count(model =>
-                                    model.Annotation.AnnotationLevel.HasValue && model.Annotation.AnnotationLevel ==
-                                    CheckAnnotationLevel.Failure);
+                                var count = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
 
                                 node.AnnotationErrorCount = count;
                                 node.AnnotationWarningCount = x.Count - count;

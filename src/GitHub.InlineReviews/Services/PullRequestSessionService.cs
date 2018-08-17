@@ -107,9 +107,9 @@ namespace GitHub.InlineReviews.Services
                 ?.SelectMany(checkSuite => checkSuite.CheckRuns)
                 .SelectMany(checkRun =>
                     checkRun.Annotations
-                        .Where(model => model.Filename == relativePath)
+                        .Where(annotation => annotation.Filename == relativePath && annotation.AnnotationLevel.HasValue)
                         .Select(annotation => new InlineAnnotationModel(checkRun, annotation)))
-                .OrderBy(tuple => tuple.Annotation.StartLine)
+                .OrderBy(tuple => tuple.StartLine)
                 .ToArray();
         }
 

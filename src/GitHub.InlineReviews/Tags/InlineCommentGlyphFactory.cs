@@ -7,6 +7,7 @@ using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using GitHub.InlineReviews.Services;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -45,21 +46,34 @@ namespace GitHub.InlineReviews.Tags
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
-        static UserControl CreateGlyph(InlineCommentTag tag)
+        static UserControl CreateGlyph(InlineTagBase tag)
         {
-            var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineCommentTag;
-
-            if (addTag != null)
+            if (tag is AddInlineCommentTag addCommentTag)
             {
                 return new AddInlineCommentGlyph();
             }
-            else if (showTag != null)
+
+            if (tag is ShowInlineCommentTag showCommentTag)
             {
                 return new ShowInlineCommentGlyph()
                 {
-                    Opacity = showTag.Thread.IsStale ? 0.5 : 1,
+                    Opacity = showCommentTag.Thread.IsStale ? 0.5 : 1,
                 };
+            }
+
+            if (tag is ShowInlineAnnotationTag showAnnotation)
+            {
+                switch (showAnnotation.Annotation.AnnotationLevel)
+                {
+                    case CheckAnnotationLevel.Failure:
+                        return new ShowInlineAnnotationFailureGlyph();
+                    case CheckAnnotationLevel.Notice:
+                       return new ShowInlineAnnotationNoticeGlyph();
+                    case CheckAnnotationLevel.Warning:
+                        return new ShowInlineAnnotationWarningGlyph();
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
