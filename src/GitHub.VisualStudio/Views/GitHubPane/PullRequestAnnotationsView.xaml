@@ -53,10 +53,10 @@
                                       IsExpanded="{Binding IsExpanded, Mode=OneTime}">
                                     <Expander.Header>
                                         <StackPanel Orientation="Horizontal">
+                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
                                             <TextBlock FontWeight="SemiBold" Margin="2 0">
-                                                <ghfvs:OcticonImage Margin="0 0 4 0" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-                                                <ghfvs:OcticonImage Margin="0 0 4 0" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
-                                                <ghfvs:OcticonImage Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
                                                 <Run Text="{Binding Model.Title, Mode=OneWay}"/>
                                             </TextBlock>
                                         </StackPanel>
