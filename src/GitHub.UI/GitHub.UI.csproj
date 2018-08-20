@@ -255,9 +255,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controls\Octicons\OcticonPaths.en-US.resx"  >
-	    <DependentUpon>Controls\Octicons\OcticonPaths.resx</DependentUpon>
-		</EmbeddedResource>
     <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
