@@ -48,7 +48,7 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.Title = statusModel.Context;
                 pullRequestCheckViewModel.Description = statusModel.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
-                pullRequestCheckViewModel.DetailsUrl = new Uri(statusModel.TargetUrl);
+                pullRequestCheckViewModel.DetailsUrl = statusModel.TargetUrl != null ? new Uri(statusModel.TargetUrl) : null;
                 pullRequestCheckViewModel.AvatarUrl = statusModel.AvatarUrl ?? DefaultAvatar;
                 pullRequestCheckViewModel.Avatar = statusModel.AvatarUrl != null
                     ? new BitmapImage(new Uri(statusModel.AvatarUrl))
