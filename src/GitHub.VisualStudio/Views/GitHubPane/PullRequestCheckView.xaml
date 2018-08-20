@@ -45,8 +45,9 @@
         <!--
             <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
         -->
-        <Label Grid.Column="3" HorizontalAlignment="Right">
-            <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
+        <Label Grid.Column="3" HorizontalAlignment="Right"
+               Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+            <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>
     </Grid>
 </local:GenericPullRequestCheckView>
