@@ -214,7 +214,7 @@ namespace GitHub.Services
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
 
-                var checkRuns = item.LastCommit?.CheckSuites.SelectMany(model => model.CheckRuns).ToArray();
+                var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
 
                 var hasCheckRuns = checkRuns?.Any() ?? false;
                 var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
