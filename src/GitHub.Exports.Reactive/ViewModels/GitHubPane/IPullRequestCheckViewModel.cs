@@ -31,16 +31,6 @@ namespace GitHub.ViewModels.GitHubPane
         Uri DetailsUrl { get; }
 
         /// <summary>
-        /// The AvatarUrl of the Status/Check application
-        /// </summary>
-        string AvatarUrl { get; }
-
-        /// <summary>
-        /// The BitmapImage of the AvatarUrl
-        /// </summary>
-        BitmapImage Avatar { get; }
-
-        /// <summary>
         /// A command that opens the DetailsUrl in a browser
         /// </summary>
         ReactiveCommand<object> OpenDetailsUrl { get; }

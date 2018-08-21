@@ -48,11 +48,7 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.Title = statusModel.Context;
                 pullRequestCheckViewModel.Description = statusModel.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
-                pullRequestCheckViewModel.DetailsUrl = statusModel.TargetUrl != null ? new Uri(statusModel.TargetUrl) : null;
-                pullRequestCheckViewModel.AvatarUrl = statusModel.AvatarUrl ?? DefaultAvatar;
-                pullRequestCheckViewModel.Avatar = statusModel.AvatarUrl != null
-                    ? new BitmapImage(new Uri(statusModel.AvatarUrl))
-                    : AvatarProvider.CreateBitmapImage(DefaultAvatar);
+                pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(statusModel.TargetUrl) ? new Uri(statusModel.TargetUrl) : null;
 
                 return pullRequestCheckViewModel;
             }) ?? new PullRequestCheckViewModel[0];
@@ -143,10 +139,6 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestCheckStatus Status{ get; private set; }
 
         public Uri DetailsUrl { get; private set; }
-
-        public string AvatarUrl { get; private set; }
-
-        public BitmapImage Avatar { get; private set; }
 
         public ReactiveCommand<object> OpenDetailsUrl { get; }
     }

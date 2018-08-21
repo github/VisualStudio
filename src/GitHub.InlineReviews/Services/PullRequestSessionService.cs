@@ -49,6 +49,7 @@ namespace GitHub.InlineReviews.Services
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
         static ICompiledQuery<PullRequestDetailModel> readPullRequest;
         static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCommitStatuses;
+        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCommitStatusesEnterprise;
         static ICompiledQuery<ActorModel> readViewer;
 
         readonly IGitService gitService;
@@ -770,74 +771,82 @@ namespace GitHub.InlineReviews.Services
 
         async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
         {
-            if (readCommitStatuses == null)
+            ICompiledQuery<IEnumerable<LastCommitAdapter>> query;
+            if (address.IsGitHubDotCom())
             {
-                if(address.IsGitHubDotCom())
+                if (readCommitStatuses == null)
                 {
                     readCommitStatuses = new Query()
-                        .Repository(Var(nameof(owner)), Var(nameof(name)))
-                        .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
-                            commit => new LastCommitAdapter
-                            {
-                                CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-                                    .Select(suite => new CheckSuiteModel
-                                    {
-                                        CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
-                                            .Select(run => new CheckRunModel
-                                            {
-                                                DatabaseId = run.DatabaseId.Value,
-                                                Conclusion = run.Conclusion.FromGraphQl(),
-                                                Status = run.Status.FromGraphQl(),
-                                                Name = run.Name,
-                                                DetailsUrl = run.Permalink,
-                                                Summary = run.Summary,
-                                                Annotations = run.Annotations(null, null, null, null).AllPages()
-                                                    .Select(annotation => new CheckRunAnnotationModel
-                                                    {
-                                                        Title = annotation.Title,
-                                                        Message = annotation.Message,
-                                                        Filename = annotation.Path,
-                                                        AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
-                                                        StartLine = annotation.Location.Start.Line,
-                                                        EndLine = annotation.Location.End.Line,
-                                                    }).ToList()
-                                            }).ToList()
-                                    }).ToList(),
-                                Statuses = commit.Commit.Status
-                                    .Select(context =>
-                                        context.Contexts.Select(statusContext => new StatusModel
-                                        {
-                                            State = statusContext.State.FromGraphQl(),
-                                            Context = statusContext.Context,
-                                            TargetUrl = statusContext.TargetUrl,
-                                            Description = statusContext.Description,
-                                            AvatarUrl = statusContext.Creator.AvatarUrl(null)
-                                        }).ToList()
-                                    ).SingleOrDefault()
-                            }
-                        ).Compile();
+                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                              commit => new LastCommitAdapter
+                              {
+                                  CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                      .Select(suite => new CheckSuiteModel
+                                      {
+                                          CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                              .Select(run => new CheckRunModel
+                                              {
+                                                  DatabaseId = run.DatabaseId.Value,
+                                                  Conclusion = run.Conclusion.FromGraphQl(),
+                                                  Status = run.Status.FromGraphQl(),
+                                                  Name = run.Name,
+                                                  DetailsUrl = run.Permalink,
+                                                  Summary = run.Summary,
+                                                  Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                      .Select(annotation => new CheckRunAnnotationModel
+                                                      {
+                                                          Title = annotation.Title,
+                                                          Message = annotation.Message,
+                                                          Filename = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
+                                                          StartLine = annotation.Location.Start.Line,
+                                                          EndLine = annotation.Location.End.Line,
+                                                      }).ToList()
+                                              }).ToList()
+                                      }).ToList(),
+                                  Statuses = commit.Commit.Status
+                                      .Select(context =>
+                                          context.Contexts.Select(statusContext => new StatusModel
+                                          {
+                                              State = statusContext.State.FromGraphQl(),
+                                              Context = statusContext.Context,
+                                              TargetUrl = statusContext.TargetUrl,
+                                              Description = statusContext.Description,
+                                              AvatarUrl = statusContext.Creator.AvatarUrl(null)
+                                          }).ToList()
+                                      ).SingleOrDefault()
+                              }
+                          ).Compile();
                 }
-                else
+
+                query = readCommitStatuses;
+            }
+            else
+            {
+                if (readCommitStatusesEnterprise == null)
                 {
-                    readCommitStatuses = new Query()
-                       .Repository(Var(nameof(owner)), Var(nameof(name)))
-                       .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
-                           commit => new LastCommitAdapter
-                           {
-                               Statuses = commit.Commit.Status
-                                   .Select(context =>
-                                       context.Contexts.Select(statusContext => new StatusModel
-                                       {
-                                           State = statusContext.State.FromGraphQl(),
-                                           Context = statusContext.Context,
-                                           TargetUrl = statusContext.TargetUrl,
-                                           Description = statusContext.Description,
-                                           AvatarUrl = statusContext.Creator.AvatarUrl(null)
-                                       }).ToList()
-                                   ).SingleOrDefault()
-                           }
-                       ).Compile();
+                    readCommitStatusesEnterprise = new Query()
+                     .Repository(Var(nameof(owner)), Var(nameof(name)))
+                     .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                         commit => new LastCommitAdapter
+                         {
+                             Statuses = commit.Commit.Status
+                                 .Select(context =>
+                                     context.Contexts.Select(statusContext => new StatusModel
+                                     {
+                                         State = statusContext.State.FromGraphQl(),
+                                         Context = statusContext.Context,
+                                         TargetUrl = statusContext.TargetUrl,
+                                         Description = statusContext.Description,
+                                         AvatarUrl = statusContext.Creator.AvatarUrl(null)
+                                     }).ToList()
+                                 ).SingleOrDefault()
+                         }
+                     ).Compile();
                 }
+
+                query = readCommitStatusesEnterprise;
             }
 
             var vars = new Dictionary<string, object>
@@ -848,7 +857,7 @@ namespace GitHub.InlineReviews.Services
             };
 
             var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(readCommitStatuses, vars);
+            var result = await connection.Run(query, vars);
             return result.First();
         }
 
