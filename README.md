@@ -85,6 +85,10 @@ To build and install a `Release` configuration VSIX:
 build.cmd Release
 install.cmd Release
 ```
+## Logs
+Logs can be viewed at the following location:
+
+`%LOCALAPPDATA%\GitHubVisualStudio\extension.log`
 
 ## More information
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
