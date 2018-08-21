@@ -813,7 +813,6 @@ namespace GitHub.InlineReviews.Services
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
                                               Description = statusContext.Description,
-                                              AvatarUrl = statusContext.Creator.AvatarUrl(null)
                                           }).ToList()
                                       ).SingleOrDefault()
                               }
@@ -839,7 +838,6 @@ namespace GitHub.InlineReviews.Services
                                          Context = statusContext.Context,
                                          TargetUrl = statusContext.TargetUrl,
                                          Description = statusContext.Description,
-                                         AvatarUrl = statusContext.Creator.AvatarUrl(null)
                                      }).ToList()
                                  ).SingleOrDefault()
                          }
