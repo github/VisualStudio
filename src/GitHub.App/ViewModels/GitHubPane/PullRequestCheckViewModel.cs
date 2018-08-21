@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
@@ -22,7 +23,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
-            return pullRequest.Statuses?.Select(model =>
+            var statuses = pullRequest.Statuses?.Select(model =>
             {
                 PullRequestCheckStatus checkStatus;
                 switch (model.State)
@@ -43,18 +44,62 @@ namespace GitHub.ViewModels.GitHubPane
                 }
 
                 var pullRequestCheckViewModel = (PullRequestCheckViewModel) viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                pullRequestCheckViewModel.CheckType = PullRequestCheckType.StatusApi;
                 pullRequestCheckViewModel.Title = model.Context;
                 pullRequestCheckViewModel.Description = model.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
-                pullRequestCheckViewModel.DetailsUrl = new Uri(model.TargetUrl);
-                pullRequestCheckViewModel.AvatarUrl = model.AvatarUrl ?? DefaultAvatar;
-                pullRequestCheckViewModel.Avatar = model.AvatarUrl != null
-                    ? new BitmapImage(new Uri(model.AvatarUrl))
-                    : AvatarProvider.CreateBitmapImage(DefaultAvatar);
+                pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(model.TargetUrl) ? new Uri(model.TargetUrl) : null;
 
                 return pullRequestCheckViewModel;
-
             }) ?? new PullRequestCheckViewModel[0];
+
+            var checks = pullRequest.CheckSuites?.SelectMany(model => model.CheckRuns)
+                .Select(model =>
+                {
+                    PullRequestCheckStatus checkStatus;
+                    switch (model.Status)
+                    {
+                        case CheckStatusState.Requested:
+                        case CheckStatusState.Queued:
+                        case CheckStatusState.InProgress:
+                            checkStatus = PullRequestCheckStatus.Pending;
+                            break;
+
+                        case CheckStatusState.Completed:
+                            switch (model.Conclusion)
+                            {
+                                case CheckConclusionState.Success:
+                                    checkStatus = PullRequestCheckStatus.Success;
+                                    break;
+
+                                case CheckConclusionState.ActionRequired:
+                                case CheckConclusionState.TimedOut:
+                                case CheckConclusionState.Cancelled:
+                                case CheckConclusionState.Failure:
+                                case CheckConclusionState.Neutral:
+                                    checkStatus = PullRequestCheckStatus.Failure;
+                                    break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
+                    pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
+                    pullRequestCheckViewModel.Title = model.Name;
+                    pullRequestCheckViewModel.Description = model.Summary;
+                    pullRequestCheckViewModel.Status = checkStatus;
+                    pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
+
+                    return pullRequestCheckViewModel;
+                }) ?? new PullRequestCheckViewModel[0];
+
+            return statuses.Concat(checks).OrderBy(model => model.Title);
         }
 
         [ImportingConstructor]
@@ -66,20 +111,28 @@ namespace GitHub.ViewModels.GitHubPane
 
         private void DoOpenDetailsUrl(object obj)
         {
-            usageTracker.IncrementCounter(x => x.NumberOfPRCheckStatusesOpenInGitHub).Forget();
+            Expression<Func<UsageModel.MeasuresModel, int>> expression;
+            if (CheckType == PullRequestCheckType.StatusApi)
+            {
+                expression = x => x.NumberOfPRStatusesOpenInGitHub;
+            }
+            else
+            {
+                expression = x => x.NumberOfPRChecksOpenInGitHub;
+            }
+
+            usageTracker.IncrementCounter(expression).Forget();
         }
 
         public string Title { get; private set; }
 
         public string Description { get; private set; }
 
+        public PullRequestCheckType CheckType { get; private set; }
+
         public PullRequestCheckStatus Status{ get; private set; }
 
         public Uri DetailsUrl { get; private set; }
-
-        public string AvatarUrl { get; private set; }
-
-        public BitmapImage Avatar { get; private set; }
 
         public ReactiveCommand<object> OpenDetailsUrl { get; }
     }
