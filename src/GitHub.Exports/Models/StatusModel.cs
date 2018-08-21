@@ -24,10 +24,5 @@
         /// The descritption for the Status
         /// </summary>
         public string Description { get; set; }
-
-        /// <summary>
-        /// The Url for the avatar for the Status
-        /// </summary>
-        public string AvatarUrl { get; set; }
     }
 }
