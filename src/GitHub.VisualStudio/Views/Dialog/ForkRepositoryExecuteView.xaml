@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              xmlns:ui="https://github.com/github/VisualStudio"
              VerticalAlignment="Top"
              Margin="8"
@@ -54,8 +53,9 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
+
                         <ui:OcticonImage Grid.Column="0" Icon="repo_forked" Height="16" Width="16" />
-                        <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap" Text="{x:Static prop:Resources.ForkTheRepository}" />
+                        <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap">Fork the repository</TextBlock>
                     </Grid>
 
                     <Grid Margin="0 16 0 0">
@@ -66,7 +66,7 @@
                     <ui:OcticonImage Grid.Column="0" Icon="home" Height="16" Width="16" />
 
                     <TextBlock Margin="8 0 0 0" Grid.Column="1" TextWrapping="Wrap">
-                    <Run Text="{x:Static prop:Resources.UpdateYourLocalRepositoryS}"/> <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> <Run Text="{x:Static prop:Resources.ToPointTo}"/>
+                      Update your local repository's <Run Style="{DynamicResource {x:Static markdig:Styles.CodeStyleKey}}">origin</Run> to point to
                       <Hyperlink><Run Text="{Binding DestinationRepository.CloneUrl, Mode=OneWay}"/></Hyperlink>
                      </TextBlock>
                     </Grid>
@@ -93,8 +93,8 @@
                    Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}" 
                    HorizontalAlignment="Left" />
         <StackPanel Margin="0 8" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Click="backButton_OnClick" Content="{x:Static prop:Resources.Back}"></Button>
-                <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Click="repoForkButton_OnClick" Content="{x:Static prop:Resources.ForkRepository}"></Button>
+          <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Click="backButton_OnClick">Back</Button>
+          <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Click="repoForkButton_OnClick">Fork Repository</Button>
         </StackPanel>
     </StackPanel>
   </StackPanel>

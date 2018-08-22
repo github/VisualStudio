@@ -4,7 +4,6 @@ using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -13,7 +12,13 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromClipboardCommand))]
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {
-      
+        public const string NoGitHubUrlMessage = "Couldn't a find a GitHub URL in clipboard";
+        public const string NoResolveSameOwnerMessage = "Couldn't find target URL in current repository. Try again after doing a fetch.";
+        public const string NoResolveDifferentOwnerMessage = "The target URL has a different owner to the current repository.";
+        public const string NoActiveRepositoryMessage = "There is no active repository to navigate";
+        public const string ChangesInWorkingDirectoryMessage = "This file has changed since the permalink was created";
+        public const string DifferentRepositoryMessage = "Please open the repository '{0}' and try again";
+        public const string UnknownLinkTypeMessage = "Couldn't open from '{0}'. Only URLs that link to repository files are currently supported.";
 
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
@@ -53,13 +58,13 @@ namespace GitHub.VisualStudio.Commands
             var context = gitHubContextService.Value.FindContextFromClipboard();
             if (context == null)
             {
-                vsServices.Value.ShowMessageBoxInfo(Resources.NoGitHubUrlMessage);
+                vsServices.Value.ShowMessageBoxInfo(NoGitHubUrlMessage);
                 return;
             }
 
             if (context.LinkType != LinkType.Blob)
             {
-                var message = string.Format(Resources.UnknownLinkTypeMessage, context.Url);
+                var message = string.Format(UnknownLinkTypeMessage, context.Url);
                 vsServices.Value.ShowMessageBoxInfo(message);
                 return;
             }
@@ -68,13 +73,13 @@ namespace GitHub.VisualStudio.Commands
             var repositoryDir = activeRepository?.LocalPath;
             if (repositoryDir == null)
             {
-                vsServices.Value.ShowMessageBoxInfo(Resources.NoActiveRepositoryMessage);
+                vsServices.Value.ShowMessageBoxInfo(NoActiveRepositoryMessage);
                 return;
             }
 
             if (!string.Equals(activeRepository.Name, context.RepositoryName, StringComparison.OrdinalIgnoreCase))
             {
-                vsServices.Value.ShowMessageBoxInfo(string.Format(Resources.DifferentRepositoryMessage, context.RepositoryName));
+                vsServices.Value.ShowMessageBoxInfo(string.Format(DifferentRepositoryMessage, context.RepositoryName));
                 return;
             }
 
@@ -83,11 +88,11 @@ namespace GitHub.VisualStudio.Commands
             {
                 if (!string.Equals(activeRepository.Owner, context.Owner, StringComparison.OrdinalIgnoreCase))
                 {
-                    vsServices.Value.ShowMessageBoxInfo(Resources.NoResolveDifferentOwnerMessage);
+                    vsServices.Value.ShowMessageBoxInfo(NoResolveDifferentOwnerMessage);
                 }
                 else
                 {
-                    vsServices.Value.ShowMessageBoxInfo(Resources.NoResolveSameOwnerMessage);
+                    vsServices.Value.ShowMessageBoxInfo(NoResolveSameOwnerMessage);
                 }
 
                 return;
@@ -104,7 +109,7 @@ namespace GitHub.VisualStudio.Commands
                     return;
                 }
 
-                vsServices.Value.ShowMessageBoxInfo(Resources.ChangesInWorkingDirectoryMessage);
+                vsServices.Value.ShowMessageBoxInfo(ChangesInWorkingDirectoryMessage);
             }
 
             gitHubContextService.Value.TryOpenFile(repositoryDir, context);
