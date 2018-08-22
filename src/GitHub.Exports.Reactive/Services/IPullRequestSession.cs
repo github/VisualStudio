@@ -153,6 +153,7 @@ namespace GitHub.Services
 
         /// <summary>
         /// Refreshes the pull request session.
+        /// </summary>
         /// <returns>A task which completes when the session has completed refreshing.</returns>
         Task Refresh();
     }

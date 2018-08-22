@@ -149,6 +149,7 @@
   <ItemGroup>
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\ICreateGistEnterpriseCommand.cs" />
     <Compile Include="Commands\IOpenFromClipboardCommand.cs" />
     <Compile Include="Commands\IOpenFromUrlCommand.cs" />
     <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
@@ -170,6 +171,12 @@
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\ActorModel.cs" />
+    <Compile Include="Models\AnnotationModel.cs" />
+    <Compile Include="Models\CheckAnnotationLevel.cs" />
+    <Compile Include="Models\CheckConclusionState.cs" />
+    <Compile Include="Models\CheckRunModel.cs" />
+    <Compile Include="Models\CheckStatusState.cs" />
+    <Compile Include="Models\CheckSuiteModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />

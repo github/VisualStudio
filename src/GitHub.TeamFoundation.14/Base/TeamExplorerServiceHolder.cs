@@ -40,7 +40,7 @@ namespace GitHub.VisualStudio.Base
         /// This constructor can be used for unit testing.
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
-        /// <param name="joinableTaskFactory">Used for switching to the Main thread.</param>
+        /// <param name="joinableTaskContext">Used for switching to the Main thread.</param>
         public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskContext joinableTaskContext)
         {
             JoinableTaskCollection = joinableTaskContext.CreateCollection();

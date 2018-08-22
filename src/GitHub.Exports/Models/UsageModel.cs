@@ -59,7 +59,8 @@ namespace GitHub.Models
             public int NumberOfWelcomeTrainingClicks { get; set; }
             public int NumberOfGitHubPaneHelpClicks { get; set; }
             public int NumberOfPRDetailsOpenInGitHub { get; set; }
-            public int NumberOfPRCheckStatusesOpenInGitHub { get; set; }
+            public int NumberOfPRStatusesOpenInGitHub { get; set; }
+            public int NumberOfPRChecksOpenInGitHub { get; set; }
             public int NumberOfPRDetailsViewChanges { get; set; }
             public int NumberOfPRDetailsViewFile { get; set; }
             public int NumberOfPRDetailsCompareWithSolution { get; set; }
