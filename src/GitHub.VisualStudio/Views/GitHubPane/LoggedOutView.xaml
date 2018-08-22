@@ -32,12 +32,12 @@
             Foreground="{DynamicResource GitHubVsWindowText}"
             HorizontalAlignment="Center"
             FontSize="16"
-            Content="{x:Static prop:Resources.SignInToGitHub}" />
+            Content="Sign in to GitHub" />
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
             HorizontalAlignment="Center"
-            Text="{x:Static prop:Resources.BlurbText}" />
+            Text="Powerful collaboration, code review, and code management for open source and private projects." />
         <StackPanel
             Margin="0,5"
             HorizontalAlignment="Center"

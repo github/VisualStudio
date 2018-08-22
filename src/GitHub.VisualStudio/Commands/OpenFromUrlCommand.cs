@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 using SVsServiceProvider = Microsoft.VisualStudio.Shell.SVsServiceProvider;
-using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio.Commands
 {
@@ -120,7 +119,7 @@ namespace GitHub.VisualStudio.Commands
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
             if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
-                var result = ShowInfoMessage(string.Format(Resources.OpenRepositoryAtDir, repositoryDir));
+                var result = ShowInfoMessage($"Open repository at '{repositoryDir}'?");
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:

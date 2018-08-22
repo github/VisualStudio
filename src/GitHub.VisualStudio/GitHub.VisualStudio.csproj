@@ -19,8 +19,6 @@
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <UICulture>en-US</UICulture>
-    <UseCodebase>true</UseCodebase>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -43,12 +41,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
-    <GeneratePkgDefFile>true</GeneratePkgDefFile>
-    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
-    <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
-    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
-    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -462,34 +454,13 @@
     <Compile Include="Views\ViewLocator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="VSPackage.en-US.resx" >
-      <MergeWithCTO>true</MergeWithCTO>
-	    <LogicalName>VSPackage.en-US.Resources</LogicalName>  
-     <DependentUpon>VSPackage.resx</DependentUpon>
-    </EmbeddedResource>
-    <None Include="VSPackage.resx">
+    <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
-    </None>
-    <EmbeddedResource Include="VSPackage.zh-Hans.resx" >
-         <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.zh-Hans.resources</LogicalName>
-      <DependentUpon>VSPackage.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GitHub.VisualStudio.vsct">
-      <SubType>Designer</SubType>
-    </None>
-    <VSCTCompile Include="GitHub.VisualStudio.en-US.vsct">
-        <ResourceName>Menus.ctmenu</ResourceName>  
-      <DependentUpon>GitHub.VisualStudio.vsct</DependentUpon>
-    </VSCTCompile>
-    <VSCTCompile Include="GitHub.VisualStudio.zh-Hans.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>  
-      <DependentUpon>GitHub.VisualStudio.vsct</DependentUpon>
-    </VSCTCompile>
     <Content Include="Resources\preview_200x200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -518,6 +489,12 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="..\..\build\version" />
+  </ItemGroup>
+  <ItemGroup>
+    <VSCTCompile Include="GitHub.VisualStudio.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
+    </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\common\CodeAnalysisDictionary.xml">
@@ -706,16 +683,22 @@
       <Project>{600998c4-54dd-4755-bfa8-6f44544d8e2e}</Project>
       <Name>ReactiveUI.Events_Net45</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
       <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
       <Name>ReactiveUI_Net45</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
       <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
@@ -726,31 +709,43 @@
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1a1da411-8d1f-4578-80a6-04576bea2dc5}</Project>
       <Name>GitHub.App</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bGetCopyToOutputDirectoryItems%3bDebugSymbolsProjectOutputGroup%3bBuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
       <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
       <Name>GitHub.Extensions.Reactive</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
@@ -760,6 +755,8 @@
       <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
       <Name>GitHub.InlineReviews</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
       <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
@@ -769,33 +766,45 @@
       <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
       <Name>GitHub.StartPage</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
       <Aliases>TF14</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
       <Name>GitHub.TeamFoundation.15</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
       <Aliases>TF15</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
       <Name>GitHub.VisualStudio.UI</Name>
       <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
