@@ -11,12 +11,12 @@ using GitHub.Models;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineCommentGlyphFactory : IGlyphFactory<InlineCommentTag>
+    class InlineGlyphFactory : IGlyphFactory<InlineTagBase>
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
 
-        public InlineCommentGlyphFactory(
+        public InlineGlyphFactory(
             IInlineCommentPeekService peekService,
             ITextView textView)
         {
@@ -24,13 +24,20 @@ namespace GitHub.InlineReviews.Tags
             this.textView = textView;
         }
 
-        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
+        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineTagBase tag)
         {
             var glyph = CreateGlyph(tag);
             glyph.DataContext = tag;
             glyph.MouseLeftButtonUp += (s, e) =>
             {
-                if (OpenThreadView(tag)) e.Handled = true;
+                if (tag is InlineCommentTag inlineCommentTag)
+                {
+                    if (OpenThreadView(inlineCommentTag)) e.Handled = true;
+                }
+
+                if (tag is ShowInlineAnnotationTag showInlineAnnotationTag)
+                {
+                }
             };
 
             return glyph;
@@ -41,7 +48,8 @@ namespace GitHub.InlineReviews.Tags
             return new[]
             {
                 typeof(AddInlineCommentTag),
-                typeof(ShowInlineCommentTag)
+                typeof(ShowInlineCommentTag),
+                typeof(ShowInlineAnnotationTag)
             };
         }
 

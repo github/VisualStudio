@@ -93,7 +93,6 @@
     <Compile Include="Models\PullRequestSessionLiveFile.cs" />
     <Compile Include="Models\PullRequestSessionFile.cs" />
     <Compile Include="Services\PullRequestStatusBarManager.cs" />
-    <Compile Include="Tags\InlineAnnotationTag.cs" />
     <Compile Include="Tags\InlineTagBase.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
@@ -151,11 +150,11 @@
     <Compile Include="Tags\ShowInlineCommentGlyph.xaml.cs">
       <DependentUpon>ShowInlineCommentGlyph.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tags\InlineCommentGlyphFactory.cs" />
+    <Compile Include="Tags\InlineGlyphFactory.cs" />
     <Compile Include="Tags\InlineCommentTag.cs" />
     <Compile Include="Tags\ShowInlineCommentTag.cs" />
     <Compile Include="Tags\InlineTagger.cs" />
-    <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
+    <Compile Include="Tags\InlineTaggerProvider.cs" />
     <Compile Include="ViewModels\InlineCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\ICommentViewModel.cs" />
     <Compile Include="Views\CommentThreadView.xaml.cs">

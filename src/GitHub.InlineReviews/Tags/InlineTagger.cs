@@ -107,17 +107,17 @@ namespace GitHub.InlineReviews.Tags
                     }
 
                     var spanAnnotations = file.InlineAnnotations.Where(x =>
-                        x.EndLine >= startLine &&
-                        x.EndLine <= endLine);
+                        x.EndLine - 1 >= startLine &&
+                        x.EndLine - 1 <= endLine);
 
                     foreach (var annotation in spanAnnotations)
                     {
                         var snapshot = span.Snapshot;
-                        var line = snapshot.GetLineFromLineNumber(annotation.EndLine);
+                        var line = snapshot.GetLineFromLineNumber(annotation.EndLine - 1);
 
                         if (side == DiffSide.Right)
                         {
-                            linesWithTags[annotation.EndLine - startLine] = true;
+                            linesWithTags[annotation.EndLine - 1 - startLine] = true;
 
                             result.Add(new TagSpan<ShowInlineAnnotationTag>(
                                 new SnapshotSpan(line.Start, line.End),

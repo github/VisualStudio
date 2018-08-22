@@ -16,12 +16,14 @@ namespace GitHub.InlineReviews.Tags
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
     [TagType(typeof(ShowInlineCommentTag))]
-    class InlineCommentTaggerProvider : IViewTaggerProvider
+    [TagType(typeof(ShowInlineAnnotationTag))]
+    [TagType(typeof(AddInlineCommentTag))]
+    class InlineTaggerProvider : IViewTaggerProvider
     {
         readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
-        public InlineCommentTaggerProvider(
+        public InlineTaggerProvider(
             IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
