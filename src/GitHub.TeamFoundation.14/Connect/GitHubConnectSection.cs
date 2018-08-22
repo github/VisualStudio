@@ -285,15 +285,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void OnPropertyChange(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "IsVisible" && IsVisible && View == null)
+            if (e.PropertyName == nameof(IsVisible) && IsVisible && View == null)
                 View = new GitHubConnectContent { DataContext = this };
-            else if (e.PropertyName == "IsExpanded" && settings != null)
+            else if (e.PropertyName == nameof(IsExpanded) && settings != null)
                 settings.IsExpanded = IsExpanded;
         }
 
         void InvitationSectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "IsVisible")
+            if (e.PropertyName == nameof(ITeamExplorerSection.IsVisible))
             {
                 Refresh(SectionConnection);
             }
