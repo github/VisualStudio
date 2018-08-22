@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="500">
     <UserControl.Resources>
@@ -59,7 +58,7 @@
             </Border.Style>
             <DockPanel>
                 <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 8 0"/>
-                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.YouMustCommitAndPushYourChangesToAddACommentHere}"></TextBlock>
+                <TextBlock TextWrapping="Wrap">You must commit and push your changes to add a comment here.</TextBlock>
             </DockPanel>
         </Border>
 
@@ -72,7 +71,7 @@
                 <Button Margin="2 0" Padding="2" Command="{Binding PreviousComment}"
                         Style="{StaticResource GitHubToolbarButton}">
                     <Button.ToolTip>
-                        <TextBlock FontSize="11" Text="{x:Static prop:Resources.PreviousComment}"></TextBlock>
+                        <TextBlock FontSize="11">Previous Comment</TextBlock>
                     </Button.ToolTip>
                     <Canvas Width="16" Height="16">
                         <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
@@ -86,7 +85,7 @@
                 <Button Margin="2 0" Padding="2" Command="{Binding NextComment}"
                         Style="{StaticResource GitHubToolbarButton}">
                     <Button.ToolTip>
-                        <TextBlock FontSize="11" Text="{x:Static prop:Resources.NextComment}"></TextBlock>
+                        <TextBlock FontSize="11">Next Comment</TextBlock>
                     </Button.ToolTip>
 
                     <Canvas Width="16" Height="16">
