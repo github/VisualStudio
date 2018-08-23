@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Windows.Media.Imaging;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
     public class ActorViewModel : ViewModelBase, IActorViewModel
     {
         const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
+        static readonly ILogger log = LogManager.ForContext<ActorViewModel>();
 
         public ActorViewModel()
         {
@@ -30,10 +33,13 @@ namespace GitHub.ViewModels
                         uri.Host.EndsWith("githubusercontent.com", StringComparison.OrdinalIgnoreCase))
                     {
                         AvatarUrl = model.AvatarUrl;
-                        Avatar = new BitmapImage(new Uri(AvatarUrl));
+                        Avatar = new BitmapImage(uri);
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Invalid avatar URL");
+                }
             }
 
             if (AvatarUrl == null)
