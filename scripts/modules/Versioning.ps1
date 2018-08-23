@@ -42,6 +42,7 @@ New-Module -ScriptBlock {
         Write-VersionVsixManifest $version
         Write-VersionSolutionInfo $version
         Write-VersionAppVeyor $version
+        Write-DirectoryBuildProps $version
         Push-Location $rootDirectory
         New-Item -Type Directory -ErrorAction SilentlyContinue build | out-null
         Set-Content build\version $version

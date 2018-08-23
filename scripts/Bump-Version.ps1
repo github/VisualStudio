@@ -53,6 +53,7 @@ if ($Trace) { Set-PSDebug -Trace 1 }
 . $scriptsDirectory\Modules\Vsix.ps1 | out-null
 . $scriptsDirectory\Modules\SolutionInfo.ps1 | out-null
 . $scriptsDirectory\Modules\AppVeyor.ps1 | out-null
+. $scriptsDirectory\Modules\DirectoryBuildProps.ps1 | out-null
 
 if ($NewVersion -eq $null) {
     if (!$BumpMajor -and !$BumpMinor -and !$BumpPatch -and !$BumpBuild){
