@@ -550,7 +550,7 @@ Line 4";
                 }
             }
 
-            [Test]
+            [Test, Ignore("Flaky test, see https://github.com/github/VisualStudio/issues/1795")]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
@@ -759,6 +759,19 @@ Line 4";
                 var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
                 var result1 = await target.GetSession("owner", "repo", 5);
                 var result2 = await target.GetSession("owner", "repo", 5);
+                var result3 = await target.GetSession("owner", "repo", 6);
+
+                Assert.That(result1, Is.SameAs(result2));
+                Assert.That(result1, Is.Not.SameAs(result3));
+            }
+
+            [Test]
+            public async Task GetSessionReturnsSameSessionForSamePullRequestOwnerCaseMismatch()
+            {
+                var target = CreateTarget();
+                var newModel = CreatePullRequestModel(NotCurrentBranchPullRequestNumber);
+                var result1 = await target.GetSession("owner", "repo", 5);
+                var result2 = await target.GetSession("Owner", "repo", 5);
                 var result3 = await target.GetSession("owner", "repo", 6);
 
                 Assert.That(result1, Is.SameAs(result2));

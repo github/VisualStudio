@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GitHub.Exports;
 using GitHub.Services;
 using NSubstitute;
@@ -379,6 +380,117 @@ public class GitHubContextServiceTests
             Assert.That(resolvedCommitish, Is.EqualTo(expectCommitish));
             Assert.That(resolvedPath, Is.EqualTo(expectPath));
             Assert.That(commitSha, Is.EqualTo(expectCommitSha));
+        }
+    }
+
+    public class TheResolveBlobFromCommitsMethod
+    {
+        [Test]
+        public void FlatTree()
+        {
+            var objectish = "12345678";
+            var expectCommitSha = "2434215c5489db2bfa2e5249144a3bc532465f97";
+            var expectBlobPath = "Class1.cs";
+            var repositoryDir = "repositoryDir";
+            var blob = Substitute.For<Blob>();
+            var treeEntry = CreateTreeEntry(TreeEntryTargetType.Blob, blob, expectBlobPath);
+            var commit = CreateCommit(expectCommitSha, treeEntry);
+            var repository = CreateRepository(commit);
+            repository.Lookup<Blob>(objectish).Returns(blob);
+            var target = CreateGitHubContextService(repositoryDir, repository);
+
+            var (commitSha, blobPath) = target.ResolveBlobFromHistory(repositoryDir, objectish);
+
+            Assert.That((commitSha, blobPath), Is.EqualTo((expectCommitSha, expectBlobPath)));
+        }
+
+        [Test]
+        public void NestedTree()
+        {
+            var objectish = "12345678";
+            var expectCommitSha = "2434215c5489db2bfa2e5249144a3bc532465f97";
+            var expectBlobPath = @"AnnotateFileTests\Class1.cs";
+            var repositoryDir = "repositoryDir";
+            var blob = Substitute.For<Blob>();
+            var blobTreeEntry = CreateTreeEntry(TreeEntryTargetType.Blob, blob, expectBlobPath);
+            var childTree = CreateTree(blobTreeEntry);
+            var treeTreeEntry = CreateTreeEntry(TreeEntryTargetType.Tree, childTree, "AnnotateFileTests");
+            var commit = CreateCommit(expectCommitSha, treeTreeEntry);
+            var repository = CreateRepository(commit);
+            repository.Lookup<Blob>(objectish).Returns(blob);
+            var target = CreateGitHubContextService(repositoryDir, repository);
+
+            var (commitSha, blobPath) = target.ResolveBlobFromHistory(repositoryDir, objectish);
+
+            Assert.That((commitSha, blobPath), Is.EqualTo((expectCommitSha, expectBlobPath)));
+        }
+
+        [Test]
+        public void MissingBlob()
+        {
+            var objectish = "12345678";
+            var repositoryDir = "repositoryDir";
+            var treeEntry = Substitute.For<TreeEntry>();
+            var repository = CreateRepository();
+            var target = CreateGitHubContextService(repositoryDir, repository);
+
+            var (commitSha, blobPath) = target.ResolveBlobFromHistory(repositoryDir, objectish);
+
+            Assert.That((commitSha, blobPath), Is.EqualTo((null as string, null as string)));
+        }
+
+        static IRepository CreateRepository(params Commit[] commits)
+        {
+            var repository = Substitute.For<IRepository>();
+            var enumerator = commits.ToList().GetEnumerator();
+            repository.Commits.GetEnumerator().Returns(enumerator);
+            return repository;
+        }
+
+        static Commit CreateCommit(string sha, params TreeEntry[] treeEntries)
+        {
+            var commit = Substitute.For<Commit>();
+            commit.Sha.Returns(sha);
+            var tree = CreateTree(treeEntries);
+            commit.Tree.Returns(tree);
+            return commit;
+        }
+
+        static TreeEntry CreateTreeEntry(TreeEntryTargetType targetType, GitObject target, string path)
+        {
+            var treeEntry = Substitute.For<TreeEntry>();
+            treeEntry.TargetType.Returns(targetType);
+            treeEntry.Target.Returns(target);
+            treeEntry.Path.Returns(path);
+            return treeEntry;
+        }
+
+        static Tree CreateTree(params TreeEntry[] treeEntries)
+        {
+            var tree = Substitute.For<Tree>();
+            var enumerator = treeEntries.ToList().GetEnumerator();
+            tree.GetEnumerator().Returns(enumerator);
+            return tree;
+        }
+    }
+
+    public class TheFindBlobShaForTextViewMethod
+    {
+        [TestCase(@"C:\Users\me\AppData\Local\Temp\TFSTemp\vctmp21996_181282.IOpenFromClipboardCommand.783ac965.cs", "783ac965")]
+        [TestCase(@"\TFSTemp\File.12345678.ext", "12345678")]
+        [TestCase(@"\TFSTemp\File.abcdefab.ext", "abcdefab")]
+        [TestCase(@"\TFSTemp\.12345678.", "12345678")]
+        [TestCase(@"\TFSTemp\File.ABCDEFAB.ext", null)]
+        [TestCase(@"\TFSTemp\File.1234567.ext", null)]
+        [TestCase(@"\TFSTemp\File.123456789.ext", null)]
+        [TestCase(@"\TFSTemp\File.12345678.ext\\", null)]
+        public void FindObjectishForTFSTempFile(string path, string expectObjectish)
+        {
+            var target = CreateGitHubContextService();
+
+            var objectish = target.FindObjectishForTFSTempFile(path);
+
+            Assert.That(objectish, Is.EqualTo(expectObjectish));
         }
     }
 

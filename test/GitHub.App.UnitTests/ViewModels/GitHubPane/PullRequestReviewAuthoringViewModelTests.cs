@@ -368,7 +368,10 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var session = CreateSession(model: model);
             var closed = false;
 
-            var target = CreateTarget(model, session);
+            var pullRequestService = Substitute.For<IPullRequestService>();
+            pullRequestService.ConfirmCancelPendingReview().Returns(true);
+
+            var target = CreateTarget(model, session, pullRequestService);
             await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
@@ -397,15 +400,18 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static PullRequestReviewAuthoringViewModel CreateTarget(
             PullRequestDetailModel model,
-            IPullRequestSession session = null)
+            IPullRequestSession session = null,
+            IPullRequestService pullRequestService = null)
         {
             session = session ?? CreateSession(model: model);
 
             return CreateTarget(
+                pullRequestService: pullRequestService,
                 sessionManager: CreateSessionManager(session));
         }
 
         static PullRequestReviewAuthoringViewModel CreateTarget(
+            IPullRequestService pullRequestService = null,
             IPullRequestEditorService editorService = null,
             IPullRequestSessionManager sessionManager = null,
             IPullRequestFilesViewModel files = null)
@@ -415,6 +421,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             files = files ?? Substitute.For<IPullRequestFilesViewModel>();
 
             return new PullRequestReviewAuthoringViewModel(
+                pullRequestService,
                 editorService,
                 sessionManager,
                 files);

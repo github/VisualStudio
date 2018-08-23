@@ -7,7 +7,9 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -50,7 +52,7 @@ namespace GitHub.ViewModels.GitHubPane
             DiffFileWithWorkingDirectory = ReactiveCommand.CreateAsyncTask(
                 isBranchCheckedOut,
                 x => (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath));
-            OpenFileInWorkingDirectory = ReactiveCommand.CreateAsyncTask(
+            OpenFileInWorkingDirectory = new NonDeletedFileCommand(
                 isBranchCheckedOut,
                 x => (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
 
@@ -197,6 +199,38 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             return threads.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Implements the <see cref="OpenFileInWorkingDirectory"/> command.
+        /// </summary>
+        /// <remarks>
+        /// We need to "Open File in Solution" when the parameter passed to the command parameter
+        /// represents a deleted file. ReactiveCommand doesn't allow us to change the CanExecute
+        /// state depending on the parameter, so we override 
+        /// <see cref="ICommand.CanExecute(object)"/> to do this ourselves.
+        /// </remarks>
+        class NonDeletedFileCommand : ReactiveCommand<Unit>, ICommand
+        {
+            public NonDeletedFileCommand(
+                IObservable<bool> canExecute,
+                Func<object, Task> executeAsync)
+                : base(canExecute, x => executeAsync(x).ToObservable())
+            {
+            }
+
+            bool ICommand.CanExecute(object parameter)
+            {
+                if (parameter is IPullRequestFileNode node)
+                {
+                    if (node.Status == PullRequestFileStatus.Removed)
+                    {
+                        return false;
+                    }
+                }
+
+                return CanExecute(parameter);
+            }
         }
     }
 }

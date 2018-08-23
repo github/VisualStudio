@@ -97,6 +97,15 @@ namespace GitHub.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to just now.
+        /// </summary>
+        internal static string JustNow {
+            get {
+                return ResourceManager.GetString("JustNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:N0} minute ago.
         /// </summary>
         internal static string minute {

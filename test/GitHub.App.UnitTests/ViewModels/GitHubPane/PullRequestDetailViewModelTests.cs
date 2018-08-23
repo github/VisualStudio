@@ -56,12 +56,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             [Test]
             public async Task ShouldShowLatestAcceptedOrChangesRequestedReviewAsync()
             {
+                var dateTimeOffset = DateTimeOffset.Now;
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.ChangesRequested),
-                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.ChangesRequested),
-                    CreatePullRequestReviewModel("3", "grokys", PullRequestReviewState.Approved),
-                    CreatePullRequestReviewModel("4", "grokys", PullRequestReviewState.Commented));
+                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.ChangesRequested, dateTimeOffset.AddMinutes(1)),
+                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.ChangesRequested, dateTimeOffset.AddMinutes(2)),
+                    CreatePullRequestReviewModel("3", "grokys", PullRequestReviewState.Approved, dateTimeOffset.AddMinutes(3)),
+                    CreatePullRequestReviewModel("4", "grokys", PullRequestReviewState.Commented, dateTimeOffset.AddMinutes(4)));
 
                 await target.Load(model);
 
@@ -77,10 +78,11 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             [Test]
             public async Task ShouldShowLatestCommentedReviewIfNothingElsePresentAsync()
             {
+                var dateTimeOffset = DateTimeOffset.Now;
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel("1", "shana", PullRequestReviewState.Commented),
-                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.Commented));
+                    CreatePullRequestReviewModel("1", "shana", PullRequestReviewState.Commented, dateTimeOffset.AddMinutes(1)),
+                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.Commented, dateTimeOffset.AddMinutes(2)));
 
                 await target.Load(model);
 
@@ -107,9 +109,11 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             [Test]
             public async Task ShouldShowPendingReviewOverApprovedAsync()
             {
+                var dateTimeOffset = DateTimeOffset.Now;
+
                 var target = CreateTarget();
                 var model = CreatePullRequestModel(
-                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.Approved),
+                    CreatePullRequestReviewModel("1", "grokys", PullRequestReviewState.Approved, dateTimeOffset.AddMinutes(1)),
                     CreatePullRequestReviewModel("2", "grokys", PullRequestReviewState.Pending));
 
                 await target.Load(model);
@@ -133,16 +137,34 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Assert.That(target.Reviews[0].Id, Is.Null);
             }
 
+            [Test]
+            public async Task ShouldNotShowChangesRequestedAfterDismissed()
+            {
+                var dateTimeOffset = DateTimeOffset.Now;
+
+                var target = CreateTarget();
+                var model = CreatePullRequestModel(
+                    CreatePullRequestReviewModel("1", "shana", PullRequestReviewState.ChangesRequested, dateTimeOffset.AddMinutes(1)),
+                    CreatePullRequestReviewModel("2", "shana", PullRequestReviewState.Dismissed, dateTimeOffset.AddMinutes(2)));
+
+                await target.Load(model);
+
+                Assert.That(target.Reviews, Has.Count.EqualTo(2));
+                Assert.That(target.Reviews[0].User.Login, Is.EqualTo("shana"));
+                Assert.That(target.Reviews[0].State, Is.EqualTo(PullRequestReviewState.Dismissed));
+                Assert.That(target.Reviews[1].User.Login, Is.EqualTo("grokys"));
+            }
+
             static PullRequestDetailModel CreatePullRequestModel(
                 params PullRequestReviewModel[] reviews)
             {
                 return PullRequestDetailViewModelTests.CreatePullRequestModel(reviews: reviews);
             }
 
-            static PullRequestReviewModel CreatePullRequestReviewModel(
-                string id,
+            static PullRequestReviewModel CreatePullRequestReviewModel(string id,
                 string login,
-                PullRequestReviewState state)
+                PullRequestReviewState state,
+                DateTimeOffset? submittedAt = null)
             {
                 var account = new ActorModel
                 {
@@ -154,6 +176,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                     Id = id,
                     Author = account,
                     State = state,
+                    SubmittedAt = submittedAt
                 };
             }
         }
@@ -581,7 +604,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<IUsageTracker>(),
                 Substitute.For<ITeamExplorerContext>(),
                 Substitute.For<IPullRequestFilesViewModel>(),
-                Substitute.For<ISyncSubmodulesCommand>());
+                Substitute.For<ISyncSubmodulesCommand>(),
+                Substitute.For<IViewViewModelFactory>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);

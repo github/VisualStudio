@@ -1,0 +1,54 @@
+﻿<local:GenericPullRequestCheckView x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestCheckView"
+                                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                                   xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+                                   xmlns:ghfvs="https://github.com/github/VisualStudio"
+                                   xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+                                   d:DesignWidth="600"
+                                   mc:Ignorable="d">
+
+    <d:DesignData.DataContext>
+        <ghfvs:PullRequestCheckViewModelDesigner />
+    </d:DesignData.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnZero" />
+            <!-- <ColumnDefinition Width="*" SharedSizeGroup="ColumnOne" /> -->
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnTwo" />
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFour" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition MaxHeight="32"/>
+        </Grid.RowDefinitions>
+
+        <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+        <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+        <!-- 
+            <Image Grid.Column="1" Source="{Binding Avatar}" Height="16" Width="16" />
+        -->
+        <Label Grid.Column="1" Foreground="{DynamicResource VsBrush.WindowText}" Content="{Binding Title}"/>
+        <!--
+            <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
+        -->
+        <Label Grid.Column="3" HorizontalAlignment="Right"
+               Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+            <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
+        </Label>
+    </Grid>
+</local:GenericPullRequestCheckView>
+

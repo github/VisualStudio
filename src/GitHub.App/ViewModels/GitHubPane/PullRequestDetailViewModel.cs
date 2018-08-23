@@ -38,6 +38,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
+        readonly IViewViewModelFactory viewViewModelFactory;
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -55,16 +56,18 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
+        IReadOnlyList<IPullRequestCheckViewModel> checks;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
-        /// <param name="localRepository">The local repository.</param>
-        /// <param name="modelService">The model service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="modelServiceFactory">The model service factory</param>
         /// <param name="usageTracker">The usage tracker.</param>
         /// <param name="teamExplorerContext">The context for tracking repo changes</param>
+        /// <param name="files">The view model which will display the changed files</param>
+        /// <param name="syncSubmodulesCommand">A command that will be run when <see cref="SyncSubmodules"/> is executed</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
@@ -73,7 +76,8 @@ namespace GitHub.ViewModels.GitHubPane
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files,
-            ISyncSubmodulesCommand syncSubmodulesCommand)
+            ISyncSubmodulesCommand syncSubmodulesCommand,
+            IViewViewModelFactory viewViewModelFactory)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -81,6 +85,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
+            Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -88,6 +93,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
             this.syncSubmodulesCommand = syncSubmodulesCommand;
+            this.viewViewModelFactory = viewViewModelFactory;
             Files = files;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -120,8 +126,14 @@ namespace GitHub.ViewModels.GitHubPane
             SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
-            OpenOnGitHub = ReactiveCommand.Create();
+            OpenOnGitHub = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
+        
             ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
+        }
+
+        private void DoOpenDetailsUrl(object obj)
+        {
+            usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
         }
 
         /// <summary>
@@ -195,6 +207,7 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
         }
 
+        /// <summary>
         /// Gets a value indicating whether the pull request branch is checked out.
         /// </summary>
         public bool IsCheckedOut
@@ -302,6 +315,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         public ReactiveCommand<object> ShowReview { get; }
 
+        public IReadOnlyList<IPullRequestCheckViewModel> Checks
+        {
+            get { return checks; }
+            private set { this.RaiseAndSetIfChanged(ref checks, value); }
+        }
+
         /// <summary>
         /// Initializes the view model.
         /// </summary>
@@ -376,6 +395,8 @@ namespace GitHub.ViewModels.GitHubPane
                 TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.BaseRepositoryOwner, pullRequest.BaseRefName);
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
+
+                Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
 
                 await Files.InitializeAsync(Session);
 
