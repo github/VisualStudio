@@ -31,7 +31,7 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Services.Vssdk" Path="|GitHub.Services.Vssdk|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.14" TargetVersion="[14.0,15.0)" Path="|GitHub.TeamFoundation.14|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" TargetVersion="[15.0,16.0)" Path="|GitHub.TeamFoundation.15|" />
-    <!-- Sometimes servicehub's version is used (currently ~1.3) when installing for Visual Studio 2017. If the version is 1.x, assume we're installing for Visual Studio 2017.  -->
+    <!-- Sometimes the version of `ServiceHub.VSDetouredHost.exe` is used when installing for Visual Studio 2017, see https://github.com/github/VisualStudio/pull/1875 -->
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" TargetVersion="[1.0,2.0)" Path="|GitHub.TeamFoundation.15|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.InlineReviewsPackage" Path="|GitHub.InlineReviews;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.StartPage" Path="|GitHub.StartPage;PkgdefProjectOutputGroup|" />
