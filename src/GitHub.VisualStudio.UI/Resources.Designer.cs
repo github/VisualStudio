@@ -232,6 +232,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete this comment?.
+        /// </summary>
+        public static string DeleteCommentConfirmation {
+            get {
+                return ResourceManager.GetString("DeleteCommentConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Comment.
+        /// </summary>
+        public static string DeleteCommentConfirmationCaption {
+            get {
+                return ResourceManager.GetString("DeleteCommentConfirmationCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         public static string Description {
@@ -840,6 +858,15 @@ namespace GitHub.VisualStudio.UI {
         public static string resendCodeButtonToolTip {
             get {
                 return ResourceManager.GetString("resendCodeButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retry.
+        /// </summary>
+        public static string Retry {
+            get {
+                return ResourceManager.GetString("Retry", resourceCulture);
             }
         }
         

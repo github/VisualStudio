@@ -149,6 +149,7 @@
   <ItemGroup>
     <Compile Include="Commands\ICopyLinkCommand.cs" />
     <Compile Include="Commands\IBlameLinkCommand.cs" />
+    <Compile Include="Commands\ICreateGistEnterpriseCommand.cs" />
     <Compile Include="Commands\IOpenFromClipboardCommand.cs" />
     <Compile Include="Commands\IOpenFromUrlCommand.cs" />
     <Compile Include="Commands\IToggleInlineCommentMarginCommand.cs" />
@@ -170,6 +171,12 @@
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="GitHubLogicException.cs" />
     <Compile Include="Models\ActorModel.cs" />
+    <Compile Include="Models\AnnotationModel.cs" />
+    <Compile Include="Models\CheckAnnotationLevel.cs" />
+    <Compile Include="Models\CheckConclusionState.cs" />
+    <Compile Include="Models\CheckRunModel.cs" />
+    <Compile Include="Models\CheckStatusState.cs" />
+    <Compile Include="Models\CheckSuiteModel.cs" />
     <Compile Include="Models\CommitMessage.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
@@ -185,6 +192,8 @@
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewModel.cs" />
     <Compile Include="Models\PullRequestReviewThreadModel.cs" />
+    <Compile Include="Models\StatusModel.cs" />
+    <Compile Include="Models\StatusState.cs" />
     <Compile Include="Services\GitHubContext.cs" />
     <Compile Include="Services\IEnterpriseCapabilitiesService.cs" />
     <Compile Include="Services\IGitHubContextService.cs" />
@@ -197,6 +206,7 @@
     <Compile Include="Services\IUsageService.cs" />
     <Compile Include="Settings\PkgCmdID.cs" />
     <Compile Include="ViewModels\GitHubPane\IGitHubPaneViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IGitHubToolWindowManager.cs" />
     <Compile Include="ViewModels\IConnectionInitializedViewModel.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

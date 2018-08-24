@@ -80,7 +80,7 @@ namespace GitHub.VisualStudio
 
             var client = CreateClient(address);
             var user = await loginManager.Login(address, client, userName, password);
-            var connection = new Connection(address, userName, user, null);
+            var connection = new Connection(address, userName, user);
 
             conns.Add(connection);
             await SaveConnections();
@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio
             var client = CreateClient(address);
             var oauthClient = new OauthClient(client.Connection);
             var user = await loginManager.LoginViaOAuth(address, client, oauthClient, OpenBrowser, cancel);
-            var connection = new Connection(address, user.Login, user, null);
+            var connection = new Connection(address, user.Login, user);
 
             conns.Add(connection);
             await SaveConnections();
@@ -122,7 +122,7 @@ namespace GitHub.VisualStudio
 
             var client = CreateClient(address);
             var user = await loginManager.LoginWithToken(address, client, token);
-            var connection = new Connection(address, user.Login, user, null);
+            var connection = new Connection(address, user.Login, user);
 
             conns.Add(connection);
             await SaveConnections();
@@ -145,6 +145,25 @@ namespace GitHub.VisualStudio
             await loginManager.Logout(address, client);
             connections.Value.Remove(connection);
             await SaveConnections();
+        }
+
+        /// <inheritdoc/>
+        public async Task Retry(IConnection connection)
+        {
+            var c = (Connection)connection;
+            c.SetLoggingIn();
+
+            try
+            {
+                var client = CreateClient(c.HostAddress);
+                var user = await loginManager.LoginFromCache(connection.HostAddress, client);
+                c.SetSuccess(user);
+                await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            }
+            catch (Exception e)
+            {
+                c.SetError(e);
+            }
         }
 
         ObservableCollectionEx<IConnection> CreateConnections()
@@ -175,23 +194,25 @@ namespace GitHub.VisualStudio
             {
                 foreach (var c in await cache.Load())
                 {
-                    var client = CreateClient(c.HostAddress);
+                    var connection = new Connection(c.HostAddress);
+                    result.Add(connection);
+                }
+
+                foreach (Connection connection in result)
+                {
+                    var client = CreateClient(connection.HostAddress);
                     User user = null;
-                    Exception error = null;
 
                     try
                     {
-                        user = await loginManager.LoginFromCache(c.HostAddress, client);
+                        user = await loginManager.LoginFromCache(connection.HostAddress, client);
+                        connection.SetSuccess(user);
+                        await usageTracker.IncrementCounter(x => x.NumberOfLogins);
                     }
                     catch (Exception e)
                     {
-                        error = e;
+                        connection.SetError(e);
                     }
-
-                    var connection = new Connection(c.HostAddress, c.UserName, user, error);
-
-                    result.Add(connection);
-                    await usageTracker.IncrementCounter(x => x.NumberOfLogins);
                 }
             }
             finally

@@ -85,6 +85,7 @@ namespace GitHub.VisualStudio
                     exports.GetExportedValue<IBlameLinkCommand>(),
                     exports.GetExportedValue<ICopyLinkCommand>(),
                     exports.GetExportedValue<ICreateGistCommand>(),
+                    exports.GetExportedValue<ICreateGistEnterpriseCommand>(),
                     exports.GetExportedValue<IOpenLinkCommand>(),
                     exports.GetExportedValue<IOpenPullRequestsCommand>(),
                     exports.GetExportedValue<IShowCurrentPullRequestCommand>(),

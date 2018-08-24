@@ -203,7 +203,9 @@
     <Compile Include="ViewModels\GitHubPane\IIssueListViewModelBase.cs" />
     <Compile Include="ViewModels\GitHubPane\ILoggedOutViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\INavigationViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\ILoginFailedViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPanePageViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\IPullRequestCheckViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\IPullRequestListViewModel.cs" />
