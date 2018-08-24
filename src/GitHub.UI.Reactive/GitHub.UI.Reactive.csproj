@@ -1,195 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}</ProjectGuid>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net461</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
-    <AssemblyName>GitHub.UI.Reactive</AssemblyName>
-    <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <OutputPath>bin\Release\</OutputPath>
-  </PropertyGroup>
+
   <Import Project="$(SolutionDir)\src\common\signing.props" />
+
   <ItemGroup>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Interactive">
-      <HintPath>..\..\packages\Ix_Experimental-Main.1.1.10823\lib\Net4\System.Interactive.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Controls\ViewBase.cs" />
-    <Compile Include="Controls\TwoFactorInput.xaml.cs">
-      <DependentUpon>TwoFactorInput.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Helpers\FocusHelper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\common\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj" />
+    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
+    <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Controls\BindingExtensions.cs" />
-    <Compile Include="Controls\Validation\UserErrorMessages.cs" />
-    <Compile Include="Controls\Validation\ValidationMessage.cs" />
-    <Compile Include="Controls\ErrorMessageDisplay.cs" />
-    <Compile Include="Controls\FilteredComboBox.cs" />
-    <Compile Include="Controls\GitHubTabControl.cs" />
-    <Compile Include="Validation\ReactiveValidatableObject.cs" />
-    <Compile Include="Validation\ValidateIfAttribute.cs" />
+    <PackageReference Include="Ix_Experimental-Main" version="1.1.10823" />
   </ItemGroup>
-  <ItemGroup>
-    <Page Include="Assets\Controls.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\ErrorMessageDisplay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\FilteredComboBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\GitHubComboBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\GitHubTabControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\Validation\UserErrorMessages.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\Validation\ValidationMessage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\TwoFactorInput.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="SharedDictionary.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj">
-      <Project>{600998c4-54dd-4755-bfa8-6f44544d8e2e}</Project>
-      <Name>ReactiveUI.Events_Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
-      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
-      <Name>ReactiveUI_Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
-      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
-      <Name>Splat-Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
-      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
-      <Name>GitHub.Exports.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
-      <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
-      <Name>GitHub.Exports</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
-      <Project>{6559E128-8B40-49A5-85A8-05565ED0C7E3}</Project>
-      <Name>GitHub.Extensions.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
-      <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
-      <Name>GitHub.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
-      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
-      <Name>GitHub.Logging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
-      <Project>{346384DD-2445-4A28-AF22-B45F3957BD89}</Project>
-      <Name>GitHub.UI</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
