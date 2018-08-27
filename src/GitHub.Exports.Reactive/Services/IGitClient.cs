@@ -110,6 +110,7 @@ namespace GitHub.Services
         /// </returns>
         Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents);
 
+        /// <summary>
         /// Gets the value of a configuration key.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -189,7 +190,7 @@ namespace GitHub.Services
         /// <summary>
         /// Find the merge base SHA between two commits.
         /// </summary>
-        /// <param name="repository">The repository.</param>
+        /// <param name="repo">The repository.</param>
         /// <param name="targetCloneUrl">The clone url of the PR target repo.</param>
         /// <param name="baseSha">The PR base SHA.</param>
         /// <param name="headSha">The PR head SHA.</param>
@@ -201,9 +202,10 @@ namespace GitHub.Services
         /// <exception cref="LibGit2Sharp.NotFoundException">Thrown when the merge base can't be found.</exception>
         Task<string> GetPullRequestMergeBase(IRepository repo, UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber);
 
+        /// <summary>
         /// Checks whether the current head is pushed to its remote tracking branch.
         /// </summary>
-        /// <param name="repository">The repository.</param>
+        /// <param name="repo">The repository.</param>
         /// <returns></returns>
         Task<bool> IsHeadPushed(IRepository repo);
 
@@ -212,7 +214,7 @@ namespace GitHub.Services
         /// <paramref name="baseBranch"/> and <paramref name="compareBranch"/> and returns their
         /// commit messages.
         /// </summary>
-        /// <param name="repository">The repository.</param>
+        /// <param name="repo">The repository.</param>
         /// <param name="baseBranch">The base branch to find a merge base with.</param>
         /// <param name="compareBranch">The compare branch to find a merge base with.</param>
         /// <param name="maxCommits">The maximum number of commits to return.</param>

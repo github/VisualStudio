@@ -9,6 +9,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -58,7 +59,7 @@
     <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.0-beta" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
     <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
     <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
     <PackageReference Include="Serilog" Version="2.5.0" />

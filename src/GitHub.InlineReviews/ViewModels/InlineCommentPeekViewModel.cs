@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
+using GitHub.InlineReviews.Peek;
 using GitHub.InlineReviews.Services;
 using GitHub.Logging;
 using GitHub.Models;
@@ -30,6 +32,7 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
+        readonly ICommentService commentService;
         IPullRequestSession session;
         IPullRequestSessionFile file;
         ICommentThreadViewModel thread;
@@ -43,12 +46,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
-        public InlineCommentPeekViewModel(
-            IInlineCommentPeekService peekService,
+        public InlineCommentPeekViewModel(IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
-            IPreviousInlineCommentCommand previousCommentCommand)
+            IPreviousInlineCommentCommand previousCommentCommand,
+            ICommentService commentService)
         {
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
@@ -59,9 +62,15 @@ namespace GitHub.InlineReviews.ViewModels
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
+            this.commentService = commentService;
             triggerPoint = peekSession.GetTriggerPoint(peekSession.TextView.TextBuffer);
 
             peekSession.Dismissed += (s, e) => Dispose();
+
+            Close = this.WhenAnyValue(x => x.Thread)
+                .SelectMany(x => x is NewInlineCommentThreadViewModel
+                    ? x.Comments.Single().CancelEdit.SelectUnit()
+                    : Observable.Never<Unit>());
 
             NextComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(nextCommentCommand.Enabled),
@@ -96,6 +105,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets a command which moves to the previous inline comment in the file.
         /// </summary>
         public ReactiveCommand<Unit> PreviousComment { get; }
+
+        public IObservable<Unit> Close { get; }
 
         public void Dispose()
         {
@@ -172,11 +183,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (thread != null)
             {
-                Thread = new InlineCommentThreadViewModel(session, thread.Comments);
+                Thread = new InlineCommentThreadViewModel(commentService, session, thread.Comments);
             }
             else
             {
-                Thread = new NewInlineCommentThreadViewModel(session, file, lineNumber, leftBuffer);
+                Thread = new NewInlineCommentThreadViewModel(commentService, session, file, lineNumber, leftBuffer);
             }
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))

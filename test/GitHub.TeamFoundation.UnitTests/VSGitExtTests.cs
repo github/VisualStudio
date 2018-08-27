@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
+using static Microsoft.VisualStudio.VSConstants;
 
 public class VSGitExtTests
 {
@@ -20,7 +21,7 @@ public class VSGitExtTests
     {
         [TestCase(true, 1)]
         [TestCase(false, 0)]
-        public void GetServiceIGitExt_WhenSccProviderContextIsActive(bool isActive, int expectCalls)
+        public void GetServiceIGitExt_WhenRepositoryOpenIsActive(bool isActive, int expectCalls)
         {
             var context = CreateVSUIContext(isActive);
             var sp = Substitute.For<IAsyncServiceProvider>();
@@ -135,7 +136,7 @@ public class VSGitExtTests
     public class TheActiveRepositoriesProperty
     {
         [Test]
-        public void SccProviderContextNotActive_IsEmpty()
+        public void RepositoryOpenContextNotActive_IsEmpty()
         {
             var context = CreateVSUIContext(false);
             var target = CreateVSGitExt(context);
@@ -144,7 +145,7 @@ public class VSGitExtTests
         }
 
         [Test]
-        public void SccProviderContextIsActive_InitializeWithActiveRepositories()
+        public void RepositoryOpenIsActive_InitializeWithActiveRepositories()
         {
             var repoPath = "repoPath";
             var repoFactory = Substitute.For<ILocalRepositoryModelFactory>();
@@ -217,8 +218,7 @@ public class VSGitExtTests
         repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
         joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
         var factory = Substitute.For<IVSUIContextFactory>();
-        var contextGuid = new Guid(Guids.GitSccProviderId);
-        factory.GetUIContext(contextGuid).Returns(context);
+        factory.GetUIContext(UICONTEXT.RepositoryOpen_guid).Returns(context);
         sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
         var vsGitExt = new VSGitExt(sp, factory, repoFactory, joinableTaskContext);
         vsGitExt.JoinTillEmpty();

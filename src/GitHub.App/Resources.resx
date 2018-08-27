@@ -321,6 +321,12 @@ https://git-scm.com/download/win</value>
   <data name="SwitchOriginTitle" xml:space="preserve">
     <value>Switch Origin</value>
   </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>Cancel Review</value>
+  </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
     <value>The destination already exists.</value>
   </data>

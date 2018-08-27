@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
@@ -18,10 +19,10 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
+        /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
         /// <param name="comments">The comments to display in this inline review.</param>
-        public InlineCommentThreadViewModel(
-            IPullRequestSession session,
+        public InlineCommentThreadViewModel(ICommentService commentService, IPullRequestSession session,
             IEnumerable<InlineCommentModel> comments)
             : base(session.User)
         {
@@ -45,13 +46,14 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 Comments.Add(new PullRequestReviewCommentViewModel(
                     session,
+                    commentService,
                     this,
                     CurrentUser,
                     comment.Review,
                     comment.Comment));
             }
 
-            Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
+            Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, this, CurrentUser));
         }
 
         /// <summary>
@@ -80,8 +82,8 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
-            var number = (int)parameter;
-            await Session.DeleteComment(number);
+            var item = (Tuple<int, int>)parameter;
+            await Session.DeleteComment(item.Item1, item.Item2);
         }
     }
 }

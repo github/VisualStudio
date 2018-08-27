@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Task = System.Threading.Tasks.Task;
+using static Microsoft.VisualStudio.VSConstants;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -51,9 +52,8 @@ namespace GitHub.VisualStudio.Base
             // Start with empty array until we have a chance to initialize.
             ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
 
-            // The IGitExt service isn't available when a TFS based solution is opened directly.
-            // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
-            var context = factory.GetUIContext(new Guid(Guids.GitSccProviderId));
+            // Initialize when we enter the context of a Git repository
+            var context = factory.GetUIContext(UICONTEXT.RepositoryOpen_guid);
             context.WhenActivated(() => JoinableTaskFactory.RunAsync(InitializeAsync).Task.Forget(log));
         }
 

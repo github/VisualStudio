@@ -159,13 +159,15 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task DeleteComment(
-            int number)
+        public async Task DeleteComment(int pullRequestId, int commentDatabaseId)
         {
-            await service.DeleteComment(
+            var model = await service.DeleteComment(
                 LocalRepository,
                 RepositoryOwner,
-                number);
+                pullRequestId,
+                commentDatabaseId);
+
+            await Update(model);
         }
 
         /// <inheritdoc/>
@@ -228,13 +230,8 @@ namespace GitHub.InlineReviews.Services
                 throw new InvalidOperationException("There is no pending review to cancel.");
             }
 
-            await service.CancelPendingReview(LocalRepository, PendingReviewId);
-
-            PullRequest.Reviews = PullRequest.Reviews
-                .Where(x => x.Id != PendingReviewId)
-                .ToList();
-
-            await Update(PullRequest);
+            var pullRequest = await service.CancelPendingReview(LocalRepository, PendingReviewId);
+            await Update(pullRequest);
         }
 
         /// <inheritdoc/>

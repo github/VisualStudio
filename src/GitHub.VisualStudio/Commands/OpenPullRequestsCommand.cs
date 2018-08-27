@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GitHub.Commands;
 using GitHub.Logging;
 using GitHub.Services;
+using GitHub.ViewModels.GitHubPane;
 using GitHub.Services.Vssdk.Commands;
 using Serilog;
 

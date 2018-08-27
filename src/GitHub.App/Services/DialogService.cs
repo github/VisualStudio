@@ -52,10 +52,19 @@ namespace GitHub.Services
             return (string)await showDialog.ShowWithFirstConnection(viewModel);
         }
 
-        public async Task ShowCreateGist()
+        public async Task ShowCreateGist(IConnection connection)
         {
             var viewModel = factory.CreateViewModel<IGistCreationViewModel>();
-            await showDialog.ShowWithFirstConnection(viewModel);
+
+            if (connection != null)
+            {
+                await viewModel.InitializeAsync(connection);
+                await showDialog.Show(viewModel);
+            }
+            else
+            {
+                await showDialog.ShowWithFirstConnection(viewModel);
+            }
         }
 
         public async Task ShowCreateRepositoryDialog(IConnection connection)

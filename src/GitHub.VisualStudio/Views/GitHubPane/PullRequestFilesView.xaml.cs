@@ -61,13 +61,15 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
                 if (fileNode != null)
                 {
-                    container.ContextMenu.DataContext = this.DataContext;
-
                     foreach (var menuItem in container.ContextMenu.Items.OfType<MenuItem>())
                     {
                         menuItem.CommandParameter = fileNode;
                     }
 
+                    // HACK: MenuItem doesn't re-query ICommand.CanExecute when CommandParameter changes. Force
+                    // this to happen by resetting its DataContext to null and then to the correct value.
+                    container.ContextMenu.DataContext = null;
+                    container.ContextMenu.DataContext = this.DataContext;
                     e.Handled = false;
                 }
             }

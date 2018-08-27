@@ -16,6 +16,8 @@ namespace GitHub.InlineReviews.SampleData
         }
 
         public string Id { get; set; }
+        public int PullRequestId { get; set; }
+        public int DatabaseId { get; set; }
         public string Body { get; set; }
         public string ErrorMessage { get; set; }
         public CommentEditState EditState { get; set; }

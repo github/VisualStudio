@@ -20,12 +20,10 @@ namespace GitHub.InlineReviews.Models
         /// </summary>
         /// <param name="relativePath">The relative path to the file that the thread is on.</param>
         /// <param name="commitSha">The SHA of the commit that the thread appears on.</param>
-        /// <param name="originalPosition">
-        /// The 1-based line number in the original diff that the thread was left on.
-        /// </param>
         /// <param name="diffMatch">
         /// The last five lines of the thread's diff hunk, in reverse order.
         /// </param>
+        /// <param name="comments">The comments in the thread</param>
         public InlineCommentThreadModel(
             string relativePath,
             string commitSha,

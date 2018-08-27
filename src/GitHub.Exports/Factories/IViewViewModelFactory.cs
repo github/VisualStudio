@@ -13,7 +13,7 @@ namespace GitHub.Factories
         /// <summary>
         /// Creates a view model based on the specified interface type.
         /// </summary>
-        /// <typeparam name="T">The view model interface type.</typeparam>
+        /// <typeparam name="TViewModel">The view model interface type.</typeparam>
         /// <returns>The view model.</returns>
         TViewModel CreateViewModel<TViewModel>() where TViewModel : IViewModel;
 

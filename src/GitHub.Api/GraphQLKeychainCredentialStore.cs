@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
@@ -23,7 +24,7 @@ namespace GitHub.Api
             this.address = address;
         }
 
-        public async Task<string> GetCredentials()
+        public async Task<string> GetCredentials(CancellationToken cancellationToken = default)
         {
             var userPass = await keychain.Load(address).ConfigureAwait(false);
             return userPass?.Item2;
