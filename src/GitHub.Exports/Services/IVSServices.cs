@@ -16,7 +16,7 @@ namespace GitHub.Services
         /// Our workaround is to create, open and delete a solution in the repo directory.
         /// This triggers an event that causes the target repo to open. ;)
         /// </remarks>
-        /// <param name="repoPath">The path to the repository to open</param>
+        /// <param name="directory">The path to the repository to open</param>
         /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
         bool TryOpenRepository(string directory);
 

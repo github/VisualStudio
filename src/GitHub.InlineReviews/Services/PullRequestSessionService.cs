@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.App.Services;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -17,6 +18,7 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
+using Octokit;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Core;
 using Octokit.GraphQL.Model;
@@ -24,6 +26,14 @@ using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
+using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
+using CheckConclusionState = GitHub.Models.CheckConclusionState;
+using CheckStatusState = GitHub.Models.CheckStatusState;
+using DraftPullRequestReviewComment = Octokit.GraphQL.Model.DraftPullRequestReviewComment;
+using FileMode = System.IO.FileMode;
+using NotFoundException = LibGit2Sharp.NotFoundException;
+using PullRequestReviewState = Octokit.GraphQL.Model.PullRequestReviewState;
+using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 
@@ -38,6 +48,8 @@ namespace GitHub.InlineReviews.Services
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestSessionService>();
         static ICompiledQuery<PullRequestDetailModel> readPullRequest;
+        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCommitStatuses;
+        static ICompiledQuery<IEnumerable<LastCommitAdapter>> readCommitStatusesEnterprise;
         static ICompiledQuery<ActorModel> readViewer;
 
         readonly IGitService gitService;
@@ -290,14 +302,14 @@ namespace GitHub.InlineReviews.Services
                         HeadRefName = pr.HeadRefName,
                         HeadRefSha = pr.HeadRefOid,
                         HeadRepositoryOwner = pr.HeadRepositoryOwner != null ? pr.HeadRepositoryOwner.Login : null,
-                        State = (PullRequestStateEnum)pr.State,
+                        State = pr.State.FromGraphQl(),
                         UpdatedAt = pr.UpdatedAt,
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
                             Id = review.Id.Value,
                             Body = review.Body,
                             CommitId = review.Commit.Oid,
-                            State = (GitHub.Models.PullRequestReviewState)review.State,
+                            State = review.State.FromGraphQl(),
                             SubmittedAt = review.SubmittedAt,
                             Author = new ActorModel
                             {
@@ -341,6 +353,10 @@ namespace GitHub.InlineReviews.Services
 
             var apiClient = await apiClientFactory.Create(address);
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
+            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
+
+            result.Statuses = lastCommitModel.Statuses;
+            result.CheckSuites = lastCommitModel.CheckSuites;
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -736,6 +752,85 @@ namespace GitHub.InlineReviews.Services
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
 
+        async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
+        {
+            ICompiledQuery<IEnumerable<LastCommitAdapter>> query;
+            if (address.IsGitHubDotCom())
+            {
+                if (readCommitStatuses == null)
+                {
+                    readCommitStatuses = new Query()
+                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                              commit => new LastCommitAdapter
+                              {
+                                  CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                      .Select(suite => new CheckSuiteModel
+                                      {
+                                          CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                              .Select(run => new CheckRunModel
+                                              {
+                                                  Conclusion = run.Conclusion.FromGraphQl(),
+                                                  Status = run.Status.FromGraphQl(),
+                                                  Name = run.Name,
+                                                  DetailsUrl = run.Permalink,
+                                                  Summary = run.Summary,
+                                              }).ToList()
+                                      }).ToList(),
+                                  Statuses = commit.Commit.Status
+                                      .Select(context =>
+                                          context.Contexts.Select(statusContext => new StatusModel
+                                          {
+                                              State = statusContext.State.FromGraphQl(),
+                                              Context = statusContext.Context,
+                                              TargetUrl = statusContext.TargetUrl,
+                                              Description = statusContext.Description,
+                                          }).ToList()
+                                      ).SingleOrDefault()
+                              }
+                          ).Compile();
+                }
+
+                query = readCommitStatuses;
+            }
+            else
+            {
+                if (readCommitStatusesEnterprise == null)
+                {
+                    readCommitStatusesEnterprise = new Query()
+                     .Repository(Var(nameof(owner)), Var(nameof(name)))
+                     .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                         commit => new LastCommitAdapter
+                         {
+                             Statuses = commit.Commit.Status
+                                 .Select(context =>
+                                     context.Contexts.Select(statusContext => new StatusModel
+                                     {
+                                         State = statusContext.State.FromGraphQl(),
+                                         Context = statusContext.Context,
+                                         TargetUrl = statusContext.TargetUrl,
+                                         Description = statusContext.Description,
+                                     }).ToList()
+                                 ).SingleOrDefault()
+                         }
+                     ).Compile();
+                }
+
+                query = readCommitStatusesEnterprise;
+            }
+
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(number), number },
+            };
+
+            var connection = await graphqlFactory.CreateConnection(address);
+            var result = await connection.Run(query, vars);
+            return result.First();
+        }
+
         static void BuildPullRequestThreads(PullRequestDetailModel model)
         {
             var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
@@ -795,11 +890,6 @@ namespace GitHub.InlineReviews.Services
             model.Threads = threads;
         }
 
-        static GitHub.Models.PullRequestReviewState FromGraphQL(Octokit.GraphQL.Model.PullRequestReviewState s)
-        {
-            return (GitHub.Models.PullRequestReviewState)s;
-        }
-
         static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)
         {
             switch (e)
@@ -825,5 +915,12 @@ namespace GitHub.InlineReviews.Services
             public string OriginalCommitId { get; set; }
             public string ReplyTo { get; set; }
         }
-    }
+
+        class LastCommitAdapter
+        {
+            public List<CheckSuiteModel> CheckSuites { get; set; }
+
+            public List<StatusModel> Statuses { get; set; }
+        }
+    }   
 }

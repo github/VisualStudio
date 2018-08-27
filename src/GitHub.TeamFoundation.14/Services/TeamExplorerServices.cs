@@ -28,6 +28,12 @@ namespace GitHub.Services
             this.serviceProvider = serviceProvider;
         }
 
+        public void ShowConnectPage()
+        {
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            var foo = te.NavigateToPage(new Guid(TeamExplorerPageIds.Connect), null);
+        }
+
         public void ShowPublishSection()
         {
             var te = serviceProvider.TryGetService<ITeamExplorer>();

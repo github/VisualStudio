@@ -42,7 +42,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekSession(),
                 CreateSessionManager(),
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 
@@ -63,7 +64,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekSession(),
                 CreateSessionManager(),
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 
@@ -88,7 +90,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekSession(),
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 
@@ -110,7 +113,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
             Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
@@ -151,7 +155,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 
@@ -177,7 +182,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekSession(),
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 
@@ -209,7 +215,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 
@@ -245,7 +252,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 peekSession,
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>());
+                Substitute.For<IPreviousInlineCommentCommand>(),
+                Substitute.For<ICommentService>());
 
             await target.Initialize();
 

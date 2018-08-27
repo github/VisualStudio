@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="service">The PR service to use.</param>
         /// <param name="sessionService">The PR session service to use.</param>
-        /// <param name="teamExplorerService">The team explorer service to use.</param>
+        /// <param name="teamExplorerContext">The team explorer context to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
             IPullRequestService service,
@@ -225,7 +225,7 @@ namespace GitHub.InlineReviews.Services
         {
             PullRequestSession session = null;
             WeakReference<PullRequestSession> weakSession;
-            var key = Tuple.Create(owner, number);
+            var key = Tuple.Create(owner.ToLowerInvariant(), number);
 
             if (sessions.TryGetValue(key, out weakSession))
             {
