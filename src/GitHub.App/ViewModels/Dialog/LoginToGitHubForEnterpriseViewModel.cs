@@ -65,7 +65,7 @@ namespace GitHub.ViewModels.Dialog
             this.WhenAnyValue(x => x.EnterpriseUrl, x => x.EnterpriseUrlValidator.ValidationResult)
                 .Throttle(TimeSpan.FromMilliseconds(500), scheduler)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => EnterpriseUrlChanged(x.Item1, x.Item2?.IsValid ?? false));
+                .Subscribe(x => UpdatingProbeStatus = EnterpriseUrlChanged(x.Item1, x.Item2?.IsValid ?? false));
 
             NavigateLearnMore = ReactiveCommand.CreateAsyncObservable(_ =>
             {
@@ -122,13 +122,19 @@ namespace GitHub.ViewModels.Dialog
             get;
         }
 
+        public Task UpdatingProbeStatus
+        {
+            get;
+            private set;
+        }
+
         protected override async Task ResetValidation()
         {
             EnterpriseUrl = null;
             await EnterpriseUrlValidator.ResetAsync();
         }
 
-        async void EnterpriseUrlChanged(string url, bool valid)
+        async Task EnterpriseUrlChanged(string url, bool valid)
         {
             if (!valid)
             {

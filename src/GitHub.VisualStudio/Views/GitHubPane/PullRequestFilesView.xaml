@@ -43,9 +43,8 @@
               MouseDoubleClick="changesTree_MouseDoubleClick"
               MouseRightButtonDown="changesTree_MouseRightButtonDown">
         <TreeView.ItemContainerStyle>
-            <Style TargetType="TreeViewItem">
+            <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                 <Setter Property="IsExpanded" Value="True"/>
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>
@@ -67,7 +66,7 @@
                             KeyboardNavigation.DirectionalNavigation="None">
 
                     <imaging:CrispImage Moniker="{Binding Converter={StaticResource FileNameToImageMonikerConverter}, Path=FileName}"
-                                        Width="16" Height="16" Margin="0,0,0,2"/>
+                                        Width="16" Height="16" Margin="0,2"/>
 
                     <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
                         <TextBlock.Style>

@@ -35,6 +35,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly ILocalRepositories localRepositories;
         readonly IUsageTracker usageTracker;
 
+        ITeamExplorerSection invitationSection;
+        string errorMessage;
         bool isCloning;
         bool isCreating;
         GitHubConnectSectionState settings;
@@ -45,41 +47,50 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         protected GitHubConnectContent View
         {
             get { return SectionContent as GitHubConnectContent; }
-            set { SectionContent = value; }
+            private set { SectionContent = value; }
+        }
+
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
+            private set { errorMessage = value; this.RaisePropertyChange(); }
         }
 
         public IConnection SectionConnection { get; set; }
 
-        bool loggedIn;
-        bool LoggedIn
+        bool isLoggingIn;
+        public bool IsLoggingIn
         {
-            get { return loggedIn; }
-            set
-            {
-                loggedIn = ShowLogout = value;
-                ShowLogin = !value;
-            }
+            get { return isLoggingIn; }
+            private set { isLoggingIn = value; this.RaisePropertyChange(); }
         }
 
         bool showLogin;
         public bool ShowLogin
         {
             get { return showLogin; }
-            set { showLogin = value; this.RaisePropertyChange(); }
+            private set { showLogin = value; this.RaisePropertyChange(); }
         }
 
         bool showLogout;
         public bool ShowLogout
         {
             get { return showLogout; }
-            set { showLogout = value; this.RaisePropertyChange(); }
+            private set { showLogout = value; this.RaisePropertyChange(); }
+        }
+
+        bool showRetry;
+        public bool ShowRetry
+        {
+            get { return showRetry; }
+            private set { showRetry = value; this.RaisePropertyChange(); }
         }
 
         IReactiveDerivedList<ILocalRepositoryModel> repositories;
         public IReactiveDerivedList<ILocalRepositoryModel> Repositories
         {
             get { return repositories; }
-            set { repositories = value; this.RaisePropertyChange(); }
+            private set { repositories = value; this.RaisePropertyChange(); }
         }
 
         ILocalRepositoryModel selectedRepository;
@@ -115,7 +126,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
-            LoggedIn = false;
             sectionIndex = index;
 
             this.packageSettings = packageSettings;
@@ -174,44 +184,61 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         protected void Refresh(IConnection connection)
         {
+            InitializeInvitationSection();
+
+            ErrorMessage = connection?.ConnectionError?.GetUserFriendlyErrorMessage(ErrorType.LoginFailed);
+            IsLoggingIn = connection?.IsLoggingIn ?? false;
+            IsVisible = connection != null || (invitationSection?.IsVisible == false);
+
             if (connection == null || !connection.IsLoggedIn)
             {
-                LoggedIn = false;
-                IsVisible = false;
-                SectionConnection = null;
                 if (Repositories != null)
                     Repositories.CollectionChanged -= UpdateRepositoryList;
                 Repositories = null;
                 settings = null;
 
-                if (sectionIndex == 0 && TEServiceProvider != null)
+                if (connection?.ConnectionError != null)
                 {
-                    var section = GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
-                    IsVisible = !(section?.IsVisible ?? true); // only show this when the invitation section is hidden. When in doubt, don't show it.
-                    if (section != null)
-                        section.PropertyChanged += (s, p) =>
-                        {
-                            if (p.PropertyName == "IsVisible")
-                                IsVisible = LoggedIn || !((ITeamExplorerSection)s).IsVisible;
-                        };
+                    ShowLogin = false;
+                    ShowLogout = true;
+                    ShowRetry = !(connection.ConnectionError is Octokit.AuthorizationException);
+                }
+                else
+                {
+                    ShowLogin = true;
+                    ShowLogout = false;
+                    ShowRetry = false;
                 }
             }
-            else
+            else if (connection != SectionConnection || Repositories == null)
             {
-                if (connection != SectionConnection)
+                Repositories?.Dispose();
+                Repositories = localRepositories.GetRepositoriesForAddress(connection.HostAddress);
+                Repositories.CollectionChanged += UpdateRepositoryList;
+                settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
+                ShowLogin = false;
+                ShowLogout = true;
+                Title = connection.HostAddress.Title;
+            }
+
+            if (connection != null && TEServiceProvider != null)
+            {
+                RefreshRepositories().Forget();
+            }
+
+            if (SectionConnection != connection)
+            {
+                if (SectionConnection != null)
                 {
-                    SectionConnection = connection;
-                    Repositories?.Dispose();
-                    Repositories = localRepositories.GetRepositoriesForAddress(connection.HostAddress);
-                    Repositories.CollectionChanged += UpdateRepositoryList;
-                    Title = connection.HostAddress.Title;
-                    IsVisible = true;
-                    LoggedIn = true;
-                    settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
-                    IsExpanded = settings.IsExpanded;
+                    SectionConnection.PropertyChanged -= ConnectionPropertyChanged;
                 }
-                if (TEServiceProvider != null)
-                    RefreshRepositories().Forget();
+
+                SectionConnection = connection;
+
+                if (SectionConnection != null)
+                {
+                    SectionConnection.PropertyChanged += ConnectionPropertyChanged;
+                }
             }
         }
 
@@ -234,6 +261,21 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 sectionTracker = new SectionStateTracker(section, RefreshRepositories);
         }
 
+        void InitializeInvitationSection()
+        {
+            // We're only interested in the invitation section if sectionIndex == 0. Don't want to show
+            // two "Log In" options.
+            if (sectionIndex == 0 && invitationSection == null)
+            {
+                invitationSection = GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
+
+                if (invitationSection != null)
+                {
+                    invitationSection.PropertyChanged += InvitationSectionPropertyChanged;
+                }
+            }
+        }
+
         void UpdateConnection()
         {
             Refresh(connectionManager.Connections.Count > sectionIndex
@@ -243,10 +285,27 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void OnPropertyChange(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "IsVisible" && IsVisible && View == null)
+            if (e.PropertyName == nameof(IsVisible) && IsVisible && View == null)
                 View = new GitHubConnectContent { DataContext = this };
-            else if (e.PropertyName == "IsExpanded" && settings != null)
+            else if (e.PropertyName == nameof(IsExpanded) && settings != null)
                 settings.IsExpanded = IsExpanded;
+        }
+
+        void InvitationSectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ITeamExplorerSection.IsVisible))
+            {
+                Refresh(SectionConnection);
+            }
+        }
+
+        private void ConnectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IConnection.IsLoggedIn) ||
+                e.PropertyName == nameof(IConnection.IsLoggingIn))
+            {
+                Refresh(SectionConnection);
+            }
         }
 
         async void UpdateRepositoryList(object sender, NotifyCollectionChangedEventArgs e)
@@ -393,6 +452,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             var dialogService = ServiceProvider.GetService<IDialogService>();
             dialogService.ShowLoginDialog();
+        }
+
+        public void Retry()
+        {
+            connectionManager.Retry(SectionConnection);
         }
 
         public bool OpenRepository()

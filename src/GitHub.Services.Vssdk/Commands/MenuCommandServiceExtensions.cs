@@ -16,7 +16,7 @@ namespace GitHub.Services.Vssdk.Commands
         /// Adds <see cref="IVsCommand"/>s or <see cref="IVsCommand{TParam}"/>s to a menu.
         /// </summary>
         /// <param name="service">The menu command service.</param>
-        /// <param name="command">The commands to add.</param>
+        /// <param name="commands">The commands to add.</param>
         public static void AddCommands(
             this IMenuCommandService service,
             params IVsCommandBase[] commands)

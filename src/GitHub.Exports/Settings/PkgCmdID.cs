@@ -19,6 +19,7 @@ namespace GitHub.VisualStudio
         public const int refreshCommand = 0x302;
         public const int pullRequestCommand = 0x310;
         public const int createGistCommand = 0x400;
+        public const int createGistEnterpriseCommand = 0x401;
         public const int openLinkCommand = 0x100;
         public const int copyLinkCommand = 0x101;
         public const int goToSolutionOrPullRequestFileCommand = 0x102;

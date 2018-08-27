@@ -12,6 +12,7 @@ namespace GitHub.Services
         /// is null or no remote exists, this method returns null
         /// </summary>
         /// <param name="repository">The repository to look at for the remote.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
         UriString GetUri(IRepository repository, string remote = "origin");
 
@@ -24,6 +25,7 @@ namespace GitHub.Services
         /// walks up the parent directories until it either finds a repository, or reaches the root disk.
         /// </remarks>
         /// <param name="path">The path to start probing</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
         UriString GetUri(string path, string remote = "origin");
         
@@ -42,7 +44,8 @@ namespace GitHub.Services
         /// <summary>
         /// Returns a <see cref="UriString"/> representing the uri of a remote.
         /// </summary>
-        /// <param name="repo"></param>
+        /// <param name="repo">The repository to look at for the remote.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns></returns>
         UriString GetRemoteUri(IRepository repo, string remote = "origin");
 

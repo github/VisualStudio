@@ -143,10 +143,11 @@ namespace GitHub.InlineReviews.UnitTests.Services
             {
                 var currentUser = CreateActor();
                 var review = CreateReview(author: currentUser, state: PullRequestReviewState.Pending);
+                var service = Substitute.For<IPullRequestSessionService>();
                 var pr = CreatePullRequest(review);
 
                 var target = new PullRequestSession(
-                    Substitute.For<IPullRequestSessionService>(),
+                    service,
                     currentUser,
                     pr,
                     Substitute.For<ILocalRepositoryModel>(),
@@ -155,6 +156,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 Assert.That(target.HasPendingReview, Is.True);
 
+                service.CancelPendingReview(null, null).ReturnsForAnyArgs(CreatePullRequest());
                 await target.CancelReview();
 
                 Assert.That(target.HasPendingReview, Is.False);
@@ -329,6 +331,8 @@ Line 4";
                 var service = Substitute.For<IPullRequestSessionService>();
                 var target = CreateTargetWithPendingReview(service);
 
+                service.CancelPendingReview(null, null).ReturnsForAnyArgs(CreatePullRequest());
+
                 await target.CancelReview();
 
                 await service.Received(1).CancelPendingReview(
@@ -341,6 +345,8 @@ Line 4";
             {
                 var service = Substitute.For<IPullRequestSessionService>();
                 var target = CreateTargetWithPendingReview(service);
+
+                service.CancelPendingReview(null, null).ReturnsForAnyArgs(CreatePullRequest());
 
                 await target.CancelReview();
 

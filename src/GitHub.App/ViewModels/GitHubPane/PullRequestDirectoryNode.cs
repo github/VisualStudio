@@ -12,7 +12,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDirectoryNode"/> class.
         /// </summary>
-        /// <param name="path">The path to the directory, relative to the repository.</param>
+        /// <param name="relativePath">The path to the directory, relative to the repository.</param>
         public PullRequestDirectoryNode(string relativePath)
         {
             DirectoryName = System.IO.Path.GetFileName(relativePath);

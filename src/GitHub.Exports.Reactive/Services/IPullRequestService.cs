@@ -18,6 +18,7 @@ namespace GitHub.Services
         /// <param name="owner">The repository owner.</param>
         /// <param name="name">The repository name.</param>
         /// <param name="after">The end cursor of the previous page, or null for the first page.</param>
+        /// <param name="states">The pull request states to filter by</param>
         /// <returns>A page of pull request item models.</returns>
         Task<Page<PullRequestListItemModel>> ReadPullRequests(
             HostAddress address,
@@ -84,6 +85,7 @@ namespace GitHub.Services
         /// Sync submodules on the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
+        /// <param name="progress">A method that will be called with progress messages</param>
         Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress);
 
         /// <summary>
@@ -224,5 +226,11 @@ namespace GitHub.Services
             string baseBranch,
             string compareBranch,
             int maxCommits);
+
+        /// <summary>
+        /// Displays a confirmation diaglog to ask if the user wants to cancel a pending review.
+        /// </summary>
+        /// <returns></returns>
+        bool ConfirmCancelPendingReview();
     }
 }
