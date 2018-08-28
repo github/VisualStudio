@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
@@ -202,8 +203,15 @@ namespace GitHub.SampleData
 
             public Octokit.User User => null;
             public bool IsLoggedIn => true;
+            public bool IsLoggingIn => false;
 
             public Exception ConnectionError => null;
+
+            event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+            {
+                add { }
+                remove { }
+            }
         }
 
         public RepositoryPublishViewModelDesigner()
