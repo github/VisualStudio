@@ -69,35 +69,30 @@ namespace GitHub.Services
                     RepositoryAffiliation.Owner
                 };
 
-                // TODO: Use fragments for the repository selections.
+                var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
+                    "repository",
+                    repo => new RepositoryListItemModel
+                    {
+                        IsFork = repo.IsFork,
+                        IsPrivate = repo.IsPrivate,
+                        Name = repo.Name,
+                        Owner = repo.Owner.Login,
+                        Url = new Uri(repo.Url),
+                    });
+
                 readViewerRepositories = new Query()
                     .Viewer
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
                             .AllPages()
-                            .Select(repo => new RepositoryListItemModel
-                            {
-                                IsFork = repo.IsFork,
-                                IsPrivate = repo.IsPrivate,
-                                Name = repo.Name,
-                                Owner = repo.Owner.Login,
-                                Url = new Uri(repo.Url),
-                            }).ToList(),
-                        // TODO: Use AllPages() below once octokit/octokit.graphql.net#132 is fixed.
-                        OrganizationRepositories = viewer.Organizations(100, null, null, null).Nodes.Select(org => new
+                            .Select(repositorySelection).ToList(),
+                        OrganizationRepositories = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
                             Repositories = org.Repositories(null, null, null, null, null, order, null, null, null)
                                 .AllPages()
-                                .Select(repo => new RepositoryListItemModel
-                                {
-                                    IsFork = repo.IsFork,
-                                    IsPrivate = repo.IsPrivate,
-                                    Name = repo.Name,
-                                    Owner = repo.Owner.Login,
-                                    Url = new Uri(repo.Url),
-                                }).ToList()
+                                .Select(repositorySelection).ToList()
                         }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();
             }
