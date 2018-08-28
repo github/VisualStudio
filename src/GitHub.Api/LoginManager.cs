@@ -24,7 +24,8 @@ namespace GitHub.Api
         readonly Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
-        readonly IReadOnlyList<string> scopes;
+        readonly IReadOnlyList<string> minimumScopes;
+        readonly IReadOnlyList<string> requestedScopes;
         readonly string authorizationNote;
         readonly string fingerprint;
         IOAuthCallbackListener oauthListener;
@@ -37,7 +38,8 @@ namespace GitHub.Api
         /// <param name="oauthListener">The callback listener to signal successful login.</param>
         /// <param name="clientId">The application's client API ID.</param>
         /// <param name="clientSecret">The application's client API secret.</param>
-        /// <param name="scopes">List of scopes to authenticate for</param>
+        /// <param name="minimumScopes">The minimum acceptable scopes.</param>
+        /// <param name="requestedScopes">The scopes to request when logging in.</param>
         /// <param name="authorizationNote">An note to store with the authorization.</param>
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
@@ -46,7 +48,8 @@ namespace GitHub.Api
             IOAuthCallbackListener oauthListener,
             string clientId,
             string clientSecret,
-            IReadOnlyList<string> scopes,
+            IReadOnlyList<string> minimumScopes,
+            IReadOnlyList<string> requestedScopes,
             string authorizationNote = null,
             string fingerprint = null)
         {
@@ -60,7 +63,8 @@ namespace GitHub.Api
             this.oauthListener = oauthListener;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
-            this.scopes = scopes;
+            this.minimumScopes = minimumScopes;
+            this.requestedScopes = requestedScopes;
             this.authorizationNote = authorizationNote;
             this.fingerprint = fingerprint;
         }
@@ -83,7 +87,7 @@ namespace GitHub.Api
 
             var newAuth = new NewAuthorization
             {
-                Scopes = scopes,
+                Scopes = requestedScopes,
                 Note = authorizationNote,
                 Fingerprint = fingerprint,
             };
@@ -378,13 +382,13 @@ namespace GitHub.Api
                     .Select(x => x.Trim())
                     .ToArray();
 
-                if (ScopesMatch(scopes, returnedScopes))
+                if (ScopesMatch(minimumScopes, returnedScopes))
                 {
                     return response.Body;
                 }
                 else
                 {
-                    log.Error("Incorrect API scopes: require {RequiredScopes} but got {Scopes}", scopes, returnedScopes);
+                    log.Error("Incorrect API scopes: require {RequiredScopes} but got {Scopes}", minimumScopes, returnedScopes);
                 }
             }
             else
@@ -393,7 +397,7 @@ namespace GitHub.Api
             }
 
             throw new IncorrectScopesException(
-                "Incorrect API scopes. Required: " + string.Join(",", scopes));
+                "Incorrect API scopes. Required: " + string.Join(",", minimumScopes));
         }
 
         Uri GetLoginUrl(IOauthClient client, string state)
@@ -402,7 +406,7 @@ namespace GitHub.Api
 
             request.State = state;
 
-            foreach (var scope in scopes)
+            foreach (var scope in minimumScopes)
             {
                 request.Scopes.Add(scope);
             }

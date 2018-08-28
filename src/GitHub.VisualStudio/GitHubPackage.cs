@@ -256,7 +256,8 @@ namespace GitHub.VisualStudio
                     oauthListener,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
-                    ApiClientConfiguration.RequiredScopes,
+                    ApiClientConfiguration.MinimumScopes,
+                    ApiClientConfiguration.RequestedScopes,
                     ApiClientConfiguration.AuthorizationNote,
                     ApiClientConfiguration.MachineFingerprint);
             }
