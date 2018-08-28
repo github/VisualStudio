@@ -125,7 +125,7 @@ namespace GitHub.Api
             } while (auth == null);
 
             await keychain.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
-            return await ReadUserWithRetry(client);
+            return await ReadUserWithRetry(client).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -147,12 +147,12 @@ namespace GitHub.Api
 
             openBrowser(loginUrl);
 
-            var code = await listen;
+            var code = await listen.ConfigureAwait(false);
             var request = new OauthTokenRequest(clientId, clientSecret, code);
-            var token = await oauthClient.CreateAccessToken(request);
+            var token = await oauthClient.CreateAccessToken(request).ConfigureAwait(false);
 
             await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
-            var user = await ReadUserWithRetry(client);
+            var user = await ReadUserWithRetry(client).ConfigureAwait(false);
             await keychain.Save(user.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
             return user;
         }
@@ -171,13 +171,13 @@ namespace GitHub.Api
 
             try
             {
-                var user = await ReadUserWithRetry(client);
+                var user = await ReadUserWithRetry(client).ConfigureAwait(false);
                 await keychain.Save(user.Login, token, hostAddress).ConfigureAwait(false);
                 return user;
             }
             catch
             {
-                await keychain.Delete(hostAddress);
+                await keychain.Delete(hostAddress).ConfigureAwait(false);
                 throw;
             }
         }
@@ -197,7 +197,7 @@ namespace GitHub.Api
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            await keychain.Delete(hostAddress);
+            await keychain.Delete(hostAddress).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -260,18 +260,18 @@ namespace GitHub.Api
                         twoFactorAuthenticationCode).ConfigureAwait(false);
                 }
 
-                if (result.Token == string.Empty)
+                if (string.IsNullOrEmpty(result.Token))
                 {
                     if (twoFactorAuthenticationCode == null)
                     {
-                        await client.Authorization.Delete(result.Id);
+                        await client.Authorization.Delete(result.Id).ConfigureAwait(false);
                     }
                     else
                     {
-                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode);
+                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode).ConfigureAwait(false);
                     }
                 }
-            } while (result.Token == string.Empty && retry++ == 0);
+            } while (string.IsNullOrEmpty(result.Token) && retry++ == 0);
 
             return result;
         }
@@ -284,7 +284,7 @@ namespace GitHub.Api
         {
             for (;;)
             {
-                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception);
+                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception).ConfigureAwait(false);
 
                 if (challengeResult == null)
                 {
@@ -308,7 +308,7 @@ namespace GitHub.Api
                     }
                     catch (Exception e)
                     {
-                        await twoFactorChallengeHandler.Value.ChallengeFailed(e);
+                        await twoFactorChallengeHandler.Value.ChallengeFailed(e).ConfigureAwait(false);
                         await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
@@ -366,7 +366,7 @@ namespace GitHub.Api
 
                 // It seems that attempting to use a token immediately sometimes fails, retry a few
                 // times with a delay of of 1s to allow the token to propagate.
-                await Task.Delay(1000);
+                await Task.Delay(1000).ConfigureAwait(false);
             }
         }
 
