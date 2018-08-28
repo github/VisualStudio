@@ -64,12 +64,17 @@ namespace GitHub.Services
                     Direction = OrderDirection.Asc
                 };
 
+                var affiliation = new RepositoryAffiliation?[]
+                {
+                    RepositoryAffiliation.Owner
+                };
+
                 // TODO: Use fragments for the repository selections.
                 readViewerRepositories = new Query()
                     .Viewer
                     .Select(viewer => new ViewerRepositoriesModel
                     {
-                        Repositories = viewer.Repositories(null, null, null, null, null, order, null, null, null)
+                        Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
                             .AllPages()
                             .Select(repo => new RepositoryListItemModel
                             {
