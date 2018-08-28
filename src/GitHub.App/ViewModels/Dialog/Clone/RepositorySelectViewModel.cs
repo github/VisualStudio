@@ -123,6 +123,12 @@ namespace GitHub.ViewModels.Dialog.Clone
             catch (Exception ex)
             {
                 log.Error(ex, "Error reading repository list from {Address}", connection.HostAddress);
+
+                if (ex is AggregateException aggregate)
+                {
+                    ex = aggregate.InnerExceptions[0];
+                }
+
                 Error = ex;
             }
             finally
