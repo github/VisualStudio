@@ -199,9 +199,8 @@ namespace GitHub.SampleData
             public HostAddress HostAddress { get; set; }
 
             public string Username { get; set; }
-            public ObservableCollection<ILocalRepositoryModel> Repositories { get; set; }
-
             public Octokit.User User => null;
+            public ScopesCollection Scopes => null;
             public bool IsLoggedIn => true;
             public bool IsLoggingIn => false;
 

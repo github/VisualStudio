@@ -80,7 +80,7 @@ namespace GitHub.VisualStudio
 
             var client = CreateClient(address);
             var login = await loginManager.Login(address, client, userName, password);
-            var connection = new Connection(address, userName, login.User);
+            var connection = new Connection(address, login.User, login.Scopes);
 
             conns.Add(connection);
             await SaveConnections();
@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio
             var client = CreateClient(address);
             var oauthClient = new OauthClient(client.Connection);
             var login = await loginManager.LoginViaOAuth(address, client, oauthClient, OpenBrowser, cancel);
-            var connection = new Connection(address, login.User.Login, login.User);
+            var connection = new Connection(address, login.User, login.Scopes);
 
             conns.Add(connection);
             await SaveConnections();
@@ -122,7 +122,7 @@ namespace GitHub.VisualStudio
 
             var client = CreateClient(address);
             var login = await loginManager.LoginWithToken(address, client, token);
-            var connection = new Connection(address, login.User.Login, login.User);
+            var connection = new Connection(address, login.User, login.Scopes);
 
             conns.Add(connection);
             await SaveConnections();
@@ -157,7 +157,7 @@ namespace GitHub.VisualStudio
             {
                 var client = CreateClient(c.HostAddress);
                 var login = await loginManager.LoginFromCache(connection.HostAddress, client);
-                c.SetSuccess(login.User);
+                c.SetSuccess(login.User, login.Scopes);
                 await usageTracker.IncrementCounter(x => x.NumberOfLogins);
             }
             catch (Exception e)
@@ -194,7 +194,7 @@ namespace GitHub.VisualStudio
             {
                 foreach (var c in await cache.Load())
                 {
-                    var connection = new Connection(c.HostAddress);
+                    var connection = new Connection(c.HostAddress, c.UserName);
                     result.Add(connection);
                 }
 
@@ -206,7 +206,7 @@ namespace GitHub.VisualStudio
                     try
                     {
                         login = await loginManager.LoginFromCache(connection.HostAddress, client);
-                        connection.SetSuccess(login.User);
+                        connection.SetSuccess(login.User, login.Scopes);
                         await usageTracker.IncrementCounter(x => x.NumberOfLogins);
                     }
                     catch (Exception e)

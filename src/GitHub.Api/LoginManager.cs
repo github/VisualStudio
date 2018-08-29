@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
+using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 using Serilog;
@@ -200,40 +201,6 @@ namespace GitHub.Api
             await keychain.Delete(hostAddress).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Tests if received API scopes match the required API scopes.
-        /// </summary>
-        /// <param name="required">The required API scopes.</param>
-        /// <param name="received">The received API scopes.</param>
-        /// <returns>True if all required scopes are present, otherwise false.</returns>
-        public static bool ScopesMatch(IReadOnlyList<string> required, IReadOnlyList<string> received)
-        {
-            foreach (var scope in required)
-            {
-                var found = received.Contains(scope);
-
-                if (!found && 
-                    (scope.StartsWith("read:", StringComparison.Ordinal) ||
-                     scope.StartsWith("write:", StringComparison.Ordinal)))
-                {
-                    // NOTE: Scopes are actually more complex than this, for example
-                    // `user` encompasses `read:user` and `user:email` but just use
-                    // this simple rule for now as it works for the scopes we require.
-                    var adminScope = scope
-                        .Replace("read:", "admin:")
-                        .Replace("write:", "admin:");
-                    found = received.Contains(adminScope);
-                }
-
-                if (!found)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
             IGitHubClient client,
             NewAuthorization newAuth,
@@ -377,12 +344,12 @@ namespace GitHub.Api
 
             if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
             {
-                var returnedScopes = response.HttpResponse.Headers[ScopesHeader]
+                var returnedScopes = new ScopesCollection(response.HttpResponse.Headers[ScopesHeader]
                     .Split(',')
                     .Select(x => x.Trim())
-                    .ToArray();
+                    .ToArray());
 
-                if (ScopesMatch(minimumScopes, returnedScopes))
+                if (returnedScopes.Matches(minimumScopes))
                 {
                     return new LoginResult(response.Body, returnedScopes);
                 }

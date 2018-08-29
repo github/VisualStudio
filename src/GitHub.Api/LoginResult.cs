@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GitHub.Models;
 using Octokit;
 
 namespace GitHub.Api
@@ -14,7 +15,7 @@ namespace GitHub.Api
         /// </summary>
         /// <param name="user">The logged-in user.</param>
         /// <param name="scopes">The login scopes.</param>
-        public LoginResult(User user, IReadOnlyList<string> scopes)
+        public LoginResult(User user, ScopesCollection scopes)
         {
             User = user;
             Scopes = scopes;
@@ -23,7 +24,7 @@ namespace GitHub.Api
         /// <summary>
         /// Gets the login scopes.
         /// </summary>
-        public IReadOnlyList<string> Scopes { get; }
+        public ScopesCollection Scopes { get; }
 
         /// <summary>
         /// Gets the logged-in user.

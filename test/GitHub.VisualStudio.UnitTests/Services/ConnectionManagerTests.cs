@@ -262,11 +262,11 @@ public class ConnectionManagerTests
     {
         var result = Substitute.For<ILoginManager>();
         result.Login(null, null, null, null)
-            .ReturnsForAnyArgs(new LoginResult(new User(), new[] { "scope1" }));
+            .ReturnsForAnyArgs(new LoginResult(new User(), new ScopesCollection(new[] { "scope1" })));
         result.Login(HostAddress.Create("invalid.com"), Arg.Any<IGitHubClient>(), Arg.Any<string>(), Arg.Any<string>())
             .Returns<LoginResult>(_ => { throw new AuthorizationException(); });
         result.LoginFromCache(null, null)
-            .ReturnsForAnyArgs(new LoginResult(new User(), new[] { "scope1" }));
+            .ReturnsForAnyArgs(new LoginResult(new User(), new ScopesCollection(new[] { "scope1" })));
         result.LoginFromCache(HostAddress.Create("invalid.com"), Arg.Any<IGitHubClient>())
             .Returns<LoginResult>(_ => { throw new AuthorizationException(); });
         return result;

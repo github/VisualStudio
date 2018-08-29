@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using GitHub.Models;
@@ -13,12 +14,16 @@ namespace GitHub.Services
     {
         string username;
         Octokit.User user;
+        ScopesCollection scopes;
         bool isLoggedIn;
         bool isLoggingIn;
         Exception connectionError;
 
-        public Connection(HostAddress hostAddress)
+        public Connection(
+            HostAddress hostAddress,
+            string username)
         {
+            this.username = username;
             HostAddress = hostAddress;
             isLoggedIn = false;
             isLoggingIn = true;
@@ -26,12 +31,12 @@ namespace GitHub.Services
 
         public Connection(
             HostAddress hostAddress,
-            string username,
-            Octokit.User user)
+            Octokit.User user,
+            ScopesCollection scopes)
         {
             HostAddress = hostAddress;
-            this.username = username;
             this.user = user;
+            this.scopes = scopes;
             isLoggedIn = true;
         }
 
@@ -44,12 +49,18 @@ namespace GitHub.Services
             get => username;
             private set => RaiseAndSetIfChanged(ref username, value);
         }
-
         /// <inheritdoc/>
         public Octokit.User User
         {
             get => user;
             private set => RaiseAndSetIfChanged(ref user, value);
+        }
+
+        /// <inheritdoc/>
+        public ScopesCollection Scopes
+        {
+            get => scopes;
+            private set => RaiseAndSetIfChanged(ref scopes, value);
         }
 
         /// <inheritdoc/>
@@ -82,7 +93,7 @@ namespace GitHub.Services
             IsLoggedIn = false;
             IsLoggingIn = true;
             User = null;
-            Username = null;
+            Scopes = null;
         }
 
         public void SetError(Exception e)
@@ -90,12 +101,13 @@ namespace GitHub.Services
             ConnectionError = e;
             IsLoggingIn = false;
             IsLoggedIn = false;
+            Scopes = null;
         }
 
-        public void SetSuccess(Octokit.User user)
+        public void SetSuccess(Octokit.User user, ScopesCollection scopes)
         {
             User = user;
-            Username = user.Login;
+            Scopes = scopes;
             IsLoggingIn = false;
             IsLoggedIn = true;
         }
