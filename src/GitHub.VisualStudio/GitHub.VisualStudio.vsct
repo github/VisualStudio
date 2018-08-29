@@ -141,7 +141,7 @@
 
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
-        <Icon guid="guidImages" id="arrow_left" />
+        <Icon guid="ImageCatalogGuid" id="Backwards" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -152,7 +152,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" type="Button">
-        <Icon guid="guidImages" id="arrow_right" />
+        <Icon guid="ImageCatalogGuid" id="Forwards" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -174,7 +174,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
-        <Icon guid="guidImages" id="refresh" />
+        <Icon guid="ImageCatalogGuid" id="Refresh" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -196,7 +196,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="helpCommand" type="Button">
-        <Icon guid="guidImages" id="question" />
+        <Icon guid="ImageCatalogGuid" id="StatusHelp" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Help</ButtonText>
