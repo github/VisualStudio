@@ -181,6 +181,17 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubToolbarCmdSet" id="syncActiveDocumentCommand" type="Button">
+        <Icon guid="guidImages" id="arrow_left" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>Sync Active Document</ButtonText>
+          <CanonicalName>.GitHub.SyncActiveDocument</CanonicalName>
+          <LocCanonicalName>.GitHub.SyncActiveDocument</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
         <Icon guid="guidImages" id="logo_toolbar" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -349,6 +360,10 @@
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
     </CommandPlacement>
 
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="syncActiveDocumentCommand" priority="0x104">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
     <CommandPlacement guid="guidGitHubToolbarCmdSet" id="helpCommand" priority="0x111">
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup"/>
     </CommandPlacement>
@@ -416,6 +431,7 @@
       <IDSymbol name="pullRequestCommand" value="0x310" />
       <IDSymbol name="githubCommand" value="0x320" />
       <IDSymbol name="helpCommand" value="0x321" />
+      <IDSymbol name="syncActiveDocumentCommand" value="0x322" />
     </GuidSymbol>
 
     <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">

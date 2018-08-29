@@ -25,6 +25,7 @@ namespace GitHub.VisualStudio
         public const int goToSolutionOrPullRequestFileCommand = 0x102;
         public const int githubCommand = 0x320;
         public const int helpCommand = 0x321;
+        public const int syncActiveDocumentCommand = 0x322;
         public const int blameCommand = 0x500;
 
         // IDs defined in InlineReviewsPackage.vsct

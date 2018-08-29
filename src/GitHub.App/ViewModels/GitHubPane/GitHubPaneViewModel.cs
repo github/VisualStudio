@@ -53,6 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ReactiveCommand<Unit> showPullRequests;
         readonly ReactiveCommand<object> openInBrowser;
         readonly ReactiveCommand<object> help;
+        readonly ReactiveCommand<Unit> syncActiveDocument;
         IDisposable connectionSubscription;
         Task initializeTask;
         IViewModel content;
@@ -159,6 +160,13 @@ namespace GitHub.ViewModels.GitHubPane
                 browser.OpenUrl(new Uri(GitHubUrls.Documentation));
                 usageTracker.IncrementCounter(x => x.NumberOfGitHubPaneHelpClicks).Forget();
             });
+
+            var currentPageIsPullRequest = currentPage
+                .SelectMany(x => (x as IPullRequestDetailViewModel)?.WhenAnyValue(model => model.IsLoading) ?? Observable.Return(false));
+
+            syncActiveDocument = ReactiveCommand.CreateAsyncTask(
+                currentPageIsPullRequest,
+                _ => SyncActiveDocument());
 
             navigator.WhenAnyObservable(x => x.Content.NavigationRequested)
                 .Subscribe(x => NavigateTo(x).Forget());
@@ -293,6 +301,12 @@ namespace GitHub.ViewModels.GitHubPane
             return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
         }
 
+        public Task SyncActiveDocument()
+        {
+            log.Debug("Sync Active Document");
+            return Task.CompletedTask;
+        }
+
         /// <inheritdoc/>
         public Task ShowPullRequest(string owner, string repo, int number)
         {
@@ -348,6 +362,7 @@ namespace GitHub.ViewModels.GitHubPane
             BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);
             BindNavigatorCommand(menuService, PkgCmdIDList.githubCommand, openInBrowser);
             BindNavigatorCommand(menuService, PkgCmdIDList.helpCommand, help);
+            BindNavigatorCommand(menuService, PkgCmdIDList.syncActiveDocumentCommand, syncActiveDocument);
         }
 
         OleMenuCommand BindNavigatorCommand<T>(IMenuCommandService menu, int commandId, ReactiveCommand<T> command)
