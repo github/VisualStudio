@@ -48,7 +48,7 @@ public class LoginManagerTests
             var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             var result = await target.Login(host, client, "foo", "bar");
 
-            Assert.That(user, Is.SameAs(result));
+            Assert.That(user, Is.SameAs(result.User));
         }
 
         [Test]

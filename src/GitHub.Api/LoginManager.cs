@@ -70,7 +70,7 @@ namespace GitHub.Api
         }
 
         /// <inheritdoc/>
-        public async Task<User> Login(
+        public async Task<LoginResult> Login(
             HostAddress hostAddress,
             IGitHubClient client,
             string userName,
@@ -129,7 +129,7 @@ namespace GitHub.Api
         }
 
         /// <inheritdoc/>
-        public async Task<User> LoginViaOAuth(
+        public async Task<LoginResult> LoginViaOAuth(
             HostAddress hostAddress,
             IGitHubClient client,
             IOauthClient oauthClient,
@@ -152,13 +152,13 @@ namespace GitHub.Api
             var token = await oauthClient.CreateAccessToken(request).ConfigureAwait(false);
 
             await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
-            var user = await ReadUserWithRetry(client).ConfigureAwait(false);
-            await keychain.Save(user.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
-            return user;
+            var result = await ReadUserWithRetry(client).ConfigureAwait(false);
+            await keychain.Save(result.User.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
+            return result;
         }
 
         /// <inheritdoc/>
-        public async Task<User> LoginWithToken(
+        public async Task<LoginResult> LoginWithToken(
             HostAddress hostAddress,
             IGitHubClient client,
             string token)
@@ -171,9 +171,9 @@ namespace GitHub.Api
 
             try
             {
-                var user = await ReadUserWithRetry(client).ConfigureAwait(false);
-                await keychain.Save(user.Login, token, hostAddress).ConfigureAwait(false);
-                return user;
+                var result = await ReadUserWithRetry(client).ConfigureAwait(false);
+                await keychain.Save(result.User.Login, token, hostAddress).ConfigureAwait(false);
+                return result;
             }
             catch
             {
@@ -183,7 +183,7 @@ namespace GitHub.Api
         }
 
         /// <inheritdoc/>
-        public Task<User> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
+        public Task<LoginResult> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
@@ -349,7 +349,7 @@ namespace GitHub.Api
                  apiException?.StatusCode == (HttpStatusCode)422);
         }
 
-        async Task<User> ReadUserWithRetry(IGitHubClient client)
+        async Task<LoginResult> ReadUserWithRetry(IGitHubClient client)
         {
             var retry = 0;
 
@@ -370,7 +370,7 @@ namespace GitHub.Api
             }
         }
 
-        async Task<User> GetUserAndCheckScopes(IGitHubClient client)
+        async Task<LoginResult> GetUserAndCheckScopes(IGitHubClient client)
         {
             var response = await client.Connection.Get<User>(
                 UserEndpoint, null, null).ConfigureAwait(false);
@@ -384,7 +384,7 @@ namespace GitHub.Api
 
                 if (ScopesMatch(minimumScopes, returnedScopes))
                 {
-                    return response.Body;
+                    return new LoginResult(response.Body, returnedScopes);
                 }
                 else
                 {

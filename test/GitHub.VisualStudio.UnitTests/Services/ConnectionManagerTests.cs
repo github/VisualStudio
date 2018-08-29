@@ -261,12 +261,14 @@ public class ConnectionManagerTests
     static ILoginManager CreateLoginManager()
     {
         var result = Substitute.For<ILoginManager>();
+        result.Login(null, null, null, null)
+            .ReturnsForAnyArgs(new LoginResult(new User(), new[] { "scope1" }));
         result.Login(HostAddress.Create("invalid.com"), Arg.Any<IGitHubClient>(), Arg.Any<string>(), Arg.Any<string>())
-            .Returns<User>(_ => { throw new AuthorizationException(); });
+            .Returns<LoginResult>(_ => { throw new AuthorizationException(); });
         result.LoginFromCache(null, null)
-            .ReturnsForAnyArgs(new User());
+            .ReturnsForAnyArgs(new LoginResult(new User(), new[] { "scope1" }));
         result.LoginFromCache(HostAddress.Create("invalid.com"), Arg.Any<IGitHubClient>())
-            .Returns<User>(_ => { throw new AuthorizationException(); });
+            .Returns<LoginResult>(_ => { throw new AuthorizationException(); });
         return result;
     }
 }
