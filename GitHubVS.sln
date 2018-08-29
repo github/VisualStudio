@@ -125,6 +125,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.UnitT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.UnitTests", "test\GitHub.VisualStudio.UnitTests\GitHub.VisualStudio.UnitTests.csproj", "{8B14F90B-0781-465D-AB94-19C8C56E3A94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.16", "src\GitHub.TeamFoundation.16\GitHub.TeamFoundation.16.csproj", "{F074E95F-A9A0-403F-8633-D112582B8A70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -504,6 +506,16 @@ Global
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.DebugCodeAnalysis|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.DebugCodeAnalysis|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.DebugWithoutVsix|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{F074E95F-A9A0-403F-8633-D112582B8A70}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
