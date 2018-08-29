@@ -13,13 +13,13 @@
     <Tags>GitHub;git;open source;source control;branch;pull request;team explorer;commit;publish</Tags>
   </Metadata>
   <Installation AllUsers="true" Experimental="false">
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,15.0]" />
-    <InstallationTarget Version="[15.0,16.0)" Id="Microsoft.VisualStudio.IntegratedShell" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,17.0)" />
+    <InstallationTarget Id="Microsoft.VisualStudio.IntegratedShell" Version="[15.0,17.0)" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0,]" />
-    <Dependency Id="Microsoft.VisualStudio.TeamFoundation.TeamExplorer.Extensions" DisplayName="Team Explorer" d:Source="Installed" Version="[14.0,16.0)" />
+    <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0,)" />
+    <Dependency Id="Microsoft.VisualStudio.TeamFoundation.TeamExplorer.Extensions" DisplayName="Team Explorer" d:Source="Installed" Version="[14.0,)" />
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
@@ -30,7 +30,7 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.App" Path="|GitHub.App|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Services.Vssdk" Path="|GitHub.Services.Vssdk|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.14" TargetVersion="[14.0,15.0)" Path="|GitHub.TeamFoundation.14|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" TargetVersion="[15.0,16.0)" Path="|GitHub.TeamFoundation.15|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" TargetVersion="[15.0,17.0)" Path="|GitHub.TeamFoundation.15|" />
     <!-- Sometimes the version of `ServiceHub.VSDetouredHost.exe` is used when installing for Visual Studio 2017, see https://github.com/github/VisualStudio/pull/1875 -->
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" TargetVersion="[1.0,2.0)" Path="|GitHub.TeamFoundation.15|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.InlineReviewsPackage" Path="|GitHub.InlineReviews;PkgdefProjectOutputGroup|" />
@@ -39,6 +39,6 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Rothko.dll" />
   </Assets>
   <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.25824.0,16.0)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.25824.0,)" DisplayName="Visual Studio core editor" />
   </Prerequisites>
 </PackageManifest>

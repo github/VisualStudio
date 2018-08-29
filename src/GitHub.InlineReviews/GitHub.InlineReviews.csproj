@@ -169,9 +169,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="source.extension.vsixmanifest">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">

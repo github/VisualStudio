@@ -30,6 +30,7 @@ namespace GitHub.Services
                 case 14:
                     return Create(() => new VSGitExt14(asyncServiceProvider));
                 case 15:
+                case 16:
                     return Create(() => new VSGitExt15(asyncServiceProvider));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
