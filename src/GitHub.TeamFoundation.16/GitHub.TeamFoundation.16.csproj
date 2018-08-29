@@ -57,23 +57,23 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Common">
-      <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Common.dll</HintPath>
+      <HintPath>..\..\lib\15.0\Microsoft.TeamFoundation.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Client">
-      <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Client.dll</HintPath>
+      <HintPath>..\..\lib\15.0\Microsoft.TeamFoundation.Client.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Controls">
-      <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Controls.dll</HintPath>
+      <HintPath>..\..\lib\15.0\Microsoft.TeamFoundation.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Controls">
-      <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+      <HintPath>..\..\lib\15.0\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Provider">
-      <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
+      <HintPath>..\..\lib\15.0\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
