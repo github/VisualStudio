@@ -18,6 +18,9 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.VisualStudio;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextManager.Interop;
 using ReactiveUI;
 using Serilog;
 using OleMenuCommand = Microsoft.VisualStudio.Shell.OleMenuCommand;
@@ -45,6 +48,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
         readonly INotAGitRepositoryViewModel notAGitRepository;
         readonly ILoginFailedViewModel loginFailed;
+        readonly IGitHubPaneService gitHubPaneService;
         readonly SemaphoreSlim navigating = new SemaphoreSlim(1);
         readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
         readonly ObservableAsPropertyHelper<bool> isSearchEnabled;
@@ -72,7 +76,8 @@ namespace GitHub.ViewModels.GitHubPane
             ILoggedOutViewModel loggedOut,
             INotAGitHubRepositoryViewModel notAGitHubRepository,
             INotAGitRepositoryViewModel notAGitRepository,
-            ILoginFailedViewModel loginFailed)
+            ILoginFailedViewModel loginFailed,
+            IGitHubPaneService gitHubPaneService)
         {
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
             Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
@@ -85,6 +90,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(notAGitHubRepository, nameof(notAGitHubRepository));
             Guard.ArgumentNotNull(notAGitRepository, nameof(notAGitRepository));
             Guard.ArgumentNotNull(loginFailed, nameof(loginFailed));
+            Guard.ArgumentNotNull(gitHubPaneService, nameof(gitHubPaneService));
 
             this.viewModelFactory = viewModelFactory;
             this.apiClientFactory = apiClientFactory;
@@ -95,6 +101,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.notAGitHubRepository = notAGitHubRepository;
             this.notAGitRepository = notAGitRepository;
             this.loginFailed = loginFailed;
+            this.gitHubPaneService = gitHubPaneService;
 
             var contentAndNavigatorContent = Observable.CombineLatest(
                 this.WhenAnyValue(x => x.Content),
@@ -162,7 +169,8 @@ namespace GitHub.ViewModels.GitHubPane
             });
 
             var currentPageIsPullRequest = currentPage
-                .SelectMany(x => (x as IPullRequestDetailViewModel)?.WhenAnyValue(model => model.IsLoading) ?? Observable.Return(false));
+                .Select(x => x as IPullRequestDetailViewModel)
+                .SelectMany(model => model?.WhenAnyValue(viewModel => !viewModel.IsLoading) ?? Observable.Return(false));
 
             syncActiveDocument = ReactiveCommand.CreateAsyncTask(
                 currentPageIsPullRequest,
@@ -303,7 +311,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         public Task SyncActiveDocument()
         {
-            log.Debug("Sync Active Document");
+            var pathOfActiveDocument = this.gitHubPaneService.GetPathOfActiveDocument();
+            log.Debug("Sync Active Document {0}", pathOfActiveDocument);
             return Task.CompletedTask;
         }
 

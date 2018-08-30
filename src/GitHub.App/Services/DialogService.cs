@@ -1,13 +1,42 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using EnvDTE;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.ViewModels.Dialog;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
+    [Export(typeof(IGitHubPaneService))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class GitHubPaneService : IGitHubPaneService
+    {
+        private readonly Lazy<DTE> dte;
+
+        [ImportingConstructor]
+        public GitHubPaneService(
+            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
+            dte = new Lazy<DTE>(() => (DTE)serviceProvider.GetService(typeof(DTE)));
+        }
+
+        public string GetPathOfActiveDocument()
+        {
+            return dte.Value.ActiveDocument.FullName;
+        }
+    }
+
+    public interface IGitHubPaneService
+    {
+        string GetPathOfActiveDocument();
+    }
+
     [Export(typeof(IDialogService))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DialogService : IDialogService
