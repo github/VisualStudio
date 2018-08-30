@@ -263,6 +263,8 @@ public class ConnectionManagerTests
         var result = Substitute.For<ILoginManager>();
         result.Login(HostAddress.Create("invalid.com"), Arg.Any<IGitHubClient>(), Arg.Any<string>(), Arg.Any<string>())
             .Returns<User>(_ => { throw new AuthorizationException(); });
+        result.LoginFromCache(null, null)
+            .ReturnsForAnyArgs(new User());
         result.LoginFromCache(HostAddress.Create("invalid.com"), Arg.Any<IGitHubClient>())
             .Returns<User>(_ => { throw new AuthorizationException(); });
         return result;

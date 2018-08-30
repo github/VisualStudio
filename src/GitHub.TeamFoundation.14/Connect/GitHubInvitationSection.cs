@@ -47,9 +47,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 OnThemeChanged();
             };
 
-            IsVisible = !cm.Connections.Where(x => x.IsLoggedIn).Any();
+            IsVisible = cm.Connections.Count == 0;
 
-            cm.Connections.CollectionChanged += (s, e) => IsVisible = !cm.Connections.Where(x => x.IsLoggedIn).Any();
+            cm.Connections.CollectionChanged += (s, e) => IsVisible = cm.Connections.Count == 0;
         }
 
         public override void Connect()

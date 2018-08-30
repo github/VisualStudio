@@ -92,5 +92,12 @@ namespace GitHub.Services
         /// <param name="address"></param>
         /// <returns>A task tracking the operation.</returns>
         Task LogOut(HostAddress address);
+
+        /// <summary>
+        /// Retries logging in to a failed connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>The resulting connection.</returns>
+        Task Retry(IConnection connection);
     }
 }

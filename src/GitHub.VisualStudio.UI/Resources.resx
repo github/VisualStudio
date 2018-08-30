@@ -536,6 +536,9 @@
   <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
     <value>Delete Comment</value>
   </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
     <value>There aren't any open pull requests</value>
   </data>

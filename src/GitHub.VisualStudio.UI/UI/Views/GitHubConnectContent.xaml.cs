@@ -42,6 +42,11 @@ namespace GitHub.VisualStudio.UI.Views
             login.IsEnabled = true;
         }
 
+        private void retry_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Retry();
+        }
+
         void repositories_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ViewModel.OpenRepository();
