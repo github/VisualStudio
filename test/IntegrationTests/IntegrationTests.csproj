@@ -53,7 +53,7 @@
       <Version>14.3.25407</Version>
     </PackageReference>
     <PackageReference Include="VsixTesting.Xunit">
-      <Version>0.1.27-beta-g899d38d635</Version>
+      <Version>0.1.4-beta</Version>
     </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.4.1-pre.build.4059</Version>
