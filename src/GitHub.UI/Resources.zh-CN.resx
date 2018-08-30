@@ -118,39 +118,39 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="day" xml:space="preserve">
-    <value>{0:N0} 天前</value>
+    <value>{0:N0} day ago</value>
   </data>
   <data name="days" xml:space="preserve">
-    <value>{0:N0} 天前</value>
+    <value>{0:N0} days ago</value>
   </data>
   <data name="hour" xml:space="preserve">
-    <value>{0:N0} 小时前</value>
+    <value>{0:N0} hour ago</value>
   </data>
   <data name="hours" xml:space="preserve">
-    <value>{0:N0} 小时前</value>
+    <value>{0:N0} hours ago</value>
   </data>
   <data name="minute" xml:space="preserve">
-    <value>{0:N0} 分钟前</value>
+    <value>{0:N0} minute ago</value>
   </data>
   <data name="minutes" xml:space="preserve">
-    <value>{0:N0} 分钟前</value>
+    <value>{0:N0} minutes ago</value>
   </data>
   <data name="month" xml:space="preserve">
-    <value>{0:N0} 月前</value>
+    <value>{0:N0} month ago</value>
   </data>
   <data name="months" xml:space="preserve">
-    <value>{0:N0} 月前</value>
+    <value>{0:N0} months ago</value>
   </data>
   <data name="second" xml:space="preserve">
-    <value>{0:N0} 秒前</value>
+    <value>{0:N0} second ago</value>
   </data>
   <data name="seconds" xml:space="preserve">
-    <value>{0:N0} 秒前</value>
+    <value>{0:N0} seconds ago</value>
   </data>
   <data name="year" xml:space="preserve">
-    <value>{0:N0} 年前</value>
+    <value>{0:N0} year ago</value>
   </data>
   <data name="years" xml:space="preserve">
-    <value>{0:N0} 年前</value>
+    <value>{0:N0} years ago</value>
   </data>
 </root>
