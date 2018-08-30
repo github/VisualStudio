@@ -118,212 +118,213 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>为新版本库选择文件夹。</value>
+    <value>Select a containing folder for your new repository.</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>克隆一个 {0} 版本库</value>
+    <value>Clone a {0} Repository</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>无法连接到github.com</value>
+    <value>Could not connect to github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
-    <value>创建一个GitHub Gist</value>
+    <value>Create a GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>创建一个{0}存储库</value>
+    <value>Create a {0} Repository</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>请输入企业网址</value>
+    <value>Please enter an Enterprise URL</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>请输入有效网址</value>
+    <value>Please enter a valid Enterprise URL</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
-    <value>不是企业服务器。请输入企业服务器 URL</value>
+    <value>Not an Enterprise server. Please enter an Enterprise URL</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>是否忘记了您的密码?</value>
+    <value>(forgot your password?)</value>
   </data>
   <data name="LoginFailedForbiddenMessage" xml:space="preserve">
-    <value>请确保使用您的密码而不是登录的个人访问令牌。</value>
+    <value>Make sure to use your password and not a Personal Access token to sign in.</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>您的用户名和密码</value>
+    <value>Check your username and password, then try again</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>登录失败</value>
+    <value>Sign in failed.</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
-    <value>连接到 GitHub</value>
+    <value>Connect To GitHub</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
-    <value>请输入您的密码。</value>
+    <value>Please enter your password</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>在 [{1}] ({2}) 上成功创建分支 ** {0} ** 拉取请求</value>
+    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
-    <value>发布版本库</value>
+    <value>Publish repository</value>
   </data>
   <data name="PublishToTitle" xml:space="preserve">
-    <value>发布版本库至 {0}</value>
+    <value>Publish repository to {0}</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
-    <value>请输入请求的标题!</value>
+    <value>Please enter a title for the Pull Request</value>
   </data>
   <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
-    <value>源和目标分支不能相同!</value>
+    <value>Source and target branch cannot be the same</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>远程不存在源分支, 你有没有推送它？</value>
+    <value>Source branch doesn't exist remotely, have you pushed it?</value>
   </data>
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>选择了项目。</value>
+    <value>No selected repository.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>请输入名称</value>
+    <value>Please enter a repository path</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
-    <value>请输入有效路径</value>
+    <value>Please enter a valid path</value>
   </data>
   <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
-    <value>包含无效字符</value>
+    <value>Path contains invalid characters</value>
   </data>
   <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
-    <value>路径太长</value>
+    <value>Path too long</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
-    <value>版本库 '{0}/{1}'已存在。</value>
+    <value>Repository '{0}/{1}' already exists.</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
-    <value>请选择一个表单并且重试。</value>
+    <value>Change the repository name or select a different account and try again.</value>
   </data>
   <data name="RepositoryCreationFailedQuota" xml:space="preserve">
-    <value>私密文档</value>
+    <value>Exceeded private repositories quota.</value>
   </data>
   <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
-    <value>同名的广告活动已存在</value>
+    <value>Repository with same name already exists at this location</value>
   </data>
   <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
-    <value>请输入姓名</value>
+    <value>Please enter a repository name</value>
   </data>
   <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
-    <value>这个名字不能超过100个字符</value>
+    <value>Repository name must be fewer than 100 characters</value>
   </data>
   <data name="SafeRepositoryNameWarning" xml:space="preserve">
-    <value>将要创建为 {0}</value>
+    <value>Will be created as {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
-    <value>在您的手机上安装双重验证程序：Google Authenticator</value>
+    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
-    <value>我们将发送一条验证码短信到您的手机。</value>
+    <value>We sent you a message via SMS with your authentication code.</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
-    <value>双重身份认证</value>
+    <value>Two-Factor authentication required</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>输入任何你喜欢的一个标志 % ，</value>
+    <value>Enter a sign in authentication code here</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
-    <value>请输入您的用户名或邮箱地址.</value>
+    <value>Please enter your username or email address</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
-    <value>用户名或电子邮件地址</value>
+    <value>Username or email address must not have spaces</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>拉取请求</value>
+    <value>Pull Requests</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>推送请求</value>
+    <value>Pull Request</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
-    <value>添加</value>
+    <value>add</value>
   </data>
   <data name="Fork" xml:space="preserve">
     <value>fork</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
-    <value>[无效]</value>
+    <value>[invalid]</value>
   </data>
   <data name="MustPullBeforePush" xml:space="preserve">
-    <value>你必须先拉取再推送</value>
+    <value>You must pull before you can push</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>没有需要拉取的提交</value>
+    <value>No commits to pull</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>没有需要推送的提交</value>
+    <value>No commits to push</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
-    <value>* 未提供说明。*</value>
+    <value>*No description provided.*</value>
   </data>
   <data name="PullRequestDetailsCheckout" xml:space="preserve">
-    <value>签出 {0}</value>
+    <value>Checkout {0}</value>
   </data>
   <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
-    <value>签出到 {0}</value>
+    <value>Checkout to {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
-    <value>从 {0} 分支 {1} 拉取</value>
+    <value>Pull from {0} branch {1}</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>推至 {0}  分支 {1}</value>
+    <value>Push to {0} branch {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>远程</value>
+    <value>remote</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
-    <value>重命名</value>
+    <value>rename</value>
   </data>
   <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
-    <value>源存版本库不再可用。</value>
+    <value>The source repository is no longer available.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>无法签出, 因为您的工作目录有未提交的更改。</value>
+    <value>Cannot checkout as your working directory has uncommitted changes.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
-    <value>同步 {0} 子模块</value>
+    <value>Sync {0} submodules</value>
   </data>
   <data name="CouldntFindGitOnPath" xml:space="preserve">
-    <value>在PATH 找不到 Git.exe。
+    <value>Couldn't find Git.exe on PATH.
 
-请安装 Git for Windows : https://git-scm.com/download/win</value>
+Please install Git for Windows from:
+https://git-scm.com/download/win</value>
   </data>
   <data name="Approved" xml:space="preserve">
-    <value>批准</value>
+    <value>Approved</value>
   </data>
   <data name="ChangesRequested" xml:space="preserve">
-    <value>更改需求</value>
+    <value>Changes Requested</value>
   </data>
   <data name="Commented" xml:space="preserve">
-    <value>已评论</value>
+    <value>Commented</value>
   </data>
   <data name="InProgress" xml:space="preserve">
-    <value>进行中</value>
+    <value>InProgress</value>
   </data>
   <data name="NavigateToEditorStatusMessage" xml:space="preserve">
-    <value>按回车键导航到编辑器</value>
+    <value>Press Enter to navigate to Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>在导航到编辑器之前签出 PR 分支</value>
+    <value>Checkout PR branch before navigating to Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>按回车键导航到编辑器 (PR 分支必须签出)</value>
+    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Fork版本库</value>
+    <value>Fork Repository</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>原始开关</value>
+    <value>Switch Origin</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
-    <value>您确定要取消此评审吗？您将丢失所有待处理的评论。</value>
+    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
   </data>
   <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
-    <value>取消评审</value>
+    <value>Cancel Review</value>
   </data>
 </root>
