@@ -1,6 +1,5 @@
 ﻿extern alias TF14;
 extern alias TF15;
-extern alias TF16;
 
 using System;
 using GitHub.Logging;
@@ -8,7 +7,6 @@ using Serilog;
 using Microsoft.VisualStudio.Shell;
 using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
 using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
-using VSGitExt16 = TF16.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.Services
 {
@@ -32,9 +30,8 @@ namespace GitHub.Services
                 case 14:
                     return Create(() => new VSGitExt14(asyncServiceProvider));
                 case 15:
-                    return Create(() => new VSGitExt15(asyncServiceProvider));
                 case 16:
-                    return Create(() => new VSGitExt16(asyncServiceProvider));
+                    return Create(() => new VSGitExt15(asyncServiceProvider));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
                     return null;
