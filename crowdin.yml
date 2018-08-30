@@ -1,0 +1,11 @@
+files:
+  - source: /src/**/Resources.en-US.resx
+    translation: /%original_path%/Resources.%locale%.resx
+  - source: /src/**/VSPackage.en-US.resx
+    translation: /%original_path%/VSPackage.%locale%.resx
+  - source: /src/**/OcticonPaths.en-US.resx
+    translation: /%original_path%/OcticonPaths.%locale%.resx
+  - source: /src/GitHub.InlineReviews/InlineReviewsPackage.en-US.vsct
+    translation: /%original_path%/InlineReviewsPackage.%locale%.vsct
+  - source: /src/GitHub.VisualStudio/GitHub.VisualStudio.en-US.vsct
+    translation: /%original_path%/GitHub.VisualStudio.%locale%.vsct

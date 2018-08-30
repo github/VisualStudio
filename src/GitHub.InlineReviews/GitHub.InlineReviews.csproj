@@ -421,11 +421,27 @@
     <Reference Include="WindowsBase" />
     <None Include="InlineReviewsPackage.vsct">
     </None>
+    <VSCTCompile Include="InlineReviewsPackage.de-DE.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
+    </VSCTCompile>
+    <VSCTCompile Include="InlineReviewsPackage.en-GB.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
+    </VSCTCompile>
     <VSCTCompile Include="InlineReviewsPackage.en-US.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
     </VSCTCompile>
-    <VSCTCompile Include="InlineReviewsPackage.zh-Hans.vsct">
+    <VSCTCompile Include="InlineReviewsPackage.es-ES.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
+    </VSCTCompile>
+    <VSCTCompile Include="InlineReviewsPackage.ru-RU.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
+    </VSCTCompile>
+    <VSCTCompile Include="InlineReviewsPackage.zh-CN.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <DependentUpon>InlineReviewsPackage.vsct</DependentUpon>
     </VSCTCompile>
@@ -434,19 +450,39 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="VSPackage.en-US.resx" >
-	   <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.en-US.resources</LogicalName>
-      <DependentUpon>VSPackage.resx</DependentUpon>
-	  </EmbeddedResource>
     <None Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </None>
-    <EmbeddedResource Include="VSPackage.zh-Hans.resx" >
+    <EmbeddedResource Include="VSPackage.de-DE.resx" >
 	   <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.zh-Hans.resources</LogicalName>
+      <LogicalName>VSPackage.de-DE.resources</LogicalName>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+	  </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.en-GB.resx" >
+	   <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.en-GB.resources</LogicalName>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+	  </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.en-US.resx" >
+	   <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.en-US.resources</LogicalName>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+	  </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.es-ES.resx" >
+	   <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.es-ES.resources</LogicalName>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+	  </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.ru-RU.resx" >
+	   <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.ru-RU.resources</LogicalName>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+	  </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.zh-CN.resx" >
+	   <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.zh-CN.resources</LogicalName>
       <DependentUpon>VSPackage.resx</DependentUpon>
 	  </EmbeddedResource>
   </ItemGroup>
