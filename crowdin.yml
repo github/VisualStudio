@@ -5,3 +5,7 @@ files:
     translation: /%original_path%/VSPackage.%locale%.resx
   - source: /src/**/OcticonPaths.en-US.resx
     translation: /%original_path%/OcticonPaths.%locale%.resx
+  - source: /src/GitHub.InlineReviews/InlineReviewsPackage.en-US.vsct
+    translation: /%original_path%/InlineReviewsPackage.%locale%.resx
+  - source: /src/GitHub.VisualStudio/GitHub.VisualStudio.en-US.vsct	
+    translation: /%original_path%/GitHub.VisualStudio.%locale%.resx
