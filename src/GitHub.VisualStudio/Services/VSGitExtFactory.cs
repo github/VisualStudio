@@ -38,7 +38,7 @@ namespace GitHub.Services
             }
         }
 
-        // NOTE: We're being careful to only reference VSGitExt14/VSGitExt15/VSGitExt16 from inside a lambda expression.
+        // NOTE: We're being careful to only reference VSGitExt14 and VSGitExt15 from inside a lambda expression.
         // This ensures that only the type that's compatible with the running DTE version is loaded.
         static IVSGitExt Create(Func<IVSGitExt> factory) => factory.Invoke();
     }
