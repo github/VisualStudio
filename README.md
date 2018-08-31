@@ -18,7 +18,7 @@ Most of the extension UI lives in the Team Explorer pane, which is available fro
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/github-visual-studio/localized.svg)](https://crowdin.com/project/github-visual-studio)
 
 [![Join the chat at freenode:github-vs](https://img.shields.io/badge/irc-freenode:%20%23github--vs-blue.svg)](http://webchat.freenode.net/?channels=%23github-vs) [![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
