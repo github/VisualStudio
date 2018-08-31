@@ -124,13 +124,13 @@
     <value>克隆一个 {0} 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>无法连接到github.com</value>
+    <value>Could not connect to github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
     <value>创建一个GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>Create a {0} Repository</value>
+    <value>创建一个{0}存储库</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
@@ -322,9 +322,9 @@ https://git-scm.com/download/win</value>
     <value>Switch Origin</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
-    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
+    <value>您确定要取消此评审吗？您将丢失所有待处理的评论。</value>
   </data>
   <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
-    <value>Cancel Review</value>
+    <value>取消评审</value>
   </data>
 </root>
