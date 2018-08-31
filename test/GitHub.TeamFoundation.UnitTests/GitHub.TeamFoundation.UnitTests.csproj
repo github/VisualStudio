@@ -201,6 +201,9 @@
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
     </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

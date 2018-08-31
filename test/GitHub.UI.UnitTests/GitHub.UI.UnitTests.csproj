@@ -97,6 +97,9 @@
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
     </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Helpers\SharedDictionary.xaml">

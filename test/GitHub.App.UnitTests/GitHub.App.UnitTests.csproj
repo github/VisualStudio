@@ -232,6 +232,9 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="GitHub.App.UnitTests.dll.config">

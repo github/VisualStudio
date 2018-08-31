@@ -282,6 +282,9 @@
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
       <Name>GitHub.VisualStudio.UI</Name>
     </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="GitHub.VisualStudio.UnitTests.dll.config">

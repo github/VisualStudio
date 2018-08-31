@@ -200,6 +200,9 @@
       <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
       <Name>GitHub.Exports</Name>
     </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

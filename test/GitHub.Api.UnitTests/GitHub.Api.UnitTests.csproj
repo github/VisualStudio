@@ -113,6 +113,9 @@
       <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
       <Name>GitHub.InlineReviews</Name>
     </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
