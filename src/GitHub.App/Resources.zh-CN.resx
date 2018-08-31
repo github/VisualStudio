@@ -127,7 +127,7 @@
     <value>无法连接到github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
-    <value>Create a GitHub Gist</value>
+    <value>创建一个GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
     <value>Create a {0} Repository</value>
@@ -271,7 +271,7 @@
     <value>Pull from {0} branch {1}</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>Push to {0} branch {1}</value>
+    <value>推至 {0}  分支 {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
     <value>remote</value>
