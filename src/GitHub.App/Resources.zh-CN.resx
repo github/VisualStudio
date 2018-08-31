@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>Select a containing folder for your new repository.</value>
+    <value>为新版本库选择文件夹。</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>Clone a {0} Repository</value>
+    <value>克隆一个 {0} 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>Could not connect to github.com</value>
