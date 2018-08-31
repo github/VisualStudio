@@ -124,7 +124,7 @@
     <value>克隆一个 {0} 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>Could not connect to github.com</value>
+    <value>无法连接到github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
     <value>Create a GitHub Gist</value>
