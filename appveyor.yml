@@ -27,7 +27,7 @@ test:
 after_test:
 - ps: |  
     choco install opencover.portable codecov
-    OpenCover.Console.exe --% -target:"nunit3-console.exe" "-targetargs: test\GitHub.Api.UnitTests\bin\Release\GitHub.Api.UnitTests.dll --where cat != Timings" -filter:"+[GitHub]*" -register:user -output:".\coverage.xml"
+    OpenCover.Console.exe --% "-target:nunit3-console.exe" "-targetargs: test\GitHub.Api.UnitTests\bin\Release\GitHub.Api.UnitTests.dll --where cat!=Timings" -filter:"+[GitHub]*" -register:user -output:".\coverage.xml"
     codecov -f "coverage.xml"
     Push-AppveyorArtifact coverage.xml
 on_success:
