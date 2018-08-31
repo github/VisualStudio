@@ -263,6 +263,8 @@
     <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />
     <Compile Include="SampleData\PullRequestCheckViewModelDesigner.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestAnnotationsViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\LoginFailedViewModel.cs" />
+    <Compile Include="ViewModels\GitHubPane\PullRequestCheckType.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListViewModel.cs" />
@@ -419,16 +421,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.en-US.resx">
-      <DependentUpon>Resources.resx</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources.zh-Hans.resx">
-      <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

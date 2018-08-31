@@ -1,5 +1,5 @@
 os: Visual Studio 2017
-version: '2.5.5.{build}'
+version: '2.5.6.{build}'
 skip_tags: true
 install:
 - ps: |
@@ -24,6 +24,11 @@ test:
   categories:
     except:
       - Timings
+after_test:
+- ps: |  
+    choco install --no-progress opencover.portable codecov
+    OpenCover.Console.exe --% "-target:nunit3-console.exe" "-targetargs: test\GitHub.Api.UnitTests\bin\Release\GitHub.Api.UnitTests.dll test\GitHub.App.UnitTests\bin\Release\GitHub.App.UnitTests.dll test\GitHub.Exports.Reactive.UnitTests\bin\Release\GitHub.Exports.Reactive.UnitTests.dll test\GitHub.Exports.UnitTests\bin\Release\GitHub.Exports.UnitTests.dll test\GitHub.Extensions.UnitTests\bin\Release\GitHub.Extensions.UnitTests.dll test\GitHub.InlineReviews.UnitTests\bin\Release\GitHub.InlineReviews.UnitTests.dll test\GitHub.Primitives.UnitTests\bin\Release\GitHub.Primitives.UnitTests.dll test\GitHub.TeamFoundation.UnitTests\bin\Release\GitHub.TeamFoundation.UnitTests.dll test\GitHub.UI.UnitTests\bin\Release\GitHub.UI.UnitTests.dll test\GitHub.VisualStudio.UnitTests\bin\Release\GitHub.VisualStudio.UnitTests.dll test\MetricsTests\MetricsTests\bin\Release\MetricsTests.dll test\TrackingCollectionTests\bin\Release\TrackingCollectionTests.dll --where cat!=Timings --inprocess" -filter:"+[GitHub*]* -[GitHub*UnitTests]*" -register:user -output:".\coverage.xml"
+    codecov -f "coverage.xml"
 on_success:
 - ps: |
     if ($full_build) {

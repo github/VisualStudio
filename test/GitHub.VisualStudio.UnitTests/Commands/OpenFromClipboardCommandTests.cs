@@ -4,7 +4,6 @@ using GitHub.Exports;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Commands;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using NSubstitute;
 using NUnit.Framework;
@@ -22,7 +21,7 @@ public class OpenFromClipboardCommandTests
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(Resources.NoGitHubUrlMessage);
+            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoGitHubUrlMessage);
         }
 
         [Test]
@@ -35,27 +34,24 @@ public class OpenFromClipboardCommandTests
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(Resources.NoActiveRepositoryMessage);
+            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoActiveRepositoryMessage);
         }
 
         [Test]
         public async Task UnknownLinkType()
         {
             var context = new GitHubContext { LinkType = LinkType.Unknown };
-            var expectMessage = string.Format(Resources.UnknownLinkTypeMessage, context.Url);
+            var expectMessage = string.Format(OpenFromClipboardCommand.UnknownLinkTypeMessage, context.Url);
             var activeRepositoryDir = "activeRepositoryDir";
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: activeRepositoryDir);
+
             await target.Execute(null);
+
             vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
         }
 
-        [Test]
-        public async Task DifferentLocalRepository_DifferentRepositoryMessage()
-        {
-            await DifferentLocalRepository("targetRepositoryName", "activeRepositoryName", Resources.DifferentRepositoryMessage);
-        }
-
+        [TestCase("targetRepositoryName", "activeRepositoryName", OpenFromClipboardCommand.DifferentRepositoryMessage)]
         [TestCase("SameRepositoryName", "SameRepositoryName", null)]
         [TestCase("same_repository_name", "SAME_REPOSITORY_NAME", null)]
         public async Task DifferentLocalRepository(string targetRepositoryName, string activeRepositoryName, string expectMessage)
@@ -79,25 +75,9 @@ public class OpenFromClipboardCommandTests
             }
         }
 
-
-        [Test]
-        public async Task CouldNotResolve_NoResolveDifferentOwnerMessage()
-        {
-            await CouldNotResolve("TargetOwner", "CurrentOwner", Resources.NoResolveDifferentOwnerMessage);
-        }
-
-        [Test]
-        public async Task CouldNotResolve_NoResolveSameOwnerMessage_SameOwner_SameOwner()
-        {
-            await CouldNotResolve("SameOwner", "SameOwner", Resources.NoResolveSameOwnerMessage);
-        }
-
-        [Test]
-        public async Task CouldNotResolve_NoResolveSameOwnerMessage_sameowner_SAMEOWNER()
-        {
-            await CouldNotResolve("sameowner", "SAMEOWNER", Resources.NoResolveSameOwnerMessage);
-        }
-
+        [TestCase("TargetOwner", "CurrentOwner", OpenFromClipboardCommand.NoResolveDifferentOwnerMessage)]
+        [TestCase("SameOwner", "SameOwner", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
+        [TestCase("sameowner", "SAMEOWNER", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
         public async Task CouldNotResolve(string targetOwner, string currentOwner, string expectMessage)
         {
             var repositoryDir = "repositoryDir";
@@ -146,13 +126,9 @@ public class OpenFromClipboardCommandTests
             vsServices.DidNotReceiveWithAnyArgs().ShowMessageBoxInfo(null);
             gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
         }
-        [Test]
-        public async Task HasChangesInWorkingDirectorye_ChangesInWorkingDirectoryMessage()
-        {
-            await HasChangesInWorkingDirectory(false, Resources.ChangesInWorkingDirectoryMessage, 1, 1);
-        }
 
         [TestCase(true, null, 1, 0)]
+        [TestCase(false, OpenFromClipboardCommand.ChangesInWorkingDirectoryMessage, 1, 1)]
         public async Task HasChangesInWorkingDirectory(bool annotateFileSupported, string message,
             int receivedTryAnnotateFile, int receivedTryOpenFile)
         {
