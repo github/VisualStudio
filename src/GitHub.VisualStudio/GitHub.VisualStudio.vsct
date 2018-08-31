@@ -3,6 +3,9 @@
   xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"
   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+  <!-- Import the standard ImageCatalogGuid monikers -->
+  <Include href="KnownImageIds.vsct"/>
+  
   <!--  This is the file that defines the actual layout and type of the commands.
         It is divided in different sections (e.g. command definition, command
         placement, ...), with each defining a specific set of properties.
@@ -138,7 +141,7 @@
 
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
-        <Icon guid="guidImages" id="arrow_left" />
+        <Icon guid="ImageCatalogGuid" id="Backwards" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -149,7 +152,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" type="Button">
-        <Icon guid="guidImages" id="arrow_right" />
+        <Icon guid="ImageCatalogGuid" id="Forwards" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -171,7 +174,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
-        <Icon guid="guidImages" id="refresh" />
+        <Icon guid="ImageCatalogGuid" id="Refresh" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -193,7 +196,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
-        <Icon guid="guidImages" id="logo_toolbar" />
+        <Icon guid="ImageCatalogGuid" id="OpenWebSite" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -204,7 +207,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="helpCommand" type="Button">
-        <Icon guid="guidImages" id="question" />
+        <Icon guid="ImageCatalogGuid" id="StatusHelp" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Help</ButtonText>
@@ -238,7 +241,7 @@
       </Button>
 
       <Button guid="guidContextMenuSet" id="openLinkCommand" type="Button">
-        <Icon guid="guidImages" id="link_external" />
+        <Icon guid="ImageCatalogGuid" id="OpenWebSite" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
