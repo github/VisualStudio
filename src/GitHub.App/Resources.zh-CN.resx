@@ -124,7 +124,7 @@
     <value>克隆一个 {0} 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>Could not connect to github.com</value>
+    <value>无法连接到github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
     <value>创建一个GitHub Gist</value>
@@ -145,19 +145,19 @@
     <value>Not an Enterprise server. Please enter an Enterprise URL</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>(forgot your password?)</value>
+    <value>(是否忘记了您的密码?)</value>
   </data>
   <data name="LoginFailedForbiddenMessage" xml:space="preserve">
-    <value>Make sure to use your password and not a Personal Access token to sign in.</value>
+    <value>请确保使用您的密码而不是登录的个人访问令牌。</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
     <value>Check your username and password, then try again</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>Sign in failed.</value>
+    <value>登录失败。</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
-    <value>Connect To GitHub</value>
+    <value>连接到 GitHub</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
     <value>Please enter your password</value>
@@ -166,16 +166,16 @@
     <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
-    <value>Publish repository</value>
+    <value>发布版本库</value>
   </data>
   <data name="PublishToTitle" xml:space="preserve">
-    <value>Publish repository to {0}</value>
+    <value>发布版本库至 {0}</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Please enter a title for the Pull Request</value>
   </data>
   <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
-    <value>Source and target branch cannot be the same</value>
+    <value>源和目标分支不能相同</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Source branch doesn't exist remotely, have you pushed it?</value>
@@ -280,7 +280,7 @@
     <value>rename</value>
   </data>
   <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
-    <value>The source repository is no longer available.</value>
+    <value>源存版本库不再可用。</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
     <value>Cannot checkout as your working directory has uncommitted changes.</value>
@@ -313,13 +313,13 @@ https://git-scm.com/download/win</value>
     <value>Checkout PR branch before navigating to Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
+    <value>按回车键导航到编辑器 (PR 分支必须签出)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Fork Repository</value>
+    <value>Fork存储库</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>Switch Origin</value>
+    <value>开关原点</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
     <value>您确定要取消此评审吗？您将丢失所有待处理的评论。</value>
