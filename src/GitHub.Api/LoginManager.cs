@@ -373,7 +373,7 @@ namespace GitHub.Api
 
             request.State = state;
 
-            foreach (var scope in minimumScopes)
+            foreach (var scope in requestedScopes)
             {
                 request.Scopes.Add(scope);
             }

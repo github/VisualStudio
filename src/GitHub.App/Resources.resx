@@ -330,4 +330,7 @@ https://git-scm.com/download/win</value>
   <data name="DestinationAlreadyExists" xml:space="preserve">
     <value>The destination already exists.</value>
   </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>Logout Required</value>
+  </data>
 </root>

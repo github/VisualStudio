@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
@@ -35,6 +37,34 @@ namespace GitHub.VisualStudio.UI.Services
             }
 
             return Task.FromResult(result);
+        }
+
+        public async Task<object> Show<TViewModel>(
+            TViewModel viewModel,
+            IConnection connection,
+            IEnumerable<string> scopes)
+                where TViewModel : IDialogContentViewModel, IConnectionInitializedViewModel
+        {
+            var result = default(object);
+
+            using (var dialogViewModel = CreateViewModel())
+            using (dialogViewModel.Done.Take(1).Subscribe(x => result = x))
+            {
+                if (!connection.Scopes.Matches(scopes))
+                {
+                    await dialogViewModel.StartWithLogout(viewModel, connection);
+                }
+                else
+                {
+                    await viewModel.InitializeAsync(connection);
+                    dialogViewModel.Start(viewModel);
+                }
+
+                var window = new GitHubDialogWindow(dialogViewModel);
+                window.ShowModal();
+            }
+
+            return result;
         }
 
         public async Task<object> ShowWithFirstConnection<TViewModel>(TViewModel viewModel)

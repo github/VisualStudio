@@ -38,7 +38,7 @@ namespace GitHub.Models
         /// </summary>
         /// <param name="required">The required API scopes.</param>
         /// <returns>True if all required scopes are present, otherwise false.</returns>
-        public bool Matches(IReadOnlyList<string> required)
+        public bool Matches(IEnumerable<string> required)
         {
             foreach (var scope in required)
             {

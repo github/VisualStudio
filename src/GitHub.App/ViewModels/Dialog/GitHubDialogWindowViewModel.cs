@@ -62,40 +62,48 @@ namespace GitHub.ViewModels.Dialog
         public async Task StartWithConnection<T>(T viewModel)
             where T : IDialogContentViewModel, IConnectionInitializedViewModel
         {
-            var connections = await connectionManager.Value.GetLoadedConnections();
+            var connections = await connectionManager.Value.GetLoadedConnections().ConfigureAwait(true);
             var connection = connections.FirstOrDefault(x => x.IsLoggedIn);
 
             if (connection == null)
             {
-                var login = CreateLoginViewModel();
-
-                subscription = login.Done.Take(1).Subscribe(async x =>
-                {
-                    var newConnection = (IConnection)x;
-
-                    if (newConnection != null)
-                    {
-                        await viewModel.InitializeAsync(newConnection);
-                        Start(viewModel);
-                    }
-                    else
-                    {
-                       done.OnNext(null);
-                    }
-                });
-
-                Content = login;
+                connection = await ShowLogin().ConfigureAwait(true);
             }
-            else
+
+            if (connection != null)
             {
-                await viewModel.InitializeAsync(connection);
+                await viewModel.InitializeAsync(connection).ConfigureAwait(true);
                 Start(viewModel);
             }
         }
 
-        ILoginViewModel CreateLoginViewModel()
+        public async Task StartWithLogout<T>(T viewModel, IConnection connection)
+            where T : IDialogContentViewModel, IConnectionInitializedViewModel
         {
-            return factory.CreateViewModel<ILoginViewModel>();
+            var logout = factory.CreateViewModel<ILogOutRequiredViewModel>();
+
+            subscription?.Dispose();
+            subscription = logout.Done.Take(1).Subscribe(async _ =>
+            {
+                await connectionManager.Value.LogOut(connection.HostAddress).ConfigureAwait(true);
+
+                connection = await ShowLogin().ConfigureAwait(true);
+
+                if (connection != null)
+                {
+                    await viewModel.InitializeAsync(connection).ConfigureAwait(true);
+                    Start(viewModel);
+                }
+            });
+
+            Content = logout;
+        }
+
+        async Task<IConnection> ShowLogin()
+        {
+            var login = factory.CreateViewModel<ILoginViewModel>();
+            Content = login;
+            return (IConnection)await login.Done.Take(1);
         }
     }
 }

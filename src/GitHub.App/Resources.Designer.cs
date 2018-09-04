@@ -298,6 +298,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Logout Required.
+        /// </summary>
+        public static string LogoutRequired {
+            get {
+                return ResourceManager.GetString("LogoutRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must pull before you can push.
         /// </summary>
         public static string MustPullBeforePush {
