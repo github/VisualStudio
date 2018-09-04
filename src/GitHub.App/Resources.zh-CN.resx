@@ -160,7 +160,7 @@
     <value>连接到 GitHub</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
-    <value>Please enter your password</value>
+    <value>请输入您的密码</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
@@ -178,7 +178,7 @@
     <value>源和目标分支不能相同</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>Source branch doesn't exist remotely, have you pushed it?</value>
+    <value>远程不存在源分支, 你有没有推送它？</value>
   </data>
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
     <value>No selected repository.</value>
@@ -187,16 +187,16 @@
     <value>Please enter a repository path</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
-    <value>Please enter a valid path</value>
+    <value>请输入有效路径</value>
   </data>
   <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
     <value>Path contains invalid characters</value>
   </data>
   <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
-    <value>Path too long</value>
+    <value>路径太长</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
-    <value>Repository '{0}/{1}' already exists.</value>
+    <value>版本库 '{0}/{1}'已存在。</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
     <value>Change the repository name or select a different account and try again.</value>
@@ -208,46 +208,46 @@
     <value>Repository with same name already exists at this location</value>
   </data>
   <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
-    <value>Please enter a repository name</value>
+    <value>请输入姓名</value>
   </data>
   <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
-    <value>Repository name must be fewer than 100 characters</value>
+    <value>这个名字不能超过100个字符</value>
   </data>
   <data name="SafeRepositoryNameWarning" xml:space="preserve">
-    <value>Will be created as {0}</value>
+    <value>将要创建为 {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
-    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
+    <value>在您的手机上安装双重验证程序：Google Authenticator</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
-    <value>We sent you a message via SMS with your authentication code.</value>
+    <value>我们将发送一条验证码短信到您的手机。</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
-    <value>Two-Factor authentication required</value>
+    <value>双重身份认证</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
     <value>Enter a sign in authentication code here</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
-    <value>Please enter your username or email address</value>
+    <value>请输入您的用户名或邮箱地址.</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
     <value>Username or email address must not have spaces</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>Pull Requests</value>
+    <value>拉取请求</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>Pull Request</value>
+    <value>推送请求</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
-    <value>add</value>
+    <value>添加</value>
   </data>
   <data name="Fork" xml:space="preserve">
     <value>fork</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
-    <value>[invalid]</value>
+    <value>[无效]</value>
   </data>
   <data name="MustPullBeforePush" xml:space="preserve">
     <value>You must pull before you can push</value>
@@ -310,7 +310,7 @@ https://git-scm.com/download/win</value>
     <value>Press Enter to navigate to Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>Checkout PR branch before navigating to Editor</value>
+    <value>在导航到编辑器之前签出 PR 分支</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
     <value>按回车键导航到编辑器 (PR 分支必须签出)</value>
