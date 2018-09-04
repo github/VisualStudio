@@ -121,6 +121,6 @@
     <value>GitHub.VisualStudio</value>
   </data>
   <data name="112" xml:space="preserve">
-    <value>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</value>
+    <value>这是一个将GitHub工作流引入Visual Studio的扩展。</value>
   </data>
 </root>

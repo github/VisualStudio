@@ -68,7 +68,7 @@
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>&amp;Connect to GitHub</ButtonText>
+          <ButtonText>连接至GitHub(&amp;C)</ButtonText>
           <CanonicalName>.GitHub.ConnectToGitHub</CanonicalName>
           <LocCanonicalName>.GitHub.ConnectToGitHub</LocCanonicalName>
         </Strings>
@@ -88,7 +88,7 @@
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Show Current Pull Request</ButtonText>
+          <ButtonText>显示当前拉取请求</ButtonText>
           <CanonicalName>.GitHub.ShowCurrentPullRequest</CanonicalName>
           <LocCanonicalName>.GitHub.ShowCurrentPullRequest</LocCanonicalName>
         </Strings>
@@ -98,7 +98,7 @@
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Sync Submodules</ButtonText>
+          <ButtonText>同步子模块</ButtonText>
           <CanonicalName>.GitHub.SyncSubmodules</CanonicalName>
           <LocCanonicalName>.GitHub.SyncSubmodules</LocCanonicalName>
         </Strings>
@@ -109,7 +109,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>AllowParams</CommandFlag>
         <Strings>
-          <ButtonText>Open from GitHub...</ButtonText>
+          <ButtonText>从GitHub打开...</ButtonText>
           <CanonicalName>.GitHub.OpenFromUrl</CanonicalName>
           <LocCanonicalName>.GitHub.OpenFromUrl</LocCanonicalName>
         </Strings>
@@ -122,7 +122,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open from clipboard</ButtonText>
+          <ButtonText>从剪贴板打开</ButtonText>
           <CanonicalName>.GitHub.OpenFromClipboard</CanonicalName>
           <LocCanonicalName>.GitHub.OpenFromClipboard</LocCanonicalName>
         </Strings>
@@ -134,7 +134,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Back</ButtonText>
+          <ButtonText>后退</ButtonText>
           <CanonicalName>.GitHub.Back</CanonicalName>
           <LocCanonicalName>.GitHub.Back</LocCanonicalName>
         </Strings>
@@ -145,7 +145,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Forward</ButtonText>
+          <ButtonText>前进</ButtonText>
           <CanonicalName>.GitHub.Forward</CanonicalName>
           <LocCanonicalName>.GitHub.Forward</LocCanonicalName>
         </Strings>
@@ -156,7 +156,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Pull Requests</ButtonText>
+          <ButtonText>拉取请求</ButtonText>
           <CanonicalName>.GitHub.PullRequests</CanonicalName>
           <LocCanonicalName>.GitHub.PullRequests</LocCanonicalName>
         </Strings>
@@ -167,7 +167,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Refresh</ButtonText>
+          <ButtonText>刷新</ButtonText>
           <CanonicalName>.GitHub.Refresh</CanonicalName>
           <LocCanonicalName>.GitHub.Refresh</LocCanonicalName>
         </Strings>
@@ -178,7 +178,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>View on GitHub</ButtonText>
+          <ButtonText>在GitHub查看</ButtonText>
           <CanonicalName>.GitHub.ViewOnGitHub</CanonicalName>
           <LocCanonicalName>.GitHub.ViewOnGitHub</LocCanonicalName>
         </Strings>
@@ -188,7 +188,7 @@
         <Icon guid="guidImages" id="question" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Help</ButtonText>
+          <ButtonText>帮助</ButtonText>
           <CanonicalName>.GitHub.Help</CanonicalName>
           <LocCanonicalName>.GitHub.Help</LocCanonicalName>
         </Strings>
@@ -200,7 +200,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Create a GitHub Gist</ButtonText>
+          <ButtonText>创建GitHub Gist</ButtonText>
           <CanonicalName>.GitHub.CreateGist</CanonicalName>
           <LocCanonicalName>.GitHub.CreateGist</LocCanonicalName>
         </Strings>
@@ -212,7 +212,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Create an Enterprise Gist</ButtonText>
+          <ButtonText>创建企业Gist</ButtonText>
           <CanonicalName>.GitHub.CreateGistEnterprise</CanonicalName>
           <LocCanonicalName>.GitHub.CreateGistEnterprise</LocCanonicalName>
         </Strings>
@@ -224,7 +224,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open on GitHub</ButtonText>
+          <ButtonText>在GitHub打开</ButtonText>
           <CanonicalName>.GitHub.OpenLink</CanonicalName>
           <LocCanonicalName>.GitHub.OpenLink</LocCanonicalName>
         </Strings>
@@ -236,7 +236,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Copy link to clipboard</ButtonText>
+          <ButtonText>复制链接</ButtonText>
           <CanonicalName>.GitHub.CopyLink</CanonicalName>
           <LocCanonicalName>.GitHub.CopyLink</LocCanonicalName>
         </Strings>
@@ -248,7 +248,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Blame</ButtonText>
+          <ButtonText>追溯</ButtonText>
           <CanonicalName>.GitHub.Blame</CanonicalName>
           <LocCanonicalName>.GitHub.Blame</LocCanonicalName>
         </Strings>
@@ -261,7 +261,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Go To Solution/PR File</ButtonText>
+          <ButtonText>转至解决方案/PR文件</ButtonText>
           <CanonicalName>.GitHub.GoToSolutionOrPRFile</CanonicalName>
           <LocCanonicalName>.GitHub.GoToSolutionOrPRFile</LocCanonicalName>
         </Strings>
