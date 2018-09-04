@@ -10,7 +10,7 @@ coverage:
   status:
     project: yes
     patch: yes
-    changes: no
+    changes: yes
 
 parsers:
   gcov:
@@ -21,9 +21,9 @@ parsers:
       macro: no
 
 comment:
-  layout: "header, diff"
-  behavior: default
+  layout: "header, reach, diff, files"
+  behavior: new
   require_changes: no
   
 fixes:
-  - "C:\projects\visualstudio\::"
+  - "/C/projects/visualstudio/::"
