@@ -26,4 +26,4 @@ comment:
   require_changes: no
   
 fixes:
-  - "C:\projects\visualstudio\::"
+  - "/C/projects/visualstudio/::"
