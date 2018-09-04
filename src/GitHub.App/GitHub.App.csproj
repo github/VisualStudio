@@ -264,7 +264,6 @@
     <Compile Include="SampleData\PullRequestCheckViewModelDesigner.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestAnnotationsViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\LoginFailedViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestCheckType.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListItemViewModel.cs" />
     <Compile Include="ViewModels\GitHubPane\PullRequestListViewModel.cs" />

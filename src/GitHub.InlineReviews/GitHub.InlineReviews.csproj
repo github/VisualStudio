@@ -449,6 +449,18 @@
       <SubType>Designer</SubType>
       <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
     </Page>
+    <Page Include="Tags\ShowInlineAnnotationFailureGlyph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tags\ShowInlineAnnotationNoticeGlyph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tags\ShowInlineAnnotationWarningGlyph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\PullRequestFileMarginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
