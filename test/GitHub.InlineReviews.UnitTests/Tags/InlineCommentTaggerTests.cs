@@ -14,17 +14,17 @@ using GitHub.InlineReviews.Margins;
 
 namespace GitHub.InlineReviews.UnitTests.Tags
 {
-    public class InlineTaggerTests
+    public class InlineCommentTaggerTests
     {
         public class WithTextBufferInfo
         {
             [Test]
             public void FirstPassShouldReturnEmptyTags()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments(DiffSide.Right));
+                    CreateSessionManager(DiffSide.Right));
 
                 var result = target.GetTags(CreateSpan(10));
 
@@ -34,10 +34,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnShowCommentTagForRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments(DiffSide.Right));
+                    CreateSessionManager(DiffSide.Right));
 
                 // Line 10 has an existing RHS comment.
                 var span = CreateSpan(10);
@@ -45,33 +45,16 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
-            }
-
-            [Test, Ignore("I broke it")]
-            public void ShouldReturnShowAnnotationTagForRhs()
-            {
-                var target = new InlineTagger(
-                    Substitute.For<ITextView>(),
-                    Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithAnnotations(DiffSide.Right));
-
-                // Line 10 has an existing Annotation comment.
-                var span = CreateSpan(5);
-                var firstPass = target.GetTags(span);
-                var result = target.GetTags(span).ToList();
-
-                Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineAnnotationTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
             [Test]
             public void ShouldReturnAddNewCommentTagForAddedLineOnRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments(DiffSide.Right));
+                    CreateSessionManager(DiffSide.Right));
 
                 // Line 11 has an add diff entry.
                 var span = CreateSpan(11);
@@ -85,10 +68,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments(DiffSide.Right));
+                    CreateSessionManager(DiffSide.Right));
 
                 // Line 13 has an delete diff entry.
                 var span = CreateSpan(13);
@@ -101,10 +84,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnShowCommentTagForLhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments(DiffSide.Left));
+                    CreateSessionManager(DiffSide.Left));
 
                 // Line 12 has an existing LHS comment.
                 var span = CreateSpan(12);
@@ -112,16 +95,16 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
             [Test]
             public void ShouldReturnAddCommentTagForLhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments(DiffSide.Left));
+                    CreateSessionManager(DiffSide.Left));
 
                 // Line 13 has an delete diff entry.
                 var span = CreateSpan(13);
@@ -135,9 +118,9 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldRaiseTagsChangedOnFileLinesChanged()
             {
-                var file = CreateSessionFileWithComments();
+                var file = CreateSessionFile();
                 var manager = CreateSessionManager(file, DiffSide.Right);
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
@@ -161,11 +144,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldCallSessionGetFileWithCorrectCommitSha()
             {
                 var sessionManager = CreateSessionManager(
-                    CreateSessionFileWithComments(),
+                    CreateSessionFile(),
                     DiffSide.Right,
                     "123");
                 var session = sessionManager.CurrentSession;
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     sessionManager);
@@ -182,11 +165,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldAlwaysCallSessionGetFileWithHeadCommitShaForLeftHandSide()
             {
                 var sessionManager = CreateSessionManager(
-                    CreateSessionFileWithComments(),
+                    CreateSessionFile(),
                     DiffSide.Left,
                     "123");
                 var session = sessionManager.CurrentSession;
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     sessionManager);
@@ -199,7 +182,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 session.Received(1).GetFile("file.cs", "HEAD");
             }
 
-            static IPullRequestSessionFile CreateSessionFileWithComments()
+            static IPullRequestSessionFile CreateSessionFile()
             {
                 var diffChunk = new DiffChunk
                 {
@@ -233,45 +216,9 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 return file;
             }
 
-            static IPullRequestSessionFile CreateSessionFileWithAnnotations()
+            static IPullRequestSessionManager CreateSessionManager(DiffSide side)
             {
-                var diffChunk = new DiffChunk
-                {
-                    Lines =
-                    {
-                        // Line numbers here are 1-based. There is an add diff entry on line 11
-                        // and a delete entry on line 13.
-                        new DiffLine { Type = DiffChangeType.Add, NewLineNumber = 11 + 1 },
-                        new DiffLine { Type = DiffChangeType.Delete, OldLineNumber = 13 + 1 },
-                    }
-                };
-                var diff = new List<DiffChunk> { diffChunk };
-
-                var annotation1 = Substitute.For<IInlineAnnotationModel>();
-                annotation1.EndLine.Returns(5);
-
-                var annotation2 = Substitute.For<IInlineAnnotationModel>();
-                annotation2.EndLine.Returns(11);
-
-                var annotations = new List<IInlineAnnotationModel> { annotation1, annotation2 };
-
-                var file = Substitute.For<IPullRequestSessionFile>();
-                file.Diff.Returns(diff);
-                file.InlineAnnotations.Returns(annotations);
-                file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
-
-                return file;
-            }
-
-            static IPullRequestSessionManager CreateSessionManagerWithComments(DiffSide side)
-            {
-                var file = CreateSessionFileWithComments();
-                return CreateSessionManager(file, side);
-            }
-
-            static IPullRequestSessionManager CreateSessionManagerWithAnnotations(DiffSide side)
-            {
-                var file = CreateSessionFileWithAnnotations();
+                var file = CreateSessionFile();
                 return CreateSessionManager(file, side);
             }
 
@@ -296,10 +243,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void FirstPassShouldReturnEmptyTags()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments());
+                    CreateSessionManager());
 
                 var result = target.GetTags(CreateSpan(10));
                 Assert.That(result, Is.Empty);
@@ -308,10 +255,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnShowCommentTag()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments());
+                    CreateSessionManager());
 
                 // Line 10 has an existing RHS comment.
                 var span = CreateSpan(10);
@@ -319,34 +266,16 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
-            }
-
-
-            [Test, Ignore("I broke it")]
-            public void ShouldReturnShowAnnotationTag()
-            {
-                var target = new InlineTagger(
-                    Substitute.For<ITextView>(),
-                    Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithAnnotations());
-
-                // Line 10 has an existing RHS comment.
-                var span = CreateSpan(10);
-                var firstPass = target.GetTags(span);
-                var result = target.GetTags(span).ToList();
-
-                Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineAnnotationTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
             }
 
             [Test]
             public void ShouldReturnAddNewCommentTagForAddedLine()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments());
+                    CreateSessionManager());
 
                 // Line 11 has an add diff entry.
                 var span = CreateSpan(11);
@@ -360,10 +289,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
-                    CreateSessionManagerWithComments());
+                    CreateSessionManager());
 
                 // Line 13 has an delete diff entry.
                 var span = CreateSpan(13);
@@ -376,9 +305,9 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [TestCase(false, false)]
             public void ShouldRaiseTagsChangedOnFileLinesChanged(bool inlineCommentMarginVisible, bool expectRaised)
             {
-                var file = CreateSessionFileWithComments();
+                var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     CreateTextView(inlineCommentMarginVisible),
                     CreateBuffer(),
                     manager);
@@ -400,9 +329,9 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldNotRaiseTagsChangedOnLeftHandSideLinesChanged()
             {
-                var file = CreateSessionFileWithComments();
+                var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
@@ -428,7 +357,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 return textView;
             }
 
-            static IPullRequestSessionFile CreateSessionFileWithComments()
+            static IPullRequestSessionFile CreateSessionFile()
             {
                 var diffChunk = new DiffChunk
                 {
@@ -462,45 +391,9 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 return file;
             }
 
-            static IPullRequestSessionFile CreateSessionFileWithAnnotations()
+            static IPullRequestSessionManager CreateSessionManager()
             {
-                var diffChunk = new DiffChunk
-                {
-                    Lines =
-                    {
-                        // Line numbers here are 1-based. There is an add diff entry on line 11
-                        // and a delete entry on line 13.
-                        new DiffLine { Type = DiffChangeType.Add, NewLineNumber = 11 + 1 },
-                        new DiffLine { Type = DiffChangeType.Delete, OldLineNumber = 13 + 1 },
-                    }
-                };
-                var diff = new List<DiffChunk> { diffChunk };
-
-                var annotation1 = Substitute.For<IInlineAnnotationModel>();
-                annotation1.EndLine.Returns(10);
-
-                var annotation2 = Substitute.For<IInlineAnnotationModel>();
-                annotation2.EndLine.Returns(12);
-
-                var annotations = new List<IInlineAnnotationModel> { annotation1, annotation2 };
-
-                var file = Substitute.For<IPullRequestSessionFile>();
-                file.Diff.Returns(diff);
-                file.InlineAnnotations.Returns(annotations);
-                file.LinesChanged.Returns(new Subject<IReadOnlyList<Tuple<int, DiffSide>>>());
-
-                return file;
-            }
-
-            static IPullRequestSessionManager CreateSessionManagerWithComments()
-            {
-                var file = CreateSessionFileWithComments();
-                return CreateSessionManager(file);
-            }
-
-            static IPullRequestSessionManager CreateSessionManagerWithAnnotations()
-            {
-                var file = CreateSessionFileWithAnnotations();
+                var file = CreateSessionFile();
                 return CreateSessionManager(file);
             }
 
