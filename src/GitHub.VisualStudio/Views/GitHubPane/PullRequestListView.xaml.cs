@@ -17,6 +17,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     [ExportViewFor(typeof(IPullRequestListViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class PullRequestListView : UserControl
