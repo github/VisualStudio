@@ -510,10 +510,10 @@
     <value>过期批注</value>
   </data>
   <data name="CreateNew" xml:space="preserve">
-    <value>Create New</value>
+    <value>创建</value>
   </data>
   <data name="Assignee" xml:space="preserve">
-    <value>Assignee</value>
+    <value>分配</value>
   </data>
   <data name="Author" xml:space="preserve">
     <value>Author</value>
