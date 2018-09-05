@@ -20,7 +20,6 @@ namespace GitHub.VisualStudio.Commands
     {
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
-        readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
         readonly Lazy<DTE> dte;
@@ -40,14 +39,12 @@ namespace GitHub.VisualStudio.Commands
         public OpenFromUrlCommand(
             Lazy<IGitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
-            Lazy<IPullRequestEditorService> pullRequestEditorService,
             Lazy<ITeamExplorerContext> teamExplorerContext,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider) :
             base(CommandSet, CommandId)
         {
             this.gitHubContextService = gitHubContextService;
             this.repositoryCloneService = repositoryCloneService;
-            this.pullRequestEditorService = pullRequestEditorService;
             this.teamExplorerContext = teamExplorerContext;
             this.serviceProvider = serviceProvider;
             dte = new Lazy<DTE>(() => (DTE)serviceProvider.GetService(typeof(DTE)));
