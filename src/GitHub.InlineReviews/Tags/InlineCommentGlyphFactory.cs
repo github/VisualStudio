@@ -10,7 +10,7 @@ using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineCommentGlyphFactory : IGlyphFactory<InlineCommentTag>
+    class InlineCommentGlyphFactory : IGlyphFactory<InlineTag>
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
@@ -23,7 +23,7 @@ namespace GitHub.InlineReviews.Tags
             this.textView = textView;
         }
 
-        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
+        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineTag tag)
         {
             var glyph = CreateGlyph(tag);
             glyph.DataContext = tag;
@@ -40,15 +40,15 @@ namespace GitHub.InlineReviews.Tags
             return new[]
             {
                 typeof(AddInlineCommentTag),
-                typeof(ShowInlineCommentTag)
+                typeof(ShowInlineTag)
             };
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
-        static UserControl CreateGlyph(InlineCommentTag tag)
+        static UserControl CreateGlyph(InlineTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineCommentTag;
+            var showTag = tag as ShowInlineTag;
 
             if (addTag != null)
             {
@@ -62,13 +62,13 @@ namespace GitHub.InlineReviews.Tags
                 };
             }
 
-            throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
+            throw new ArgumentException($"Unknown 'InlineTag' type '{tag}'");
         }
 
-        bool OpenThreadView(InlineCommentTag tag)
+        bool OpenThreadView(InlineTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineCommentTag;
+            var showTag = tag as ShowInlineTag;
 
             if (addTag != null)
             {

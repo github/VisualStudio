@@ -7,7 +7,7 @@ namespace GitHub.InlineReviews.Tags
     /// <summary>
     /// A tag which marks a line in an editor where a new review comment can be added.
     /// </summary>
-    public class AddInlineCommentTag : InlineCommentTag
+    public class AddInlineCommentTag : InlineTag
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AddInlineCommentTag"/> class.

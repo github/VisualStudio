@@ -9,10 +9,10 @@ namespace GitHub.InlineReviews.Tags
     /// Base class for inline comment tags.
     /// </summary>
     /// <seealso cref="AddInlineCommentTag"/>
-    /// <seealso cref="ShowInlineCommentTag"/>
-    public abstract class InlineCommentTag : ITag
+    /// <seealso cref="ShowInlineTag"/>
+    public abstract class InlineTag : ITag
     {
-        protected InlineCommentTag(
+        protected InlineTag(
             IPullRequestSession session,
             int lineNumber,
             DiffChangeType diffChangeType)

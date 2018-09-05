@@ -113,7 +113,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag)
+        public ITrackingPoint Show(ITextView textView, ShowInlineTag tag)
         {
             Guard.ArgumentNotNull(textView, nameof(textView));
             Guard.ArgumentNotNull(tag, nameof(tag));
@@ -136,7 +136,7 @@ namespace GitHub.InlineReviews.Services
             return trackingPoint;
         }
 
-        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineCommentTag tag)
+        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineTag tag)
         {
             var diffModel = (textView as IWpfTextView)?.TextViewModel as IDifferenceTextViewModel;
             var snapshot = textView.TextSnapshot;

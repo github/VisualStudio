@@ -14,14 +14,14 @@ using GitHub.InlineReviews.Margins;
 
 namespace GitHub.InlineReviews.UnitTests.Tags
 {
-    public class InlineTaggerTests
+    public class InlineCommentTaggerTests
     {
         public class WithTextBufferInfo
         {
             [Test]
             public void FirstPassShouldReturnEmptyTags()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments(DiffSide.Right));
@@ -34,7 +34,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnShowCommentTagForRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments(DiffSide.Right));
@@ -51,7 +51,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test, Ignore("I broke it")]
             public void ShouldReturnShowAnnotationTagForRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithAnnotations(DiffSide.Right));
@@ -62,13 +62,13 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineAnnotationTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
             [Test]
             public void ShouldReturnAddNewCommentTagForAddedLineOnRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments(DiffSide.Right));
@@ -85,7 +85,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments(DiffSide.Right));
@@ -101,7 +101,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnShowCommentTagForLhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments(DiffSide.Left));
@@ -118,7 +118,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnAddCommentTagForLhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments(DiffSide.Left));
@@ -137,7 +137,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             {
                 var file = CreateSessionFileWithComments();
                 var manager = CreateSessionManager(file, DiffSide.Right);
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
@@ -165,7 +165,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     DiffSide.Right,
                     "123");
                 var session = sessionManager.CurrentSession;
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     sessionManager);
@@ -186,7 +186,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     DiffSide.Left,
                     "123");
                 var session = sessionManager.CurrentSession;
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     sessionManager);
@@ -296,7 +296,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void FirstPassShouldReturnEmptyTags()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments());
@@ -308,7 +308,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldReturnShowCommentTag()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments());
@@ -324,9 +324,9 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
 
             [Test, Ignore("I broke it")]
-            public void ShouldReturnShowAnnotationTag()
+            public void ShouldReturnShowInlineTag()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithAnnotations());
@@ -337,13 +337,13 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineAnnotationTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
             [Test]
             public void ShouldReturnAddNewCommentTagForAddedLine()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments());
@@ -360,7 +360,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             [Test]
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManagerWithComments());
@@ -378,7 +378,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             {
                 var file = CreateSessionFileWithComments();
                 var manager = CreateSessionManager(file);
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     CreateTextView(inlineCommentMarginVisible),
                     CreateBuffer(),
                     manager);
@@ -402,7 +402,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             {
                 var file = CreateSessionFileWithComments();
                 var manager = CreateSessionManager(file);
-                var target = new InlineTagger(
+                var target = new InlineCommentTagger(
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);

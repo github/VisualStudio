@@ -29,11 +29,11 @@ namespace GitHub.InlineReviews.Services
         void Hide(ITextView textView);
 
         /// <summary>
-        /// Shows the peek view for a <see cref="ShowInlineCommentTag"/>.
+        /// Shows the peek view for a <see cref="ShowInlineTag"/>.
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <param name="tag">The tag.</param>
-        ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag);
+        ITrackingPoint Show(ITextView textView, ShowInlineTag tag);
 
         /// <summary>
         /// Shows the peek view for an <see cref="AddInlineCommentTag"/>.

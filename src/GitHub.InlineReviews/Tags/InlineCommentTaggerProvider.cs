@@ -15,7 +15,7 @@ namespace GitHub.InlineReviews.Tags
     /// </summary>
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
-    [TagType(typeof(ShowInlineCommentTag))]
+    [TagType(typeof(ShowInlineTag))]
     class InlineCommentTaggerProvider : IViewTaggerProvider
     {
         readonly IPullRequestSessionManager sessionManager;
