@@ -118,52 +118,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
-    <value>Invalid authentication code</value>
+    <value>无效的验证码</value>
   </data>
   <data name="authenticationFailedLabelMessage" xml:space="preserve">
-    <value>Try entering the code again or clicking the resend button to get a new authentication code.</value>
+    <value>尝试再次输入代码或单击重新发送按钮以获取新的验证码。</value>
   </data>
   <data name="authenticationSentLabelContent" xml:space="preserve">
-    <value>Authentication code sent!</value>
+    <value>验证码已发送！</value>
   </data>
   <data name="authenticationSentLabelMessage" xml:space="preserve">
-    <value>If you do not receive the authentication code, contact support@github.com.</value>
+    <value>如果您没有收到验证码，请联系 support@github.com 。</value>
   </data>
   <data name="browsePathButtonContent" xml:space="preserve">
-    <value>Browse</value>
+    <value>浏览</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
-    <value>Could not connect to github.com</value>
+    <value>无法连接到github.com</value>
   </data>
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
-    <value>Could not connect to the server.</value>
+    <value>无法连接服务器</value>
   </data>
   <data name="CreateLink" xml:space="preserve">
-    <value>Create</value>
+    <value>创建</value>
   </data>
   <data name="DescriptionOptional" xml:space="preserve">
-    <value>Description (Optional)</value>
+    <value>说明(可选)</value>
   </data>
   <data name="openInBrowser" xml:space="preserve">
-    <value>Open in Browser</value>
+    <value>在浏览器中打开</value>
   </data>
   <data name="CancelLink" xml:space="preserve">
-    <value>Cancel</value>
+    <value>取消</value>
   </data>
   <data name="gistCreatedMessage" xml:space="preserve">
-    <value>Gist created</value>
+    <value>Gist已创建</value>
   </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
-    <value>Failed to create gist</value>
+    <value>创建Gist失败</value>
   </data>
   <data name="prUpdatedByText" xml:space="preserve">
-    <value>by</value>
+    <value>由</value>
   </data>
   <data name="Options_PrivacyTitle" xml:space="preserve">
-    <value>Privacy</value>
+    <value>隐私</value>
   </data>
   <data name="Options_MetricsLabel" xml:space="preserve">
-    <value>Help us improve by sending anonymous usage data</value>
+    <value>通过发送匿名使用数据来帮助我们改进</value>
   </data>
   <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
     <value>Could not copy to the clipboard. Please try again.</value>
