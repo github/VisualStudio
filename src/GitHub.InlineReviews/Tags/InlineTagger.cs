@@ -21,9 +21,9 @@ namespace GitHub.InlineReviews.Tags
     /// <summary>
     /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
     /// </summary>
-    public sealed class InlineCommentTagger : ITagger<InlineTag>, IDisposable
+    public sealed class InlineTagger : ITagger<InlineTag>, IDisposable
     {
-        static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
+        static readonly ILogger log = LogManager.ForContext<InlineTagger>();
         static readonly IReadOnlyList<ITagSpan<InlineTag>> EmptyTags = new ITagSpan<InlineTag>[0];
         readonly ITextBuffer buffer;
         readonly ITextView view;
@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.Tags
         IDisposable sessionManagerSubscription;
         IDisposable visibleSubscription;
 
-        public InlineCommentTagger(
+        public InlineTagger(
             ITextView view,
             ITextBuffer buffer,
             IPullRequestSessionManager sessionManager)
@@ -84,7 +84,7 @@ namespace GitHub.InlineReviews.Tags
                 {
                     var startLine = span.Start.GetContainingLine().LineNumber;
                     var endLine = span.End.GetContainingLine().LineNumber;
-                    var linesWithComments = new BitArray((endLine - startLine) + 1);
+                    var linesWithTags = new BitArray((endLine - startLine) + 1);
                     var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
                         x.LineNumber <= endLine);
@@ -97,11 +97,30 @@ namespace GitHub.InlineReviews.Tags
                         if ((side == DiffSide.Left && thread.DiffLineType == DiffChangeType.Delete) ||
                             (side == DiffSide.Right && thread.DiffLineType != DiffChangeType.Delete))
                         {
-                            linesWithComments[thread.LineNumber - startLine] = true;
+                            linesWithTags[thread.LineNumber - startLine] = true;
 
                             result.Add(new TagSpan<ShowInlineTag>(
                                 new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineTag(currentSession, thread)));
+                                new ShowInlineTag(currentSession, thread, thread.LineNumber, thread.DiffLineType)));
+                        }
+                    }
+
+                    var spanAnnotations = file.InlineAnnotations.Where(x =>
+                        x.EndLine - 1 >= startLine &&
+                        x.EndLine - 1 <= endLine);
+
+                    foreach (var annotation in spanAnnotations)
+                    {
+                        var snapshot = span.Snapshot;
+                        var line = snapshot.GetLineFromLineNumber(annotation.EndLine - 1);
+
+                        if (side == DiffSide.Right)
+                        {
+                            linesWithTags[annotation.EndLine - 1 - startLine] = true;
+
+                            result.Add(new TagSpan<ShowInlineTag>(
+                                new SnapshotSpan(line.Start, line.End),
+                                new ShowInlineTag(currentSession, null, annotation.EndLine, DiffChangeType.Add)));
                         }
                     }
 
@@ -113,7 +132,7 @@ namespace GitHub.InlineReviews.Tags
 
                             if (lineNumber >= startLine &&
                                 lineNumber <= endLine &&
-                                !linesWithComments[lineNumber - startLine]
+                                !linesWithTags[lineNumber - startLine]
                                 && (side == DiffSide.Right || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);

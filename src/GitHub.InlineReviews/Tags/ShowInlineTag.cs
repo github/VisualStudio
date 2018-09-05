@@ -15,13 +15,12 @@ namespace GitHub.InlineReviews.Tags
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="thread">A model holding the details of the thread.</param>
-        public ShowInlineTag(
-            IPullRequestSession session,
-            IInlineCommentThreadModel thread)
-            : base(session, thread.LineNumber, thread.DiffLineType)
+        /// <param name="lineNumber"></param>
+        /// <param name="diffLineType"></param>
+        public ShowInlineTag(IPullRequestSession session,
+            IInlineCommentThreadModel thread, int lineNumber, DiffChangeType diffLineType)
+            : base(session, lineNumber, diffLineType)
         {
-            Guard.ArgumentNotNull(thread, nameof(thread));
-
             Thread = thread;
         }
 

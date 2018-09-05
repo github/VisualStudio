@@ -98,6 +98,23 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+            PullRequestDetailModel pullRequest,
+            string relativePath)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            return pullRequest.CheckSuites
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns)
+                .SelectMany(checkRun =>
+                    checkRun.Annotations
+                        .Where(annotation => annotation.Filename == relativePath && annotation.AnnotationLevel.HasValue)
+                        .Select(annotation => new InlineAnnotationModel(checkRun, annotation)))
+                .OrderBy(tuple => tuple.StartLine)
+                .ToArray();
+        }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             PullRequestDetailModel pullRequest,
             string relativePath,
@@ -775,6 +792,16 @@ namespace GitHub.InlineReviews.Services
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
+                                                  Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                      .Select(annotation => new CheckRunAnnotationModel
+                                                      {
+                                                          Title = annotation.Title,
+                                                          Message = annotation.Message,
+                                                          Filename = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
+                                                          StartLine = annotation.Location.Start.Line,
+                                                          EndLine = annotation.Location.End.Line,
+                                                      }).ToList()
                                               }).ToList()
                                       }).ToList(),
                                   Statuses = commit.Commit.Status

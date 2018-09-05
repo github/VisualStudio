@@ -141,7 +141,7 @@
     <Compile Include="Tags\InlineCommentGlyphFactory.cs" />
     <Compile Include="Tags\InlineTag.cs" />
     <Compile Include="Tags\ShowInlineTag.cs" />
-    <Compile Include="Tags\InlineCommentTagger.cs" />
+    <Compile Include="Tags\InlineTagger.cs" />
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
     <Compile Include="ViewModels\InlineCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\ICommentViewModel.cs" />
