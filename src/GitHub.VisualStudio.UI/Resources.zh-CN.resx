@@ -187,7 +187,7 @@
     <value>维基</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>Pulse</value>
+    <value>脉冲</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
     <value>拉取请求</value>
@@ -334,93 +334,93 @@
     <value>筛选分支</value>
   </data>
   <data name="PublishToGitHubButton" xml:space="preserve">
-    <value>Publish to GitHub</value>
+    <value>发布到 GitHub</value>
   </data>
   <data name="GetStartedText" xml:space="preserve">
-    <value>Get Started</value>
+    <value>入门</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>Sign in</value>
+    <value>登录</value>
   </data>
   <data name="SignInCallToAction" xml:space="preserve">
-    <value>Sign in...</value>
+    <value>登录...</value>
   </data>
   <data name="LocalBranchUpToDate" xml:space="preserve">
-    <value>Local branch up to date</value>
+    <value>本地分支最新!</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
-    <value>Changes ({0})</value>
+    <value>变更:({0}）</value>
   </data>
   <data name="ViewChanges" xml:space="preserve">
-    <value>View Changes</value>
+    <value>查看变更</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
-    <value>Compare File as Default Action</value>
+    <value>将比较文件作为默认操作</value>
   </data>
   <data name="ViewFile" xml:space="preserve">
-    <value>View File</value>
+    <value>查看文件</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
-    <value>Open File as Default Action</value>
+    <value>将打开文件作为默认操作</value>
   </data>
   <data name="SwitchToListView" xml:space="preserve">
-    <value>Switch to List View</value>
+    <value>切换到列表视图</value>
   </data>
   <data name="SwitchToTreeView" xml:space="preserve">
-    <value>Switch to Tree View</value>
+    <value>切换到树视图</value>
   </data>
   <data name="UpdatedFormat" xml:space="preserve">
-    <value>updated {0}</value>
+    <value>已更新“{0}”</value>
   </data>
   <data name="OpenPROnGitHubToolTip" xml:space="preserve">
-    <value>View Pull Request on GitHub</value>
+    <value>在GitHub上查看拉取请求</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
+    <value>欢迎使用 GitHub for Visual Studio！ 您可以先看看这里 [培训](show-training) 或[文档](show-docs)?
 
-[Don't show this again](dont-show-again)</value>
+[不再显示](dont-show-again)</value>
   </data>
   <data name="prUpdatedText" xml:space="preserve">
-    <value>Updated</value>
+    <value>已更新</value>
   </data>
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>Show PR comments on editor margin</value>
+    <value>在编辑器边缘显示PR注释</value>
   </data>
   <data name="Options_ExperimentalTitle" xml:space="preserve">
-    <value>Experimental features</value>
+    <value>实验性功能</value>
   </data>
   <data name="Options_ExperimentalNote" xml:space="preserve">
-    <value>These features might change in a future version</value>
+    <value>我们将在未来的版本中改变此功能。</value>
   </data>
   <data name="ViewChangesInSolution" xml:space="preserve">
-    <value>View Changes in Solution</value>
+    <value>在解决方案中查看更新</value>
   </data>
   <data name="OpenFileInSolution" xml:space="preserve">
-    <value>Open File in Solution</value>
+    <value>解决方案中打开文件</value>
   </data>
   <data name="TokenPrompt" xml:space="preserve">
-    <value>Token</value>
+    <value>令牌</value>
   </data>
   <data name="ContinueYourReview" xml:space="preserve">
-    <value>Continue your review</value>
+    <value>继续复审</value>
   </data>
   <data name="AddYourReview" xml:space="preserve">
-    <value>Add your review</value>
+    <value>添加复审</value>
   </data>
   <data name="Reviewers" xml:space="preserve">
-    <value>Reviewers</value>
+    <value>复审人员</value>
   </data>
   <data name="AddReviewComment" xml:space="preserve">
-    <value>Add review comment</value>
+    <value>添加复审注释</value>
   </data>
   <data name="AddSingleComment" xml:space="preserve">
-    <value>Add a single comment</value>
+    <value>添加评论</value>
   </data>
   <data name="ForkNavigationItemText" xml:space="preserve">
     <value>Fork</value>
   </data>
   <data name="Options_DebuggingTitle" xml:space="preserve">
-    <value>Debugging</value>
+    <value>调试</value>
   </data>
   <data name="Options_EnableTraceLoggingText" xml:space="preserve">
     <value>启用日志跟踪</value>
@@ -429,7 +429,7 @@
     <value>GitHub括在在Blend内部无效</value>
   </data>
   <data name="Options_ForkButtonLabel" xml:space="preserve">
-    <value>Show Fork button in Team Explorer</value>
+    <value>在团队资源管理器中显示分叉按钮</value>
   </data>
   <data name="UpdateComment" xml:space="preserve">
     <value>更新注释</value>
@@ -438,7 +438,7 @@
     <value>取消</value>
   </data>
   <data name="Pending" xml:space="preserve">
-    <value>Pending</value>
+    <value>挂起</value>
   </data>
   <data name="StartAReview" xml:space="preserve">
     <value>开始复审</value>
@@ -459,10 +459,10 @@
     <value>返回</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>Fork Repository</value>
+    <value>Fork存储库</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
-    <value>Fork the repository</value>
+    <value>Fork此存储库</value>
   </data>
   <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
     <value>更新本地存储库的</value>
@@ -558,21 +558,21 @@
     <value>目标URL与当前存储库拥有者不同。</value>
   </data>
   <data name="NoActiveRepositoryMessage" xml:space="preserve">
-    <value>There is no active repository to navigate</value>
+    <value>没有活动的存储库可以导航</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>This file has changed since the permalink was created</value>
+    <value>自创建固定链接以来，此文件已更改</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
-    <value>Please open the repository '{0}' and try again</value>
+    <value>请打开存储库“{0}”，然后重试</value>
   </data>
   <data name="UnknownLinkTypeMessage" xml:space="preserve">
-    <value>Couldn't open from '{0}'. Only URLs that link to repository files are currently supported.</value>
+    <value>无法从“{0}”打开。目前仅支持链接到存储库文件的URL。</value>
   </data>
   <data name="NoGitHubUrlMessage" xml:space="preserve">
-    <value>Couldn't a find a GitHub URL in clipboard</value>
+    <value>无法在剪贴板中找到GitHub网址！</value>
   </data>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
-    <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
+    <value>无法在当前存储库中找到目标URL。在进行提取后再试一次。</value>
   </data>
 </root>
