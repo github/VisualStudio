@@ -75,6 +75,10 @@ namespace GitHub.ViewModels.Dialog
                 await viewModel.InitializeAsync(connection).ConfigureAwait(true);
                 Start(viewModel);
             }
+            else
+            {
+                done.OnNext(null);
+            }
         }
 
         public async Task StartWithLogout<T>(T viewModel, IConnection connection)
