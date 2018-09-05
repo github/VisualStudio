@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>为新版本库选择文件夹。</value>
+    <value>Select a containing folder for your new repository.</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
     <value>克隆一个 {0} 版本库</value>
@@ -136,13 +136,13 @@
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>Please enter an Enterprise URL</value>
+    <value>请输入企业网址</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>Please enter a valid Enterprise URL</value>
+    <value>请输入有效的企业网址</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
-    <value>Not an Enterprise server. Please enter an Enterprise URL</value>
+    <value>不是企业服务器。请输入企业服务器 URL</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
     <value>(是否忘记了您的密码?)</value>
@@ -151,7 +151,7 @@
     <value>请确保使用您的密码而不是登录的个人访问令牌。</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>Check your username and password, then try again</value>
+    <value>检查您的用户名和密码然后重试</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
     <value>登录失败。</value>
@@ -163,7 +163,7 @@
     <value>请输入您的密码</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
+    <value>在 [{1}] ({2}) 上成功创建分支 ** {0} ** 拉取请求</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
     <value>发布版本库</value>
@@ -172,7 +172,7 @@
     <value>发布版本库至 {0}</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
-    <value>Please enter a title for the Pull Request</value>
+    <value>请输入请求的标题!</value>
   </data>
   <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
     <value>源和目标分支不能相同</value>
@@ -181,16 +181,16 @@
     <value>远程不存在源分支, 你有没有推送它？</value>
   </data>
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No selected repository.</value>
+    <value>没有选定的存储库。</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>Please enter a repository path</value>
+    <value>请输入名称</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
     <value>请输入有效路径</value>
   </data>
   <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
-    <value>Path contains invalid characters</value>
+    <value>路径包含无效字符</value>
   </data>
   <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
     <value>路径太长</value>
@@ -199,13 +199,13 @@
     <value>版本库 '{0}/{1}'已存在。</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
-    <value>Change the repository name or select a different account and try again.</value>
+    <value>请更改存储库名称或选择其他帐户, 然后重试。</value>
   </data>
   <data name="RepositoryCreationFailedQuota" xml:space="preserve">
-    <value>Exceeded private repositories quota.</value>
+    <value>私密文档</value>
   </data>
   <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
-    <value>Repository with same name already exists at this location</value>
+    <value>同名的广告活动已存在</value>
   </data>
   <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
     <value>请输入姓名</value>
@@ -226,13 +226,13 @@
     <value>双重身份认证</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>Enter a sign in authentication code here</value>
+    <value>在此处输入身份验证代码中的符号</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
     <value>请输入您的用户名或邮箱地址.</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
-    <value>Username or email address must not have spaces</value>
+    <value>用户名或电子邮件地址不能有空格</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
     <value>拉取请求</value>
@@ -253,7 +253,7 @@
     <value>你必须先拉取再推送</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>No commits to pull</value>
+    <value>没有需要拉取的提交</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
     <value>没有需要推送的提交</value>
