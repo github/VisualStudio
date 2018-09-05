@@ -1,30 +1,30 @@
-﻿using GitHub.Extensions;
-using GitHub.InlineReviews.Margins;
-using GitHub.Logging;
-using GitHub.Models;
-using GitHub.Services;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
-using ReactiveUI;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Extensions;
+using GitHub.Logging;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.InlineReviews.Margins;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Tagging;
+using ReactiveUI;
+using Serilog;
 
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
     /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
     /// </summary>
-    public sealed class InlineTagger : ITagger<InlineTagBase>, IDisposable
+    public sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
-        static readonly ILogger log = LogManager.ForContext<InlineTagger>();
-        static readonly IReadOnlyList<ITagSpan<InlineTagBase>> EmptyTags = new ITagSpan<InlineTagBase>[0];
+        static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
+        static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.Tags
         IDisposable sessionManagerSubscription;
         IDisposable visibleSubscription;
 
-        public InlineTagger(
+        public InlineCommentTagger(
             ITextView view,
             ITextBuffer buffer,
             IPullRequestSessionManager sessionManager)
@@ -64,7 +64,7 @@ namespace GitHub.InlineReviews.Tags
             visibleSubscription = null;
         }
 
-        public IEnumerable<ITagSpan<InlineTagBase>> GetTags(NormalizedSnapshotSpanCollection spans)
+        public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             if (needsInitialize)
             {
@@ -74,7 +74,7 @@ namespace GitHub.InlineReviews.Tags
             }
             else if (file?.InlineCommentThreads != null)
             {
-                var result = new List<ITagSpan<InlineTagBase>>();
+                var result = new List<ITagSpan<InlineCommentTag>>();
                 var currentSession = session ?? sessionManager.CurrentSession;
 
                 if (currentSession == null)
@@ -84,8 +84,7 @@ namespace GitHub.InlineReviews.Tags
                 {
                     var startLine = span.Start.GetContainingLine().LineNumber;
                     var endLine = span.End.GetContainingLine().LineNumber;
-                    var linesWithTags = new BitArray((endLine - startLine) + 1);
-
+                    var linesWithComments = new BitArray((endLine - startLine) + 1);
                     var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
                         x.LineNumber <= endLine);
@@ -98,30 +97,11 @@ namespace GitHub.InlineReviews.Tags
                         if ((side == DiffSide.Left && thread.DiffLineType == DiffChangeType.Delete) ||
                             (side == DiffSide.Right && thread.DiffLineType != DiffChangeType.Delete))
                         {
-                            linesWithTags[thread.LineNumber - startLine] = true;
+                            linesWithComments[thread.LineNumber - startLine] = true;
 
                             result.Add(new TagSpan<ShowInlineCommentTag>(
                                 new SnapshotSpan(line.Start, line.End),
                                 new ShowInlineCommentTag(currentSession, thread)));
-                        }
-                    }
-
-                    var spanAnnotations = file.InlineAnnotations.Where(x =>
-                        x.EndLine - 1 >= startLine &&
-                        x.EndLine - 1 <= endLine);
-
-                    foreach (var annotation in spanAnnotations)
-                    {
-                        var snapshot = span.Snapshot;
-                        var line = snapshot.GetLineFromLineNumber(annotation.EndLine - 1);
-
-                        if (side == DiffSide.Right)
-                        {
-                            linesWithTags[annotation.EndLine - 1 - startLine] = true;
-
-                            result.Add(new TagSpan<ShowInlineAnnotationTag>(
-                                new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineAnnotationTag(currentSession, annotation)));
                         }
                     }
 
@@ -133,14 +113,13 @@ namespace GitHub.InlineReviews.Tags
 
                             if (lineNumber >= startLine &&
                                 lineNumber <= endLine &&
-                                !linesWithTags[lineNumber - startLine]
+                                !linesWithComments[lineNumber - startLine]
                                 && (side == DiffSide.Right || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
-                                result.Add(new TagSpan<AddInlineCommentTag>(
+                                result.Add(new TagSpan<InlineCommentTag>(
                                     new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
-                                    new AddInlineCommentTag(currentSession, file.CommitSha, relativePath, line.DiffLineNumber,
-                                        lineNumber, line.Type)));
+                                    new AddInlineCommentTag(currentSession, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type)));
                             }
                         }
                     }

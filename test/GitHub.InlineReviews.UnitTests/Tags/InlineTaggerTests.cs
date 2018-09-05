@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
             [Test, Ignore("I broke it")]
@@ -112,7 +112,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
             [Test]
@@ -319,7 +319,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineCommentTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
 

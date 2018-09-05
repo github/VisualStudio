@@ -25,7 +25,7 @@ namespace GitHub.InlineReviews.Margins
         readonly IPullRequestSessionManager sessionManager;
         readonly Grid marginGrid;
 
-        GlyphMargin<InlineTagBase> glyphMargin;
+        GlyphMargin<InlineCommentTag> glyphMargin;
         IDisposable currentSessionSubscription;
         IDisposable visibleSubscription;
         bool hasChanges;
@@ -45,10 +45,10 @@ namespace GitHub.InlineReviews.Margins
             textView.Options.SetOptionValue(InlineCommentTextViewOptions.MarginEnabledId, false);
 
             marginGrid = new GlyphMarginGrid { Width = 17.0 };
-            var glyphFactory = new InlineGlyphFactory(peekService, textView);
+            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
 
-            glyphMargin = new GlyphMargin<InlineTagBase>(textView, glyphFactory, marginGrid, tagAggregatorFactory,
+            glyphMargin = new GlyphMargin<InlineCommentTag>(textView, glyphFactory, marginGrid, tagAggregatorFactory,
                 editorFormatMap, MarginPropertiesName);
 
             if (IsDiffView())
