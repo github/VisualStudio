@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,50 +15,42 @@ namespace GitHub.TeamFoundation
     internal class RegistryHelper
     {
         static readonly ILogger log = LogManager.ForContext<RegistryHelper>();
-        const string TEGitKey = @"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl";
+
         static RegistryKey OpenGitKey(string path)
         {
-            return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(TEGitKey + "\\" + path, true);
+            var keyName = $"Software\\Microsoft\\VisualStudio\\{MajorVersion}.0\\TeamFoundation\\GitSourceControl\\{path}";
+            return Registry.CurrentUser.OpenSubKey(keyName, true);
         }
 
         internal static IEnumerable<ILocalRepositoryModel> PokeTheRegistryForRepositoryList()
         {
-            var key = OpenGitKey("Repositories");
-
-            if (key != null)
+            using (var key = OpenGitKey("Repositories"))
             {
-                using (key)
+                if (key == null)
                 {
-                    return key.GetSubKeyNames().Select(x =>
-                    {
-                        var subkey = key.OpenSubKey(x);
-
-                        if (subkey != null)
-                        {
-                            using (subkey)
-                            {
-                                try
-                                {
-                                    var path = subkey?.GetValue("Path") as string;
-                                    if (path != null && Directory.Exists(path))
-                                        return new LocalRepositoryModel(path, GitService.GitServiceHelper);
-                                }
-                                catch (Exception)
-                                {
-                                    // no sense spamming the log, the registry might have ton of stale things we don't care about
-                                }
-
-                            }
-                        }
-
-                        return null;
-                    })
-                    .Where(x => x != null)
-                    .ToList();
+                    return Enumerable.Empty<ILocalRepositoryModel>();
                 }
-            }
 
-            return new ILocalRepositoryModel[0];
+                return key.GetSubKeyNames().Select(x =>
+                {
+                    using (var subkey = key.OpenSubKey(x))
+                    {
+                        try
+                        {
+                            var path = subkey?.GetValue("Path") as string;
+                            if (path != null && Directory.Exists(path))
+                                return new LocalRepositoryModel(path, GitService.GitServiceHelper);
+                        }
+                        catch (Exception)
+                        {
+                            // no sense spamming the log, the registry might have ton of stale things we don't care about
+                        }
+                        return null;
+                    }
+                })
+                .Where(x => x != null)
+                .ToList();
+            }
         }
 
         internal static string PokeTheRegistryForLocalClonePath()
@@ -68,15 +61,16 @@ namespace GitHub.TeamFoundation
             }
         }
 
-        const string NewProjectDialogKeyPath = @"Software\Microsoft\VisualStudio\14.0\NewProjectDialog";
         const string MRUKeyPath = "MRUSettingsLocalProjectLocationEntries";
         internal static string SetDefaultProjectPath(string path)
         {
+            var newProjectDialogKeyPath = $"Software\\Microsoft\\VisualStudio\\{MajorVersion}.0\\NewProjectDialog";
+
             var old = String.Empty;
             try
             {
-                var newProjectKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true) ??
-                                    Microsoft.Win32.Registry.CurrentUser.CreateSubKey(NewProjectDialogKeyPath);
+                var newProjectKey = Registry.CurrentUser.OpenSubKey(newProjectDialogKeyPath, true) ??
+                                    Registry.CurrentUser.CreateSubKey(newProjectDialogKeyPath);
 
                 if (newProjectKey == null)
                 {
@@ -84,7 +78,7 @@ namespace GitHub.TeamFoundation
                         string.Format(
                             CultureInfo.CurrentCulture,
                             "Could not open or create registry key '{0}'",
-                            NewProjectDialogKeyPath));
+                            newProjectDialogKeyPath));
                 }
 
                 using (newProjectKey)
@@ -132,5 +126,8 @@ namespace GitHub.TeamFoundation
             }
             return old;
         }
+
+        // Major version number of the current devenv process
+        static int MajorVersion => Process.GetCurrentProcess().MainModule.FileVersionInfo.FileMajorPart;
     }
 }
