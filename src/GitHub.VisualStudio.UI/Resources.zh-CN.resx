@@ -268,70 +268,70 @@
     <value>了解详细信息</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
-    <value>Git ignore</value>
+    <value>Git忽略</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
-    <value>Search repositories</value>
+    <value>搜索存储库</value>
   </data>
   <data name="loadingFailedMessageContent" xml:space="preserve">
-    <value>Some or all repositories may not have loaded. Close the dialog and try again.</value>
+    <value>部分或全部存储库没有加载，请关闭对话框重试。</value>
   </data>
   <data name="loadingFailedMessageMessage" xml:space="preserve">
-    <value>An error occurred while loading repositories</value>
+    <value>加载存储库时发送意外。</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>GitHub Enterprise server address</value>
+    <value>GitHub企业服务器地址</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>The host isn't available or is not a GitHub Enterprise server. Check the address and try again.</value>
+    <value>无效主机或不是GitHub企业服务器，请检查地址并重试。</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
-    <value>Username or email</value>
+    <value>用户名或电子邮件</value>
   </data>
   <data name="PasswordPrompt" xml:space="preserve">
-    <value>Password</value>
+    <value>密码</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>Check your username and password, then try again</value>
+    <value>检查您的用户名和密码然后重试</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>Sign in</value>
+    <value>登录</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>(forgot your password?)</value>
+    <value>(是否忘记了您的密码?)</value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
-    <value>Please check your internet connection and try again.</value>
+    <value>请检查你的 Internet 连接，然后重试。</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Don’t have GitHub Enterprise? </value>
+    <value>没有GitHub企业版？</value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>Don’t have an account? </value>
+    <value>没有帐户?</value>
   </data>
   <data name="TitleRequired" xml:space="preserve">
-    <value>Title (required)</value>
+    <value>标题(必须)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Description</value>
+    <value>描述</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects.</value>
+    <value>将此存储库发布到 GitHub, 并为开源和私有项目获得强大的协作、代码审阅和代码管理。</value>
   </data>
   <data name="NotAGitHubRepository" xml:space="preserve">
-    <value>This repository is not on GitHub</value>
+    <value>此存储库未托管至Github</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>No repository</value>
+    <value>没有存储库</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>We couldn't find a git repository here. Open a git project or click "File -&gt; Add to Source Control" in a project to get started.</value>
+    <value>我们在这里找不到 git 存储库。打开一个 git 项目或单击项目中的 "文件"-&gt; "添加到源代码管理" 以开始.</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
-    <value>Create an account</value>
+    <value>创建帐户</value>
   </data>
   <data name="filterBranchesText" xml:space="preserve">
-    <value>Filter branches</value>
+    <value>筛选分支</value>
   </data>
   <data name="PublishToGitHubButton" xml:space="preserve">
     <value>Publish to GitHub</value>
@@ -516,46 +516,46 @@
     <value>分配</value>
   </data>
   <data name="Author" xml:space="preserve">
-    <value>Author</value>
+    <value>作者</value>
   </data>
   <data name="SignInWithYourBrowser" xml:space="preserve">
-    <value>Sign in with your browser</value>
+    <value>使用浏览器登录</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>Open</value>
+    <value>打开</value>
   </data>
   <data name="FilterByAuthor" xml:space="preserve">
-    <value>Filter by Author</value>
+    <value>按作者过滤</value>
   </data>
   <data name="SelectFork" xml:space="preserve">
-    <value>Select Fork</value>
+    <value>选择Fork</value>
   </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
-    <value>There aren't any open pull requests</value>
+    <value>这里没有任何打开的推送请求</value>
   </data>
   <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
-    <value>Pull requests let you tell others about changes you've pushed to a repository on GitHub</value>
+    <value>通过推送请求告诉其他人关于你推送到一个GitHub存储库的变更</value>
   </data>
   <data name="NoResultsMatchedYourSearch" xml:space="preserve">
-    <value>No results matched your search.</value>
+    <value>您的搜索没有匹配结果</value>
   </data>
   <data name="ToGetStartedYouCan" xml:space="preserve">
-    <value>To get started you can</value>
+    <value>现在开始你可以</value>
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
-    <value>create a pull request</value>
+    <value>创建拉取请求</value>
   </data>
   <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>Are you sure you want to delete this comment?</value>
+    <value>您确定要删除此注释吗?</value>
   </data>
   <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
-    <value>Delete Comment</value>
+    <value>删除注释</value>
   </data>
   <data name="OpenRepositoryAtDir" xml:space="preserve">
-    <value>Open repository at '{0}'?</value>
+    <value>在“{0}”打开存储库?</value>
   </data>
   <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
-    <value>The target URL has a different owner to the current repository.</value>
+    <value>目标URL与当前存储库拥有者不同。</value>
   </data>
   <data name="NoActiveRepositoryMessage" xml:space="preserve">
     <value>There is no active repository to navigate</value>
