@@ -14,7 +14,7 @@ using GitHub.InlineReviews.Margins;
 
 namespace GitHub.InlineReviews.UnitTests.Tags
 {
-    public class InlineCommentTaggerTests
+    public class InlineTaggerTests
     {
         public class WithTextBufferInfo
         {
