@@ -87,40 +87,56 @@ namespace GitHub.InlineReviews.Tags
                     var linesWithTags = new BitArray((endLine - startLine) + 1);
                     var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
-                        x.LineNumber <= endLine);
+                        x.LineNumber <= endLine)
+                        .ToArray();
 
-                    foreach (var thread in spanThreads)
+                    var spanThreadsByLine = spanThreads.ToDictionary(model => model.LineNumber);
+
+                    Dictionary<int, IInlineAnnotationModel[]> spanAnnotationsByLine = null;
+                    if (side == DiffSide.Right)
                     {
-                        var snapshot = span.Snapshot;
-                        var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
+                        var spanAnnotations = file.InlineAnnotations.Where(x =>
+                                x.EndLine - 1 >= startLine &&
+                                x.EndLine - 1 <= endLine);
 
-                        if ((side == DiffSide.Left && thread.DiffLineType == DiffChangeType.Delete) ||
-                            (side == DiffSide.Right && thread.DiffLineType != DiffChangeType.Delete))
-                        {
-                            linesWithTags[thread.LineNumber - startLine] = true;
-
-                            result.Add(new TagSpan<ShowInlineTag>(
-                                new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineTag(currentSession, thread, thread.LineNumber, thread.DiffLineType)));
-                        }
+                        spanAnnotationsByLine = spanAnnotations
+                            .GroupBy(model => model.EndLine)
+                            .ToDictionary(models => models.Key - 1, models => models.ToArray());
                     }
 
-                    var spanAnnotations = file.InlineAnnotations.Where(x =>
-                        x.EndLine - 1 >= startLine &&
-                        x.EndLine - 1 <= endLine);
-
-                    foreach (var annotation in spanAnnotations)
+                    var lines = spanThreadsByLine.Keys.Union(spanAnnotationsByLine?.Keys ?? Enumerable.Empty<int>());
+                    foreach (var line in lines)
                     {
                         var snapshot = span.Snapshot;
-                        var line = snapshot.GetLineFromLineNumber(annotation.EndLine - 1);
+                        var snapshotLine = snapshot.GetLineFromLineNumber(line);
 
-                        if (side == DiffSide.Right)
+                        IInlineCommentThreadModel thread;
+                        if (spanThreadsByLine.TryGetValue(line, out thread))
                         {
-                            linesWithTags[annotation.EndLine - 1 - startLine] = true;
+                            var isThreadDeleteSide = thread.DiffLineType == DiffChangeType.Delete;
+                            var sidesMatch = side == DiffSide.Left && isThreadDeleteSide || side == DiffSide.Right && !isThreadDeleteSide;
+                            if (!sidesMatch)
+                            {
+                                thread = null;
+                            }
+                        }
+
+                        IInlineAnnotationModel[] annotations = null;
+                        spanAnnotationsByLine?.TryGetValue(line, out annotations);
+
+                        if (thread != null || annotations != null)
+                        {
+                            linesWithTags[line - startLine] = true;
+
+                            var showInlineTag = new ShowInlineTag(currentSession, line, thread?.DiffLineType ?? DiffChangeType.Add)
+                            {
+                                Thread = thread,
+                                Annotations = annotations
+                            };
 
                             result.Add(new TagSpan<ShowInlineTag>(
-                                new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineTag(currentSession, null, annotation.EndLine, DiffChangeType.Add)));
+                                new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
+                                showInlineTag));
                         }
                     }
 

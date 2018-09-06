@@ -252,7 +252,11 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+
+                var showInlineTag = result[0].Tag as ShowInlineTag;
+                Assert.That(showInlineTag, Is.Not.Null);
+                Assert.That(showInlineTag.Thread, Is.Not.Null);
+                Assert.That(showInlineTag.Annotations, Is.Null);
             }
 
             [Test]
@@ -264,13 +268,41 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
 
-                // Line 10 has an existing RHS comment.
+                // Line 10 has an existing RHS annotation.
                 var span = CreateSpan(10);
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+
+                var showInlineTag = result[0].Tag as ShowInlineTag;
+                Assert.That(showInlineTag, Is.Not.Null);
+                Assert.That(showInlineTag.Thread, Is.Null);
+                Assert.That(showInlineTag.Annotations, Is.Not.Null);
+                Assert.That(showInlineTag.Annotations.Length, Is.EqualTo(1));
+            }
+
+            [Test]
+            public void ShouldReturnShowInlineTagForTwoAnnotations()
+            {
+                var file = CreateSessionFile(false, true);
+                var target = new InlineTagger(
+                    Substitute.For<ITextView>(),
+                    Substitute.For<ITextBuffer>(),
+                    CreateSessionManager(file));
+
+                // Line 20 has an existing RHS annotation.
+                var span = CreateSpan(20);
+                var firstPass = target.GetTags(span);
+                var result = target.GetTags(span).ToList();
+
+                Assert.That(result, Has.One.Items);
+
+                var showInlineTag = result[0].Tag as ShowInlineTag;
+                Assert.That(showInlineTag, Is.Not.Null);
+                Assert.That(showInlineTag.Thread, Is.Null);
+                Assert.That(showInlineTag.Annotations, Is.Not.Null);
+                Assert.That(showInlineTag.Annotations.Length, Is.EqualTo(2));
             }
 
             [Test]
@@ -287,8 +319,13 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var firstPass = target.GetTags(span);
                 var result = target.GetTags(span).ToList();
 
-                Assert.That(result.Count, Is.EqualTo(2));
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+                Assert.That(result, Has.One.Items);
+
+                var showInlineTag = result[0].Tag as ShowInlineTag;
+                Assert.That(showInlineTag, Is.Not.Null);
+                Assert.That(showInlineTag.Thread, Is.Not.Null);
+                Assert.That(showInlineTag.Annotations, Is.Not.Null);
+                Assert.That(showInlineTag.Annotations.Length, Is.EqualTo(1));
             }
 
             [Test]
@@ -395,7 +432,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
         {
             // We pretend that each line has 10 chars and there are 20 lines.
             var result = Substitute.For<ITextSnapshot>();
-            result.Length.Returns(200);
+            result.Length.Returns(300);
             result.GetLineFromPosition(0).ReturnsForAnyArgs(x => CreateLine(result, x.Arg<int>() / 10));
             result.GetLineFromLineNumber(0).ReturnsForAnyArgs(x => CreateLine(result, x.Arg<int>()));
             return result;
@@ -470,7 +507,10 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var annotation2 = Substitute.For<IInlineAnnotationModel>();
                 annotation2.EndLine.Returns(21);
 
-                var annotations = new List<IInlineAnnotationModel> { annotation1, annotation2 };
+                var annotation3 = Substitute.For<IInlineAnnotationModel>();
+                annotation3.EndLine.Returns(21);
+
+                var annotations = new List<IInlineAnnotationModel> { annotation1, annotation2, annotation3 };
 
                 file.InlineAnnotations.Returns(annotations);
             }
