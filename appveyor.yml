@@ -43,6 +43,7 @@ test:
 on_success:
 - ps: |
     if ($package) {
+      Write-Host "Signing and packaging"
       script\Sign-Package -AppVeyor -ForVSInstaller:$forVSInstaller
     }
 
