@@ -29,3 +29,5 @@ on_success:
     if ($full_build) {
       script\Sign-Package -AppVeyor
     }
+on_finish:
+- ps: scripts\Run-CodeCoverage.ps1 -AppVeyor -Configuration:Release
