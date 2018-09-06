@@ -238,7 +238,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             }
 
             [Test]
-            public void ShouldReturnShowInlineTag()
+            public void ShouldReturnShowInlineTagForComment()
             {
                 var file = CreateSessionFile();
                 var target = new InlineTagger(
@@ -256,8 +256,8 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             }
 
 
-            [Test, Ignore("I broke it")]
-            public void ShouldReturnShowInlineTag()
+            [Test]
+            public void ShouldReturnShowInlineTagForAnnotation()
             {
                 var file = CreateSessionFile(false, true);
                 var target = new InlineTagger(
