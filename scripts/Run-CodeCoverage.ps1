@@ -57,7 +57,7 @@ $codecovArgs = "-f `"coverage.xml`""
 
     Run-Process 600 $opencover $opencoverArgs
 
-    if ($AppVeyor) {
+    if($AppVeyor) {
         Run-Process 60 $codecov $codecovArgs
     }
 
