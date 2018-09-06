@@ -46,7 +46,7 @@ $opencoverArgs = @(
 ) -join " "
 
 $codecovDirectory = Join-Path $rootDirectory packages\Codecov.1.0.5\tools
-$codecov = Join-Path $opencoverDirectory codecov.exe
+$codecov = Join-Path $codecovDirectory codecov.exe
 $codecovArgs = "-f `"coverage.xml`""
 
 & {
