@@ -63,7 +63,7 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesChangedEvent
+    public class TheActiveRepositoriesChangedEvent : TestBaseClass
     {
         [Test]
         public void GitExtPropertyChangedEvent_ActiveRepositoriesChangedIsFired()
@@ -133,7 +133,7 @@ public class VSGitExtTests
         }
     }
 
-    public class TheActiveRepositoriesProperty
+    public class TheActiveRepositoriesProperty : TestBaseClass
     {
         [Test]
         public void RepositoryOpenContextNotActive_IsEmpty()
