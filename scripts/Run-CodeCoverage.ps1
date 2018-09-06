@@ -47,7 +47,7 @@ $opencoverArgs = @(
 
 $codecovDirectory = Join-Path $rootDirectory packages\Codecov.1.0.5\tools
 $codecov = Join-Path $codecovDirectory codecov.exe
-$codecovArgs = "-f `"$rootDirectory\coverage.xml`""
+$codecovArgs = "-f $rootDirectory\coverage.xml"
 
 & {
     Trap {
