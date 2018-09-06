@@ -131,8 +131,9 @@ namespace GitHub.Services
                 data.Reports.Add(current);
             }
 
-            current.Dimensions.Lang = CultureInfo.CurrentUICulture.IetfLanguageTag;
+            current.Dimensions.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
             current.Dimensions.CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag;
+            current.Dimensions.CurrentUILang = CultureInfo.CurrentUICulture.IetfLanguageTag;
             current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
             current.Dimensions.VSVersion = vsservices.VSVersion;
 
