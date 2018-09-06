@@ -34,7 +34,7 @@ $testAssemblies = @(
     "test\TrackingCollectionTests\bin\$Configuration\TrackingCollectionTests.dll"
 )
 
-$opencoverTargetArgs = ($testAssemblies -join " ") + " --where cat!=Timings --where cat!=CodeCoverageFlake --inprocess --noresult"
+$opencoverTargetArgs = ($testAssemblies -join " ") + " --where \`"cat!=Timings or cat!=CodeCoverageFlake\`" --inprocess --noresult"
 
 $opencoverDirectory = Join-Path $rootDirectory packages\OpenCover.4.6.519\tools
 $opencover = Join-Path $opencoverDirectory OpenCover.Console.exe
