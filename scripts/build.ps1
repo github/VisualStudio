@@ -57,6 +57,10 @@ Vsix | out-null
 
 Push-Location $rootDirectory
 
+if ($Package -and $BuildNumber -gt -1) {
+    $BumpVersion = $true
+}
+
 if ($UpdateSubmodules) {
     Update-Submodules
 }
