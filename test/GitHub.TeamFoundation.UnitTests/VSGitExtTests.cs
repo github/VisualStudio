@@ -17,7 +17,7 @@ using static Microsoft.VisualStudio.VSConstants;
 
 public class VSGitExtTests
 {
-    public class TheConstructor
+    public class TheConstructor : TestBaseClass
     {
         [TestCase(true, 1)]
         [TestCase(false, 0)]
