@@ -16,7 +16,7 @@ install:
       git submodule deinit script
     }
 
-    git submodule update --recursive --force
+    git submodule update --recursive --force --depth 1
     nuget restore GitHubVS.sln
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
