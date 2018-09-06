@@ -42,12 +42,12 @@ $opencoverArgs = @(
     "-target:`"$nunitConsoleRunner`"",
     "-targetargs:`"$opencoverTargetArgs`"",
     "-filter:`"+[GitHub*]* -[GitHub*UnitTests]*`"",
-    "-register:user -output:coverage.xml"
+    "-register:user -output:$rootDirectory\coverage.xml"
 ) -join " "
 
 $codecovDirectory = Join-Path $rootDirectory packages\Codecov.1.0.5\tools
 $codecov = Join-Path $codecovDirectory codecov.exe
-$codecovArgs = "-f `"coverage.xml`""
+$codecovArgs = "-f `"$rootDirectory\coverage.xml`""
 
 & {
     Trap {
