@@ -255,7 +255,6 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
-
             [Test]
             public void ShouldReturnShowInlineTagForAnnotation()
             {
@@ -271,6 +270,24 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+            }
+
+            [Test]
+            public void ShouldReturnShowOneInlineTagForCommentAndAnnotation()
+            {
+                var file = CreateSessionFile(true, true);
+                var target = new InlineTagger(
+                    Substitute.For<ITextView>(),
+                    Substitute.For<ITextBuffer>(),
+                    CreateSessionManager(file));
+
+                // Line 10 has an existing RHS comment.
+                var span = CreateSpan(10);
+                var firstPass = target.GetTags(span);
+                var result = target.GetTags(span).ToList();
+
+                Assert.That(result.Count, Is.EqualTo(2));
                 Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
             }
 
