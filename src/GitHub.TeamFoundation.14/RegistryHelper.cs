@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Services;
 using Microsoft.Win32;
 using Serilog;
+using static System.FormattableString;
 
 namespace GitHub.TeamFoundation
 {
@@ -18,7 +19,7 @@ namespace GitHub.TeamFoundation
 
         static RegistryKey OpenGitKey(string path)
         {
-            var keyName = $"Software\\Microsoft\\VisualStudio\\{MajorVersion}.0\\TeamFoundation\\GitSourceControl\\{path}";
+            var keyName = Invariant($"Software\\Microsoft\\VisualStudio\\{MajorVersion}.0\\TeamFoundation\\GitSourceControl\\{path}");
             return Registry.CurrentUser.OpenSubKey(keyName, true);
         }
 
@@ -64,7 +65,7 @@ namespace GitHub.TeamFoundation
         const string MRUKeyPath = "MRUSettingsLocalProjectLocationEntries";
         internal static string SetDefaultProjectPath(string path)
         {
-            var newProjectDialogKeyPath = $"Software\\Microsoft\\VisualStudio\\{MajorVersion}.0\\NewProjectDialog";
+            var newProjectDialogKeyPath = Invariant($"Software\\Microsoft\\VisualStudio\\{MajorVersion}.0\\NewProjectDialog");
 
             var old = String.Empty;
             try
