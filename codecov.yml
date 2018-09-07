@@ -27,3 +27,8 @@ comment:
   
 fixes:
   - "/C/projects/visualstudio/::"
+
+ignore:
+  - "*.xaml"
+  - "*.xaml.cs"
+  - "**/SampleData/*"
