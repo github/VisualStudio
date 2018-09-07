@@ -124,9 +124,9 @@
     </Compile>
     <Compile Include="Services\DiffServiceTests.cs" />
     <Compile Include="Services\PullRequestSessionTests.cs" />
-    <Compile Include="ViewModels\InlineCommentPeekViewModelTests.cs" />
-    <Compile Include="ViewModels\InlineCommentThreadViewModelTests.cs" />
-    <Compile Include="ViewModels\NewInlineCommentThreadViewModelTests.cs" />
+    <Compile Include="ViewModels\InlineReviewPeekViewModelTests.cs" />
+    <Compile Include="ViewModels\CommentThreadInlineReviewViewModelTests.cs" />
+    <Compile Include="ViewModels\NewCommentThreadInlineReviewViewModelTests.cs" />
     <Compile Include="ViewModels\PullRequestReviewCommentViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>

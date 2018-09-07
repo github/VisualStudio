@@ -10,7 +10,7 @@ using ReactiveUI;
 namespace GitHub.InlineReviews.SampleData
 {
     [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    class CommentThreadViewModelDesigner : ICommentThreadViewModel
+    class InlineReviewViewModelDesigner : IInlineReviewViewModel
     {
         public ObservableCollection<ICommentViewModel> Comments { get; }
             = new ObservableCollection<ICommentViewModel>();

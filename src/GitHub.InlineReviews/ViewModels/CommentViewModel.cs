@@ -46,7 +46,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="webUrl"></param>
         protected CommentViewModel(
             ICommentService commentService,
-            ICommentThreadViewModel thread,
+            IInlineReviewViewModel thread,
             IActorViewModel currentUser,
             int pullRequestId,
             string commentId,
@@ -114,7 +114,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="model">The comment model.</param>
         protected CommentViewModel(
             ICommentService commentService,
-            ICommentThreadViewModel thread,
+            IInlineReviewViewModel thread,
             ActorModel currentUser,
             CommentModel model)
             : this(
@@ -270,7 +270,7 @@ namespace GitHub.InlineReviews.ViewModels
         public IActorViewModel CurrentUser { get; }
 
         /// <inheritdoc/>
-        public ICommentThreadViewModel Thread { get; }
+        public IInlineReviewViewModel Thread { get; }
 
         /// <inheritdoc/>
         public IActorViewModel Author { get; }

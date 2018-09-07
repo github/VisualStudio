@@ -210,7 +210,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         static PullRequestReviewCommentViewModel CreateTarget(
             IPullRequestSession session = null,
             ICommentService commentService = null,
-            ICommentThreadViewModel thread = null,
+            IInlineReviewViewModel thread = null,
             ActorModel currentUser = null,
             PullRequestReviewModel review = null,
             PullRequestReviewCommentModel comment = null)
@@ -248,10 +248,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             };
         }
 
-        static ICommentThreadViewModel CreateThread(
+        static IInlineReviewViewModel CreateThread(
             bool canPost = true)
         {
-            var result = Substitute.For<ICommentThreadViewModel>();
+            var result = Substitute.For<IInlineReviewViewModel>();
             result.PostComment.Returns(ReactiveCommand.CreateAsyncTask(_ => Task.CompletedTask));
             return result;
         }

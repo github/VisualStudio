@@ -14,26 +14,28 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// A new inline comment thread that is being authored.
     /// </summary>
-    public class NewInlineCommentThreadViewModel : CommentThreadViewModel
+    public class NewCommentThreadInlineReviewViewModel : InlineReviewViewModel
     {
         bool needsPush;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
+        /// Initializes a new instance of the <see cref="CommentThreadInlineReviewViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
+        /// <param name="annotationModels"></param>
         /// <param name="file">The file being commented on.</param>
         /// <param name="lineNumber">The 0-based line number in the file.</param>
         /// <param name="leftComparisonBuffer">
         ///     True if the comment is being left on the left-hand-side of a diff; otherwise false.
         /// </param>
-        public NewInlineCommentThreadViewModel(ICommentService commentService,
+        public NewCommentThreadInlineReviewViewModel(ICommentService commentService,
             IPullRequestSession session,
+            InlineAnnotationViewModel[] annotationModels,
             IPullRequestSessionFile file,
             int lineNumber,
             bool leftComparisonBuffer)
-            : base(session.User)
+            : base(session.User, annotationModels)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotNull(file, nameof(file));

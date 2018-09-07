@@ -9,9 +9,9 @@ using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
-    public class NewInlineCommentThreadViewModelTests
+    public class NewCommentThreadInlineReviewViewModelTests
     {
-        public NewInlineCommentThreadViewModelTests()
+        public NewCommentThreadInlineReviewViewModelTests()
         {
             Splat.ModeDetector.Current.SetInUnitTestRunner(true);
         }
@@ -19,9 +19,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public void CreatesReplyPlaceholder()
         {
-            var target = new NewInlineCommentThreadViewModel(
+            var target = new NewCommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(),
+                CreateSession(), new InlineAnnotationViewModel[0],
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
                 false);
@@ -35,9 +35,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void NeedsPushTracksFileCommitSha()
         {
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(
+            var target = new NewCommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(),
+                CreateSession(), new InlineAnnotationViewModel[0],
                 file,
                 10,
                 false);
@@ -60,9 +60,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PlaceholderCommitEnabledWhenCommentHasBodyAndPostCommentIsEnabled()
         {
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(
+            var target = new NewCommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(),
+                CreateSession(), new InlineAnnotationViewModel[0],
                 file,
                 10,
                 false);
@@ -84,9 +84,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(
+            var target = new NewCommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                session, file, 10, false);
+                session, new InlineAnnotationViewModel[0],
+                file, 10, false);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
@@ -116,9 +117,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }
             });
 
-            var target = new NewInlineCommentThreadViewModel(
+            var target = new NewCommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                session, file, 16, true);
+                session, new InlineAnnotationViewModel[0],
+                file, 16, true);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);

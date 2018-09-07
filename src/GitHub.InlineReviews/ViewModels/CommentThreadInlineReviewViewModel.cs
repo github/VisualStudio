@@ -14,17 +14,19 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// A thread of inline comments (aka Pull Request Review Comments).
     /// </summary>
-    public class InlineCommentThreadViewModel : CommentThreadViewModel
+    public class CommentThreadInlineReviewViewModel : InlineReviewViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
+        /// Initializes a new instance of the <see cref="CommentThreadInlineReviewViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
+        /// <param name="annotationModels"></param>
         /// <param name="comments">The comments to display in this inline review.</param>
-        public InlineCommentThreadViewModel(ICommentService commentService, IPullRequestSession session,
+        public CommentThreadInlineReviewViewModel(ICommentService commentService, IPullRequestSession session,
+            InlineAnnotationViewModel[] annotationModels,
             IEnumerable<InlineCommentModel> comments)
-            : base(session.User)
+            : base(session.User, annotationModels)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 

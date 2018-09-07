@@ -10,14 +10,14 @@ using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
-    public class InlineCommentThreadViewModelTests
+    public class CommentThreadInlineReviewViewModelTests
     {
         [Test]
         public void CreatesComments()
         {
-            var target = new InlineCommentThreadViewModel(
+            var target = new CommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(),
+                CreateSession(), new InlineAnnotationViewModel[0], 
                 CreateComments("Comment 1", "Comment 2"));
 
             Assert.That(3, Is.EqualTo(target.Comments.Count));
@@ -43,10 +43,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
-            var target = new InlineCommentThreadViewModel(
+            var target = new CommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(),
-                CreateComments("Comment 1"));
+                CreateSession(), new InlineAnnotationViewModel[0], CreateComments("Comment 1"));
 
             Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.False);
 
@@ -58,9 +57,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PostsCommentInReplyToCorrectComment()
         {
             var session = CreateSession();
-            var target = new InlineCommentThreadViewModel(
+            var target = new CommentThreadInlineReviewViewModel(
                 Substitute.For<ICommentService>(),
-                session,
+                session, new InlineAnnotationViewModel[0],
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";

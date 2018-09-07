@@ -23,12 +23,12 @@ using GitHub.Commands;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
-    public class InlineCommentPeekViewModelTests
+    public class InlineReviewPeekViewModelTests
     {
         const string FullPath = "c:\\repo\\test.cs";
         const string RelativePath = "test.cs";
 
-        public InlineCommentPeekViewModelTests()
+        public InlineReviewPeekViewModelTests()
         {
             Splat.ModeDetector.Current.SetInUnitTestRunner(true);
         }
@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task ThreadIsCreatedForExistingComments()
         {
             // There is an existing comment thread at line 10.
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 CreateSessionManager(),
@@ -48,7 +48,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             await target.Initialize();
 
             // There should be an existing comment and a reply placeholder.
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(CommentThreadInlineReviewViewModel)));
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
             Assert.That(target.Thread.Comments[0].Body, Is.EqualTo("Existing comment"));
             Assert.That(target.Thread.Comments[1].Body, Is.EqualTo(string.Empty));
@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public async Task ThreadIsCreatedForNewComment()
         {
             // There is no existing comment thread at line 9, but there is a + diff entry.
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 9),
                 CreatePeekSession(),
                 CreateSessionManager(),
@@ -69,7 +69,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(NewCommentThreadInlineReviewViewModel)));
             Assert.That(target.Thread.Comments[0].Body, Is.EqualTo(string.Empty));
             Assert.That(target.Thread.Comments[0].EditState, Is.EqualTo(CommentEditState.Editing));
         }
@@ -85,7 +85,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 textBufferInfo: bufferInfo);
 
             // There is an existing comment thread at line 10.
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 sessionManager,
@@ -96,7 +96,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             await target.Initialize();
 
             // There should be an existing comment and a reply placeholder.
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(CommentThreadInlineReviewViewModel)));
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
             Assert.That(target.Thread.Comments[0].Body, Is.EqualTo("Existing comment"));
             Assert.That(target.Thread.Comments[1].Body, Is.EqualTo(string.Empty));
@@ -108,7 +108,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 8),
                 peekSession,
                 sessionManager,
@@ -117,7 +117,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<ICommentService>());
 
             await target.Initialize();
-            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(NewCommentThreadInlineReviewViewModel)));
 
             target.Thread.Comments[0].Body = "New Comment";
 
@@ -142,7 +142,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(CommentThreadInlineReviewViewModel)));
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,
@@ -160,7 +160,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread, Is.InstanceOf(typeof(CommentThreadInlineReviewViewModel)));
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
             var file = await sessionManager.GetLiveFile(
@@ -177,7 +177,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 sessionManager,
@@ -210,7 +210,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,
@@ -247,7 +247,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var sessionManager = CreateSessionManager();
             var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
+            var target = new InlineReviewPeekViewModel(
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,

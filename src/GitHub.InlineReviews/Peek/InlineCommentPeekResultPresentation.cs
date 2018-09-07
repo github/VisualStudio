@@ -9,14 +9,14 @@ namespace GitHub.InlineReviews.Peek
     class InlineCommentPeekResultPresentation : IPeekResultPresentation, IDesiredHeightProvider
     {
         const double PeekBorders = 28.0;
-        readonly InlineCommentPeekViewModel viewModel;
+        readonly InlineReviewPeekViewModel viewModel;
         InlineCommentPeekView view;
         double desiredHeight;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
 
-        public InlineCommentPeekResultPresentation(InlineCommentPeekViewModel viewModel)
+        public InlineCommentPeekResultPresentation(InlineReviewPeekViewModel viewModel)
         {
             this.viewModel = viewModel;
         }
