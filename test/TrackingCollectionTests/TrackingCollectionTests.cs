@@ -1832,7 +1832,7 @@ public class TrackingTests : TestBase
         col.Dispose();
     }
 
-    [Test]
+    [Test, Category("CodeCoverageFlake")]
     public void RemovingFirstItemWithFilterWorks()
     {
         var source = new Subject<Thing>();
