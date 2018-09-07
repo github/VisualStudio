@@ -151,9 +151,9 @@
       <DependentUpon>ShowInlineCommentGlyph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tags\InlineGlyphFactory.cs" />
-    <Compile Include="Tags\InlineTag.cs" />
-    <Compile Include="Tags\ShowInlineTag.cs" />
-    <Compile Include="Tags\InlineTagger.cs" />
+    <Compile Include="Tags\InlineReviewTag.cs" />
+    <Compile Include="Tags\ShowInlineReviewTag.cs" />
+    <Compile Include="Tags\InlineReviewTagger.cs" />
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
     <Compile Include="ViewModels\CommentThreadInlineReviewViewModel.cs" />
     <Compile Include="ViewModels\ICommentViewModel.cs" />

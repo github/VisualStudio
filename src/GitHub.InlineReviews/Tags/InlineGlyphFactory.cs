@@ -10,7 +10,7 @@ using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineGlyphFactory : IGlyphFactory<InlineTag>
+    class InlineGlyphFactory : IGlyphFactory<InlineReviewTag>
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
@@ -23,7 +23,7 @@ namespace GitHub.InlineReviews.Tags
             this.textView = textView;
         }
 
-        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineTag tag)
+        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineReviewTag tag)
         {
             var glyph = CreateGlyph(tag);
             glyph.DataContext = tag;
@@ -40,15 +40,15 @@ namespace GitHub.InlineReviews.Tags
             return new[]
             {
                 typeof(AddInlineCommentTag),
-                typeof(ShowInlineTag)
+                typeof(ShowInlineReviewTag)
             };
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
-        static UserControl CreateGlyph(InlineTag tag)
+        static UserControl CreateGlyph(InlineReviewTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineTag;
+            var showTag = tag as ShowInlineReviewTag;
 
             if (addTag != null)
             {
@@ -78,13 +78,13 @@ namespace GitHub.InlineReviews.Tags
                 throw new ArgumentException($"{nameof(showTag)} does not have a thread or annotations");
             }
 
-            throw new ArgumentException($"Unknown 'InlineTag' type '{tag}'");
+            throw new ArgumentException($"Unknown 'InlineReviewTag' type '{tag}'");
         }
 
-        bool OpenThreadView(InlineTag tag)
+        bool OpenThreadView(InlineReviewTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineTag;
+            var showTag = tag as ShowInlineReviewTag;
 
             if (addTag != null)
             {

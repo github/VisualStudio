@@ -14,7 +14,7 @@ using GitHub.InlineReviews.Margins;
 
 namespace GitHub.InlineReviews.UnitTests.Tags
 {
-    public class InlineTaggerTests
+    public class InlineReviewTaggerTests
     {
         public class WithTextBufferInfo
         {
@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void FirstPassShouldReturnEmptyTags()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Right));
@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowInlineTagForRhs()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Right));
@@ -47,14 +47,14 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineReviewTag>());
             }
 
             [Test]
             public void ShouldReturnShowAnnotationTagForRhs()
             {
                 var file = CreateSessionFile(withComments: false, withAnnotations:true);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Right));
@@ -65,14 +65,14 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineReviewTag>());
             }
 
             [Test]
             public void ShouldReturnAddNewCommentTagForAddedLineOnRhs()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Right));
@@ -90,7 +90,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Right));
@@ -107,7 +107,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowInlineTagForLhs()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Left));
@@ -118,14 +118,14 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = target.GetTags(span).ToList();
 
                 Assert.That(result, Has.One.Items);
-                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineTag>());
+                Assert.That(result[0].Tag, Is.InstanceOf<ShowInlineReviewTag>());
             }
 
             [Test]
             public void ShouldReturnAddCommentTagForLhs()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file, DiffSide.Left));
@@ -144,7 +144,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             {
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file, DiffSide.Right);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
@@ -172,7 +172,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     DiffSide.Right,
                     "123");
                 var session = sessionManager.CurrentSession;
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     sessionManager);
@@ -193,7 +193,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                     DiffSide.Left,
                     "123");
                 var session = sessionManager.CurrentSession;
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     sessionManager);
@@ -228,7 +228,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void FirstPassShouldReturnEmptyTags()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -241,7 +241,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowInlineTagForComment()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -253,7 +253,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
                 Assert.That(result, Has.One.Items);
 
-                var showInlineTag = result[0].Tag as ShowInlineTag;
+                var showInlineTag = result[0].Tag as ShowInlineReviewTag;
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Not.Null);
                 Assert.That(showInlineTag.Annotations, Is.Null);
@@ -263,7 +263,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowInlineTagForAnnotation()
             {
                 var file = CreateSessionFile(false, true);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -275,7 +275,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
                 Assert.That(result, Has.One.Items);
 
-                var showInlineTag = result[0].Tag as ShowInlineTag;
+                var showInlineTag = result[0].Tag as ShowInlineReviewTag;
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Null);
                 Assert.That(showInlineTag.Annotations, Is.Not.Null);
@@ -286,7 +286,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowInlineTagForTwoAnnotations()
             {
                 var file = CreateSessionFile(false, true);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -298,7 +298,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
                 Assert.That(result, Has.One.Items);
 
-                var showInlineTag = result[0].Tag as ShowInlineTag;
+                var showInlineTag = result[0].Tag as ShowInlineReviewTag;
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Null);
                 Assert.That(showInlineTag.Annotations, Is.Not.Null);
@@ -309,7 +309,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnShowOneInlineTagForCommentAndAnnotation()
             {
                 var file = CreateSessionFile(true, true);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -321,7 +321,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
                 Assert.That(result, Has.One.Items);
 
-                var showInlineTag = result[0].Tag as ShowInlineTag;
+                var showInlineTag = result[0].Tag as ShowInlineReviewTag;
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Not.Null);
                 Assert.That(showInlineTag.Annotations, Is.Not.Null);
@@ -332,7 +332,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldReturnAddNewCommentTagForAddedLine()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -350,7 +350,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             public void ShouldNotReturnAddNewCommentTagForDeletedLineOnRhs()
             {
                 var file = CreateSessionFile();
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     Substitute.For<ITextBuffer>(),
                     CreateSessionManager(file));
@@ -368,7 +368,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             {
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     CreateTextView(inlineCommentMarginVisible),
                     CreateBuffer(),
                     manager);
@@ -392,7 +392,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
             {
                 var file = CreateSessionFile();
                 var manager = CreateSessionManager(file);
-                var target = new InlineTagger(
+                var target = new InlineReviewTagger(
                     Substitute.For<ITextView>(),
                     CreateBuffer(),
                     manager);
