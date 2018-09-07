@@ -25,7 +25,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="annotationModels"></param>
         protected InlineReviewViewModel(ActorModel currentUser, IReadOnlyList<InlineAnnotationViewModel> annotationModels)
         {
-            AnnotationModels = annotationModels;
+            Annotations = annotationModels;
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
             Comments = new ObservableCollection<ICommentViewModel>();
@@ -77,6 +77,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// <inheritdoc/>
         public IActorViewModel CurrentUser { get; }
 
-        public IReadOnlyList<InlineAnnotationViewModel> AnnotationModels { get; }
+        public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
     }
 }

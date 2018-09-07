@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="GitHub.InlineReviews.Views.InlineAnnotationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+
+    <d:DesignProperties.DataContext>
+        <sample:InlineAnnotationViewModelDesigner />
+    </d:DesignProperties.DataContext>
+
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+            <TextBlock FontWeight="SemiBold" Margin="2 0">
+                <Run Text="{Binding Model.Title, Mode=OneWay}"/>
+            </TextBlock>
+        </StackPanel>
+        <TextBlock Margin="5 4 0 0">
+            <Run Text="{Binding Model.FileName, Mode=OneWay}"/>
+            <Run FontWeight="SemiBold" Text="{Binding Model.LineDescription, Mode=OneWay}"/>
+        </TextBlock>
+        <markdig:MarkdownViewer Margin="5 0 0 0" Markdown="{Binding Model.Message}"/>
+    </StackPanel>
+
+</UserControl>
+

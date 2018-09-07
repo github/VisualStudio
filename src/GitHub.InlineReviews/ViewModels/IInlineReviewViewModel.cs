@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using GitHub.Models;
@@ -36,5 +37,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// Called by a comment in the thread to send a delete of the comment to the API.
         /// </summary>
         ReactiveCommand<Unit> DeleteComment { get; }
+
+        IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
     }
 }

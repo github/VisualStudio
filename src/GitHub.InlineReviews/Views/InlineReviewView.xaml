@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GitHub.InlineReviews.Views.CommentThreadView"
+﻿<UserControl x:Class="GitHub.InlineReviews.Views.InlineReviewView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -30,11 +30,21 @@
         </x:Array>
     </d:DesignProperties.DataContext>
 
-    <ItemsControl ItemsSource="{Binding Comments}">
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <local:CommentView Margin="0 4"/>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <StackPanel Orientation="Vertical">
+        <ItemsControl ItemsSource="{Binding Annotations}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:InlineAnnotationView Margin="0 4"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding Comments}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:CommentView Margin="0 4"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
 </UserControl>

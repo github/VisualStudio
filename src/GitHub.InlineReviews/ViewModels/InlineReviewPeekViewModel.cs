@@ -235,14 +235,4 @@ namespace GitHub.InlineReviews.ViewModels
             return null;
         }
     }
-
-    public class InlineAnnotationViewModel
-    {
-        readonly IInlineAnnotationModel model;
-
-        public InlineAnnotationViewModel(IInlineAnnotationModel model)
-        {
-            this.model = model;
-        }
-    }
 }

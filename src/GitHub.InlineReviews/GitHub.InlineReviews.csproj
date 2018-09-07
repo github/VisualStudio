@@ -84,6 +84,7 @@
     <Compile Include="Margins\InlineCommentMargin.cs" />
     <Compile Include="Margins\InlineCommentMarginVisible.cs" />
     <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
+    <Compile Include="SampleData\InlineAnnotationViewModelDesigner.cs" />
     <Compile Include="Services\CommentService.cs" />
     <Compile Include="Services\ICommentService.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
@@ -116,6 +117,8 @@
     <Compile Include="Tags\ShowInlineCommentAnnotationGlyph.xaml.cs">
       <DependentUpon>ShowInlineCommentAnnotationGlyph.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\IInlineAnnotationViewModel.cs" />
+    <Compile Include="ViewModels\InlineAnnotationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestFileMarginViewModel.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="ViewModels\IInlineReviewViewModel.cs" />
@@ -125,14 +128,17 @@
     <Compile Include="ViewModels\NewCommentThreadInlineReviewViewModel.cs" />
     <Compile Include="ViewModels\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
+    <Compile Include="Views\InlineAnnotationView.xaml.cs">
+      <DependentUpon>InlineAnnotationView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PullRequestFileMarginView.xaml.cs">
       <DependentUpon>PullRequestFileMarginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InlineCommentPeekView.xaml.cs">
-      <DependentUpon>InlineCommentPeekView.xaml</DependentUpon>
+    <Compile Include="Views\InlineReviewPeekView.xaml.cs">
+      <DependentUpon>InlineReviewPeekView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SampleData\CommentViewModelDesigner.cs" />
     <Compile Include="Services\DiffService.cs" />
@@ -151,8 +157,8 @@
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
     <Compile Include="ViewModels\CommentThreadInlineReviewViewModel.cs" />
     <Compile Include="ViewModels\ICommentViewModel.cs" />
-    <Compile Include="Views\CommentThreadView.xaml.cs">
-      <DependentUpon>CommentThreadView.xaml</DependentUpon>
+    <Compile Include="Views\InlineReviewView.xaml.cs">
+      <DependentUpon>InlineReviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
@@ -449,6 +455,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\InlineAnnotationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\PullRequestFileMarginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -457,7 +467,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InlineCommentPeekView.xaml">
+    <Page Include="Views\InlineReviewPeekView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -469,7 +479,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\CommentThreadView.xaml">
+    <Page Include="Views\InlineReviewView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

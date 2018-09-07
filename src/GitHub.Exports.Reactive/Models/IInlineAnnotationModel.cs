@@ -7,6 +7,10 @@
     {
         int StartLine { get; }
         int EndLine { get; }
+        string Title { get; }
         CheckAnnotationLevel AnnotationLevel { get; }
+        string Message { get; }
+        string FileName { get; }
+        string LineDescription { get; }
     }
 }

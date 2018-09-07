@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GitHub.InlineReviews.Views.InlineCommentPeekView"
+﻿<UserControl x:Class="GitHub.InlineReviews.Views.InlineReviewPeekView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -103,9 +103,11 @@
         <ScrollViewer Name="threadScroller"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubPeekViewBackground}">
-            <Grid>
-                <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
-            </Grid>
+            <StackPanel Orientation="Vertical">
+                <Grid>
+                    <local:InlineReviewView x:Name="threadView" DataContext="{Binding Thread}"/>
+                </Grid>
+            </StackPanel>
         </ScrollViewer>
     </DockPanel>
 </UserControl>
