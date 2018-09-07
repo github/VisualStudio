@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.Margins
             textView.Options.SetOptionValue(InlineCommentTextViewOptions.MarginEnabledId, false);
 
             marginGrid = new GlyphMarginGrid { Width = 17.0 };
-            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView);
+            var glyphFactory = new InlineGlyphFactory(peekService, textView);
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
 
             glyphMargin = new GlyphMargin<InlineTag>(textView, glyphFactory, marginGrid, tagAggregatorFactory,
