@@ -23,6 +23,8 @@ namespace GitHub.Models
 
         public int EndLine => annotation.EndLine;
 
+        public string CheckRunName => checkRun.Name;
+
         public string Title => annotation.Title;
 
         public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel.Value;

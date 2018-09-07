@@ -12,5 +12,6 @@
         string Message { get; }
         string FileName { get; }
         string LineDescription { get; }
+        string CheckRunName { get; }
     }
 }

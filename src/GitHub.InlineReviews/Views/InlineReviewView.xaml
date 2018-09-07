@@ -5,29 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
-             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="500">
     <d:DesignProperties.DataContext>
-        <x:Array Type="{x:Type sample:InlineReviewViewModelDesigner}">
-            <sample:InlineReviewViewModelDesigner>
-              <!-- <sample:CommentThreadViewModelDesigner.Comments>
-                    <sample:CommentViewModelDesigner>
-                        <sample:CommentViewModelDesigner.Body>
-                            I assume this doesn't do anything if our message isn't showing?
-                        </sample:CommentViewModelDesigner.Body>
-                    </sample:CommentViewModelDesigner>
-                    <sample:CommentViewModelDesigner>
-                        <sample:CommentViewModelDesigner.Body>
-                            Nope, does nothing! Also checked the logs.
-                        </sample:CommentViewModelDesigner.Body>
-                    </sample:CommentViewModelDesigner>
-                    <sample:CommentViewModelDesigner EditState="Placeholder">
-                        <sample:CommentViewModelDesigner.Body>
-                            Reply...
-                        </sample:CommentViewModelDesigner.Body>
-                    </sample:CommentViewModelDesigner>
-                </sample:CommentThreadViewModelDesigner.Comments> -->
-      </sample:InlineReviewViewModelDesigner>
-        </x:Array>
+        <sample:InlineReviewViewModelDesigner />
     </d:DesignProperties.DataContext>
 
     <StackPanel Orientation="Vertical">
@@ -48,3 +28,4 @@
         </ItemsControl>
     </StackPanel>
 </UserControl>
+
