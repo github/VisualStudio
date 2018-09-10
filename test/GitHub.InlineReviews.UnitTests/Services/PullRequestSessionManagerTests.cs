@@ -442,7 +442,7 @@ Line 4";
                 }
             }
 
-            [Test]
+            [Test, NUnit.Framework.Category("CodeCoverageFlake")]
             public async Task UpdatesInlineCommentThreadsFromEditorContent()
             {
                 var baseContents = @"Line 1
@@ -497,7 +497,7 @@ Line 4";
                 }
             }
 
-            [Test]
+            [Test, NUnit.Framework.Category("CodeCoverageFlake")]
             public async Task UpdatesReviewCommentWithNewBody()
             {
                 var baseContents = @"Line 1
