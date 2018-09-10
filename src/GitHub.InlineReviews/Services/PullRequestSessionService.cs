@@ -98,6 +98,23 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+            PullRequestDetailModel pullRequest,
+            string relativePath)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            return pullRequest.CheckSuites
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                .SelectMany(arg =>
+                    arg.checkRun.Annotations
+                        .Where(annotation => annotation.Path == relativePath && annotation.AnnotationLevel.HasValue)
+                        .Select(annotation => new InlineAnnotationModel(arg.checkRun, annotation)))
+                .OrderBy(tuple => tuple.StartLine)
+                .ToArray();
+        }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             PullRequestDetailModel pullRequest,
             string relativePath,

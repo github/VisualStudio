@@ -117,14 +117,14 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding AnnotationErrorCount}" Value="0">
+                                    <DataTrigger Binding="{Binding AnnotationFailureCount}" Value="0">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                         <ghfvs:OcticonImage Icon="x" Height="10" Margin="-2 0"/>
-                        <Label Content="{Binding AnnotationErrorCount}"></Label>
+                        <Label Content="{Binding AnnotationFailureCount}"></Label>
                     </TextBlock>
 
                     <TextBlock VerticalAlignment="Center" Margin="4 0">

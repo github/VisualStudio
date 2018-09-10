@@ -25,7 +25,7 @@ namespace GitHub.SampleData
                 AnnotationLevel = CheckAnnotationLevel.Notice,
                 StartLine = 3,
                 EndLine = 4,
-                Filename = "asdf/asdf.cs",
+                Path = "asdf/asdf.cs",
                 Message = "; is expected",
                 Title = "CS 12345"
             }),
@@ -34,7 +34,7 @@ namespace GitHub.SampleData
                 AnnotationLevel = CheckAnnotationLevel.Warning,
                 StartLine = 3,
                 EndLine = 4,
-                Filename = "asdf/asdf.cs",
+                Path = "asdf/asdf.cs",
                 Message = "; is expected",
                 Title = "CS 12345"
             }),
@@ -43,7 +43,7 @@ namespace GitHub.SampleData
                 AnnotationLevel = CheckAnnotationLevel.Failure,
                 StartLine = 3,
                 EndLine = 4,
-                Filename = "blah.cs",
+                Path = "blah.cs",
                 Message = "; is expected",
                 Title = "CS 12345"
             })

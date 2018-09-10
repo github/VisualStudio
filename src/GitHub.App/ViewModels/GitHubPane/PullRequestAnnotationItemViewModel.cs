@@ -9,14 +9,14 @@ namespace GitHub.App.ViewModels.GitHubPane
     {
         bool isExpanded;
 
-        public PullRequestAnnotationItemViewModel(CheckRunAnnotationModel model)
+        public PullRequestAnnotationItemViewModel(CheckRunAnnotationModel annotation)
         {
-            this.Model = model;
+            this.Annotation = annotation;
         }
 
-        public CheckRunAnnotationModel Model { get; }
+        public CheckRunAnnotationModel Annotation { get; }
 
-        public string LineDescription => $"{Model.StartLine}:{Model.EndLine}";
+        public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
 
         public bool IsExpanded
         {

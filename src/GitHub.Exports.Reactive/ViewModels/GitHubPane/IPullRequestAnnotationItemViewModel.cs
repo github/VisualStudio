@@ -4,7 +4,7 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public interface IPullRequestAnnotationItemViewModel
     {
-        CheckRunAnnotationModel Model { get; }
+        CheckRunAnnotationModel Annotation { get; }
         bool IsExpanded { get; set; }
         string LineDescription { get; }
     }

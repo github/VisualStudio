@@ -123,6 +123,18 @@ namespace GitHub.ViewModels.GitHubPane
                     {
                         subscriptions.Add(file.WhenAnyValue(x => x.InlineCommentThreads)
                             .Subscribe(x => node.CommentCount = CountComments(x, filter)));
+
+                        subscriptions.Add(file.WhenAnyValue(x => x.InlineAnnotations)
+                            .Subscribe(x =>
+                            {
+                                var noticeCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Notice);
+                                var warningCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+                                var failureCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+
+                                node.AnnotationNoticeCount = noticeCount;
+                                node.AnnotationWarningCount = warningCount;
+                                node.AnnotationFailureCount = failureCount;
+                            }));
                     }
 
                     var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
