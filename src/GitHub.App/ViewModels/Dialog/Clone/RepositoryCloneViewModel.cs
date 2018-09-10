@@ -10,6 +10,7 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
+using Rothko;
 using Serilog;
 
 namespace GitHub.ViewModels.Dialog.Clone
@@ -19,6 +20,7 @@ namespace GitHub.ViewModels.Dialog.Clone
     public class RepositoryCloneViewModel : ViewModelBase, IRepositoryCloneViewModel
     {
         static readonly ILogger log = LogManager.ForContext<RepositoryCloneViewModel>();
+        readonly IOperatingSystem os;
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
@@ -28,12 +30,14 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(
+            IOperatingSystem os,
             IConnectionManager connectionManager,
             IRepositoryCloneService service,
             IRepositorySelectViewModel gitHubTab,
             IRepositorySelectViewModel enterpriseTab,
             IRepositoryUrlViewModel urlTab)
         {
+            this.os = os;
             this.connectionManager = connectionManager;
             this.service = service;
 
@@ -60,6 +64,7 @@ namespace GitHub.ViewModels.Dialog.Clone
                 (repo, error) => (repo, error))
                 .Select(x => x.repo != null && x.error == null);
 
+            Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
                 canClone,
                 _ => repository.Select(x => new CloneDialogResult(Path, x)));
@@ -87,6 +92,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public IObservable<object> Done => Clone;
 
+        public ReactiveCommand<object> Browse { get; }
+
         public ReactiveCommand<CloneDialogResult> Clone { get; }
 
         public async Task InitializeAsync(IConnection connection)
@@ -111,6 +118,24 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
+        }
+
+        void BrowseForDirectory()
+        {
+            var result = os.Dialog.BrowseForDirectory(Path, Resources.BrowseForDirectory);
+
+            if (result != BrowseDirectoryResult.Failed)
+            {
+                var path = result.DirectoryPath;
+                var selected = tabs[SelectedTabIndex].Repository;
+
+                if (selected != null)
+                {
+                    path = System.IO.Path.Combine(path, selected.Name);
+                }
+
+                Path = path;
+            }
         }
 
         void UpdatePath(IRepositoryModel x)

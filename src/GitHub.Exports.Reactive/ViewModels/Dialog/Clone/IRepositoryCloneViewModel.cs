@@ -43,6 +43,11 @@ namespace GitHub.ViewModels.Dialog.Clone
         int SelectedTabIndex { get; }
 
         /// <summary>
+        /// Gets the command executed when the user clicks "Browse".
+        /// </summary>
+        ReactiveCommand<object> Browse { get; }
+
+        /// <summary>
         /// Gets the command executed when the user clicks "Clone".
         /// </summary>
         ReactiveCommand<CloneDialogResult> Clone { get; }

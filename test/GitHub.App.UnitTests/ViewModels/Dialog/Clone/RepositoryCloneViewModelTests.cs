@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.ViewModels.Dialog.Clone;
 using NSubstitute;
 using NUnit.Framework;
+using Rothko;
 
 namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 {
@@ -241,12 +242,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         static RepositoryCloneViewModel CreateTarget(
+            IOperatingSystem os = null,
             IConnectionManager connectionManager = null,
             IRepositoryCloneService service = null,
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
             IRepositoryUrlViewModel urlTab = null)
         {
+            os = os ?? Substitute.For<IOperatingSystem>();
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
             service = service ?? CreateRepositoryCloneService();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
@@ -254,6 +257,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             urlTab = urlTab ?? Substitute.For<IRepositoryUrlViewModel>();
 
             return new RepositoryCloneViewModel(
+                os,
                 connectionManager,
                 service,
                 gitHubTab,
