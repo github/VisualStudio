@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Commands
         protected NextInlineCommentCommand(
             IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineReviewPeekService peekService)
+            IInlineCommentPeekService peekService)
             : base(serviceProvider, tagAggregatorFactory, peekService, CommandSet, CommandId)
         {
         }

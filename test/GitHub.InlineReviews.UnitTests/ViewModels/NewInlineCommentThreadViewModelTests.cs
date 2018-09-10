@@ -9,9 +9,9 @@ using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
-    public class NewCommentThreadInlineReviewViewModelTests
+    public class NewInlineCommentThreadViewModelTests
     {
-        public NewCommentThreadInlineReviewViewModelTests()
+        public NewInlineCommentThreadViewModelTests()
         {
             Splat.ModeDetector.Current.SetInUnitTestRunner(true);
         }
@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public void CreatesReplyPlaceholder()
         {
-            var target = new NewCommentThreadInlineReviewViewModel(
+            var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 CreateSession(), new InlineAnnotationViewModel[0],
                 Substitute.For<IPullRequestSessionFile>(),
@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void NeedsPushTracksFileCommitSha()
         {
             var file = CreateFile();
-            var target = new NewCommentThreadInlineReviewViewModel(
+            var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 CreateSession(), new InlineAnnotationViewModel[0],
                 file,
@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PlaceholderCommitEnabledWhenCommentHasBodyAndPostCommentIsEnabled()
         {
             var file = CreateFile();
-            var target = new NewCommentThreadInlineReviewViewModel(
+            var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 CreateSession(), new InlineAnnotationViewModel[0],
                 file,
@@ -84,7 +84,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewCommentThreadInlineReviewViewModel(
+            var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 session, new InlineAnnotationViewModel[0],
                 file, 10, false);
@@ -117,7 +117,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }
             });
 
-            var target = new NewCommentThreadInlineReviewViewModel(
+            var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 session, new InlineAnnotationViewModel[0],
                 file, 16, true);

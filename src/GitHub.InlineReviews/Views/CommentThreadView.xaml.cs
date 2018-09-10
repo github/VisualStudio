@@ -4,9 +4,9 @@ using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.InlineReviews.Views
 {
-    public partial class InlineReviewView : UserControl
+    public partial class CommentThreadView : UserControl
     {
-        public InlineReviewView()
+        public CommentThreadView()
         {
             InitializeComponent();
             PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;

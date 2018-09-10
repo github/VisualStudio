@@ -11,9 +11,9 @@ using ReactiveUI;
 namespace GitHub.InlineReviews.SampleData
 {
     [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    class InlineReviewViewModelDesigner : IInlineReviewViewModel
+    class CommentThreadViewModelDesigner : ICommentThreadViewModel
     {
-        public InlineReviewViewModelDesigner()
+        public CommentThreadViewModelDesigner()
         {
 
             var checkRunAnnotationModel1 = new CheckRunAnnotationModel

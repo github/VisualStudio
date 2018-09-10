@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.SampleData
         public bool IsReadOnly { get; set; }
         public bool IsSubmitting { get; set; }
         public bool CanDelete { get; } = true;
-        public IInlineReviewViewModel Thread { get; }
+        public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IActorViewModel Author { get; set; }
         public Uri WebUrl { get; }

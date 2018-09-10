@@ -21,7 +21,7 @@ namespace GitHub.InlineReviews.Margins
     {
         readonly Lazy<IEditorFormatMapService> editorFormatMapService;
         readonly Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory;
-        readonly Lazy<IInlineReviewPeekService> peekService;
+        readonly Lazy<IInlineCommentPeekService> peekService;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
         readonly UIContext uiContext;
 
@@ -30,7 +30,7 @@ namespace GitHub.InlineReviews.Margins
             Lazy<IPullRequestSessionManager> sessionManager,
             Lazy<IEditorFormatMapService> editorFormatMapService,
             Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory,
-            Lazy<IInlineReviewPeekService> peekService)
+            Lazy<IInlineCommentPeekService> peekService)
         {
             this.sessionManager = sessionManager;
             this.editorFormatMapService = editorFormatMapService;

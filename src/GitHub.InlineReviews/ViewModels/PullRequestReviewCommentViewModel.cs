@@ -44,7 +44,7 @@ namespace GitHub.InlineReviews.ViewModels
         public PullRequestReviewCommentViewModel(
             IPullRequestSession session,
             ICommentService commentService,
-            IInlineReviewViewModel thread,
+            ICommentThreadViewModel thread,
             IActorViewModel currentUser,
             int pullRequestId,
             string commentId,
@@ -93,7 +93,7 @@ namespace GitHub.InlineReviews.ViewModels
         public PullRequestReviewCommentViewModel(
             IPullRequestSession session,
             ICommentService commentService,
-            IInlineReviewViewModel thread,
+            ICommentThreadViewModel thread,
             IActorViewModel currentUser,
             PullRequestReviewModel review,
             PullRequestReviewCommentModel model)
@@ -125,7 +125,7 @@ namespace GitHub.InlineReviews.ViewModels
         public static CommentViewModel CreatePlaceholder(
             IPullRequestSession session,
             ICommentService commentService,
-            IInlineReviewViewModel thread,
+            ICommentThreadViewModel thread,
             IActorViewModel currentUser)
         {
             return new PullRequestReviewCommentViewModel(

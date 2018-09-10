@@ -8,15 +8,15 @@ namespace GitHub.InlineReviews.Tags
     /// <summary>
     /// A tag which marks a line where inline review comments are present.
     /// </summary>
-    public class ShowInlineReviewTag : InlineReviewTag
+    public class ShowInlineCommentTag : InlineCommentTag
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShowInlineReviewTag"/> class.
+        /// Initializes a new instance of the <see cref="ShowInlineCommentTag"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="lineNumber"></param>
         /// <param name="diffLineType"></param>
-        public ShowInlineReviewTag(IPullRequestSession session, int lineNumber, DiffChangeType diffLineType)
+        public ShowInlineCommentTag(IPullRequestSession session, int lineNumber, DiffChangeType diffLineType)
             : base(session, lineNumber, diffLineType)
         {
         }

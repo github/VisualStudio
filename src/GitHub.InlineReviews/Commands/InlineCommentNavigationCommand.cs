@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.Commands
         static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
-        readonly IInlineReviewPeekService peekService;
+        readonly IInlineCommentPeekService peekService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentNavigationCommand"/> class.
@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Commands
         protected InlineCommentNavigationCommand(
             IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineReviewPeekService peekService,
+            IInlineCommentPeekService peekService,
             Guid commandSet,
             int commandId)
             : base(commandSet, commandId)
@@ -181,13 +181,13 @@ namespace GitHub.InlineReviews.Commands
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <returns>The tag aggregator</returns>
-        protected ITagAggregator<InlineReviewTag> CreateTagAggregator(ITextView textView)
+        protected ITagAggregator<InlineCommentTag> CreateTagAggregator(ITextView textView)
         {
-            return tagAggregatorFactory.CreateTagAggregator<InlineReviewTag>(textView);
+            return tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
         }
 
         /// <summary>
-        /// Gets the <see cref="ShowInlineReviewTag"/>s for the specified text view.
+        /// Gets the <see cref="ShowInlineCommentTag"/>s for the specified text view.
         /// </summary>
         /// <param name="textViews">The active text views.</param>
         /// <returns>A collection of <see cref="ITagInfo"/> objects, ordered by line.</returns>
@@ -205,7 +205,7 @@ namespace GitHub.InlineReviews.Commands
                     {
                         TextView = textView,
                         Point = Map(x.Span.Start, textView.TextSnapshot),
-                        Tag = x.Tag as ShowInlineReviewTag,
+                        Tag = x.Tag as ShowInlineCommentTag,
                     })
                     .Where(x => x.Tag != null && x.Point.HasValue);
                 result.AddRange(tags);
@@ -225,7 +225,7 @@ namespace GitHub.InlineReviews.Commands
         protected void ShowPeekComments(
             InlineCommentNavigationParams parameter,
             ITextView textView,
-            ShowInlineReviewTag tag,
+            ShowInlineCommentTag tag,
             IEnumerable<ITextView> allTextViews)
         {
             foreach (var other in allTextViews)
@@ -268,14 +268,14 @@ namespace GitHub.InlineReviews.Commands
         protected interface ITagInfo
         {
             ITextView TextView { get; }
-            ShowInlineReviewTag Tag { get; }
+            ShowInlineCommentTag Tag { get; }
             SnapshotPoint Point { get; }
         }
 
         class TagInfo : ITagInfo
         {
             public ITextView TextView { get; set; }
-            public ShowInlineReviewTag Tag { get; set; }
+            public ShowInlineCommentTag Tag { get; set; }
             public SnapshotPoint? Point { get; set; }
 
             SnapshotPoint ITagInfo.Point => Point.Value;

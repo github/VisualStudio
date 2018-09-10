@@ -10,12 +10,12 @@ using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
-    public class CommentThreadInlineReviewViewModelTests
+    public class InlineCommentThreadViewModelTests
     {
         [Test]
         public void CreatesComments()
         {
-            var target = new CommentThreadInlineReviewViewModel(
+            var target = new InlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 CreateSession(), new InlineAnnotationViewModel[0], 
                 CreateComments("Comment 1", "Comment 2"));
@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
-            var target = new CommentThreadInlineReviewViewModel(
+            var target = new InlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 CreateSession(), new InlineAnnotationViewModel[0], CreateComments("Comment 1"));
 
@@ -57,7 +57,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PostsCommentInReplyToCorrectComment()
         {
             var session = CreateSession();
-            var target = new CommentThreadInlineReviewViewModel(
+            var target = new InlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
                 session, new InlineAnnotationViewModel[0],
                 CreateComments("Comment 1", "Comment 2"));

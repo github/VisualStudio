@@ -23,15 +23,15 @@ namespace GitHub.InlineReviews.Services
     /// <summary>
     /// Shows inline comments in a peek view.
     /// </summary>
-    [Export(typeof(IInlineReviewPeekService))]
-    class InlineReviewPeekService : IInlineReviewPeekService
+    [Export(typeof(IInlineCommentPeekService))]
+    class InlineCommentPeekService : IInlineCommentPeekService
     {
         readonly IOutliningManagerService outliningService;
         readonly IPeekBroker peekBroker;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public InlineReviewPeekService(
+        public InlineCommentPeekService(
             IOutliningManagerService outliningManager,
             IPeekBroker peekBroker,
             IUsageTracker usageTracker)
@@ -113,7 +113,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public ITrackingPoint Show(ITextView textView, ShowInlineReviewTag tag)
+        public ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag)
         {
             Guard.ArgumentNotNull(textView, nameof(textView));
             Guard.ArgumentNotNull(tag, nameof(tag));
@@ -136,7 +136,7 @@ namespace GitHub.InlineReviews.Services
             return trackingPoint;
         }
 
-        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineReviewTag tag)
+        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineCommentTag tag)
         {
             var diffModel = (textView as IWpfTextView)?.TextViewModel as IDifferenceTextViewModel;
             var snapshot = textView.TextSnapshot;

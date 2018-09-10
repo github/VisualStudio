@@ -11,11 +11,11 @@ using Microsoft.VisualStudio.Utilities;
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
-    /// Factory class for <see cref="InlineReviewTagger"/>s.
+    /// Factory class for <see cref="InlineCommentTagger"/>s.
     /// </summary>
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
-    [TagType(typeof(ShowInlineReviewTag))]
+    [TagType(typeof(ShowInlineCommentTag))]
     class InlineCommentTaggerProvider : IViewTaggerProvider
     {
         readonly IPullRequestSessionManager sessionManager;
@@ -32,7 +32,7 @@ namespace GitHub.InlineReviews.Tags
         public ITagger<T> CreateTagger<T>(ITextView view, ITextBuffer buffer) where T : ITag
         {
             return buffer.Properties.GetOrCreateSingletonProperty(() =>
-                new InlineReviewTagger(
+                new InlineCommentTagger(
                     view,
                     buffer,
                     sessionManager)) as ITagger<T>;

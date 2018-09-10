@@ -77,7 +77,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets the thread that the comment is a part of.
         /// </summary>
-        IInlineReviewViewModel Thread { get; }
+        ICommentThreadViewModel Thread { get; }
 
         /// <summary>
         /// Gets the URL of the comment on the web.

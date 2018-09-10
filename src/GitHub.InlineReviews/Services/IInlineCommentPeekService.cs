@@ -9,7 +9,7 @@ namespace GitHub.InlineReviews.Services
     /// <summary>
     /// Shows inline comments in a peek view.
     /// </summary>
-    public interface IInlineReviewPeekService
+    public interface IInlineCommentPeekService
     {
         /// <summary>
         /// Gets the line number for a peek session tracking point.
@@ -29,11 +29,11 @@ namespace GitHub.InlineReviews.Services
         void Hide(ITextView textView);
 
         /// <summary>
-        /// Shows the peek view for a <see cref="ShowInlineReviewTag"/>.
+        /// Shows the peek view for a <see cref="ShowInlineCommentTag"/>.
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <param name="tag">The tag.</param>
-        ITrackingPoint Show(ITextView textView, ShowInlineReviewTag tag);
+        ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag);
 
         /// <summary>
         /// Shows the peek view for an <see cref="AddInlineCommentTag"/>.

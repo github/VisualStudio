@@ -26,16 +26,16 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// Represents the contents of an inline comment peek view displayed in an editor.
     /// </summary>
-    public sealed class InlineReviewPeekViewModel : ReactiveObject, IDisposable
+    public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
-        static readonly ILogger log = LogManager.ForContext<InlineReviewPeekViewModel>();
-        readonly IInlineReviewPeekService peekService;
+        static readonly ILogger log = LogManager.ForContext<InlineCommentPeekViewModel>();
+        readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
         readonly ICommentService commentService;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        IInlineReviewViewModel thread;
+        ICommentThreadViewModel thread;
         IDisposable fileSubscription;
         IDisposable sessionSubscription;
         IDisposable threadSubscription;
@@ -44,9 +44,9 @@ namespace GitHub.InlineReviews.ViewModels
         DiffSide side;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InlineReviewPeekViewModel"/> class.
+        /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
-        public InlineReviewPeekViewModel(IInlineReviewPeekService peekService,
+        public InlineCommentPeekViewModel(IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
@@ -68,7 +68,7 @@ namespace GitHub.InlineReviews.ViewModels
             peekSession.Dismissed += (s, e) => Dispose();
 
             Close = this.WhenAnyValue(x => x.Thread)
-                .SelectMany(x => x is NewCommentThreadInlineReviewViewModel
+                .SelectMany(x => x is NewInlineCommentThreadViewModel
                     ? x.Comments.Single().CancelEdit.SelectUnit()
                     : Observable.Never<Unit>());
 
@@ -90,7 +90,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets the thread of comments to display.
         /// </summary>
-        public IInlineReviewViewModel Thread
+        public ICommentThreadViewModel Thread
         {
             get { return thread; }
             private set { this.RaiseAndSetIfChanged(ref thread, value); }
@@ -187,11 +187,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (thread != null)
             {
-                Thread = new CommentThreadInlineReviewViewModel(commentService, session, annotationModels, thread.Comments);
+                Thread = new InlineCommentThreadViewModel(commentService, session, annotationModels, thread.Comments);
             }
             else
             {
-                Thread = new NewCommentThreadInlineReviewViewModel(commentService, session, annotationModels, file, lineNumber, leftBuffer);
+                Thread = new NewInlineCommentThreadViewModel(commentService, session, annotationModels, file, lineNumber, leftBuffer);
             }
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))

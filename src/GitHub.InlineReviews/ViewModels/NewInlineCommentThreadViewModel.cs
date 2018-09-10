@@ -14,12 +14,12 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// A new inline comment thread that is being authored.
     /// </summary>
-    public class NewCommentThreadInlineReviewViewModel : InlineReviewViewModel
+    public class NewInlineCommentThreadViewModel : CommentThreadViewModel
     {
         bool needsPush;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommentThreadInlineReviewViewModel"/> class.
+        /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="leftComparisonBuffer">
         ///     True if the comment is being left on the left-hand-side of a diff; otherwise false.
         /// </param>
-        public NewCommentThreadInlineReviewViewModel(ICommentService commentService,
+        public NewInlineCommentThreadViewModel(ICommentService commentService,
             IPullRequestSession session,
             InlineAnnotationViewModel[] annotationModels,
             IPullRequestSessionFile file,

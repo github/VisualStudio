@@ -10,20 +10,20 @@ using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineGlyphFactory : IGlyphFactory<InlineReviewTag>
+    class InlineCommentGlyphFactory : IGlyphFactory<InlineCommentTag>
     {
-        readonly IInlineReviewPeekService peekService;
+        readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
 
-        public InlineGlyphFactory(
-            IInlineReviewPeekService peekService,
+        public InlineCommentGlyphFactory(
+            IInlineCommentPeekService peekService,
             ITextView textView)
         {
             this.peekService = peekService;
             this.textView = textView;
         }
 
-        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineReviewTag tag)
+        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
         {
             var glyph = CreateGlyph(tag);
             glyph.DataContext = tag;
@@ -40,15 +40,15 @@ namespace GitHub.InlineReviews.Tags
             return new[]
             {
                 typeof(AddInlineCommentTag),
-                typeof(ShowInlineReviewTag)
+                typeof(ShowInlineCommentTag)
             };
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
-        static UserControl CreateGlyph(InlineReviewTag tag)
+        static UserControl CreateGlyph(InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineReviewTag;
+            var showTag = tag as ShowInlineCommentTag;
 
             if (addTag != null)
             {
@@ -78,13 +78,13 @@ namespace GitHub.InlineReviews.Tags
                 throw new ArgumentException($"{nameof(showTag)} does not have a thread or annotations");
             }
 
-            throw new ArgumentException($"Unknown 'InlineReviewTag' type '{tag}'");
+            throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
         }
 
-        bool OpenThreadView(InlineReviewTag tag)
+        bool OpenThreadView(InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
-            var showTag = tag as ShowInlineReviewTag;
+            var showTag = tag as ShowInlineCommentTag;
 
             if (addTag != null)
             {

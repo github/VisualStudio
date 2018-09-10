@@ -50,7 +50,7 @@ namespace GitHub.InlineReviews
             {
                 exports.GetExportedValue<INextInlineCommentCommand>(),
                 exports.GetExportedValue<IPreviousInlineCommentCommand>(),
-                exports.GetExportedValue<IToggleInlineReviewMarginCommand>()
+                exports.GetExportedValue<IToggleInlineCommentMarginCommand>()
             };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();

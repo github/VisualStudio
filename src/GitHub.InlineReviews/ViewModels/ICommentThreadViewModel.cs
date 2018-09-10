@@ -11,7 +11,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// A comment thread.
     /// </summary>
-    public interface IInlineReviewViewModel
+    public interface ICommentThreadViewModel
     {
         /// <summary>
         /// Gets the comments in the thread.

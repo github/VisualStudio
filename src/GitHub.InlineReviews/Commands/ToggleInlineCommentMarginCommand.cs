@@ -12,8 +12,8 @@ using Microsoft.VisualStudio.Editor;
 
 namespace GitHub.InlineReviews.Commands
 {
-    [Export(typeof(IToggleInlineReviewMarginCommand))]
-    public class ToggleInlineReviewMarginCommand : VsCommand, IToggleInlineReviewMarginCommand
+    [Export(typeof(IToggleInlineCommentMarginCommand))]
+    public class ToggleInlineCommentMarginCommand : VsCommand, IToggleInlineCommentMarginCommand
     {
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -30,7 +30,7 @@ namespace GitHub.InlineReviews.Commands
         readonly Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
-        public ToggleInlineReviewMarginCommand(
+        public ToggleInlineCommentMarginCommand(
             IGitHubServiceProvider serviceProvider,
             Lazy<IVsEditorAdaptersFactoryService> editorAdapter,
             Lazy<IUsageTracker> usageTracker) : base(CommandSet, CommandId)

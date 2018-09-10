@@ -12,18 +12,18 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// Base view model for a thread of comments.
     /// </summary>
-    public abstract class InlineReviewViewModel : ReactiveObject, IInlineReviewViewModel
+    public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
         ReactiveCommand<Unit> postComment;
         ReactiveCommand<Unit> editComment;
         ReactiveCommand<Unit> deleteComment;
 
         /// <summary>
-        /// Intializes a new instance of the <see cref="InlineReviewViewModel"/> class.
+        /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
         /// <param name="annotationModels"></param>
-        protected InlineReviewViewModel(ActorModel currentUser, IReadOnlyList<InlineAnnotationViewModel> annotationModels)
+        protected CommentThreadViewModel(ActorModel currentUser, IReadOnlyList<InlineAnnotationViewModel> annotationModels)
         {
             Annotations = annotationModels;
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));

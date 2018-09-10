@@ -105,7 +105,7 @@
                       Background="{DynamicResource GitHubPeekViewBackground}">
             <StackPanel Orientation="Vertical">
                 <Grid>
-                    <local:InlineReviewView x:Name="threadView" DataContext="{Binding Thread}"/>
+                    <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
                 </Grid>
             </StackPanel>
         </ScrollViewer>

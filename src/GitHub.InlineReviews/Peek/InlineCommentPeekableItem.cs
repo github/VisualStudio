@@ -7,13 +7,13 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItem : IPeekableItem
     {
-        public InlineCommentPeekableItem(InlineReviewPeekViewModel viewModel)
+        public InlineCommentPeekableItem(InlineCommentPeekViewModel viewModel)
         {
             ViewModel = viewModel;
         }
 
         public string DisplayName => "GitHub Code Review";
-        public InlineReviewPeekViewModel ViewModel { get; }
+        public InlineCommentPeekViewModel ViewModel { get; }
 
         public IEnumerable<IPeekRelationship> Relationships => new[] { InlineCommentPeekRelationship.Instance };
 

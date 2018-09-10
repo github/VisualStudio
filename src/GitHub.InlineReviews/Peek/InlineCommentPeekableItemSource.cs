@@ -12,13 +12,13 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItemSource : IPeekableItemSource
     {
-        readonly IInlineReviewPeekService peekService;
+        readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand _nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
         readonly ICommentService commentService;
 
-        public InlineCommentPeekableItemSource(IInlineReviewPeekService peekService,
+        public InlineCommentPeekableItemSource(IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.Peek
         {
             if (session.RelationshipName == InlineCommentPeekRelationship.Instance.Name)
             {
-                var viewModel = new InlineReviewPeekViewModel(
+                var viewModel = new InlineCommentPeekViewModel(
                     peekService,
                     session,
                     sessionManager,
