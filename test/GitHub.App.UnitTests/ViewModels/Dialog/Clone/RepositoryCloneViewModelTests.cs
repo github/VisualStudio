@@ -113,12 +113,10 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         public async Task Repository_Name_Is_Appended_To_Base_Path()
         {
             var target = CreateTarget();
-            var repository = Substitute.For<IRepositoryModel>();
 
-            repository.Name.Returns("repo");
-            SetRepository(target.GitHubTab, repository);
+            SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
 
-            Assert.That(target.Path, Is.EqualTo("d:\\efault\\path\\repo"));
+            Assert.That(target.Path, Is.EqualTo("d:\\efault\\path\\owner\\repo"));
         }
 
         [Test]
@@ -135,10 +133,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         public async Task PathError_Is_Set_For_Existing_Destination()
         {
             var target = CreateTarget();
-            var repository = Substitute.For<IRepositoryModel>();
-
-            repository.Name.Returns("repo");
-            SetRepository(target.GitHubTab, repository);
+            SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
             target.Path = "d:\\exists";
 
             Assert.That(target.PathError, Is.EqualTo(Resources.DestinationAlreadyExists));
@@ -148,13 +143,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         public async Task Repository_Name_Replaces_Last_Part_Of_Non_Base_Path()
         {
             var target = CreateTarget();
-            var repository = Substitute.For<IRepositoryModel>();
 
-            target.Path = "d:\\efault\\foo";
-            repository.Name.Returns("repo");
-            SetRepository(target.GitHubTab, repository);
+            var owner = "owner";
+            target.Path = "d:\\efault";
+            SetRepository(target.GitHubTab, CreateRepositoryModel(owner, "name"));
+            target.Path = $"d:\\efault\\{owner}\\foo";
+            SetRepository(target.GitHubTab, CreateRepositoryModel(owner, "repo"));
 
-            Assert.That(target.Path, Is.EqualTo("d:\\efault\\repo"));
+            Assert.That(target.Path, Is.EqualTo($"d:\\efault\\{owner}\\repo"));
         }
 
         [Test]
@@ -174,7 +170,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             await target.InitializeAsync(null);
 
-            SetRepository(target.GitHubTab, Substitute.For<IRepositoryModel>());
+            SetRepository(target.GitHubTab, CreateRepositoryModel());
 
             Assert.That(target.Clone.CanExecute(null), Is.True);
         }
@@ -186,7 +182,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             await target.InitializeAsync(null);
 
-            SetRepository(target.GitHubTab, Substitute.For<IRepositoryModel>());
+            SetRepository(target.GitHubTab, CreateRepositoryModel());
             Assert.That(target.Clone.CanExecute(null), Is.True);
 
             target.Path = "d:\\exists";
@@ -259,6 +255,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
                 gitHubTab,
                 enterpriseTab,
                 urlTab);
+        }
+
+        static IRepositoryModel CreateRepositoryModel(string owner = "owner", string name = "repo")
+        {
+            var repository = Substitute.For<IRepositoryModel>();
+            repository.Owner.Returns(owner);
+            repository.Name.Returns(name);
+            return repository;
         }
     }
 }
