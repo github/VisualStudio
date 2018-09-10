@@ -7,9 +7,7 @@ using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.Services.Vssdk.Commands;
 using EnvDTE;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 using SVsServiceProvider = Microsoft.VisualStudio.Shell.SVsServiceProvider;
 using GitHub.VisualStudio.UI;
@@ -19,12 +17,11 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromUrlCommand))]
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
+        readonly Lazy<IDialogService> dialogService;
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
-        readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
         readonly Lazy<DTE> dte;
-        readonly IServiceProvider serviceProvider;
 
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -38,16 +35,15 @@ namespace GitHub.VisualStudio.Commands
 
         [ImportingConstructor]
         public OpenFromUrlCommand(
+            Lazy<IDialogService> dialogService,
             Lazy<IGitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
-            Lazy<ITeamExplorerContext> teamExplorerContext,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider) :
             base(CommandSet, CommandId)
         {
+            this.dialogService = dialogService;
             this.gitHubContextService = gitHubContextService;
             this.repositoryCloneService = repositoryCloneService;
-            this.teamExplorerContext = teamExplorerContext;
-            this.serviceProvider = serviceProvider;
             dte = new Lazy<DTE>(() => (DTE)serviceProvider.GetService(typeof(DTE)));
             gitHubToolWindowManager = new Lazy<IGitHubToolWindowManager>(
                 () => (IGitHubToolWindowManager)serviceProvider.GetService(typeof(IGitHubToolWindowManager)));
@@ -58,88 +54,43 @@ namespace GitHub.VisualStudio.Commands
 
         public override async Task Execute(string url)
         {
-            var context = string.IsNullOrEmpty(url) ? null : gitHubContextService.Value.FindContextFromUrl(url);
-            if (context == null)
+            var cloneDialogResult = await dialogService.Value.ShowCloneDialog(null);
+            if (cloneDialogResult == null)
             {
-                context = gitHubContextService.Value.FindContextFromClipboard();
+                return;
             }
 
+            url = cloneDialogResult.Repository.CloneUrl;
+            var context = gitHubContextService.Value.FindContextFromUrl(url);
             if (context == null)
             {
                 // Couldn't find a URL to open
                 return;
             }
 
-            var activeDir = teamExplorerContext.Value.ActiveRepository?.LocalPath;
-            if (activeDir != null)
-            {
-                // Try opening file in current context
-                if (gitHubContextService.Value.TryOpenFile(activeDir, context))
-                {
-                    return;
-                }
-            }
-
-            // Keep repos in unique dir while testing
-            var defaultSubPath = "GitHubCache";
-
-            var cloneUrl = gitHubContextService.Value.ToRepositoryUrl(context).ToString();
-            var targetDir = Path.Combine(repositoryCloneService.Value.DefaultClonePath, defaultSubPath, context.Owner);
-            var repositoryDirName = context.RepositoryName;
-            var repositoryDir = Path.Combine(targetDir, repositoryDirName);
-
+            var repositoryDir = cloneDialogResult.Path;
             if (!Directory.Exists(repositoryDir))
             {
-                var result = ShowInfoMessage($"Clone {cloneUrl} to '{repositoryDir}'?");
-                switch (result)
-                {
-                    case VSConstants.MessageBoxResult.IDYES:
-                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDir);
-                        // Open the cloned repository
-                        dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
-                        dte.Value.ExecuteCommand("View.TfsTeamExplorer");
-                        break;
-                    case VSConstants.MessageBoxResult.IDNO:
-                        // Target the current solution
-                        repositoryDir = FindSolutionDirectory(dte.Value.Solution);
-                        if (repositoryDir == null)
-                        {
-                            // No current solution to use
-                            return;
-                        }
+                var cloneUrl = gitHubContextService.Value.ToRepositoryUrl(context).ToString();
+                var repositoryDirName = Path.GetFileName(repositoryDir);
+                var targetDir = Path.GetDirectoryName(repositoryDir);
+                await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
 
-                        break;
-                    case VSConstants.MessageBoxResult.IDCANCEL:
-                        return;
-                }
+                // Open the cloned repository
+                dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
+                dte.Value.ExecuteCommand("View.TfsTeamExplorer");
             }
 
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
             if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
-                var result = ShowInfoMessage(string.Format(Resources.OpenRepositoryAtDir, repositoryDir));
-                switch (result)
-                {
-                    case VSConstants.MessageBoxResult.IDYES:
-                        // Open if current solution isn't in repository directory
-                        dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
-                        dte.Value.ExecuteCommand("View.TfsTeamExplorer");
-                        break;
-                    case VSConstants.MessageBoxResult.IDNO:
-                        break;
-                    case VSConstants.MessageBoxResult.IDCANCEL:
-                        return;
-                }
+                // Open if current solution isn't in repository directory
+                dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
+                dte.Value.ExecuteCommand("View.TfsTeamExplorer");
             }
 
             await TryOpenPullRequest(context);
             gitHubContextService.Value.TryOpenFile(repositoryDir, context);
-        }
-
-        VSConstants.MessageBoxResult ShowInfoMessage(string message)
-        {
-            return (VSConstants.MessageBoxResult)VsShellUtilities.ShowMessageBox(serviceProvider, message, null,
-                OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         static bool ContainsDirectory(string repositoryDir, string solutionDir)
