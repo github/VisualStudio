@@ -23,15 +23,15 @@ namespace GitHub.InlineReviews.Services
     /// <summary>
     /// Shows inline comments in a peek view.
     /// </summary>
-    [Export(typeof(IInlineCommentPeekService))]
-    class InlineCommentPeekService : IInlineCommentPeekService
+    [Export(typeof(IInlineReviewPeekService))]
+    class InlineReviewPeekService : IInlineReviewPeekService
     {
         readonly IOutliningManagerService outliningService;
         readonly IPeekBroker peekBroker;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public InlineCommentPeekService(
+        public InlineReviewPeekService(
             IOutliningManagerService outliningManager,
             IPeekBroker peekBroker,
             IUsageTracker usageTracker)

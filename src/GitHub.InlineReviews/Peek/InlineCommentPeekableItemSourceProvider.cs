@@ -16,23 +16,23 @@ namespace GitHub.InlineReviews.Peek
     [Name("GitHub Inline Comments Peekable Item Source")]
     class InlineCommentPeekableItemSourceProvider : IPeekableItemSourceProvider
     {
-        readonly IInlineCommentPeekService peekService;
+        readonly IInlineReviewPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly INextInlineCommentCommand nextCommentCommand;
+        readonly INextInlineReviewCommand _nextReviewCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
         readonly ICommentService commentService;
 
         [ImportingConstructor]
         public InlineCommentPeekableItemSourceProvider(
-            IInlineCommentPeekService peekService,
+            IInlineReviewPeekService peekService,
             IPullRequestSessionManager sessionManager,
-            INextInlineCommentCommand nextCommentCommand,
+            INextInlineReviewCommand nextReviewCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
             ICommentService commentService)
         {
             this.peekService = peekService;
             this.sessionManager = sessionManager;
-            this.nextCommentCommand = nextCommentCommand;
+            this._nextReviewCommand = nextReviewCommand;
             this.previousCommentCommand = previousCommentCommand;
             this.commentService = commentService;
         }
@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Peek
             return new InlineCommentPeekableItemSource(
                 peekService,
                 sessionManager,
-                nextCommentCommand,
+                _nextReviewCommand,
                 previousCommentCommand,
                 commentService);
         }

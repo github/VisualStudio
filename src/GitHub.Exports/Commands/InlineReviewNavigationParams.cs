@@ -3,7 +3,7 @@
 namespace GitHub.Commands
 {
     /// <summary>
-    /// Supplies parameters to <see cref="INextInlineCommentCommand"/> and
+    /// Supplies parameters to <see cref="INextInlineReviewCommand"/> and
     /// <see cref="IPreviousInlineCommentCommand"/>.
     /// </summary>
     public class InlineReviewNavigationParams

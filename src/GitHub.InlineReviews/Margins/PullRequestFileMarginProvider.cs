@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.Margins
     internal sealed class PullRequestFileMarginProvider : IWpfTextViewMarginProvider
     {
         readonly Lazy<IPullRequestSessionManager> sessionManager;
-        readonly Lazy<IToggleInlineCommentMarginCommand> enableInlineCommentsCommand;
+        readonly Lazy<IToggleInlineReviewMarginCommand> enableInlineCommentsCommand;
         readonly Lazy<IGoToSolutionOrPullRequestFileCommand> goToSolutionOrPullRequestFileCommand;
         readonly Lazy<IPackageSettings> packageSettings;
         readonly Lazy<IUsageTracker> usageTracker;
@@ -30,7 +30,7 @@ namespace GitHub.InlineReviews.Margins
 
         [ImportingConstructor]
         public PullRequestFileMarginProvider(
-            Lazy<IToggleInlineCommentMarginCommand> enableInlineCommentsCommand,
+            Lazy<IToggleInlineReviewMarginCommand> enableInlineCommentsCommand,
             Lazy<IGoToSolutionOrPullRequestFileCommand> goToSolutionOrPullRequestFileCommand,
             Lazy<IPullRequestSessionManager> sessionManager,
             Lazy<IPackageSettings> packageSettings,

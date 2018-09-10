@@ -48,9 +48,9 @@ namespace GitHub.InlineReviews
             var exports = componentModel.DefaultExportProvider;
             var commands = new IVsCommandBase[]
             {
-                exports.GetExportedValue<INextInlineCommentCommand>(),
+                exports.GetExportedValue<INextInlineReviewCommand>(),
                 exports.GetExportedValue<IPreviousInlineCommentCommand>(),
-                exports.GetExportedValue<IToggleInlineCommentMarginCommand>()
+                exports.GetExportedValue<IToggleInlineReviewMarginCommand>()
             };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();

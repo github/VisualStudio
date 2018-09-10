@@ -24,25 +24,25 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Base class for commands that navigate between inline comments.
     /// </summary>
-    abstract class InlineCommentNavigationCommand : VsCommand<InlineReviewNavigationParams>
+    abstract class InlineReviewNavigationCommand : VsCommand<InlineReviewNavigationParams>
     {
-        static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
+        static readonly ILogger log = LogManager.ForContext<InlineReviewNavigationCommand>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
-        readonly IInlineCommentPeekService peekService;
+        readonly IInlineReviewPeekService peekService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InlineCommentNavigationCommand"/> class.
+        /// Initializes a new instance of the <see cref="InlineReviewNavigationCommand"/> class.
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         /// <param name="commandSet">The GUID of the group the command belongs to.</param>
         /// <param name="commandId">The numeric identifier of the command.</param>
-        protected InlineCommentNavigationCommand(
+        protected InlineReviewNavigationCommand(
             IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService,
+            IInlineReviewPeekService peekService,
             Guid commandSet,
             int commandId)
             : base(commandSet, commandId)
@@ -170,7 +170,7 @@ namespace GitHub.InlineReviews.Commands
             }
             catch (Exception e)
             {
-                log.Error(e, "Exception in InlineCommentNavigationCommand.GetCurrentTextViews()");
+                log.Error(e, "Exception in InlineReviewNavigationCommand.GetCurrentTextViews()");
             }
 
             return result;

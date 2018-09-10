@@ -9,7 +9,7 @@ namespace GitHub.InlineReviews.Services
     /// <summary>
     /// Shows inline comments in a peek view.
     /// </summary>
-    public interface IInlineCommentPeekService
+    public interface IInlineReviewPeekService
     {
         /// <summary>
         /// Gets the line number for a peek session tracking point.

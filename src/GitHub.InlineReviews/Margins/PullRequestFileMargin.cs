@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.Margins
 
         public PullRequestFileMargin(
             IWpfTextView textView,
-            IToggleInlineCommentMarginCommand toggleInlineCommentMarginCommand,
+            IToggleInlineReviewMarginCommand toggleInlineReviewMarginCommand,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IPullRequestSessionManager sessionManager,
             Lazy<IUsageTracker> usageTracker)
@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.Margins
             this.textView = textView;
             this.sessionManager = sessionManager;
 
-            viewModel = new PullRequestFileMarginViewModel(toggleInlineCommentMarginCommand, goToSolutionOrPullRequestFileCommand, usageTracker);
+            viewModel = new PullRequestFileMarginViewModel(toggleInlineReviewMarginCommand, goToSolutionOrPullRequestFileCommand, usageTracker);
             visualElement = new PullRequestFileMarginView { DataContext = viewModel, ClipToBounds = true };
 
             visibilitySubscription = viewModel.WhenAnyValue(x => x.Enabled).Subscribe(enabled =>

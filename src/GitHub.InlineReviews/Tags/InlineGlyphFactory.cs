@@ -12,11 +12,11 @@ namespace GitHub.InlineReviews.Tags
 {
     class InlineGlyphFactory : IGlyphFactory<InlineReviewTag>
     {
-        readonly IInlineCommentPeekService peekService;
+        readonly IInlineReviewPeekService peekService;
         readonly ITextView textView;
 
         public InlineGlyphFactory(
-            IInlineCommentPeekService peekService,
+            IInlineReviewPeekService peekService,
             ITextView textView)
         {
             this.peekService = peekService;

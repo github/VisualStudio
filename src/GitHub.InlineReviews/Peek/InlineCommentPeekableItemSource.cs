@@ -12,21 +12,21 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItemSource : IPeekableItemSource
     {
-        readonly IInlineCommentPeekService peekService;
+        readonly IInlineReviewPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly INextInlineCommentCommand nextCommentCommand;
+        readonly INextInlineReviewCommand _nextReviewCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
         readonly ICommentService commentService;
 
-        public InlineCommentPeekableItemSource(IInlineCommentPeekService peekService,
+        public InlineCommentPeekableItemSource(IInlineReviewPeekService peekService,
             IPullRequestSessionManager sessionManager,
-            INextInlineCommentCommand nextCommentCommand,
+            INextInlineReviewCommand nextReviewCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
             ICommentService commentService)
         {
             this.peekService = peekService;
             this.sessionManager = sessionManager;
-            this.nextCommentCommand = nextCommentCommand;
+            this._nextReviewCommand = nextReviewCommand;
             this.previousCommentCommand = previousCommentCommand;
             this.commentService = commentService;
         }
@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.Peek
                     peekService,
                     session,
                     sessionManager,
-                    nextCommentCommand,
+                    _nextReviewCommand,
                     previousCommentCommand,
                     commentService);
                 viewModel.Initialize().Forget();

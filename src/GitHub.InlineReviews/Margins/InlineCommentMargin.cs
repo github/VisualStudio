@@ -33,7 +33,7 @@ namespace GitHub.InlineReviews.Margins
 
         public InlineCommentMargin(
             IWpfTextViewHost wpfTextViewHost,
-            IInlineCommentPeekService peekService,
+            IInlineReviewPeekService peekService,
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             Lazy<IPullRequestSessionManager> sessionManager)

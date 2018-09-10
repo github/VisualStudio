@@ -1,20 +1,20 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Linq;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Text.Tagging;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Services;
+using Microsoft.VisualStudio.Text.Tagging;
 using GitHub.Commands;
 using GitHub.Services;
 
 namespace GitHub.InlineReviews.Commands
 {
     /// <summary>
-    /// Navigates to and opens the the previous inline comment thread in the currently active text view.
+    /// Navigates to and opens the the next inline review in the currently active text view.
     /// </summary>
-    [Export(typeof(IPreviousInlineCommentCommand))]
-    class PreviousInlineCommentCommand : InlineCommentNavigationCommand, IPreviousInlineCommentCommand
+    [Export(typeof(INextInlineReviewCommand))]
+    class NextInlineReviewCommand : InlineReviewNavigationCommand, INextInlineReviewCommand
     {
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -24,19 +24,19 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the numeric identifier of the command.
         /// </summary>
-        public const int CommandId = PkgCmdIDList.PreviousInlineCommentId;
+        public const int CommandId = PkgCmdIDList.NextInlineCommentId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PreviousInlineCommentCommand"/> class.
+        /// Initializes a new instance of the <see cref="NextInlineReviewCommand"/> class.
         /// </summary>
         /// <param name="serviceProvider">The GitHub service provider.</param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         [ImportingConstructor]
-        protected PreviousInlineCommentCommand(
+        protected NextInlineReviewCommand(
             IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService)
+            IInlineReviewPeekService peekService)
             : base(serviceProvider, tagAggregatorFactory, peekService, CommandSet, CommandId)
         {
         }
@@ -53,7 +53,7 @@ namespace GitHub.InlineReviews.Commands
             if (tags.Count > 0)
             {
                 var cursorPoint = GetCursorPoint(textViews[0], parameter);
-                var next = tags.LastOrDefault(x => x.Point < cursorPoint) ?? tags.Last();
+                var next = tags.FirstOrDefault(x => x.Point > cursorPoint) ?? tags.First();
                 ShowPeekComments(parameter, next.TextView, next.Tag, textViews);
             }
 

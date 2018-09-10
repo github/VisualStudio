@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.ViewModels
     public sealed class InlineReviewPeekViewModel : ReactiveObject, IDisposable
     {
         static readonly ILogger log = LogManager.ForContext<InlineReviewPeekViewModel>();
-        readonly IInlineCommentPeekService peekService;
+        readonly IInlineReviewPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
         readonly ICommentService commentService;
@@ -46,17 +46,17 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineReviewPeekViewModel"/> class.
         /// </summary>
-        public InlineReviewPeekViewModel(IInlineCommentPeekService peekService,
+        public InlineReviewPeekViewModel(IInlineReviewPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
-            INextInlineCommentCommand nextCommentCommand,
+            INextInlineReviewCommand nextReviewCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
             ICommentService commentService)
         {
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
+            Guard.ArgumentNotNull(nextReviewCommand, nameof(nextReviewCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
 
             this.peekService = peekService;
@@ -73,8 +73,8 @@ namespace GitHub.InlineReviews.ViewModels
                     : Observable.Never<Unit>());
 
             NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextCommentCommand.Enabled),
-                _ => nextCommentCommand.Execute(new InlineReviewNavigationParams
+                Observable.Return(nextReviewCommand.Enabled),
+                _ => nextReviewCommand.Execute(new InlineReviewNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
