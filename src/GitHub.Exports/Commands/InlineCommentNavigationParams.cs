@@ -3,10 +3,10 @@
 namespace GitHub.Commands
 {
     /// <summary>
-    /// Supplies parameters to <see cref="INextInlineReviewCommand"/> and
+    /// Supplies parameters to <see cref="INextInlineCommentCommand"/> and
     /// <see cref="IPreviousInlineCommentCommand"/>.
     /// </summary>
-    public class InlineReviewNavigationParams
+    public class InlineCommentNavigationParams
     {
         /// <summary>
         /// Gets or sets the line that should be used as the start point for navigation.

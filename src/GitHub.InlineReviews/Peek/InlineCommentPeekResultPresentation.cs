@@ -10,7 +10,7 @@ namespace GitHub.InlineReviews.Peek
     {
         const double PeekBorders = 28.0;
         readonly InlineReviewPeekViewModel viewModel;
-        InlineReviewPeekView view;
+        InlineCommentPeekView view;
         double desiredHeight;
 
         public bool IsDirty => false;
@@ -72,7 +72,7 @@ namespace GitHub.InlineReviews.Peek
 
         public UIElement Create(IPeekSession session, IPeekResultScrollState scrollState)
         {
-            view = new InlineReviewPeekView();
+            view = new InlineCommentPeekView();
             view.DataContext = viewModel;
 
             // Report the desired size back to the peek view. Unfortunately the peek view

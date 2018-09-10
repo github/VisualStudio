@@ -48,7 +48,7 @@ namespace GitHub.InlineReviews
             var exports = componentModel.DefaultExportProvider;
             var commands = new IVsCommandBase[]
             {
-                exports.GetExportedValue<INextInlineReviewCommand>(),
+                exports.GetExportedValue<INextInlineCommentCommand>(),
                 exports.GetExportedValue<IPreviousInlineCommentCommand>(),
                 exports.GetExportedValue<IToggleInlineReviewMarginCommand>()
             };

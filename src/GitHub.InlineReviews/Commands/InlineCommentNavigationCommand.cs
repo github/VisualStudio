@@ -24,22 +24,22 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Base class for commands that navigate between inline comments.
     /// </summary>
-    abstract class InlineReviewNavigationCommand : VsCommand<InlineReviewNavigationParams>
+    abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
     {
-        static readonly ILogger log = LogManager.ForContext<InlineReviewNavigationCommand>();
+        static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
         readonly IGitHubServiceProvider serviceProvider;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineReviewPeekService peekService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InlineReviewNavigationCommand"/> class.
+        /// Initializes a new instance of the <see cref="InlineCommentNavigationCommand"/> class.
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         /// <param name="commandSet">The GUID of the group the command belongs to.</param>
         /// <param name="commandId">The numeric identifier of the command.</param>
-        protected InlineReviewNavigationCommand(
+        protected InlineCommentNavigationCommand(
             IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineReviewPeekService peekService,
@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews.Commands
         /// <param name="parameter">The parameters.</param>
         /// <param name="textView">The text view.</param>
         /// <returns></returns>
-        protected int GetCursorPoint(ITextView textView, InlineReviewNavigationParams parameter)
+        protected int GetCursorPoint(ITextView textView, InlineCommentNavigationParams parameter)
         {
             if (parameter?.FromLine != null)
             {
@@ -170,7 +170,7 @@ namespace GitHub.InlineReviews.Commands
             }
             catch (Exception e)
             {
-                log.Error(e, "Exception in InlineReviewNavigationCommand.GetCurrentTextViews()");
+                log.Error(e, "Exception in InlineCommentNavigationCommand.GetCurrentTextViews()");
             }
 
             return result;
@@ -223,7 +223,7 @@ namespace GitHub.InlineReviews.Commands
         /// <param name="parameter">The navigation parameter detailing a search from the specified tag</param>
         /// <param name="allTextViews">The full list of text views</param>
         protected void ShowPeekComments(
-            InlineReviewNavigationParams parameter,
+            InlineCommentNavigationParams parameter,
             ITextView textView,
             ShowInlineReviewTag tag,
             IEnumerable<ITextView> allTextViews)

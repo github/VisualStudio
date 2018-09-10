@@ -71,9 +71,9 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Commands\ToggleInlineReviewMarginCommand.cs" />
-    <Compile Include="Commands\InlineReviewNavigationCommand.cs" />
-    <Compile Include="Commands\PreviousInlineReviewCommand.cs" />
-    <Compile Include="Commands\NextInlineReviewCommand.cs" />
+    <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
+    <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
+    <Compile Include="Commands\NextInlineCommentCommand.cs" />
     <Compile Include="Margins\InlineCommentTextViewOptions.cs" />
     <Compile Include="Margins\PullRequestFileMargin.cs" />
     <Compile Include="Margins\PullRequestFileMarginProvider.cs" />
@@ -137,8 +137,8 @@
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InlineReviewPeekView.xaml.cs">
-      <DependentUpon>InlineReviewPeekView.xaml</DependentUpon>
+    <Compile Include="Views\InlineCommentPeekView.xaml.cs">
+      <DependentUpon>InlineCommentPeekView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SampleData\CommentViewModelDesigner.cs" />
     <Compile Include="Services\DiffService.cs" />
@@ -476,7 +476,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InlineReviewPeekView.xaml">
+    <Page Include="Views\InlineCommentPeekView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

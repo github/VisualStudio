@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 CreateSessionManager(),
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -63,7 +63,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 9),
                 CreatePeekSession(),
                 CreateSessionManager(),
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -89,7 +89,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 sessionManager,
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -112,7 +112,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 8),
                 peekSession,
                 sessionManager,
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -154,7 +154,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -181,7 +181,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
                 sessionManager,
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -214,7 +214,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 
@@ -251,7 +251,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreatePeekService(lineNumber: 10),
                 peekSession,
                 sessionManager,
-                Substitute.For<INextInlineReviewCommand>(),
+                Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
                 Substitute.For<ICommentService>());
 

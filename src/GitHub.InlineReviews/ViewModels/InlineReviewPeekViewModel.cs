@@ -49,14 +49,14 @@ namespace GitHub.InlineReviews.ViewModels
         public InlineReviewPeekViewModel(IInlineReviewPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager,
-            INextInlineReviewCommand nextReviewCommand,
+            INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
             ICommentService commentService)
         {
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(nextReviewCommand, nameof(nextReviewCommand));
+            Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
 
             this.peekService = peekService;
@@ -73,15 +73,15 @@ namespace GitHub.InlineReviews.ViewModels
                     : Observable.Never<Unit>());
 
             NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextReviewCommand.Enabled),
-                _ => nextReviewCommand.Execute(new InlineReviewNavigationParams
+                Observable.Return(nextCommentCommand.Enabled),
+                _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
             PreviousComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(previousCommentCommand.Enabled),
-                _ => previousCommentCommand.Execute(new InlineReviewNavigationParams
+                _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));

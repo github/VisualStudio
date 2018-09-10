@@ -254,7 +254,7 @@ namespace GitHub.Services
         {
             var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDiff: false);
 
-            var param = (object) new InlineReviewNavigationParams
+            var param = (object) new InlineCommentNavigationParams
             {
                 FromLine = fromLine,
             };
