@@ -1,446 +1,70 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHub.App</RootNamespace>
-    <AssemblyName>GitHub.App</AssemblyName>
-    <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <OutputPath>bin\Release\</OutputPath>
-  </PropertyGroup>
+
   <Import Project="$(SolutionDir)\src\common\signing.props" />
+
   <ItemGroup>
-    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.ComponentModelHost.14.0.25424\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.CoreUtility.14.3.25407\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Editor, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Editor.14.3.25407\lib\net45\Microsoft.VisualStudio.Editor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6071\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.14.0.14.3.25407\lib\Microsoft.VisualStudio.Shell.14.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Immutable.10.0.10.0.30319\lib\net40\Microsoft.VisualStudio.Shell.Immutable.10.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.7.10.6072\lib\net11\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.10.0.10.0.30320\lib\net20\Microsoft.VisualStudio.Shell.Interop.10.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.11.0.11.0.61031\lib\net20\Microsoft.VisualStudio.Shell.Interop.11.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.12.0.12.0.30111\lib\net20\Microsoft.VisualStudio.Shell.Interop.12.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.8.0.8.0.50728\lib\net11\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.Data, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Data.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.Logic.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.Logic.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.UI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.UI.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.UI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Text.UI.Wpf.14.3.25407\lib\net45\Microsoft.VisualStudio.Text.UI.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.7.10.6071\lib\net11\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.8.0.8.0.50728\lib\net11\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Threading, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Threading.14.1.131\lib\net45\Microsoft.VisualStudio.Threading.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Utilities, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.14.3.25407\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Utilities, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.14.3.25407\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="rothko, Version=0.0.3.0, Culture=neutral, PublicKeyToken=9f664c41f503810a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rothko.0.0.3-ghfvs\lib\net45\rothko.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SQLitePCL.raw, Version=0.7.3.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\lib\net45\SQLitePCL.raw.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Stateless, Version=2.5.56.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Stateless.2.5.56.0\lib\portable-net40+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Stateless.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Collections\IVirtualizingListSource.cs" />
-    <Compile Include="Collections\SequentialListSource.cs" />
-    <Compile Include="Collections\VirtualizingList.cs" />
-    <Compile Include="Collections\VirtualizingListCollectionView.cs" />
-    <Compile Include="Commands\UsageTrackingCommand.cs" />
-    <Compile Include="Factories\ViewViewModelFactory.cs" />
-    <Compile Include="Factories\ModelServiceFactory.cs" />
-    <Compile Include="Models\PullRequestDetailArgument.cs" />
-    <Compile Include="Models\PullRequestModel.cs" />
-    <Compile Include="SampleData\ActorViewModelDesigner.cs" />
-    <Compile Include="SampleData\ForkRepositoryExecuteViewModelDesigner.cs" />
-    <Compile Include="SampleData\ForkRepositorySelectViewModelDesigner.cs" />
-    <Compile Include="SampleData\GitServiceDesigner.cs" />
-    <Compile Include="SampleData\ForkRepositorySwitchViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestFilesViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestListItemViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestReviewAuthoringViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestReviewFileCommentViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestReviewViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestUserReviewsViewModelDesigner.cs" />
-    <Compile Include="SampleData\UserFilterViewModelDesigner.cs" />
-    <Compile Include="Services\EnterpriseCapabilitiesService.cs" />
-    <Compile Include="Services\FromGraphQlExtensions.cs" />
-    <Compile Include="Services\GitHubContextService.cs" />
-    <Compile Include="Services\GlobalConnection.cs" />
-    <Compile Include="Services\RepositoryForkService.cs" />
-    <Compile Include="Services\RepositoryService.cs" />
-    <Compile Include="ViewModels\ActorViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ForkRepositoryExecuteViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ForkRepositorySwitchViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ForkRepositoryViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\ForkRepositorySelectViewModel.cs" />
-    <Compile Include="Services\PullRequestEditorService.cs" />
-    <Compile Include="Services\TeamExplorerContext.cs" />
-    <Compile Include="Services\OAuthCallbackListener.cs" />
-    <Compile Include="Services\TextViewCommandDispatcher.cs" />
-    <Compile Include="ViewModels\Dialog\GistCreationViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\GitHubDialogWindowViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\LoginCredentialsViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\LoginTabViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\LoginToGitHubForEnterpriseViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\LoginToGitHubViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\LoginViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\Login2FaViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\RepositoryCloneViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\RepositoryCreationViewModel.cs" />
-    <Compile Include="ViewModels\Dialog\PagedDialogViewModelBase.cs" />
-    <Compile Include="ViewModels\Dialog\RepositoryRecloneViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\IssueListViewModelBase.cs" />
-    <Compile Include="ViewModels\GitHubPane\LoggedOutViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\NavigationViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\GitHubPaneViewModel.cs" />
-    <Compile Include="SampleData\PullRequestCheckViewModelDesigner.cs" />
-    <Compile Include="ViewModels\GitHubPane\LoginFailedViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestCheckType.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestFilesViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestListItemViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestListViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PanePageViewModelBase.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestDetailViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestCreationViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\NotAGitHubRepositoryViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\NotAGitRepositoryViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestReviewAuthoringViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestReviewCommentViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestCheckViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestReviewSummaryViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestReviewViewModel.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestUserReviewsViewModel.cs" />
-    <Compile Include="ViewModels\RepositoryFormViewModel.cs" />
-    <Compile Include="ViewModels\TeamExplorer\RepositoryPublishViewModel.cs" />
-    <Compile Include="Caches\CacheIndex.cs" />
-    <Compile Include="Caches\CacheItem.cs" />
-    <Compile Include="Caches\ImageCache.cs" />
-    <Compile Include="Extensions\AkavacheExtensions.cs" />
-    <Compile Include="Extensions\EnvironmentExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
+    <Resource Include="Images\*.png" />
+
+    <Compile Update="Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Include="SampleData\AccountDesigner.cs" />
-    <Compile Include="SampleData\LocalRepositoryModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
-    <Compile Include="SampleData\PullRequestListViewModelDesigner.cs" />
-    <Compile Include="SampleData\RemoteRepositoryModelDesigner.cs" />
-    <Compile Include="SampleData\RepositoryRecloneViewModelDesigner.cs" />
-    <Compile Include="Services\AvatarProvider.cs" />
-    <Compile Include="Services\DialogService.cs" />
-    <Compile Include="Services\GitHubCredentialProvider.cs" />
-    <Compile Include="Services\IGitHubCredentialProvider.cs" />
-    <Compile Include="Services\ImageDownloader.cs" />
-    <Compile Include="Services\GitClient.cs" />
-    <Compile Include="Services\ModelService.cs" />
-    <Compile Include="Services\PullRequestService.cs" />
-    <Compile Include="Services\RepositoryCloneService.cs" />
-    <Compile Include="Extensions\FileExtensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\common\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
-    <Compile Include="ViewModels\UserFilterViewModel.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AkavacheSqliteLinkerOverride.cs" />
-    <Compile Include="Authentication\TwoFactorChallengeHandler.cs" />
-    <Compile Include="Authentication\TwoFactorRequiredUserError.cs" />
-    <Compile Include="Factories\HostCacheFactory.cs" />
-    <Compile Include="Factories\IBlobCacheFactory.cs" />
-    <Compile Include="Factories\IHostCacheFactory.cs" />
-    <Compile Include="Caches\SharedCache.cs" />
-    <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
-    <Compile Include="Info\GitHubUrls.cs" />
-    <Compile Include="Infrastructure\ExportWrappers.cs" />
-    <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\RemoteRepositoryModel.cs" />
-    <Compile Include="SampleData\SampleViewModels.cs" />
-    <Compile Include="Api\ApiClient.cs" />
-    <Compile Include="Factories\ApiClientFactory.cs" />
-    <Compile Include="Services\ErrorMap.cs" />
-    <Compile Include="Services\ErrorMessage.cs" />
-    <Compile Include="Services\ErrorMessageTranslator.cs" />
-    <Compile Include="Services\RepositoryCreationService.cs" />
-    <Compile Include="Services\GistPublishService.cs" />
-    <Compile Include="Services\RepositoryPublishService.cs" />
-    <Compile Include="Services\SerializedObjectProvider.cs" />
-    <Compile Include="Services\StandardUserErrors.cs" />
-    <Compile Include="Services\Translation.cs" />
-    <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
-    <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
-    <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestDirectoryNode.cs" />
-    <Compile Include="ViewModels\GitHubPane\PullRequestFileNode.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\default_org_avatar.png" />
-    <Resource Include="Images\default_user_avatar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\submodules\akavache\Akavache.Sqlite3\Akavache.Sqlite3.csproj">
-      <Project>{241c47df-ca8e-4296-aa03-2c48bb646abd}</Project>
-      <Name>Akavache.Sqlite3</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
-      <Project>{b4e665e5-6caf-4414-a6e2-8de1c3bcf203}</Project>
-      <Name>Akavache_Net45</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
-      <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
-      <Name>Octokit.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
-      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
-      <Name>Octokit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
-      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
-      <Name>ReactiveUI_Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
-      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
-      <Name>Splat-Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
-      <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
-      <Name>CredentialManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
-      <Project>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</Project>
-      <Name>GitHub.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
-      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
-      <Name>GitHub.Exports.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
-      <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
-      <Name>GitHub.Exports</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
-      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
-      <Name>GitHub.Extensions.Reactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
-      <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
-      <Name>GitHub.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
-      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
-      <Name>GitHub.Logging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
-      <Project>{2D3D2834-33BE-45CA-B3CC-12F853557D7B}</Project>
-      <Name>GitHub.Services.Vssdk</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
-      <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
-      <Name>GitHub.UI.Reactive</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
+
+    <EmbeddedResource Update="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  
   <ItemGroup>
-    <Analyzer Include="..\..\packages\SerilogAnalyzer.0.12.0.0\analyzers\dotnet\cs\SerilogAnalyzer.dll" />
+    <ProjectReference Include="..\..\submodules\akavache\Akavache.Sqlite3\Akavache.Sqlite3.csproj" />
+    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj" />
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj" />
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj" />
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
+    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj" />
+    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj" />
+    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
+    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
+    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj" />
+    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
+    <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj" />
+    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
-  </Target>
-  <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <ItemGroup>
+    <PackageReference Include="EnvDTE" Version="8.0.1" />
+    <PackageReference Include="LibGit2Sharp" Version="0.23.1" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.164" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
+    <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost" Version="14.0.25424" />
+    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="14.3.25407" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
+    <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
+    <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
+    <PackageReference Include="Serilog" Version="2.5.0" />
+    <PackageReference Include="SerilogAnalyzer" Version="0.12.0.0" />
+    <PackageReference Include="SQLitePCL.raw_basic" Version="0.7.3.0-vs2012" targetFramework="net45" />
+    <PackageReference Include="Stateless" Version="2.5.56.0" targetFramework="net45" />
+  </ItemGroup>
 </Project>

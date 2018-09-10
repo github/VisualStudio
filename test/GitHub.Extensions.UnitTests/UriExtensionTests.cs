@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 public class UriExtensionTests
 {
-    public class TheAppendMethod : TestBaseClass
+    public class TheAppendMethod
     {
         [TestCase("https://github.com/foo/bar", "graphs", "https://github.com/foo/bar/graphs")]
         [TestCase("https://github.com/foo/bar/", "graphs", "https://github.com/foo/bar/graphs")]
