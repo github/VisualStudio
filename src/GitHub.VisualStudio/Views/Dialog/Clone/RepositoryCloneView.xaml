@@ -36,6 +36,7 @@
                    Margin="16">
             <Label DockPanel.Dock="Left">Local Path</Label>
             <Button DockPanel.Dock="Right"
+                    Command="{Binding Browse}"
                     Style="{DynamicResource GitHubBlueLinkButton}"
                     VerticalContentAlignment="Center">
                 Browse

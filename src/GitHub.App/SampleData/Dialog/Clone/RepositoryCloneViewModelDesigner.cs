@@ -23,6 +23,7 @@ namespace GitHub.SampleData.Dialog.Clone
         public IRepositorySelectViewModel GitHubTab { get; }
         public IRepositorySelectViewModel EnterpriseTab { get; }
         public IRepositoryUrlViewModel UrlTab { get; }
+        public ReactiveCommand<object> Browse { get; }
         public ReactiveCommand<CloneDialogResult> Clone { get; }
 
         public Task InitializeAsync(IConnection connection)

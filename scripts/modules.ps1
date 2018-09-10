@@ -73,7 +73,7 @@ New-Module -ScriptBlock {
             $output += Get-Content $outputPath
             $exitCode = $process.ExitCode
         } else {
-            $output += "Tests timed out. Backtrace:"
+            $output += "Process timed out. Backtrace:"
             $output += Get-DotNetStack $process.Id
             $exitCode = 9999
         }
