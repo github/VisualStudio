@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace GitHub.InlineReviews.Services
@@ -9,11 +10,17 @@ namespace GitHub.InlineReviews.Services
     {
         public bool ConfirmCommentDelete()
         {
+            var options = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft ?
+                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign :
+                0;
+
             return MessageBox.Show(
                 VisualStudio.UI.Resources.DeleteCommentConfirmation,
                 VisualStudio.UI.Resources.DeleteCommentConfirmationCaption,
                 MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question) == DialogResult.Yes;
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button1,
+                options) == DialogResult.Yes;
         }
     }
 }
