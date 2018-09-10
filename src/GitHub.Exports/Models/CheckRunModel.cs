@@ -39,6 +39,9 @@ namespace GitHub.Models
         /// </summary>
         public string Summary { get; set; }
 
-        public int DatabaseId { get; set; }
+        /// <summary>
+        /// The check run Id
+        /// </summary>
+        public int CheckRunId { get; set; }
     }
 }

@@ -94,7 +94,7 @@ namespace GitHub.App.ViewModels.GitHubPane
 
                 var checkRunModel = pullRequest
                     .CheckSuites.SelectMany(model => model.CheckRuns)
-                    .First(model => model.DatabaseId == CheckRunId);
+                    .First(model => model.CheckRunId == CheckRunId);
 
                 CheckRunName = checkRunModel.Name;
                 Annotations = checkRunModel.Annotations
