@@ -14,7 +14,8 @@ namespace GitHub.App.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestAnnotationsViewModel : PanePageViewModelBase, IPullRequestAnnotationsViewModel
     {
-        private readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestEditorService pullRequestEditorService;
 
         IPullRequestSession session;
         string title;
@@ -22,9 +23,10 @@ namespace GitHub.App.ViewModels.GitHubPane
         IReadOnlyList<IPullRequestAnnotationItemViewModel> annotations;
 
         [ImportingConstructor]
-        public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager)
+        public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager, IPullRequestEditorService pullRequestEditorService)
         {
             this.sessionManager = sessionManager;
+            this.pullRequestEditorService = pullRequestEditorService;
             NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
                 NavigateTo(FormattableString.Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
         }
@@ -93,12 +95,12 @@ namespace GitHub.App.ViewModels.GitHubPane
                 PullRequestTitle = pullRequest.Title;
 
                 var checkRunModel = pullRequest
-                    .CheckSuites.SelectMany(model => model.CheckRuns)
-                    .First(model => model.DatabaseId == CheckRunId);
+                    .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new {checkSuite, checkRun}))
+                    .First(model => model.checkRun.DatabaseId == CheckRunId);
 
-                CheckRunName = checkRunModel.Name;
-                Annotations = checkRunModel.Annotations
-                    .Select(model => new PullRequestAnnotationItemViewModel(model))
+                CheckRunName = checkRunModel.checkRun.Name;
+                Annotations = checkRunModel.checkRun.Annotations
+                    .Select(annotation => new PullRequestAnnotationItemViewModel(checkRunModel.checkSuite, checkRunModel.checkRun, annotation, session, pullRequestEditorService))
                     .ToArray();
             }
             finally

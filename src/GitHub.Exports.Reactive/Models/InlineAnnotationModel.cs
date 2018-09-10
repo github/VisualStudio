@@ -20,7 +20,7 @@ namespace GitHub.Models
             this.annotation = annotation;
         }
 
-        public string FileName => annotation.Filename;
+        public string FileName => annotation.Path;
 
         public int StartLine => annotation.StartLine;
 

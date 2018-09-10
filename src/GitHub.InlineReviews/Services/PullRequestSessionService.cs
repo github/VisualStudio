@@ -108,7 +108,7 @@ namespace GitHub.InlineReviews.Services
                 ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
                 .SelectMany(arg =>
                     arg.checkRun.Annotations
-                        .Where(annotation => annotation.Filename == relativePath && annotation.AnnotationLevel.HasValue)
+                        .Where(annotation => annotation.Path == relativePath && annotation.AnnotationLevel.HasValue)
                         .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
                 .OrderBy(tuple => tuple.StartLine)
                 .ToArray();
@@ -803,7 +803,7 @@ namespace GitHub.InlineReviews.Services
                                                       {
                                                           Title = annotation.Title,
                                                           Message = annotation.Message,
-                                                          Filename = annotation.Path,
+                                                          Path = annotation.Path,
                                                           AnnotationLevel = annotation.AnnotationLevel.FromGraphQl(),
                                                           StartLine = annotation.Location.Start.Line,
                                                           EndLine = annotation.Location.End.Line,

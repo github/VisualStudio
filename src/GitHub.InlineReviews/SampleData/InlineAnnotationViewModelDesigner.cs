@@ -11,7 +11,7 @@ namespace GitHub.InlineReviews.SampleData
             var checkRunAnnotationModel = new CheckRunAnnotationModel
             {
                 AnnotationLevel = CheckAnnotationLevel.Failure,
-                Filename = "SomeFile.cs",
+                Path = "SomeFile.cs",
                 EndLine = 12,
                 StartLine = 12,
                 Message = "Some Error Message",

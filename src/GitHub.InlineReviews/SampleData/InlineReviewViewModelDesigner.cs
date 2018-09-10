@@ -19,7 +19,7 @@ namespace GitHub.InlineReviews.SampleData
             var checkRunAnnotationModel1 = new CheckRunAnnotationModel
             {
                 AnnotationLevel = CheckAnnotationLevel.Failure,
-                Filename = "SomeFile.cs",
+                Path = "SomeFile.cs",
                 EndLine = 12,
                 StartLine = 12,
                 Message = "CS12345: ; expected",
@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.SampleData
             var checkRunAnnotationModel2 = new CheckRunAnnotationModel
             {
                 AnnotationLevel = CheckAnnotationLevel.Warning,
-                Filename = "SomeFile.cs",
+                Path = "SomeFile.cs",
                 EndLine = 12,
                 StartLine = 12,
                 Message = "CS12345: ; expected",
@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.SampleData
             var checkRunAnnotationModel3 = new CheckRunAnnotationModel
             {
                 AnnotationLevel = CheckAnnotationLevel.Notice,
-                Filename = "SomeFile.cs",
+                Path = "SomeFile.cs",
                 EndLine = 12,
                 StartLine = 12,
                 Message = "CS12345: ; expected",

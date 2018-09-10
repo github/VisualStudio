@@ -18,7 +18,7 @@
         /// <summary>
         /// The path that this annotation was made on.
         /// </summary>
-        public string Filename { get; set; }
+        public string Path { get; set; }
 
         /// <summary>
         /// The annotation's message.

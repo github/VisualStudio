@@ -317,6 +317,9 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         public ReactiveCommand<object> ShowReview { get; }
 
+        /// <summary>
+        /// Gets a command that navigates to a pull request annotations.
+        /// </summary>
         public ReactiveCommand<object> ShowAnnotations { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks
