@@ -153,6 +153,38 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Assert.That(target.Path, Is.EqualTo($"d:\\efault\\{owner}\\repo"));
         }
 
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\owner1\\repo1", "owner2/repo2", "c:\\base\\owner2\\repo2",
+            Description = "Path unchanged")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\owner1\\changed", "owner2/repo2", "c:\\base\\owner2\\repo2",
+            Description = "Repo name changed")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\owner1", "owner2/repo2", "c:\\base\\owner2\\repo2",
+            Description = "Repo name deleted")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base", "owner2/repo2", "c:\\base\\owner2\\repo2",
+            Description = "Base path reverted")]
+
+        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base\\owner1\\changed", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
+            Description = "Base path and repo name changed")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base\\owner1", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
+            Description = "Base path changed and repo name deleted")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
+            Description = "Base path changed and repo owner/name deleted")]
+
+        [TestCase("c:\\base", "owner1/repo1", "", "owner2/repo2", "owner2\\repo2",
+            Description = "Base path cleared")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\repo1", "owner2/repo2", "c:\\base\\repo1\\owner2\\repo2",
+            Description = "Owner deleted looks like base path change")]
+        public async Task User_Edits_Path(string basePath, string repo1, string userPath, string repo2, string expectPath)
+        {
+            var target = CreateTarget();
+
+            target.Path = basePath;
+            SetRepository(target.GitHubTab, CreateRepositoryModel(repo1));
+            target.Path = userPath;
+            SetRepository(target.GitHubTab, CreateRepositoryModel(repo2));
+
+            Assert.That(target.Path, Is.EqualTo(expectPath));
+        }
+
         [Test]
         public async Task Clone_Is_Initially_Disabled()
         {
@@ -257,7 +289,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
                 urlTab);
         }
 
-        static IRepositoryModel CreateRepositoryModel(string owner = "owner", string name = "repo")
+        static IRepositoryModel CreateRepositoryModel(string repo = "owner/repo")
+        {
+            var split = repo.Split('/');
+            var (owner, name) = (split[0], split[1]);
+            return CreateRepositoryModel(owner, name);
+        }
+
+        static IRepositoryModel CreateRepositoryModel(string owner, string name)
         {
             var repository = Substitute.For<IRepositoryModel>();
             repository.Owner.Returns(owner);
