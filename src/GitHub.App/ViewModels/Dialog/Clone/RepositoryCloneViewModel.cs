@@ -23,6 +23,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IRepositoryCloneService service;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
+        string previousOwner;
         ObservableAsPropertyHelper<string> pathError;
         int selectedTabIndex;
 
@@ -50,7 +51,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             pathError = Observable.CombineLatest(
                 repository,
-                this.WhenAnyValue(x => x.Path), 
+                this.WhenAnyValue(x => x.Path),
                 ValidatePath)
                 .ToProperty(this, x => x.PathError);
 
@@ -113,20 +114,38 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
         }
 
-        void UpdatePath(IRepositoryModel x)
+        void UpdatePath(IRepositoryModel repository)
         {
-            if (x != null)
+            if (repository != null)
             {
-                if (Path == service.DefaultClonePath)
+                var basePath = GetBasePath(Path, previousOwner);
+                previousOwner = repository.Owner;
+                Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
+            }
+        }
+
+        static string GetBasePath(string path, string owner)
+        {
+            if (owner != null)
+            {
+                var dir = path;
+                for (var i = 0; i < 2; i++)
                 {
-                    Path = System.IO.Path.Combine(Path, x.Name);
-                }
-                else
-                {
-                    var basePath = System.IO.Path.GetDirectoryName(Path);
-                    Path = System.IO.Path.Combine(basePath, x.Name);
+                    if (string.IsNullOrEmpty(dir))
+                    {
+                        break;
+                    }
+
+                    var name = System.IO.Path.GetFileName(dir);
+                    dir = System.IO.Path.GetDirectoryName(dir);
+                    if (name == owner)
+                    {
+                        return dir;
+                    }
                 }
             }
+
+            return path;
         }
 
         string ValidatePath(IRepositoryModel repository, string path)
