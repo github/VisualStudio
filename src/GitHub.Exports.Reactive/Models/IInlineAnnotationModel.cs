@@ -13,5 +13,6 @@
         string FileName { get; }
         string LineDescription { get; }
         string CheckRunName { get; }
+        string HeadSha { get; }
     }
 }

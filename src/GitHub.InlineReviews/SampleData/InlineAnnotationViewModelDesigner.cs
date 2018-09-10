@@ -25,7 +25,13 @@ namespace GitHub.InlineReviews.SampleData
                     Name = "Fake Check Run"
                 };
 
-            Model= new InlineAnnotationModel(checkRunModel, checkRunAnnotationModel);
+            var checkSuiteModel = new CheckSuiteModel()
+            {
+                HeadSha = "ed6198c37b13638e902716252b0a17d54bd59e4a",
+                CheckRuns = new List<CheckRunModel> { checkRunModel}
+            };
+
+            Model= new InlineAnnotationModel(checkSuiteModel, checkRunModel, checkRunAnnotationModel);
         }
 
         public IInlineAnnotationModel Model { get; }

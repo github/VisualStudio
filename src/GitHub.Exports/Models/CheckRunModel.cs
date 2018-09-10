@@ -42,6 +42,6 @@ namespace GitHub.Models
         /// <summary>
         /// The check run Id
         /// </summary>
-        public int CheckRunId { get; set; }
+        public int DatabaseId { get; set; }
     }
 }

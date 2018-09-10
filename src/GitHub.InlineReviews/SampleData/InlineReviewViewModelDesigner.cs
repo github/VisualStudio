@@ -53,11 +53,17 @@ namespace GitHub.InlineReviews.SampleData
                     Name = "MSBuildLog Analyzer"
                 };
 
+            var checkSuiteModel = new CheckSuiteModel()
+            {
+                HeadSha = "ed6198c37b13638e902716252b0a17d54bd59e4a",
+                CheckRuns = new List<CheckRunModel> { checkRunModel }
+            };
+
             Annotations = new[]
             {
-                new InlineAnnotationViewModel(new InlineAnnotationModel(checkRunModel, checkRunAnnotationModel1)),
-                new InlineAnnotationViewModel(new InlineAnnotationModel(checkRunModel, checkRunAnnotationModel2)),
-                new InlineAnnotationViewModel(new InlineAnnotationModel(checkRunModel, checkRunAnnotationModel3)),
+                new InlineAnnotationViewModel(new InlineAnnotationModel(checkSuiteModel, checkRunModel, checkRunAnnotationModel1)),
+                new InlineAnnotationViewModel(new InlineAnnotationModel(checkSuiteModel, checkRunModel, checkRunAnnotationModel2)),
+                new InlineAnnotationViewModel(new InlineAnnotationModel(checkSuiteModel, checkRunModel, checkRunAnnotationModel3)),
             };
 
             Comments = new ObservableCollection<ICommentViewModel>(){new CommentViewModelDesigner()

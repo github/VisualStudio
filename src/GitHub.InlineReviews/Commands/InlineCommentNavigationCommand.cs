@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Base class for commands that navigate between inline comments.
     /// </summary>
-    abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
+    abstract class InlineCommentNavigationCommand : VsCommand<InlineReviewNavigationParams>
     {
         static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
         readonly IGitHubServiceProvider serviceProvider;
@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews.Commands
         /// <param name="parameter">The parameters.</param>
         /// <param name="textView">The text view.</param>
         /// <returns></returns>
-        protected int GetCursorPoint(ITextView textView, InlineCommentNavigationParams parameter)
+        protected int GetCursorPoint(ITextView textView, InlineReviewNavigationParams parameter)
         {
             if (parameter?.FromLine != null)
             {
@@ -223,7 +223,7 @@ namespace GitHub.InlineReviews.Commands
         /// <param name="parameter">The navigation parameter detailing a search from the specified tag</param>
         /// <param name="allTextViews">The full list of text views</param>
         protected void ShowPeekComments(
-            InlineCommentNavigationParams parameter,
+            InlineReviewNavigationParams parameter,
             ITextView textView,
             ShowInlineReviewTag tag,
             IEnumerable<ITextView> allTextViews)

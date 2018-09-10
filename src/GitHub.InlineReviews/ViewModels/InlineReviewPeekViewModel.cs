@@ -74,14 +74,14 @@ namespace GitHub.InlineReviews.ViewModels
 
             NextComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(nextCommentCommand.Enabled),
-                _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
+                _ => nextCommentCommand.Execute(new InlineReviewNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
             PreviousComment = ReactiveCommand.CreateAsyncTask(
                 Observable.Return(previousCommentCommand.Enabled),
-                _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
+                _ => previousCommentCommand.Execute(new InlineReviewNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));

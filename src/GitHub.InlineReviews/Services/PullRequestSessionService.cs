@@ -105,11 +105,11 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             return pullRequest.CheckSuites
-                ?.SelectMany(checkSuite => checkSuite.CheckRuns)
-                .SelectMany(checkRun =>
-                    checkRun.Annotations
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                .SelectMany(arg =>
+                    arg.checkRun.Annotations
                         .Where(annotation => annotation.Filename == relativePath && annotation.AnnotationLevel.HasValue)
-                        .Select(annotation => new InlineAnnotationModel(checkRun, annotation)))
+                        .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
                 .OrderBy(tuple => tuple.StartLine)
                 .ToArray();
         }
@@ -374,6 +374,10 @@ namespace GitHub.InlineReviews.Services
 
             result.Statuses = lastCommitModel.Statuses;
             result.CheckSuites = lastCommitModel.CheckSuites;
+            foreach (var checkSuite in result.CheckSuites)
+            {
+                checkSuite.HeadSha = lastCommitModel.HeadSha;
+            }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -781,6 +785,7 @@ namespace GitHub.InlineReviews.Services
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
+                                  HeadSha = commit.Commit.Oid,
                                   CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                       .Select(suite => new CheckSuiteModel
                                       {
@@ -789,6 +794,7 @@ namespace GitHub.InlineReviews.Services
                                               {
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
+                                                  DatabaseId = run.DatabaseId.Value,
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
@@ -948,6 +954,8 @@ namespace GitHub.InlineReviews.Services
             public List<CheckSuiteModel> CheckSuites { get; set; }
 
             public List<StatusModel> Statuses { get; set; }
+
+            public string HeadSha { get; set; }
         }
     }   
 }

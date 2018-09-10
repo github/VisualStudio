@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.Commands
         /// Executes the command.
         /// </summary>
         /// <returns>A task that tracks the execution of the command.</returns>
-        public override Task Execute(InlineCommentNavigationParams parameter)
+        public override Task Execute(InlineReviewNavigationParams parameter)
         {
             var textViews = GetCurrentTextViews().ToList();
             var tags = GetTags(textViews);
