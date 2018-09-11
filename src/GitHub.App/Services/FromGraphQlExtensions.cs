@@ -103,12 +103,10 @@ namespace GitHub.Services
             }
         }
 
-        public static CheckAnnotationLevel? FromGraphQl(this Octokit.GraphQL.Model.CheckAnnotationLevel? value)
+        public static CheckAnnotationLevel FromGraphQl(this Octokit.GraphQL.Model.CheckAnnotationLevel value)
         {
             switch (value)
             {
-                case null:
-                    return null;
                 case Octokit.GraphQL.Model.CheckAnnotationLevel.Failure:
                     return CheckAnnotationLevel.Failure;
                 case Octokit.GraphQL.Model.CheckAnnotationLevel.Notice:

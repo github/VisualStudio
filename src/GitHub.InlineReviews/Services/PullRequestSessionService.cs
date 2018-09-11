@@ -108,7 +108,7 @@ namespace GitHub.InlineReviews.Services
                 ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
                 .SelectMany(arg =>
                     arg.checkRun.Annotations
-                        .Where(annotation => annotation.Path == relativePath && annotation.AnnotationLevel.HasValue)
+                        .Where(annotation => annotation.Path == relativePath)
                         .Select(annotation => new InlineAnnotationModel(arg.checkRun, annotation)))
                 .OrderBy(tuple => tuple.StartLine)
                 .ToArray();
@@ -789,9 +789,20 @@ namespace GitHub.InlineReviews.Services
                                               {
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
+                                                  DatabaseId = run.DatabaseId.Value,
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
+                                                  Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                      .Select(annotation => new CheckRunAnnotationModel
+                                                      {
+                                                          Title = annotation.Title,
+                                                          Message = annotation.Message,
+                                                          Path = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.Value.FromGraphQl(),
+                                                          StartLine = annotation.Location.Start.Line,
+                                                          EndLine = annotation.Location.End.Line,
+                                                      }).ToList()
                                               }).ToList()
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
