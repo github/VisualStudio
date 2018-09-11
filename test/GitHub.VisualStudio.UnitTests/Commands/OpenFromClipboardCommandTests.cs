@@ -50,16 +50,12 @@ public class OpenFromClipboardCommandTests
             vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
         }
 
-        [Test]
-        public async Task DifferentLocalRepository_DifferentRepositoryMessage()
-        {
-            await DifferentLocalRepository("targetRepositoryName", "activeRepositoryName", Resources.DifferentRepositoryMessage);
-        }
-
         [TestCase("SameRepositoryName", "SameRepositoryName", null)]
         [TestCase("same_repository_name", "SAME_REPOSITORY_NAME", null)]
+        [TestCase("targetRepositoryName", "activeRepositoryName", "#" + nameof(Resources.DifferentRepositoryMessage))]
         public async Task DifferentLocalRepository(string targetRepositoryName, string activeRepositoryName, string expectMessage)
         {
+            expectMessage = ResolveResources(expectMessage);
             var activeRepositoryDir = "activeRepositoryDir";
             var context = CreateGitHubContext(repositoryName: targetRepositoryName);
             var resolveBlobResult = ("commitish", "path", "SHA");
@@ -79,27 +75,12 @@ public class OpenFromClipboardCommandTests
             }
         }
 
-
-        [Test]
-        public async Task CouldNotResolve_NoResolveDifferentOwnerMessage()
-        {
-            await CouldNotResolve("TargetOwner", "CurrentOwner", Resources.NoResolveDifferentOwnerMessage);
-        }
-
-        [Test]
-        public async Task CouldNotResolve_NoResolveSameOwnerMessage_SameOwner_SameOwner()
-        {
-            await CouldNotResolve("SameOwner", "SameOwner", Resources.NoResolveSameOwnerMessage);
-        }
-
-        [Test]
-        public async Task CouldNotResolve_NoResolveSameOwnerMessage_sameowner_SAMEOWNER()
-        {
-            await CouldNotResolve("sameowner", "SAMEOWNER", Resources.NoResolveSameOwnerMessage);
-        }
-
+        [TestCase("TargetOwner", "CurrentOwner", "#" + nameof(Resources.NoResolveDifferentOwnerMessage))]
+        [TestCase("SameOwner", "SameOwner", "#" + nameof(Resources.NoResolveSameOwnerMessage))]
+        [TestCase("sameowner", "SAMEOWNER", "#" + nameof(Resources.NoResolveSameOwnerMessage))]
         public async Task CouldNotResolve(string targetOwner, string currentOwner, string expectMessage)
         {
+            expectMessage = ResolveResources(expectMessage);
             var repositoryDir = "repositoryDir";
             var repositoryName = "repositoryName";
             var context = CreateGitHubContext(repositoryName: repositoryName, owner: targetOwner);
@@ -146,16 +127,13 @@ public class OpenFromClipboardCommandTests
             vsServices.DidNotReceiveWithAnyArgs().ShowMessageBoxInfo(null);
             gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
         }
-        [Test]
-        public async Task HasChangesInWorkingDirectorye_ChangesInWorkingDirectoryMessage()
-        {
-            await HasChangesInWorkingDirectory(false, Resources.ChangesInWorkingDirectoryMessage, 1, 1);
-        }
 
+        [TestCase(false, "#" + nameof(Resources.ChangesInWorkingDirectoryMessage), 1, 1)]
         [TestCase(true, null, 1, 0)]
         public async Task HasChangesInWorkingDirectory(bool annotateFileSupported, string message,
             int receivedTryAnnotateFile, int receivedTryOpenFile)
         {
+            message = ResolveResources(message);
             var repositoryDir = "repositoryDir";
             var repositoryName = "repositoryName";
             var targetBranch = "targetBranch";
@@ -227,6 +205,16 @@ public class OpenFromClipboardCommandTests
                 new Lazy<IGitHubContextService>(() => gitHubContextService),
                 new Lazy<ITeamExplorerContext>(() => teamExplorerContext),
                 new Lazy<IVSServices>(() => vsServices));
+        }
+
+        static string ResolveResources(string str)
+        {
+            if (str != null && str.StartsWith("#", StringComparison.Ordinal))
+            {
+                return (string)typeof(Resources).GetProperty(str.Substring(1)).GetValue(null);
+            }
+
+            return str;
         }
     }
 }
