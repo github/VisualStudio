@@ -29,7 +29,7 @@ $testAssemblies = @(
     "test\GitHub.TeamFoundation.UnitTests\bin\$Configuration\net461\GitHub.TeamFoundation.UnitTests.dll",
     "test\GitHub.UI.UnitTests\bin\$Configuration\net461\GitHub.UI.UnitTests.dll",
     "test\GitHub.VisualStudio.UnitTests\bin\$Configuration\net461\GitHub.VisualStudio.UnitTests.dll",
-    "test\MetricsTests\MetricsTests\bin\$Configuration\net461\MetricsTests.dll",
+    "test\MetricsTests\MetricsTests\bin\$Configuration\MetricsTests.dll",
     "test\TrackingCollectionTests\bin\$Configuration\net461\TrackingCollectionTests.dll"
 )
 
