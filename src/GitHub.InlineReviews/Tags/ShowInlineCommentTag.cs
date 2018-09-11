@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -27,8 +28,8 @@ namespace GitHub.InlineReviews.Tags
         public IInlineCommentThreadModel Thread { get; set; }
 
         /// <summary>
-        /// Gets an array of models holding details of the annotations at the tagged line.
+        /// Gets a list of models holding details of the annotations at the tagged line.
         /// </summary>
-        public IInlineAnnotationModel[] Annotations { get; set; }
+        public IReadOnlyList<IInlineAnnotationModel> Annotations { get; set; }
     }
 }

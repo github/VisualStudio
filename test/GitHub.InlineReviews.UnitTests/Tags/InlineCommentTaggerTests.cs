@@ -279,7 +279,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Null);
                 Assert.That(showInlineTag.Annotations, Is.Not.Null);
-                Assert.That(showInlineTag.Annotations.Length, Is.EqualTo(1));
+                Assert.That(showInlineTag.Annotations.Count, Is.EqualTo(1));
             }
 
             [Test]
@@ -302,7 +302,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Null);
                 Assert.That(showInlineTag.Annotations, Is.Not.Null);
-                Assert.That(showInlineTag.Annotations.Length, Is.EqualTo(2));
+                Assert.That(showInlineTag.Annotations.Count, Is.EqualTo(2));
             }
 
             [Test]
@@ -325,7 +325,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 Assert.That(showInlineTag, Is.Not.Null);
                 Assert.That(showInlineTag.Thread, Is.Not.Null);
                 Assert.That(showInlineTag.Annotations, Is.Not.Null);
-                Assert.That(showInlineTag.Annotations.Length, Is.EqualTo(1));
+                Assert.That(showInlineTag.Annotations.Count, Is.EqualTo(1));
             }
 
             [Test]
