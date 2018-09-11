@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
@@ -14,13 +11,18 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <inheritdoc cref="IPullRequestCheckViewModel"/>
     [Export(typeof(IPullRequestCheckViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCheckViewModel: ViewModelBase, IPullRequestCheckViewModel
     {
         private readonly IUsageTracker usageTracker;
-        const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
 
+        /// <summary>
+        /// Factory method to create a <see cref="PullRequestCheckViewModel"/>.
+        /// </summary>
+        /// <param name="viewViewModelFactory">A viewviewmodel factory.</param>
+        /// <param name="pullRequest">The pull request.</param>
         public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
             var statuses = pullRequest.Statuses?.Select(statusModel =>
@@ -51,7 +53,7 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(statusModel.TargetUrl) ? new Uri(statusModel.TargetUrl) : null;
 
                 return pullRequestCheckViewModel;
-            }) ?? new PullRequestCheckViewModel[0];
+            }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             var checks = pullRequest.CheckSuites?.SelectMany(checkSuiteModel => checkSuiteModel.CheckRuns)
                 .Select(checkRunModel =>
@@ -99,11 +101,15 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.DetailsUrl = new Uri(checkRunModel.DetailsUrl);
 
                     return pullRequestCheckViewModel;
-                }) ?? new PullRequestCheckViewModel[0];
+                }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             return statuses.Concat(checks).OrderBy(model => model.Title);
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="PullRequestCheckViewModel"/>.
+        /// </summary>
+        /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         public PullRequestCheckViewModel(IUsageTracker usageTracker)
         {
@@ -125,21 +131,29 @@ namespace GitHub.ViewModels.GitHubPane
 
             usageTracker.IncrementCounter(expression).Forget();
         }
-        
+
+        /// <inheritdoc/>
         public string Title { get; private set; }
 
+        /// <inheritdoc/>
         public string Description { get; private set; }
 
+        /// <inheritdoc/>
         public PullRequestCheckType CheckType { get; private set; }
 
+        /// <inheritdoc/>
         public int CheckRunId { get; private set; }
 
+        /// <inheritdoc/>
         public bool HasAnnotations { get; private set; }
 
+        /// <inheritdoc/>
         public PullRequestCheckStatus Status{ get; private set; }
 
+        /// <inheritdoc/>
         public Uri DetailsUrl { get; private set; }
 
+        /// <inheritdoc/>
         public ReactiveCommand<object> OpenDetailsUrl { get; }
     }
 }

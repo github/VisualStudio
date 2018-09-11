@@ -62,7 +62,7 @@ namespace GitHub.ViewModels.GitHubPane
     }
 
     /// <summary>
-    /// Represents a view model for displaying details of a pull request.
+    /// A view model which displays the details of a pull request.
     /// </summary>
     public interface IPullRequestDetailViewModel : IPanePageViewModel, IOpenInBrowser
     {
@@ -164,6 +164,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
         ReactiveCommand<Unit> Push { get; }
+
+        /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        ReactiveCommand<Unit> SyncSubmodules { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.

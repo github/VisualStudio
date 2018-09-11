@@ -5,6 +5,9 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A viewmodel which displays a list of annotations for a pull request's check run.
+    /// </summary>
     public interface IPullRequestAnnotationsViewModel : IPanePageViewModel
     {
         /// <summary>
