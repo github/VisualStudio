@@ -149,24 +149,31 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        static string GetBasePath(string path, string owner)
+        string GetBasePath(string path, string owner)
         {
-            if (owner != null)
+            if (string.IsNullOrEmpty(path))
             {
-                var dir = path;
-                for (var i = 0; i < 2; i++)
-                {
-                    if (string.IsNullOrEmpty(dir))
-                    {
-                        break;
-                    }
+                return service.DefaultClonePath;
+            }
 
-                    var name = System.IO.Path.GetFileName(dir);
-                    dir = System.IO.Path.GetDirectoryName(dir);
-                    if (name == owner)
-                    {
-                        return dir;
-                    }
+            if (string.IsNullOrEmpty(owner))
+            {
+                return path;
+            }
+
+            var dir = path;
+            for (var i = 0; i < 2; i++)
+            {
+                if (string.IsNullOrEmpty(dir))
+                {
+                    break;
+                }
+
+                var name = System.IO.Path.GetFileName(dir);
+                dir = System.IO.Path.GetDirectoryName(dir);
+                if (name == owner)
+                {
+                    return dir;
                 }
             }
 
