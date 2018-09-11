@@ -57,7 +57,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             Assert.That(readme.FileName, Is.EqualTo("readme.md"));
         }
 
-        [Test, Ignore("I broke it")]
+        [Test]
         public async Task FileCommentCountShouldTrackSessionInlineCommentsAsync()
         {
             var outdatedThread = CreateThread(-1);
@@ -88,7 +88,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
             Assert.That(((IPullRequestFileNode)target.Items[0]).CommentCount, Is.EqualTo(2));
 
-            file.Received(1).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
+            file.Received(2).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
         }
 
         static PullRequestFilesViewModel CreateTarget()

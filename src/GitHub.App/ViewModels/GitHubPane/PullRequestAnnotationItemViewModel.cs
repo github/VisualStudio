@@ -5,31 +5,27 @@ using ReactiveUI;
 
 namespace GitHub.App.ViewModels.GitHubPane
 {
-    /// <summary>
-    /// The viewmodel for a single annotation item in a list
-    /// </summary>
+    /// <inheritdoc cref="IPullRequestAnnotationItemViewModel"/>
     public class PullRequestAnnotationItemViewModel : ViewModelBase, IPullRequestAnnotationItemViewModel
     {
         bool isExpanded;
 
+        /// <summary>
+        /// Initializes the <see cref="PullRequestAnnotationItemViewModel"/>.
+        /// </summary>
+        /// <param name="annotation">The check run annotation model.</param>
         public PullRequestAnnotationItemViewModel(CheckRunAnnotationModel annotation)
         {
             this.Annotation = annotation;
         }
 
-        /// <summary>
-        /// Gets the annotation model.
-        /// </summary>
+        /// <inheritdoc />
         public CheckRunAnnotationModel Annotation { get; }
 
-        /// <summary>
-        /// Gets a formatted descriptor of the line(s) the annotation is about.
-        /// </summary>
+        /// <inheritdoc />
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
 
-        /// <summary>
-        /// Gets or sets a flag to control the expanded state.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsExpanded
         {
             get { return isExpanded; }
