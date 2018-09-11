@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C
 		scripts\common.ps1 = scripts\common.ps1
 		scripts\Get-CheckedOutBranch.ps1 = scripts\Get-CheckedOutBranch.ps1
 		scripts\Get-HeadSha1.ps1 = scripts\Get-HeadSha1.ps1
+		scripts\modules.ps1 = scripts\modules.ps1
 		nuget.config = nuget.config
 		scripts\Require-CleanWorkTree.ps1 = scripts\Require-CleanWorkTree.ps1
 		scripts\Run-CodeCoverage.ps1 = scripts\Run-CodeCoverage.ps1
