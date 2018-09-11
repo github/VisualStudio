@@ -23,10 +23,14 @@ namespace GitHub.Models
         /// </summary>
         public DateTimeOffset? CompletedAt { get; set; }
 
-        /// <summary>The check run's annotations.</summary>
+        /// <summary>
+        /// The check run's annotations.
+        /// </summary>
         public List<CheckRunAnnotationModel> Annotations { get; set; }
         
-        /// <summary>The name of the check for this check run.</summary>
+        /// <summary>
+        /// The name of the check for this check run.
+        /// </summary>
         public string Name { get; set; }
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace GitHub.Models
         public string Summary { get; set; }
 
         /// <summary>
-        /// The check run Id
+        /// The database id of a Check Run.
         /// </summary>
         public int DatabaseId { get; set; }
     }
