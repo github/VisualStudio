@@ -1,5 +1,4 @@
 ﻿using System;
-using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -11,18 +10,18 @@ namespace GitHub.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="CloneDialogResult"/> class.
         /// </summary>
-        /// <param name="basePath">The selected base path for the clone.</param>
+        /// <param name="path">The path to clone the repository to.</param>
         /// <param name="repository">The selected repository.</param>
-        public CloneDialogResult(string basePath, IRepositoryModel repository)
+        public CloneDialogResult(string path, IRepositoryModel repository)
         {
-            BasePath = basePath;
+            Path = path;
             Repository = repository;
         }
 
         /// <summary>
-        /// Gets the filesystem path to which the user wants to clone.
+        /// Gets the path to clone the repository to.
         /// </summary>
-        public string BasePath { get; }
+        public string Path { get; }
 
         /// <summary>
         /// Gets the repository selected by the user.

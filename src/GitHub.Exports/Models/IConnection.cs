@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using GitHub.Primitives;
 using Octokit;
 
@@ -28,6 +27,11 @@ namespace GitHub.Models
         /// This may be null if <see cref="IsLoggedIn"/> is false.
         /// </remarks>
         User User { get; }
+
+        /// <summary>
+        /// Gets the login scopes.
+        /// </summary>
+        ScopesCollection Scopes { get; }
 
         /// <summary>
         /// Gets a value indicating whether the login of the account succeeded.
