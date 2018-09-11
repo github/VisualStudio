@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
@@ -21,7 +22,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(), new InlineAnnotationViewModel[0],
+                CreateSession(), Array.Empty<InlineAnnotationViewModel>(),
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
                 false);
@@ -37,7 +38,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(), new InlineAnnotationViewModel[0],
+                CreateSession(), Array.Empty<InlineAnnotationViewModel>(),
                 file,
                 10,
                 false);
@@ -62,7 +63,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
-                CreateSession(), new InlineAnnotationViewModel[0],
+                CreateSession(), Array.Empty<InlineAnnotationViewModel>(),
                 file,
                 10,
                 false);
@@ -86,7 +87,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
-                session, new InlineAnnotationViewModel[0],
+                session, Array.Empty<InlineAnnotationViewModel>(),
                 file, 10, false);
 
             target.Comments[0].Body = "New Comment";
@@ -119,7 +120,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<ICommentService>(),
-                session, new InlineAnnotationViewModel[0],
+                session, Array.Empty<InlineAnnotationViewModel>(),
                 file, 16, true);
 
             target.Comments[0].Body = "New Comment";
