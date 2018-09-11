@@ -41,7 +41,6 @@
   <DockPanel>
     <ghfvs:InfoPanel Name="infoPanel"
                    DockPanel.Dock="Top"
-                   MessageType="{Binding MessageType}"
                    Message="{Binding Message}"
                    VerticalAlignment="Top"/>
     <StackPanel DockPanel.Dock="Top"

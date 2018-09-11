@@ -33,9 +33,14 @@ namespace GitHub.Api
         public static string ClientSecret { get; private set; }
 
         /// <summary>
-        /// Gets the scopes required by the application.
+        /// Gets the minimum scopes required by the application.
         /// </summary>
-        public static IReadOnlyList<string> RequiredScopes { get; } = new[] { "user", "repo", "gist", "write:public_key" };
+        public static IReadOnlyList<string> MinimumScopes { get; } = new[] { "user", "repo", "gist", "write:public_key" };
+
+        /// <summary>
+        /// Gets the ideal scopes requested by the application.
+        /// </summary>
+        public static IReadOnlyList<string> RequestedScopes { get; } = new[] { "user", "repo", "gist", "write:public_key", "read:org" };
 
         /// <summary>
         /// Gets a note that will be stored with the OAUTH token.

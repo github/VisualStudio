@@ -1,67 +1,65 @@
-﻿<UserControl x:Class="GitHub.VisualStudio.UI.Controls.InfoPanel"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ghfvs="https://github.com/github/VisualStudio"
-             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Controls"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
-             Background="{DynamicResource VsBrush.InfoBackground}"
-             d:DataContext="{d:DesignInstance Type=ghfvs:InfoPanelDesigner, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300"
-             d:DesignWidth="300"
-             mc:Ignorable="d"
-             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitHubInfoPanel}">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ghfvs="https://github.com/github/VisualStudio"
+                    xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Controls"
+                    xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf">
+    <Style TargetType="local:InfoPanel">
+        <Setter Property="Background" Value="{DynamicResource VsBrush.InfoBackground}"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:InfoPanel">
+                    <Border Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            Visibility="{TemplateBinding Message, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
+                        <DockPanel>
+                            <DockPanel.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.MergedDictionaries>
+                                        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+                                        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+                                    </ResourceDictionary.MergedDictionaries>
+                                    <Style x:Key="DocumentStyle" TargetType="FlowDocument">
+                                        <Setter Property="FontFamily" Value="Segoe UI"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="TextAlignment" Value="Left"/>
+                                        <Setter Property="PagePadding" Value="0"/>
+                                    </Style>
+                                    <Style x:Key="LinkStyle" TargetType="Hyperlink">
+                                        <Setter Property="Foreground" Value="{DynamicResource GitHubActionLinkItemBrush}"/>
+                                        <Setter Property="TextDecorations" Value="Underline"/>
+                                    </Style>
+                                </ResourceDictionary>
+                            </DockPanel.Resources>
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
-                <Setter Property="FontFamily" Value="Segoe UI"/>
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="TextAlignment" Value="Left"/>
-                <Setter Property="PagePadding" Value="0"/>
-            </Style>
-            <Style x:Key="LinkStyle" TargetType="Hyperlink">
-                <Setter Property="Foreground" Value="{DynamicResource GitHubActionLinkItemBrush}"/>
-                <Setter Property="TextDecorations" Value="Underline"/>
-            </Style>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
-    <FrameworkElement.CommandBindings>
-        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
-    </FrameworkElement.CommandBindings>
-
-    <DockPanel Margin="8" LastChildFill="True">
-        <ghfvs:OcticonImage Width="16"
-                         Height="16"
-                         Margin="0,0,8,0"
-                         VerticalAlignment="Top"
-                         DockPanel.Dock="Left"
-                         Foreground="{Binding IconColor}"
-                         Icon="{Binding Icon}"/>
-        <ghfvs:OcticonButton Width="16"
-                          Height="16"
-                          Margin="0"
-                          VerticalAlignment="Top"
-                          Background="Transparent"
-                          Click="Dismiss_Click"
-                          DockPanel.Dock="Right"
-                          Foreground="Black"
-                          Icon="x"/>
-
-        <markdig:MarkdownViewer x:Name="document"
-                                Margin="8,0"
-                                VerticalAlignment="Top"
-                                DockPanel.Dock="Top"
-                                Foreground="Black"
-                                Markdown="{Binding Message}"
-                                ScrollViewer.CanContentScroll="False"
-                                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                                ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
-    </DockPanel>
-</UserControl>
+                            <ghfvs:OcticonImage Width="16"
+                                            Height="16"
+                                            Margin="0,0,8,0"
+                                            VerticalAlignment="Top"
+                                            DockPanel.Dock="Left"
+                                            Icon="{TemplateBinding Icon}"/>
+                            <ghfvs:OcticonButton x:Name="PART_CloseButton"
+                                             Width="16"
+                                             Height="16"
+                                             Margin="0"
+                                             VerticalAlignment="Top"
+                                             Background="Transparent"
+                                             DockPanel.Dock="Right"
+                                             Foreground="Black"
+                                             Icon="x"
+                                             Visibility="{TemplateBinding ShowCloseButton, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
+                            <markdig:MarkdownViewer Margin="8,0"
+                                                VerticalAlignment="Top"
+                                                DockPanel.Dock="Top"
+                                                Foreground="Black"
+                                                Markdown="{TemplateBinding Message}"
+                                                ScrollViewer.CanContentScroll="False"
+                                                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                                ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

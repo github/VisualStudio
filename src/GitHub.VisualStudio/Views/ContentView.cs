@@ -5,6 +5,7 @@ using System.Windows.Data;
 using GitHub.Exports;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
+using GitHub.ViewModels.Dialog.Clone;
 
 namespace GitHub.VisualStudio.Views
 {
