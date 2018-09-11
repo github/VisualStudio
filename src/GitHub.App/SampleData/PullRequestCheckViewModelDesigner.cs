@@ -19,9 +19,9 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<object> OpenDetailsUrl { get; set; } = null;
 
-        public PullRequestCheckType CheckType { get; }
+        public PullRequestCheckType CheckType { get; set; } = PullRequestCheckType.ChecksApi;
 
-        public int CheckRunId { get; }
+        public int CheckRunId { get; set; }
 
         public bool HasAnnotations { get; } = true;
     }

@@ -33,6 +33,6 @@
         /// <summary>
         /// The annotation's severity level.
         /// </summary>
-        public CheckAnnotationLevel? AnnotationLevel { get; set; }
+        public CheckAnnotationLevel AnnotationLevel { get; set; }
     }
 }

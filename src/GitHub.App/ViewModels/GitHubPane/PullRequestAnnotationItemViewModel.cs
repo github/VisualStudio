@@ -9,6 +9,9 @@ using ReactiveUI;
 
 namespace GitHub.App.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// The viewmodel for a single annotation item in a list
+    /// </summary>
     public class PullRequestAnnotationItemViewModel : ViewModelBase, IPullRequestAnnotationItemViewModel
     {
         readonly CheckSuiteModel checkSuite;
@@ -40,12 +43,21 @@ namespace GitHub.App.ViewModels.GitHubPane
 
         public bool IsFileInPullRequest { get; }
 
+        /// <summary>
+        /// Gets the annotation model.
+        /// </summary>
         public CheckRunAnnotationModel Annotation { get; }
 
+        /// <summary>
+        /// Gets a formatted descriptor of the line(s) the annotation is about.
+        /// </summary>
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
 
         public ReactiveCommand<Unit> OpenAnnotation { get; }
 
+        /// <summary>
+        /// Gets or sets a flag to control the expanded state.
+        /// </summary>
         public bool IsExpanded
         {
             get { return isExpanded; }

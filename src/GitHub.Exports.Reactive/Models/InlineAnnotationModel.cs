@@ -2,12 +2,18 @@
 
 namespace GitHub.Models
 {
+    /// <inheritdoc />
     public class InlineAnnotationModel: IInlineAnnotationModel
     {
         readonly CheckSuiteModel checkSuite;
         readonly CheckRunModel checkRun;
         readonly CheckRunAnnotationModel annotation;
 
+        /// <summary>
+        /// Initializes the <see cref="InlineAnnotationModel"/>.
+        /// </summary>
+        /// <param name="checkRun">The check run model.</param>
+        /// <param name="annotation">The annotation model.</param>
         public InlineAnnotationModel(CheckSuiteModel checkSuite, CheckRunModel checkRun,
             CheckRunAnnotationModel annotation)
         {
@@ -22,9 +28,14 @@ namespace GitHub.Models
 
         public string FileName => annotation.Path;
 
+        /// <inheritdoc />
         public int StartLine => annotation.StartLine;
 
+        /// <inheritdoc />
         public int EndLine => annotation.EndLine;
+
+        /// <inheritdoc />
+        public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel;
 
         public string CheckRunName => checkRun.Name;
 

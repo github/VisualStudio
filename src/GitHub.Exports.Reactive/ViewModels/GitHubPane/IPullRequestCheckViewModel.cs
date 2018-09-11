@@ -11,34 +11,43 @@ namespace GitHub.ViewModels.GitHubPane
     public interface IPullRequestCheckViewModel: IViewModel
     {
         /// <summary>
-        /// The title of the Status/Check
+        /// The title of the Status/Check.
         /// </summary>
         string Title { get; }
 
         /// <summary>
-        /// The description of the Status/Check
+        /// The description of the Status/Check.
         /// </summary>
         string Description { get; }
 
         /// <summary>
-        /// The status of the Status/Check
+        /// The status of the Status/Check.
         /// </summary>
         PullRequestCheckStatus Status { get; }
 
         /// <summary>
-        /// The url where more information about the Status/Check can be found
+        /// The url where more information about the Status/Check can be found.
         /// </summary>
         Uri DetailsUrl { get; }
 
         /// <summary>
-        /// A command that opens the DetailsUrl in a browser
+        /// A command that opens the DetailsUrl in a browser.
         /// </summary>
         ReactiveCommand<object> OpenDetailsUrl { get; }
 
+        /// <summary>
+        /// Gets the type of check run, Status/Check.
+        /// </summary>
         PullRequestCheckType CheckType { get; }
 
+        /// <summary>
+        /// Gets the id of the check run.
+        /// </summary>
         int CheckRunId { get; }
 
+        /// <summary>
+        /// Gets a flag to show this check run has annotations.
+        /// </summary>
         bool HasAnnotations { get; }
     }
 

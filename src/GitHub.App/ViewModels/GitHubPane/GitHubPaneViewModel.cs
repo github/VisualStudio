@@ -328,6 +328,7 @@ namespace GitHub.ViewModels.GitHubPane
                      x.User.Login == login);
         }
 
+        /// <inheritdoc/>
         public Task ShowPullRequestCheckRun(string owner, string repo, int number, int checkRunId)
         {
             Guard.ArgumentNotNull(owner, nameof(owner));

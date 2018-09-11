@@ -5,6 +5,9 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A viewmodel which displays a list of annotations for a pull request's check run.
+    /// </summary>
     public interface IPullRequestAnnotationsViewModel : IPanePageViewModel
     {
         /// <summary>
@@ -26,12 +29,40 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         int PullRequestNumber { get; }
 
-        int CheckRunId { get; }
-        ReactiveCommand<object> NavigateToPullRequest { get; }
+        /// <summary>
+        /// Gets the title of the pull request.
+        /// </summary>
         string PullRequestTitle { get; }
+
+        /// <summary>
+        /// Gets the id of the check run.
+        /// </summary>
+        int CheckRunId { get; }
+
+        /// <summary>
+        /// Gets the name of the check run.
+        /// </summary>
         string CheckRunName { get; }
+
+        /// <summary>
+        /// Gets a command which navigates to the parent pull request.
+        /// </summary>
+        ReactiveCommand<object> NavigateToPullRequest { get; }
+
+        /// <summary>
+        /// Gets the list of annotations.
+        /// </summary>
         IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; }
 
+        /// <summary>
+        /// Initializes the view model.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="connection">The connection to the repository host.</param>
+        /// <param name="owner">The pull request's repository owner.</param>
+        /// <param name="repo">The pull request's repository name.</param>
+        /// <param name="pullRequestNumber">The pull request's number.</param>
+        /// <param name="checkRunId">The pull request's check run id.</param>
         Task InitializeAsync(
             ILocalRepositoryModel localRepository,
             IConnection connection,
