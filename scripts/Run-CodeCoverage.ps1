@@ -50,7 +50,7 @@ $codecovArgs = "-f $rootDirectory\coverage.xml"
 
 & {
     Trap {
-        Write-Output "$Project tests failed"
+        Write-Output "Code coverage failed"
         exit 0
     }
 
@@ -58,11 +58,11 @@ $codecovArgs = "-f $rootDirectory\coverage.xml"
 
     if($AppVeyor) {
         Push-AppveyorArtifact "$rootDirectory\coverage.xml"
-        Run-Process 60 $codecov $codecovArgs
+        Run-Process 300 $codecov $codecovArgs
     }
 
     if (!$?) {
-        Write-Output "$Project tests failed"
+        Write-Output "Code coverage failed"
         exit 0
     }
 }
