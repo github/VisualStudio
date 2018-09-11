@@ -57,6 +57,7 @@ $codecovArgs = "-f $rootDirectory\coverage.xml"
     Run-Process 600 $opencover $opencoverArgs
 
     if($AppVeyor) {
+        Push-AppveyorArtifact "$rootDirectory\coverage.xml"
         Run-Process 60 $codecov $codecovArgs
     }
 
