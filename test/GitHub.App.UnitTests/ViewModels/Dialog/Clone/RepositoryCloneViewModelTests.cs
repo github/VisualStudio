@@ -172,8 +172,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
         [TestCase("c:\\base", "owner1/repo1", "", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Base path cleared")]
-        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\repo1", "owner2/repo2", "c:\\base\\repo1\\owner2\\repo2",
-            Description = "Owner deleted looks like base path change")]
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\repo1", "owner2/repo2", "c:\\base\\owner2\\repo2",
+            Description = "Owner deleted")]
         public async Task User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
         {
             var target = CreateTarget(defaultClonePath: defaultClonePath);
