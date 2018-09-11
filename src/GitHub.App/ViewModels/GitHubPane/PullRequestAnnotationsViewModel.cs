@@ -10,6 +10,9 @@ using ReactiveUI;
 
 namespace GitHub.App.ViewModels.GitHubPane
 {
+    /// <summary>
+    /// A viewmodel which displays a list of annotations for a pull request's check run.
+    /// </summary>
     [Export(typeof(IPullRequestAnnotationsViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestAnnotationsViewModel : PanePageViewModelBase, IPullRequestAnnotationsViewModel
@@ -21,6 +24,10 @@ namespace GitHub.App.ViewModels.GitHubPane
         string checkRunName;
         IReadOnlyList<IPullRequestAnnotationItemViewModel> annotations;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
+        /// </summary>
+        /// <param name="sessionManager">The pull request session manager.</param>
         [ImportingConstructor]
         public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager)
         {
@@ -29,9 +36,9 @@ namespace GitHub.App.ViewModels.GitHubPane
                 NavigateTo(FormattableString.Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
         }
 
+        /// <inheritdoc/>
         public async Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner,
-            string repo,
-            int pullRequestNumber, int checkRunId)
+            string repo, int pullRequestNumber, int checkRunId)
         {
             if (repo != localRepository.Name)
             {

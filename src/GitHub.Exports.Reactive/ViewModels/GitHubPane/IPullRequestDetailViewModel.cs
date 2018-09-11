@@ -175,10 +175,13 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         ReactiveCommand<object> ShowReview { get; }
 
+        /// <summary>
+        /// Gets a command that navigates to a pull request's check run annotation list.
+        /// </summary>
         ReactiveCommand<object> ShowAnnotations { get; }
 
         /// <summary>
-        /// Gets the latest pull request Checks & Statuses
+        /// Gets the latest pull request checks & statuses.
         /// </summary>
         IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
