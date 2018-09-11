@@ -175,6 +175,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             string FindDirWithout(string dir, string match, int levels)
             {
+                string dirWithout = null;
                 for (var i = 0; i < 2; i++)
                 {
                     if (string.IsNullOrEmpty(dir))
@@ -186,11 +187,11 @@ namespace GitHub.ViewModels.Dialog.Clone
                     dir = System.IO.Path.GetDirectoryName(dir);
                     if (name == match)
                     {
-                        return dir;
+                        dirWithout = dir;
                     }
                 }
 
-                return null;
+                return dirWithout;
             }
         }
 
