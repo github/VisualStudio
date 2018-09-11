@@ -6,6 +6,7 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="60">
 
@@ -52,9 +53,7 @@
                 </StackPanel>
             </Button>
             <Grid.ToolTip>
-                <TextBlock VerticalAlignment="Center">
-                    View, Checkout or Create a Pull request
-                </TextBlock>
+                <TextBlock VerticalAlignment="Center" Text="{x:Static prop:Resources.ViewCheckoutOrCreateAPullRequest}"/>
             </Grid.ToolTip>
         </Grid>
 
