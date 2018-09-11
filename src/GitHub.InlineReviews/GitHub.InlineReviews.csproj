@@ -370,14 +370,6 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.0-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.0-beta\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Octokit.GraphQL, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
     </Reference>

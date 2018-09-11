@@ -384,6 +384,12 @@
     </Compile>
     <Compile Include="Views\ActorAvatarView.cs" />
     <Compile Include="Views\ContentView.cs" />
+    <Compile Include="Views\Dialog\Clone\RepositoryCloneView.xaml.cs">
+      <DependentUpon>RepositoryCloneView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\Clone\SelectPageView.xaml.cs">
+      <DependentUpon>SelectPageView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialog\ForkRepositoryExecuteView.xaml.cs">
       <DependentUpon>ForkRepositoryExecuteView.xaml</DependentUpon>
     </Compile>
@@ -402,8 +408,8 @@
     <Compile Include="Views\Dialog\Login2FaView.xaml.cs">
       <DependentUpon>Login2FaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialog\RepositoryCloneView.xaml.cs">
-      <DependentUpon>RepositoryCloneView.xaml</DependentUpon>
+    <Compile Include="Views\Dialog\LogOutRequiredView.xaml.cs">
+      <DependentUpon>LogOutRequiredView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\RepositoryCreationView.xaml.cs">
       <DependentUpon>RepositoryCreationView.xaml</DependentUpon>
@@ -565,6 +571,14 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
+    <Page Include="Views\Dialog\Clone\RepositoryCloneView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialog\Clone\SelectPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialog\ForkRepositoryExecuteView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -589,9 +603,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Dialog\RepositoryCloneView.xaml">
+    <Page Include="Views\Dialog\LogOutRequiredView.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialog\RepositoryCreationView.xaml">
       <Generator>MSBuild:Compile</Generator>

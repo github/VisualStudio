@@ -16,6 +16,7 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubActionLink.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ItemsControls.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/SectionControl.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/UI/Controls/InfoPanel.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <DrawingBrush x:Key="ConnectArrowBrush">
