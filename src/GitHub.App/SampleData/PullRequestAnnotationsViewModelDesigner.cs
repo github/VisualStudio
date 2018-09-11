@@ -20,33 +20,41 @@ namespace GitHub.SampleData
         public string CheckRunName { get; } = "Psuedo Check Run";
         public IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; } = new[]
         {
-            new PullRequestAnnotationItemViewModel(new CheckRunAnnotationModel
-            {
-                AnnotationLevel = CheckAnnotationLevel.Notice,
-                StartLine = 3,
-                EndLine = 4,
-                Path = "asdf/asdf.cs",
-                Message = "; is expected",
-                Title = "CS 12345"
-            }),
-            new PullRequestAnnotationItemViewModel(new CheckRunAnnotationModel
-            {
-                AnnotationLevel = CheckAnnotationLevel.Warning,
-                StartLine = 3,
-                EndLine = 4,
-                Path = "asdf/asdf.cs",
-                Message = "; is expected",
-                Title = "CS 12345"
-            }),
-            new PullRequestAnnotationItemViewModel(new CheckRunAnnotationModel
-            {
-                AnnotationLevel = CheckAnnotationLevel.Failure,
-                StartLine = 3,
-                EndLine = 4,
-                Path = "blah.cs",
-                Message = "; is expected",
-                Title = "CS 12345"
-            })
+            new PullRequestAnnotationItemViewModelDesigner{
+                Annotation = new CheckRunAnnotationModel
+                {
+                    AnnotationLevel = CheckAnnotationLevel.Notice,
+                    StartLine = 3,
+                    EndLine = 4,
+                    Path = "asdf/asdf.cs",
+                    Message = "; is expected",
+                    Title = "CS 12345"
+                },
+                IsExpanded = true,
+            },
+            new PullRequestAnnotationItemViewModelDesigner{
+                Annotation = new CheckRunAnnotationModel
+                {
+                    AnnotationLevel = CheckAnnotationLevel.Warning,
+                    StartLine = 3,
+                    EndLine = 4,
+                    Path = "asdf/asdf.cs",
+                    Message = "; is expected",
+                    Title = "CS 12345"
+                },
+                IsExpanded = true
+            },
+            new PullRequestAnnotationItemViewModelDesigner{
+                Annotation = new CheckRunAnnotationModel
+                {
+                    AnnotationLevel = CheckAnnotationLevel.Failure,
+                    StartLine = 3,
+                    EndLine = 4,
+                    Path = "blah.cs",
+                    Message = "; is expected",
+                    Title = "CS 12345"
+                }
+            }
         };
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo,
