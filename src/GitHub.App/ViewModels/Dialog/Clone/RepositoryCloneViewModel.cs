@@ -25,7 +25,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IRepositoryCloneService service;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
-        string previousOwner;
+        IRepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathError;
         int selectedTabIndex;
 
@@ -143,41 +143,55 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (repository != null)
             {
-                var basePath = GetBasePath(Path, previousOwner);
-                previousOwner = repository.Owner;
+                var basePath = GetUpdatedBasePath(Path);
+                previousRepository = repository;
                 Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
             }
         }
 
-        string GetBasePath(string path, string owner)
+        string GetUpdatedBasePath(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
                 return service.DefaultClonePath;
             }
 
-            if (string.IsNullOrEmpty(owner))
+            if (previousRepository == null)
             {
                 return path;
             }
 
-            var dir = path;
-            for (var i = 0; i < 2; i++)
+            if (FindDirWithout(path, previousRepository?.Owner, 2) is string dirWithoutOwner)
             {
-                if (string.IsNullOrEmpty(dir))
-                {
-                    break;
-                }
+                return dirWithoutOwner;
+            }
 
-                var name = System.IO.Path.GetFileName(dir);
-                dir = System.IO.Path.GetDirectoryName(dir);
-                if (name == owner)
-                {
-                    return dir;
-                }
+            if (FindDirWithout(path, previousRepository?.Name, 1) is string dirWithoutRepo)
+            {
+                return dirWithoutRepo;
             }
 
             return path;
+
+            string FindDirWithout(string dir, string match, int levels)
+            {
+                for (var i = 0; i < 2; i++)
+                {
+                    if (string.IsNullOrEmpty(dir))
+                    {
+                        break;
+                    }
+
+                    var name = System.IO.Path.GetFileName(dir);
+                    dir = System.IO.Path.GetDirectoryName(dir);
+                    if (name == match)
+                    {
+                        return dir;
+                    }
+                }
+
+                return null;
+            }
         }
 
         string ValidatePath(IRepositoryModel repository, string path)
