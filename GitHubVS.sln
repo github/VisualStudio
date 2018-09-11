@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI.Reactive", "src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj", "{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI.Reactive", "src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj", "{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Extensions", "src\GitHub.Extensions\GitHub.Extensions.csproj", "{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}"
 EndProject
@@ -44,8 +44,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C
 		scripts\common.ps1 = scripts\common.ps1
 		scripts\Get-CheckedOutBranch.ps1 = scripts\Get-CheckedOutBranch.ps1
 		scripts\Get-HeadSha1.ps1 = scripts\Get-HeadSha1.ps1
+		scripts\modules.ps1 = scripts\modules.ps1
 		nuget.config = nuget.config
 		scripts\Require-CleanWorkTree.ps1 = scripts\Require-CleanWorkTree.ps1
+		scripts\Run-CodeCoverage.ps1 = scripts\Run-CodeCoverage.ps1
 		scripts\Run-NUnit.ps1 = scripts\Run-NUnit.ps1
 		scripts\Run-Tests.ps1 = scripts\Run-Tests.ps1
 		scripts\Run-XUnit.ps1 = scripts\Run-XUnit.ps1
