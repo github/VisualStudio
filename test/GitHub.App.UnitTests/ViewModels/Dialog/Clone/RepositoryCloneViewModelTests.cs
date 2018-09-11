@@ -170,17 +170,16 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
             Description = "Base path changed and repo owner/name deleted")]
 
-        [TestCase("c:\\base", "owner1/repo1", "", "owner2/repo2", "owner2\\repo2",
+        [TestCase("c:\\base", "owner1/repo1", "", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Base path cleared")]
         [TestCase("c:\\base", "owner1/repo1", "c:\\base\\repo1", "owner2/repo2", "c:\\base\\repo1\\owner2\\repo2",
             Description = "Owner deleted looks like base path change")]
-        public async Task User_Edits_Path(string basePath, string repo1, string userPath, string repo2, string expectPath)
+        public async Task User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
         {
-            var target = CreateTarget();
-
-            target.Path = basePath;
+            var target = CreateTarget(defaultClonePath: defaultClonePath);
             SetRepository(target.GitHubTab, CreateRepositoryModel(repo1));
             target.Path = userPath;
+
             SetRepository(target.GitHubTab, CreateRepositoryModel(repo2));
 
             Assert.That(target.Path, Is.EqualTo(expectPath));
@@ -261,10 +260,10 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             return result;
         }
 
-        static IRepositoryCloneService CreateRepositoryCloneService()
+        static IRepositoryCloneService CreateRepositoryCloneService(string defaultClonePath)
         {
             var result = Substitute.For<IRepositoryCloneService>();
-            result.DefaultClonePath.Returns("d:\\efault\\path");
+            result.DefaultClonePath.Returns(defaultClonePath);
             result.DestinationExists("d:\\exists").Returns(true);
             return result;
         }
@@ -275,11 +274,12 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IRepositoryCloneService service = null,
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
-            IRepositoryUrlViewModel urlTab = null)
+            IRepositoryUrlViewModel urlTab = null,
+            string defaultClonePath = "d:\\efault\\path")
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
-            service = service ?? CreateRepositoryCloneService();
+            service = service ?? CreateRepositoryCloneService(defaultClonePath);
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
             urlTab = urlTab ?? Substitute.For<IRepositoryUrlViewModel>();
