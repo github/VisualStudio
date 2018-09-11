@@ -22,10 +22,10 @@ namespace GitHub.InlineReviews.ViewModels
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="annotationModels"></param>
-        protected CommentThreadViewModel(ActorModel currentUser, IReadOnlyList<InlineAnnotationViewModel> annotationModels)
+        /// <param name="annotations"></param>
+        protected CommentThreadViewModel(ActorModel currentUser, IReadOnlyList<InlineAnnotationViewModel> annotations)
         {
-            Annotations = annotationModels;
+            Annotations = annotations;
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
             Comments = new ObservableCollection<ICommentViewModel>();
@@ -77,6 +77,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <inheritdoc/>
         public IActorViewModel CurrentUser { get; }
 
+        /// <inheritdoc/>
         public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
     }
 }

@@ -804,6 +804,7 @@ namespace GitHub.InlineReviews.Services
                                                           Title = annotation.Title,
                                                           Message = annotation.Message,
                                                           Path = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.Value.FromGraphQl(),
                                                           StartLine = annotation.Location.Start.Line,
                                                           EndLine = annotation.Location.End.Line,
                                                       }).ToList()

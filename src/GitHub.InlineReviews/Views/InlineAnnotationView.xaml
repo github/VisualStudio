@@ -26,7 +26,7 @@
             <Run Text="{Binding Model.Title, Mode=OneWay}"/>
         </TextBlock>
         <TextBlock Margin="5 4 0 0">
-            <Run Text="{Binding Model.FileName, Mode=OneWay}"/>
+            <Run Text="{Binding Model.Path, Mode=OneWay}"/>
             <Run FontWeight="SemiBold" Text="{Binding Model.LineDescription, Mode=OneWay}"/>
         </TextBlock>
         <markdig:MarkdownViewer Margin="5 0 0 0" Markdown="{Binding Model.Message}"/>

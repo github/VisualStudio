@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews.Peek
     {
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly INextInlineCommentCommand _nextCommentCommand;
+        readonly INextInlineCommentCommand nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
         readonly ICommentService commentService;
 
@@ -32,7 +32,7 @@ namespace GitHub.InlineReviews.Peek
         {
             this.peekService = peekService;
             this.sessionManager = sessionManager;
-            this._nextCommentCommand = nextCommentCommand;
+            this.nextCommentCommand = nextCommentCommand;
             this.previousCommentCommand = previousCommentCommand;
             this.commentService = commentService;
         }
@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Peek
             return new InlineCommentPeekableItemSource(
                 peekService,
                 sessionManager,
-                _nextCommentCommand,
+                nextCommentCommand,
                 previousCommentCommand,
                 commentService);
         }

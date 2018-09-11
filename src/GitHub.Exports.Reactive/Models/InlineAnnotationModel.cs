@@ -26,7 +26,7 @@ namespace GitHub.Models
             this.annotation = annotation;
         }
 
-        public string FileName => annotation.Path;
+        public string Path => annotation.Path;
 
         /// <inheritdoc />
         public int StartLine => annotation.StartLine;
@@ -37,16 +37,19 @@ namespace GitHub.Models
         /// <inheritdoc />
         public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel;
 
+        /// <inheritdoc />
         public string CheckRunName => checkRun.Name;
 
+        /// <inheritdoc />
         public string Title => annotation.Title;
 
-        public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel.Value;
-
+        /// <inheritdoc />
         public string Message => annotation.Message;
 
+        /// <inheritdoc />
         public string HeadSha => checkSuite.HeadSha;
 
+        /// <inheritdoc />
         public string LineDescription => $"{StartLine}:{EndLine}";
     }
 }

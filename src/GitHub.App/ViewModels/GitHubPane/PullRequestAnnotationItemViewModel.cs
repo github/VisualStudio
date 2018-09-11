@@ -22,7 +22,11 @@ namespace GitHub.App.ViewModels.GitHubPane
         /// <summary>
         /// Initializes the <see cref="PullRequestAnnotationItemViewModel"/>.
         /// </summary>
+        /// <param name="checkSuite">The check suite model.</param>
+        /// <param name="checkRun">The check run model.</param>
         /// <param name="annotation">The check run annotation model.</param>
+        /// <param name="session">The pull request session.</param>
+        /// <param name="editorService">The pull request editor service.</param>
         public PullRequestAnnotationItemViewModel(CheckSuiteModel checkSuite, 
             CheckRunModel checkRun,
             CheckRunAnnotationModel annotation,
@@ -43,6 +47,7 @@ namespace GitHub.App.ViewModels.GitHubPane
             });
         }
 
+        /// <inheritdoc />
         public bool IsFileInPullRequest { get; }
 
         /// <inheritdoc />
@@ -51,6 +56,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         /// <inheritdoc />
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
 
+        /// <inheritdoc />
         public ReactiveCommand<Unit> OpenAnnotation { get; }
 
         /// <inheritdoc />

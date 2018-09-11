@@ -38,6 +38,9 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         ReactiveCommand<Unit> DeleteComment { get; }
 
+        /// <summary>
+        /// Gets the annotations displayed.
+        /// </summary>
         IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
     }
 }

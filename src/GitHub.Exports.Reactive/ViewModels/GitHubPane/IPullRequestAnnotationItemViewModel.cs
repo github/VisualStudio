@@ -24,7 +24,14 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         bool IsExpanded { get; set; }
 
+        /// <summary>
+        /// Gets a flag which indicates this annotation item is from a file changed in this pull request.
+        /// </summary>
         bool IsFileInPullRequest { get; }
+
+        /// <summary>
+        /// Gets a command which opens the annotation in the diff view.
+        /// </summary>
         ReactiveCommand<Unit> OpenAnnotation { get; }
     }
 }

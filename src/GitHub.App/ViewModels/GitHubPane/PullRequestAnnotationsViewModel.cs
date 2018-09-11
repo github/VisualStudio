@@ -27,6 +27,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
         /// </summary>
         /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="pullRequestEditorService">The pull request editor service.</param>
         [ImportingConstructor]
         public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager, IPullRequestEditorService pullRequestEditorService)
         {

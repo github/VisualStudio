@@ -11,7 +11,7 @@ using GitHub.Services;
 namespace GitHub.InlineReviews.Commands
 {
     /// <summary>
-    /// Navigates to and opens the the next inline review in the currently active text view.
+    /// Navigates to and opens the the next inline comment thread in the currently active text view.
     /// </summary>
     [Export(typeof(INextInlineCommentCommand))]
     class NextInlineCommentCommand : InlineCommentNavigationCommand, INextInlineCommentCommand

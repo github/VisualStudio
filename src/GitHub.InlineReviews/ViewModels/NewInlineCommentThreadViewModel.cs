@@ -23,7 +23,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
-        /// <param name="annotationModels"></param>
+        /// <param name="annotations">The annotations to display in this inline review.</param>
         /// <param name="file">The file being commented on.</param>
         /// <param name="lineNumber">The 0-based line number in the file.</param>
         /// <param name="leftComparisonBuffer">
@@ -31,11 +31,11 @@ namespace GitHub.InlineReviews.ViewModels
         /// </param>
         public NewInlineCommentThreadViewModel(ICommentService commentService,
             IPullRequestSession session,
-            InlineAnnotationViewModel[] annotationModels,
+            InlineAnnotationViewModel[] annotations,
             IPullRequestSessionFile file,
             int lineNumber,
             bool leftComparisonBuffer)
-            : base(session.User, annotationModels)
+            : base(session.User, annotations)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotNull(file, nameof(file));
