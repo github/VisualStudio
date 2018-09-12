@@ -211,10 +211,10 @@
     <value>请输入姓名</value>
   </data>
   <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
-    <value>Repository name must be fewer than 100 characters</value>
+    <value>这个名字不能超过100个字符</value>
   </data>
   <data name="SafeRepositoryNameWarning" xml:space="preserve">
-    <value>Will be created as {0}</value>
+    <value>将要创建为 {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
     <value>Open the two-factor authentication app on your device to view your authentication code.</value>
