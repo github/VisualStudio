@@ -68,25 +68,12 @@ namespace GitHub.VisualStudio.Commands
                 return;
             }
 
+            var cloneUrl = gitHubContextService.Value.ToRepositoryUrl(context).ToString();
             var repositoryDir = cloneDialogResult.Path;
-            if (!Directory.Exists(repositoryDir))
-            {
-                var cloneUrl = gitHubContextService.Value.ToRepositoryUrl(context).ToString();
-                var repositoryDirName = Path.GetFileName(repositoryDir);
-                var targetDir = Path.GetDirectoryName(repositoryDir);
-                await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
-
-                // Open the cloned repository
-                dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
-                dte.Value.ExecuteCommand("View.TfsTeamExplorer");
-            }
-
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
             if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
-                // Open if current solution isn't in repository directory
-                dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
-                dte.Value.ExecuteCommand("View.TfsTeamExplorer");
+                await repositoryCloneService.Value.CloneOrOpenRepository(cloneUrl, repositoryDir);
             }
 
             await TryOpenPullRequest(context);
