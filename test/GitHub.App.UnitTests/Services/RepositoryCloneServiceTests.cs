@@ -21,7 +21,7 @@ public class RepositoryCloneServiceTests
             var vsGitServices = serviceProvider.GetVSGitServices();
             var cloneService = serviceProvider.GetRepositoryCloneService();
 
-            await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
+            await cloneService.CloneRepository("https://github.com/foo/bar", @"c:\dev\bar");
 
             operatingSystem.Directory.Received().CreateDirectory(@"c:\dev\bar");
             await vsGitServices.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", true);
@@ -41,7 +41,7 @@ public class RepositoryCloneServiceTests
             var model = UsageModel.Create(Guid.NewGuid());
 
             await usageTracker.Received().IncrementCounter(
-                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x => 
+                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
                     ((MemberExpression)x.Body).Member.Name == nameof(model.Measures.NumberOfClones)));
         }
     }
