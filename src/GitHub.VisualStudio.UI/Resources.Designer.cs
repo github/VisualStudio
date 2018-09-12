@@ -88,6 +88,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Approve.
+        /// </summary>
+        public static string Approve {
+            get {
+                return ResourceManager.GetString("Approve", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assignee.
+        /// </summary>
+        public static string Assignee {
+            get {
+                return ResourceManager.GetString("Assignee", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid authentication code.
         /// </summary>
         public static string authenticationFailedLabelContent {
@@ -124,6 +142,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Author.
+        /// </summary>
+        public static string Author {
+            get {
+                return ResourceManager.GetString("Author", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string Back {
+            get {
+                return ResourceManager.GetString("Back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The GitHub extension is not available inside Blend.
         /// </summary>
         public static string BlendDialogText {
@@ -153,6 +189,15 @@ namespace GitHub.VisualStudio.UI {
         /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
         public static string CancelLink {
             get {
                 return ResourceManager.GetString("CancelLink", resourceCulture);
@@ -169,11 +214,38 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This file has changed since the permalink was created.
+        /// </summary>
+        public static string ChangesInWorkingDirectoryMessage {
+            get {
+                return ResourceManager.GetString("ChangesInWorkingDirectoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone.
         /// </summary>
         public static string CloneLink {
             get {
                 return ResourceManager.GetString("CloneLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comment only.
+        /// </summary>
+        public static string CommentOnly {
+            get {
+                return ResourceManager.GetString("CommentOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comments.
+        /// </summary>
+        public static string Comments {
+            get {
+                return ResourceManager.GetString("Comments", resourceCulture);
             }
         }
         
@@ -223,11 +295,38 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to create a pull request.
+        /// </summary>
+        public static string CreateAPullRequest {
+            get {
+                return ResourceManager.GetString("CreateAPullRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         public static string CreateLink {
             get {
                 return ResourceManager.GetString("CreateLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create New.
+        /// </summary>
+        public static string CreateNew {
+            get {
+                return ResourceManager.GetString("CreateNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create pull request.
+        /// </summary>
+        public static string CreatePullRequest {
+            get {
+                return ResourceManager.GetString("CreatePullRequest", resourceCulture);
             }
         }
         
@@ -264,6 +363,15 @@ namespace GitHub.VisualStudio.UI {
         public static string DescriptionOptional {
             get {
                 return ResourceManager.GetString("DescriptionOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please open the repository &apos;{0}&apos; and try again.
+        /// </summary>
+        public static string DifferentRepositoryMessage {
+            get {
+                return ResourceManager.GetString("DifferentRepositoryMessage", resourceCulture);
             }
         }
         
@@ -340,6 +448,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filter by Author.
+        /// </summary>
+        public static string FilterByAuthor {
+            get {
+                return ResourceManager.GetString("FilterByAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -363,6 +480,24 @@ namespace GitHub.VisualStudio.UI {
         public static string ForkNavigationItemText {
             get {
                 return ResourceManager.GetString("ForkNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fork Repository.
+        /// </summary>
+        public static string ForkRepository {
+            get {
+                return ResourceManager.GetString("ForkRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fork the repository.
+        /// </summary>
+        public static string ForkTheRepository {
+            get {
+                return ResourceManager.GetString("ForkTheRepository", resourceCulture);
             }
         }
         
@@ -556,11 +691,65 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Next Comment.
+        /// </summary>
+        public static string NextComment {
+            get {
+                return ResourceManager.GetString("NextComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is no active repository to navigate.
+        /// </summary>
+        public static string NoActiveRepositoryMessage {
+            get {
+                return ResourceManager.GetString("NoActiveRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t a find a GitHub URL in clipboard.
+        /// </summary>
+        public static string NoGitHubUrlMessage {
+            get {
+                return ResourceManager.GetString("NoGitHubUrlMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No repositories.
         /// </summary>
         public static string noRepositoriesMessageText {
             get {
                 return ResourceManager.GetString("noRepositoriesMessageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The target URL has a different owner to the current repository..
+        /// </summary>
+        public static string NoResolveDifferentOwnerMessage {
+            get {
+                return ResourceManager.GetString("NoResolveDifferentOwnerMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t find target URL in current repository. Try again after doing a fetch..
+        /// </summary>
+        public static string NoResolveSameOwnerMessage {
+            get {
+                return ResourceManager.GetString("NoResolveSameOwnerMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No results matched your search..
+        /// </summary>
+        public static string NoResultsMatchedYourSearch {
+            get {
+                return ResourceManager.GetString("NoResultsMatchedYourSearch", resourceCulture);
             }
         }
         
@@ -655,6 +844,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open repository at &apos;{0}&apos;?.
+        /// </summary>
+        public static string OpenRepositoryAtDir {
+            get {
+                return ResourceManager.GetString("OpenRepositoryAtDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         public static string openTwoFactorAuthAppText {
@@ -745,6 +943,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Outdated comments.
+        /// </summary>
+        public static string OutdatedComments {
+            get {
+                return ResourceManager.GetString("OutdatedComments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
         public static string PasswordPrompt {
@@ -759,6 +966,24 @@ namespace GitHub.VisualStudio.UI {
         public static string pathText {
             get {
                 return ResourceManager.GetString("pathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pending.
+        /// </summary>
+        public static string Pending {
+            get {
+                return ResourceManager.GetString("Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous Comment.
+        /// </summary>
+        public static string PreviousComment {
+            get {
+                return ResourceManager.GetString("PreviousComment", resourceCulture);
             }
         }
         
@@ -799,6 +1024,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pull.
+        /// </summary>
+        public static string Pull {
+            get {
+                return ResourceManager.GetString("Pull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull requests let you tell others about changes you&apos;ve pushed to a repository on GitHub.
+        /// </summary>
+        public static string PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub {
+            get {
+                return ResourceManager.GetString("PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pull Requests.
         /// </summary>
         public static string PullRequestsNavigationItemText {
@@ -813,6 +1056,15 @@ namespace GitHub.VisualStudio.UI {
         public static string PulseNavigationItemText {
             get {
                 return ResourceManager.GetString("PulseNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Push.
+        /// </summary>
+        public static string Push {
+            get {
+                return ResourceManager.GetString("Push", resourceCulture);
             }
         }
         
@@ -840,6 +1092,15 @@ namespace GitHub.VisualStudio.UI {
         public static string RepositoryPublishedMessage {
             get {
                 return ResourceManager.GetString("RepositoryPublishedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request changes.
+        /// </summary>
+        public static string RequestChanges {
+            get {
+                return ResourceManager.GetString("RequestChanges", resourceCulture);
             }
         }
         
@@ -880,6 +1141,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Fork.
+        /// </summary>
+        public static string SelectFork {
+            get {
+                return ResourceManager.GetString("SelectFork", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign in....
         /// </summary>
         public static string SignInCallToAction {
@@ -894,6 +1164,24 @@ namespace GitHub.VisualStudio.UI {
         public static string SignInLink {
             get {
                 return ResourceManager.GetString("SignInLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in to GitHub.
+        /// </summary>
+        public static string SignInToGitHub {
+            get {
+                return ResourceManager.GetString("SignInToGitHub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in with your browser.
+        /// </summary>
+        public static string SignInWithYourBrowser {
+            get {
+                return ResourceManager.GetString("SignInWithYourBrowser", resourceCulture);
             }
         }
         
@@ -916,6 +1204,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Start a review.
+        /// </summary>
+        public static string StartAReview {
+            get {
+                return ResourceManager.GetString("StartAReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submit your review for.
+        /// </summary>
+        public static string SubmitYourReviewFor {
+            get {
+                return ResourceManager.GetString("SubmitYourReviewFor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Switch to List View.
         /// </summary>
         public static string SwitchToListView {
@@ -934,6 +1240,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sync.
+        /// </summary>
+        public static string Sync {
+            get {
+                return ResourceManager.GetString("Sync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
         ///
         ///[Don&apos;t show this again](dont-show-again).
@@ -941,6 +1256,15 @@ namespace GitHub.VisualStudio.UI {
         public static string TeamExplorerWelcomeMessage {
             get {
                 return ResourceManager.GetString("TeamExplorerWelcomeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There aren&apos;t any open pull requests.
+        /// </summary>
+        public static string ThereArenTAnyOpenPullRequests {
+            get {
+                return ResourceManager.GetString("ThereArenTAnyOpenPullRequests", resourceCulture);
             }
         }
         
@@ -954,6 +1278,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To get started you can.
+        /// </summary>
+        public static string ToGetStartedYouCan {
+            get {
+                return ResourceManager.GetString("ToGetStartedYouCan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Token.
         /// </summary>
         public static string TokenPrompt {
@@ -963,11 +1296,29 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to to point to.
+        /// </summary>
+        public static string ToPointTo {
+            get {
+                return ResourceManager.GetString("ToPointTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>
         public static string twoFactorAuthText {
             get {
                 return ResourceManager.GetString("twoFactorAuthText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t open from &apos;{0}&apos;. Only URLs that link to repository files are currently supported..
+        /// </summary>
+        public static string UnknownLinkTypeMessage {
+            get {
+                return ResourceManager.GetString("UnknownLinkTypeMessage", resourceCulture);
             }
         }
         
@@ -986,6 +1337,15 @@ namespace GitHub.VisualStudio.UI {
         public static string UpdatedFormat {
             get {
                 return ResourceManager.GetString("UpdatedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Update your local repository&apos;s.
+        /// </summary>
+        public static string UpdateYourLocalRepositoryS {
+            get {
+                return ResourceManager.GetString("UpdateYourLocalRepositoryS", resourceCulture);
             }
         }
         
@@ -1026,6 +1386,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View, Checkout or Create a Pull request.
+        /// </summary>
+        public static string ViewCheckoutOrCreateAPullRequest {
+            get {
+                return ResourceManager.GetString("ViewCheckoutOrCreateAPullRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View File.
         /// </summary>
         public static string ViewFile {
@@ -1040,6 +1409,33 @@ namespace GitHub.VisualStudio.UI {
         public static string WikiNavigationItemText {
             get {
                 return ResourceManager.GetString("WikiNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to wrote.
+        /// </summary>
+        public static string Wrote {
+            get {
+                return ResourceManager.GetString("Wrote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must commit and push your changes to add a comment here..
+        /// </summary>
+        public static string YouMustCommitAndPushYourChangesToAddACommentHere {
+            get {
+                return ResourceManager.GetString("YouMustCommitAndPushYourChangesToAddACommentHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your review summary.
+        /// </summary>
+        public static string YourReviewSummary {
+            get {
+                return ResourceManager.GetString("YourReviewSummary", resourceCulture);
             }
         }
     }

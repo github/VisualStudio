@@ -132,7 +132,8 @@ namespace GitHub.StartPage
 
                 if (basePath != null)
                 {
-                    result = new CloneDialogResult(basePath, repository);
+                    var path = Path.Combine(basePath, repository.Name);
+                    result = new CloneDialogResult(path, repository);
                 }
             }
 
@@ -142,7 +143,6 @@ namespace GitHub.StartPage
                 {
                     await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
-                        result.Repository.Name,
                         result.Path,
                         progress);
 

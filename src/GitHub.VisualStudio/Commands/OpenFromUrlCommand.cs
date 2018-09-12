@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 using SVsServiceProvider = Microsoft.VisualStudio.Shell.SVsServiceProvider;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio.Commands
 {
@@ -93,7 +94,7 @@ namespace GitHub.VisualStudio.Commands
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:
-                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
+                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDir);
                         // Open the cloned repository
                         dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
                         dte.Value.ExecuteCommand("View.TfsTeamExplorer");
@@ -116,7 +117,7 @@ namespace GitHub.VisualStudio.Commands
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
             if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
-                var result = ShowInfoMessage($"Open repository at '{repositoryDir}'?");
+                var result = ShowInfoMessage(string.Format(Resources.OpenRepositoryAtDir, repositoryDir));
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:
