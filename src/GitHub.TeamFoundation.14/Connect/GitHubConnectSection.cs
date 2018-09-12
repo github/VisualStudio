@@ -151,7 +151,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
-                    await cloneService.CloneRepository(
+                    await cloneService.CloneOrOpenRepository(
                         result.Repository.CloneUrl,
                         result.Path);
 

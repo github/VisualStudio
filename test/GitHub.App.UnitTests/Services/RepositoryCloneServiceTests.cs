@@ -33,9 +33,10 @@ public class RepositoryCloneServiceTests
             var serviceProvider = Substitutes.ServiceProvider;
             var operatingSystem = serviceProvider.GetOperatingSystem();
             var vsGitServices = serviceProvider.GetVSGitServices();
+            var vsServices = serviceProvider.GetVSServices();
             var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
             var usageTracker = Substitute.For<IUsageTracker>();
-            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, graphqlFactory, usageTracker);
+            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, vsServices, graphqlFactory, usageTracker);
 
             await cloneService.CloneRepository("https://github.com/foo/bar", @"c:\dev\bar");
             var model = UsageModel.Create(Guid.NewGuid());

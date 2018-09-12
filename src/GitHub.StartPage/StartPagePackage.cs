@@ -141,7 +141,7 @@ namespace GitHub.StartPage
             {
                 try
                 {
-                    await cloneService.CloneRepository(
+                    await cloneService.CloneOrOpenRepository(
                         result.Repository.CloneUrl,
                         result.Path,
                         progress);

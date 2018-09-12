@@ -34,6 +34,7 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
+        readonly IVSServices vsServices;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
@@ -42,6 +43,7 @@ namespace GitHub.Services
         public RepositoryCloneService(
             IOperatingSystem operatingSystem,
             IVSGitServices vsGitServices,
+            IVSServices vsServices,
             IGraphQLClientFactory graphqlFactory,
             IUsageTracker usageTracker)
         {
@@ -100,6 +102,25 @@ namespace GitHub.Services
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
             var result = await graphql.Run(readViewerRepositories).ConfigureAwait(false);
             return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task CloneOrOpenRepository(
+            string cloneUrl,
+            string repositoryPath,
+            object progress = null)
+        {
+            Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
+            Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
+
+            if (!DestinationExists(repositoryPath))
+            {
+                await CloneRepository(cloneUrl, repositoryPath, progress);
+            }
+            else
+            {
+                vsServices.TryOpenRepository(repositoryPath);
+            }
         }
 
         /// <inheritdoc/>

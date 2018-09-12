@@ -34,6 +34,22 @@ namespace GitHub.Services
             object progress = null);
 
         /// <summary>
+        /// Clones the specificed repository into the specified directory or opens it if the repository already exists.
+        /// </summary>
+        /// <param name="cloneUrl">The url of the repository to clone.</param>
+        /// <param name="repositoryPath">The repository directory.</param>
+        /// <param name="progress">
+        /// An object through which to report progress. This must be of type
+        /// System.IProgress&lt;Microsoft.VisualStudio.Shell.ServiceProgressData&gt;, but
+        /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
+        /// </param>
+        /// <returns></returns>
+        Task CloneOrOpenRepository(
+            string cloneUrl,
+            string repositoryPath,
+            object progress = null);
+
+        /// <summary>
         /// Checks whether the specified destination path already exists.
         /// </summary>
         /// <param name="path">The destination path.</param>
