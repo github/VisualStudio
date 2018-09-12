@@ -5,7 +5,6 @@
                                      xmlns:ghfvs="https://github.com/github/VisualStudio"
                                      xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
                                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                                     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                      d:DesignHeight="440"
                                      d:DesignWidth="414"
                                      Style="{DynamicResource DialogUserControl}"
@@ -42,7 +41,7 @@
                             Icon="check"
                             IsDefault="True"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryButton}" >
-      <TextBlock Text="{x:Static prop:Resources.CreateLink}" />
+      <TextBlock Text="{x:Static ghfvs:Resources.CreateLink}" />
     </ghfvs:OcticonCircleButton>
 
     <StackPanel>
@@ -104,7 +103,7 @@
 
         <Label Grid.Row="0"
                Grid.Column="0"
-               Content="{x:Static prop:Resources.nameText}"
+               Content="{x:Static ghfvs:Resources.nameText}"
                Target="{Binding ElementName=nameText}" />
                 <ghfvs:PromptTextBox x:Name="nameText"
                           Grid.Row="0"
@@ -126,7 +125,7 @@
 
         <Label Grid.Row="2"
                Grid.Column="0"
-               Content="{x:Static prop:Resources.Description}"
+               Content="{x:Static ghfvs:Resources.Description}"
                Target="{Binding ElementName=description}"
                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryDescriptionTextBlock}" />
         <ghfvs:PromptTextBox x:Name="description"
@@ -138,7 +137,7 @@
 
         <Label Grid.Row="3"
                Grid.Column="0"
-               Content="{x:Static prop:Resources.localPathText}"
+               Content="{x:Static ghfvs:Resources.localPathText}"
                Target="{Binding ElementName=localPathText}" />
         <Grid Grid.Row="3" Grid.Column="1">
 
@@ -157,7 +156,7 @@
                   Grid.Column="1"
                   Margin="3,0,0,0"
                   VerticalContentAlignment="Center"
-                  Content="{x:Static prop:Resources.browsePathButtonContent}"
+                  Content="{x:Static ghfvs:Resources.browsePathButtonContent}"
                   Padding="0"
                   Style="{StaticResource GitHubBlueLinkButton}" 
                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryLocalPathBrowseButton}" />
@@ -170,7 +169,7 @@
 
         <Label Grid.Row="5"
                Grid.Column="0"
-               Content="{x:Static prop:Resources.ignoreTemplateListText}"
+               Content="{x:Static ghfvs:Resources.ignoreTemplateListText}"
                Target="{Binding ElementName=ignoreTemplateList}" />
         <ghfvs:FilteredComboBox x:Name="ignoreTemplateList"
                                Grid.Row="5"
@@ -193,7 +192,7 @@
 
         <Label Grid.Row="6"
                Grid.Column="0"
-               Content="{x:Static prop:Resources.licenseListText}"
+               Content="{x:Static ghfvs:Resources.licenseListText}"
                Target="{Binding ElementName=licenseList}" />
         <ghfvs:FilteredComboBox x:Name="licenseList"
                                Grid.Row="6"
@@ -241,7 +240,7 @@
                 <CheckBox x:Name="makePrivate"
                   Grid.Row="9"
                   Grid.Column="1"
-                  Content="{x:Static prop:Resources.makePrivateContent}"
+                  Content="{x:Static ghfvs:Resources.makePrivateContent}"
                   Padding="8,0,0,0"
                   Style="{DynamicResource BlueRoundedCheckBox}" 
                   IsChecked="{Binding KeepPrivate}"

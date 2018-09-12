@@ -47,7 +47,7 @@ namespace GitHub.VisualStudio.Views.Dialog
                         browser?.OpenUrl(new Uri(gist.HtmlUrl));
 
                         var ns = serviceProvider.TryGetService<IStatusBarNotificationService>();
-                        ns?.ShowMessage(UI.Resources.gistCreatedMessage);
+                        ns?.ShowMessage(GitHub.Resources.gistCreatedMessage);
                     });
 
                 d(notifications.Listen()

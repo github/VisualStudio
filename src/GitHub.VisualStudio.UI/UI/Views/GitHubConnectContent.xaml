@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
              mc:Ignorable="d"
              KeyboardNavigation.TabNavigation="Local"
              DataContext="{Binding ViewModel}"
@@ -153,16 +152,16 @@
     <WrapPanel Orientation="Horizontal"
                Margin="6,0,0,6"
                Visibility="{Binding SectionConnection.IsLoggedIn, Converter={ghfvs:BooleanToVisibilityConverter}}">
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static prop:Resources.CloneLink}"              
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static ghfvs:Resources.CloneLink}"              
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static ghfvs:Resources.CreateLink}"
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static ghfvs:Resources.SignOutLink}"
               Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignOutHyperlink}"/>
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static ghfvs:Resources.LoginLink}"
               Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignInHyperlink}"/>
     </WrapPanel>
@@ -210,7 +209,7 @@
                     <RowDefinition Height="Auto" />
                   </Grid.RowDefinitions>
                   <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">
-                    <Run Text="{x:Static prop:Resources.nameText}"/>:
+                    <Run Text="{x:Static ghfvs:Resources.nameText}"/>:
                   </TextBlock>
                   <TextBlock Grid.Row="0" Grid.Column="1">
                     <TextBlock.Text>
@@ -221,7 +220,7 @@
                     </TextBlock.Text>
                   </TextBlock>
                   <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">
-                    <Run Text="{x:Static prop:Resources.pathText}"/>:
+                    <Run Text="{x:Static ghfvs:Resources.pathText}"/>:
                   </TextBlock>
                   <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=LocalPath}" />
                 </Grid>
@@ -263,13 +262,13 @@
                   Margin="0,8,0,0"
                   Orientation="Horizontal">
         <Button Style="{StaticResource ActionLinkButton}"
-                Content="{x:Static prop:Resources.Retry}"
+                Content="{x:Static ghfvs:Resources.Retry}"
                 Click="retry_Click"
                 Margin="0,0,8,0"
                 Visibility="{Binding ShowRetry, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <Button Style="{StaticResource ActionLinkButton}"
                 Click="signOut_Click"
-                Content="{x:Static prop:Resources.SignOutLink}"
+                Content="{x:Static ghfvs:Resources.SignOutLink}"
                 Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
       </StackPanel>
     </Grid>

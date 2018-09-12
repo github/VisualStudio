@@ -18,17 +18,6 @@
 
   <ItemGroup>
     <Resource Include="Images\*.png" />
-
-    <Compile Update="Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-
-    <EmbeddedResource Update="Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -45,6 +34,7 @@
     <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj" />
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
+    <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj" />
     <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj" />
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj" />
   </ItemGroup>

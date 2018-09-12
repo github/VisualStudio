@@ -15,8 +15,8 @@ namespace GitHub.InlineReviews.Services
                 0;
 
             return MessageBox.Show(
-                VisualStudio.UI.Resources.DeleteCommentConfirmation,
-                VisualStudio.UI.Resources.DeleteCommentConfirmationCaption,
+                Resources.DeleteCommentConfirmation,
+                Resources.DeleteCommentConfirmationCaption,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button1,

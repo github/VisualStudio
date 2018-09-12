@@ -5,7 +5,6 @@
                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                             xmlns:ghfvs="https://github.com/github/VisualStudio"
                             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
-                            xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                             d:DesignHeight="440"
                             d:DesignWidth="414"
                             Background="Transparent"
@@ -52,7 +51,7 @@
                             IsDefault="True"
                             Command="{Binding CloneCommand}"
                             >
-      <TextBlock Text="{x:Static prop:Resources.CloneLink}" />
+      <TextBlock Text="{x:Static ghfvs:Resources.CloneLink}" />
     </ghfvs:OcticonCircleButton>
 
     <Border x:Name="repositoriesListPane"
@@ -107,7 +106,7 @@
                  Style="{StaticResource Light}" 
                  HorizontalAlignment="Right"
                  Margin="4,0"
-                 Content="{x:Static prop:Resources.pathText}"
+                 Content="{x:Static ghfvs:Resources.pathText}"
                  Target="{Binding ElementName=clonePath}" />
             
           <ghfvs:OcticonImage Grid.Row="0" Grid.Column="1" Icon="repo"/>
@@ -142,7 +141,7 @@
                     Grid.Column="1"
                     Margin="4,0,4,0"
                     VerticalContentAlignment="Center"
-                    Content="{x:Static prop:Resources.browsePathButtonContent}"
+                    Content="{x:Static ghfvs:Resources.browsePathButtonContent}"
                     Padding="0"
                     Style="{StaticResource GitHubBlueLinkButton}"
                     Command="{Binding BrowseForDirectory}" />
