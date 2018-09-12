@@ -220,112 +220,111 @@
     <value>Open the two-factor authentication app on your device to view your authentication code.</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
-    <value>We sent you a message via SMS with your authentication code.</value>
+    <value>我们将发送一条验证码短信到您的手机。</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
-    <value>Two-Factor authentication required</value>
+    <value>双重身份认证</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>Enter a sign in authentication code here</value>
+    <value>在此处输入身份验证代码中的符号</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
-    <value>Please enter your username or email address</value>
+    <value>请输入您的用户名或邮箱地址.</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
-    <value>Username or email address must not have spaces</value>
+    <value>用户名或电子邮件地址不能有空格</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>Pull Requests</value>
+    <value>拉取请求</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>Pull Request</value>
+    <value>推送请求</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
-    <value>add</value>
+    <value>添加</value>
   </data>
   <data name="Fork" xml:space="preserve">
     <value>fork</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
-    <value>[invalid]</value>
+    <value>[无效]</value>
   </data>
   <data name="MustPullBeforePush" xml:space="preserve">
-    <value>You must pull before you can push</value>
+    <value>你必须先拉取再推送</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>No commits to pull</value>
+    <value>没有需要拉取的提交</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>No commits to push</value>
+    <value>没有需要推送的提交</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
-    <value>*No description provided.*</value>
+    <value>* 未提供说明。*</value>
   </data>
   <data name="PullRequestDetailsCheckout" xml:space="preserve">
-    <value>Checkout {0}</value>
+    <value>签出 {0}</value>
   </data>
   <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
-    <value>Checkout to {0}</value>
+    <value>签出到 {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
-    <value>Pull from {0} branch {1}</value>
+    <value>从 {0} 分支 {1} 拉取</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>Push to {0} branch {1}</value>
+    <value>推至 {0}  分支 {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>remote</value>
+    <value>远程</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
-    <value>rename</value>
+    <value>重命名</value>
   </data>
   <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
-    <value>The source repository is no longer available.</value>
+    <value>源存版本库不再可用。</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Cannot checkout as your working directory has uncommitted changes.</value>
+    <value>无法签出, 因为您的工作目录有未提交的更改。</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
-    <value>Sync {0} submodules</value>
+    <value>同步 {0} 子模块</value>
   </data>
   <data name="CouldntFindGitOnPath" xml:space="preserve">
-    <value>Couldn't find Git.exe on PATH.
+    <value>在PATH 找不到 Git.exe。
 
-Please install Git for Windows from:
-https://git-scm.com/download/win</value>
+请安装 Git for Windows : https://git-scm.com/download/win</value>
   </data>
   <data name="Approved" xml:space="preserve">
-    <value>Approved</value>
+    <value>批准</value>
   </data>
   <data name="ChangesRequested" xml:space="preserve">
-    <value>Changes Requested</value>
+    <value>更改需求</value>
   </data>
   <data name="Commented" xml:space="preserve">
-    <value>Commented</value>
+    <value>已评论</value>
   </data>
   <data name="InProgress" xml:space="preserve">
-    <value>InProgress</value>
+    <value>进行中</value>
   </data>
   <data name="NavigateToEditorStatusMessage" xml:space="preserve">
-    <value>Press Enter to navigate to Editor</value>
+    <value>按回车键导航到编辑器</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>Checkout PR branch before navigating to Editor</value>
+    <value>在导航到编辑器之前签出 PR 分支</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
+    <value>按回车键导航到编辑器 (PR 分支必须签出)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Fork Repository</value>
+    <value>Fork存储库</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>Switch Origin</value>
+    <value>开关原点</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
-    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
+    <value>您确定要取消此评审吗？您将丢失所有待处理的评论。</value>
   </data>
   <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
-    <value>Cancel Review</value>
+    <value>取消评审</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
     <value>The destination already exists.</value>
