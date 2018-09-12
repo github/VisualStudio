@@ -118,10 +118,8 @@ namespace GitHub.Services
             {
                 await CloneRepository(cloneUrl, repositoryPath, progress);
             }
-            else
-            {
-                teamExplorerServices.OpenRepository(repositoryPath);
-            }
+
+            teamExplorerServices.OpenRepository(repositoryPath);
         }
 
         /// <inheritdoc/>
