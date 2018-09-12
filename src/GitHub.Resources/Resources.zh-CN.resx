@@ -121,7 +121,7 @@
     <value>为新版本库选择文件夹。</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>Clone a Repository</value>
+    <value>克隆一个 版本库</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>无法连接到github.com</value>
@@ -432,7 +432,7 @@
     <value>私有Gist</value>
   </data>
   <data name="fileNameText" xml:space="preserve">
-    <value>File Name</value>
+    <value>文件名</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
     <value>你没有登录到 {0},因此操作可能才会失败. [立即登录]({1})</value>
