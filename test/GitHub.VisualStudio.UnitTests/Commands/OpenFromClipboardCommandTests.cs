@@ -4,6 +4,7 @@ using GitHub.Exports;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Commands;
+using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using NSubstitute;
 using NUnit.Framework;
@@ -21,7 +22,7 @@ public class OpenFromClipboardCommandTests
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoGitHubUrlMessage);
+            vsServices.Received(1).ShowMessageBoxInfo(Resources.NoGitHubUrlMessage);
         }
 
         [Test]
@@ -34,28 +35,27 @@ public class OpenFromClipboardCommandTests
 
             await target.Execute(null);
 
-            vsServices.Received(1).ShowMessageBoxInfo(OpenFromClipboardCommand.NoActiveRepositoryMessage);
+            vsServices.Received(1).ShowMessageBoxInfo(Resources.NoActiveRepositoryMessage);
         }
 
         [Test]
         public async Task UnknownLinkType()
         {
             var context = new GitHubContext { LinkType = LinkType.Unknown };
-            var expectMessage = string.Format(OpenFromClipboardCommand.UnknownLinkTypeMessage, context.Url);
+            var expectMessage = string.Format(Resources.UnknownLinkTypeMessage, context.Url);
             var activeRepositoryDir = "activeRepositoryDir";
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: activeRepositoryDir);
-
             await target.Execute(null);
-
             vsServices.Received(1).ShowMessageBoxInfo(expectMessage);
         }
 
-        [TestCase("targetRepositoryName", "activeRepositoryName", OpenFromClipboardCommand.DifferentRepositoryMessage)]
         [TestCase("SameRepositoryName", "SameRepositoryName", null)]
         [TestCase("same_repository_name", "SAME_REPOSITORY_NAME", null)]
+        [TestCase("targetRepositoryName", "activeRepositoryName", "#" + nameof(Resources.DifferentRepositoryMessage))]
         public async Task DifferentLocalRepository(string targetRepositoryName, string activeRepositoryName, string expectMessage)
         {
+            expectMessage = ResolveResources(expectMessage);
             var activeRepositoryDir = "activeRepositoryDir";
             var context = CreateGitHubContext(repositoryName: targetRepositoryName);
             var resolveBlobResult = ("commitish", "path", "SHA");
@@ -75,11 +75,12 @@ public class OpenFromClipboardCommandTests
             }
         }
 
-        [TestCase("TargetOwner", "CurrentOwner", OpenFromClipboardCommand.NoResolveDifferentOwnerMessage)]
-        [TestCase("SameOwner", "SameOwner", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
-        [TestCase("sameowner", "SAMEOWNER", OpenFromClipboardCommand.NoResolveSameOwnerMessage)]
+        [TestCase("TargetOwner", "CurrentOwner", "#" + nameof(Resources.NoResolveDifferentOwnerMessage))]
+        [TestCase("SameOwner", "SameOwner", "#" + nameof(Resources.NoResolveSameOwnerMessage))]
+        [TestCase("sameowner", "SAMEOWNER", "#" + nameof(Resources.NoResolveSameOwnerMessage))]
         public async Task CouldNotResolve(string targetOwner, string currentOwner, string expectMessage)
         {
+            expectMessage = ResolveResources(expectMessage);
             var repositoryDir = "repositoryDir";
             var repositoryName = "repositoryName";
             var context = CreateGitHubContext(repositoryName: repositoryName, owner: targetOwner);
@@ -127,11 +128,12 @@ public class OpenFromClipboardCommandTests
             gitHubContextService.Received(1).TryOpenFile(repositoryDir, context);
         }
 
+        [TestCase(false, "#" + nameof(Resources.ChangesInWorkingDirectoryMessage), 1, 1)]
         [TestCase(true, null, 1, 0)]
-        [TestCase(false, OpenFromClipboardCommand.ChangesInWorkingDirectoryMessage, 1, 1)]
         public async Task HasChangesInWorkingDirectory(bool annotateFileSupported, string message,
             int receivedTryAnnotateFile, int receivedTryOpenFile)
         {
+            message = ResolveResources(message);
             var repositoryDir = "repositoryDir";
             var repositoryName = "repositoryName";
             var targetBranch = "targetBranch";
@@ -203,6 +205,16 @@ public class OpenFromClipboardCommandTests
                 new Lazy<IGitHubContextService>(() => gitHubContextService),
                 new Lazy<ITeamExplorerContext>(() => teamExplorerContext),
                 new Lazy<IVSServices>(() => vsServices));
+        }
+
+        static string ResolveResources(string str)
+        {
+            if (str != null && str.StartsWith("#", StringComparison.Ordinal))
+            {
+                return (string)typeof(Resources).GetProperty(str.Substring(1)).GetValue(null);
+            }
+
+            return str;
         }
     }
 }
