@@ -118,22 +118,22 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
-    <value>Invalid authentication code</value>
+    <value>无效的验证码</value>
   </data>
   <data name="authenticationFailedLabelMessage" xml:space="preserve">
-    <value>Try entering the code again or clicking the resend button to get a new authentication code.</value>
+    <value>尝试再次输入代码或单击重新发送按钮以获取新的验证码。</value>
   </data>
   <data name="authenticationSentLabelContent" xml:space="preserve">
-    <value>Authentication code sent!</value>
+    <value>验证码已发送！</value>
   </data>
   <data name="authenticationSentLabelMessage" xml:space="preserve">
-    <value>If you do not receive the authentication code, contact support@github.com.</value>
+    <value>如果您没有收到验证码，请联系 support@github.com 。</value>
   </data>
   <data name="browsePathButtonContent" xml:space="preserve">
-    <value>Browse</value>
+    <value>浏览</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
-    <value>Could not connect to github.com</value>
+    <value>无法连接到github.com</value>
   </data>
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
     <value>Could not connect to the server.</value>
@@ -253,112 +253,112 @@
     <value>Name</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
-    <value>Private Repository</value>
+    <value>私有存储库</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>Sign in failed.</value>
+    <value>登录失败。</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Local path</value>
+    <value>本地路径</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
-    <value>License</value>
+    <value>许可证</value>
   </data>
   <data name="learnMoreLink" xml:space="preserve">
-    <value>Learn more</value>
+    <value>了解详细信息</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
-    <value>Git ignore</value>
+    <value>Git忽略</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
-    <value>Search repositories</value>
+    <value>搜索存储库</value>
   </data>
   <data name="loadingFailedMessageContent" xml:space="preserve">
-    <value>Some or all repositories may not have loaded. Close the dialog and try again.</value>
+    <value>部分或全部存储库没有加载，请关闭对话框重试。</value>
   </data>
   <data name="loadingFailedMessageMessage" xml:space="preserve">
-    <value>An error occurred while loading repositories</value>
+    <value>加载存储库时发送意外。</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>GitHub Enterprise server address</value>
+    <value>GitHub企业服务器地址</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>The host isn't available or is not a GitHub Enterprise server. Check the address and try again.</value>
+    <value>无效主机或不是GitHub企业服务器，请检查地址并重试。</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
-    <value>Username or email</value>
+    <value>用户名或电子邮件</value>
   </data>
   <data name="PasswordPrompt" xml:space="preserve">
-    <value>Password</value>
+    <value>密码</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>Check your username and password, then try again</value>
+    <value>检查您的用户名和密码然后重试</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>Sign in</value>
+    <value>登录</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>(forgot your password?)</value>
+    <value>(是否忘记了您的密码?)</value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
-    <value>Please check your internet connection and try again.</value>
+    <value>请检查你的 Internet 连接，然后重试。</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Don’t have GitHub Enterprise? </value>
+    <value>没有GitHub企业版？</value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>Don’t have an account? </value>
+    <value>没有帐户?</value>
   </data>
   <data name="TitleRequired" xml:space="preserve">
-    <value>Title (required)</value>
+    <value>标题(必须)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Description</value>
+    <value>描述</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects.</value>
+    <value>将此存储库发布到 GitHub, 并为开源和私有项目获得强大的协作、代码审阅和代码管理。</value>
   </data>
   <data name="NotAGitHubRepository" xml:space="preserve">
-    <value>This repository is not on GitHub</value>
+    <value>此存储库未托管至Github</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>No repository</value>
+    <value>没有存储库</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>We couldn't find a git repository here. Open a git project or click "File -&gt; Add to Source Control" in a project to get started.</value>
+    <value>我们在这里找不到 git 存储库。打开一个 git 项目或单击项目中的 "文件"-&gt; "添加到源代码管理" 以开始.</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
-    <value>Create an account</value>
+    <value>创建帐户</value>
   </data>
   <data name="filterBranchesText" xml:space="preserve">
-    <value>Filter branches</value>
+    <value>筛选分支</value>
   </data>
   <data name="PublishToGitHubButton" xml:space="preserve">
-    <value>Publish to GitHub</value>
+    <value>发布到 GitHub</value>
   </data>
   <data name="GetStartedText" xml:space="preserve">
-    <value>Get Started</value>
+    <value>入门</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>Sign in</value>
+    <value>登录</value>
   </data>
   <data name="SignInCallToAction" xml:space="preserve">
-    <value>Sign in...</value>
+    <value>登录...</value>
   </data>
   <data name="LocalBranchUpToDate" xml:space="preserve">
-    <value>Local branch up to date</value>
+    <value>本地分支最新!</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
-    <value>Changes ({0})</value>
+    <value>变更:({0}）</value>
   </data>
   <data name="ViewChanges" xml:space="preserve">
-    <value>View Changes</value>
+    <value>查看变更</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
-    <value>Compare File as Default Action</value>
+    <value>将比较文件作为默认操作</value>
   </data>
   <data name="ViewFile" xml:space="preserve">
-    <value>View File</value>
+    <value>查看文件</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
     <value>Open File as Default Action</value>
