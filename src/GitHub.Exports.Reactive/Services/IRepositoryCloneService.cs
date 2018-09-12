@@ -21,7 +21,6 @@ namespace GitHub.Services
         /// Clones the specificed repository into the specified directory.
         /// </summary>
         /// <param name="cloneUrl">The url of the repository to clone.</param>
-        /// <param name="repositoryName">The name of the repository to clone.</param>
         /// <param name="repositoryPath">The directory that will contain the repository directory.</param>
         /// <param name="progress">
         /// An object through which to report progress. This must be of type
@@ -31,7 +30,6 @@ namespace GitHub.Services
         /// <returns></returns>
         Task CloneRepository(
             string cloneUrl,
-            string repositoryName,
             string repositoryPath,
             object progress = null);
 

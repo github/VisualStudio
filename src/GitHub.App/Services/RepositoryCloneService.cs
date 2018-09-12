@@ -105,30 +105,26 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task CloneRepository(
             string cloneUrl,
-            string repositoryName,
             string repositoryPath,
             object progress = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
-            Guard.ArgumentNotEmptyString(repositoryName, nameof(repositoryName));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
-
-            string path = Path.Combine(repositoryPath, repositoryName);
 
             // Switch to a thread pool thread for IO then back to the main thread to call
             // vsGitServices.Clone() as this must be called on the main thread.
             await ThreadingHelper.SwitchToPoolThreadAsync();
-            operatingSystem.Directory.CreateDirectory(path);
+            operatingSystem.Directory.CreateDirectory(repositoryPath);
             await ThreadingHelper.SwitchToMainThreadAsync();
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, path, true, progress);
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, path);
+                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, repositoryPath);
                 throw;
             }
         }
