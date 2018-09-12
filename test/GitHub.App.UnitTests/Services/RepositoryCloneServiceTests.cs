@@ -37,7 +37,7 @@ public class RepositoryCloneServiceTests
             var usageTracker = Substitute.For<IUsageTracker>();
             var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, graphqlFactory, usageTracker);
 
-            await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
+            await cloneService.CloneRepository("https://github.com/foo/bar", @"c:\dev\bar");
             var model = UsageModel.Create(Guid.NewGuid());
 
             await usageTracker.Received().IncrementCounter(
