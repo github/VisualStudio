@@ -65,9 +65,16 @@ namespace GitHub.ViewModels.Dialog.Clone
                 (repo, error) => (repo, error))
                 .Select(x => x.repo != null && x.error == null);
 
+            var canOpen =
+                this.WhenAnyValue(x => x.Path)
+                .Select(x => service.DestinationExists(x));
+
             Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
                 canClone,
+                _ => repository.Select(x => new CloneDialogResult(Path, x)));
+            Open = ReactiveCommand.CreateAsyncObservable(
+                canOpen,
                 _ => repository.Select(x => new CloneDialogResult(Path, x)));
         }
 
@@ -91,11 +98,13 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public string Title => Resources.CloneTitle;
 
-        public IObservable<object> Done => Clone;
+        public IObservable<object> Done => Observable.Merge(Clone, Open);
 
         public ReactiveCommand<object> Browse { get; }
 
         public ReactiveCommand<CloneDialogResult> Clone { get; }
+
+        public ReactiveCommand<CloneDialogResult> Open { get; }
 
         public async Task InitializeAsync(IConnection connection)
         {

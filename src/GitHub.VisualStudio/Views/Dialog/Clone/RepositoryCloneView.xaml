@@ -23,7 +23,8 @@
     <DockPanel>
         <ghfvs:InfoPanel Message="{Binding PathError}"/>
 
-        <ghfvs:OcticonCircleButton DockPanel.Dock="Bottom"
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <ghfvs:OcticonCircleButton
                                    Margin="12"
                                    HorizontalAlignment="Center"
                                    Icon="check"
@@ -31,6 +32,16 @@
                                    Command="{Binding Clone}"
                                    Content="Clone"
                                    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
+
+            <ghfvs:OcticonCircleButton
+                                   Margin="12"
+                                   HorizontalAlignment="Center"
+                                   Icon="check"
+                                   IsDefault="True"
+                                   Command="{Binding Open}"
+                                   Content="Open"
+                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+        </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom"
                    Margin="16">
