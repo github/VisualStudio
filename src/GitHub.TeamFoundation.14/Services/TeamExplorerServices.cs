@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
+using EnvDTE;
 using GitHub.Extensions;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
@@ -29,10 +30,22 @@ namespace GitHub.Services
             this.serviceProvider = serviceProvider;
         }
 
+        public void OpenRepository(string repositoryPath)
+        {
+            OpenFolder(repositoryPath);
+            ShowHomePage();
+        }
+
         public void ShowConnectPage()
         {
             var te = serviceProvider.TryGetService<ITeamExplorer>();
             te.NavigateToPage(new Guid(TeamExplorerPageIds.Connect), null);
+        }
+
+        public void ShowHomePage()
+        {
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            te.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
         }
 
         public void ShowPublishSection()
@@ -88,6 +101,12 @@ namespace GitHub.Services
         {
             manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             return manager?.IsNotificationVisible(guid) ?? false;
+        }
+
+        void OpenFolder(string repositoryPath)
+        {
+            var dte = serviceProvider.TryGetService<DTE>();
+            dte?.ExecuteCommand("File.OpenFolder", repositoryPath);
         }
     }
 }

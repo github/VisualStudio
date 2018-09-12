@@ -34,7 +34,7 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
-        readonly IVSServices vsServices;
+        readonly ITeamExplorerServices teamExplorerServices;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
@@ -43,12 +43,13 @@ namespace GitHub.Services
         public RepositoryCloneService(
             IOperatingSystem operatingSystem,
             IVSGitServices vsGitServices,
-            IVSServices vsServices,
+            ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
             IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
+            this.teamExplorerServices = teamExplorerServices;
             this.graphqlFactory = graphqlFactory;
             this.usageTracker = usageTracker;
 
@@ -119,7 +120,7 @@ namespace GitHub.Services
             }
             else
             {
-                vsServices.TryOpenRepository(repositoryPath);
+                teamExplorerServices.OpenRepository(repositoryPath);
             }
         }
 
