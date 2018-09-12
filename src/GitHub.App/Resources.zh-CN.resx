@@ -130,7 +130,7 @@
     <value>Create a GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>Create a {0} Repository</value>
+    <value>创建一个{0}存储库</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
