@@ -6,7 +6,6 @@
                                       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                                      xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -145,7 +144,7 @@
                             Grid.Row="1"
                             Margin="10,5"
                             Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
-                            PromptText="{x:Static prop:Resources.TitleRequired}"
+                            PromptText="{x:Static ghfvs:Resources.TitleRequired}"
                             Style="{DynamicResource GitHubVsPromptTextBox}"
                             SpellCheck.IsEnabled="True"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationTitleTextBox}"/>
@@ -154,7 +153,7 @@
                             MinHeight="100"
                             Margin="10,5"
                             AcceptsReturn="True"
-                            PromptText="{x:Static prop:Resources.Description}"
+                            PromptText="{x:Static ghfvs:Resources.Description}"
                             Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                             Style="{DynamicResource GitHubVsPromptTextBox}"
                             VerticalScrollBarVisibility="Auto"
@@ -174,13 +173,13 @@
                     Margin="6,0,0,0"
                     HorizontalAlignment="Right"
                     Command="{Binding CreatePullRequest}"
-                    Content="{x:Static prop:Resources.CreatePullRequest}"
+                    Content="{x:Static ghfvs:Resources.CreatePullRequest}"
                     Style="{StaticResource GitHubVsPrimaryActionButton}" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCreateButton}"/>
             <Button DockPanel.Dock="Right"
                     HorizontalAlignment="Right"
                     Command="{Binding Cancel}"
-                    Content="{x:Static prop:Resources.CancelLink}"
+                    Content="{x:Static ghfvs:Resources.CancelLink}"
                     Style="{StaticResource GitHubVsButton}" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCancelButton}"/>
 

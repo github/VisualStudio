@@ -5,7 +5,6 @@
                             xmlns:ghfvs="https://github.com/github/VisualStudio"
                             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                            xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                             DataContext="{Binding ViewModel}"
                             d:DesignHeight="300"
                             d:DesignWidth="300"
@@ -32,12 +31,12 @@
             Foreground="{DynamicResource GitHubVsWindowText}"
             HorizontalAlignment="Center"
             FontSize="16"
-            Content="{x:Static prop:Resources.SignInToGitHub}" />
+            Content="{x:Static ghfvs:Resources.SignInToGitHub}" />
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
             HorizontalAlignment="Center"
-            Text="{x:Static prop:Resources.BlurbText}" />
+            Text="{x:Static ghfvs:Resources.BlurbText}" />
         <StackPanel
             Margin="0,5"
             HorizontalAlignment="Center"
@@ -45,13 +44,13 @@
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink Command="{Binding SignIn}" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitHubLoggedOutSignInHyperlink}" ><TextBlock Text="{x:Static prop:Resources.SignInLink}" /></Hyperlink>
+                <Hyperlink Command="{Binding SignIn}" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitHubLoggedOutSignInHyperlink}" ><TextBlock Text="{x:Static ghfvs:Resources.SignInLink}" /></Hyperlink>
             </TextBlock>
 
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink Command="{Binding Register}" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitHubLoggedOutCreateAnAccountHyperlink}" ><TextBlock Text="{x:Static prop:Resources.CreateAccountLink}" /></Hyperlink>
+                <Hyperlink Command="{Binding Register}" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitHubLoggedOutCreateAnAccountHyperlink}" ><TextBlock Text="{x:Static ghfvs:Resources.CreateAccountLink}" /></Hyperlink>
             </TextBlock>
         </StackPanel>
     </StackPanel>

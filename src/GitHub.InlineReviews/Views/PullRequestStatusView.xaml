@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="60">
 
@@ -53,7 +53,7 @@
                 </StackPanel>
             </Button>
             <Grid.ToolTip>
-                <TextBlock VerticalAlignment="Center" Text="{x:Static prop:Resources.ViewCheckoutOrCreateAPullRequest}"/>
+                <TextBlock VerticalAlignment="Center" Text="{x:Static ghfvs:Resources.ViewCheckoutOrCreateAPullRequest}"/>
             </Grid.ToolTip>
         </Grid>
 
