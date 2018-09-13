@@ -121,7 +121,7 @@
     <value>为新版本库选择文件夹。</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>克隆一个 {0} 版本库</value>
+    <value>Clone a Repository</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>无法连接到github.com</value>
@@ -217,7 +217,7 @@
     <value>将要创建为 {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
-    <value>在您的手机上安装双重验证程序：Google Authenticator</value>
+    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
     <value>我们将发送一条验证码短信到您的手机。</value>
@@ -325,5 +325,11 @@
   </data>
   <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
     <value>取消评审</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>The destination already exists.</value>
+  </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>Logout Required</value>
   </data>
 </root>

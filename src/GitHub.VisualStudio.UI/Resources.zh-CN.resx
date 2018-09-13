@@ -530,6 +530,15 @@
   <data name="SelectFork" xml:space="preserve">
     <value>选择Fork</value>
   </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>您确定要删除此注释吗?</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>删除注释</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
     <value>这里没有任何打开的推送请求</value>
   </data>
@@ -544,12 +553,6 @@
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
     <value>创建拉取请求</value>
-  </data>
-  <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>您确定要删除此注释吗?</value>
-  </data>
-  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
-    <value>删除注释</value>
   </data>
   <data name="OpenRepositoryAtDir" xml:space="preserve">
     <value>在“{0}”打开存储库?</value>
