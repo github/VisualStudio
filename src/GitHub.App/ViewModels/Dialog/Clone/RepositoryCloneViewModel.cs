@@ -60,14 +60,12 @@ namespace GitHub.ViewModels.Dialog.Clone
                 .ToProperty(this, x => x.PathError);
 
             var canClone = Observable.CombineLatest(
-                repository,
-                this.WhenAnyValue(x => x.PathError),
-                (repo, error) => (repo, error))
-                .Select(x => x.repo != null && x.error == null);
+                repository, this.WhenAnyValue(x => x.PathError),
+                (repo, error) => repo != null && error == null);
 
-            var canOpen =
-                this.WhenAnyValue(x => x.Path)
-                .Select(x => service.DestinationExists(x));
+            var canOpen = Observable.CombineLatest(
+                repository, this.WhenAnyValue(x => x.Path),
+                (repo, path) => repo != null && service.DestinationExists(path));
 
             Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
