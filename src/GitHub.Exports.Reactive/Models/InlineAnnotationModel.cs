@@ -12,6 +12,7 @@ namespace GitHub.Models
         /// <summary>
         /// Initializes the <see cref="InlineAnnotationModel"/>.
         /// </summary>
+        /// <param name="checkSuite">The check suite model.</param>
         /// <param name="checkRun">The check run model.</param>
         /// <param name="annotation">The annotation model.</param>
         public InlineAnnotationModel(CheckSuiteModel checkSuite, CheckRunModel checkRun,
@@ -36,6 +37,9 @@ namespace GitHub.Models
 
         /// <inheritdoc />
         public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel;
+
+        /// <inheritdoc />
+        public string CheckSuiteName => checkSuite.ApplicationName;
 
         /// <inheritdoc />
         public string CheckRunName => checkRun.Name;

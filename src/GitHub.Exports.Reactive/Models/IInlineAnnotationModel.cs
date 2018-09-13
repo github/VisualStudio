@@ -41,6 +41,11 @@
         string LineDescription { get; }
 
         /// <summary>
+        /// Gets the name of the check suite.
+        /// </summary>
+        string CheckSuiteName { get; }
+
+        /// <summary>
         /// Gets the name of the check run.
         /// </summary>
         string CheckRunName { get; }

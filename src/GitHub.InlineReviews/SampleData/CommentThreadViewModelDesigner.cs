@@ -56,7 +56,8 @@ namespace GitHub.InlineReviews.SampleData
             var checkSuiteModel = new CheckSuiteModel()
             {
                 HeadSha = "ed6198c37b13638e902716252b0a17d54bd59e4a",
-                CheckRuns = new List<CheckRunModel> { checkRunModel }
+                CheckRuns = new List<CheckRunModel> { checkRunModel },
+                ApplicationName = "My Awesome Check Suite"
             };
 
             Annotations = new[]
