@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Views.TeamExplorer
                 {
                     if (state == ProgressState.Success)
                     {
-                        teServices.ShowMessage(UI.Resources.RepositoryPublishedMessage);
+                        teServices.ShowMessage(GitHub.Resources.RepositoryPublishedMessage);
                     }
                 });
 

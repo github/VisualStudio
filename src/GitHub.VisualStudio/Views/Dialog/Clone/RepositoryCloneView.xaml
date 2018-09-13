@@ -34,7 +34,7 @@
 
         <DockPanel DockPanel.Dock="Bottom"
                    Margin="16">
-            <Label DockPanel.Dock="Left">Local Path</Label>
+            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
                     Style="{DynamicResource GitHubBlueLinkButton}"

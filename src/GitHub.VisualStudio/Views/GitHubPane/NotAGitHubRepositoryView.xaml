@@ -5,7 +5,6 @@
     xmlns:ghfvs="https://github.com/github/VisualStudio"
     xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
     DataContext="{Binding ViewModel}"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -31,17 +30,17 @@
             Foreground="{DynamicResource GitHubVsWindowText}"
             HorizontalAlignment="Center"
             FontSize="16"
-            Content="{x:Static prop:Resources.NotAGitHubRepository}" />
+            Content="{x:Static ghfvs:Resources.NotAGitHubRepository}" />
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
             HorizontalAlignment="Center"
-            Text="{x:Static prop:Resources.NotAGitHubRepositoryMessage}" />
+            Text="{x:Static ghfvs:Resources.NotAGitHubRepositoryMessage}" />
         <Button HorizontalAlignment="Center"
                 Margin="0,15"
                 Style="{DynamicResource GitHubVsPrimaryActionButton}"
                 Command="{Binding Publish}" >
-          <TextBlock Text="{x:Static prop:Resources.GetStartedText}" />
+          <TextBlock Text="{x:Static ghfvs:Resources.GetStartedText}" />
         </Button>
     </StackPanel>
   </DockPanel>

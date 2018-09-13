@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI.Reactive", "src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj", "{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI.Reactive", "src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj", "{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Extensions", "src\GitHub.Extensions\GitHub.Extensions.csproj", "{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}"
 EndProject
@@ -122,6 +122,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.TeamFoundation.UnitTests", "test\GitHub.TeamFoundation.UnitTests\GitHub.TeamFoundation.UnitTests.csproj", "{93778A89-3E58-4853-B772-948EBB3F17BE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.VisualStudio.UnitTests", "test\GitHub.VisualStudio.UnitTests\GitHub.VisualStudio.UnitTests.csproj", "{8B14F90B-0781-465D-AB94-19C8C56E3A94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Resources", "src\GitHub.Resources\GitHub.Resources.csproj", "{54E8D71A-AABB-4698-95FE-7F11612B8E59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -492,6 +494,16 @@ Global
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{8B14F90B-0781-465D-AB94-19C8C56E3A94}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{54E8D71A-AABB-4698-95FE-7F11612B8E59}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
