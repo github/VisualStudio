@@ -13,7 +13,6 @@ namespace GitHub.Services
     public class TeamExplorerServices : ITeamExplorerServices
     {
         readonly IGitHubServiceProvider serviceProvider;
-        readonly IVSServices vsServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. ITeamExplorerNotificationManager is declared here so
@@ -24,15 +23,15 @@ namespace GitHub.Services
         ITeamExplorerNotificationManager manager;
 
         [ImportingConstructor]
-        public TeamExplorerServices(IGitHubServiceProvider serviceProvider, IVSServices vsServices)
+        public TeamExplorerServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            this.vsServices = vsServices;
         }
 
         public void OpenRepository(string repositoryPath)
         {
 #if TEAMEXPLORER14
+            var vsServices = serviceProvider.GetService<IVSServices>();
             vsServices.TryOpenRepository(repositoryPath);
 #else
             OpenFolder(repositoryPath);
