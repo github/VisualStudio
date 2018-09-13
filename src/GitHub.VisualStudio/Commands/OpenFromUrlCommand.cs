@@ -94,7 +94,7 @@ namespace GitHub.VisualStudio.Commands
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:
-                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
+                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDir);
                         // Open the cloned repository
                         dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
                         dte.Value.ExecuteCommand("View.TfsTeamExplorer");
