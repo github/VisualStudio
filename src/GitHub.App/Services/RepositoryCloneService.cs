@@ -114,7 +114,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
 
-            if (!DestinationExists(repositoryPath))
+            if (!DestinationDirectoryExists(repositoryPath) && !DestinationFileExists(repositoryPath))
             {
                 await CloneRepository(cloneUrl, repositoryPath, progress);
             }
@@ -150,7 +150,10 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public bool DestinationExists(string path) => Directory.Exists(path) || File.Exists(path);
+        public bool DestinationDirectoryExists(string path) => Directory.Exists(path);
+
+        /// <inheritdoc/>
+        public bool DestinationFileExists(string path) => File.Exists(path);
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {

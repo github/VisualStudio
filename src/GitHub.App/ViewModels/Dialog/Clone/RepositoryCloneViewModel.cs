@@ -60,12 +60,12 @@ namespace GitHub.ViewModels.Dialog.Clone
                 .ToProperty(this, x => x.PathError);
 
             var canClone = Observable.CombineLatest(
-                repository, this.WhenAnyValue(x => x.PathError),
-                (repo, error) => repo != null && error == null);
+                repository, this.WhenAnyValue(x => x.Path), this.WhenAnyValue(x => x.PathError),
+                (repo, path, error) => repo != null && error == null && !service.DestinationDirectoryExists(path));
 
             var canOpen = Observable.CombineLatest(
-                repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && service.DestinationExists(path));
+                repository, this.WhenAnyValue(x => x.Path), this.WhenAnyValue(x => x.PathError),
+                (repo, path, error) => repo != null && error == null && service.DestinationDirectoryExists(path));
 
             Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
@@ -211,7 +211,8 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (repository != null)
             {
-                return service.DestinationExists(path) ?
+                // TODO: Update wording for DestinationAlreadyExists
+                return service.DestinationFileExists(path) ?
                     Resources.DestinationAlreadyExists :
                     null;
             }
