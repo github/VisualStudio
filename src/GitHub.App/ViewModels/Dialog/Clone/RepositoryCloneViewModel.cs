@@ -25,6 +25,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IRepositoryCloneService service;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
+        IRepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathError;
         int selectedTabIndex;
 
@@ -54,7 +55,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             pathError = Observable.CombineLatest(
                 repository,
-                this.WhenAnyValue(x => x.Path), 
+                this.WhenAnyValue(x => x.Path),
                 ValidatePath)
                 .ToProperty(this, x => x.PathError);
 
@@ -138,19 +139,59 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        void UpdatePath(IRepositoryModel x)
+        void UpdatePath(IRepositoryModel repository)
         {
-            if (x != null)
+            if (repository != null)
             {
-                if (Path == service.DefaultClonePath)
+                var basePath = GetUpdatedBasePath(Path);
+                previousRepository = repository;
+                Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
+            }
+        }
+
+        string GetUpdatedBasePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return service.DefaultClonePath;
+            }
+
+            if (previousRepository == null)
+            {
+                return path;
+            }
+
+            if (FindDirWithout(path, previousRepository?.Owner, 2) is string dirWithoutOwner)
+            {
+                return dirWithoutOwner;
+            }
+
+            if (FindDirWithout(path, previousRepository?.Name, 1) is string dirWithoutRepo)
+            {
+                return dirWithoutRepo;
+            }
+
+            return path;
+
+            string FindDirWithout(string dir, string match, int levels)
+            {
+                string dirWithout = null;
+                for (var i = 0; i < 2; i++)
                 {
-                    Path = System.IO.Path.Combine(Path, x.Name);
+                    if (string.IsNullOrEmpty(dir))
+                    {
+                        break;
+                    }
+
+                    var name = System.IO.Path.GetFileName(dir);
+                    dir = System.IO.Path.GetDirectoryName(dir);
+                    if (name == match)
+                    {
+                        dirWithout = dir;
+                    }
                 }
-                else
-                {
-                    var basePath = System.IO.Path.GetDirectoryName(Path);
-                    Path = System.IO.Path.Combine(basePath, x.Name);
-                }
+
+                return dirWithout;
             }
         }
 
