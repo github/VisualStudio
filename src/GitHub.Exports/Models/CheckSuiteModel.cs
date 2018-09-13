@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace GitHub.Models
@@ -17,5 +17,7 @@ namespace GitHub.Models
         /// The check runs associated with a check suite.
         /// </summary>
         public List<CheckRunModel> CheckRuns { get; set; }
+
+        public string ApplicationName { get; set; }
     }
 }

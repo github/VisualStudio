@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -53,6 +53,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the list of annotations.
         /// </summary>
         IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; }
+
+        /// <summary>
+        /// Name of the Check Suite.
+        /// </summary>
+        string CheckSuiteName { get; }
 
         /// <summary>
         /// Initializes the view model.

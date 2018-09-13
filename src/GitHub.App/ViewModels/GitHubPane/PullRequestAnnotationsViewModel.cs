@@ -20,6 +20,7 @@ namespace GitHub.App.ViewModels.GitHubPane
 
         IPullRequestSession session;
         string title;
+        string checkSuiteName;
         string checkRunName;
         IReadOnlyList<IPullRequestAnnotationItemViewModel> annotations;
 
@@ -86,6 +87,13 @@ namespace GitHub.App.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public string CheckSuiteName
+        {
+            get { return checkSuiteName; }
+            private set { this.RaiseAndSetIfChanged(ref checkSuiteName, value); }
+        }
+
+        /// <inheritdoc/>
         public string CheckRunName
         {
             get { return checkRunName; }
@@ -108,13 +116,15 @@ namespace GitHub.App.ViewModels.GitHubPane
                 await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
-                var checkRunModel = pullRequest
-                    .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new {checkSuite, checkRun}))
-                    .First(model => model.checkRun.DatabaseId == CheckRunId);
+                var checkSuiteRun = pullRequest
+                    .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns
+                            .Select(checkRun => new{checkSuite, checkRun}))
+                    .First(arg => arg.checkRun.DatabaseId == CheckRunId);
 
-                CheckRunName = checkRunModel.checkRun.Name;
-                Annotations = checkRunModel.checkRun.Annotations
-                    .Select(annotation => new PullRequestAnnotationItemViewModel(checkRunModel.checkSuite, checkRunModel.checkRun, annotation, session, pullRequestEditorService))
+                CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
+                CheckRunName = checkSuiteRun.checkRun.Name;
+                Annotations = checkSuiteRun.checkRun.Annotations
+                    .Select(annotation => new PullRequestAnnotationItemViewModel(checkSuiteRun.checkSuite, checkSuiteRun.checkRun, annotation, session, pullRequestEditorService))
                     .ToArray();
             }
             finally

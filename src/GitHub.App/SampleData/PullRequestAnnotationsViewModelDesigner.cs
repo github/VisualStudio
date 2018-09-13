@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GitHub.App.ViewModels.GitHubPane;
@@ -17,6 +17,7 @@ namespace GitHub.SampleData
         public int CheckRunId { get; set; }
         public ReactiveCommand<object> NavigateToPullRequest { get; }
         public string PullRequestTitle { get; } = "Fixing stuff in this PR";
+        public string CheckSuiteName { get; } = "Awesome Check Suite";
         public string CheckRunName { get; } = "Psuedo Check Run";
         public IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; } = new[]
         {

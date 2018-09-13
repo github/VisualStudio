@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -808,7 +808,8 @@ namespace GitHub.InlineReviews.Services
                                                           StartLine = annotation.Location.Start.Line,
                                                           EndLine = annotation.Location.End.Line,
                                                       }).ToList()
-                                              }).ToList()
+                                              }).ToList(),
+                                          ApplicationName = suite.App.Name,
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
