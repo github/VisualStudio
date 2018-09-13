@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -19,6 +19,7 @@ namespace GitHub.App.ViewModels.GitHubPane
 
         IPullRequestSession session;
         string title;
+        string checkSuiteName;
         string checkRunName;
         IReadOnlyList<IPullRequestAnnotationItemViewModel> annotations;
 
@@ -83,6 +84,13 @@ namespace GitHub.App.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public string CheckSuiteName
+        {
+            get { return checkSuiteName; }
+            private set { this.RaiseAndSetIfChanged(ref checkSuiteName, value); }
+        }
+
+        /// <inheritdoc/>
         public string CheckRunName
         {
             get { return checkRunName; }
@@ -105,13 +113,15 @@ namespace GitHub.App.ViewModels.GitHubPane
                 await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
-                var checkRunModel = pullRequest
-                    .CheckSuites.SelectMany(model => model.CheckRuns)
-                    .First(model => model.DatabaseId == CheckRunId);
+                var checkSuiteRun = pullRequest
+                    .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns
+                            .Select(checkRun => new{checkSuite, checkRun}))
+                    .First(arg => arg.checkRun.DatabaseId == CheckRunId);
 
-                CheckRunName = checkRunModel.Name;
-                Annotations = checkRunModel.Annotations
-                    .Select(model => new PullRequestAnnotationItemViewModel(model))
+                CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
+                CheckRunName = checkSuiteRun.checkRun.Name;
+                Annotations = checkSuiteRun.checkRun.Annotations
+                    .Select(annotation => new PullRequestAnnotationItemViewModel(annotation))
                     .ToArray();
             }
             finally
