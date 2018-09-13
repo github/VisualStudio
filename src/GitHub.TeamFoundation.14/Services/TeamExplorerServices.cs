@@ -3,10 +3,8 @@ using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 using EnvDTE;
-using GitHub.Extensions;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.Services
 {
@@ -15,6 +13,7 @@ namespace GitHub.Services
     public class TeamExplorerServices : ITeamExplorerServices
     {
         readonly IGitHubServiceProvider serviceProvider;
+        readonly IVSServices vsServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. ITeamExplorerNotificationManager is declared here so
@@ -25,14 +24,19 @@ namespace GitHub.Services
         ITeamExplorerNotificationManager manager;
 
         [ImportingConstructor]
-        public TeamExplorerServices(IGitHubServiceProvider serviceProvider)
+        public TeamExplorerServices(IGitHubServiceProvider serviceProvider, IVSServices vsServices)
         {
             this.serviceProvider = serviceProvider;
+            this.vsServices = vsServices;
         }
 
         public void OpenRepository(string repositoryPath)
         {
+#if TEAMEXPLORER14
+            vsServices.TryOpenRepository(repositoryPath);
+#else
             OpenFolder(repositoryPath);
+#endif
             ShowHomePage();
         }
 
