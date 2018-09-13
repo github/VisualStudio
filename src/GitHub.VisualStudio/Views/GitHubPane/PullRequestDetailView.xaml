@@ -6,7 +6,6 @@
                                     xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
                                     xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                                    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                     xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
                                     xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                     xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
@@ -113,7 +112,7 @@
 
             <!-- Updated at -->
             <TextBlock Opacity="0.5"
-                       Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
+                       Text="{Binding Model.UpdatedAt, StringFormat={x:Static ghfvs:Resources.UpdatedFormat}, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
 
             <!-- Git operation error message -->
             <TextBox Foreground="Red" 
@@ -154,7 +153,7 @@
                                     Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ghfvs:BooleanToInverseVisibilityConverter}}">
                         <ghfvs:OcticonImage Icon="arrow_down"/>
                         <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
-                        <ghfvs:GitHubActionLink Content="{x:Static prop:Resources.Pull}"
+                        <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Pull}"
                                                 Command="{Binding Pull}"
                                                 Margin="4,0"
                                                 ToolTip="{Binding UpdateState.PullToolTip}"
@@ -162,7 +161,7 @@
                                                 VerticalAlignment="Center"/>
                         <ghfvs:OcticonImage Icon="arrow_up"/>
                         <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
-                        <ghfvs:GitHubActionLink Content="{x:Static prop:Resources.Push}"
+                        <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Push}"
                                                 Command="{Binding Push}"
                                                 Margin="4,0"
                                                 ToolTip="{Binding UpdateState.PushToolTip}"
@@ -173,7 +172,7 @@
                                             Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
                         <TextBlock  Margin="4 0 0 0" Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"
                                     Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
-                        <ghfvs:GitHubActionLink Content="{x:Static prop:Resources.Sync}"
+                        <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Sync}"
                                                 Command="{Binding SyncSubmodules}"
                                                 Margin="4 0"
                                                 ToolTip="{Binding UpdateState.SyncSubmodulesToolTip}"
@@ -201,13 +200,13 @@
                         </TextBlock.Style>
 
                         <ghfvs:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
+                        <Run Text="{x:Static ghfvs:Resources.LocalBranchUpToDate}"/>
                     </TextBlock>
                 </StackPanel>
 
                 <!-- Author and open time -->
                 <ghfvs:SectionControl Name="descriptionSection"
-                                      HeaderText="{x:Static prop:Resources.Description}"
+                                      HeaderText="{x:Static ghfvs:Resources.Description}"
                                       IsExpanded="True"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <StackPanel Orientation="Vertical">
@@ -221,7 +220,7 @@
 
                             <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
                                 <Run FontWeight="SemiBold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
-                                <Run Text="{x:Static prop:Resources.Wrote}" />
+                                <Run Text="{x:Static ghfvs:Resources.Wrote}" />
                             </TextBlock>
                         </StackPanel>
                         <!-- PR Body -->
@@ -232,7 +231,7 @@
                 </ghfvs:SectionControl>
 
                 <ghfvs:SectionControl Name="reviewsSection"
-                                      HeaderText="{x:Static prop:Resources.Reviewers}"
+                                      HeaderText="{x:Static ghfvs:Resources.Reviewers}"
                                       IsExpanded="True"
                                       Margin="0 8 0 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
@@ -263,7 +262,7 @@
                 <ghfvs:SectionControl Name="changesSection" 
                                       Grid.Row="4"
                                       IsExpanded="True"
-                                      HeaderText="{Binding Files.ChangedFilesCount, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
+                                      HeaderText="{Binding Files.ChangedFilesCount, StringFormat={x:Static ghfvs:Resources.ChangesCountFormat}}"
                                       Margin="0 8 10 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true"/>
                 
