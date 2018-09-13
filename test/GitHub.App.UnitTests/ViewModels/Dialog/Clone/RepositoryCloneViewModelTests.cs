@@ -111,7 +111,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Repository_Name_Is_Appended_To_Base_Path()
+        public async Task Owner_And_Repository_Name_Is_Appended_To_Base_Path()
         {
             var target = CreateTarget();
 
