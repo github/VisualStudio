@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GitHub;
 using GitHub.Exports;
 using GitHub.Primitives;
 using GitHub.Services;

@@ -4,7 +4,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
              Width="Auto"
              Height="auto"
              Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -59,6 +58,6 @@
               Click="signIn_Click"
               Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToInverseVisibilityConverter}}"
               Style="{StaticResource ActionLinkButton}" 
-              Content="{x:Static prop:Resources.SignInCallToAction}" />
+              Content="{x:Static ghfvs:Resources.SignInCallToAction}" />
   </StackPanel>
 </UserControl>

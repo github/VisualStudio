@@ -6,7 +6,6 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
 
     <d:DesignData.DataContext>
@@ -77,7 +76,7 @@
                                               Margin="0 4"
                                               Visibility="{Binding Body, Converter={ghfvs:NullToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold" Text="{x:Static prop:Resources.Description}"/>
+                                            <TextBlock FontWeight="SemiBold" Text="{x:Static ghfvs:Resources.Description}"/>
                                         </Expander.Header>
                                         <markdig:MarkdownViewer Margin="22 4 0 0" Markdown="{Binding Body}"/>
                                     </Expander>
@@ -85,7 +84,7 @@
                                               Margin="0 4"
                                               Visibility="{Binding FileComments.Count, Converter={ghfvs:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold" Text="{x:Static prop:Resources.Comments}"/>
+                                            <TextBlock FontWeight="SemiBold" Text="{x:Static ghfvs:Resources.Comments}"/>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" 
                                                                            Margin="22 4 0 0"/>
@@ -93,7 +92,7 @@
                                     <Expander Margin="0 4"
                                               Visibility="{Binding OutdatedFileComments.Count, Converter={ghfvs:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold" Text="{x:Static prop:Resources.OutdatedComments}"/>
+                                            <TextBlock FontWeight="SemiBold" Text="{x:Static ghfvs:Resources.OutdatedComments}"/>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding OutdatedFileComments}"
                                                                            Margin="22 4 0 0"/>

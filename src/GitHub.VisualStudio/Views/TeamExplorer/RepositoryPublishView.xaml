@@ -5,7 +5,6 @@
                                        xmlns:ghfvs="https://github.com/github/VisualStudio"
                                        xmlns:local="clr-namespace:GitHub.VisualStudio.Views.TeamExplorer"
                                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                                       xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                        Margin="0"
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
@@ -61,7 +60,7 @@
         <TextBlock HorizontalAlignment="Stretch"
                    VerticalAlignment="Center"
                    Foreground="{DynamicResource GitHubVsGrayText}"
-                   Text="{x:Static prop:Resources.RepoDoesNotHaveRemoteText}"
+                   Text="{x:Static ghfvs:Resources.RepoDoesNotHaveRemoteText}"
                    TextTrimming="CharacterEllipsis"
                    TextWrapping="Wrap"
                    ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
@@ -107,7 +106,7 @@
                Foreground="{DynamicResource GitHubVsWindowText}"
                MaxLength="{x:Static ghfvs:Constants.MaxRepositoryNameLength}"
                Text="{Binding RepositoryName}"
-               PromptText="{x:Static prop:Resources.RepoNameText}"
+               PromptText="{x:Static ghfvs:Resources.RepoNameText}"
                SpellCheck.IsEnabled="True"
                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryNameTextBox}"
                VerticalContentAlignment="Center"/>
@@ -121,7 +120,7 @@
                Foreground="{DynamicResource GitHubVsWindowText}"
                Text="{Binding Description}"
                TextWrapping="WrapWithOverflow"
-               PromptText="{x:Static prop:Resources.DescriptionOptional}"
+               PromptText="{x:Static ghfvs:Resources.DescriptionOptional}"
                SpellCheck.IsEnabled="True"
                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryDescriptionTextBox}"
                VerticalContentAlignment="Center" />
@@ -146,7 +145,7 @@
                     </Style>
                 </TextBlock.Resources>
                 <TextBlock.Inlines>
-                    <Run Text="{x:Static prop:Resources.makePrivateContent}" />
+                    <Run Text="{x:Static ghfvs:Resources.makePrivateContent}" />
                 </TextBlock.Inlines>
             </TextBlock>
         </CheckBox>
@@ -157,7 +156,7 @@
             IsDefault="True"
             Style="{StaticResource GitHubVsButton}"
             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPublishRepositoryButton}" >
-            <TextBlock Text="{x:Static prop:Resources.publishText}" />
+            <TextBlock Text="{x:Static ghfvs:Resources.publishText}" />
         </Button>
 
   </StackPanel>
