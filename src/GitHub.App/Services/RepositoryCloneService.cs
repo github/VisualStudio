@@ -84,6 +84,7 @@ namespace GitHub.Services
                     .Viewer
                     .Select(viewer => new ViewerRepositoriesModel
                     {
+                        Owner = viewer.Login,
                         Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
