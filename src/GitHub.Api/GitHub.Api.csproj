@@ -1,132 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHub.Api</RootNamespace>
-    <AssemblyName>GitHub.Api</AssemblyName>
-    <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <OutputPath>bin\Release\</OutputPath>
-  </PropertyGroup>
+  
   <Import Project="$(SolutionDir)\src\common\signing.props" />
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit.GraphQL, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit.GraphQL.Core, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ApiClientConfiguration.cs" />
-    <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs" Condition="$(Buildtype) == 'Internal'">
+
+  <ItemGroup Condition="$(Buildtype) == 'Internal'">
+    <Compile Remove="ApiClientConfiguration_User.cs" />
+    <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs">
       <Link>ApiClientConfiguration_User.cs</Link>
     </Compile>
-    <Compile Include="ApiClientConfiguration_User.cs" Condition="$(Buildtype) != 'Internal'" />
-    <Compile Include="GraphQLKeychainCredentialStore.cs" />
-    <Compile Include="IGraphQLClientFactory.cs" />
-    <Compile Include="GraphQLClientFactory.cs" />
-    <Compile Include="IKeychain.cs" />
-    <Compile Include="ILoginManager.cs" />
-    <Compile Include="IOAuthCallbackListener.cs" />
-    <Compile Include="IncorrectScopesException.cs" />
-    <Compile Include="ITwoFactorChallengeHandler.cs" />
-    <Compile Include="LoginManager.cs" />
-    <Compile Include="KeychainCredentialStore.cs" />
-    <Compile Include="WindowsKeychain.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\common\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="SimpleApiClient.cs" />
-    <Compile Include="SimpleApiClientFactory.cs" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
+  
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
-      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
-      <Name>Octokit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
-      <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
-      <Name>CredentialManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
-      <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
-      <Name>GitHub.Exports</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
-      <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
-      <Name>GitHub.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
-      <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
-      <Name>GitHub.Logging</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
+    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj" />
+    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
+    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
+    <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="packages.config" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

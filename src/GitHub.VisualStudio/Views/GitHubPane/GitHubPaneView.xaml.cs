@@ -33,9 +33,9 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                     .Subscribe(n =>
                     {
                         if (n.Type == Notification.NotificationType.Error || n.Type == Notification.NotificationType.Warning)
-                            infoPanel.MessageType = MessageType.Warning;
+                            infoPanel.Icon = Octicon.alert;
                         else
-                            infoPanel.MessageType = MessageType.Information;
+                            infoPanel.Icon = Octicon.info;
                         infoPanel.Message = n.Message;
                     }));
             });

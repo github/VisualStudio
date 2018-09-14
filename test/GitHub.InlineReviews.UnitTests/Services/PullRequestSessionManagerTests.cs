@@ -30,11 +30,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
         const string OwnerCloneUrl = "https://github.com/owner/repo";
         static readonly ActorModel CurrentUser = new ActorModel { Login = "currentUser" };
 
-        public PullRequestSessionManagerTests()
-        {
-            Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-        }
-
         public class TheConstructor : PullRequestSessionManagerTests
         {
             [Test]
@@ -447,7 +442,7 @@ Line 4";
                 }
             }
 
-            [Test]
+            [Test, NUnit.Framework.Category("CodeCoverageFlake")]
             public async Task UpdatesInlineCommentThreadsFromEditorContent()
             {
                 var baseContents = @"Line 1
@@ -502,7 +497,7 @@ Line 4";
                 }
             }
 
-            [Test]
+            [Test, NUnit.Framework.Category("CodeCoverageFlake")]
             public async Task UpdatesReviewCommentWithNewBody()
             {
                 var baseContents = @"Line 1

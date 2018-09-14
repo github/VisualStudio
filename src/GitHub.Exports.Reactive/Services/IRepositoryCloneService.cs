@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Reactive;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitHub.Models;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -19,7 +21,6 @@ namespace GitHub.Services
         /// Clones the specificed repository into the specified directory.
         /// </summary>
         /// <param name="cloneUrl">The url of the repository to clone.</param>
-        /// <param name="repositoryName">The name of the repository to clone.</param>
         /// <param name="repositoryPath">The directory that will contain the repository directory.</param>
         /// <param name="progress">
         /// An object through which to report progress. This must be of type
@@ -29,8 +30,18 @@ namespace GitHub.Services
         /// <returns></returns>
         Task CloneRepository(
             string cloneUrl,
-            string repositoryName,
             string repositoryPath,
             object progress = null);
+
+        /// <summary>
+        /// Checks whether the specified destination path already exists.
+        /// </summary>
+        /// <param name="path">The destination path.</param>
+        /// <returns>
+        /// true if a file or directory is already present at <paramref name="path"/>; otherwise false.
+        /// </returns>
+        bool DestinationExists(string path);
+
+        Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address);
     }
 }

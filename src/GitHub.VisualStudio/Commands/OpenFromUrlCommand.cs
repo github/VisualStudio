@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 using SVsServiceProvider = Microsoft.VisualStudio.Shell.SVsServiceProvider;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio.Commands
 {
@@ -20,7 +21,6 @@ namespace GitHub.VisualStudio.Commands
     {
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
-        readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IGitHubToolWindowManager> gitHubToolWindowManager;
         readonly Lazy<DTE> dte;
@@ -40,14 +40,12 @@ namespace GitHub.VisualStudio.Commands
         public OpenFromUrlCommand(
             Lazy<IGitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService,
-            Lazy<IPullRequestEditorService> pullRequestEditorService,
             Lazy<ITeamExplorerContext> teamExplorerContext,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider) :
             base(CommandSet, CommandId)
         {
             this.gitHubContextService = gitHubContextService;
             this.repositoryCloneService = repositoryCloneService;
-            this.pullRequestEditorService = pullRequestEditorService;
             this.teamExplorerContext = teamExplorerContext;
             this.serviceProvider = serviceProvider;
             dte = new Lazy<DTE>(() => (DTE)serviceProvider.GetService(typeof(DTE)));
@@ -96,7 +94,7 @@ namespace GitHub.VisualStudio.Commands
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:
-                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDirName, targetDir);
+                        await repositoryCloneService.Value.CloneRepository(cloneUrl, repositoryDir);
                         // Open the cloned repository
                         dte.Value.ExecuteCommand("File.OpenFolder", repositoryDir);
                         dte.Value.ExecuteCommand("View.TfsTeamExplorer");
@@ -119,7 +117,7 @@ namespace GitHub.VisualStudio.Commands
             var solutionDir = FindSolutionDirectory(dte.Value.Solution);
             if (solutionDir == null || !ContainsDirectory(repositoryDir, solutionDir))
             {
-                var result = ShowInfoMessage($"Open repository at '{repositoryDir}'?");
+                var result = ShowInfoMessage(string.Format(Resources.OpenRepositoryAtDir, repositoryDir));
                 switch (result)
                 {
                     case VSConstants.MessageBoxResult.IDYES:

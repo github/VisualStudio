@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GitHub.Models;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -32,6 +33,14 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         /// <param name="viewModel">The view model to display.</param>
         Task StartWithConnection<T>(T viewModel)
+            where T : IDialogContentViewModel, IConnectionInitializedViewModel;
+
+        /// <summary>
+        /// Starts displaying a view model that requires a connection that needs to be logged out
+        /// and back in.
+        /// </summary>
+        /// <param name="viewModel">The view model to display.</param>
+        Task StartWithLogout<T>(T viewModel, IConnection connection)
             where T : IDialogContentViewModel, IConnectionInitializedViewModel;
     }
 }

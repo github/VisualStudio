@@ -2,12 +2,14 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using EnvDTE;
+using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.ViewModels.Dialog;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using GitHub.ViewModels.Dialog.Clone;
 
 namespace GitHub.Services
 {
@@ -58,17 +60,15 @@ namespace GitHub.Services
 
         public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
         {
+            Guard.ArgumentNotNull(connection, nameof(connection));
+
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
 
-            if (connection != null)
-            {
-                await viewModel.InitializeAsync(connection);
-                return (CloneDialogResult)await showDialog.Show(viewModel);
-            }
-            else
-            {
-                return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel);
-            }
+            return (CloneDialogResult)await showDialog.Show(
+                viewModel,
+                connection,
+                ApiClientConfiguration.RequestedScopes)
+                .ConfigureAwait(false);
         }
 
         public async Task<string> ShowReCloneDialog(IRepositoryModel repository)

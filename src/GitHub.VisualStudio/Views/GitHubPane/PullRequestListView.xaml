@@ -7,7 +7,6 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
     <d:DesignProperties.DataContext>
@@ -48,9 +47,8 @@
             <Separator DockPanel.Dock="Left" Style="{StaticResource VerticalSeparator}" Margin="4 0" />
 
             <ghfvs:GitHubActionLink DockPanel.Dock="Left"
-                                    Command="{Binding CreatePullRequest}">
-                Create New
-            </ghfvs:GitHubActionLink>
+                                    Command="{Binding CreatePullRequest}"
+                                    Content="{x:Static ghfvs:Resources.CreateNew}"/>
 
             <ghfvs:DropDownButton Name="authorFilterDropDown"
                                   DockPanel.Dock="Right"
@@ -58,7 +56,7 @@
                                   Cursor="Hand"
                                   Foreground="{DynamicResource GitHubActionLinkItemBrush}"
                                   Padding="2"
-                                  ToolTip="Filter by Author"
+                                  ToolTip="{x:Static ghfvs:Resources.FilterByAuthor}"
                                   VerticalAlignment="Center"
                                   Visibility="{Binding Items.Count, Converter={ghfvs:CountToVisibilityConverter}}"
                                   PopupOpened="authorFilterDropDown_PopupOpened">
@@ -79,7 +77,7 @@
                                   Cursor="Hand"
                                   Foreground="{DynamicResource GitHubActionLinkItemBrush}"
                                   Padding="2"
-                                  ToolTip="Select Fork"
+                                  ToolTip="{x:Static ghfvs:Resources.SelectFork}"
                                   VerticalAlignment="Center"
                                   Visibility="{Binding Forks, Converter={ghfvs:NullToVisibilityConverter}}">
                 <ghfvs:OcticonImage Icon="repo_forked" Height="12" Width="12"/>
@@ -113,8 +111,8 @@
                      KeyDown="ListBox_KeyDown">
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{x:Static prop:Resources.Open}" Command="{Binding OpenItem}"/>
-                        <MenuItem Header="{x:Static prop:Resources.openInBrowser}" Command="{Binding OpenItemInBrowser}"/>
+                        <MenuItem Header="{x:Static ghfvs:Resources.Open}" Command="{Binding OpenItem}"/>
+                        <MenuItem Header="{x:Static ghfvs:Resources.openInBrowser}" Command="{Binding OpenItemInBrowser}"/>
                     </ContextMenu>
                 </ListBox.ContextMenu>
                 <ListBox.ItemContainerStyle>
@@ -141,22 +139,22 @@
                            HorizontalAlignment="Center"
                            FontSize="16"
                            Margin="4"
-                           Text="There aren't any open pull requests"/>
+                           Text="{x:Static ghfvs:Resources.ThereArenTAnyOpenPullRequests}"/>
                 <TextBlock TextWrapping="Wrap"
                            TextAlignment="Center"
                            HorizontalAlignment="Center"
                            Margin="4"
                            Opacity="0.75"
-                           Text="Pull requests let you tell others about changes you've pushed to a repository on GitHub"/>
+                           Text="{x:Static ghfvs:Resources.PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub}"/>
                 <TextBlock TextWrapping="Wrap"
                            TextAlignment="Center"
                            HorizontalAlignment="Center"
                            Margin="4"
                            Opacity="0.75">
-                    To get started you can
+                    <Run Text="{x:Static ghfvs:Resources.ToGetStartedYouCan}"/>
                     <Hyperlink Command="{Binding CreatePullRequest}"
                                Foreground="{DynamicResource GitHubActionLinkItemBrush}">
-                        create a pull request
+                        <Run Text="{x:Static ghfvs:Resources.CreateAPullRequest}"/>
                     </Hyperlink>
                 </TextBlock>
             </StackPanel>
@@ -172,8 +170,9 @@
                            HorizontalAlignment="Center"
                            FontSize="16"
                            Margin="4"
-                           Text="No results matched your search."/>
+                           Text="{x:Static ghfvs:Resources.NoResultsMatchedYourSearch}"/>
             </StackPanel>
         </Grid>
     </DockPanel>
 </UserControl>
+

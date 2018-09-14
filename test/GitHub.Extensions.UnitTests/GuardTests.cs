@@ -10,7 +10,7 @@ namespace UnitTests.GitHub.Extensions
 {
     public class GuardTests
     {
-        public class TheArgumentNotNullMethod : TestBaseClass
+        public class TheArgumentNotNullMethod
         {
             [Test]
             public void ShouldNotThrow()
@@ -25,7 +25,7 @@ namespace UnitTests.GitHub.Extensions
             }
         }
 
-        public class TheArgumentNonNegativeMethod : TestBaseClass
+        public class TheArgumentNonNegativeMethod
         {
             [Test]
             public void ShouldNotThrowFor0()
@@ -46,7 +46,7 @@ namespace UnitTests.GitHub.Extensions
             }
         }
 
-        public class TheArgumentNotEmptyStringMethod : TestBaseClass
+        public class TheArgumentNotEmptyStringMethod
         {
             [Test]
             public void ShouldNotThrowForString()
@@ -67,7 +67,7 @@ namespace UnitTests.GitHub.Extensions
             }
         }
 
-        public class TheArgumentInRangeMethod : TestBaseClass
+        public class TheArgumentInRangeMethod
         {
             [Test]
             public void ShouldNotThrowForGreaterThanMinimum()

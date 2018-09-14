@@ -76,7 +76,7 @@
                                               Margin="0 4"
                                               Visibility="{Binding Body, Converter={ghfvs:NullToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Description</TextBlock>
+                                            <TextBlock FontWeight="SemiBold" Text="{x:Static ghfvs:Resources.Description}"/>
                                         </Expander.Header>
                                         <markdig:MarkdownViewer Margin="22 4 0 0" Markdown="{Binding Body}"/>
                                     </Expander>
@@ -84,7 +84,7 @@
                                               Margin="0 4"
                                               Visibility="{Binding FileComments.Count, Converter={ghfvs:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Comments</TextBlock>
+                                            <TextBlock FontWeight="SemiBold" Text="{x:Static ghfvs:Resources.Comments}"/>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding FileComments}" 
                                                                            Margin="22 4 0 0"/>
@@ -92,7 +92,7 @@
                                     <Expander Margin="0 4"
                                               Visibility="{Binding OutdatedFileComments.Count, Converter={ghfvs:CountToVisibilityConverter}}">
                                         <Expander.Header>
-                                            <TextBlock FontWeight="SemiBold">Outdated comments</TextBlock>
+                                            <TextBlock FontWeight="SemiBold" Text="{x:Static ghfvs:Resources.OutdatedComments}"/>
                                         </Expander.Header>
                                         <local:PullRequestFileCommentsView DataContext="{Binding OutdatedFileComments}"
                                                                            Margin="22 4 0 0"/>
