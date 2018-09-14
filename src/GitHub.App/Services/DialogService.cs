@@ -30,7 +30,7 @@ namespace GitHub.Services
 
         public string GetPathOfActiveDocument()
         {
-            return dte.Value.ActiveDocument.FullName;
+            return dte.Value.ActiveDocument?.FullName;
         }
     }
 

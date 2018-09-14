@@ -170,7 +170,9 @@ namespace GitHub.ViewModels.GitHubPane
 
             var currentPageIsPullRequest = currentPage
                 .Select(x => x as IPullRequestDetailViewModel)
-                .SelectMany(model => model?.WhenAnyValue(viewModel => !viewModel.IsLoading) ?? Observable.Return(false));
+                .SelectMany(model =>
+                    model?.WhenAnyValue(viewModel => viewModel.IsLoading, isLoading => !isLoading) ??
+                    Observable.Return(false));
 
             syncActiveDocument = ReactiveCommand.CreateAsyncTask(
                 currentPageIsPullRequest,
@@ -311,8 +313,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         public Task SyncActiveDocument()
         {
-            var pathOfActiveDocument = this.gitHubPaneService.GetPathOfActiveDocument();
-            log.Debug("Sync Active Document {0}", pathOfActiveDocument);
+            var pathOfActiveDocument = gitHubPaneService.GetPathOfActiveDocument();
+            log.Debug("Sync Active Document {0}", pathOfActiveDocument ?? "[NULL]");
             return Task.CompletedTask;
         }
 
