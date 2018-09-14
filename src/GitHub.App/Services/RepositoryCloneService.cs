@@ -66,7 +66,7 @@ namespace GitHub.Services
 
                 var affiliation = new RepositoryAffiliation?[]
                 {
-                    RepositoryAffiliation.Owner
+                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
