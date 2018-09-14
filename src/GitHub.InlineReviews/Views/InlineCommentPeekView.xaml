@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
@@ -58,7 +59,7 @@
             </Border.Style>
             <DockPanel>
                 <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 8 0"/>
-                <TextBlock TextWrapping="Wrap">You must commit and push your changes to add a comment here.</TextBlock>
+                <TextBlock TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.YouMustCommitAndPushYourChangesToAddACommentHere}"/>
             </DockPanel>
         </Border>
 
@@ -71,7 +72,7 @@
                 <Button Margin="2 0" Padding="2" Command="{Binding PreviousComment}"
                         Style="{StaticResource GitHubToolbarButton}">
                     <Button.ToolTip>
-                        <TextBlock FontSize="11">Previous Comment</TextBlock>
+                        <TextBlock FontSize="11" Text="{x:Static ghfvs:Resources.PreviousComment}"/>
                     </Button.ToolTip>
                     <Canvas Width="16" Height="16">
                         <!-- TODO: Double check these brushes since they don't seem like the right fill colors -->
@@ -85,7 +86,7 @@
                 <Button Margin="2 0" Padding="2" Command="{Binding NextComment}"
                         Style="{StaticResource GitHubToolbarButton}">
                     <Button.ToolTip>
-                        <TextBlock FontSize="11">Next Comment</TextBlock>
+                        <TextBlock FontSize="11" Text="{x:Static ghfvs:Resources.NextComment}"/>
                     </Button.ToolTip>
 
                     <Canvas Width="16" Height="16">

@@ -101,7 +101,7 @@ namespace GitHub.Commands
                 {
                     if (!info.Session.IsCheckedOut)
                     {
-                        ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
+                        ShowInfoMessage(Resources.NavigateToEditorNotCheckedOutInfoMessage);
                         return;
                     }
 
@@ -237,7 +237,7 @@ namespace GitHub.Commands
             if (teamExplorerContext.Value.ActiveRepository?.LocalPath is string repositoryDir &&
                 FindObjectishForTFSTempFile(sourceView) is string objectish)
             {
-                var (commitSha, blobPath) = gitHubContextService.Value.ResolveBlobFromHistory(repositoryDir, objectish);
+                var (_, blobPath) = gitHubContextService.Value.ResolveBlobFromHistory(repositoryDir, objectish);
                 if (blobPath is string)
                 {
                     var workingFile = Path.Combine(repositoryDir, blobPath);

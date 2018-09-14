@@ -70,11 +70,10 @@ namespace GitHub.StartPage
             if (request == null)
                 return null;
 
-            var path = Path.Combine(request.BasePath, request.Repository.Name);
             var uri = request.Repository.CloneUrl.ToRepositoryUrl();
             return new CodeContainer(
-                localProperties: new CodeContainerLocalProperties(path, CodeContainerType.Folder,
-                                new CodeContainerSourceControlProperties(request.Repository.Name, path, new Guid(Guids.GitSccProviderId))),
+                localProperties: new CodeContainerLocalProperties(request.Path, CodeContainerType.Folder,
+                                new CodeContainerSourceControlProperties(request.Repository.Name, request.Path, new Guid(Guids.GitSccProviderId))),
                 remote: new RemoteCodeContainer(request.Repository.Name,
                                                 new Guid(Guids.CodeContainerProviderId),
                                                 uri,
@@ -133,7 +132,8 @@ namespace GitHub.StartPage
 
                 if (basePath != null)
                 {
-                    result = new CloneDialogResult(basePath, repository);
+                    var path = Path.Combine(basePath, repository.Name);
+                    result = new CloneDialogResult(path, repository);
                 }
             }
 
@@ -143,8 +143,7 @@ namespace GitHub.StartPage
                 {
                     await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
-                        result.Repository.Name,
-                        result.BasePath,
+                        result.Path,
                         progress);
 
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();

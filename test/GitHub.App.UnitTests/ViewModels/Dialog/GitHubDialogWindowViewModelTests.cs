@@ -52,7 +52,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var target = CreateTarget();
                 var content = Substitute.For<ITestViewModel>();
 
-                await target.StartWithConnection(content);
+                target.StartWithConnection(content).Forget();
 
 				Assert.That(target.Content, Is.InstanceOf<ILoginViewModel>());
 			}
@@ -64,7 +64,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var target = CreateTarget(connectionManager);
                 var content = Substitute.For<ITestViewModel>();
 
-                await target.StartWithConnection(content);
+                target.StartWithConnection(content).Forget();
 
                 Assert.That(content, Is.SameAs(target.Content));
                 await content.Received(1).InitializeAsync(connectionManager.Connections[0]);
@@ -75,13 +75,13 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
             {
                 var target = CreateTarget();
                 var content = Substitute.For<ITestViewModel>();
-
-                await target.StartWithConnection(content);
+                var task = target.StartWithConnection(content);
 
                 var login = (ILoginViewModel)target.Content;
                 var connection = Substitute.For<IConnection>();
                 ((ISubject<object>)login.Done).OnNext(connection);
 
+                await task;
                 Assert.That(content, Is.SameAs(target.Content));
                 await content.Received(1).InitializeAsync(connection);
             }
@@ -94,11 +94,12 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var closed = false;
 
                 target.Done.Subscribe(_ => closed = true);
-                await target.StartWithConnection(content);
 
+                var task = target.StartWithConnection(content);
                 var login = (ILoginViewModel)target.Content;
                 ((ISubject<object>)login.Done).OnNext(null);
 
+                await task;
                 Assert.True(closed);
             }
         }

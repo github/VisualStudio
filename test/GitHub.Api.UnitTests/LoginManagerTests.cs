@@ -27,7 +27,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             await target.Login(host, client, "foo", "bar");
 
             await keychain.Received().Save("foo", "123abc", host);
@@ -45,10 +45,10 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             var result = await target.Login(host, client, "foo", "bar");
 
-            Assert.That(user, Is.SameAs(result));
+            Assert.That(user, Is.SameAs(result.User));
         }
 
         [Test]
@@ -69,7 +69,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             var result = await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
@@ -93,7 +93,7 @@ public class LoginManagerTests
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.Value.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received().GetOrCreateApplicationAuthentication(
@@ -123,7 +123,7 @@ public class LoginManagerTests
                 new TwoFactorChallengeResult("111111"),
                 new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
@@ -159,7 +159,7 @@ public class LoginManagerTests
                 new TwoFactorChallengeResult("111111"),
                 new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
@@ -190,7 +190,7 @@ public class LoginManagerTests
                 TwoFactorChallengeResult.RequestResendCode,
                 new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             await target.Login(host, client, "foo", "bar");
 
             await client.Authorization.Received(2).GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>());
@@ -213,7 +213,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             await target.Login(enterprise, client, "foo", "bar");
 
             await keychain.Received().Save("foo", "bar", enterprise);
@@ -232,7 +232,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             Assert.ThrowsAsync<AuthorizationException>(async () => await target.Login(enterprise, client, "foo", "bar"));
 
             await keychain.Received().Delete(enterprise);
@@ -251,7 +251,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
 
@@ -276,7 +276,7 @@ public class LoginManagerTests
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
             tfa.Value.HandleTwoFactorException(exception).Returns(new TwoFactorChallengeResult("123456"));
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await target.Login(host, client, "foo", "bar"));
 
             await keychain.Received().Delete(host);
@@ -293,7 +293,7 @@ public class LoginManagerTests
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
             var oauthListener = Substitute.For<IOAuthCallbackListener>();
 
-            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes);
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
 
             Assert.ThrowsAsync<IncorrectScopesException>(() => target.Login(host, client, "foo", "bar"));
         }
@@ -309,41 +309,6 @@ public class LoginManagerTests
             userResponse.Body.Returns(user ?? new User());
             result.Connection.Get<User>(new Uri("user", UriKind.Relative), null, null).Returns(userResponse);
             return result;
-        }
-    }
-
-    public class TheScopesMatchMethod
-    {
-        [Test]
-        public void ReturnsFalseWhenMissingScopes()
-        {
-            var received = new[] { "user", "repo", "write:public_key" };
-
-            Assert.False(LoginManager.ScopesMatch(scopes, received));
-        }
-
-        [Test]
-        public void ReturnsTrueWhenScopesEqual()
-        {
-            var received = new[] { "user", "repo", "gist", "write:public_key" };
-
-            Assert.True(LoginManager.ScopesMatch(scopes, received));
-        }
-
-        [Test]
-        public void ReturnsTrueWhenExtraScopesReturned()
-        {
-            var received = new[] { "user", "repo", "gist", "foo", "write:public_key" };
-
-            Assert.True(LoginManager.ScopesMatch(scopes, received));
-        }
-
-        [Test]
-        public void ReturnsTrueWhenAdminScopeReturnedInsteadOfWrite()
-        {
-            var received = new[] { "user", "repo", "gist", "foo", "admin:public_key" };
-
-            Assert.True(LoginManager.ScopesMatch(scopes, received));
         }
     }
 }

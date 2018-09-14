@@ -179,6 +179,9 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Home\ForkNavigationItem.cs">
       <Link>Home\ForkNavigationItem.cs</Link>
     </Compile>
+    <Compile Include="..\GitHub.TeamFoundation.14\RegistryHelper.cs">
+      <Link>RegistryHelper.cs</Link>
+    </Compile>
     <Compile Include="..\GitHub.TeamFoundation.14\Services\LocalRepositoryModelFactory.cs">
       <Link>Services\LocalRepositoryModelFactory.cs</Link>
     </Compile>
@@ -248,7 +251,6 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Services\VSGitServices.cs">
       <Link>Services\VSGitServices.cs</Link>
     </Compile>
-    <Compile Include="RegistryHelper.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
@@ -293,6 +295,10 @@
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
       <Name>GitHub.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj">
+      <Project>{54e8d71a-aabb-4698-95fe-7f11612b8e59}</Project>
+      <Name>GitHub.Resources</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>

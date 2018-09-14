@@ -1,5 +1,5 @@
 os: Visual Studio 2017
-version: '2.5.5.{build}'
+version: '2.5.6.{build}'
 skip_tags: true
 install:
 - ps: |
@@ -29,3 +29,5 @@ on_success:
     if ($full_build) {
       script\Sign-Package -AppVeyor
     }
+on_finish:
+- ps: scripts\Run-CodeCoverage.ps1 -AppVeyor -Configuration:Release

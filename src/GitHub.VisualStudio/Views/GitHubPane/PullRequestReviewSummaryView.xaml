@@ -11,7 +11,6 @@
              xmlns:vm="clr-namespace:GitHub.ViewModels.GitHubPane;assembly=GitHub.App"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" d:DesignWidth="300"
              Name="root">
 
@@ -81,7 +80,7 @@
                     <ui:GitHubActionLink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                                          CommandParameter="{Binding}"
                                          Margin="2 1 2 0"
-                                         Content="{x:Static prop:Resources.ContinueYourReview}"
+                                         Content="{x:Static ghfvs:Resources.ContinueYourReview}"
                                          Visibility="{Binding State, Converter={ui:EqualsToVisibilityConverter Pending}}"/>
                 </Grid>
             </Grid>
@@ -90,7 +89,7 @@
         <ui:GitHubActionLink Command="{Binding Path=DataContext.ShowReview, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                              CommandParameter="{Binding}"
                              Visibility="{Binding Id, Converter={ui:EqualsToVisibilityConverter {x:Null}}}"
-                             Content="{x:Static prop:Resources.AddYourReview}"/>
+                             Content="{x:Static ghfvs:Resources.AddYourReview}"/>
 
     </Grid>
 </UserControl>

@@ -153,8 +153,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
                     await cloneService.CloneRepository(
                         result.Repository.CloneUrl,
-                        result.Repository.Name,
-                        result.BasePath);
+                        result.Path);
 
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }

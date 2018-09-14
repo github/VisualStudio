@@ -1,4 +1,4 @@
-﻿#if TEAMEXPLORER15
+﻿#if !TEAMEXPLORER14
 // Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
 extern alias SF15;
 using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
