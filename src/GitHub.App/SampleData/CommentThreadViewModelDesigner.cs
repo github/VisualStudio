@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
-using GitHub.InlineReviews.ViewModels;
-using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
 
-namespace GitHub.InlineReviews.SampleData
+namespace GitHub.SampleData
 {
     [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    class CommentThreadViewModelDesigner : ICommentThreadViewModel
+    public class CommentThreadViewModelDesigner : ICommentThreadViewModel
     {
         public ObservableCollection<ICommentViewModel> Comments { get; }
             = new ObservableCollection<ICommentViewModel>();

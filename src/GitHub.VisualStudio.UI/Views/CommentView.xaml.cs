@@ -7,7 +7,7 @@ using GitHub.ViewModels;
 using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
 
-namespace GitHub.InlineReviews.Views
+namespace GitHub.VisualStudio.Views
 {
     public class GenericCommentView : ViewBase<ICommentViewModel, GenericCommentView> { }
 
