@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj" />
-    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
-    <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj" />
+    <ProjectReference Include="..\GitHub.App\GitHub.App.csproj" />
+    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj" />
   </ItemGroup>
 
   <ItemGroup>

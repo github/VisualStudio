@@ -5,6 +5,7 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
+             xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
@@ -21,7 +22,7 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <ghfvs:InfoPanel Message="{Binding PathError}"/>
+        <uic:InfoPanel Message="{Binding PathError}"/>
 
         <ghfvs:OcticonCircleButton DockPanel.Dock="Bottom"
                                    Margin="12"

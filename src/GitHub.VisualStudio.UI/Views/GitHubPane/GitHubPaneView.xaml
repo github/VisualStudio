@@ -6,6 +6,7 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
              Foreground="{DynamicResource GitHubVsWindowText}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -39,7 +40,7 @@
   </Control.Resources>
 
   <DockPanel>
-    <ghfvs:InfoPanel Name="infoPanel"
+    <uic:InfoPanel Name="infoPanel"
                    DockPanel.Dock="Top"
                    Message="{Binding Message}"
                    VerticalAlignment="Top"/>
