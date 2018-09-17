@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using GitHub.VisualStudio.UI;
+using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.VisualStudio
 {

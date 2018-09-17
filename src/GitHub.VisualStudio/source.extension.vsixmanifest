@@ -36,6 +36,7 @@
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.InlineReviewsPackage" Path="|GitHub.InlineReviews;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.StartPage" Path="|GitHub.StartPage;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.InlineReviews" Path="|GitHub.InlineReviews|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.VisualStudio.UI" Path="|GitHub.VisualStudio.UI|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Rothko.dll" />
   </Assets>
   <Prerequisites>

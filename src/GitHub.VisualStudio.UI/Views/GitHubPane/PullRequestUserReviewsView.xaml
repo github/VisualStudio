@@ -6,6 +6,7 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
 
     <d:DesignData.DataContext>
@@ -40,7 +41,7 @@
                            Text="{Binding PullRequestTitle}"
                            TextWrapping="Wrap"/>
                 <StackPanel Orientation="Horizontal" Margin="0 4">
-                    <ghfvs:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
+                    <uic:AccountAvatar Account="{Binding User}" Margin="0 0 4 0" Width="16" Height="16"/>
                     <TextBlock Text="{Binding Reviews.Count, StringFormat={}{0} reviews}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
