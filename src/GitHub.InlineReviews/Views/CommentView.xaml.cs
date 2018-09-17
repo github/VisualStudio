@@ -3,6 +3,7 @@ using System.Windows.Input;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.ViewModels;
 using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
 

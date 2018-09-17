@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reactive;
-using GitHub.Models;
-using GitHub.ViewModels;
 using ReactiveUI;
 
-namespace GitHub.InlineReviews.ViewModels
+namespace GitHub.ViewModels
 {
     public enum CommentEditState
     {

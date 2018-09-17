@@ -84,8 +84,6 @@
     <Compile Include="Margins\InlineCommentMargin.cs" />
     <Compile Include="Margins\InlineCommentMarginVisible.cs" />
     <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
-    <Compile Include="Services\CommentService.cs" />
-    <Compile Include="Services\ICommentService.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
@@ -111,9 +109,6 @@
     <Compile Include="Margins\InlineCommentMarginProvider.cs" />
     <Compile Include="Services\PullRequestSessionService.cs" />
     <Compile Include="ViewModels\PullRequestFileMarginViewModel.cs" />
-    <Compile Include="ViewModels\CommentViewModel.cs" />
-    <Compile Include="ViewModels\ICommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
@@ -144,7 +139,6 @@
     <Compile Include="Tags\InlineCommentTagger.cs" />
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
     <Compile Include="ViewModels\InlineCommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\ICommentViewModel.cs" />
     <Compile Include="Views\CommentThreadView.xaml.cs">
       <DependentUpon>CommentThreadView.xaml</DependentUpon>
     </Compile>
