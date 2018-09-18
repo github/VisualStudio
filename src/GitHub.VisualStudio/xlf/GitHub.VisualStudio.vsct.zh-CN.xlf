@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../GitHub.VisualStudio.vsct">
+    <body>
+      <trans-unit id="addConnectionCommand|ButtonText">
+        <source>&amp;Connect to GitHub</source>
+        <target state="new">&amp;Connect to GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="addConnectionCommand|LocCanonicalName">
+        <source>.GitHub.ConnectToGitHub</source>
+        <target state="new">.GitHub.ConnectToGitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="backCommand|ButtonText">
+        <source>Back</source>
+        <target state="new">Back</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="backCommand|LocCanonicalName">
+        <source>.GitHub.Back</source>
+        <target state="new">.GitHub.Back</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="copyLinkCommand|ButtonText">
+        <source>Copy link to clipboard</source>
+        <target state="new">Copy link to clipboard</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="copyLinkCommand|LocCanonicalName">
+        <source>.GitHub.CopyLink</source>
+        <target state="new">.GitHub.CopyLink</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="forwardCommand|ButtonText">
+        <source>Forward</source>
+        <target state="new">Forward</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="forwardCommand|LocCanonicalName">
+        <source>.GitHub.Forward</source>
+        <target state="new">.GitHub.Forward</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="githubCommand|ButtonText">
+        <source>View on GitHub</source>
+        <target state="new">View on GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="githubCommand|LocCanonicalName">
+        <source>.GitHub.ViewOnGitHub</source>
+        <target state="new">.GitHub.ViewOnGitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText">
+        <source>Go To Solution/PR File</source>
+        <target state="new">Go To Solution/PR File</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
+        <source>.GitHub.GoToSolutionOrPRFile</source>
+        <target state="new">.GitHub.GoToSolutionOrPRFile</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="helpCommand|ButtonText">
+        <source>Help</source>
+        <target state="new">Help</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="helpCommand|LocCanonicalName">
+        <source>.GitHub.Help</source>
+        <target state="new">.GitHub.Help</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idBlameCommand|ButtonText">
+        <source>Blame</source>
+        <target state="new">Blame</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idBlameCommand|LocCanonicalName">
+        <source>.GitHub.Blame</source>
+        <target state="new">.GitHub.Blame</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistCommand|ButtonText">
+        <source>Create a GitHub Gist</source>
+        <target state="new">Create a GitHub Gist</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistCommand|LocCanonicalName">
+        <source>.GitHub.CreateGist</source>
+        <target state="new">.GitHub.CreateGist</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistEnterpriseCommand|ButtonText">
+        <source>Create an Enterprise Gist</source>
+        <target state="new">Create an Enterprise Gist</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">
+        <source>.GitHub.CreateGistEnterprise</source>
+        <target state="new">.GitHub.CreateGistEnterprise</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubContextMenu|ButtonText">
+        <source>GitHub</source>
+        <target state="new">GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubContextMenu|CommandName">
+        <source>GitHub</source>
+        <target state="new">GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubToolbar|ButtonText">
+        <source>WindowToolBar</source>
+        <target state="new">WindowToolBar</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubToolbar|CommandName">
+        <source>Window Toolbar</source>
+        <target state="new">Window Toolbar</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromClipboardCommand|ButtonText">
+        <source>Open from clipboard</source>
+        <target state="new">Open from clipboard</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromClipboardCommand|LocCanonicalName">
+        <source>.GitHub.OpenFromClipboard</source>
+        <target state="new">.GitHub.OpenFromClipboard</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromUrlCommand|ButtonText">
+        <source>Open from GitHub...</source>
+        <target state="new">Open from GitHub...</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromUrlCommand|LocCanonicalName">
+        <source>.GitHub.OpenFromUrl</source>
+        <target state="new">.GitHub.OpenFromUrl</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openLinkCommand|ButtonText">
+        <source>Open on GitHub</source>
+        <target state="new">Open on GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openLinkCommand|LocCanonicalName">
+        <source>.GitHub.OpenLink</source>
+        <target state="new">.GitHub.OpenLink</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="pullRequestCommand|ButtonText">
+        <source>Pull Requests</source>
+        <target state="new">Pull Requests</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="pullRequestCommand|LocCanonicalName">
+        <source>.GitHub.PullRequests</source>
+        <target state="new">.GitHub.PullRequests</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="refreshCommand|ButtonText">
+        <source>Refresh</source>
+        <target state="new">Refresh</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="refreshCommand|LocCanonicalName">
+        <source>.GitHub.Refresh</source>
+        <target state="new">.GitHub.Refresh</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showCurrentPullRequestCommand|ButtonText">
+        <source>Show Current Pull Request</source>
+        <target state="new">Show Current Pull Request</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
+        <source>.GitHub.ShowCurrentPullRequest</source>
+        <target state="new">.GitHub.ShowCurrentPullRequest</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showGitHubPaneCommand|ButtonText">
+        <source>GitHub</source>
+        <target state="new">GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showGitHubPaneCommand|LocCanonicalName">
+        <source>.GitHub.ShowGitHubPane</source>
+        <target state="new">.GitHub.ShowGitHubPane</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="syncSubmodulesCommand|ButtonText">
+        <source>Sync Submodules</source>
+        <target state="new">Sync Submodules</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="syncSubmodulesCommand|LocCanonicalName">
+        <source>.GitHub.SyncSubmodules</source>
+        <target state="new">.GitHub.SyncSubmodules</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
