@@ -3,6 +3,7 @@ using GitHub.Models;
 using Octokit.GraphQL.Model;
 using CheckConclusionState = GitHub.Models.CheckConclusionState;
 using CheckStatusState = GitHub.Models.CheckStatusState;
+using IssueState = GitHub.Models.IssueState;
 using PullRequestReviewState = GitHub.Models.PullRequestReviewState;
 using StatusState = GitHub.Models.StatusState;
 
@@ -28,6 +29,19 @@ namespace GitHub.Services
                     return CheckConclusionState.Success;
                 case Octokit.GraphQL.Model.CheckConclusionState.Neutral:
                     return CheckConclusionState.Neutral;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        public static IssueState FromGraphQl(this Octokit.GraphQL.Model.IssueState value)
+        {
+            switch (value)
+            {
+                case Octokit.GraphQL.Model.IssueState.Open:
+                    return IssueState.Open;
+                case Octokit.GraphQL.Model.IssueState.Closed:
+                    return IssueState.Closed;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
@@ -97,6 +111,19 @@ namespace GitHub.Services
                     return PullRequestReviewState.ChangesRequested;
                 case Octokit.GraphQL.Model.PullRequestReviewState.Dismissed:
                     return PullRequestReviewState.Dismissed;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
+
+        public static Octokit.GraphQL.Model.IssueState ToGraphQL(this IssueState value)
+        {
+            switch (value)
+            {
+                case IssueState.Open:
+                    return Octokit.GraphQL.Model.IssueState.Open;
+                case IssueState.Closed:
+                    return Octokit.GraphQL.Model.IssueState.Closed;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }

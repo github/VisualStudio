@@ -821,4 +821,7 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
   </data>
+  <data name="ThereArentAnyOpenIssues" xml:space="preserve">
+    <value>There aren't any open issues.</value>
+  </data>
 </root>

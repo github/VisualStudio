@@ -79,6 +79,11 @@ namespace GitHub.ViewModels.GitHubPane
         Task NavigateTo(Uri uri);
 
         /// <summary>
+        /// Shows the issue list in the GitHub pane.
+        /// </summary>
+        Task ShowIssues();
+
+        /// <summary>
         /// Shows the pull reqest list in the GitHub pane.
         /// </summary>
         Task ShowPullRequests();

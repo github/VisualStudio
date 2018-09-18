@@ -51,6 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ObservableAsPropertyHelper<string> title;
         readonly ReactiveCommand<Unit> refresh;
         readonly ReactiveCommand<Unit> showPullRequests;
+        readonly ReactiveCommand<Unit> showIssues;
         readonly ReactiveCommand<object> openInBrowser;
         readonly ReactiveCommand<object> help;
         IDisposable connectionSubscription;
@@ -145,6 +146,10 @@ namespace GitHub.ViewModels.GitHubPane
             showPullRequests = ReactiveCommand.CreateAsyncTask(
                 this.WhenAny(x => x.Content, x => x.Value == navigator),
                 _ => ShowPullRequests());
+
+            showIssues = ReactiveCommand.CreateAsyncTask(
+                this.WhenAny(x => x.Content, x => x.Value == navigator),
+                _ => ShowIssues());
 
             openInBrowser = ReactiveCommand.Create(currentPage.Select(x => x is IOpenInBrowser));
             openInBrowser.Subscribe(_ =>
@@ -288,6 +293,12 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public Task ShowIssues()
+        {
+            return NavigateTo<IIssueListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
+        }
+
+        /// <inheritdoc/>
         public Task ShowPullRequests()
         {
             return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
@@ -343,6 +354,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             var menuService = (IMenuCommandService)paneServiceProvider.GetService(typeof(IMenuCommandService));
             BindNavigatorCommand(menuService, PkgCmdIDList.pullRequestCommand, showPullRequests);
+            BindNavigatorCommand(menuService, PkgCmdIDList.issuesCommand, showIssues);
             BindNavigatorCommand(menuService, PkgCmdIDList.backCommand, navigator.NavigateBack);
             BindNavigatorCommand(menuService, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
             BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);
