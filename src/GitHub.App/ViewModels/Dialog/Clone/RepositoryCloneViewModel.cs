@@ -94,7 +94,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref selectedTabIndex, value);
         }
 
-        public string Title => Resources.CloneTitle;
+        public string Title => Resources.OpenFromGitHubTitle;
 
         public IObservable<object> Done => Observable.Merge(Clone, Open);
 

@@ -123,6 +123,9 @@
   <data name="CloneTitle" xml:space="preserve">
     <value>Clone a Repository</value>
   </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>Open from GitHub</value>
+  </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>Could not connect to github.com</value>
   </data>
