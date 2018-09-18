@@ -66,7 +66,7 @@ namespace GitHub.VisualStudio.Commands
                 return;
             }
 
-            url = cloneDialogResult.Repository.CloneUrl;
+            url = cloneDialogResult.Url;
             var context = gitHubContextService.Value.FindContextFromUrl(url);
             if (context == null)
             {

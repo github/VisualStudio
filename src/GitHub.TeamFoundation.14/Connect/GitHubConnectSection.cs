@@ -152,7 +152,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
                     await cloneService.CloneOrOpenRepository(
-                        result.Repository.CloneUrl,
+                        result.Url,
                         result.Path);
 
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
@@ -160,7 +160,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 catch (Exception e)
                 {
                     var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Repository.Name));
+                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Url.RepositoryName));
                 }
             }
         }

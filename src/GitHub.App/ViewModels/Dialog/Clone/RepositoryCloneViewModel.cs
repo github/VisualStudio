@@ -70,10 +70,10 @@ namespace GitHub.ViewModels.Dialog.Clone
             Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
                 canClone,
-                _ => repository.Select(x => new CloneDialogResult(Path, x)));
+                _ => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)));
             Open = ReactiveCommand.CreateAsyncObservable(
                 canOpen,
-                _ => repository.Select(x => new CloneDialogResult(Path, x)));
+                _ => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)));
         }
 
         public IRepositorySelectViewModel GitHubTab { get; }
