@@ -11,9 +11,14 @@ After you provide your GitHub or GitHub Enterprise credentials to GitHub for Vis
 
 ![Clone button in the GitHub section of Team Explorer](images/clone-link.png)
 
-4. In the list of repositories, click the repository you'd like to clone.
+4. In the list of repositories, scroll until you find the repository you'd like to clone. You can also filter the repository results by using the *Filter* text box.
 
 ![List of GitHub repositories that can be cloned inside a dialog](images/clone-dialog.png)
 
-5. If desired, change the local path where the repository will be cloned into, or leave the default as-is. Click **Clone**.
-6. In Team Explorer, under the list of repositories, locate the repository and double-click to open the project in Visual Studio.
+In addition to using the list of repositories, you can use the URL tab to clone a repository by it's URL or using the repository owner and name.
+
+![List of GitHub repositories that can be cloned inside a dialog](images/clone-url-dialog.png)
+
+5. If desired, change the local path where the repository will be cloned into, or leave the default as-is.
+6. Once a repository is selected and the path is set, Click **Clone**.
+7. In Team Explorer, under the list of repositories, locate the repository and double-click to open the project in Visual Studio.
