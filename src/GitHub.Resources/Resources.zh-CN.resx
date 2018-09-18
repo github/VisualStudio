@@ -779,7 +779,7 @@
     <value>删除注释</value>
   </data>
   <data name="Retry" xml:space="preserve">
-    <value>Retry</value>
+    <value>重试</value>
   </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
     <value>这里没有任何打开的推送请求</value>
