@@ -36,7 +36,7 @@ namespace GitHub.Services
         /// <summary>
         /// Clones the specificed repository into the specified directory or opens it if the repository already exists.
         /// </summary>
-        /// <param name="cloneUrl">The url of the repository to clone.</param>
+        /// <param name="url">The GitHub URL to clone or open.</param>
         /// <param name="repositoryPath">The repository directory.</param>
         /// <param name="progress">
         /// An object through which to report progress. This must be of type
@@ -45,7 +45,7 @@ namespace GitHub.Services
         /// </param>
         /// <returns></returns>
         Task CloneOrOpenRepository(
-            string cloneUrl,
+            UriString url,
             string repositoryPath,
             object progress = null);
 
