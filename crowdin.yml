@@ -2,4 +2,4 @@ files:
   - source: /src/GitHub.Resources/Resources.resx
     translation: /%original_path%/Resources.%locale%.resx
   - source: /src/GitHub.VisualStudio/xlf/GitHub.VisualStudio.vsct.zh-CN.xlf
-    translation: /**/GitHub.VisualStudio.%locale%.xlf
+    translation: /%original_path%/GitHub.VisualStudio.%locale%.xlf
