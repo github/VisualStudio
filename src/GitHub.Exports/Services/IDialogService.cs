@@ -13,8 +13,7 @@ namespace GitHub.Services
         /// Shows the Clone dialog.
         /// </summary>
         /// <param name="connection">
-        /// The connection to use. If null, the first connection will be used, or the user promted
-        /// to log in if there are no connections.
+        /// The connection to use. If null, the URL tab will be used.
         /// </param>
         /// <returns>
         /// A task that returns an instance of <see cref="CloneDialogResult"/> on success,
