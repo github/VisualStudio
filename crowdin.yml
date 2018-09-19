@@ -3,3 +3,4 @@ files:
     translation: /%original_path%/Resources.%locale%.resx
   - source: /src/GitHub.VisualStudio/xlf/GitHub.VisualStudio.vsct.zh-CN.xlf
     translation: /%original_path%/GitHub.VisualStudio.%locale%.xlf
+    dest: /GitHub.VisualStudio.xlf
