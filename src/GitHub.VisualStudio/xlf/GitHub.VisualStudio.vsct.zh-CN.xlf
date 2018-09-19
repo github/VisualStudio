@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="addConnectionCommand|ButtonText">
         <source>&amp;Connect to GitHub</source>
-        <target xml:lang="zh-CN" state="needs-translation">&amp;Connect to GitHub</target>
+        <target xml:lang="zh-CN" state="translated">连接至GitHub(&amp;C)</target>
         <note/>
       </trans-unit>
       <trans-unit id="addConnectionCommand|LocCanonicalName">
@@ -14,7 +14,7 @@
       </trans-unit>
       <trans-unit id="backCommand|ButtonText">
         <source>Back</source>
-        <target xml:lang="zh-CN" state="needs-translation">Back</target>
+        <target xml:lang="zh-CN" state="translated">返回</target>
         <note/>
       </trans-unit>
       <trans-unit id="backCommand|LocCanonicalName">
@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="copyLinkCommand|ButtonText">
         <source>Copy link to clipboard</source>
-        <target xml:lang="zh-CN" state="needs-translation">Copy link to clipboard</target>
+        <target xml:lang="zh-CN" state="translated">复制连结到剪贴簿</target>
         <note/>
       </trans-unit>
       <trans-unit id="copyLinkCommand|LocCanonicalName">
@@ -34,7 +34,7 @@
       </trans-unit>
       <trans-unit id="forwardCommand|ButtonText">
         <source>Forward</source>
-        <target xml:lang="zh-CN" state="needs-translation">Forward</target>
+        <target xml:lang="zh-CN" state="translated">转发</target>
         <note/>
       </trans-unit>
       <trans-unit id="forwardCommand|LocCanonicalName">
@@ -64,7 +64,7 @@
       </trans-unit>
       <trans-unit id="helpCommand|ButtonText">
         <source>Help</source>
-        <target xml:lang="zh-CN" state="needs-translation">Help</target>
+        <target xml:lang="zh-CN" state="translated">帮助</target>
         <note/>
       </trans-unit>
       <trans-unit id="helpCommand|LocCanonicalName">
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="idCreateGistCommand|ButtonText">
         <source>Create a GitHub Gist</source>
-        <target xml:lang="zh-CN" state="needs-translation">Create a GitHub Gist</target>
+        <target xml:lang="zh-CN" state="translated">创建一个GitHub Gist</target>
         <note/>
       </trans-unit>
       <trans-unit id="idCreateGistCommand|LocCanonicalName">
@@ -104,12 +104,12 @@
       </trans-unit>
       <trans-unit id="idGitHubContextMenu|ButtonText">
         <source>GitHub</source>
-        <target xml:lang="zh-CN" state="needs-translation">GitHub</target>
+        <target xml:lang="zh-CN" state="translated">GitHub</target>
         <note/>
       </trans-unit>
       <trans-unit id="idGitHubContextMenu|CommandName">
         <source>GitHub</source>
-        <target xml:lang="zh-CN" state="needs-translation">GitHub</target>
+        <target xml:lang="zh-CN" state="translated">GitHub</target>
         <note/>
       </trans-unit>
       <trans-unit id="idGitHubToolbar|ButtonText">
@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="pullRequestCommand|ButtonText">
         <source>Pull Requests</source>
-        <target xml:lang="zh-CN" state="needs-translation">Pull Requests</target>
+        <target xml:lang="zh-CN" state="translated">拉取请求</target>
         <note/>
       </trans-unit>
       <trans-unit id="pullRequestCommand|LocCanonicalName">
@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="refreshCommand|ButtonText">
         <source>Refresh</source>
-        <target xml:lang="zh-CN" state="needs-translation">Refresh</target>
+        <target xml:lang="zh-CN" state="translated">刷新</target>
         <note/>
       </trans-unit>
       <trans-unit id="refreshCommand|LocCanonicalName">
@@ -174,7 +174,7 @@
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|ButtonText">
         <source>Show Current Pull Request</source>
-        <target xml:lang="zh-CN" state="needs-translation">Show Current Pull Request</target>
+        <target xml:lang="zh-CN" state="translated">显示当前推送请求</target>
         <note/>
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
@@ -184,7 +184,7 @@
       </trans-unit>
       <trans-unit id="showGitHubPaneCommand|ButtonText">
         <source>GitHub</source>
-        <target xml:lang="zh-CN" state="needs-translation">GitHub</target>
+        <target xml:lang="zh-CN" state="translated">GitHub</target>
         <note/>
       </trans-unit>
       <trans-unit id="showGitHubPaneCommand|LocCanonicalName">
