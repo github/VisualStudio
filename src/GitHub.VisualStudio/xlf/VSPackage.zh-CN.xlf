@@ -7,9 +7,9 @@
         <target xml:lang="zh-CN" state="needs-translation">GitHub.VisualStudio</target>
         <note/>
       </trans-unit>
-      <trans-unit id="112">
+      <trans-unit id="112" approved="yes">
         <source>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</source>
-        <target xml:lang="zh-CN" state="needs-translation">A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</target>
+        <target xml:lang="zh-CN">这是一个将GitHub工作流引入Visual Studio的扩展。</target>
         <note/>
       </trans-unit>
     </body>
