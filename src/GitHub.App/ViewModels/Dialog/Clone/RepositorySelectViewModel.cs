@@ -111,11 +111,16 @@ namespace GitHub.ViewModels.Dialog.Clone
                 var results = await service.ReadViewerRepositories(connection.HostAddress).ConfigureAwait(true);
 
                 var yourRepositories = results.Repositories
+                    .Where(r => r.Owner == results.Owner)
                     .Select(x => new RepositoryItemViewModel(x, "Your repositories"));
+                var collaboratorRepositories = results.Repositories
+                    .Where(r => r.Owner != results.Owner)
+                    .OrderBy(r => r.Owner)
+                    .Select(x => new RepositoryItemViewModel(x, "Collaborator repositories"));
                 var orgRepositories = results.OrganizationRepositories
                     .OrderBy(x => x.Key)
                     .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, x.Key)));
-                Items = yourRepositories.Concat(orgRepositories).ToList();
+                Items = yourRepositories.Concat(collaboratorRepositories).Concat(orgRepositories).ToList();
                 ItemsView = CollectionViewSource.GetDefaultView(Items);
                 ItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RepositoryItemViewModel.Group)));
                 ItemsView.Filter = FilterItem;
@@ -149,7 +154,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         IRepositoryModel CreateRepository(IRepositoryItemViewModel item)
         {
-            return item != null ? 
+            return item != null ?
                 new RepositoryModel(item.Name, UriString.ToUriString(item.Url)) :
                 null;
         }
