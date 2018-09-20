@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="zh-CN" original="../GitHub.VisualStudio.vsct">
+    <body>
+      <trans-unit id="addConnectionCommand|ButtonText" approved="yes">
+        <source>&amp;Connect to GitHub</source>
+        <target xml:lang="zh-CN">连接至GitHub(&amp;C)</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="addConnectionCommand|LocCanonicalName">
+        <source>.GitHub.ConnectToGitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.ConnectToGitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="backCommand|ButtonText" approved="yes">
+        <source>Back</source>
+        <target xml:lang="zh-CN">返回</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="backCommand|LocCanonicalName">
+        <source>.GitHub.Back</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.Back</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="copyLinkCommand|ButtonText" approved="yes">
+        <source>Copy link to clipboard</source>
+        <target xml:lang="zh-CN">复制连结到剪贴簿</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="copyLinkCommand|LocCanonicalName">
+        <source>.GitHub.CopyLink</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.CopyLink</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="forwardCommand|ButtonText" approved="yes">
+        <source>Forward</source>
+        <target xml:lang="zh-CN">转发</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="forwardCommand|LocCanonicalName">
+        <source>.GitHub.Forward</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.Forward</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="githubCommand|ButtonText">
+        <source>View on GitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">View on GitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="githubCommand|LocCanonicalName">
+        <source>.GitHub.ViewOnGitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.ViewOnGitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText">
+        <source>Go To Solution/PR File</source>
+        <target xml:lang="zh-CN" state="needs-translation">Go To Solution/PR File</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
+        <source>.GitHub.GoToSolutionOrPRFile</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.GoToSolutionOrPRFile</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="helpCommand|ButtonText" approved="yes">
+        <source>Help</source>
+        <target xml:lang="zh-CN">帮助</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="helpCommand|LocCanonicalName">
+        <source>.GitHub.Help</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.Help</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idBlameCommand|ButtonText">
+        <source>Blame</source>
+        <target xml:lang="zh-CN" state="needs-translation">Blame</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idBlameCommand|LocCanonicalName">
+        <source>.GitHub.Blame</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.Blame</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idCreateGistCommand|ButtonText" approved="yes">
+        <source>Create a GitHub Gist</source>
+        <target xml:lang="zh-CN">创建一个GitHub Gist</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idCreateGistCommand|LocCanonicalName">
+        <source>.GitHub.CreateGist</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.CreateGist</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idCreateGistEnterpriseCommand|ButtonText">
+        <source>Create an Enterprise Gist</source>
+        <target xml:lang="zh-CN" state="needs-translation">Create an Enterprise Gist</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">
+        <source>.GitHub.CreateGistEnterprise</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.CreateGistEnterprise</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idGitHubContextMenu|ButtonText">
+        <source>GitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">GitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idGitHubContextMenu|CommandName">
+        <source>GitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">GitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idGitHubToolbar|ButtonText">
+        <source>WindowToolBar</source>
+        <target xml:lang="zh-CN" state="needs-translation">WindowToolBar</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="idGitHubToolbar|CommandName">
+        <source>Window Toolbar</source>
+        <target xml:lang="zh-CN" state="needs-translation">Window Toolbar</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="openFromClipboardCommand|ButtonText">
+        <source>Open from clipboard</source>
+        <target xml:lang="zh-CN" state="needs-translation">Open from clipboard</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="openFromClipboardCommand|LocCanonicalName">
+        <source>.GitHub.OpenFromClipboard</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.OpenFromClipboard</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="openFromUrlCommand|ButtonText">
+        <source>Open from GitHub...</source>
+        <target xml:lang="zh-CN" state="needs-translation">Open from GitHub...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="openFromUrlCommand|LocCanonicalName">
+        <source>.GitHub.OpenFromUrl</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.OpenFromUrl</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="openLinkCommand|ButtonText">
+        <source>Open on GitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">Open on GitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="openLinkCommand|LocCanonicalName">
+        <source>.GitHub.OpenLink</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.OpenLink</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="pullRequestCommand|ButtonText" approved="yes">
+        <source>Pull Requests</source>
+        <target xml:lang="zh-CN">拉取请求</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="pullRequestCommand|LocCanonicalName">
+        <source>.GitHub.PullRequests</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.PullRequests</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="refreshCommand|ButtonText" approved="yes">
+        <source>Refresh</source>
+        <target xml:lang="zh-CN">刷新</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="refreshCommand|LocCanonicalName">
+        <source>.GitHub.Refresh</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.Refresh</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="showCurrentPullRequestCommand|ButtonText" approved="yes">
+        <source>Show Current Pull Request</source>
+        <target xml:lang="zh-CN">显示当前推送请求</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
+        <source>.GitHub.ShowCurrentPullRequest</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.ShowCurrentPullRequest</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="showGitHubPaneCommand|ButtonText">
+        <source>GitHub</source>
+        <target xml:lang="zh-CN" state="needs-translation">GitHub</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="showGitHubPaneCommand|LocCanonicalName">
+        <source>.GitHub.ShowGitHubPane</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.ShowGitHubPane</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="syncSubmodulesCommand|ButtonText">
+        <source>Sync Submodules</source>
+        <target xml:lang="zh-CN" state="needs-translation">Sync Submodules</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="syncSubmodulesCommand|LocCanonicalName">
+        <source>.GitHub.SyncSubmodules</source>
+        <target xml:lang="zh-CN" state="needs-translation">.GitHub.SyncSubmodules</target>
+        <note/>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
