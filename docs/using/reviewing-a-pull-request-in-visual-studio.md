@@ -12,15 +12,21 @@ GitHub for Visual Studio provides facilities for reviewing a pull request direct
 
 ## Viewing a pull request
 
-The Pull Request Details view shows the current state of the pull request, including information about who created the pull request, the source and target branch, and the files changed.
+The Pull Request Details view shows the current state of the pull request, including:
+- information about who created the pull request
+- the source and target branch
+- a description of the pull request
+- reviewers and the status of their review
+- checks (if checks have been enabled for the repository)
+- the files changed
 
-![The details of a single pull request in the GitHub pane](images/pr-details.png)
+![The details of a single pull request in the GitHub pane](images/pr-detail-view.png)
 
 ## Checking out a pull request
 
 To check out the pull request branch, click the **Checkout [branch]** link where [branch] is the name of the branch that will be checked out.
 
-![Location of the checkout link in the GitHub pull request details page](images/pr-details-checkout-link.png)
+![Location of the checkout link in the GitHub pull request details page](images/pr-detail-view-checkout-branch.png)
 
 If the pull request is from a fork then a remote will be added to the forked repository and the branch checked out locally. This remote will automatically be cleaned up when the local branch is deleted.
 
