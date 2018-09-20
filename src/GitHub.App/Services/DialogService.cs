@@ -31,8 +31,6 @@ namespace GitHub.Services
 
         public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
         {
-            Guard.ArgumentNotNull(connection, nameof(connection));
-
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
 
             return (CloneDialogResult)await showDialog.Show(

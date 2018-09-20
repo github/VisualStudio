@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.UI.Services
             using (var dialogViewModel = CreateViewModel())
             using (dialogViewModel.Done.Take(1).Subscribe(x => result = x))
             {
-                if (!connection.Scopes.Matches(scopes))
+                if (connection != null && !connection.Scopes.Matches(scopes))
                 {
                     await dialogViewModel.StartWithLogout(viewModel, connection);
                 }

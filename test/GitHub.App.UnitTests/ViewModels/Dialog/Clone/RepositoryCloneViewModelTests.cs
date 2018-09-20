@@ -56,7 +56,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             var cm = CreateConnectionManager("https://github.com", "https://enterprise.com");
             var target = CreateTarget(connectionManager: cm);
 
-            await target.InitializeAsync(null);
+            await target.InitializeAsync(cm.Connections[0]);
 
             await target.GitHubTab.Received(1).Activate();
             await target.EnterpriseTab.DidNotReceive().Activate();
@@ -131,7 +131,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathError_Is_Set_For_Existing_Destination()
+        public async Task PathError_Is_Set_For_Existing_File_At_Destination()
         {
             var target = CreateTarget();
             SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
@@ -284,7 +284,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             service = service ?? CreateRepositoryCloneService(defaultClonePath);
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
-            urlTab = urlTab ?? Substitute.For<IRepositoryUrlViewModel>();
+            urlTab = urlTab ?? CreateRepositoryUrlViewModel();
 
             return new RepositoryCloneViewModel(
                 os,
@@ -308,6 +308,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             repository.Owner.Returns(owner);
             repository.Name.Returns(name);
             return repository;
+        }
+
+        static IRepositoryUrlViewModel CreateRepositoryUrlViewModel()
+        {
+            var repositoryUrlViewModel = Substitute.For<IRepositoryUrlViewModel>();
+            repositoryUrlViewModel.Repository.Returns(null as IRepositoryModel);
+            repositoryUrlViewModel.Url.Returns(string.Empty);
+            return repositoryUrlViewModel;
         }
     }
 }
