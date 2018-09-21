@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Numerics;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -274,6 +275,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IOperatingSystem os = null,
             IConnectionManager connectionManager = null,
             IRepositoryCloneService service = null,
+            IUsageService usageService = null,
+            IUsageTracker usageTracker = null,
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
             IRepositoryUrlViewModel urlTab = null,
@@ -282,6 +285,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             os = os ?? Substitute.For<IOperatingSystem>();
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
             service = service ?? CreateRepositoryCloneService(defaultClonePath);
+            usageService = CreateUsageService();
+            usageTracker = Substitute.For<IUsageTracker>();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
             urlTab = urlTab ?? Substitute.For<IRepositoryUrlViewModel>();
@@ -290,9 +295,21 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
                 os,
                 connectionManager,
                 service,
+                usageService,
+                usageTracker,
                 gitHubTab,
                 enterpriseTab,
                 urlTab);
+        }
+
+        static IUsageService CreateUsageService(bool isGroupA = false)
+        {
+            var usageService = Substitute.For<IUsageService>();
+            var guidBytes = new byte[16];
+            guidBytes[guidBytes.Length - 1] = (byte)(isGroupA ? 0 : 1);
+            var userGuid = new Guid(guidBytes);
+            usageService.GetUserGuid().Returns(userGuid);
+            return usageService;
         }
 
         static IRepositoryModel CreateRepositoryModel(string repo = "owner/repo")
