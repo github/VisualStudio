@@ -24,6 +24,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
         readonly IUsageService usageService;
+        readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         IRepositoryModel previousRepository;
@@ -36,6 +37,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IConnectionManager connectionManager,
             IRepositoryCloneService service,
             IUsageService usageService,
+            IUsageTracker usageTracker,
             IRepositorySelectViewModel gitHubTab,
             IRepositorySelectViewModel enterpriseTab,
             IRepositoryUrlViewModel urlTab)
@@ -44,6 +46,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.connectionManager = connectionManager;
             this.service = service;
             this.usageService = usageService;
+            this.usageTracker = usageTracker;
 
             GitHubTab = gitHubTab;
             EnterpriseTab = enterpriseTab;
@@ -127,6 +130,19 @@ namespace GitHub.ViewModels.Dialog.Clone
             if (await IsGroupA().ConfigureAwait(false))
             {
                 SelectedTabIndex = 2;
+            }
+
+            switch (SelectedTabIndex)
+            {
+                case 0:
+                    usageTracker.IncrementCounter(model => model.NumberOfCloneViewGitHubTab).Forget();
+                    break;
+                case 1:
+                    usageTracker.IncrementCounter(model => model.NumberOfCloneViewEnterpriseTab).Forget();
+                    break;
+                case 2:
+                    usageTracker.IncrementCounter(model => model.NumberOfCloneViewUrlTab).Forget();
+                    break;
             }
         }
 
