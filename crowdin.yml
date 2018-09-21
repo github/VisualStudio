@@ -1,3 +1,9 @@
+preserve_hierarchy: true
+
 files:
   - source: /src/GitHub.Resources/Resources.resx
     translation: /%original_path%/Resources.%locale%.resx
+  - source: /src/GitHub.VisualStudio/xlf/GitHub.VisualStudio.vsct.zh-CN.xlf
+    translation: /%original_path%/GitHub.VisualStudio.vsct.%locale%.xlf
+  - source: /src/GitHub.VisualStudio/xlf/VSPackage.zh-CN.xlf
+    translation: /%original_path%/VSPackage.%locale%.xlf

@@ -75,10 +75,10 @@ namespace GitHub.VisualStudio.UI.Services
             using (var dialogViewModel = CreateViewModel())
             using (dialogViewModel.Done.Take(1).Subscribe(x => result = x))
             {
-                await dialogViewModel.StartWithConnection(viewModel);
-
+                var task = dialogViewModel.StartWithConnection(viewModel);
                 var window = new GitHubDialogWindow(dialogViewModel);
                 window.ShowModal();
+                await task;
             }
 
             return result;

@@ -32,6 +32,7 @@ namespace GitHub.Models
             public string VSVersion { get; set; }
             public string Lang { get; set; }
             public string CurrentLang { get; set; }
+            public string CurrentUILang { get; set; }
         }
 
         public class MeasuresModel
