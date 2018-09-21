@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -59,8 +60,9 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             await target.InitializeAsync(connection).ConfigureAwait(false);
 
-            await usageTracker.Received(1).IncrementCounter(Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(
-                x => x.ToString() == expressionString)).ConfigureAwait(false);
+            await usageTracker.Received(1).IncrementCounter(Arg.Any<Expression<Func<UsageModel.MeasuresModel, int>>>()).ConfigureAwait(false);
+            var expression = (Expression<Func<UsageModel.MeasuresModel, int>>) usageTracker.ReceivedCalls().First().GetArguments()[0];
+            Assert.AreEqual(expressionString, expression.ToString());
         }
 
         [Test]
