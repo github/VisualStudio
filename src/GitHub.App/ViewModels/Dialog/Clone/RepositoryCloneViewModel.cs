@@ -23,6 +23,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IOperatingSystem os;
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
+        readonly IUsageService usageService;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         IRepositoryModel previousRepository;
@@ -34,6 +35,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IOperatingSystem os,
             IConnectionManager connectionManager,
             IRepositoryCloneService service,
+            IUsageService usageService,
             IRepositorySelectViewModel gitHubTab,
             IRepositorySelectViewModel enterpriseTab,
             IRepositoryUrlViewModel urlTab)
@@ -41,6 +43,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.os = os;
             this.connectionManager = connectionManager;
             this.service = service;
+            this.usageService = usageService;
 
             GitHubTab = gitHubTab;
             EnterpriseTab = enterpriseTab;
@@ -119,6 +122,20 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
+
+            // Users in group A will see the URL tab by default
+            if (await IsGroupA().ConfigureAwait(false))
+            {
+                SelectedTabIndex = 2;
+            }
+        }
+
+        // Put 50% of users in group A
+        async Task<bool> IsGroupA()
+        {
+            var userGuid = await usageService.GetUserGuid().ConfigureAwait(false);
+            var lastByte = userGuid.ToByteArray().Last();
+            return lastByte % 2 == 0;
         }
 
         void BrowseForDirectory()
