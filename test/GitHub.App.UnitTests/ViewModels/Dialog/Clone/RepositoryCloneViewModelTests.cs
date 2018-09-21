@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -25,6 +26,41 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             target.GitHubTab.Received(1).Initialize(cm.Connections[0]);
             target.EnterpriseTab.DidNotReceiveWithAnyArgs().Initialize(null);
+        }
+
+        [TestCase("https://github.com", false, 0)]
+        [TestCase("https://enterprise.com", false, 1)]
+        [TestCase("https://github.com", true, 2, Description = "Show URL tab for GitHub connections")]
+        [TestCase("https://enterprise.com", true, 2, Description = "Show URL tab for Enterprise connections")]
+        public async Task Default_SelectedTabIndex_For_Group(string address, bool isGroupA, int expectTabIndex)
+        {
+            var cm = CreateConnectionManager(address);
+            var connection = cm.Connections[0];
+            var usageService = CreateUsageService(isGroupA);
+            var target = CreateTarget(connectionManager: cm, usageService: usageService);
+
+            await target.InitializeAsync(connection);
+
+            Assert.That(target.SelectedTabIndex, Is.EqualTo(expectTabIndex));
+        }
+
+        [TestCase("https://github.com", false, "model => model.NumberOfCloneViewGitHubTab")]
+        [TestCase("https://enterprise.com", false, "model => model.NumberOfCloneViewEnterpriseTab")]
+        [TestCase("https://github.com", true, "model => model.NumberOfCloneViewUrlTab")]
+        [TestCase("https://enterprise.com", true, "model => model.NumberOfCloneViewUrlTab")]
+        public async Task IncrementCounter_Showing_Default_Tab(string address, bool isGroupA, string expressionString)
+        {
+            var cm = CreateConnectionManager(address);
+            var connection = cm.Connections[0];
+            var usageService = CreateUsageService(isGroupA);
+            var usageTracker = Substitute.For<IUsageTracker>();
+            var target = CreateTarget(connectionManager: cm, usageService: usageService, usageTracker: usageTracker);
+            usageTracker.IncrementCounter(null).ReturnsForAnyArgs(Task.CompletedTask);
+
+            await target.InitializeAsync(connection).ConfigureAwait(false);
+
+            await usageTracker.Received(1).IncrementCounter(Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(
+                x => x.ToString() == expressionString)).ConfigureAwait(false);
         }
 
         [Test]
@@ -285,8 +321,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             os = os ?? Substitute.For<IOperatingSystem>();
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
             service = service ?? CreateRepositoryCloneService(defaultClonePath);
-            usageService = CreateUsageService();
-            usageTracker = Substitute.For<IUsageTracker>();
+            usageService = usageService ?? CreateUsageService();
+            usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
             urlTab = urlTab ?? Substitute.For<IRepositoryUrlViewModel>();
