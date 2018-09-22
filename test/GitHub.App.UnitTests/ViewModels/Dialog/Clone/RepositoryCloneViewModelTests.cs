@@ -45,11 +45,11 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Assert.That(target.SelectedTabIndex, Is.EqualTo(expectTabIndex));
         }
 
-        [TestCase("https://github.com", false, "model => model.NumberOfCloneViewGitHubTab")]
-        [TestCase("https://enterprise.com", false, "model => model.NumberOfCloneViewEnterpriseTab")]
-        [TestCase("https://github.com", true, "model => model.NumberOfCloneViewUrlTab")]
-        [TestCase("https://enterprise.com", true, "model => model.NumberOfCloneViewUrlTab")]
-        public async Task IncrementCounter_Showing_Default_Tab(string address, bool isGroupA, string expressionString)
+        [TestCase("https://github.com", false, nameof(UsageModel.MeasuresModel.NumberOfCloneViewGitHubTab))]
+        [TestCase("https://enterprise.com", false, nameof(UsageModel.MeasuresModel.NumberOfCloneViewEnterpriseTab))]
+        [TestCase("https://github.com", true, nameof(UsageModel.MeasuresModel.NumberOfCloneViewUrlTab))]
+        [TestCase("https://enterprise.com", true, nameof(UsageModel.MeasuresModel.NumberOfCloneViewUrlTab))]
+        public async Task IncrementCounter_Showing_Default_Tab(string address, bool isGroupA, string expectCounter)
         {
             var cm = CreateConnectionManager(address);
             var connection = cm.Connections[0];
@@ -60,9 +60,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             await target.InitializeAsync(connection).ConfigureAwait(false);
 
-            await usageTracker.Received(1).IncrementCounter(Arg.Any<Expression<Func<UsageModel.MeasuresModel, int>>>()).ConfigureAwait(false);
-            var expression = (Expression<Func<UsageModel.MeasuresModel, int>>) usageTracker.ReceivedCalls().First().GetArguments()[0];
-            Assert.AreEqual(expressionString, expression.ToString());
+            var counter = await GetIncrementedCounter(usageTracker);
+            Assert.That(counter, Is.EqualTo(expectCounter));
         }
 
         [Test]
@@ -363,6 +362,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             repository.Owner.Returns(owner);
             repository.Name.Returns(name);
             return repository;
+        }
+
+        static async Task<string> GetIncrementedCounter(IUsageTracker usageTracker)
+        {
+            await usageTracker.Received(1).IncrementCounter(Arg.Any<Expression<Func<UsageModel.MeasuresModel, int>>>()).ConfigureAwait(false);
+            var expression = (Expression<Func<UsageModel.MeasuresModel, int>>)usageTracker.ReceivedCalls().First().GetArguments()[0];
+            var counter = ((MemberExpression)expression.Body).Member.Name;
+            return counter;
         }
     }
 }
