@@ -89,6 +89,8 @@ namespace GitHub.Models
             public int NumberOfCloneViewGitHubTab { get; set; }
             public int NumberOfCloneViewEnterpriseTab { get; set; }
             public int NumberOfCloneViewUrlTab { get; set; }
+            public int NumberOfGitHubClones { get; set; }
+            public int NumberOfEnterpriseClones { get; set; }
         }
     }
 }
