@@ -13,7 +13,8 @@ namespace GitHub.Services
         /// Shows the Clone dialog.
         /// </summary>
         /// <param name="connection">
-        /// The connection to use. If null, the URL tab will be used.
+        /// The connection to use. If null, the first connection will be used, or the user promted
+        /// to log in if there are no connections.
         /// </param>
         /// <param name="url">
         /// The URL to prepopulate URL field with or null.

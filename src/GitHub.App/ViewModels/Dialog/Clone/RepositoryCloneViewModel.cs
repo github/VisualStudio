@@ -125,11 +125,6 @@ namespace GitHub.ViewModels.Dialog.Clone
                 SelectedTabIndex = 1;
             }
 
-            if (connection == null)
-            {
-                SelectedTabIndex = 2;
-            }
-
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
         }
 
