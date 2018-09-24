@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="addConnectionCommand|ButtonText" approved="yes">
         <source>&amp;Connect to GitHub</source>
-        <target xml:lang="zh-CN">连接至GitHub(&amp;C)</target>
+        <target xml:lang="zh-CN" state="translated">连接至GitHub(&amp;C)</target>
         <note/>
       </trans-unit>
       <trans-unit id="addConnectionCommand|LocCanonicalName">
@@ -14,7 +14,7 @@
       </trans-unit>
       <trans-unit id="backCommand|ButtonText" approved="yes">
         <source>Back</source>
-        <target xml:lang="zh-CN">返回</target>
+        <target xml:lang="zh-CN" state="translated">返回</target>
         <note/>
       </trans-unit>
       <trans-unit id="backCommand|LocCanonicalName">
@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="copyLinkCommand|ButtonText" approved="yes">
         <source>Copy link to clipboard</source>
-        <target xml:lang="zh-CN">复制连结到剪贴簿</target>
+        <target xml:lang="zh-CN" state="translated">复制连结到剪贴簿</target>
         <note/>
       </trans-unit>
       <trans-unit id="copyLinkCommand|LocCanonicalName">
@@ -34,7 +34,7 @@
       </trans-unit>
       <trans-unit id="forwardCommand|ButtonText" approved="yes">
         <source>Forward</source>
-        <target xml:lang="zh-CN">转发</target>
+        <target xml:lang="zh-CN" state="translated">转发</target>
         <note/>
       </trans-unit>
       <trans-unit id="forwardCommand|LocCanonicalName">
@@ -44,7 +44,7 @@
       </trans-unit>
       <trans-unit id="githubCommand|ButtonText" approved="yes">
         <source>View on GitHub</source>
-        <target xml:lang="zh-CN">在GitHub上打开</target>
+        <target xml:lang="zh-CN" state="translated">在GitHub上打开</target>
         <note/>
       </trans-unit>
       <trans-unit id="githubCommand|LocCanonicalName">
@@ -54,7 +54,7 @@
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText" approved="yes">
         <source>Go To Solution/PR File</source>
-        <target xml:lang="zh-CN">转到解决方案/PR文件</target>
+        <target xml:lang="zh-CN" state="translated">转到解决方案/PR文件</target>
         <note/>
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
@@ -64,7 +64,7 @@
       </trans-unit>
       <trans-unit id="helpCommand|ButtonText" approved="yes">
         <source>Help</source>
-        <target xml:lang="zh-CN">帮助</target>
+        <target xml:lang="zh-CN" state="translated">帮助</target>
         <note/>
       </trans-unit>
       <trans-unit id="helpCommand|LocCanonicalName">
@@ -74,7 +74,7 @@
       </trans-unit>
       <trans-unit id="idBlameCommand|ButtonText" approved="yes">
         <source>Blame</source>
-        <target xml:lang="zh-CN">追溯</target>
+        <target xml:lang="zh-CN" state="translated">追溯</target>
         <note/>
       </trans-unit>
       <trans-unit id="idBlameCommand|LocCanonicalName">
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="idCreateGistCommand|ButtonText" approved="yes">
         <source>Create a GitHub Gist</source>
-        <target xml:lang="zh-CN">创建一个GitHub Gist</target>
+        <target xml:lang="zh-CN" state="translated">创建一个GitHub Gist</target>
         <note/>
       </trans-unit>
       <trans-unit id="idCreateGistCommand|LocCanonicalName">
@@ -94,7 +94,7 @@
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|ButtonText" approved="yes">
         <source>Create an Enterprise Gist</source>
-        <target xml:lang="zh-CN">创建企业Gist</target>
+        <target xml:lang="zh-CN" state="translated">创建企业Gist</target>
         <note/>
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">
@@ -124,7 +124,7 @@
       </trans-unit>
       <trans-unit id="openFromClipboardCommand|ButtonText" approved="yes">
         <source>Open from clipboard</source>
-        <target xml:lang="zh-CN">从剪贴板打开</target>
+        <target xml:lang="zh-CN" state="translated">从剪贴板打开</target>
         <note/>
       </trans-unit>
       <trans-unit id="openFromClipboardCommand|LocCanonicalName">
@@ -134,7 +134,7 @@
       </trans-unit>
       <trans-unit id="openFromUrlCommand|ButtonText" approved="yes">
         <source>Open from GitHub...</source>
-        <target xml:lang="zh-CN">从 GitHub 打开...</target>
+        <target xml:lang="zh-CN" state="translated">从 GitHub 打开...</target>
         <note/>
       </trans-unit>
       <trans-unit id="openFromUrlCommand|LocCanonicalName">
@@ -144,7 +144,7 @@
       </trans-unit>
       <trans-unit id="openLinkCommand|ButtonText" approved="yes">
         <source>Open on GitHub</source>
-        <target xml:lang="zh-CN">在GitHub上打开</target>
+        <target xml:lang="zh-CN" state="translated">在GitHub上打开</target>
         <note/>
       </trans-unit>
       <trans-unit id="openLinkCommand|LocCanonicalName">
@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="pullRequestCommand|ButtonText" approved="yes">
         <source>Pull Requests</source>
-        <target xml:lang="zh-CN">拉取请求</target>
+        <target xml:lang="zh-CN" state="translated">拉取请求</target>
         <note/>
       </trans-unit>
       <trans-unit id="pullRequestCommand|LocCanonicalName">
@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="refreshCommand|ButtonText" approved="yes">
         <source>Refresh</source>
-        <target xml:lang="zh-CN">刷新</target>
+        <target xml:lang="zh-CN" state="translated">刷新</target>
         <note/>
       </trans-unit>
       <trans-unit id="refreshCommand|LocCanonicalName">
@@ -174,7 +174,7 @@
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|ButtonText" approved="yes">
         <source>Show Current Pull Request</source>
-        <target xml:lang="zh-CN">显示当前推送请求</target>
+        <target xml:lang="zh-CN" state="translated">显示当前推送请求</target>
         <note/>
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
@@ -194,7 +194,7 @@
       </trans-unit>
       <trans-unit id="syncSubmodulesCommand|ButtonText" approved="yes">
         <source>Sync Submodules</source>
-        <target xml:lang="zh-CN">同步子模块</target>
+        <target xml:lang="zh-CN" state="translated">同步子模块</target>
         <note/>
       </trans-unit>
       <trans-unit id="syncSubmodulesCommand|LocCanonicalName">
