@@ -56,7 +56,7 @@ Then click the icon on the desired line and leave a comment.
 
 To just comment on this one line, select **Add a single comment**. This will add the comment immediately.
 
-To start a review of the Pull Request and all it's changes, select **Start a review**. This will add this comment as pending, and the comment will be submitted once the review is complete.
+To start a review of the Pull Request and all its changes, select **Start a review**. This will add this comment as pending, and the comment will be submitted once the review is complete.
 
 #### Viewing comments
 

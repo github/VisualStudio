@@ -1,6 +1,6 @@
 # Creating gists
 
-GitHub for Visual Studio enables easy creation of gists directly from the Visual Studio Editor.
+With GitHub for Visual Studio, you can easily create gists directly from the editor.
 
 1. [Sign in](../getting-started/authenticating-to-github.md) to GitHub.
 
