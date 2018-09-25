@@ -36,7 +36,6 @@ namespace GitHub.Services
 #else
             OpenFolder(repositoryPath);
 #endif
-            ShowHomePage();
         }
 
         public void ShowConnectPage()

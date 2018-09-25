@@ -115,13 +115,22 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(url, nameof(url));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
 
-            if (!DestinationDirectoryExists(repositoryPath) && !DestinationFileExists(repositoryPath))
+            if (DestinationFileExists(repositoryPath))
             {
-                var cloneUrl = url.ToRepositoryUrl().ToString();
-                await CloneRepository(cloneUrl, repositoryPath, progress);
+                throw new InvalidOperationException("Can't clone or open a repository because a file exists at: " + repositoryPath);
             }
 
-            teamExplorerServices.OpenRepository(repositoryPath);
+            if (DestinationDirectoryExists(repositoryPath))
+            {
+                teamExplorerServices.OpenRepository(repositoryPath);
+            }
+            else
+            {
+                var cloneUrl = url.ToRepositoryUrl().ToString();
+                await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+            }
+
+            teamExplorerServices.ShowHomePage();
         }
 
         /// <inheritdoc/>
