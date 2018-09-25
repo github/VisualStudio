@@ -121,14 +121,26 @@ namespace GitHub.Services
                 throw new InvalidOperationException("Can't clone or open a repository because a file exists at: " + repositoryPath);
             }
 
+            var repositoryUrl = url.ToRepositoryUrl();
+            var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             if (DestinationDirectoryExists(repositoryPath))
             {
                 teamExplorerServices.OpenRepository(repositoryPath);
             }
             else
             {
-                var cloneUrl = url.ToRepositoryUrl().ToString();
+                var cloneUrl = repositoryUrl.ToString();
                 await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                }
+                else
+                {
+                    // If it isn't a GitHub URL, assume it's an Enterprise URL
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                }
             }
 
             teamExplorerServices.ShowHomePage();
@@ -152,20 +164,7 @@ namespace GitHub.Services
             try
             {
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
-
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
-
-                var repositoryUrl = new UriString(cloneUrl).ToRepositoryUrl();
-                var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-                if (isDotCom)
-                {
-                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
-                }
-                else
-                {
-                    // If it isn't a GitHub URL, assume it's an Enterprise URL
-                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
-                }
             }
             catch (Exception ex)
             {
