@@ -895,7 +895,7 @@
       </_ResourcesToMergeWithCTOWithCultureMetadata>
     </ItemGroup>
   </Target>
-  <Import Project="..\..\packages\XliffTasks.0.2.0-beta-63125-01\build\XliffTasks.targets" Condition="Exists('..\..\packages\XliffTasks.0.2.0-beta-63125-01\build\XliffTasks.targets')" />
+  <Import Project="..\..\packages\XliffTasks.0.2.0-beta-63125-01\build\XliffTasks.targets" Condition="Exists('..\..\packages\XliffTasks.0.2.0-beta-63125-01\build\XliffTasks.targets') And '$(NCrunch)' != '1'" />
   <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\build\net45\SQLitePCL.raw_basic.targets')" />
   <Import Project="..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.8.122\build\Microsoft.VisualStudio.Threading.Analyzers.targets" Condition="Exists('..\..\packages\Microsoft.VisualStudio.Threading.Analyzers.15.8.122\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" />
   <Import Project="..\..\packages\Microsoft.VisualStudio.SDK.Analyzers.15.8.33\build\Microsoft.VisualStudio.SDK.Analyzers.targets" Condition="Exists('..\..\packages\Microsoft.VisualStudio.SDK.Analyzers.15.8.33\build\Microsoft.VisualStudio.SDK.Analyzers.targets')" />
