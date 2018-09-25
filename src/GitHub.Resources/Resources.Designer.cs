@@ -505,7 +505,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The destination already exists..
+        ///   Looks up a localized string similar to A file exists at the destination path..
         /// </summary>
         public static string DestinationAlreadyExists {
             get {

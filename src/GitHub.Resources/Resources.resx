@@ -331,7 +331,7 @@ https://git-scm.com/download/win</value>
     <value>Cancel Review</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>The destination already exists.</value>
+    <value>A file exists at the destination path.</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
     <value>Logout Required</value>

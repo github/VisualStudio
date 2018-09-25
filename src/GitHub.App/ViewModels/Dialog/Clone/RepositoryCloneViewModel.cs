@@ -239,7 +239,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (repository != null)
             {
-                // TODO: Update wording for DestinationAlreadyExists
                 return service.DestinationFileExists(path) ?
                     Resources.DestinationAlreadyExists :
                     null;
