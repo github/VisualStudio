@@ -51,17 +51,24 @@ public class RepositoryCloneServiceTests
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
-        [TestCase("https://github.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
-        [TestCase("https://github.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
-        [TestCase("https://github.com/foo/bar", 0, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
-        [TestCase("https://enterprise.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
-        [TestCase("https://enterprise.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
-        [TestCase("https://enterprise.com/foo/bar", 0, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
-        public async Task UpdatesMetricsWhenCloneOrOpenRepositoryAsync(string cloneUrl, int numberOfCalls, string counterName)
+        [TestCase("https://github.com/foo/bar", false, 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
+        [TestCase("https://github.com/foo/bar", false, 1, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
+        [TestCase("https://github.com/foo/bar", false, 0, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
+        [TestCase("https://enterprise.com/foo/bar", false, 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
+        [TestCase("https://enterprise.com/foo/bar", false, 1, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
+        [TestCase("https://enterprise.com/foo/bar", false, 0, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
+
+        [TestCase("https://github.com/foo/bar", true, 1, nameof(UsageModel.MeasuresModel.NumberOfGitHubOpens))]
+        [TestCase("https://github.com/foo/bar", true, 0, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseOpens))]
+        [TestCase("https://enterprise.com/foo/bar", true, 1, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseOpens))]
+        [TestCase("https://enterprise.com/foo/bar", true, 0, nameof(UsageModel.MeasuresModel.NumberOfGitHubOpens))]
+        public async Task UpdatesMetricsWhenCloneOrOpenRepositoryAsync(string cloneUrl, bool dirExists, int numberOfCalls, string counterName)
         {
-            var cloneDialogResult = new CloneDialogResult(@"c:\dev\bar", cloneUrl);
+            var repositoryPath = @"c:\dev\bar";
+            var cloneDialogResult = new CloneDialogResult(repositoryPath, cloneUrl);
             var serviceProvider = Substitutes.ServiceProvider;
             var operatingSystem = serviceProvider.GetOperatingSystem();
+            operatingSystem.Directory.DirectoryExists(repositoryPath).Returns(dirExists);
             var vsGitServices = serviceProvider.GetVSGitServices();
             var teamExplorerServices = Substitute.For<ITeamExplorerServices>();
             var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
