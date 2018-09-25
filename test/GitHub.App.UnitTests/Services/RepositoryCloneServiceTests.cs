@@ -27,8 +27,13 @@ public class RepositoryCloneServiceTests
             await vsGitServices.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", true);
         }
 
-        [Test]
-        public async Task UpdatesMetricsWhenRepositoryClonedAsync()
+        [TestCase("https://github.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
+        [TestCase("https://github.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
+        [TestCase("https://github.com/foo/bar", 0, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
+        [TestCase("https://enterprise.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
+        [TestCase("https://enterprise.com/foo/bar", 1, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
+        [TestCase("https://enterprise.com/foo/bar", 0, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
+        public async Task UpdatesMetricsWhenRepositoryClonedAsync(string cloneUrl, int numberOfCalls, string counterName)
         {
             var serviceProvider = Substitutes.ServiceProvider;
             var operatingSystem = serviceProvider.GetOperatingSystem();
@@ -37,12 +42,12 @@ public class RepositoryCloneServiceTests
             var usageTracker = Substitute.For<IUsageTracker>();
             var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, graphqlFactory, usageTracker);
 
-            await cloneService.CloneRepository("https://github.com/foo/bar", @"c:\dev\bar");
+            await cloneService.CloneRepository(cloneUrl, @"c:\dev\bar");
             var model = UsageModel.Create(Guid.NewGuid());
 
-            await usageTracker.Received().IncrementCounter(
+            await usageTracker.Received(numberOfCalls).IncrementCounter(
                 Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
-                    ((MemberExpression)x.Body).Member.Name == nameof(model.Measures.NumberOfClones)));
+                    ((MemberExpression)x.Body).Member.Name == counterName));
         }
     }
 }
