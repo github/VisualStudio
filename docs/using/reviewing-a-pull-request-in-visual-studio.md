@@ -58,4 +58,38 @@ To just comment on this one line, select **Add a single comment**. This will add
 
 To start a review of the Pull Request and all it's changes, select **Start a review**. This will add this comment as pending, and the comment will be submitted once the review is complete.
 
-Existing comments left by you or other reviewers will also show up in this margin. Click the icon to open an inline conversation view from which you can review and reply to comments:
+#### Viewing comments
+
+Existing comments left by you or other reviewers will also show up in this margin. Click the icon to open an inline conversation view from which you can review and reply to comments.
+
+Single comments appear like this when viewed inline.
+![Single comment](images/single-comment.png)
+
+Review comments appear the same as single comments except for a Pending badge is added to the comment.
+![Single comment](images/pending-review-comment.png)
+
+#### Modifying Comments
+
+Single and review comments can either be edited or deleted.
+
+To edit a comment, press the pencil symbol to edit the comment and then select **Update comment** once finished.
+![Edit comment](images/edit-comment.png)
+
+To delete a comment, press the x symbol. A confirmation box to delete the comment will appear.
+![Delete comment](images/delete-comment.png)
+
+#### Submitting a review
+
+From the pull request details view you can go to the review summary and submit a review.
+
+If you have pending review comments you'll see the option **Continue your review**:
+![Continue review](images/continue-your-review.png)
+
+Otherwise you'll see an option to **Add your review**:
+![Add review](images/add-review.png)
+
+When you are redirected to the review summary view, leave a review summary and select **Submit review**.
+![Submit review](images/submit-review.png)
+
+The options available are to **Approve**, **Comment only** or **Request changes**.
+![Submit review options](images/submit-review-options.png)
