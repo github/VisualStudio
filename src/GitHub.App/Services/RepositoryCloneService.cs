@@ -126,6 +126,15 @@ namespace GitHub.Services
             if (DestinationDirectoryExists(repositoryPath))
             {
                 teamExplorerServices.OpenRepository(repositoryPath);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubOpens);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseOpens);
+                }
             }
             else
             {
@@ -138,7 +147,6 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    // If it isn't a GitHub URL, assume it's an Enterprise URL
                     await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
                 }
             }
@@ -174,10 +182,10 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public bool DestinationDirectoryExists(string path) => Directory.Exists(path);
+        public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
 
         /// <inheritdoc/>
-        public bool DestinationFileExists(string path) => File.Exists(path);
+        public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
