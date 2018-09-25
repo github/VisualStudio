@@ -86,6 +86,7 @@ If you have pending review comments you'll see the option **Continue your review
 ![Continue review](images/continue-your-review.png)
 
 Otherwise you'll see an option to **Add your review**:
+
 ![Add review](images/add-review.png)
 
 When you are redirected to the review summary view, leave a review summary and select **Submit review**.
