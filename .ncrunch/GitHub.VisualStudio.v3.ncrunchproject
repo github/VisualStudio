@@ -1,5 +1,9 @@
 ﻿<ProjectConfiguration>
   <Settings>
+    <AdditionalFilesToIncludeForProject>
+      <Value>xlf\GitHub.VisualStudio.vsct.zh-CN.xlf</Value>
+      <Value>xlf\VSPackage.zh-CN.xlf</Value>
+    </AdditionalFilesToIncludeForProject>
     <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
   </Settings>
 </ProjectConfiguration>
