@@ -142,11 +142,7 @@ namespace GitHub.StartPage
             {
                 try
                 {
-                    await cloneService.CloneOrOpenRepository(
-                        result.Url,
-                        result.Path,
-                        progress);
-
+                    await cloneService.CloneOrOpenRepository(result, progress);
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
                 }
                 catch

@@ -108,12 +108,13 @@ namespace GitHub.Services
 
         /// <inheritdoc/>
         public async Task CloneOrOpenRepository(
-            UriString url,
-            string repositoryPath,
+            CloneDialogResult cloneDialogResult,
             object progress = null)
         {
-            Guard.ArgumentNotEmptyString(url, nameof(url));
-            Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
+            Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
+
+            var repositoryPath = cloneDialogResult.Path;
+            var url = cloneDialogResult.Url;
 
             if (DestinationFileExists(repositoryPath))
             {

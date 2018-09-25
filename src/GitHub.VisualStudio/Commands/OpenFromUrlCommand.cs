@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.Commands
             var cloneDialogResult = await dialogService.Value.ShowCloneDialog(null, url);
             if (cloneDialogResult != null)
             {
-                await repositoryCloneService.Value.CloneOrOpenRepository(cloneDialogResult.Url, cloneDialogResult.Path);
+                await repositoryCloneService.Value.CloneOrOpenRepository(cloneDialogResult);
             }
         }
     }

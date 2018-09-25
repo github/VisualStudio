@@ -34,10 +34,9 @@ namespace GitHub.Services
             object progress = null);
 
         /// <summary>
-        /// Clones the specificed repository into the specified directory or opens it if the repository already exists.
+        /// Clones the specified repository into the specified directory or opens it if the directory already exists.
         /// </summary>
-        /// <param name="url">The GitHub URL to clone or open.</param>
-        /// <param name="repositoryPath">The repository directory.</param>
+        /// <param name="cloneDialogResult">The URL and path of the repository to clone or open.</param>
         /// <param name="progress">
         /// An object through which to report progress. This must be of type
         /// System.IProgress&lt;Microsoft.VisualStudio.Shell.ServiceProgressData&gt;, but
@@ -45,8 +44,7 @@ namespace GitHub.Services
         /// </param>
         /// <returns></returns>
         Task CloneOrOpenRepository(
-            UriString url,
-            string repositoryPath,
+            CloneDialogResult cloneDialogResult,
             object progress = null);
 
         /// <summary>
