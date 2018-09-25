@@ -52,6 +52,10 @@ You can add comments to a pull request directly from Visual Studio. When a file 
 ![Hover over margin to see add comment icon](images/hover-to-add-comment.png)
 
 Then click the icon on the desired line and leave a comment.
-![Add a comment](images/add-comment.png)
+![Add a comment](images/add-review-comment.png)
+
+To just comment on this one line, select **Add a single comment**. This will add the comment immediately.
+
+To start a review of the Pull Request and all it's changes, select **Start a review**. This will add this comment as pending, and the comment will be submitted once the review is complete.
 
 Existing comments left by you or other reviewers will also show up in this margin. Click the icon to open an inline conversation view from which you can review and reply to comments:
