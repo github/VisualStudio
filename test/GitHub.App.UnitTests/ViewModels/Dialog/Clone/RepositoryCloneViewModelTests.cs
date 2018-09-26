@@ -166,7 +166,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             target.Path = "d:\\exists";
 
-            Assert.That(target.PathError, Is.Null);
+            Assert.That(target.PathWarning, Is.Null);
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
             target.Path = "d:\\exists";
 
-            Assert.That(target.PathError, Is.EqualTo(Resources.DestinationAlreadyExists));
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.DestinationAlreadyExists));
         }
 
         [Test]
