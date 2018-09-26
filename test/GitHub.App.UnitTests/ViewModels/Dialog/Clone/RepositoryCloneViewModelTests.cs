@@ -318,6 +318,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IUsageTracker usageTracker = null,
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
+            IGitService gitService = null,
             IRepositoryUrlViewModel urlTab = null,
             string defaultClonePath = "d:\\efault\\path")
         {
@@ -328,12 +329,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
+            gitService = gitService ?? Substitute.For<IGitService>();
             urlTab = urlTab ?? CreateRepositoryUrlViewModel();
 
             return new RepositoryCloneViewModel(
                 os,
                 connectionManager,
                 service,
+                gitService,
                 usageService,
                 usageTracker,
                 gitHubTab,
