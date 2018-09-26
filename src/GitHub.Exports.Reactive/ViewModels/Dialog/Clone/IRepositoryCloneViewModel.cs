@@ -35,6 +35,11 @@ namespace GitHub.ViewModels.Dialog.Clone
         string PathError { get; }
 
         /// <summary>
+        /// Gets a warning message that explains why <see cref="Path"/> is suspect.
+        /// </summary>
+        string PathWarning { get; }
+
+        /// <summary>
         /// Gets the index of the selected tab.
         /// </summary>
         /// <remarks>

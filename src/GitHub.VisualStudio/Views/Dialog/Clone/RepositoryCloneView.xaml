@@ -55,6 +55,10 @@
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
         </DockPanel>
 
+        <ghfvs:InfoPanel Message="{Binding PathWarning}"
+                         DockPanel.Dock="Bottom"
+                         Margin="0"/>
+
         <TabControl SelectedIndex="{Binding SelectedTabIndex}"
                     Style="{StaticResource LightModalViewTabControl}">
             <TabItem Header="GitHub.com"

@@ -23,12 +23,14 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IOperatingSystem os;
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
+        readonly IGitService gitService;
         readonly IUsageService usageService;
         readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         IRepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathError;
+        ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
 
         [ImportingConstructor]
@@ -36,6 +38,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IOperatingSystem os,
             IConnectionManager connectionManager,
             IRepositoryCloneService service,
+            IGitService gitService,
             IUsageService usageService,
             IUsageTracker usageTracker,
             IRepositorySelectViewModel gitHubTab,
@@ -45,6 +48,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.os = os;
             this.connectionManager = connectionManager;
             this.service = service;
+            this.gitService = gitService;
             this.usageService = usageService;
             this.usageTracker = usageTracker;
 
@@ -62,8 +66,14 @@ namespace GitHub.ViewModels.Dialog.Clone
             pathError = Observable.CombineLatest(
                 repository,
                 this.WhenAnyValue(x => x.Path),
-                ValidatePath)
+                ValidatePathError)
                 .ToProperty(this, x => x.PathError);
+
+            pathWarning = Observable.CombineLatest(
+                repository,
+                this.WhenAnyValue(x => x.Path),
+                ValidatePathWarning)
+                .ToProperty(this, x => x.PathWarning);
 
             var canClone = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path), this.WhenAnyValue(x => x.PathError),
@@ -93,6 +103,8 @@ namespace GitHub.ViewModels.Dialog.Clone
         }
 
         public string PathError => pathError.Value;
+
+        public string PathWarning => pathWarning.Value;
 
         public int SelectedTabIndex
         {
@@ -235,13 +247,44 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        string ValidatePath(IRepositoryModel repository, string path)
+        string ValidatePathError(IRepositoryModel repository, string path)
         {
             if (repository != null)
             {
                 return service.DestinationFileExists(path) ?
                     Resources.DestinationAlreadyExists :
                     null;
+            }
+
+            return null;
+        }
+
+        string ValidatePathWarning(IRepositoryModel repositoryModel, string path)
+        {
+            if (repositoryModel != null)
+            {
+                if (service.DestinationDirectoryExists(path))
+                {
+                    using (var repository = gitService.GetRepository(path))
+                    {
+                        if (repository == null)
+                        {
+                            return $"Can't find a repository at local path";
+                        }
+
+                        var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
+                        if (localUrl == null)
+                        {
+                            return $"Local repository doesn't have an 'origin' remote";
+                        }
+
+                        var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
+                        if (localUrl != targetUrl)
+                        {
+                            return $"Local repository has a remote of {localUrl}";
+                        }
+                    }
+                }
             }
 
             return null;

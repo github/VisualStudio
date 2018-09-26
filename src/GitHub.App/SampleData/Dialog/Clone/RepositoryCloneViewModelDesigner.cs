@@ -17,6 +17,7 @@ namespace GitHub.SampleData.Dialog.Clone
 
         public string Path { get; set; }
         public string PathError { get; set; }
+        public string PathWarning { get; set; }
         public int SelectedTabIndex { get; set; }
         public string Title => null;
         public IObservable<object> Done => null;
