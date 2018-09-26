@@ -5,7 +5,7 @@ using ReactiveUI;
 namespace GitHub.ViewModels.Dialog.Clone
 {
     /// <summary>
-    /// ViewModel for the the Clone Repository dialog
+    /// ViewModel for the Clone Repository dialog
     /// </summary>
     public interface IRepositoryCloneViewModel : IDialogContentViewModel, IConnectionInitializedViewModel
     {
@@ -28,11 +28,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         /// Gets the path to clone the repository to.
         /// </summary>
         string Path { get; set; }
-
-        /// <summary>
-        /// Gets an error message that explains why <see cref="Path"/> is not valid.
-        /// </summary>
-        string PathError { get; }
 
         /// <summary>
         /// Gets a warning message that explains why <see cref="Path"/> is suspect.

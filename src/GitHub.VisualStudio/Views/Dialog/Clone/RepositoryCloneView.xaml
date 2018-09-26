@@ -21,8 +21,6 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <ghfvs:InfoPanel Message="{Binding PathError}"/>
-
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
             <ghfvs:OcticonCircleButton
                                    Margin="12"

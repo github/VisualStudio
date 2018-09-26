@@ -29,7 +29,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         IRepositoryModel previousRepository;
-        ObservableAsPropertyHelper<string> pathError;
         ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
 
@@ -63,12 +62,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             Path = service.DefaultClonePath;
             repository.Subscribe(x => UpdatePath(x));
 
-            pathError = Observable.CombineLatest(
-                repository,
-                this.WhenAnyValue(x => x.Path),
-                ValidatePathError)
-                .ToProperty(this, x => x.PathError);
-
             pathWarning = Observable.CombineLatest(
                 repository,
                 this.WhenAnyValue(x => x.Path),
@@ -76,12 +69,12 @@ namespace GitHub.ViewModels.Dialog.Clone
                 .ToProperty(this, x => x.PathWarning);
 
             var canClone = Observable.CombineLatest(
-                repository, this.WhenAnyValue(x => x.Path), this.WhenAnyValue(x => x.PathError),
-                (repo, path, error) => repo != null && error == null && !service.DestinationDirectoryExists(path));
+                repository, this.WhenAnyValue(x => x.Path),
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && !service.DestinationDirectoryExists(path));
 
             var canOpen = Observable.CombineLatest(
-                repository, this.WhenAnyValue(x => x.Path), this.WhenAnyValue(x => x.PathError),
-                (repo, path, error) => repo != null && error == null && service.DestinationDirectoryExists(path));
+                repository, this.WhenAnyValue(x => x.Path),
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path));
 
             Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
@@ -101,8 +94,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             get => path;
             set => this.RaiseAndSetIfChanged(ref path, value);
         }
-
-        public string PathError => pathError.Value;
 
         public string PathWarning => pathWarning.Value;
 
@@ -247,22 +238,15 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        string ValidatePathError(IRepositoryModel repository, string path)
-        {
-            if (repository != null)
-            {
-                return service.DestinationFileExists(path) ?
-                    Resources.DestinationAlreadyExists :
-                    null;
-            }
-
-            return null;
-        }
-
         string ValidatePathWarning(IRepositoryModel repositoryModel, string path)
         {
             if (repositoryModel != null)
             {
+                if (service.DestinationFileExists(path))
+                {
+                    return Resources.DestinationAlreadyExists;
+                }
+
                 if (service.DestinationDirectoryExists(path))
                 {
                     using (var repository = gitService.GetRepository(path))
