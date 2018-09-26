@@ -169,8 +169,13 @@ namespace GitHub.VisualStudio.UI
             {
                 SearchHost.IsEnabled = enabled;
 
-                if (SearchHost.SearchQuery?.SearchString != query)
+                var searchString = SearchHost.SearchQuery?.SearchString;
+                if (searchString?.Trim() != query?.Trim())
                 {
+                    // SearchAsync will crash the process if we send it a duplicate string.
+                    // There is a SearchTrimsWhitespace setting that makes searched with leading or trailing
+                    // white-space appear as duplicates. We compare the query with trimmed white-space to avoid this.
+                    // https://github.com/github/VisualStudio/issues/1948
                     SearchHost.SearchAsync(query != null ? new SearchQuery(query) : null);
                 }
             }
