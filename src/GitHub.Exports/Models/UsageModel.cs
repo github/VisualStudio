@@ -32,6 +32,7 @@ namespace GitHub.Models
             public string VSVersion { get; set; }
             public string Lang { get; set; }
             public string CurrentLang { get; set; }
+            public string CurrentUILang { get; set; }
         }
 
         public class MeasuresModel
@@ -85,6 +86,11 @@ namespace GitHub.Models
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
             public int NumberOfPullRequestFileMarginToggleInlineCommentMargin { get; set; }
             public int NumberOfPullRequestFileMarginViewChanges { get; set; }
+            public int NumberOfCloneViewGitHubTab { get; set; }
+            public int NumberOfCloneViewEnterpriseTab { get; set; }
+            public int NumberOfCloneViewUrlTab { get; set; }
+            public int NumberOfGitHubClones { get; set; }
+            public int NumberOfEnterpriseClones { get; set; }
         }
     }
 }

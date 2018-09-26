@@ -5,6 +5,7 @@ namespace GitHub.Models
 {
     public class ViewerRepositoriesModel
     {
+        public string Owner { get; set; }
         public IReadOnlyList<RepositoryListItemModel> Repositories { get; set; }
         public IDictionary<string, IReadOnlyList<RepositoryListItemModel>> OrganizationRepositories { get; set; }
     }

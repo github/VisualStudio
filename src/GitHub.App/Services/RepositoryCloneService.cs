@@ -66,7 +66,7 @@ namespace GitHub.Services
 
                 var affiliation = new RepositoryAffiliation?[]
                 {
-                    RepositoryAffiliation.Owner
+                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
@@ -84,6 +84,7 @@ namespace GitHub.Services
                     .Viewer
                     .Select(viewer => new ViewerRepositoriesModel
                     {
+                        Owner = viewer.Login,
                         Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
@@ -120,7 +121,20 @@ namespace GitHub.Services
             try
             {
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
+
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
+
+                var repositoryUrl = new UriString(cloneUrl).ToRepositoryUrl();
+                var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                }
+                else
+                {
+                    // If it isn't a GitHub URL, assume it's an Enterprise URL
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                }
             }
             catch (Exception ex)
             {

@@ -25,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="packages.config" />
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
   </ItemGroup>
