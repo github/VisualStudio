@@ -25,9 +25,10 @@
       <LastGenOutput>AutomationIDs.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
+    <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,14 +19,15 @@ public class VSGitExtTests
 {
     public class TheConstructor : TestBaseClass
     {
-        [TestCase(true, 1)]
-        [TestCase(false, 0)]
-        public void GetServiceIGitExt_WhenRepositoryOpenIsActive(bool isActive, int expectCalls)
+        [TestCase(true, Guids.GitSccProviderId, 1)]
+        [TestCase(true, UICONTEXT.RepositoryOpen_string, 0, Description = "No longer using RepositoryOpen")]
+        [TestCase(false, Guids.GitSccProviderId, 0)]
+        public void GetServiceIGitExt_WhenGitSccProviderIsActive(bool isActive, string contextGuidString, int expectCalls)
         {
             var context = CreateVSUIContext(isActive);
             var sp = Substitute.For<IAsyncServiceProvider>();
 
-            var target = CreateVSGitExt(context, sp: sp);
+            var target = CreateVSGitExt(context, sp: sp, contextGuidString: contextGuidString);
 
             sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
         }
@@ -210,15 +211,16 @@ public class VSGitExtTests
     }
 
     static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IAsyncServiceProvider sp = null,
-        ILocalRepositoryModelFactory repoFactory = null, JoinableTaskContext joinableTaskContext = null)
+        ILocalRepositoryModelFactory repoFactory = null, JoinableTaskContext joinableTaskContext = null, string contextGuidString = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();
+        var contextGuid = new Guid(contextGuidString ?? Guids.GitSccProviderId);
         sp = sp ?? Substitute.For<IAsyncServiceProvider>();
         repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
         joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
         var factory = Substitute.For<IVSUIContextFactory>();
-        factory.GetUIContext(UICONTEXT.RepositoryOpen_guid).Returns(context);
+        factory.GetUIContext(contextGuid).Returns(context);
         sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
         var vsGitExt = new VSGitExt(sp, factory, repoFactory, joinableTaskContext);
         vsGitExt.JoinTillEmpty();

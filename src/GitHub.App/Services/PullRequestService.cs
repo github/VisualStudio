@@ -472,7 +472,7 @@ namespace GitHub.Services
             var exitCode = await Where("git");
             if (exitCode != 0)
             {
-                progress(App.Resources.CouldntFindGitOnPath);
+                progress(Resources.CouldntFindGitOnPath);
                 return false;
             }
 
@@ -820,8 +820,8 @@ namespace GitHub.Services
         public bool ConfirmCancelPendingReview()
         {
             return MessageBox.Show(
-                       GitHub.App.Resources.CancelPendingReviewConfirmation,
-                       GitHub.App.Resources.CancelPendingReviewConfirmationCaption,
+                       Resources.CancelPendingReviewConfirmation,
+                       Resources.CancelPendingReviewConfirmationCaption,
                        MessageBoxButtons.YesNo,
                        MessageBoxIcon.Question) == DialogResult.Yes;
         }

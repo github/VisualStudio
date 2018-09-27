@@ -117,6 +117,264 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BrowseForDirectory" xml:space="preserve">
+    <value>Select a containing folder for your new repository.</value>
+  </data>
+  <data name="CloneTitle" xml:space="preserve">
+    <value>Clone a Repository</value>
+  </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>Open from GitHub</value>
+  </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>Could not connect to github.com</value>
+  </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>Create a GitHub Gist</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>Create a {0} Repository</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs</value>
+  </data>
+  <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
+    <value>Please enter an Enterprise URL</value>
+  </data>
+  <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
+    <value>Please enter a valid Enterprise URL</value>
+  </data>
+  <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
+    <value>Not an Enterprise server. Please enter an Enterprise URL</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(forgot your password?)</value>
+  </data>
+  <data name="LoginFailedForbiddenMessage" xml:space="preserve">
+    <value>Make sure to use your password and not a Personal Access token to sign in.</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>Check your username and password, then try again</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>Sign in failed.</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Connect To GitHub</value>
+  </data>
+  <data name="PasswordValidatorEmpty" xml:space="preserve">
+    <value>Please enter your password</value>
+  </data>
+  <data name="PRCreatedUpstream" xml:space="preserve">
+    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
+  </data>
+  <data name="PublishTitle" xml:space="preserve">
+    <value>Publish repository</value>
+  </data>
+  <data name="PublishToTitle" xml:space="preserve">
+    <value>Publish repository to {0}</value>
+  </data>
+  <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
+    <value>Please enter a title for the Pull Request</value>
+  </data>
+  <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
+    <value>Source and target branch cannot be the same</value>
+  </data>
+  <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
+    <value>Source branch doesn't exist remotely, have you pushed it?</value>
+  </data>
+  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
+    <value>No selected repository.</value>
+  </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>Please enter a repository path</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>Please enter a valid path</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>Path contains invalid characters</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>Path too long</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
+    <value>Repository '{0}/{1}' already exists.</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
+    <value>Change the repository name or select a different account and try again.</value>
+  </data>
+  <data name="RepositoryCreationFailedQuota" xml:space="preserve">
+    <value>Exceeded private repositories quota.</value>
+  </data>
+  <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
+    <value>Repository with same name already exists at this location</value>
+  </data>
+  <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
+    <value>Please enter a repository name</value>
+  </data>
+  <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
+    <value>Repository name must be fewer than 100 characters</value>
+  </data>
+  <data name="SafeRepositoryNameWarning" xml:space="preserve">
+    <value>Will be created as {0}</value>
+  </data>
+  <data name="TwoFactorApp" xml:space="preserve">
+    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
+  </data>
+  <data name="TwoFactorSms" xml:space="preserve">
+    <value>We sent you a message via SMS with your authentication code.</value>
+  </data>
+  <data name="TwoFactorTitle" xml:space="preserve">
+    <value>Two-Factor authentication required</value>
+  </data>
+  <data name="TwoFactorUnknown" xml:space="preserve">
+    <value>Enter a sign in authentication code here</value>
+  </data>
+  <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
+    <value>Please enter your username or email address</value>
+  </data>
+  <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
+    <value>Username or email address must not have spaces</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Requests</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Pull Request</value>
+  </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>add</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>fork</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>[invalid]</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>You must pull before you can push</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>No commits to pull</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>No commits to push</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>*No description provided.*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>Checkout {0}</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>Checkout to {0}</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>Pull from {0} branch {1}</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>Push to {0} branch {1}</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>remote</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>rename</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>The source repository is no longer available.</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>Cannot checkout as your working directory has uncommitted changes.</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>Sync {0} submodules</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>Couldn't find Git.exe on PATH.
+
+Please install Git for Windows from:
+https://git-scm.com/download/win</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>Changes Requested</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>Commented</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>InProgress</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>Press Enter to navigate to Editor</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>Checkout PR branch before navigating to Editor</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
+  </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>Fork Repository</value>
+  </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>Switch Origin</value>
+  </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>Cancel Review</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>A file exists at the destination path.</value>
+  </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>Logout Required</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>{0:N0} day ago</value>
+  </data>
+  <data name="days" xml:space="preserve">
+    <value>{0:N0} days ago</value>
+  </data>
+  <data name="hour" xml:space="preserve">
+    <value>{0:N0} hour ago</value>
+  </data>
+  <data name="hours" xml:space="preserve">
+    <value>{0:N0} hours ago</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>just now</value>
+  </data>
+  <data name="minute" xml:space="preserve">
+    <value>{0:N0} minute ago</value>
+  </data>
+  <data name="minutes" xml:space="preserve">
+    <value>{0:N0} minutes ago</value>
+  </data>
+  <data name="month" xml:space="preserve">
+    <value>{0:N0} month ago</value>
+  </data>
+  <data name="months" xml:space="preserve">
+    <value>{0:N0} months ago</value>
+  </data>
+  <data name="second" xml:space="preserve">
+    <value>{0:N0} second ago</value>
+  </data>
+  <data name="seconds" xml:space="preserve">
+    <value>{0:N0} seconds ago</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>{0:N0} year ago</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>{0:N0} years ago</value>
+  </data>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
     <value>Invalid authentication code</value>
   </data>
@@ -189,9 +447,6 @@
   <data name="PulseNavigationItemText" xml:space="preserve">
     <value>Pulse</value>
   </data>
-  <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>Pull Requests</value>
-  </data>
   <data name="pathText" xml:space="preserve">
     <value>Path</value>
   </data>
@@ -255,9 +510,6 @@
   <data name="makePrivateContent" xml:space="preserve">
     <value>Private Repository</value>
   </data>
-  <data name="LoginFailedText" xml:space="preserve">
-    <value>Sign in failed.</value>
-  </data>
   <data name="localPathText" xml:space="preserve">
     <value>Local path</value>
   </data>
@@ -291,14 +543,8 @@
   <data name="PasswordPrompt" xml:space="preserve">
     <value>Password</value>
   </data>
-  <data name="LoginFailedMessage" xml:space="preserve">
-    <value>Check your username and password, then try again</value>
-  </data>
   <data name="LoginLink" xml:space="preserve">
     <value>Sign in</value>
-  </data>
-  <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>(forgot your password?)</value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
     <value>Please check your internet connection and try again.</value>
@@ -434,8 +680,101 @@
   <data name="UpdateComment" xml:space="preserve">
     <value>Update comment</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="StartAReview" xml:space="preserve">
+    <value>Start a review</value>
+  </data>
+  <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
+    <value>You must commit and push your changes to add a comment here.</value>
+  </data>
+  <data name="PreviousComment" xml:space="preserve">
+    <value>Previous Comment</value>
+  </data>
+  <data name="NextComment" xml:space="preserve">
+    <value>Next Comment</value>
+  </data>
+  <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
+    <value>View, Checkout or Create a Pull request</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ForkRepository" xml:space="preserve">
+    <value>Fork Repository</value>
+  </data>
+  <data name="ForkTheRepository" xml:space="preserve">
+    <value>Fork the repository</value>
+  </data>
+  <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
+    <value> Update your local repository's</value>
+  </data>
+  <data name="ToPointTo" xml:space="preserve">
+    <value>to point to</value>
+  </data>
+  <data name="CreatePullRequest" xml:space="preserve">
+    <value>Create pull request</value>
+  </data>
+  <data name="SignInToGitHub" xml:space="preserve">
+    <value>Sign in to GitHub</value>
+  </data>
+  <data name="Pull" xml:space="preserve">
+    <value>Pull</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="Sync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="Wrote" xml:space="preserve">
+    <value>wrote</value>
+  </data>
+  <data name="SubmitYourReviewFor" xml:space="preserve">
+    <value>Submit your review for</value>
+  </data>
+  <data name="YourReviewSummary" xml:space="preserve">
+    <value>Your review summary</value>
+  </data>
+  <data name="CommentOnly" xml:space="preserve">
+    <value>Comment only</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="RequestChanges" xml:space="preserve">
+    <value>Request changes</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="OutdatedComments" xml:space="preserve">
+    <value>Outdated comments</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Create New</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>Assignee</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>Sign in with your browser</value>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
+  </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>Filter by Author</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>Select Fork</value>
   </data>
   <data name="DeleteCommentConfirmation" xml:space="preserve">
     <value>Are you sure you want to delete this comment?</value>
@@ -445,5 +784,56 @@
   </data>
   <data name="Retry" xml:space="preserve">
     <value>Retry</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>There aren't any open pull requests</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>Pull requests let you tell others about changes you've pushed to a repository on GitHub</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>No results matched your search.</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>To get started you can</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>create a pull request</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>Open repository at '{0}'?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>The target URL has a different owner to the current repository.</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>There is no active repository to navigate</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>This file has changed since the permalink was created</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>Please open the repository '{0}' and try again</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>Couldn't open from '{0}'. Only URLs that link to repository files are currently supported.</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>Couldn't a find a GitHub URL in clipboard</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
+  </data>
+  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>A repository already exists at this location, but it has a remote of {0}.</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
   </data>
 </root>
