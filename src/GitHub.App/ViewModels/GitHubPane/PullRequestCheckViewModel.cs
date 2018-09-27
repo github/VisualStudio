@@ -62,11 +62,14 @@ namespace GitHub.ViewModels.GitHubPane
                 return pullRequestCheckViewModel;
             }) ?? Array.Empty<PullRequestCheckViewModel>();
 
-            var checks = pullRequest.CheckSuites?.SelectMany(checkSuiteModel => checkSuiteModel.CheckRuns)
-                .Select(checkRunModel =>
+            var checks = 
+                pullRequest.CheckSuites?
+                    .SelectMany(checkSuite => checkSuite.CheckRuns
+                        .Select(checkRun => new { checkSuiteModel = checkSuite, checkRun}))
+                .Select(arg =>
                 {
                     PullRequestCheckStatus checkStatus;
-                    switch (checkRunModel.Status)
+                    switch (arg.checkRun.Status)
                     {
                         case CheckStatusState.Requested:
                         case CheckStatusState.Queued:
@@ -75,7 +78,7 @@ namespace GitHub.ViewModels.GitHubPane
                             break;
 
                         case CheckStatusState.Completed:
-                            switch (checkRunModel.Conclusion)
+                            switch (arg.checkRun.Conclusion)
                             {
                                 case CheckConclusionState.Success:
                                     checkStatus = PullRequestCheckStatus.Success;
@@ -100,12 +103,16 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
-                    pullRequestCheckViewModel.CheckRunId = checkRunModel.DatabaseId;
-                    pullRequestCheckViewModel.HasAnnotations = checkRunModel.Annotations?.Any() ?? false;
-                    pullRequestCheckViewModel.Title = checkRunModel.Name;
-                    pullRequestCheckViewModel.Description = checkRunModel.Summary;
+                    pullRequestCheckViewModel.CheckRunId = arg.checkRun.DatabaseId;
+                    pullRequestCheckViewModel.HasAnnotations = arg.checkRun.Annotations?.Any() ?? false;
+                    pullRequestCheckViewModel.Title = arg.checkRun.Name;
+                    pullRequestCheckViewModel.Description = arg.checkRun.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
-                    pullRequestCheckViewModel.DetailsUrl = new Uri(checkRunModel.DetailsUrl);
+                    pullRequestCheckViewModel.DetailsUrl = new Uri(arg.checkRun.DetailsUrl);
+                    pullRequestCheckViewModel.AvatarUrl = arg.checkSuiteModel.ApplicationLogoUrl ?? DefaultAvatar;
+                    pullRequestCheckViewModel.Avatar = arg.checkSuiteModel.ApplicationLogoUrl != null
+                        ? new BitmapImage(new Uri(arg.checkSuiteModel.ApplicationLogoUrl))
+                        : AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                     return pullRequestCheckViewModel;
                 }) ?? Array.Empty<PullRequestCheckViewModel>();

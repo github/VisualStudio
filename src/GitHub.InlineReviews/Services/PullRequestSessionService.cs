@@ -810,6 +810,8 @@ namespace GitHub.InlineReviews.Services
                                                       }).ToList()
                                               }).ToList(),
                                           ApplicationName = suite.App.Name,
+                                          ApplicationSlug = suite.App.Slug,
+                                          ApplicationLogoUrl = suite.App.LogoUrl(null),
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
