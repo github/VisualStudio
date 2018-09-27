@@ -27,6 +27,20 @@ namespace GitHub.Services
             IssueState[] states);
 
         /// <summary>
+        /// Reads the details of a specified issue.
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The issue number.</param>
+        /// <returns>A task returning the issue model.</returns>
+        Task<IssueDetailModel> ReadIssue(
+            HostAddress address,
+            string owner,
+            string name,
+            int number);
+
+        /// <summary>
         /// Reads a page of users that can be assigned to issues.
         /// </summary>
         /// <param name="address">The host address.</param>

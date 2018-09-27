@@ -336,6 +336,7 @@
     <Compile Include="Commands\CreateGistCommand.cs" />
     <Compile Include="Commands\OpenFromClipboardCommand.cs" />
     <Compile Include="Commands\OpenFromUrlCommand.cs" />
+    <Compile Include="Commands\ShowIssueDetailsCommand.cs" />
     <Compile Include="Commands\ShowMessageBoxCommand.cs" />
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
@@ -374,7 +375,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
+    <Compile Include="UI\AsyncPaneBase.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\IssueDetailPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>

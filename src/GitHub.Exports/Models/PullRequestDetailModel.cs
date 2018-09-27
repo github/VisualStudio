@@ -6,37 +6,12 @@ namespace GitHub.Models
     /// <summary>
     /// Holds the details of a Pull Request.
     /// </summary>
-    public class PullRequestDetailModel
+    public class PullRequestDetailModel : IssueishDetailModel
     {
-        /// <summary>
-        /// Gets or sets the GraphQL ID of the pull request.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request number.
-        /// </summary>
-        public int Number { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request author.
-        /// </summary>
-        public ActorModel Author { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request title.
-        /// </summary>
-        public string Title { get; set; }
-
         /// <summary>
         /// Gets or sets the pull request state (open, closed, merged).
         /// </summary>
         public PullRequestStateEnum State { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request body markdown.
-        /// </summary>
-        public string Body { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the base branch (e.g. "master").
@@ -68,11 +43,6 @@ namespace GitHub.Models
         /// </summary>
         public string HeadRepositoryOwner { get; set; }
 
-        /// <summary>
-        /// Gets or sets the date/time at which the pull request was last updated.
-        /// </summary>
-        public DateTimeOffset UpdatedAt { get; set; }
-        
         /// <summary>
         /// Gets or sets a collection of files changed by the pull request.
         /// </summary>

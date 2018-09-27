@@ -19,6 +19,7 @@ namespace GitHub.Services
     {
         static ICompiledQuery<Page<ActorModel>> readAssignableUsers;
         static ICompiledQuery<Page<IssueListItemModel>> readIssues;
+        static ICompiledQuery<IssueDetailModel> readIssue;
 
         readonly IGraphQLClientFactory graphqlFactory;
 
@@ -76,6 +77,52 @@ namespace GitHub.Services
             };
 
             return await graphql.Run(readIssues, vars).ConfigureAwait(false);
+        }
+
+        public async Task<IssueDetailModel> ReadIssue(HostAddress address, string owner, string name, int number)
+        {
+            if (readIssue == null)
+            {
+                readIssue = new Query()
+                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Issue(Var(nameof(number)))
+                    .Select(issue => new IssueDetailModel
+                    {
+                        Id = issue.Id.Value,
+                        Number = issue.Number,
+                        Author = new ActorModel
+                        {
+                            Login = issue.Author.Login,
+                            AvatarUrl = issue.Author.AvatarUrl(null),
+                        },
+                        Title = issue.Title,
+                        Body = issue.Body,
+                        UpdatedAt = issue.UpdatedAt,
+                        Comments = issue.Comments(null, null, null, null).AllPages().Select(comment => new CommentModel
+                        {
+                            Id = comment.Id.Value,
+                            DatabaseId = comment.DatabaseId.Value,
+                            Author = new ActorModel
+                            {
+                                Login = comment.Author.Login,
+                                AvatarUrl = comment.Author.AvatarUrl(null),
+                            },
+                            Body = comment.Body,
+                            CreatedAt = comment.CreatedAt,                            
+                            Url = comment.Url,
+                        }).ToList(),
+                    }).Compile();
+            }
+
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(number), number },
+            };
+
+            return await graphql.Run(readIssue, vars).ConfigureAwait(false);
         }
 
         public async Task<Page<ActorModel>> ReadAssignableUsers(

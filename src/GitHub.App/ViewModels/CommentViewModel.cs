@@ -43,7 +43,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="author">The author of the comment.</param>
         /// <param name="updatedAt">The modified date of the comment.</param>
         /// <param name="webUrl"></param>
-        protected CommentViewModel(
+        public CommentViewModel(
             ICommentService commentService,
             ICommentThreadViewModel thread,
             IActorViewModel currentUser,
@@ -111,7 +111,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="model">The comment model.</param>
-        protected CommentViewModel(
+        public CommentViewModel(
             ICommentService commentService,
             ICommentThreadViewModel thread,
             ActorModel currentUser,

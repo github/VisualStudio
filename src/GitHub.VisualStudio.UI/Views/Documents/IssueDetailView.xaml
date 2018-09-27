@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.Documents.IssueDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Documents"
+             xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <d:DesignData.DataContext>
+        <ghfvs:IssueDetailViewModelDesigner Number="1865"
+                                            Title="Installer hangs after download of GHfVS is complete">
+            <ghfvs:IssueDetailViewModelDesigner.Body>
+                <ghfvs:CommentViewModelDesigner>
+                    <ghfvs:CommentViewModelDesigner.Body>
+                        __Version__
+- GitHub Extension for Visual Studio version: 2.5.4 release
+- Visual Studio version: VS2017
+
+__What happened__ 
+
+@shana reported that on a fresh install of GHfVS the redist installer hangs after the extension is done installing.
+                    </ghfvs:CommentViewModelDesigner.Body>
+                </ghfvs:CommentViewModelDesigner>
+            </ghfvs:IssueDetailViewModelDesigner.Body>
+        </ghfvs:IssueDetailViewModelDesigner>
+    </d:DesignData.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+    
+    <DockPanel Margin="16">
+        <TextBlock DockPanel.Dock="Top"
+                   TextWrapping="Wrap"
+                   FontSize="20">
+            <Run Text="{Binding Title, Mode=OneWay}"/>
+            <Run Text="{Binding Number, Mode=OneWay, StringFormat=#{0}}" Foreground="Gray"/>
+        </TextBlock>
+        <StackPanel>
+            <v:CommentView ViewModel="{Binding Body}"/>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

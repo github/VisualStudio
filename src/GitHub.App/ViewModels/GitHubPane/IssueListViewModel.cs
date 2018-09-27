@@ -4,12 +4,12 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
-using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -22,6 +22,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly IReadOnlyList<string> states = new[] { "Open", "Closed", "All" };
         readonly IIssueService service;
+        readonly IShowIssueDetailsCommand showIssueDetails;
         ObservableAsPropertyHelper<Uri> webUrl;
 
         /// <summary>
@@ -33,12 +34,14 @@ namespace GitHub.ViewModels.GitHubPane
         [ImportingConstructor]
         public IssueListViewModel(
             IRepositoryService repositoryService,
-            IIssueService service)
+            IIssueService service,
+            IShowIssueDetailsCommand showIssueDetails)
             : base(repositoryService)
         {
             Guard.ArgumentNotNull(service, nameof(service));
 
             this.service = service;
+            this.showIssueDetails = showIssueDetails;
 
             webUrl = this.WhenAnyValue(x => x.RemoteRepository)
                 .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("issue"))
@@ -65,8 +68,11 @@ namespace GitHub.ViewModels.GitHubPane
         protected override Task DoOpenItem(IIssueListItemViewModelBase item)
         {
             var i = (IIssueListItemViewModel)item;
-            NavigateTo(Invariant($"{RemoteRepository.Owner}/{RemoteRepository.Name}/issue/{i.Number}"));
-            return Task.CompletedTask;
+            return showIssueDetails.Execute(new ShowIssueDetailsParams(
+                HostAddress.Create(LocalRepository.CloneUrl),
+                RemoteRepository.Owner,
+                RemoteRepository.Name,
+                i.Number));
         }
 
         /// <inheritdoc/>
