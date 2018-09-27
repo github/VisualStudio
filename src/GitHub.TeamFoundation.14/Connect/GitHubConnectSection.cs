@@ -158,7 +158,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 catch (Exception e)
                 {
                     var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Url.RepositoryName));
+                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.CloneOrOpenFailed, result.Url.RepositoryName));
                 }
             }
         }

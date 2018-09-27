@@ -25,7 +25,7 @@ namespace GitHub.Services
         CannotDropFolder,
         CannotDropFolderUnauthorizedAccess,
         ClipboardFailed,
-        ClonedFailed,
+        CloneOrOpenFailed,
         CloneFailedNotLoggedIn,
         CommitCreateFailed,
         CommitRevertFailed,
@@ -123,7 +123,7 @@ namespace GitHub.Services
             },
             { ErrorType.ClipboardFailed, Map(Defaults("Failed to copy text to the clipboard.")) },
             {
-                ErrorType.ClonedFailed, Map(Defaults("Failed to clone the repository '{0}'", "Email support@github.com if you continue to have problems."),
+                ErrorType.CloneOrOpenFailed, Map(Defaults("Failed to clone or open the repository '{0}'", "Email support@github.com if you continue to have problems."),
                     new[]
                     {
                         new Translation(@"fatal: bad config file line (\d+) in (.+)", "Failed to clone the repository '{0}'", @"The config file '$2' is corrupted at line $1. You may need to open the file and try to fix any errors."),
