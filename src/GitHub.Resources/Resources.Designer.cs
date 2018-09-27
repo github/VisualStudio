@@ -250,7 +250,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can&apos;t find a repository at local path..
+        ///   Looks up a localized string similar to There is already a directory at this location, but it doesn&apos;t contain a repository..
         /// </summary>
         public static string CantFindARepositoryAtLocalPath {
             get {
@@ -883,7 +883,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Local repository doesn&apos;t have a remote named &quot;origin&quot;..
+        ///   Looks up a localized string similar to A repository already exists at this location, but it doesn&apos;t have a remote named &quot;origin&quot;..
         /// </summary>
         public static string LocalRepositoryDoesntHaveARemoteOrigin {
             get {
@@ -892,7 +892,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Local repository has a remote of {0}..
+        ///   Looks up a localized string similar to A repository already exists at this location, but it has a remote of {0}..
         /// </summary>
         public static string LocalRepositoryHasARemoteOf {
             get {

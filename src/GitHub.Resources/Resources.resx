@@ -825,13 +825,13 @@ https://git-scm.com/download/win</value>
     <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
   </data>
   <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>Can't find a repository at local path.</value>
+    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>Local repository doesn't have a remote named "origin".</value>
+    <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>Local repository has a remote of {0}.</value>
+    <value>A repository already exists at this location, but it has a remote of {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
