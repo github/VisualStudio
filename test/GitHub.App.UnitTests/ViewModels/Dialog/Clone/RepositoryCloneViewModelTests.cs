@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
@@ -17,6 +18,9 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 {
     public class RepositoryCloneViewModelTests
     {
+        const string directoryExists = "d:\\exists";
+        const string defaultPath = "d:\\default\\path";
+
         [Test]
         public async Task GitHubPage_Is_Initialized()
         {
@@ -146,17 +150,20 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         {
             var target = CreateTarget();
 
-            Assert.That(target.Path, Is.EqualTo("d:\\efault\\path"));
+            Assert.That(target.Path, Is.EqualTo(defaultPath));
         }
 
         [Test]
         public async Task Owner_And_Repository_Name_Is_Appended_To_Base_Path()
         {
+            var owner = "owner";
+            var repo = "repo";
             var target = CreateTarget();
+            var expectPath = Path.Combine(defaultPath, owner, repo);
 
-            SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
+            SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
 
-            Assert.That(target.Path, Is.EqualTo("d:\\efault\\path\\owner\\repo"));
+            Assert.That(target.Path, Is.EqualTo(expectPath));
         }
 
         [Test]
@@ -164,7 +171,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         {
             var target = CreateTarget();
 
-            target.Path = "d:\\exists";
+            target.Path = directoryExists;
 
             Assert.That(target.PathWarning, Is.Null);
         }
@@ -174,7 +181,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         {
             var target = CreateTarget();
             SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
-            target.Path = "d:\\exists";
+            target.Path = directoryExists;
 
             Assert.That(target.PathWarning, Is.EqualTo(Resources.DestinationAlreadyExists));
         }
@@ -258,7 +265,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             SetRepository(target.GitHubTab, CreateRepositoryModel());
             Assert.That(target.Clone.CanExecute(null), Is.True);
 
-            target.Path = "d:\\exists";
+            target.Path = directoryExists;
 
             Assert.That(target.Clone.CanExecute(null), Is.False);
         }
@@ -305,8 +312,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         {
             var result = Substitute.For<IRepositoryCloneService>();
             result.DefaultClonePath.Returns(defaultClonePath);
-            result.DestinationDirectoryExists("d:\\exists").Returns(false);
-            result.DestinationFileExists("d:\\exists").Returns(true);
+            result.DestinationDirectoryExists(directoryExists).Returns(false);
+            result.DestinationFileExists(directoryExists).Returns(true);
             return result;
         }
 
@@ -320,7 +327,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IRepositorySelectViewModel enterpriseTab = null,
             IGitService gitService = null,
             IRepositoryUrlViewModel urlTab = null,
-            string defaultClonePath = "d:\\efault\\path")
+            string defaultClonePath = defaultPath)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
