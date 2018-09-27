@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
@@ -16,6 +17,8 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCheckViewModel: ViewModelBase, IPullRequestCheckViewModel
     {
+        const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
+
         private readonly IUsageTracker usageTracker;
 
         /// <summary>
