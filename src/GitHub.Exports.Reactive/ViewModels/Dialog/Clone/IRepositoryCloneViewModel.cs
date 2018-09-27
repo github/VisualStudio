@@ -5,7 +5,7 @@ using ReactiveUI;
 namespace GitHub.ViewModels.Dialog.Clone
 {
     /// <summary>
-    /// ViewModel for the the Clone Repository dialog
+    /// ViewModel for the Clone Repository dialog
     /// </summary>
     public interface IRepositoryCloneViewModel : IDialogContentViewModel, IConnectionInitializedViewModel
     {
@@ -30,9 +30,9 @@ namespace GitHub.ViewModels.Dialog.Clone
         string Path { get; set; }
 
         /// <summary>
-        /// Gets an error message that explains why <see cref="Path"/> is not valid.
+        /// Gets a warning message that explains why <see cref="Path"/> is suspect.
         /// </summary>
-        string PathError { get; }
+        string PathWarning { get; }
 
         /// <summary>
         /// Gets the index of the selected tab.

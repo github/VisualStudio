@@ -21,9 +21,8 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <ghfvs:InfoPanel Message="{Binding PathError}"/>
-
-        <ghfvs:OcticonCircleButton DockPanel.Dock="Bottom"
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <ghfvs:OcticonCircleButton
                                    Margin="12"
                                    HorizontalAlignment="Center"
                                    Icon="check"
@@ -32,9 +31,19 @@
                                    Content="Clone"
                                    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
 
+            <ghfvs:OcticonCircleButton
+                                   Margin="12"
+                                   HorizontalAlignment="Center"
+                                   Icon="check"
+                                   IsDefault="True"
+                                   Command="{Binding Open}"
+                                   Content="Open"
+                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+        </StackPanel>
+
         <DockPanel DockPanel.Dock="Bottom"
                    Margin="16">
-            <Label DockPanel.Dock="Left">Local Path</Label>
+            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
                     Style="{DynamicResource GitHubBlueLinkButton}"
@@ -43,6 +52,10 @@
             </Button>
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
         </DockPanel>
+
+        <ghfvs:InfoPanel Message="{Binding PathWarning}"
+                         DockPanel.Dock="Bottom"
+                         Margin="0"/>
 
         <TabControl SelectedIndex="{Binding SelectedTabIndex}"
                     Style="{StaticResource LightModalViewTabControl}">

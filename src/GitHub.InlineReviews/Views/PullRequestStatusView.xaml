@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
@@ -52,9 +53,7 @@
                 </StackPanel>
             </Button>
             <Grid.ToolTip>
-                <TextBlock VerticalAlignment="Center">
-                    View, Checkout or Create a Pull request
-                </TextBlock>
+                <TextBlock VerticalAlignment="Center" Text="{x:Static ghfvs:Resources.ViewCheckoutOrCreateAPullRequest}"/>
             </Grid.ToolTip>
         </Grid>
 

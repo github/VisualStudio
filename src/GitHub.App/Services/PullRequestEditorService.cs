@@ -553,7 +553,7 @@ namespace GitHub.Services
             var textView = vsEditorAdaptersFactory.GetWpfTextView(vsTextView);
 
             var statusMessage = session.IsCheckedOut ?
-                App.Resources.NavigateToEditorStatusMessage : App.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+                Resources.NavigateToEditorStatusMessage : Resources.NavigateToEditorNotCheckedOutStatusMessage;
 
             textView.GotAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(statusMessage);

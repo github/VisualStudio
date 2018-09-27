@@ -4,7 +4,6 @@
                                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
-                               xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                xmlns:ghfvs="https://github.com/github/VisualStudio"
                                mc:Ignorable="d"
                                d:DesignWidth="414"
@@ -28,7 +27,7 @@
             x:Name="createGistButton"
             HorizontalAlignment="Center"
             Icon="check">
-            <TextBlock Text="{x:Static prop:Resources.CreateLink}"/>
+            <TextBlock Text="{x:Static ghfvs:Resources.CreateLink}"/>
         </ghfvs:OcticonCircleButton>
 
         <StackPanel>
@@ -70,10 +69,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static prop:Resources.fileNameText}"/>
+                <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static ghfvs:Resources.fileNameText}"/>
                 <ghfvs:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistFileNameTextBox}" />
 
-                <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.Description}"/>
+                <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static ghfvs:Resources.Description}"/>
                 <ghfvs:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1" SpellCheck.IsEnabled="True" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistDescriptionTextBlock}"/>
 
                 <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
@@ -90,7 +89,7 @@
                     x:Name="makePrivate"
                     Grid.Column="1"
                     Grid.Row="3"
-                    Content="{x:Static prop:Resources.makePrivateGist}"
+                    Content="{x:Static ghfvs:Resources.makePrivateGist}"
                     Style="{DynamicResource BlueRoundedCheckBox}"
                     Padding="8,4,0,4" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateGistCheckBox}" />
@@ -100,8 +99,8 @@
                     Grid.ColumnSpan="2"
                     Grid.Row="4"
                     Margin="0,10"
-                    Message="{x:Static prop:Resources.gistCreationFailedMessage}">
-                    <TextBlock x:Name="errorMessageText" TextWrapping="Wrap" Text="{x:Static prop:Resources.gistCreationFailedMessage}"/>
+                    Message="{x:Static ghfvs:Resources.gistCreationFailedMessage}">
+                    <TextBlock x:Name="errorMessageText" TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.gistCreationFailedMessage}"/>
                 </ghfvs:ErrorMessageDisplay>
             </Grid>
         </StackPanel>

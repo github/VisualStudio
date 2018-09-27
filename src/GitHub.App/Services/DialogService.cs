@@ -29,17 +29,27 @@ namespace GitHub.Services
             this.showDialog = showDialog;
         }
 
-        public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
+        public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null)
         {
-            Guard.ArgumentNotNull(connection, nameof(connection));
-
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
+            if (url != null)
+            {
+                viewModel.UrlTab.Url = url;
+            }
 
-            return (CloneDialogResult)await showDialog.Show(
-                viewModel,
-                connection,
-                ApiClientConfiguration.RequestedScopes)
-                .ConfigureAwait(false);
+            if (connection != null)
+            {
+                return (CloneDialogResult)await showDialog.Show(
+                    viewModel,
+                    connection,
+                    ApiClientConfiguration.RequestedScopes)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel)
+                    .ConfigureAwait(false);
+            }
         }
 
         public async Task<string> ShowReCloneDialog(IRepositoryModel repository)

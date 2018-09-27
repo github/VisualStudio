@@ -2,9 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              d:DesignHeight="200"
              mc:Ignorable="d">
   <UserControl.Resources>
@@ -70,14 +70,14 @@
             Padding="6 8 6 8"
             Style="{DynamicResource GroupBoxFlat}">
       <GroupBox.Header>
-        <Run Text="{x:Static prop:Resources.Options_PrivacyTitle}" />
+        <Run Text="{x:Static ghfvs:Resources.Options_PrivacyTitle}" />
       </GroupBox.Header>
       <DockPanel>
         <WrapPanel DockPanel.Dock="Top">
-          <CheckBox x:Name="chkMetrics" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_MetricsLabel}" />
+          <CheckBox x:Name="chkMetrics" VerticalAlignment="Center" Content="{x:Static ghfvs:Resources.Options_MetricsLabel}" />
         </WrapPanel>
         <TextBlock>
-        <Hyperlink ToolTip="https://visualstudio.github.com/samples.html" NavigateUri="https://visualstudio.github.com/samples.html" RequestNavigate="Hyperlink_RequestNavigate"><TextBlock Text="{x:Static prop:Resources.learnMoreLink}"/></Hyperlink>
+        <Hyperlink ToolTip="https://visualstudio.github.com/samples.html" NavigateUri="https://visualstudio.github.com/samples.html" RequestNavigate="Hyperlink_RequestNavigate"><TextBlock Text="{x:Static ghfvs:Resources.learnMoreLink}"/></Hyperlink>
       </TextBlock>
       </DockPanel>
     </GroupBox>
@@ -89,10 +89,10 @@
             Padding="6 8 6 8"
             Style="{DynamicResource GroupBoxFlat}">
       <GroupBox.Header>
-            <Run Text="{x:Static prop:Resources.Options_DebuggingTitle}" />
+            <Run Text="{x:Static ghfvs:Resources.Options_DebuggingTitle}" />
       </GroupBox.Header>
       <DockPanel>
-        <CheckBox x:Name="chkEnableTraceLogging" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EnableTraceLoggingText}" />
+        <CheckBox x:Name="chkEnableTraceLogging" VerticalAlignment="Center" Content="{x:Static ghfvs:Resources.Options_EnableTraceLoggingText}" />
       </DockPanel>
     </GroupBox>
     <GroupBox
@@ -103,19 +103,19 @@
             Padding="6 8 6 8"
             Style="{DynamicResource GroupBoxFlat}">
       <GroupBox.Header>
-        <Run Text="{x:Static prop:Resources.Options_ExperimentalTitle}" />
+        <Run Text="{x:Static ghfvs:Resources.Options_ExperimentalTitle}" />
       </GroupBox.Header>
       <DockPanel>
         <WrapPanel DockPanel.Dock="Top">
-          <CheckBox x:Name="chkEditorComments" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_EditorCommentsLabel}" />
+          <CheckBox x:Name="chkEditorComments" VerticalAlignment="Center" Content="{x:Static ghfvs:Resources.Options_EditorCommentsLabel}" />
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
-          <CheckBox x:Name="chkForkButton" VerticalAlignment="Center" Content="{x:Static prop:Resources.Options_ForkButtonLabel}" />
+          <CheckBox x:Name="chkForkButton" VerticalAlignment="Center" Content="{x:Static ghfvs:Resources.Options_ForkButtonLabel}" />
         </WrapPanel>
         <TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap">
           <LineBreak />
           <Italic>
-              <Run Text="{x:Static prop:Resources.Options_ExperimentalNote}" />
+              <Run Text="{x:Static ghfvs:Resources.Options_ExperimentalNote}" />
           </Italic>
         </TextBlock>
       </DockPanel>

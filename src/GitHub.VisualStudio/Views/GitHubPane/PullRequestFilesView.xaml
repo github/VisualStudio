@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              Name="root">
@@ -24,10 +23,10 @@
             </ResourceDictionary.MergedDictionaries>
 
             <ContextMenu x:Key="FileContextMenu">
-                <MenuItem Header="{x:Static prop:Resources.ViewChanges}" Command="{Binding DiffFile}"/>
-                <MenuItem Header="{x:Static prop:Resources.ViewFile}" Command="{Binding ViewFile}"/>
-                <MenuItem Header="{x:Static prop:Resources.ViewChangesInSolution}" Command="{Binding DiffFileWithWorkingDirectory}"/>
-                <MenuItem Header="{x:Static prop:Resources.OpenFileInSolution}" Command="{Binding OpenFileInWorkingDirectory}"/>
+                <MenuItem Header="{x:Static ghfvs:Resources.ViewChanges}" Command="{Binding DiffFile}"/>
+                <MenuItem Header="{x:Static ghfvs:Resources.ViewFile}" Command="{Binding ViewFile}"/>
+                <MenuItem Header="{x:Static ghfvs:Resources.ViewChangesInSolution}" Command="{Binding DiffFileWithWorkingDirectory}"/>
+                <MenuItem Header="{x:Static ghfvs:Resources.OpenFileInSolution}" Command="{Binding OpenFileInWorkingDirectory}"/>
             </ContextMenu>
         </ResourceDictionary>
     </Control.Resources>
