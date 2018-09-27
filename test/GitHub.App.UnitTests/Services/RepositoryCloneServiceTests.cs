@@ -49,5 +49,25 @@ public class RepositoryCloneServiceTests
                 Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
+
+        [TestCase(@"c:\default\repo", @"c:\default", 1, nameof(UsageModel.MeasuresModel.NumberOfClonesToDefaultClonePath))]
+        [TestCase(@"c:\not_default\repo", @"c:\default", 0, nameof(UsageModel.MeasuresModel.NumberOfClonesToDefaultClonePath))]
+        public async Task UpdatesMetricsWhenDefaultClonePath(string targetPath, string defaultPath, int numberOfCalls, string counterName)
+        {
+            var serviceProvider = Substitutes.ServiceProvider;
+            var operatingSystem = serviceProvider.GetOperatingSystem();
+            var vsGitServices = serviceProvider.GetVSGitServices();
+            vsGitServices.GetLocalClonePathFromGitProvider().Returns(defaultPath);
+            var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
+            var usageTracker = Substitute.For<IUsageTracker>();
+            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, graphqlFactory, usageTracker);
+
+            await cloneService.CloneRepository("https://github.com/foo/bar", targetPath);
+            var model = UsageModel.Create(Guid.NewGuid());
+
+            await usageTracker.Received(numberOfCalls).IncrementCounter(
+                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
+                    ((MemberExpression)x.Body).Member.Name == counterName));
+        }
     }
 }
