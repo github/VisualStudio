@@ -797,7 +797,7 @@ namespace GitHub.InlineReviews.Services
                                                   DatabaseId = run.DatabaseId.Value,
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
-                                                  Summary = run.Summary
+                                                  Summary = run.Summary,
                                                   Annotations = run.Annotations(null, null, null, null).AllPages()
                                                       .Select(annotation => new CheckRunAnnotationModel
                                                       {
