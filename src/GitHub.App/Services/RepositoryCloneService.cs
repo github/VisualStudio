@@ -135,6 +135,12 @@ namespace GitHub.Services
                     // If it isn't a GitHub URL, assume it's an Enterprise URL
                     await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
                 }
+
+                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Count the number of times users clone into the Default Repository Location
+                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
+                }
             }
             catch (Exception ex)
             {
