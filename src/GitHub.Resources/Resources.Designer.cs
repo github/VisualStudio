@@ -2181,6 +2181,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You have already cloned to this location. Click &apos;Open&apos; to open the local repository..
+        /// </summary>
+        public static string YouHaveAlreadyClonedToThisLocation {
+            get {
+                return ResourceManager.GetString("YouHaveAlreadyClonedToThisLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must commit and push your changes to add a comment here..
         /// </summary>
         public static string YouMustCommitAndPushYourChangesToAddACommentHere {

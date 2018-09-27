@@ -267,6 +267,8 @@ namespace GitHub.ViewModels.Dialog.Clone
                         {
                             return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, localUrl);
                         }
+
+                        return Resources.YouHaveAlreadyClonedToThisLocation;
                     }
                 }
             }

@@ -833,4 +833,7 @@ https://git-scm.com/download/win</value>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
     <value>Local repository has a remote of {0}.</value>
   </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
+  </data>
 </root>
