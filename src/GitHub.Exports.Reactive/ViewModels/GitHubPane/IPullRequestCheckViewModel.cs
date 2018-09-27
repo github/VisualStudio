@@ -35,6 +35,9 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
 
         ReactiveCommand<object> OpenDetailsUrl { get; }
+
+        string AvatarUrl { get; }
+        BitmapImage Avatar { get; }
     }
 
     public enum PullRequestCheckStatus
