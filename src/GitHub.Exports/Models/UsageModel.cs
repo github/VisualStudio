@@ -93,6 +93,7 @@ namespace GitHub.Models
             public int NumberOfEnterpriseClones { get; set; }
             public int NumberOfGitHubOpens { get; set; }
             public int NumberOfEnterpriseOpens { get; set; }
+            public int NumberOfClonesToDefaultClonePath { get; set; }
         }
     }
 }

@@ -173,6 +173,12 @@ namespace GitHub.Services
             {
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
+
+                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Count the number of times users clone into the Default Repository Location
+                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
+                }
             }
             catch (Exception ex)
             {
