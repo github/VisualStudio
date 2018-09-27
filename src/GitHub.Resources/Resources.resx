@@ -824,4 +824,13 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
   </data>
+  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+    <value>Can't find a repository at local path.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>Local repository doesn't have a remote named "origin".</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>Local repository has a remote of {0}.</value>
+  </data>
 </root>

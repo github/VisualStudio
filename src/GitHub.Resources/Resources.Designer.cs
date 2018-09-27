@@ -250,6 +250,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find a repository at local path..
+        /// </summary>
+        public static string CantFindARepositoryAtLocalPath {
+            get {
+                return ResourceManager.GetString("CantFindARepositoryAtLocalPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changes ({0}).
         /// </summary>
         public static string ChangesCountFormat {
@@ -870,6 +879,24 @@ namespace GitHub {
         public static string localPathText {
             get {
                 return ResourceManager.GetString("localPathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local repository doesn&apos;t have a remote named &quot;origin&quot;..
+        /// </summary>
+        public static string LocalRepositoryDoesntHaveARemoteOrigin {
+            get {
+                return ResourceManager.GetString("LocalRepositoryDoesntHaveARemoteOrigin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local repository has a remote of {0}..
+        /// </summary>
+        public static string LocalRepositoryHasARemoteOf {
+            get {
+                return ResourceManager.GetString("LocalRepositoryHasARemoteOf", resourceCulture);
             }
         }
         

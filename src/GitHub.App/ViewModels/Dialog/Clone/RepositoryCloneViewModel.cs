@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
@@ -253,19 +253,19 @@ namespace GitHub.ViewModels.Dialog.Clone
                     {
                         if (repository == null)
                         {
-                            return $"Can't find a repository at local path";
+                            return Resources.CantFindARepositoryAtLocalPath;
                         }
 
                         var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
                         if (localUrl == null)
                         {
-                            return $"Local repository doesn't have an 'origin' remote";
+                            return Resources.LocalRepositoryDoesntHaveARemoteOrigin;
                         }
 
                         var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
                         if (localUrl != targetUrl)
                         {
-                            return $"Local repository has a remote of {localUrl}";
+                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, localUrl);
                         }
                     }
                 }
