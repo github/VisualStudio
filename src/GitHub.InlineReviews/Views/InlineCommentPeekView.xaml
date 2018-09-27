@@ -104,9 +104,11 @@
         <ScrollViewer Name="threadScroller"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubPeekViewBackground}">
-            <Grid>
-                <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
-            </Grid>
+            <StackPanel Orientation="Vertical">
+                <Grid>
+                    <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
+                </Grid>
+            </StackPanel>
         </ScrollViewer>
     </DockPanel>
 </UserControl>

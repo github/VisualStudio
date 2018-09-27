@@ -181,13 +181,17 @@ namespace GitHub.InlineReviews.ViewModels
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
 
+            var annotationModels = file.InlineAnnotations?.Where(model => model.EndLine - 1 == lineNumber)
+                .Select(model => new InlineAnnotationViewModel(model))
+                .ToArray();
+
             if (thread != null)
             {
-                Thread = new InlineCommentThreadViewModel(commentService, session, thread.Comments);
+                Thread = new InlineCommentThreadViewModel(commentService, session, annotationModels, thread.Comments);
             }
             else
             {
-                Thread = new NewInlineCommentThreadViewModel(commentService, session, file, lineNumber, leftBuffer);
+                Thread = new NewInlineCommentThreadViewModel(commentService, session, annotationModels, file, lineNumber, leftBuffer);
             }
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))

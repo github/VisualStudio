@@ -35,6 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
         static readonly Regex pullNewReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/new");
         static readonly Regex pullUserReviewsUri = CreateRoute("/:owner/:repo/pull/:number/reviews/:login");
+        static readonly Regex pullCheckRunsUri = CreateRoute("/:owner/:repo/pull/:number/checkruns/:id");
 
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
@@ -265,6 +266,15 @@ namespace GitHub.ViewModels.GitHubPane
                 var login = match.Groups["login"].Value;
                 await ShowPullRequestReviews(owner, repo, number, login);
             }
+            else if ((match = pullCheckRunsUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                var id = int.Parse(match.Groups["id"].Value);
+
+                await ShowPullRequestCheckRun(owner, repo, number, id);
+            }
             else
             {
                 throw new NotSupportedException("Unrecognised GitHub pane URL: " + uri.AbsolutePath);
@@ -316,6 +326,20 @@ namespace GitHub.ViewModels.GitHubPane
                      x.LocalRepository.Name == repo &&
                      x.PullRequestNumber == number &&
                      x.User.Login == login);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowPullRequestCheckRun(string owner, string repo, int number, int checkRunId)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            return NavigateTo<IPullRequestAnnotationsViewModel>(
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, checkRunId),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestNumber == number &&
+                     x.CheckRunId == checkRunId);
         }
 
         /// <inheritdoc/>

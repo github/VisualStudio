@@ -98,6 +98,23 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+            PullRequestDetailModel pullRequest,
+            string relativePath)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            return pullRequest.CheckSuites
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                .SelectMany(arg =>
+                    arg.checkRun.Annotations
+                        .Where(annotation => annotation.Path == relativePath)
+                        .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
+                .OrderBy(tuple => tuple.StartLine)
+                .ToArray();
+        }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
             PullRequestDetailModel pullRequest,
             string relativePath,
@@ -357,6 +374,10 @@ namespace GitHub.InlineReviews.Services
 
             result.Statuses = lastCommitModel.Statuses;
             result.CheckSuites = lastCommitModel.CheckSuites;
+            foreach (var checkSuite in result.CheckSuites)
+            {
+                checkSuite.HeadSha = lastCommitModel.HeadSha;
+            }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -764,6 +785,7 @@ namespace GitHub.InlineReviews.Services
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
+                                  HeadSha = commit.Commit.Oid,
                                   CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                       .Select(suite => new CheckSuiteModel
                                       {
@@ -772,10 +794,22 @@ namespace GitHub.InlineReviews.Services
                                               {
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
+                                                  DatabaseId = run.DatabaseId.Value,
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary
-                                              }).ToList()
+                                                  Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                      .Select(annotation => new CheckRunAnnotationModel
+                                                      {
+                                                          Title = annotation.Title,
+                                                          Message = annotation.Message,
+                                                          Path = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.Value.FromGraphQl(),
+                                                          StartLine = annotation.Location.Start.Line,
+                                                          EndLine = annotation.Location.End.Line,
+                                                      }).ToList()
+                                              }).ToList(),
+                                          ApplicationName = suite.App.Name,
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
@@ -922,6 +956,8 @@ namespace GitHub.InlineReviews.Services
             public List<CheckSuiteModel> CheckSuites { get; set; }
 
             public List<StatusModel> Statuses { get; set; }
+
+            public string HeadSha { get; set; }
         }
     }   
 }

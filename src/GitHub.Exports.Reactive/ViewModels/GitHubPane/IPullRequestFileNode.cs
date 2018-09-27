@@ -33,5 +33,20 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the number of review comments on the file.
         /// </summary>
         int CommentCount { get; }
+
+        /// <summary>
+        /// Gets or sets the number of annotation notices on the file.
+        /// </summary>
+        int AnnotationNoticeCount { get; }
+
+        /// <summary>
+        /// Gets or sets the number of annotation errors on the file.
+        /// </summary>
+        int AnnotationWarningCount { get; }
+
+        /// <summary>
+        /// Gets or sets the number of annotation failures on the file.
+        /// </summary>
+        int AnnotationFailureCount { get; }
     }
 }

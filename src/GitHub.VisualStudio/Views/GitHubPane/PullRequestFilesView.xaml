@@ -102,6 +102,57 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationNoticeCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <ghfvs:OcticonImage Icon="alert" Height="10" Margin="-2 0"/>
+                        <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationNotice, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding AnnotationNoticeCount, Mode=OneWay}"/>
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationWarningCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <ghfvs:OcticonImage Icon="alert" Height="10" Margin="-2 0"/>
+                        <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationWarning, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding AnnotationWarningCount, Mode=OneWay}"/>
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationFailureCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <ghfvs:OcticonImage Icon="x" Height="10" Margin="-2 0"/>
+                        <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationFailure, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding AnnotationFailureCount, Mode=OneWay}"/>
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
                                     <DataTrigger Binding="{Binding CommentCount}" Value="0">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>

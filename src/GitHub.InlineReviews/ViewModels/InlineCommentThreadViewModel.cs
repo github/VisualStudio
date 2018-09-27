@@ -21,10 +21,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
+        /// <param name="annotations">The annotations to display in this inline review.</param>
         /// <param name="comments">The comments to display in this inline review.</param>
         public InlineCommentThreadViewModel(ICommentService commentService, IPullRequestSession session,
+            InlineAnnotationViewModel[] annotations,
             IEnumerable<InlineCommentModel> comments)
-            : base(session.User)
+            : base(session.User, annotations)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 

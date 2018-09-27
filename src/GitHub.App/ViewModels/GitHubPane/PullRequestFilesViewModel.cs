@@ -66,6 +66,32 @@ namespace GitHub.ViewModels.GitHubPane
                     await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
                 }
             });
+
+            OpenFirstAnnotationNotice = ReactiveCommand.CreateAsyncTask(async x =>
+            {
+                await OpenFirstAnnotation(editorService, (IPullRequestFileNode) x, CheckAnnotationLevel.Notice);
+            });
+
+            OpenFirstAnnotationWarning = ReactiveCommand.CreateAsyncTask(async x =>
+            {
+                await OpenFirstAnnotation(editorService, (IPullRequestFileNode) x, CheckAnnotationLevel.Warning);
+            });
+
+            OpenFirstAnnotationFailure = ReactiveCommand.CreateAsyncTask(async x =>
+            {
+                await OpenFirstAnnotation(editorService, (IPullRequestFileNode) x, CheckAnnotationLevel.Failure);
+            });
+        }
+
+        private async Task OpenFirstAnnotation(IPullRequestEditorService editorService, IPullRequestFileNode file,
+            CheckAnnotationLevel checkAnnotationLevel)
+        {
+            var annotationModel = await GetFirstAnnotation(file, checkAnnotationLevel);
+
+            if (annotationModel != null)
+            {
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, annotationModel.EndLine);
+            }
         }
 
         /// <inheritdoc/>
@@ -123,6 +149,18 @@ namespace GitHub.ViewModels.GitHubPane
                     {
                         subscriptions.Add(file.WhenAnyValue(x => x.InlineCommentThreads)
                             .Subscribe(x => node.CommentCount = CountComments(x, filter)));
+
+                        subscriptions.Add(file.WhenAnyValue(x => x.InlineAnnotations)
+                            .Subscribe(x =>
+                            {
+                                var noticeCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Notice);
+                                var warningCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+                                var failureCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+
+                                node.AnnotationNoticeCount = noticeCount;
+                                node.AnnotationWarningCount = warningCount;
+                                node.AnnotationFailureCount = failureCount;
+                            }));
                     }
 
                     var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
@@ -148,6 +186,15 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> OpenFirstComment { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> OpenFirstAnnotationNotice { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> OpenFirstAnnotationWarning { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit> OpenFirstAnnotationFailure { get; }
 
         static int CountComments(
             IEnumerable<IInlineCommentThreadModel> thread,
@@ -199,6 +246,15 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             return threads.FirstOrDefault();
+        }
+
+        async Task<IInlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
+            CheckAnnotationLevel annotationLevel)
+        {
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
+            var annotations = sessionFile.InlineAnnotations;
+
+            return annotations.FirstOrDefault(model => model.AnnotationLevel == annotationLevel);
         }
 
         /// <summary>

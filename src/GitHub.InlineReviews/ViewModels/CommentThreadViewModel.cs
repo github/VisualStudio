@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using GitHub.Extensions;
@@ -21,8 +22,10 @@ namespace GitHub.InlineReviews.ViewModels
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
-        protected CommentThreadViewModel(ActorModel currentUser)
+        /// <param name="annotations"></param>
+        protected CommentThreadViewModel(ActorModel currentUser, IReadOnlyList<InlineAnnotationViewModel> annotations)
         {
+            Annotations = annotations;
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
             Comments = new ObservableCollection<ICommentViewModel>();
@@ -73,5 +76,8 @@ namespace GitHub.InlineReviews.ViewModels
 
         /// <inheritdoc/>
         public IActorViewModel CurrentUser { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
     }
 }

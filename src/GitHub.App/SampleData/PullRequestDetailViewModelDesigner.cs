@@ -122,8 +122,10 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
+        public ReactiveCommand<Unit> SyncSubmodules { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> ShowReview { get; }
+        public ReactiveCommand<object> ShowAnnotations { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 

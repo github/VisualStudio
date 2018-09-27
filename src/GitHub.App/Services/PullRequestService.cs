@@ -115,7 +115,8 @@ namespace GitHub.Services
                                                       {
                                                           Conclusion = run.Conclusion.FromGraphQl(),
                                                           Status = run.Status.FromGraphQl()
-                                                      }).ToList()
+                                                      }).ToList(),
+                                                  ApplicationName = suite.App.Name,
                                               }).ToList(),
                                           Statuses = commit.Commit.Status
                                                   .Select(context =>
@@ -1020,6 +1021,8 @@ namespace GitHub.Services
         class CheckSuiteSummaryModel
         {
             public List<CheckRunSummaryModel> CheckRuns { get; set; }
+
+            public string ApplicationName { get; set; }
         }
 
         class CheckRunSummaryModel

@@ -92,6 +92,15 @@ namespace GitHub.ViewModels.GitHubPane
         Task ShowPullRequest(string owner, string repo, int number);
 
         /// <summary>
+        /// Shows the details for a pull request's check run in the GitHub pane.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="repo">The repository name.</param>
+        /// <param name="number">The pull rqeuest number.</param>
+        /// <param name="checkRunId">The check run number.</param>
+        Task ShowPullRequestCheckRun(string owner, string repo, int number, int checkRunId);
+
+        /// <summary>
         /// Shows the pull requests reviews authored by a user.
         /// </summary>
         /// <param name="owner">The repository owner.</param>
